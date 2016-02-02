@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "czmq.h"
-#include "../../native/include/org_zeromq_czmq_Zsock.h"
+#include "org_zeromq_czmq_Zsock.h"
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1new (JNIEnv *env, jclass c, jint type)
@@ -145,6 +145,24 @@ Java_org_zeromq_czmq_Zsock__1_1newClient (JNIEnv *env, jclass c, jstring endpoin
     jlong new_client_ = (jlong) (intptr_t) zsock_new_client (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_client_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zsock__1_1newRadio (JNIEnv *env, jclass c, jstring endpoint)
+{
+    char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
+    jlong new_radio_ = (jlong) (intptr_t) zsock_new_radio (endpoint_);
+    (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
+    return new_radio_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zsock__1_1newDish (JNIEnv *env, jclass c, jstring endpoint)
+{
+    char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
+    jlong new_dish_ = (jlong) (intptr_t) zsock_new_dish (endpoint_);
+    (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
+    return new_dish_;
 }
 
 JNIEXPORT void JNICALL
@@ -287,6 +305,24 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1flush (JNIEnv *env, jclass c, jlong self)
 {
     zsock_flush ((zsock_t *) (intptr_t) self);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1join (JNIEnv *env, jclass c, jlong self, jstring group)
+{
+    char *group_ = (char *) (*env)->GetStringUTFChars (env, group, NULL);
+    jint join_ = (jint) zsock_join ((zsock_t *) (intptr_t) self, group_);
+    (*env)->ReleaseStringUTFChars (env, group, group_);
+    return join_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1leave (JNIEnv *env, jclass c, jlong self, jstring group)
+{
+    char *group_ = (char *) (*env)->GetStringUTFChars (env, group, NULL);
+    jint leave_ = (jint) zsock_leave ((zsock_t *) (intptr_t) self, group_);
+    (*env)->ReleaseStringUTFChars (env, group, group_);
+    return leave_;
 }
 
 JNIEXPORT jboolean JNICALL

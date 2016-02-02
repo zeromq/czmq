@@ -148,6 +148,22 @@ public class Zframe implements AutoCloseable{
         __setRoutingId (self, routingId);
     }
     /*
+    Return frame group of radio-dish pattern.
+    */
+    native static String __group (long self);
+    public String group () {
+        return __group (self);
+    }
+    /*
+    Set group on frame. This is used if/when the frame is sent to a
+    ZMQ_RADIO socket.                                              
+    Return -1 on error, 0 on success.                              
+    */
+    native static int __setGroup (long self, String group);
+    public int setGroup (String group) {
+        return __setGroup (self, group);
+    }
+    /*
     Return TRUE if two frames have identical size and data
     If either frame is NULL, equality is always false.    
     */

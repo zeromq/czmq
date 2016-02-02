@@ -249,6 +249,20 @@ void QmlZsock::flush () {
 };
 
 ///
+//  Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                 
+int QmlZsock::join (const QString &group) {
+    return zsock_join (self, group.toUtf8().data());
+};
+
+///
+//  Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                  
+int QmlZsock::leave (const QString &group) {
+    return zsock_leave (self, group.toUtf8().data());
+};
+
+///
 //  Get socket option `heartbeat_ivl`.
 int QmlZsock::heartbeatIvl () {
     return zsock_heartbeat_ivl (self);
@@ -1032,6 +1046,22 @@ QmlZsock *QmlZsockAttached::constructServer (const QString &endpoint) {
 QmlZsock *QmlZsockAttached::constructClient (const QString &endpoint) {
     QmlZsock *qmlSelf = new QmlZsock ();
     qmlSelf->self = zsock_new_client (endpoint.toUtf8().data());
+    return qmlSelf;
+};
+
+///
+//  Create a RADIO socket. Default action is bind.
+QmlZsock *QmlZsockAttached::constructRadio (const QString &endpoint) {
+    QmlZsock *qmlSelf = new QmlZsock ();
+    qmlSelf->self = zsock_new_radio (endpoint.toUtf8().data());
+    return qmlSelf;
+};
+
+///
+//  Create a DISH socket. Default action is connect.
+QmlZsock *QmlZsockAttached::constructDish (const QString &endpoint) {
+    QmlZsock *qmlSelf = new QmlZsock ();
+    qmlSelf->self = zsock_new_dish (endpoint.toUtf8().data());
     return qmlSelf;
 };
 

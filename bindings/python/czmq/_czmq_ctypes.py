@@ -2086,6 +2086,10 @@ lib.zframe_routing_id.restype = c_int
 lib.zframe_routing_id.argtypes = [zframe_p]
 lib.zframe_set_routing_id.restype = None
 lib.zframe_set_routing_id.argtypes = [zframe_p, c_int]
+lib.zframe_group.restype = c_char_p
+lib.zframe_group.argtypes = [zframe_p]
+lib.zframe_set_group.restype = c_int
+lib.zframe_set_group.argtypes = [zframe_p, c_char_p]
 lib.zframe_eq.restype = c_bool
 lib.zframe_eq.argtypes = [zframe_p, zframe_p]
 lib.zframe_reset.restype = None
@@ -2235,6 +2239,20 @@ Else returns zero.
 ZMQ_SERVER socket.
         """
         return lib.zframe_set_routing_id(self._as_parameter_, routing_id)
+
+    def group(self):
+        """
+        Return frame group of radio-dish pattern.
+        """
+        return lib.zframe_group(self._as_parameter_)
+
+    def set_group(self, group):
+        """
+        Set group on frame. This is used if/when the frame is sent to a
+ZMQ_RADIO socket.
+Return -1 on error, 0 on success.
+        """
+        return lib.zframe_set_group(self._as_parameter_, group)
 
     def eq(self, other):
         """
@@ -4526,6 +4544,10 @@ lib.zsock_new_server.restype = zsock_p
 lib.zsock_new_server.argtypes = [c_char_p]
 lib.zsock_new_client.restype = zsock_p
 lib.zsock_new_client.argtypes = [c_char_p]
+lib.zsock_new_radio.restype = zsock_p
+lib.zsock_new_radio.argtypes = [c_char_p]
+lib.zsock_new_dish.restype = zsock_p
+lib.zsock_new_dish.argtypes = [c_char_p]
 lib.zsock_bind.restype = c_int
 lib.zsock_bind.argtypes = [zsock_p, c_char_p]
 lib.zsock_endpoint.restype = c_char_p
@@ -4564,6 +4586,10 @@ lib.zsock_wait.restype = c_int
 lib.zsock_wait.argtypes = [zsock_p]
 lib.zsock_flush.restype = None
 lib.zsock_flush.argtypes = [zsock_p]
+lib.zsock_join.restype = c_int
+lib.zsock_join.argtypes = [zsock_p, c_char_p]
+lib.zsock_leave.restype = c_int
+lib.zsock_leave.argtypes = [zsock_p, c_char_p]
 lib.zsock_is.restype = c_bool
 lib.zsock_is.argtypes = [c_void_p]
 lib.zsock_resolve.restype = c_void_p
@@ -4912,6 +4938,20 @@ action is connect.
         """
         return Zsock(lib.zsock_new_client(endpoint), False)
 
+    @staticmethod
+    def new_radio(endpoint):
+        """
+        Create a RADIO socket. Default action is bind.
+        """
+        return Zsock(lib.zsock_new_radio(endpoint), False)
+
+    @staticmethod
+    def new_dish(endpoint):
+        """
+        Create a DISH socket. Default action is connect.
+        """
+        return Zsock(lib.zsock_new_dish(endpoint), False)
+
     def bind(self, format, *args):
         """
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
@@ -5151,6 +5191,20 @@ discard it. This is useful when reading partial messages, to get specific
 message types.
         """
         return lib.zsock_flush(self._as_parameter_)
+
+    def join(self, group):
+        """
+        Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+Returns 0 if OK, -1 if failed.
+        """
+        return lib.zsock_join(self._as_parameter_, group)
+
+    def leave(self, group):
+        """
+        Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+Returns 0 if OK, -1 if failed.
+        """
+        return lib.zsock_leave(self._as_parameter_, group)
 
     @staticmethod
     def is_(self):

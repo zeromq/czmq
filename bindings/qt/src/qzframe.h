@@ -77,6 +77,14 @@ public:
     //  ZMQ_SERVER socket.                                                  
     void setRoutingId (quint32 routingId);
 
+    //  Return frame group of radio-dish pattern.
+    const QString group ();
+
+    //  Set group on frame. This is used if/when the frame is sent to a
+    //  ZMQ_RADIO socket.                                              
+    //  Return -1 on error, 0 on success.                              
+    int setGroup (const QString &group);
+
     //  Return TRUE if two frames have identical size and data
     //  If either frame is NULL, equality is always false.    
     bool eq (QZframe *other);

@@ -7,7 +7,7 @@ find_package (JNI REQUIRED)
 find_library (ZMQ_LIBRARY NAMES zmq libzmq REQUIRED)
 find_library (CZMQ_LIBRARY NAMES czmq REQUIRED)
 
-include_directories (${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} src/native/include)
+include_directories (${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} ../../include src/native/include)
 
 set (czmqjni_sources
     src/main/c/org_zeromq_czmq_Zarmour.c
@@ -37,6 +37,7 @@ set (czmqjni_sources
 )
 
 add_library (czmqjni SHARED ${czmqjni_sources})
+add_definitions (-DCZMQ_BUILD_DRAFT_API)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O2")
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)

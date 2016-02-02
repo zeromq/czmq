@@ -293,6 +293,22 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
+      begin # DRAFT method
+        attach_function :zframe_group, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function group() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zframe_set_group, [:pointer, :string], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_group() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zframe_reset, [:pointer, :pointer, :size_t], :void, **opts
       attach_function :zframe_print, [:pointer, :string], :void, **opts
@@ -717,6 +733,22 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
+      begin # DRAFT method
+        attach_function :zsock_new_radio, [:string], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function new_radio() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_new_dish, [:string], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function new_dish() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_endpoint, [:pointer], :string, **opts
@@ -751,6 +783,22 @@ module CZMQ
       attach_function :zsock_signal, [:pointer, :char], :int, **opts
       attach_function :zsock_wait, [:pointer], :int, **opts
       attach_function :zsock_flush, [:pointer], :void, **opts
+      begin # DRAFT method
+        attach_function :zsock_join, [:pointer, :string], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function join() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_leave, [:pointer, :string], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function leave() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
       begin # DRAFT method

@@ -155,6 +155,24 @@ void QZframe::setRoutingId (quint32 routingId)
 }
 
 ///
+//  Return frame group of radio-dish pattern.
+const QString QZframe::group ()
+{
+    const QString rv = QString (zframe_group (self));
+    return rv;
+}
+
+///
+//  Set group on frame. This is used if/when the frame is sent to a
+//  ZMQ_RADIO socket.                                              
+//  Return -1 on error, 0 on success.                              
+int QZframe::setGroup (const QString &group)
+{
+    int rv = zframe_set_group (self, group.toUtf8().data());
+    return rv;
+}
+
+///
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    
 bool QZframe::eq (QZframe *other)

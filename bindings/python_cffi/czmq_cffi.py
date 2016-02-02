@@ -1068,6 +1068,16 @@ uint32_t
 void
     zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
 
+// Return frame group of radio-dish pattern.
+const char *
+    zframe_group (zframe_t *self);
+
+// Set group on frame. This is used if/when the frame is sent to a
+// ZMQ_RADIO socket.                                              
+// Return -1 on error, 0 on success.                              
+int
+    zframe_set_group (zframe_t *self, const char *group);
+
 // Return TRUE if two frames have identical size and data
 // If either frame is NULL, equality is always false.    
 bool
@@ -2311,6 +2321,14 @@ zsock_t *
 zsock_t *
     zsock_new_client (const char *endpoint);
 
+// Create a RADIO socket. Default action is bind.
+zsock_t *
+    zsock_new_radio (const char *endpoint);
+
+// Create a DISH socket. Default action is connect.
+zsock_t *
+    zsock_new_dish (const char *endpoint);
+
 // Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
 // ephemeral ports, if you specify the port number as "*". By default      
 // zsock uses the IANA designated range from C000 (49152) to FFFF (65535). 
@@ -2512,6 +2530,16 @@ int
 // message types.                                                           
 void
     zsock_flush (void *self);
+
+// Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+// Returns 0 if OK, -1 if failed.                                 
+int
+    zsock_join (void *self, const char *group);
+
+// Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+// Returns 0 if OK, -1 if failed.                                  
+int
+    zsock_leave (void *self, const char *group);
 
 // Probe the supplied object, and report if it looks like a zsock_t.
 // Takes a polymorphic socket reference.                            

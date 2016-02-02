@@ -211,6 +211,14 @@ public slots:
     //  message types.                                                           
     void flush ();
 
+    //  Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+    //  Returns 0 if OK, -1 if failed.                                 
+    int join (const QString &group);
+
+    //  Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+    //  Returns 0 if OK, -1 if failed.                                  
+    int leave (const QString &group);
+
     //  Get socket option `heartbeat_ivl`.
     int heartbeatIvl ();
 
@@ -586,6 +594,12 @@ public slots:
 
     //  Create a CLIENT socket. Default action is connect.
     QmlZsock *constructClient (const QString &endpoint);
+
+    //  Create a RADIO socket. Default action is bind.
+    QmlZsock *constructRadio (const QString &endpoint);
+
+    //  Create a DISH socket. Default action is connect.
+    QmlZsock *constructDish (const QString &endpoint);
 
     //  Destroy the socket. You must use this for any socket created via the
     //  zsock_new method.                                                   
