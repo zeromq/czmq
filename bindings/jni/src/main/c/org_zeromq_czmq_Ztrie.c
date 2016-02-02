@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "czmq.h"
-#include "../../native/include/org_zeromq_czmq_Ztrie.h"
+#include "org_zeromq_czmq_Ztrie.h"
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Ztrie__1_1new (JNIEnv *env, jclass c, jchar delimiter)

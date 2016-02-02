@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "czmq.h"
-#include "../../native/include/org_zeromq_czmq_Zclock.h"
+#include "org_zeromq_czmq_Zclock.h"
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zclock__1_1sleep (JNIEnv *env, jclass c, jint msecs)

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "czmq.h"
-#include "../../native/include/org_zeromq_czmq_Zsock.h"
+#include "org_zeromq_czmq_Zsock.h"
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1new (JNIEnv *env, jclass c, jint type)

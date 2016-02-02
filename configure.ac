@@ -429,7 +429,7 @@ if test "x$cross_compiling" = "xyes"; then
 else
     # enable draft API by default if we're in a git repository
     # else disable it by default; then allow --enable-drafts=yes/no override
-    AC_CHECK_FILE(.git, [gitmaster=yes], [gitmaster=no])
+    AC_CHECK_FILE($srcdir/.git, [gitmaster=yes], [gitmaster=no])
 fi
 
 AC_ARG_ENABLE([drafts],
