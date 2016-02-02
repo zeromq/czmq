@@ -97,6 +97,16 @@
         <argument name = "endpoint" type = "string" />
     </constructor>
 
+    <constructor name = "new radio" state = "draft">
+        Create a RADIO socket. Default action is bind.
+        <argument name = "endpoint" type = "string" />
+    </constructor>
+
+    <constructor name = "new dish" state = "draft">
+        Create a DISH socket. Default action is connect.
+        <argument name = "endpoint" type = "string" />
+    </constructor>
+
     <method name = "bind">
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
         ephemeral ports, if you specify the port number as "*". By default
@@ -329,6 +339,20 @@
         If there is a partial message still waiting on the socket, remove and
         discard it. This is useful when reading partial messages, to get specific
         message types.
+    </method>
+
+    <method name = "join" state = "draft"  polymorphic = "1">
+        Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+        Returns 0 if OK, -1 if failed.
+        <argument name = "group" type = "string" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "leave" state = "draft"  polymorphic = "1">
+        Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+        Returns 0 if OK, -1 if failed.
+        <argument name = "group" type = "string" />
+        <return type = "integer" />
     </method>
 
     <method name = "is" singleton = "1">

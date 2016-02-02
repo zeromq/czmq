@@ -133,6 +133,18 @@ CZMQ_EXPORT uint32_t
 CZMQ_EXPORT void
     zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
 
+//  *** Draft method, for development use, may change without warning ***
+//  Return frame group of radio-dish pattern.
+CZMQ_EXPORT const char *
+    zframe_group (zframe_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set group on frame. This is used if/when the frame is sent to a
+//  ZMQ_RADIO socket.                                              
+//  Return -1 on error, 0 on success.                              
+CZMQ_EXPORT int
+    zframe_set_group (zframe_t *self, const char *group);
+
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
 

@@ -37,6 +37,9 @@ struct _zframe_t {
     zmq_msg_t zmsg;             //  zmq_msg_t blob for frame
     int more;                   //  More flag, from last read
     uint32_t routing_id;        //  Routing ID back to sender, if any
+#ifdef ZMQ_GROUP_MAX_LENGTH
+    char group[ZMQ_GROUP_MAX_LENGTH + 1];
+#endif
 };
 
 //  --------------------------------------------------------------------------
@@ -132,6 +135,11 @@ zframe_recv (void *source)
     if (zsock_type (source) == ZMQ_SERVER)
         self->routing_id = zmq_msg_routing_id (&self->zmsg);
 #endif
+#if defined (ZMQ_DISH)
+    //  Grab group if we're reading from a DISH Socket (ZMQ 4.2 and later)
+    if (zsock_type (source) == ZMQ_DISH)
+        strcpy (self->group, zmq_msg_group (&self->zmsg));
+#endif
     return self;
 }
 
@@ -159,7 +167,12 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
             if (zmq_msg_copy (&copy, &self->zmsg))
                 return -1;
 #if defined (ZMQ_SERVER)
-            zmq_msg_set_routing_id (&copy, self->routing_id);
+            if (zsock_type (dest) == ZMQ_SERVER)
+                zmq_msg_set_routing_id (&copy, self->routing_id);
+#endif
+#if defined (ZMQ_RADIO)
+            if (zsock_type (dest) == ZMQ_RADIO)
+                zmq_msg_set_group (&copy, self->group);
 #endif
             if (zmq_sendmsg (handle, &copy, send_flags) == -1) {
                 zmq_msg_close (&copy);
@@ -168,7 +181,12 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
         }
         else {
 #if defined (ZMQ_SERVER)
-            zmq_msg_set_routing_id (&self->zmsg, self->routing_id);
+            if (zsock_type (dest) == ZMQ_SERVER)
+                zmq_msg_set_routing_id (&self->zmsg, self->routing_id);
+#endif
+#if defined (ZMQ_RADIO)
+            if (zsock_type (dest) == ZMQ_RADIO)
+                zmq_msg_set_group (&self->zmsg, self->group);
 #endif
             if (zmq_sendmsg (handle, &self->zmsg, send_flags) >= 0)
                 zframe_destroy (self_p);
@@ -339,6 +357,42 @@ zframe_set_routing_id (zframe_t *self, uint32_t routing_id)
     assert (self);
     assert (zframe_is (self));
     self->routing_id = routing_id;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return frame group of radio-dish pattern.
+const char *
+zframe_group (zframe_t *self)
+{
+    assert (self);
+#ifdef ZMQ_DISH
+    return self->group;
+#else
+    return NULL;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set group on frame. This is used if/when the frame is sent to a
+//  ZMQ_RADIO socket.
+//  Return -1 on error, 0 on success.
+int
+zframe_set_group (zframe_t *self, const char *group)
+{
+#ifdef ZMQ_RADIO
+    if (strlen(group) > ZMQ_GROUP_MAX_LENGTH) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    strcpy (self->group, group);
+    return 0;
+#else
+    errno = EINVAL;
+    return -1;
+#endif
 }
 
 
@@ -613,6 +667,37 @@ zframe_test (bool verbose)
 
     zsock_destroy (&client);
     zsock_destroy (&server);
+#endif
+
+#ifdef ZMQ_RADIO
+    //  Create radio and dish sockets and connect over inproc
+    zsock_t *radio = zsock_new_radio ("inproc://zframe-test-radio");
+    assert (radio);
+    zsock_t *dish = zsock_new_dish ("inproc://zframe-test-radio");
+    assert (dish);
+
+    //  Join the group
+    rc = zsock_join (dish, "World");
+    assert (rc == 0);
+
+    //  Publish message from radio
+    zframe_t *message = zframe_new ("Hello", 5);
+    assert (message);
+    rc = zframe_set_group (message, "World");
+    assert (rc == 0);
+    rc = zframe_send (&message, radio, 0);
+    assert (rc == 0);
+    assert (!message);
+
+    //  Receive the message from dish
+    message = zframe_recv (dish);
+    assert (message);
+    assert (zframe_streq (message, "Hello"));
+    assert (strcmp("World", zframe_group (message)) == 0);
+    zframe_destroy (&message);
+
+    zsock_destroy (&dish);
+    zsock_destroy (&radio);
 #endif
 
     //  @end

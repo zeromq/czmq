@@ -45,6 +45,18 @@ CZMQ_EXPORT void
     zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
 
 //  *** Draft method, defined for internal use only ***
+//  Return frame group of radio-dish pattern.
+CZMQ_EXPORT const char *
+    zframe_group (zframe_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set group on frame. This is used if/when the frame is sent to a
+//  ZMQ_RADIO socket.                                              
+//  Return -1 on error, 0 on success.                              
+CZMQ_EXPORT int
+    zframe_set_group (zframe_t *self, const char *group);
+
+//  *** Draft method, defined for internal use only ***
 //  By default the reactor stops if the process receives a SIGINT or SIGTERM 
 //  signal. This makes it impossible to shut-down message based architectures
 //  like zactors. This method lets you switch off break handling. The default
@@ -83,6 +95,16 @@ CZMQ_EXPORT zsock_t *
     zsock_new_client (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
+//  Create a RADIO socket. Default action is bind.
+CZMQ_EXPORT zsock_t *
+    zsock_new_radio (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
+//  Create a DISH socket. Default action is connect.
+CZMQ_EXPORT zsock_t *
+    zsock_new_dish (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.     
 CZMQ_EXPORT uint32_t
@@ -93,6 +115,18 @@ CZMQ_EXPORT uint32_t
 //  This will be used when sending messages on the socket via the zsock API.
 CZMQ_EXPORT void
     zsock_set_routing_id (zsock_t *self, uint32_t routing_id);
+
+//  *** Draft method, defined for internal use only ***
+//  Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                 
+CZMQ_EXPORT int
+    zsock_join (void *self, const char *group);
+
+//  *** Draft method, defined for internal use only ***
+//  Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                  
+CZMQ_EXPORT int
+    zsock_leave (void *self, const char *group);
 
 //  *** Draft method, defined for internal use only ***
 //  Get socket option `heartbeat_ivl`.
