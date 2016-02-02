@@ -397,6 +397,50 @@ zsock_new_client (const char *endpoints)
     return zsock_new_client_checked (endpoints, NULL, 0);
 }
 
+//  --------------------------------------------------------------------------
+//  Create a RADIO socket. Default action is bind.
+
+zsock_t *
+zsock_new_radio_checked (const char *endpoints, const char *filename, size_t line_nbr)
+{
+#if defined ZMQ_RADIO
+    zsock_t *sock = zsock_new_checked (ZMQ_RADIO, filename, line_nbr);
+    if (zsock_attach (sock, endpoints, true))
+        zsock_destroy (&sock);
+    return sock;
+#else
+    return NULL;
+#endif
+}
+
+zsock_t *
+zsock_new_radio (const char *endpoints)
+{
+    return zsock_new_radio_checked (endpoints, NULL, 0);
+}
+
+//  --------------------------------------------------------------------------
+//  Create a RADIO socket. Default action is connect.
+
+zsock_t *
+zsock_new_dish_checked (const char *endpoints, const char *filename, size_t line_nbr)
+{
+#if defined ZMQ_DISH
+    zsock_t *sock = zsock_new_checked (ZMQ_DISH, filename, line_nbr);
+    if (zsock_attach (sock, endpoints, false))
+        zsock_destroy (&sock);
+    return sock;
+#else
+    return NULL;
+#endif
+}
+
+zsock_t *
+zsock_new_dish (const char *endpoints)
+{
+    return zsock_new_dish_checked (endpoints, NULL, 0);
+}
+
 
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
@@ -1561,6 +1605,40 @@ zsock_flush (void *self)
         zmsg_t *msg = zmsg_recv (self);
         zmsg_destroy (&msg);
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.
+
+int
+zsock_join (void *self, const char *group)
+{
+    assert (self);
+#ifdef ZMQ_DISH
+    return zmq_join (zsock_resolve (self), group);
+#else
+    errno = EINVAL;
+    return -1;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.
+
+int
+zsock_leave (void *self, const char *group)
+{
+    assert (self);
+#ifdef ZMQ_DISH
+    return zmq_leave (zsock_resolve (self), group);
+#else
+    errno = EINVAL;
+    return -1;
+#endif
 }
 
 

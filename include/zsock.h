@@ -733,6 +733,16 @@ CZMQ_EXPORT zsock_t *
     zsock_new_client (const char *endpoint);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Create a RADIO socket. Default action is bind.
+CZMQ_EXPORT zsock_t *
+    zsock_new_radio (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Create a DISH socket. Default action is connect.
+CZMQ_EXPORT zsock_t *
+    zsock_new_dish (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.     
 CZMQ_EXPORT uint32_t
@@ -743,6 +753,18 @@ CZMQ_EXPORT uint32_t
 //  This will be used when sending messages on the socket via the zsock API.
 CZMQ_EXPORT void
     zsock_set_routing_id (zsock_t *self, uint32_t routing_id);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                 
+CZMQ_EXPORT int
+    zsock_join (void *self, const char *group);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                  
+CZMQ_EXPORT int
+    zsock_leave (void *self, const char *group);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get socket option `heartbeat_ivl`.
@@ -848,6 +870,12 @@ CZMQ_EXPORT zsock_t *
 
 CZMQ_EXPORT zsock_t *
     zsock_new_client_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_radio_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_dish_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
 #ifdef __cplusplus
 }
