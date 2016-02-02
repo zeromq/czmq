@@ -211,7 +211,9 @@
 //- Always include ZeroMQ headers -------------------------------------------
 
 #include "zmq.h"
-#include "zmq_utils.h"
+#if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4, 2, 0))
+#   include "zmq_utils.h"
+#endif
 
 //- Standard ANSI include files ---------------------------------------------
 
