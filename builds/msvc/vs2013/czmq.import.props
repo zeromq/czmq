@@ -12,13 +12,11 @@
   </PropertyGroup>
 
   <!-- User Interface -->
-
   <ItemGroup Label="BuildOptionsExtension">
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)czmq.import.xml" />
   </ItemGroup>
 
   <!-- Linkage -->
-
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\czmq\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -32,7 +30,6 @@
   </ItemDefinitionGroup>
 
   <!-- Copy -->
-
   <Target Name="Linkage-czmq-dynamic" AfterTargets="AfterBuild" Condition="'$(Linkage-czmq)' == 'dynamic'">
     <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"
           SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\$(PlatformToolset)\dynamic\libczmq.dll"
@@ -49,7 +46,6 @@
   </Target>
 
   <!-- Messages -->
-
   <Target Name="czmq-info" BeforeTargets="AfterBuild" Condition="'$(Linkage-czmq)' == 'dynamic'">
     <Message Text="Copying libczmq.dll -&gt; $(TargetDir)libczmq.dll" Importance="high"/>
     <Message Text="Copying libczmq.pdb -&gt; $(TargetDir)libczmq.pdb" Importance="high" Condition="$(Configuration.IndexOf('Debug')) != -1" />

@@ -14,7 +14,6 @@
   </PropertyGroup>
 
   <!-- Configuration -->
-
   <ItemDefinitionGroup>
     <PreBuildEvent>
       <Command>copy $(BuildRoot)platform.h $(RepoRoot)include\</Command>
@@ -34,29 +33,39 @@
   </ItemDefinitionGroup>
 
   <!-- Dependencies -->
-
   <ImportGroup Label="PropertySheets">
+    <Import Project="$(SolutionDir)libsodium.import.props" Condition="'$(HAVE_LIBSODIUM)'=='1'" />
     <Import Project="$(SolutionDir)libzmq.import.props" />
+    <Import Project="$(SolutionDir)uuid.import.props" Condition="'$(HAVE_UUID)'=='1'" />
   </ImportGroup>
 
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'dynamic'">
+    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">dynamic</Linkage-libsodium>
     <Linkage-libzmq>dynamic</Linkage-libzmq>
+    <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">dynamic</Linkage-uuid>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'ltcg'">
+    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">ltcg</Linkage-libsodium>
     <Linkage-libzmq>ltcg</Linkage-libzmq>
+    <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">ltcg</Linkage-uuid>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'static'">
+    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">static</Linkage-libsodium>
     <Linkage-libzmq>static</Linkage-libzmq>
+    <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">static</Linkage-uuid>
   </PropertyGroup>
 
   <!-- Messages -->
-
   <Target Name="CustomInfo" BeforeTargets="PrepareForBuild">
     <Message Text="Will copy $(BuildRoot)platform.h -&gt; $(RepoRoot)include\platform.h" Importance="high"/>
   </Target>
 
   <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">
-    <Message Text="Linkage-libzmq : $(Linkage-libzmq)" Importance="high"/>
+    <Message Text="Linkage-libsodium: $(Linkage-libsodium)" Importance="high" Condition="'$(HAVE_LIBSODIUM)'=='1'" />
+    <Message Text="Linkage-libzmq: $(Linkage-libzmq)" Importance="high" />
+    <Message Text="Linkage-uuid: $(Linkage-uuid)" Importance="high" Condition="'$(HAVE_UUID)'=='1'" />
   </Target>
 <!--
 ################################################################################
