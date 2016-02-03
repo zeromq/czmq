@@ -253,6 +253,18 @@ class Zactor(object):
         if self.allow_destruct:
             lib.zactor_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -388,6 +400,18 @@ class Zarmour(object):
         """
         if self.allow_destruct:
             lib.zarmour_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
 
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
@@ -565,6 +589,18 @@ class Zcert(object):
         if self.allow_destruct:
             lib.zcert_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -578,14 +614,14 @@ class Zcert(object):
         """
         Accepts public/secret key pair from caller
         """
-        return Zcert(lib.zcert_new_from(public_key, secret_key), False)
+        return Zcert(lib.zcert_new_from(public_key, secret_key), True)
 
     @staticmethod
     def load(filename):
         """
         Load certificate from file
         """
-        return Zcert(lib.zcert_load(filename), False)
+        return Zcert(lib.zcert_load(filename), True)
 
     def public_key(self):
         """
@@ -748,6 +784,18 @@ stored on disk.
         if self.allow_destruct:
             lib.zcertstore_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -875,6 +923,18 @@ allocated and left empty, and you can then add data using zchunk_append.
         """
         if self.allow_destruct:
             lib.zchunk_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
 
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
@@ -1070,6 +1130,18 @@ class Zclock(object):
     """
 
     allow_destruct = False
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -1218,6 +1290,18 @@ class Zconfig(object):
         if self.allow_destruct:
             lib.zconfig_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -1233,7 +1317,7 @@ class Zconfig(object):
 reference for the root, if the file exists and is readable. Returns NULL
 if the file does not exist.
         """
-        return Zconfig(lib.zconfig_load(filename), False)
+        return Zconfig(lib.zconfig_load(filename), True)
 
     @staticmethod
     def loadf(format, *args):
@@ -1241,7 +1325,7 @@ if the file does not exist.
         Equivalent to zconfig_load, taking a format string instead of a fixed
 filename.
         """
-        return Zconfig(lib.zconfig_loadf(format, *args), False)
+        return Zconfig(lib.zconfig_loadf(format, *args), True)
 
     def name(self):
         """
@@ -1462,6 +1546,18 @@ digest by repeatedly calling zdigest_update() on chunks of data.
         if self.allow_destruct:
             lib.zdigest_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -1566,6 +1662,18 @@ loads only the top-level directory, and does not use parent as a path.
         """
         if self.allow_destruct:
             lib.zdir_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
 
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
@@ -1751,6 +1859,18 @@ class ZdirPatch(object):
         if self.allow_destruct:
             lib.zdir_patch_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -1891,6 +2011,18 @@ may be NULL, in which case it is not used.
         """
         if self.allow_destruct:
             lib.zfile_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
 
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
@@ -2134,6 +2266,18 @@ size octets from the specified data into the frame body.
         if self.allow_destruct:
             lib.zframe_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -2147,14 +2291,14 @@ size octets from the specified data into the frame body.
         """
         Create an empty (zero-sized) frame
         """
-        return Zframe(lib.zframe_new_empty(), False)
+        return Zframe(lib.zframe_new_empty(), True)
 
     @staticmethod
     def from_(string):
         """
         Create a frame with a specified string content.
         """
-        return Zframe(lib.zframe_from(string), False)
+        return Zframe(lib.zframe_from(string), True)
 
     @staticmethod
     def recv(source):
@@ -2163,7 +2307,7 @@ size octets from the specified data into the frame body.
 was interrupted. Does a blocking recv, if you want to not block then use
 zpoller or zloop.
         """
-        return Zframe(lib.zframe_recv(source), False)
+        return Zframe(lib.zframe_recv(source), True)
 
     @staticmethod
     def send(self_p, dest, flags):
@@ -2367,6 +2511,18 @@ class Zhash(object):
         if self.allow_destruct:
             lib.zhash_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -2382,7 +2538,7 @@ class Zhash(object):
 defined by zhash_pack. Hash table is set to autofree. An empty frame
 unpacks to an empty hash table.
         """
-        return Zhash(lib.zhash_unpack(frame), False)
+        return Zhash(lib.zhash_unpack(frame), True)
 
     def insert(self, key, item):
         """
@@ -2660,6 +2816,18 @@ class Zhashx(object):
         if self.allow_destruct:
             lib.zhashx_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -2675,7 +2843,7 @@ class Zhashx(object):
 defined by zhashx_pack. Hash table is set to autofree. An empty frame
 unpacks to an empty hash table.
         """
-        return Zhashx(lib.zhashx_unpack(frame), False)
+        return Zhashx(lib.zhashx_unpack(frame), True)
 
     def insert(self, key, item):
         """
@@ -2980,6 +3148,18 @@ class Ziflist(object):
         if self.allow_destruct:
             lib.ziflist_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -3117,6 +3297,18 @@ class Zlist(object):
         """
         if self.allow_destruct:
             lib.zlist_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
 
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
@@ -3362,6 +3554,18 @@ list are automatically destroyed as well.
         """
         if self.allow_destruct:
             lib.zlistx_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
 
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
@@ -3650,6 +3854,18 @@ class Zloop(object):
         if self.allow_destruct:
             lib.zloop_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -3903,6 +4119,18 @@ class Zmsg(object):
         if self.allow_destruct:
             lib.zmsg_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -3919,7 +4147,7 @@ was interrupted. Does a blocking recv. If you want to not block then use
 the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
 before receiving.
         """
-        return Zmsg(lib.zmsg_recv(source), False)
+        return Zmsg(lib.zmsg_recv(source), True)
 
     @staticmethod
     def load(file):
@@ -3927,7 +4155,7 @@ before receiving.
         Load/append an open file into new message, return the message.
 Returns NULL if the message could not be loaded.
         """
-        return Zmsg(lib.zmsg_load(coerce_py_file(file)), False)
+        return Zmsg(lib.zmsg_load(coerce_py_file(file)), True)
 
     @staticmethod
     def decode(buffer, buffer_size):
@@ -3936,7 +4164,7 @@ Returns NULL if the message could not be loaded.
 a new zmsg_t object. Returns NULL if the buffer was badly formatted or
 there was insufficient memory to work.
         """
-        return Zmsg(lib.zmsg_decode(buffer, buffer_size), False)
+        return Zmsg(lib.zmsg_decode(buffer, buffer_size), True)
 
     @staticmethod
     def new_signal(status):
@@ -3945,7 +4173,7 @@ there was insufficient memory to work.
 message carrying a 1-byte success/failure code (by convention, 0 means
 OK). Signals are encoded to be distinguishable from "normal" messages.
         """
-        return Zmsg(lib.zmsg_new_signal(status), False)
+        return Zmsg(lib.zmsg_new_signal(status), True)
 
     @staticmethod
     def send(self_p, dest):
@@ -4221,6 +4449,18 @@ zactor_t instance, a libzmq socket (void *), or a file handle.
         if self.allow_destruct:
             lib.zpoller_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -4334,6 +4574,18 @@ class Zproc(object):
     """
 
     allow_destruct = False
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -4831,6 +5083,18 @@ zsock_new method.
         if self.allow_destruct:
             lib.zsock_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -4844,7 +5108,7 @@ zsock_new method.
         """
         Create a PUB socket. Default action is bind.
         """
-        return Zsock(lib.zsock_new_pub(endpoint), False)
+        return Zsock(lib.zsock_new_pub(endpoint), True)
 
     @staticmethod
     def new_sub(endpoint, subscribe):
@@ -4852,105 +5116,105 @@ zsock_new method.
         Create a SUB socket, and optionally subscribe to some prefix string. Default
 action is connect.
         """
-        return Zsock(lib.zsock_new_sub(endpoint, subscribe), False)
+        return Zsock(lib.zsock_new_sub(endpoint, subscribe), True)
 
     @staticmethod
     def new_req(endpoint):
         """
         Create a REQ socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_req(endpoint), False)
+        return Zsock(lib.zsock_new_req(endpoint), True)
 
     @staticmethod
     def new_rep(endpoint):
         """
         Create a REP socket. Default action is bind.
         """
-        return Zsock(lib.zsock_new_rep(endpoint), False)
+        return Zsock(lib.zsock_new_rep(endpoint), True)
 
     @staticmethod
     def new_dealer(endpoint):
         """
         Create a DEALER socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_dealer(endpoint), False)
+        return Zsock(lib.zsock_new_dealer(endpoint), True)
 
     @staticmethod
     def new_router(endpoint):
         """
         Create a ROUTER socket. Default action is bind.
         """
-        return Zsock(lib.zsock_new_router(endpoint), False)
+        return Zsock(lib.zsock_new_router(endpoint), True)
 
     @staticmethod
     def new_push(endpoint):
         """
         Create a PUSH socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_push(endpoint), False)
+        return Zsock(lib.zsock_new_push(endpoint), True)
 
     @staticmethod
     def new_pull(endpoint):
         """
         Create a PULL socket. Default action is bind.
         """
-        return Zsock(lib.zsock_new_pull(endpoint), False)
+        return Zsock(lib.zsock_new_pull(endpoint), True)
 
     @staticmethod
     def new_xpub(endpoint):
         """
         Create an XPUB socket. Default action is bind.
         """
-        return Zsock(lib.zsock_new_xpub(endpoint), False)
+        return Zsock(lib.zsock_new_xpub(endpoint), True)
 
     @staticmethod
     def new_xsub(endpoint):
         """
         Create an XSUB socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_xsub(endpoint), False)
+        return Zsock(lib.zsock_new_xsub(endpoint), True)
 
     @staticmethod
     def new_pair(endpoint):
         """
         Create a PAIR socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_pair(endpoint), False)
+        return Zsock(lib.zsock_new_pair(endpoint), True)
 
     @staticmethod
     def new_stream(endpoint):
         """
         Create a STREAM socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_stream(endpoint), False)
+        return Zsock(lib.zsock_new_stream(endpoint), True)
 
     @staticmethod
     def new_server(endpoint):
         """
         Create a SERVER socket. Default action is bind.
         """
-        return Zsock(lib.zsock_new_server(endpoint), False)
+        return Zsock(lib.zsock_new_server(endpoint), True)
 
     @staticmethod
     def new_client(endpoint):
         """
         Create a CLIENT socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_client(endpoint), False)
+        return Zsock(lib.zsock_new_client(endpoint), True)
 
     @staticmethod
     def new_radio(endpoint):
         """
         Create a RADIO socket. Default action is bind.
         """
-        return Zsock(lib.zsock_new_radio(endpoint), False)
+        return Zsock(lib.zsock_new_radio(endpoint), True)
 
     @staticmethod
     def new_dish(endpoint):
         """
         Create a DISH socket. Default action is connect.
         """
-        return Zsock(lib.zsock_new_dish(endpoint), False)
+        return Zsock(lib.zsock_new_dish(endpoint), True)
 
     def bind(self, format, *args):
         """
@@ -5860,6 +6124,18 @@ class Zstr(object):
     """
 
     allow_destruct = False
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -6011,6 +6287,18 @@ class Ztrie(object):
         if self.allow_destruct:
             lib.ztrie_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -6142,6 +6430,18 @@ class Zuuid(object):
         if self.allow_destruct:
             lib.zuuid_destroy(byref(self._as_parameter_))
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
     def __bool__(self):
         "Determine whether the object is valid by converting to boolean" # Python 3
         return self._as_parameter_.__bool__()
@@ -6155,7 +6455,7 @@ class Zuuid(object):
         """
         Create UUID object from supplied ZUUID_LEN-octet value.
         """
-        return Zuuid(lib.zuuid_new_from(source), False)
+        return Zuuid(lib.zuuid_new_from(source), True)
 
     def set(self, source):
         """

@@ -86,21 +86,25 @@ CZMQ_EXPORT void
 
 //  *** Draft method, defined for internal use only ***
 //  Create a SERVER socket. Default action is bind.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zsock_t *
     zsock_new_server (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
 //  Create a CLIENT socket. Default action is connect.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zsock_t *
     zsock_new_client (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
 //  Create a RADIO socket. Default action is bind.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zsock_t *
     zsock_new_radio (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
 //  Create a DISH socket. Default action is connect.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zsock_t *
     zsock_new_dish (const char *endpoint);
 
@@ -170,6 +174,7 @@ CZMQ_EXPORT char *
 
 //  *** Draft method, defined for internal use only ***
 //  Create a new empty zgossip_msg
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zgossip_msg_t *
     zgossip_msg_new (void);
 

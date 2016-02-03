@@ -435,7 +435,7 @@ fi
 AC_ARG_ENABLE([drafts],
     AS_HELP_STRING([--enable-drafts],
         [Build and install draft classes and methods [default=yes.]]),
-    [enable_drafts=$withval],
+    [enable_drafts=$enableval],
     [enable_drafts=$gitmaster])
 
 AM_CONDITIONAL([ENABLE_DRAFTS], [test x$enable_drafts != xno])
