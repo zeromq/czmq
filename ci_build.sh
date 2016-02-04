@@ -24,7 +24,7 @@ if [ "$BUILD_TYPE" == "default" ]; then
 
     # Clone and build dependencies
     git clone --quiet --depth 1 https://github.com/jedisct1/libsodium libsodium
-    git --no-pager log -oneline -n1
+    git --no-pager log --oneline -n1
     cd libsodium
     ./autogen.sh 2> /dev/null
     ./configure "${CONFIG_OPTS[@]}"
@@ -32,7 +32,7 @@ if [ "$BUILD_TYPE" == "default" ]; then
     make install
     cd ..
     git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq
-    git --no-pager log -oneline -n1
+    git --no-pager log --oneline -n1
     cd libzmq
     ./autogen.sh 2> /dev/null
     ./configure "${CONFIG_OPTS[@]}"
