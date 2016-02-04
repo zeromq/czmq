@@ -23,17 +23,17 @@ if [ "$BUILD_TYPE" == "default" ]; then
     CONFIG_OPTS+=("--quiet")
 
     # Clone and build dependencies
-    git clone --quiet --depth 1 https://github.com/jedisct1/libsodium libsodium
-    git --no-pager log --oneline -n1
+    git clone --quiet --depth 1 -b stable https://github.com/jedisct1/libsodium libsodium
     cd libsodium
+    git --no-pager log --oneline -n1
     ./autogen.sh 2> /dev/null
     ./configure "${CONFIG_OPTS[@]}"
     make -j4
     make install
     cd ..
     git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq
-    git --no-pager log --oneline -n1
     cd libzmq
+    git --no-pager log --oneline -n1
     ./autogen.sh 2> /dev/null
     ./configure "${CONFIG_OPTS[@]}"
     make -j4
