@@ -49,6 +49,7 @@ set (czmqjni_sources
 )
 
 add_library (czmqjni SHARED ${czmqjni_sources})
+add_definitions (-DCZMQ_BUILD_DRAFT_API)
 target_link_libraries (czmqjni
     czmq
     zmq

@@ -38,9 +38,10 @@ fi
 
     if [ ! -d "$LIBZMQ_ROOT" ]; then
         echo "The LIBZMQ_ROOT directory does not exist"
-        echo "  ${LIBZMQ_ROOT}"
+        echo "  ${LIBZMQ_ROOT}" run run
         exit 1
     fi
+    echo "Building libzmq in ${LIBZMQ_ROOT}..."
 
     (bash ${LIBZMQ_ROOT}/builds/android/build.sh) || exit 1
     UPSTREAM_PREFIX=${LIBZMQ_ROOT}/builds/android/prefix/${TOOLCHAIN_NAME}
@@ -57,8 +58,8 @@ fi
 
     export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
 
-    (cd "${cache}/czmq" && ./autogen.sh \
-        && ./configure "${ANDROID_BUILD_OPTS[@]}" --without-documentation \
+    (cd "${cache}/czmq" && ./autogen.sh 2> /dev/null \
+        && ./configure --quiet "${ANDROID_BUILD_OPTS[@]}" --without-docs \
         && make -j 4 \
         && make install) || exit 1
 }

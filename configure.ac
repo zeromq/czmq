@@ -120,7 +120,6 @@ if test "x$was_libsodium_check_lib_detected" = "xno"; then
     LIBS="${libsodium_LIBS} ${LIBS}"
 fi
 
-
 was_libzmq_check_lib_detected=no
 
 PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
@@ -164,7 +163,6 @@ if test "x$was_libzmq_check_lib_detected" = "xno"; then
     CFLAGS="${libzmq_CFLAGS} ${CFLAGS}"
     LIBS="${libzmq_LIBS} ${LIBS}"
 fi
-
 
 was_uuid_check_lib_detected=no
 
@@ -211,7 +209,6 @@ if test "x$was_uuid_check_lib_detected" = "xno"; then
     CFLAGS="${uuid_CFLAGS} ${CFLAGS}"
     LIBS="${uuid_LIBS} ${LIBS}"
 fi
-
 
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
