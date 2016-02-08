@@ -120,6 +120,39 @@ zsock_heartbeat_timeout (void *self)
 }
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_PRE_ALLOCATED_FD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_pre_allocated_fd (void *self, int pre_allocated_fd)
+{
+    assert (self);
+#   if defined (ZMQ_PRE_ALLOCATED_FD)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_PRE_ALLOCATED_FD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_pre_allocated_fd (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_PRE_ALLOCATED_FD)
+    int pre_allocated_fd;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, &option_len);
+    return pre_allocated_fd;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_TOS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -3319,6 +3352,14 @@ zsock_option_test (bool verbose)
     zsock_set_heartbeat_timeout (self, 6000);
     assert (zsock_heartbeat_timeout (self) == 6000);
     zsock_heartbeat_timeout (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_PRE_ALLOCATED_FD)
+    self = zsock_new (ZMQ_REQ);
+    assert (self);
+    zsock_set_pre_allocated_fd (self, 3);
+    assert (zsock_pre_allocated_fd (self) == 3);
+    zsock_pre_allocated_fd (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TOS)

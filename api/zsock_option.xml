@@ -38,6 +38,16 @@
     <argument name = "heartbeat timeout" type = "integer" />
 </method>
 
+<method name = "pre allocated fd" polymorphic = "1" state = "draft">
+    Get socket option `pre_allocated_fd`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set pre allocated fd" polymorphic = "1" state = "draft">
+    Set socket option `pre_allocated_fd`.
+    <argument name = "pre allocated fd" type = "integer" />
+</method>
+
 <method name = "tos" polymorphic = "1">
     Get socket option `tos`.
     <return type = "integer" fresh = "1" />

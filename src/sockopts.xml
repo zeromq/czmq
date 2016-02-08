@@ -16,6 +16,8 @@
             test_value = "4000" state = "draft" />
         <option name = "heartbeat_timeout" type = "int"    mode = "rw"  test = "DEALER"
             test_value = "6000" state = "draft" />
+        <option name = "pre_allocated_fd"  type = "int"    mode = "rw"  test = "REQ"
+            test_value = "3" state = "draft" />
 
         <!-- Options that are new in 4.1 -->
         <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />

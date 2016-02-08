@@ -139,6 +139,42 @@ zsocket_heartbeat_timeout (void *zocket)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_PRE_ALLOCATED_FD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_pre_allocated_fd (void *zocket, int pre_allocated_fd)
+{
+    if (zsock_is (zocket)) {
+        printf ("Please use zsock_set_pre_allocated_fd () on zsock_t instances\n");
+        assert (false);
+    }
+#   if defined (ZMQ_PRE_ALLOCATED_FD)
+    int rc = zmq_setsockopt (zocket, ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_PRE_ALLOCATED_FD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsocket_pre_allocated_fd (void *zocket)
+{
+#   if defined (ZMQ_PRE_ALLOCATED_FD)
+    int pre_allocated_fd;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, &option_len);
+    return pre_allocated_fd;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_TOS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -3619,6 +3655,14 @@ zsockopt_test (bool verbose)
     zsocket_set_heartbeat_timeout (zocket, 6000);
     assert (zsocket_heartbeat_timeout (zocket) == 6000);
     zsocket_heartbeat_timeout (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_PRE_ALLOCATED_FD)
+    zocket = zsocket_new (ctx, ZMQ_REQ);
+    assert (zocket);
+    zsocket_set_pre_allocated_fd (zocket, 3);
+    assert (zsocket_pre_allocated_fd (zocket) == 3);
+    zsocket_pre_allocated_fd (zocket);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_TOS)
