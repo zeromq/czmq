@@ -473,6 +473,20 @@ public class Zsock implements AutoCloseable{
         __setHeartbeatTimeout (self, heartbeatTimeout);
     }
     /*
+    Get socket option `use_fd`.
+    */
+    native static int __useFd (long self);
+    public int useFd () {
+        return __useFd (self);
+    }
+    /*
+    Set socket option `use_fd`.
+    */
+    native static void __setUseFd (long self, int useFd);
+    public void setUseFd (int useFd) {
+        __setUseFd (self, useFd);
+    }
+    /*
     Get socket option `tos`.
     */
     native static int __tos (long self);

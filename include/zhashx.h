@@ -149,7 +149,7 @@ CZMQ_EXPORT const void *
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.            
 CZMQ_EXPORT void
-    zhashx_comment (zhashx_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zhashx_comment (zhashx_t *self, const char *format, ...);
 
 //  Save hash table to a text file in name=value format. Hash values must be
 //  printable strings; keys may not contain '=' character. Returns 0 if OK, 
@@ -257,6 +257,9 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zhashx_test (bool verbose);
 
+//  @ignore
+void
+    zhashx_comment (zhashx_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
 #ifdef __cplusplus

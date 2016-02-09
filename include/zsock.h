@@ -115,7 +115,7 @@ CZMQ_EXPORT void
 //  clients being aware. Protocols that run on ephemeral ports should take  
 //  this into account.                                                      
 CZMQ_EXPORT int
-    zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_bind (zsock_t *self, const char *format, ...);
 
 //  Returns last bound endpoint, if any.
 CZMQ_EXPORT const char *
@@ -125,18 +125,18 @@ CZMQ_EXPORT const char *
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.                                               
 CZMQ_EXPORT int
-    zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_unbind (zsock_t *self, const char *format, ...);
 
 //  Connect a socket to a formatted endpoint        
 //  Returns 0 if OK, -1 if the endpoint was invalid.
 CZMQ_EXPORT int
-    zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_connect (zsock_t *self, const char *format, ...);
 
 //  Disconnect a socket from a formatted endpoint                  
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.                                               
 CZMQ_EXPORT int
-    zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_disconnect (zsock_t *self, const char *format, ...);
 
 //  Attach a socket to zero or more endpoints. If endpoints is not null,     
 //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by 
@@ -799,7 +799,27 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
 
+//  *** Draft method, for development use, may change without warning ***
+//  Get socket option `use_fd`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_use_fd (void *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set socket option `use_fd`.
+CZMQ_EXPORT void
+    zsock_set_use_fd (void *self, int use_fd);
+
 #endif // CZMQ_BUILD_DRAFT_API
+//  @ignore
+int
+    zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
 // zsock leak detection - not a part of the official interface to zsock. This

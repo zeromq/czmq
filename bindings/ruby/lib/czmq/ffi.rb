@@ -849,6 +849,22 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
+      begin # DRAFT method
+        attach_function :zsock_use_fd, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zsock_use_fd() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_set_use_fd, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zsock_set_use_fd() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zsock_tos, [:pointer], :int, **opts
       attach_function :zsock_set_tos, [:pointer, :int], :void, **opts
       attach_function :zsock_set_router_handover, [:pointer, :int], :void, **opts

@@ -166,6 +166,17 @@ CZMQ_EXPORT void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
 
 //  *** Draft method, defined for internal use only ***
+//  Get socket option `use_fd`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_use_fd (void *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set socket option `use_fd`.
+CZMQ_EXPORT void
+    zsock_set_use_fd (void *self, int use_fd);
+
+//  *** Draft method, defined for internal use only ***
 //  Accepts a void pointer and returns a fresh character string. If source
 //  is null, returns an empty string.                                     
 //  Caller owns return value and must destroy it when done.

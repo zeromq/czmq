@@ -473,6 +473,22 @@ void QZsock::setHeartbeatTimeout (int heartbeatTimeout)
 }
 
 ///
+//  Get socket option `use_fd`.
+int QZsock::useFd ()
+{
+    int rv = zsock_use_fd (self);
+    return rv;
+}
+
+///
+//  Set socket option `use_fd`.
+void QZsock::setUseFd (int useFd)
+{
+    zsock_set_use_fd (self, useFd);
+    
+}
+
+///
 //  Get socket option `tos`.
 int QZsock::tos ()
 {
