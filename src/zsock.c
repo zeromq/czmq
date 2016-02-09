@@ -485,11 +485,12 @@ zsock_bind (zsock_t *self, const char *format, ...)
         int port = atoi (zrex_hit (rex, 1));
 #if defined (HAVE_LIBSYSTEMD)
         if (zsys_auto_use_fd ()) {
-            int n = sd_listen_fds (0);
-            for (int i = SD_LISTEN_FDS_START; i < SD_LISTEN_FDS_START + n; ++i)
-                if (sd_is_socket_inet (i, AF_UNSPEC, SOCK_STREAM, 1,
+            int last_handle = SD_LISTEN_FDS_START + sd_listen_fds (0);
+            int handle;
+            for (handle = SD_LISTEN_FDS_START; handle < last_handle; ++handle)
+                if (sd_is_socket_inet (handle, AF_UNSPEC, SOCK_STREAM, 1,
                         (uint16_t) port) > 0) {
-                    zsock_set_use_fd (self, i);
+                    zsock_set_use_fd (self, handle);
                     break;
                 }
         }
@@ -537,10 +538,11 @@ zsock_bind (zsock_t *self, const char *format, ...)
             const char *sock_path;
             zrex_fetch (rex, &sock_path, NULL);
 
-            int n = sd_listen_fds (0);
-            for (int i = SD_LISTEN_FDS_START; i < SD_LISTEN_FDS_START + n; ++i)
-                if (sd_is_socket_unix (i, SOCK_STREAM, 1, sock_path, 0) > 0) {
-                    zsock_set_use_fd (self, i);
+            int last_handle = SD_LISTEN_FDS_START + sd_listen_fds (0);
+            int handle;
+            for (handle = SD_LISTEN_FDS_START; handle < last_handle; ++handle)
+                if (sd_is_socket_unix (handle, SOCK_STREAM, 1, sock_path, 0) > 0) {
+                    zsock_set_use_fd (self, handle);
                     break;
                 }
         }
