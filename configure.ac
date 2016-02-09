@@ -210,6 +210,21 @@ if test "x$was_uuid_check_lib_detected" = "xno"; then
     LIBS="${uuid_LIBS} ${LIBS}"
 fi
 
+was_systemd_check_lib_detected=no
+
+PKG_CHECK_MODULES([systemd], [libsystemd >= 200.0.0],
+    [
+        AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The libsystemd library is to be used.])
+    ],
+    [
+        AC_MSG_WARN([Cannot find libsystemd 200.0.0 or higher])
+    ])
+
+if test "x$was_systemd_check_lib_detected" = "xno"; then
+    CFLAGS="${systemd_CFLAGS} ${CFLAGS}"
+    LIBS="${systemd_LIBS} ${LIBS}"
+fi
+
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
 

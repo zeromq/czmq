@@ -297,6 +297,19 @@ CZMQ_EXPORT void
 CZMQ_EXPORT const char *
     zsys_ipv6_mcast_address (void);
 
+//  Configure the automatic use of pre-allocated FDs when creating new sockets.
+//  If 0 (default), nothing will happen. Else, when a new socket is bound, the
+//  system API will be used to check if an existing pre-allocated FD with a
+//  matching port (if TCP) or path (if IPC) exists, and if it does it will be
+//  set via the ZMQ_USE_FD socket option so that the library will use it
+//  instead of creating a new socket.
+CZMQ_EXPORT void
+    zsys_set_auto_use_fd (int auto_use_fd);
+
+//  Return use of automatic pre-allocated FDs for zsock instances.
+CZMQ_EXPORT int
+    zsys_auto_use_fd (void);
+
 //  Set log identity, which is a string that prefixes all log messages sent
 //  by this process. The log identity defaults to the environment variable
 //  ZSYS_LOGIDENT, if that is set.

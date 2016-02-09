@@ -13,6 +13,7 @@ Build-Depends: bison, debhelper (>= 8),
     libsodium-dev,
     libzmq4-dev,
     libuuid-dev,
+    libsystemd-dev,
     dh-autoreconf
 
 Package-List:

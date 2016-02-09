@@ -96,6 +96,7 @@
             '-lsodium',
             '-lzmq',
             '-luuid',
+            '-lsystemd',
             '-lpthread'
         ]
       },
@@ -112,6 +113,7 @@
             '-lsodium',
             '-lzmq',
             '-luuid',
+            '-lsystemd',
             '-lpthread'
         ]
       }

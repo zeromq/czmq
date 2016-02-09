@@ -73,6 +73,7 @@ static int s_ipv6 = 0;              //  ZSYS_IPV6=0
 static char *s_interface = NULL;    //  ZSYS_INTERFACE=
 static char *s_ipv6_address = NULL; //  ZSYS_IPV6_ADDRESS=
 static char *s_ipv6_mcast_address = NULL; //  ZSYS_IPV6_MCAST_ADDRESS=
+static int s_auto_use_fd = 0;       //  ZSYS_AUTO_USE_FD=0
 static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
 static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
@@ -164,6 +165,10 @@ zsys_init (void)
         if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
             s_logsystem = false;
     }
+
+    if (getenv ("ZSYS_AUTO_USE_FD"))
+        s_auto_use_fd = atoi (getenv ("ZSYS_AUTO_USE_FD"));
+
     zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
@@ -1433,6 +1438,35 @@ zsys_ipv6_mcast_address (void)
 
 
 //  --------------------------------------------------------------------------
+//  Configure the automatic use of pre-allocated FDs when creating new sockets.
+//  If 0 (default), nothing will happen. Else, when a new socket is bound, the
+//  system API will be used to check if an existing pre-allocated FD with a
+//  matching port (if TCP) or path (if IPC) exists, and if it does it will be
+//  set via the ZMQ_USE_FD socket option so that the library will use it
+//  instead of creating a new socket.
+
+
+void
+zsys_set_auto_use_fd (int auto_use_fd)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_auto_use_fd = auto_use_fd;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return use of automatic pre-allocated FDs for zsock instances.
+
+int
+zsys_auto_use_fd (void)
+{
+    return s_auto_use_fd;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set log identity, which is a string that prefixes all log messages sent
 //  by this process. The log identity defaults to the environment variable
 //  ZSYS_LOGIDENT, if that is set.
@@ -1772,6 +1806,9 @@ zsys_test (bool verbose)
     }
     zsys_close (logger, NULL, 0);
     //  @end
+
+    zsys_set_auto_use_fd (1);
+    assert (zsys_auto_use_fd () == 1);
 
     printf ("OK\n");
 }

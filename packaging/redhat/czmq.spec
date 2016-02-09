@@ -26,6 +26,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  libsodium-devel
 BuildRequires:  zeromq-devel
 BuildRequires:  uuid-devel
+BuildRequires:  systemd-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -54,6 +55,7 @@ Requires:       libczmq3 = %{version}
 Requires:       libsodium-devel
 Requires:       zeromq-devel
 Requires:       uuid-devel
+Requires:       systemd-devel
 
 %description devel
 czmq the high-level c binding for 0mq.

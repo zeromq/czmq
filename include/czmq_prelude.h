@@ -315,6 +315,9 @@
 #   if (defined (__UTYPE_ANDROID))
 #       include <android/log.h>
 #   endif
+#   if (defined (__UTYPE_LINUX) && defined (HAVE_LIBSYSTEMD))
+#       include <systemd/sd-daemon.h>
+#   endif
 #endif
 
 #if (defined (__VMS__))
