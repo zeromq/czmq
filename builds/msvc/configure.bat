@@ -45,6 +45,13 @@ IF EXIST "..\..\..\uuid" (
     ECHO Building without uuid
     ECHO #undef HAVE_UUID>> platform.h
 )
+IF EXIST "..\..\..\systemd" (
+    ECHO Building with systemd
+    ECHO #define HAVE_SYSTEMD 1>> platform.h
+) ELSE (
+    ECHO Building without systemd
+    ECHO #undef HAVE_SYSTEMD>> platform.h
+)
 
 :-  Check if we want to build the draft API
 IF NOT EXIST "..\..\.git" GOTO no_draft

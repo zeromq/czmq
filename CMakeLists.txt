@@ -112,6 +112,17 @@ IF (UUID_FOUND)
 ENDIF (UUID_FOUND)
 
 ########################################################################
+# SYSTEMD dependency
+########################################################################
+find_package(systemd)
+IF (SYSTEMD_FOUND)
+    include_directories(${SYSTEMD_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${SYSTEMD_LIBRARIES})
+    add_definitions(-DHAVE_LIBSYSTEMD)
+    list(APPEND OPTIONAL_LIBRARIES ${SYSTEMD_LIBRARIES})
+ENDIF (SYSTEMD_FOUND)
+
+########################################################################
 # includes
 ########################################################################
 set (czmq_headers

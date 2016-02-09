@@ -23,6 +23,7 @@ Build-Depends: bison, debhelper (>= 8),
     libsodium-dev,
     libzmq4-dev,
     libuuid-dev,
+    libsystemd-dev,
     dh-autoreconf,
     systemd
 
@@ -39,6 +40,7 @@ Depends:
     libsodium-dev,
     libzmq4-dev,
     libuuid-dev,
+    libsystemd-dev,
     libczmq3 (= ${binary:Version})
 Description: development files for czmq
  This package contains development files for czmq: the high-level c binding for 0mq

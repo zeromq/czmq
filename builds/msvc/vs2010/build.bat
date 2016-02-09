@@ -32,6 +32,14 @@ IF EXIST "..\..\..\..\uuid\builds/msvc/vs2010\uuid.import.props" (
 ) ELSE (
     ECHO Building without uuid
 )
+IF EXIST "..\..\..\..\systemd\builds/msvc/vs2010\systemd.import.props" (
+    COPY /Y "..\..\..\..\systemd\builds/msvc/vs2010\systemd.import.props" . > %log%
+    IF errorlevel 1 GOTO error
+    SET packages=%packages% /p:HAVE_SYSTEMD=1
+    ECHO Building with systemd
+) ELSE (
+    ECHO Building without systemd
+)
 
 ECHO Building CZMQ... (%packages%)
 
