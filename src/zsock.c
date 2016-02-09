@@ -482,8 +482,20 @@ zsock_bind (zsock_t *self, const char *format, ...)
     zrex_t *rex = zrex_new (NULL);
     if (zrex_eq (rex, endpoint, "^tcp://.*:(\\d+)$")) {
         assert (zrex_hits (rex) == 2);
+        int port = atoi (zrex_hit (rex, 1));
+#if defined (HAVE_LIBSYSTEMD)
+        if (zsys_auto_use_fd ()) {
+            int n = sd_listen_fds (0);
+            for (int i = SD_LISTEN_FDS_START; i < SD_LISTEN_FDS_START + n; ++i)
+                if (sd_is_socket_inet (i, AF_UNSPEC, SOCK_STREAM, 1,
+                        (uint16_t) port) > 0) {
+                    zsock_set_use_fd (self, i);
+                    break;
+                }
+        }
+#endif
         if (zmq_bind (self->handle, endpoint) == 0)
-            rc = atoi (zrex_hit (rex, 1));
+            rc = port;
         else
             rc = -1;
     }
@@ -518,8 +530,23 @@ zsock_bind (zsock_t *self, const char *format, ...)
                 port = first;
         }
     }
-    else
+    else {
+#if defined (HAVE_LIBSYSTEMD)
+        if (zsys_auto_use_fd () && zrex_eq (rex, endpoint, "^ipc://(.*)$")) {
+            assert (zrex_hits (rex) == 2);
+            const char *sock_path;
+            zrex_fetch (rex, &sock_path, NULL);
+
+            int n = sd_listen_fds (0);
+            for (int i = SD_LISTEN_FDS_START; i < SD_LISTEN_FDS_START + n; ++i)
+                if (sd_is_socket_unix (i, SOCK_STREAM, 1, sock_path, 0) > 0) {
+                    zsock_set_use_fd (self, i);
+                    break;
+                }
+        }
+#endif
         rc = zmq_bind (self->handle, endpoint);
+    }
 
     //  Store successful endpoint for later reference
     if (rc >= 0) {
