@@ -6,7 +6,7 @@ program_libs = src/libczmq.la ${project_libs}
 
 # Programs need to link the c++ runtime if everything was compiled statically.
 if !ENABLE_SHARED
-program_libs += -lstdc++
+program_libs += -lstdc++ -lm
 endif
 
 lib_LTLIBRARIES += src/libczmq.la
