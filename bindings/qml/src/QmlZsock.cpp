@@ -299,6 +299,18 @@ void QmlZsock::setHeartbeatTimeout (int heartbeatTimeout) {
 };
 
 ///
+//  Get socket option `use_fd`.
+int QmlZsock::useFd () {
+    return zsock_use_fd (self);
+};
+
+///
+//  Set socket option `use_fd`.
+void QmlZsock::setUseFd (int useFd) {
+    zsock_set_use_fd (self, useFd);
+};
+
+///
 //  Get socket option `tos`.
 int QmlZsock::tos () {
     return zsock_tos (self);

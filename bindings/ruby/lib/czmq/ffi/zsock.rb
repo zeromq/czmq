@@ -1036,6 +1036,56 @@ module CZMQ
         result
       end
 
+      # Get socket option `use_fd`.
+      #
+      # @return [Integer]
+      def use_fd()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_use_fd(self_p)
+        result
+      end
+
+      # Get socket option `use_fd`.
+      #
+      # This is the polymorphic version of #use_fd.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.use_fd(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_use_fd(self_p)
+        result
+      end
+
+      # Set socket option `use_fd`.
+      #
+      # @param use_fd [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_use_fd(use_fd)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        use_fd = Integer(use_fd)
+        result = ::CZMQ::FFI.zsock_set_use_fd(self_p, use_fd)
+        result
+      end
+
+      # Set socket option `use_fd`.
+      #
+      # This is the polymorphic version of #set_use_fd.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param use_fd [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_use_fd(self_p, use_fd)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        use_fd = Integer(use_fd)
+        result = ::CZMQ::FFI.zsock_set_use_fd(self_p, use_fd)
+        result
+      end
+
       # Get socket option `tos`.
       #
       # @return [Integer]

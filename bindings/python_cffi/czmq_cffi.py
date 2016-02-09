@@ -2577,6 +2577,14 @@ int
 void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
 
+// Get socket option `use_fd`.
+int
+    zsock_use_fd (void *self);
+
+// Set socket option `use_fd`.
+void
+    zsock_set_use_fd (void *self, int use_fd);
+
 // Get socket option `tos`.
 int
     zsock_tos (void *self);

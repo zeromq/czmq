@@ -4858,6 +4858,10 @@ lib.zsock_heartbeat_timeout.restype = c_int
 lib.zsock_heartbeat_timeout.argtypes = [zsock_p]
 lib.zsock_set_heartbeat_timeout.restype = None
 lib.zsock_set_heartbeat_timeout.argtypes = [zsock_p, c_int]
+lib.zsock_use_fd.restype = c_int
+lib.zsock_use_fd.argtypes = [zsock_p]
+lib.zsock_set_use_fd.restype = None
+lib.zsock_set_use_fd.argtypes = [zsock_p, c_int]
 lib.zsock_tos.restype = c_int
 lib.zsock_tos.argtypes = [zsock_p]
 lib.zsock_set_tos.restype = None
@@ -5523,6 +5527,18 @@ return the supplied value. Takes a polymorphic socket reference.
         Set socket option `heartbeat_timeout`.
         """
         return lib.zsock_set_heartbeat_timeout(self._as_parameter_, heartbeat_timeout)
+
+    def use_fd(self):
+        """
+        Get socket option `use_fd`.
+        """
+        return lib.zsock_use_fd(self._as_parameter_)
+
+    def set_use_fd(self, use_fd):
+        """
+        Set socket option `use_fd`.
+        """
+        return lib.zsock_set_use_fd(self._as_parameter_, use_fd)
 
     def tos(self):
         """

@@ -408,16 +408,16 @@ AC_SUBST([pkgconfigdir])
 
 # enable specific system integration features
 AC_ARG_WITH([systemd],
-    AS_HELP_STRING([--with-systemd],
-    [Build and install with systemd integration [default=no].]),
-    [with_systemd=$withval],
-    [with_systemd=no])
+    AS_HELP_STRING([--with-systemd-units],
+    [Build and install with systemd units integration [default=no].]),
+    [with_systemd_units=$withval],
+    [with_systemd_units=no])
 
-AM_CONDITIONAL([WITH_SYSTEMD], [test x$with_systemd != xno])
+AM_CONDITIONAL([WITH_SYSTEMD_UNITS], [test x$with_systemd_units != xno])
 
-AM_COND_IF([WITH_SYSTEMD],
-    [PKG_CHECK_MODULES([SYSTEMD], [systemd >= 200], [],
-        [AC_MSG_ERROR([Cannot find required package for systemd. Note, pkg-config is required due to specified version >= 200])])],
+AM_COND_IF([WITH_SYSTEMD_UNITS],
+    [AC_DEFINE(WITH_SYSTEMD_UNITS, 1, [systemd units are going to be installed])
+    AC_SUBST(WITH_SYSTEMD_UNITS)],
     [])
 
 if test "x$cross_compiling" = "xyes"; then
@@ -452,7 +452,7 @@ AC_CONFIG_FILES([Makefile
                  src/libczmq.pc
                  ])
 
-AM_COND_IF([WITH_SYSTEMD],
+AM_COND_IF([WITH_SYSTEMD_UNITS],
     [AC_CONFIG_FILES([
     ])],
     [])

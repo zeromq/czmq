@@ -379,6 +379,19 @@ Java_org_zeromq_czmq_Zsock__1_1setHeartbeatTimeout (JNIEnv *env, jclass c, jlong
 }
 
 JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1useFd (JNIEnv *env, jclass c, jlong self)
+{
+    jint use_fd_ = (jint) zsock_use_fd ((zsock_t *) (intptr_t) self);
+    return use_fd_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setUseFd (JNIEnv *env, jclass c, jlong self, jint use_fd)
+{
+    zsock_set_use_fd ((zsock_t *) (intptr_t) self, (int) use_fd);
+}
+
+JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tos (JNIEnv *env, jclass c, jlong self)
 {
     jint tos_ = (jint) zsock_tos ((zsock_t *) (intptr_t) self);

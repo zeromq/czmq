@@ -237,6 +237,12 @@ public slots:
     //  Set socket option `heartbeat_timeout`.
     void setHeartbeatTimeout (int heartbeatTimeout);
 
+    //  Get socket option `use_fd`.
+    int useFd ();
+
+    //  Set socket option `use_fd`.
+    void setUseFd (int useFd);
+
     //  Get socket option `tos`.
     int tos ();
 
