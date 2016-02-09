@@ -139,35 +139,35 @@ zsocket_heartbeat_timeout (void *zocket)
 
 
 //  --------------------------------------------------------------------------
-//  Set socket ZMQ_PRE_ALLOCATED_FD value
+//  Set socket ZMQ_USE_FD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
-zsocket_set_pre_allocated_fd (void *zocket, int pre_allocated_fd)
+zsocket_set_use_fd (void *zocket, int use_fd)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsock_set_pre_allocated_fd () on zsock_t instances\n");
+        printf ("Please use zsock_set_use_fd () on zsock_t instances\n");
         assert (false);
     }
-#   if defined (ZMQ_PRE_ALLOCATED_FD)
-    int rc = zmq_setsockopt (zocket, ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, sizeof (int));
+#   if defined (ZMQ_USE_FD)
+    int rc = zmq_setsockopt (zocket, ZMQ_USE_FD, &use_fd, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return socket ZMQ_PRE_ALLOCATED_FD value
+//  Return socket ZMQ_USE_FD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 int
-zsocket_pre_allocated_fd (void *zocket)
+zsocket_use_fd (void *zocket)
 {
-#   if defined (ZMQ_PRE_ALLOCATED_FD)
-    int pre_allocated_fd;
+#   if defined (ZMQ_USE_FD)
+    int use_fd;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (zocket, ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, &option_len);
-    return pre_allocated_fd;
+    zmq_getsockopt (zocket, ZMQ_USE_FD, &use_fd, &option_len);
+    return use_fd;
 #   else
     return 0;
 #   endif
@@ -3657,12 +3657,12 @@ zsockopt_test (bool verbose)
     zsocket_heartbeat_timeout (zocket);
     zsocket_destroy (ctx, zocket);
 #     endif
-#     if defined (ZMQ_PRE_ALLOCATED_FD)
+#     if defined (ZMQ_USE_FD)
     zocket = zsocket_new (ctx, ZMQ_REQ);
     assert (zocket);
-    zsocket_set_pre_allocated_fd (zocket, 3);
-    assert (zsocket_pre_allocated_fd (zocket) == 3);
-    zsocket_pre_allocated_fd (zocket);
+    zsocket_set_use_fd (zocket, 3);
+    assert (zsocket_use_fd (zocket) == 3);
+    zsocket_use_fd (zocket);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_TOS)

@@ -38,14 +38,14 @@
     <argument name = "heartbeat timeout" type = "integer" />
 </method>
 
-<method name = "pre allocated fd" polymorphic = "1" state = "draft">
-    Get socket option `pre_allocated_fd`.
+<method name = "use fd" polymorphic = "1" state = "draft">
+    Get socket option `use_fd`.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set pre allocated fd" polymorphic = "1" state = "draft">
-    Set socket option `pre_allocated_fd`.
-    <argument name = "pre allocated fd" type = "integer" />
+<method name = "set use fd" polymorphic = "1" state = "draft">
+    Set socket option `use_fd`.
+    <argument name = "use fd" type = "integer" />
 </method>
 
 <method name = "tos" polymorphic = "1">

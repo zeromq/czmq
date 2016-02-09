@@ -120,33 +120,33 @@ zsock_heartbeat_timeout (void *self)
 }
 
 //  --------------------------------------------------------------------------
-//  Set socket ZMQ_PRE_ALLOCATED_FD value
+//  Set socket ZMQ_USE_FD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
-zsock_set_pre_allocated_fd (void *self, int pre_allocated_fd)
+zsock_set_use_fd (void *self, int use_fd)
 {
     assert (self);
-#   if defined (ZMQ_PRE_ALLOCATED_FD)
-    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, sizeof (int));
+#   if defined (ZMQ_USE_FD)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_USE_FD, &use_fd, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return socket ZMQ_PRE_ALLOCATED_FD value
+//  Return socket ZMQ_USE_FD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 int
-zsock_pre_allocated_fd (void *self)
+zsock_use_fd (void *self)
 {
     assert (self);
-#   if defined (ZMQ_PRE_ALLOCATED_FD)
-    int pre_allocated_fd;
+#   if defined (ZMQ_USE_FD)
+    int use_fd;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (zsock_resolve (self), ZMQ_PRE_ALLOCATED_FD, &pre_allocated_fd, &option_len);
-    return pre_allocated_fd;
+    zmq_getsockopt (zsock_resolve (self), ZMQ_USE_FD, &use_fd, &option_len);
+    return use_fd;
 #   else
     return 0;
 #   endif
@@ -3354,12 +3354,12 @@ zsock_option_test (bool verbose)
     zsock_heartbeat_timeout (self);
     zsock_destroy (&self);
 #     endif
-#     if defined (ZMQ_PRE_ALLOCATED_FD)
+#     if defined (ZMQ_USE_FD)
     self = zsock_new (ZMQ_REQ);
     assert (self);
-    zsock_set_pre_allocated_fd (self, 3);
-    assert (zsock_pre_allocated_fd (self) == 3);
-    zsock_pre_allocated_fd (self);
+    zsock_set_use_fd (self, 3);
+    assert (zsock_use_fd (self) == 3);
+    zsock_use_fd (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TOS)
