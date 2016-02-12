@@ -8,6 +8,7 @@
   'target_defaults': {
     'include_dirs': [
       '../../include',
+      '../../../libzmq/include',
       '.'
     ],
     'defines': [
