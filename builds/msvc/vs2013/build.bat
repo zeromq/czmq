@@ -8,14 +8,6 @@ IF NOT EXIST %environment% SET environment="%programfiles%\%tools%"
 IF NOT EXIST %environment% GOTO no_tools
 
 SET packages=
-IF EXIST "..\..\..\..\libsodium\builds/msvc/vs2013\libsodium.import.props" (
-    COPY /Y "..\..\..\..\libsodium\builds/msvc/vs2013\libsodium.import.props" . > %log%
-    IF errorlevel 1 GOTO error
-    SET packages=%packages% /p:HAVE_LIBSODIUM=1
-    ECHO Building with libsodium
-) ELSE (
-    ECHO Building without libsodium
-)
 IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2013\libzmq.import.props" (
     COPY /Y "..\..\..\..\libzmq\builds/msvc/vs2013\libzmq.import.props" . > %log%
     IF errorlevel 1 GOTO error

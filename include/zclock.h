@@ -56,6 +56,7 @@ CZMQ_EXPORT void
 
 //  @end
 
+
 //  DEPRECATED in favor of zsys logging, see issue #519
 //  Print formatted string to stdout, prefixed by date/time and
 //  terminated with a newline.

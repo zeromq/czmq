@@ -822,6 +822,7 @@ int
     zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
+
 // zsock leak detection - not a part of the official interface to zsock. This
 // enables CZMQ to report socket leaks intelligently.
 #if defined ZSOCK_NOCHECK

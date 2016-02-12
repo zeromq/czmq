@@ -21,13 +21,6 @@ ECHO. >> platform.h
 ECHO #define CZMQ_HAVE_WINDOWS 1>> platform.h
 
 :-  Check for dependencies
-IF EXIST "..\..\..\libsodium" (
-    ECHO Building with libsodium
-    ECHO #define HAVE_LIBSODIUM 1>> platform.h
-) ELSE (
-    ECHO Building without libsodium
-    ECHO #undef HAVE_LIBSODIUM>> platform.h
-)
 IF EXIST "..\..\..\libzmq" (
     ECHO Building with libzmq
     ECHO #define HAVE_LIBZMQ 1>> platform.h

@@ -175,6 +175,7 @@ void
 int
     zconfig_savef (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
+
 //  Self test of this class
 CZMQ_EXPORT void
     zconfig_test (bool verbose);

@@ -28,7 +28,6 @@
 //  These are global variables accessible to CZMQ application code
 volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
-volatile uint64_t zsys_allocs = 0;
 
 static void s_signal_handler (int signal_value);
 

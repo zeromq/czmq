@@ -10,13 +10,12 @@ AM_CFLAGS = \
 
 
 AM_CPPFLAGS = \
-    ${libsodium_CFLAGS} \
     ${libzmq_CFLAGS} \
     ${uuid_CFLAGS} \
     ${systemd_CFLAGS} \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${uuid_LIBS} ${systemd_LIBS}
+project_libs = ${libzmq_LIBS} ${uuid_LIBS} ${systemd_LIBS}
 
 SUBDIRS = doc
 DIST_SUBDIRS = doc

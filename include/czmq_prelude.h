@@ -518,30 +518,11 @@ typedef struct {
 
 //- Non-portable declaration specifiers -------------------------------------
 
-#if defined (__WINDOWS__)
-#   if defined LIBCZMQ_STATIC
-#       define CZMQ_EXPORT
-#   elif defined LIBCZMQ_EXPORTS
-#       define CZMQ_EXPORT __declspec(dllexport)
-#   else
-#       define CZMQ_EXPORT __declspec(dllimport)
-#   endif
-#else
-#   define CZMQ_EXPORT
-#endif
-
 //  For thread-local storage
 #if defined (__WINDOWS__)
 #   define CZMQ_THREADLS __declspec(thread)
 #else
 #   define CZMQ_THREADLS __thread
-#endif
-
-//- Memory allocations ------------------------------------------------------
-#if defined(__cplusplus)
-   extern "C" CZMQ_EXPORT volatile uint64_t zsys_allocs;
-#else
-   extern CZMQ_EXPORT volatile uint64_t zsys_allocs;
 #endif
 
 //  Replacement for malloc() which asserts if we run out of heap, and
@@ -550,10 +531,6 @@ static inline void *
 safe_malloc (size_t size, const char *file, unsigned line)
 {
 //     printf ("%s:%u %08d\n", file, line, (int) size);
-#if defined (__UTYPE_LINUX) && defined (__IS_64BIT__)
-    //  On GCC we count zmalloc memory allocations
-    __sync_add_and_fetch (&zsys_allocs, 1);
-#endif
     void *mem = calloc (1, size);
     if (mem == NULL) {
         fprintf (stderr, "FATAL ERROR at %s:%u\n", file, line);

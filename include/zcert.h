@@ -125,6 +125,7 @@ void
     zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
 //  @end
 
+
 #ifdef __cplusplus
 }
 #endif

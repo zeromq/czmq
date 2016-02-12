@@ -97,7 +97,7 @@ s_thread_shim (void *args)
 //  Create a new actor.
 
 zactor_t *
-zactor_new (zactor_fn *actor, void *args)
+zactor_new (zactor_fn actor, void *args)
 {
     zactor_t *self = (zactor_t *) zmalloc (sizeof (zactor_t));
     assert (self);

@@ -24,8 +24,8 @@
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(ConfigurationType)' == 'StaticLibrary'">LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(ConfigurationType)' == 'DynamicLibrary'">LIBCZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(ConfigurationType)' == 'StaticLibrary'">CZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(ConfigurationType)' == 'DynamicLibrary'">CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Rpcrt4.lib;Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -34,28 +34,24 @@
 
   <!-- Dependencies -->
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(SolutionDir)libsodium.import.props" Condition="'$(HAVE_LIBSODIUM)'=='1'" />
     <Import Project="$(SolutionDir)libzmq.import.props" />
     <Import Project="$(SolutionDir)uuid.import.props" Condition="'$(HAVE_UUID)'=='1'" />
     <Import Project="$(SolutionDir)systemd.import.props" Condition="'$(HAVE_SYSTEMD)'=='1'" />
   </ImportGroup>
 
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'dynamic'">
-    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">dynamic</Linkage-libsodium>
     <Linkage-libzmq>dynamic</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">dynamic</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">dynamic</Linkage-systemd>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'ltcg'">
-    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">ltcg</Linkage-libsodium>
     <Linkage-libzmq>ltcg</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">ltcg</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">ltcg</Linkage-systemd>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'static'">
-    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">static</Linkage-libsodium>
     <Linkage-libzmq>static</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">static</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">static</Linkage-systemd>
@@ -67,7 +63,6 @@
   </Target>
 
   <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">
-    <Message Text="Linkage-libsodium: $(Linkage-libsodium)" Importance="high" Condition="'$(HAVE_LIBSODIUM)'=='1'" />
     <Message Text="Linkage-libzmq: $(Linkage-libzmq)" Importance="high" />
     <Message Text="Linkage-uuid: $(Linkage-uuid)" Importance="high" Condition="'$(HAVE_UUID)'=='1'" />
     <Message Text="Linkage-systemd: $(Linkage-systemd)" Importance="high" Condition="'$(HAVE_SYSTEMD)'=='1'" />

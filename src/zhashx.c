@@ -466,7 +466,7 @@ zhashx_rename (zhashx_t *self, const void *old_key, const void *new_key)
 //  Returns the item, or NULL if there is no such item.
 
 void *
-zhashx_freefn (zhashx_t *self, const void *key, zhashx_free_fn *free_fn)
+zhashx_freefn (zhashx_t *self, const void *key, zhashx_free_fn free_fn)
 {
     assert (self);
     assert (key);
@@ -1049,7 +1049,7 @@ zhashx_autofree (zhashx_t *self)
 //  final return code from callback function (zero = success).
 
 int
-zhashx_foreach (zhashx_t *self, zhashx_foreach_fn *callback, void *argument)
+zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument)
 {
     assert (self);
 

@@ -385,11 +385,12 @@ zlist_size (zlist_t *self)
 //  The sort is not stable, so may reorder items with the same keys.
 
 void
-zlist_sort (zlist_t *self, zlist_compare_fn *compare)
+zlist_sort (zlist_t *self, zlist_compare_fn compare_fn)
 {
-    //  If the compare function is NULL use the lists one if present
-    if (!compare && self->compare_fn)
+    zlist_compare_fn *compare = compare_fn;
+    if (compare == NULL)
         compare = self->compare_fn;
+
     //  Uses a comb sort, which is simple and reasonably fast.
     //  See http://en.wikipedia.org/wiki/Comb_sort
     size_t gap = self->size;
@@ -442,7 +443,7 @@ zlist_comparefn (zlist_t *self,  zlist_compare_fn fn)
 //  Returns the item, or NULL if there is no such item.
 
 void *
-zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail)
+zlist_freefn (zlist_t *self, void *item, zlist_free_fn fn, bool at_tail)
 {
     node_t *node = self->head;
     if (at_tail)

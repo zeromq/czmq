@@ -157,6 +157,7 @@ CZMQ_EXPORT void
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
+
 //  Deprecated method aliases
 #define zloop_set_tolerant(s,i) zloop_poller_set_tolerant(s,i)
 
