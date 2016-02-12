@@ -22,7 +22,8 @@
         'libraries': [
           'ws2_32',
           'advapi32',
-          'iphlpapi'
+          'iphlpapi',
+          'Rpcrt4'
         ]
       }],
       [ 'OS=="mac"', {
