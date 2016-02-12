@@ -10,11 +10,13 @@
       '../../include',
       '.'
     ],
+    'defines': [
+      'CZMQ_GYP_BUILD'
+    ],
     'conditions': [
       [ 'OS=="win"', {
         'defines': [
-          'CZMQ_HAVE_WINDOWS=1',
-          'LIBCZMQ_STATIC'
+          'CZMQ_HAVE_WINDOWS'
         ],
         'libraries': [
           'ws2_32',
@@ -24,12 +26,12 @@
       }],
       [ 'OS=="mac"', {
         'defines': [
-          'CZMQ_HAVE_OSX=1'
+          'CZMQ_HAVE_OSX'
         ]
       }],
       [ 'OS=="linux"', {
         'defines': [
-          'CZMQ_HAVE_LINUX=1'
+          'CZMQ_HAVE_LINUX'
         ],
         'libraries': [
           '-lpthread'
@@ -42,7 +44,7 @@
       'target_name': 'libczmq',
       'type': 'static_library',
       'sources': [
-        'platform.hpp',
+        'platform.h',
         '../../include/czmq.h',
         '../../include/czmq_prelude.h',
         '../../src/zactor.c',
@@ -143,13 +145,21 @@
       ],
       'dependencies': [
         '../../../libzmq/builds/gyp/project.gyp:libzmq',
+      ],
+      'copies': [
+        {
+          'destination': '../../src',
+          'files': [
+              'platform.h'
+          ]
+        }
       ]
     },
     {
       'target_name': 'zmakecert',
       'type': 'executable',
       'sources': [
-        'src/zmakecert.c'
+        '../../src/zmakecert.c'
       ],
       'dependencies': [
         'libczmq'
@@ -159,7 +169,7 @@
       'target_name': 'czmq_selftest',
       'type': 'executable',
       'sources': [
-        'src/czmq_selftest.c'
+        '../../src/czmq_selftest.c'
       ],
       'dependencies': [
         'libczmq'

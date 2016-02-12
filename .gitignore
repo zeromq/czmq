@@ -85,3 +85,4 @@ build/
 # Temporary files
 *.swp
 *~
+.test*
