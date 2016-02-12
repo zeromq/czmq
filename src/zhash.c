@@ -356,7 +356,7 @@ zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
 //  Returns the item, or NULL if there is no such item.
 
 void *
-zhash_freefn (zhash_t *self, const char *key, zhash_free_fn *free_fn)
+zhash_freefn (zhash_t *self, const char *key, zhash_free_fn free_fn)
 {
     assert (self);
     assert (key);
@@ -783,7 +783,7 @@ zhash_autofree (zhash_t *self)
 //  final return code from callback function (zero = success).
 
 int
-zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
+zhash_foreach (zhash_t *self, zhash_foreach_fn callback, void *argument)
 {
     assert (self);
 
