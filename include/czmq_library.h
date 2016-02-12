@@ -37,9 +37,9 @@
     CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
 
 #if defined (__WINDOWS__)
-#   if defined LIBCZMQ_STATIC
+#   if defined CZMQ_STATIC
 #       define CZMQ_EXPORT
-#   elif defined LIBCZMQ_EXPORTS
+#   elif defined CZMQ_EXPORTS
 #       define CZMQ_EXPORT __declspec(dllexport)
 #   else
 #       define CZMQ_EXPORT __declspec(dllimport)

@@ -25,7 +25,8 @@
 #define CZMQ_BUILD_DRAFT_API
 
 #if defined CZMQ_HAVE_WINDOWS
-#   define LIBCZMQ_STATIC
+#   define CZMQ_STATIC
+#   define ZMQ_STATIC
 
 #elif defined CZMQ_HAVE_OSX
 #   define CZMQ_HAVE_IFADDRS
