@@ -171,6 +171,7 @@ void
     zproc_log_debug (const char *format, ...) CHECK_PRINTF (1);
 //  @end
 
+
 #ifdef __cplusplus
 }
 #endif

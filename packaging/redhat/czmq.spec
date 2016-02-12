@@ -23,7 +23,6 @@ BuildRequires:  autoconf
 BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
-BuildRequires:  libsodium-devel
 BuildRequires:  zeromq-devel
 BuildRequires:  uuid-devel
 BuildRequires:  systemd-devel
@@ -52,7 +51,6 @@ This package contains shared library.
 Summary:        the high-level c binding for 0mq
 Group:          System/Libraries
 Requires:       libczmq3 = %{version}
-Requires:       libsodium-devel
 Requires:       zeromq-devel
 Requires:       uuid-devel
 Requires:       systemd-devel

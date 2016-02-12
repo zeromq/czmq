@@ -30,9 +30,6 @@ export TOOLCHAIN_NAME="arm-linux-androideabi-$NDK_ABI_VER"
 export TOOLCHAIN_HOST="arm-linux-androideabi"
 export TOOLCHAIN_ARCH="arm"
 
-export LIBSODIUM_ROOT="/tmp/libsodium"
-git clone --quiet --depth 1 -b stable https://github.com/jedisct1/libsodium $LIBSODIUM_ROOT
-
 export LIBZMQ_ROOT="/tmp/libzmq"
 git clone --quiet --depth 1 https://github.com/zeromq/libzmq $LIBZMQ_ROOT
 

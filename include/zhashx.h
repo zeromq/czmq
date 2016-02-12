@@ -262,6 +262,7 @@ void
     zhashx_comment (zhashx_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
+
 #ifdef __cplusplus
 }
 #endif

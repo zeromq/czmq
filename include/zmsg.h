@@ -231,6 +231,7 @@ int
     zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
+
 //  DEPRECATED as over-engineered, poor style
 //  Pop frame off front of message, caller now owns frame
 //  If next frame is empty, pops and destroys that empty frame.

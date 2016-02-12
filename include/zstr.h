@@ -96,6 +96,7 @@ int
     zstr_sendfm (void *dest, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
+
 //  DEPRECATED as poor style -- callers should use zloop or zpoller
 //  Receive C string from socket, if socket had input ready. Caller must
 //  free returned string using zstr_free. Returns NULL if there was no input

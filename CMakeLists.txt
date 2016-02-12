@@ -79,17 +79,6 @@ list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 set(OPTIONAL_LIBRARIES)
 
 ########################################################################
-# LIBSODIUM dependency
-########################################################################
-find_package(libsodium)
-IF (LIBSODIUM_FOUND)
-    include_directories(${LIBSODIUM_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
-    add_definitions(-DHAVE_LIBSODIUM)
-    list(APPEND OPTIONAL_LIBRARIES ${LIBSODIUM_LIBRARIES})
-ENDIF (LIBSODIUM_FOUND)
-
-########################################################################
 # LIBZMQ dependency
 ########################################################################
 find_package(libzmq REQUIRED)

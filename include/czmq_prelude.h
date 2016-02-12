@@ -538,10 +538,11 @@ typedef struct {
 #endif
 
 //- Memory allocations ------------------------------------------------------
-#if defined(__cplusplus)
-   extern "C" CZMQ_EXPORT volatile uint64_t zsys_allocs;
+
+#if defined (__cplusplus)
+    extern "C" CZMQ_EXPORT volatile uint64_t zsys_allocs;
 #else
-   extern CZMQ_EXPORT volatile uint64_t zsys_allocs;
+    extern CZMQ_EXPORT volatile uint64_t zsys_allocs;
 #endif
 
 //  Replacement for malloc() which asserts if we run out of heap, and

@@ -28,7 +28,6 @@
   <!-- Dependencies -->
   <ImportGroup Label="PropertySheets">
     <Import Project="$(SolutionDir)czmq.import.props" />
-    <Import Project="$(SolutionDir)libsodium.import.props" Condition="'$(HAVE_LIBSODIUM)'=='1'" />
     <Import Project="$(SolutionDir)libzmq.import.props" />
     <Import Project="$(SolutionDir)uuid.import.props" Condition="'$(HAVE_UUID)'=='1'" />
     <Import Project="$(SolutionDir)systemd.import.props" Condition="'$(HAVE_SYSTEMD)'=='1'" />
@@ -36,7 +35,6 @@
 
   <PropertyGroup Condition="$(Configuration.IndexOf('DEXE')) != -1">
     <Linkage-czmq>dynamic</Linkage-czmq>
-    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">dynamic</Linkage-libsodium>
     <Linkage-libzmq>dynamic</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">dynamic</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">dynamic</Linkage-systemd>
@@ -44,7 +42,6 @@
 
   <PropertyGroup Condition="$(Configuration.IndexOf('LEXE')) != -1">
     <Linkage-czmq>ltcg</Linkage-czmq>
-    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">ltcg</Linkage-libsodium>
     <Linkage-libzmq>ltcg</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">ltcg</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">ltcg</Linkage-systemd>
@@ -52,7 +49,6 @@
 
   <PropertyGroup Condition="$(Configuration.IndexOf('SEXE')) != -1">
     <Linkage-czmq>static</Linkage-czmq>
-    <Linkage-libsodium Condition="'$(HAVE_LIBSODIUM)'=='1'">static</Linkage-libsodium>
     <Linkage-libzmq>static</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">static</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">static</Linkage-systemd>
@@ -61,7 +57,6 @@
   <!-- Messages -->
   <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">
     <Message Text="Linkage-czmq: $(Linkage-czmq)" Importance="high"/>
-    <Message Text="Linkage-libsodium: $(Linkage-libsodium)" Importance="high" Condition="'$(HAVE_LIBSODIUM)'=='1'" />
     <Message Text="Linkage-libzmq: $(Linkage-libzmq)" Importance="high" />
     <Message Text="Linkage-uuid: $(Linkage-uuid)" Importance="high" Condition="'$(HAVE_UUID)'=='1'" />
     <Message Text="Linkage-systemd: $(Linkage-systemd)" Importance="high" Condition="'$(HAVE_SYSTEMD)'=='1'" />

@@ -190,6 +190,7 @@ void
     zhash_comment (zhash_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
+
 #ifdef __cplusplus
 }
 #endif
