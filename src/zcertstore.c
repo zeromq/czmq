@@ -151,7 +151,7 @@ zcertstore_lookup (zcertstore_t *self, const char *public_key)
         if (dir
         && (self->modified != zdir_modified (dir)
         ||  self->count != zdir_count (dir)
-        ||  self->cursize != zdir_cursize (dir)))
+        ||  self->cursize != (size_t) zdir_cursize (dir)))
             s_load_certs_from_disk (self);
             
         zdir_destroy (&dir);

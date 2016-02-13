@@ -260,7 +260,7 @@ s_rebuild_pollset (zloop_t *self)
     s_reader_t *reader = (s_reader_t *) zlistx_first (self->readers);
     uint item_nbr = 0;
     while (reader) {
-        zmq_pollitem_t poll_item = { zsock_resolve (reader->sock), 0, ZMQ_POLLIN };
+        zmq_pollitem_t poll_item = { zsock_resolve (reader->sock), 0, ZMQ_POLLIN, 0 };
         self->pollset [item_nbr] = poll_item;
         self->readact [item_nbr] = *reader;
         item_nbr++;
