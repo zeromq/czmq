@@ -11,9 +11,9 @@ sudo: false
 env:
 - BUILD_TYPE=default ZMQ_REPO=zeromq2-x
 - BUILD_TYPE=default ZMQ_REPO=zeromq3-x
-- BUILD_TYPE=default ZMQ_REPO=zeromq4-x WITH_LIBSODIUM=1
-- BUILD_TYPE=default ZMQ_REPO=zeromq4-1 WITH_LIBSODIUM=1
-- BUILD_TYPE=default ZMQ_REPO=libzmq    WITH_LIBSODIUM=1
+- BUILD_TYPE=default ZMQ_REPO=zeromq4-x
+- BUILD_TYPE=default ZMQ_REPO=zeromq4-1
+- BUILD_TYPE=default ZMQ_REPO=libzmq
 - BUILD_TYPE=android
 # As we have errors in bindings/python/test.py I'm suspending this...
 #- BUILD_TYPE=check-py
