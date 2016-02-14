@@ -616,6 +616,10 @@ s_can_connect (zctx_t *ctx, void **server, void **client)
     //  By default PUSH sockets block if there's no peer
     zsock_set_sndtimeo (*server, 200);
     zstr_send (*server, "Hello, World");
+    if (zsock_mechanism (*client) == ZMQ_CURVE)
+        zclock_sleep (1500);
+    else
+        zclock_sleep (200);
 
     zpoller_t *poller = zpoller_new (*client, NULL);
     bool success = (zpoller_wait (poller, 400) == *client);

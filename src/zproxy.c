@@ -434,9 +434,13 @@ s_can_connect (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, const char *f
     rc = zsock_connect (*sink, "%s", backend);
     assert (rc == 0);
     zstr_send (*faucet, "Hello, World");
+    if (zsock_mechanism (*faucet) == ZMQ_CURVE)
+        zclock_sleep (3000);
+    else
+        zclock_sleep (200);
     zpoller_t *poller = zpoller_new (*sink, NULL);
     assert (poller);
-    bool success = (zpoller_wait (poller, 200) == *sink);
+    bool success = (zpoller_wait (poller, 400) == *sink);
     zpoller_destroy (&poller);
     s_create_test_sockets (proxy, faucet, sink, verbose);
 
