@@ -1103,7 +1103,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
         //   We record the current process id in the lock file
         char pid_buffer [10];
         snprintf (pid_buffer, sizeof (pid_buffer), "%6d\n", getpid ());
-        if (write (handle, pid_buffer, strlen (pid_buffer)) != strlen (pid_buffer)) {
+        if ((size_t) write (handle, pid_buffer, strlen (pid_buffer)) != strlen (pid_buffer)) {
             zsys_error ("cannot write to lockfile: %s", strerror (errno));
             close (handle);
             return -1;

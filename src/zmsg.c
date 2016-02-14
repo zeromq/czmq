@@ -671,7 +671,7 @@ zmsg_encode (zmsg_t *self, byte **buffer)
         }
         frame = zmsg_next (self);
     }
-    assert ((dest - *buffer) == buffer_size);
+    assert ((size_t) (dest - *buffer) == buffer_size);
     return buffer_size;
 }
 
