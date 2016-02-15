@@ -18,9 +18,6 @@ CMAKE_OPTS+=("-DCMAKE_PREFIX_PATH:PATH=${BUILD_PREFIX}")
 CMAKE_OPTS+=("-DCMAKE_LIBRARY_PATH:PATH=${BUILD_PREFIX}/lib")
 CMAKE_OPTS+=("-DCMAKE_INCLUDE_PATH:PATH=${BUILD_PREFIX}/include")
 
-git clone git://github.com/jedisct1/libsodium.git &&
-( cd libsodium; ./autogen.sh && ./configure --prefix=$BUILD_PREFIX && make check && make install ) || exit 1
-
 # Build, check, and install ZeroMQ
 git clone git://github.com/zeromq/libzmq.git &&
 ( cd libzmq; ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" --prefix=${BUILD_PREFIX} && make check && make install ) || exit 1
