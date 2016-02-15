@@ -1283,8 +1283,10 @@ zsock_bsend (void *self, const char *picture, ...)
     byte *needle = (byte *) zmq_msg_data (&msg);
 
     //  Set routing id if self is zsock
+#if defined ZMQ_SERVER
     if (zsock_is (self) && zsock_routing_id ((zsock_t *)self) != 0)
         zmq_msg_set_routing_id (&msg, zsock_routing_id ((zsock_t *)self));
+#endif
 
     va_start (argptr, picture);
     picptr = picture;
@@ -1417,8 +1419,10 @@ zsock_brecv (void *selfish, const char *picture, ...)
     byte *ceiling = needle + zmq_msg_size (&msg);
 
     //  If selfish is zsock get routing id from msg
+#if defined ZMQ_SERVER
     if (zsock_is (selfish) && zsock_type (self) == ZMQ_SERVER)
         zsock_set_routing_id (self, zmq_msg_routing_id (&msg));
+#endif
 
     va_list argptr;
     va_start (argptr, picture);
