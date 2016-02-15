@@ -13,7 +13,7 @@ CONFIG_OPTS+=("CXXFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_OPTS+=("LDFLAGS=-L${BUILD_PREFIX}/lib")
 CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
 CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
-CONFIG_OPTS+=("--without-docs")
+CONFIG_OPTS+=("--with-docs=no")
 CONFIG_OPTS+=("--quiet")
 
 git clone --quiet --depth 1 -b stable git://github.com/jedisct1/libsodium.git &&
@@ -34,5 +34,4 @@ cd ../../..
 ./configure "${CONFIG_OPTS[@]}"
 make -j4
 make check
-make memcheck
 make install
