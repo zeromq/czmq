@@ -19,7 +19,7 @@ if [ "$BUILD_TYPE" == "default" ]; then
     CONFIG_OPTS+=("LDFLAGS=-L${BUILD_PREFIX}/lib")
     CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
     CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
-    CONFIG_OPTS+=("--without-docs")
+    CONFIG_OPTS+=("--with-docs=no")
     CONFIG_OPTS+=("--quiet")
 
     # Clone and build dependencies
