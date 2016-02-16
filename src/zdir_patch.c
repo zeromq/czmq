@@ -57,7 +57,7 @@ zdir_patch_new (const char *path, zfile_t *file, int op, const char *alias)
     self->vpath = (char *) zmalloc (strlen (alias) + strlen (filename) + 2);
     assert (self->vpath);
 
-    if (alias [strlen (alias) - 1] == '/')
+    if (strlen (alias) && alias [strlen (alias) - 1] == '/')
         sprintf (self->vpath, "%s%s", alias, filename);
     else
         sprintf (self->vpath, "%s/%s", alias, filename);
