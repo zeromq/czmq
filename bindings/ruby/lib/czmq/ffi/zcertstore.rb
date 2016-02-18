@@ -134,8 +134,8 @@ module CZMQ
         result
       end
 
-      # DEPRECATED as incompatible with centralized logging
-      # Print list of certificates in store to open stream 
+      # Print list of certificates in store to open stream. This method is
+      # deprecated, and you should use the print method.                  
       #
       # @param file [::FFI::Pointer, #to_ptr]
       # @return [void]

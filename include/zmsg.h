@@ -225,9 +225,9 @@ CZMQ_EXPORT void
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @ignore
-int
+CZMQ_EXPORT int
     zmsg_pushstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
-int
+CZMQ_EXPORT int
     zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 

@@ -90,9 +90,9 @@ CZMQ_EXPORT char *
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @ignore
-int
+CZMQ_EXPORT int
     zstr_sendf (void *dest, const char *format, ...) CHECK_PRINTF (2);
-int
+CZMQ_EXPORT int
     zstr_sendfm (void *dest, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 

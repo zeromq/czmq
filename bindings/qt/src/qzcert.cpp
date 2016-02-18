@@ -170,8 +170,8 @@ void QZcert::print ()
 }
 
 ///
-//  DEPRECATED as incompatible with centralized logging
-//  Print certificate contents to open stream          
+//  Print certificate contents to open stream. This method is deprecated
+//  and you should use the print method.                                
 void QZcert::fprint (FILE *file)
 {
     zcert_fprint (self, file);

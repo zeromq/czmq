@@ -63,8 +63,8 @@ void QZcertstore::print ()
 }
 
 ///
-//  DEPRECATED as incompatible with centralized logging
-//  Print list of certificates in store to open stream 
+//  Print list of certificates in store to open stream. This method is
+//  deprecated, and you should use the print method.                  
 void QZcertstore::fprint (FILE *file)
 {
     zcertstore_fprint (self, file);

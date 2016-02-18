@@ -166,13 +166,13 @@ CZMQ_EXPORT void
     zconfig_test (bool verbose);
 
 //  @ignore
-void
+CZMQ_EXPORT void
     zconfig_putf (zconfig_t *self, const char *path, const char *format, ...) CHECK_PRINTF (3);
-void
+CZMQ_EXPORT void
     zconfig_set_value (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
-void
+CZMQ_EXPORT void
     zconfig_set_comment (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
-int
+CZMQ_EXPORT int
     zconfig_savef (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 

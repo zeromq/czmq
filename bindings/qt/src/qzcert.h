@@ -80,8 +80,8 @@ public:
     //  Print certificate contents to stdout
     void print ();
 
-    //  DEPRECATED as incompatible with centralized logging
-    //  Print certificate contents to open stream          
+    //  Print certificate contents to open stream. This method is deprecated
+    //  and you should use the print method.                                
     void fprint (FILE *file);
 
     //  Self test of this class

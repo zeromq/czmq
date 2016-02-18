@@ -125,7 +125,8 @@ typedef void (zhashx_free_fn) (
 typedef size_t (zhashx_hash_fn) (
     const void *key);
 
-// DEPRECATED as clumsy -- use zhashx_first/_next instead
+// Callback function for zhashx_foreach method.                              
+// This callback is deprecated and you should use zhashx_first/_next instead.
 typedef int (zhashx_foreach_fn) (
     const char *key, void *item, void *argument);
 
@@ -360,8 +361,8 @@ bool
 void
     zcert_print (zcert_t *self);
 
-// DEPRECATED as incompatible with centralized logging
-// Print certificate contents to open stream          
+// Print certificate contents to open stream. This method is deprecated
+// and you should use the print method.                                
 void
     zcert_fprint (zcert_t *self, FILE *file);
 
@@ -399,8 +400,8 @@ void
 void
     zcertstore_print (zcertstore_t *self);
 
-// DEPRECATED as incompatible with centralized logging
-// Print list of certificates in store to open stream 
+// Print list of certificates in store to open stream. This method is
+// deprecated, and you should use the print method.                  
 void
     zcertstore_fprint (zcertstore_t *self, FILE *file);
 
@@ -1438,16 +1439,15 @@ void
 zhashx_t *
     zhashx_dup_v2 (zhashx_t *self);
 
-// DEPRECATED as clumsy -- use set_destructor instead
-// Set hash for automatic value destruction          
+// Set hash for automatic value destruction. This method is deprecated
+// and you should use set_destructor instead.                         
 void
     zhashx_autofree (zhashx_t *self);
 
-// DEPRECATED as clumsy -- use zhashx_first/_next instead                 
 // Apply function to each item in the hash table. Items are iterated in no
 // defined order. Stops if callback function returns non-zero and returns 
-// final return code from callback function (zero = success).             
-// Callback function for zhashx_foreach method                            
+// final return code from callback function (zero = success). This method 
+// is deprecated and you should use zhashx_first/_next instead.           
 int
     zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 

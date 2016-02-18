@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has legacy methods, which will be removed over time. You
+//  should not use them, and migrate any code that is still using them.
 //  Create a new certificate store from a disk directory, loading and        
 //  indexing all certificates in that location. The directory itself may be  
 //  absent, and created later, or modified at any time. The certificate store
@@ -52,8 +54,9 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zcertstore_print (zcertstore_t *self);
 
-//  DEPRECATED as incompatible with centralized logging
-//  Print list of certificates in store to open stream 
+//  *** Deprecated method, slated for removal: avoid using it ***
+//  Print list of certificates in store to open stream. This method is
+//  deprecated, and you should use the print method.                  
 CZMQ_EXPORT void
     zcertstore_fprint (zcertstore_t *self, FILE *file);
 
