@@ -159,15 +159,15 @@ CZMQ_EXPORT void
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @ignore
-void
+CZMQ_EXPORT void
     zproc_log_error (const char *format, ...) CHECK_PRINTF (1);
-void
+CZMQ_EXPORT void
     zproc_log_warning (const char *format, ...) CHECK_PRINTF (1);
-void
+CZMQ_EXPORT void
     zproc_log_notice (const char *format, ...) CHECK_PRINTF (1);
-void
+CZMQ_EXPORT void
     zproc_log_info (const char *format, ...) CHECK_PRINTF (1);
-void
+CZMQ_EXPORT void
     zproc_log_debug (const char *format, ...) CHECK_PRINTF (1);
 //  @end
 

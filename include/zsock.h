@@ -812,13 +812,13 @@ CZMQ_EXPORT void
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @ignore
-int
+CZMQ_EXPORT int
     zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
-int
+CZMQ_EXPORT int
     zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
-int
+CZMQ_EXPORT int
     zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
-int
+CZMQ_EXPORT int
     zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 

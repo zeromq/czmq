@@ -24,6 +24,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has legacy methods, which will be removed over time. You
+//  should not use them, and migrate any code that is still using them.
 // Destroy an item
 typedef void (zhashx_destructor_fn) (
     void **item);
@@ -44,7 +46,8 @@ typedef void (zhashx_free_fn) (
 typedef size_t (zhashx_hash_fn) (
     const void *key);
 
-// DEPRECATED as clumsy -- use zhashx_first/_next instead
+// Callback function for zhashx_foreach method.                              
+// This callback is deprecated and you should use zhashx_first/_next instead.
 typedef int (zhashx_foreach_fn) (
     const char *key, void *item, void *argument);
 
@@ -240,16 +243,17 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zhashx_t *
     zhashx_dup_v2 (zhashx_t *self);
 
-//  DEPRECATED as clumsy -- use set_destructor instead
-//  Set hash for automatic value destruction          
+//  *** Deprecated method, slated for removal: avoid using it ***
+//  Set hash for automatic value destruction. This method is deprecated
+//  and you should use set_destructor instead.                         
 CZMQ_EXPORT void
     zhashx_autofree (zhashx_t *self);
 
-//  DEPRECATED as clumsy -- use zhashx_first/_next instead                 
+//  *** Deprecated method, slated for removal: avoid using it ***
 //  Apply function to each item in the hash table. Items are iterated in no
 //  defined order. Stops if callback function returns non-zero and returns 
-//  final return code from callback function (zero = success).             
-//  Callback function for zhashx_foreach method                            
+//  final return code from callback function (zero = success). This method 
+//  is deprecated and you should use zhashx_first/_next instead.           
 CZMQ_EXPORT int
     zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
@@ -258,7 +262,7 @@ CZMQ_EXPORT void
     zhashx_test (bool verbose);
 
 //  @ignore
-void
+CZMQ_EXPORT void
     zhashx_comment (zhashx_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
