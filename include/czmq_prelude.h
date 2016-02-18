@@ -460,11 +460,10 @@ typedef struct {
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__))
     typedef int mode_t;
-#       if defined (__IS_64BIT__)
-    typedef long long ssize_t;
-#       else
-    typedef long ssize_t;
-#       endif
+#     if !defined (_SSIZE_T_DEFINED)
+typedef intptr_t ssize_t;
+#       define _SSIZE_T_DEFINED
+#     endif
 #   endif
 #   if ((!defined (__MINGW32__) \
     || (defined (__MINGW32__) && defined (__IS_64BIT__))) \
