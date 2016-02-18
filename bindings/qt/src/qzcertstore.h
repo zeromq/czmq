@@ -41,8 +41,8 @@ public:
     //  Print list of certificates in store to logging facility
     void print ();
 
-    //  DEPRECATED as incompatible with centralized logging
-    //  Print list of certificates in store to open stream 
+    //  Print list of certificates in store to open stream. This method is
+    //  deprecated, and you should use the print method.                  
     void fprint (FILE *file);
 
     //  Self test of this class

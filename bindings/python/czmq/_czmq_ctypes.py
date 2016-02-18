@@ -721,8 +721,8 @@ heap memory, returns NULL.
 
     def fprint(self, file):
         """
-        DEPRECATED as incompatible with centralized logging
-Print certificate contents to open stream
+        Print certificate contents to open stream. This method is deprecated
+and you should use the print method.
         """
         return lib.zcert_fprint(self._as_parameter_, coerce_py_file(file))
 
@@ -827,8 +827,8 @@ directly on the certificate. Takes ownership of zcert_t object.
 
     def fprint(self, file):
         """
-        DEPRECATED as incompatible with centralized logging
-Print list of certificates in store to open stream
+        Print list of certificates in store to open stream. This method is
+deprecated, and you should use the print method.
         """
         return lib.zcertstore_fprint(self._as_parameter_, coerce_py_file(file))
 
@@ -3073,18 +3073,17 @@ since there's no other way to know how to duplicate the item value.
 
     def autofree(self):
         """
-        DEPRECATED as clumsy -- use set_destructor instead
-Set hash for automatic value destruction
+        Set hash for automatic value destruction. This method is deprecated
+and you should use set_destructor instead.
         """
         return lib.zhashx_autofree(self._as_parameter_)
 
     def foreach(self, callback, argument):
         """
-        DEPRECATED as clumsy -- use zhashx_first/_next instead
-Apply function to each item in the hash table. Items are iterated in no
+        Apply function to each item in the hash table. Items are iterated in no
 defined order. Stops if callback function returns non-zero and returns
-final return code from callback function (zero = success).
-Callback function for zhashx_foreach method
+final return code from callback function (zero = success). This method
+is deprecated and you should use zhashx_first/_next instead.
         """
         return lib.zhashx_foreach(self._as_parameter_, callback, argument)
 

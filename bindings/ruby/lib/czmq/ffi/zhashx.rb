@@ -156,7 +156,8 @@ module CZMQ
       end
 
       # Create a new callback of the following type:
-      # DEPRECATED as clumsy -- use zhashx_first/_next instead
+      # Callback function for zhashx_foreach method.                              
+      # This callback is deprecated and you should use zhashx_first/_next instead.
       #     typedef int (zhashx_foreach_fn) (                
       #         const char *key, void *item, void *argument);
       #
@@ -555,8 +556,8 @@ module CZMQ
         result
       end
 
-      # DEPRECATED as clumsy -- use set_destructor instead
-      # Set hash for automatic value destruction          
+      # Set hash for automatic value destruction. This method is deprecated
+      # and you should use set_destructor instead.                         
       #
       # @return [void]
       def autofree()
@@ -566,11 +567,10 @@ module CZMQ
         result
       end
 
-      # DEPRECATED as clumsy -- use zhashx_first/_next instead                 
       # Apply function to each item in the hash table. Items are iterated in no
       # defined order. Stops if callback function returns non-zero and returns 
-      # final return code from callback function (zero = success).             
-      # Callback function for zhashx_foreach method                            
+      # final return code from callback function (zero = success). This method 
+      # is deprecated and you should use zhashx_first/_next instead.           
       #
       # @param callback [::FFI::Pointer, #to_ptr]
       # @param argument [::FFI::Pointer, #to_ptr]
