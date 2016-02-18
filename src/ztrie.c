@@ -342,11 +342,11 @@ s_ztrie_parse_path (ztrie_t *self, const char *path, int mode)
     if (zlistx_size (self->params) > 0)
         zlistx_purge (self->params);
 
-    int len = strlen (path);
+    size_t len = strlen (path);
     needle = (char *) path;
     char *needle_stop = needle + len;
     //  Ignore trailing delimiter
-    if (needle[len-1] == self->delimiter)
+    if (needle [len-1] == self->delimiter)
         needle_stop -= 1;
     while (needle < needle_stop + 1) {
         //  It is valid not to have an delimiter at the end of the path
@@ -367,7 +367,7 @@ s_ztrie_parse_path (ztrie_t *self, const char *path, int mode)
                 int matchType = zlistx_size (self->params) > 0? NODE_TYPE_PARAM:
                                     beginRegex? NODE_TYPE_REGEX: NODE_TYPE_STRING;
                 char *matchToken = beginRegex? beginRegex: beginToken;
-                int matchTokenLen = needle - matchToken - (beginRegex? 1: 0);
+                int matchTokenLen = (int) (needle - matchToken) - (beginRegex? 1: 0);
                 //  Illegal token
                 if (matchTokenLen == 0)
                     return NULL;
@@ -387,7 +387,7 @@ s_ztrie_parse_path (ztrie_t *self, const char *path, int mode)
                     matchType = zlistx_size (self->params) > 0? NODE_TYPE_PARAM:
                                         beginRegex? NODE_TYPE_REGEX: NODE_TYPE_STRING;
                     matchToken = beginRegex? beginRegex: beginToken;
-                    matchTokenLen = needle - matchToken - (beginRegex? 1: 0);
+                    matchTokenLen = (int) (needle - matchToken) - (beginRegex? 1: 0);
                 }
 
                 //  In insert and lookup mode only do a string comparison

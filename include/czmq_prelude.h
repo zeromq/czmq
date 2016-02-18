@@ -80,6 +80,7 @@
 #   define __MSDOS__
 //  Stop cheeky warnings about "deprecated" functions like fopen
 #   if _MSC_VER >= 1500
+#       undef  _CRT_SECURE_NO_DEPRECATE
 #       define _CRT_SECURE_NO_DEPRECATE
 #       pragma warning(disable: 4996)
 #   endif
