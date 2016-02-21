@@ -71,6 +71,7 @@ s_self_destroy (self_t **self_p)
     assert (self_p);
     if (*self_p) {
         self_t *self = *self_p;
+        zpoller_destroy (&self->poller);
         zsock_destroy (&self->frontend);
         zsock_destroy (&self->backend);
         zsock_destroy (&self->capture);
@@ -80,7 +81,6 @@ s_self_destroy (self_t **self_p)
             zstr_free (&self->public_key [index]);
             zstr_free (&self->secret_key [index]);
         }
-        zpoller_destroy (&self->poller);
         free (self);
         *self_p = NULL;
     }
