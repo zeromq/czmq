@@ -270,4 +270,11 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zgossip_msg_test (bool verbose);
 
+//  *** Draft constants, defined for internal use only ***
+#define ZGOSSIP_MSG_HELLO 1                 // 
+#define ZGOSSIP_MSG_PUBLISH 2               // 
+#define ZGOSSIP_MSG_PING 3                  // 
+#define ZGOSSIP_MSG_PONG 4                  // 
+#define ZGOSSIP_MSG_INVALID 5               // 
+
 #endif

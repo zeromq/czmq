@@ -1,0 +1,25 @@
+{
+  "name": "czmq",
+  # ???
+  "version": "0.0.0",
+  "description": "czmq",
+  "scripts": {
+    "install": "prebuild --install",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "rebuild": "prebuild --compile",
+    "prebuild": "prebuild --strip --verbose"
+  },
+  "author": "See AUTHORS",
+  "license": "MPL-2.0",
+  "gypfile": true,
+  "repository": {
+    "type": "git",
+    # ???
+    "url": "https://github.com/hintjens/zyre-nodejs"
+  },
+  "dependencies": {
+    "prebuild": "^3.0.3",
+    "node-ninja": "^1.0.1",
+    "nan": "^2.2.0"
+  }
+}
