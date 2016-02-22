@@ -56,7 +56,7 @@ AX_PROJECT_LOCAL_HOOK # Optional project-local hook (acinclude.m4)
 
 # Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
-                  [With GCC Code Coverage reporting.])],
+                  [With GCC Code Coverage reporting])],
                   [CZMQ_GCOV="$withval"])
 
 if test "x${CZMQ_GCOV}" == "xyes"; then
@@ -110,7 +110,7 @@ PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
                 AC_SUBST([libzmq_LIBS],[${libzmq_synthetic_libs}])
                 was_libzmq_check_lib_detected=yes
             ],
-            [AC_MSG_ERROR([cannot link with -lzmq, install libzmq.])])
+            [AC_MSG_ERROR([cannot link with -lzmq, install libzmq])])
     ])
 
 if test "x$was_libzmq_check_lib_detected" = "xno"; then
@@ -122,7 +122,7 @@ was_uuid_check_lib_detected=no
 
 PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
     [
-        AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used.])
+        AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
     ],
     [
         AC_ARG_WITH([uuid],
@@ -154,7 +154,7 @@ PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
                 AC_SUBST([uuid_CFLAGS],[${uuid_synthetic_cflags}])
                 AC_SUBST([uuid_LIBS],[${uuid_synthetic_libs}])
                 was_uuid_check_lib_detected=yes
-                AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used.])
+                AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
             ],
             [])
     ])
@@ -168,7 +168,7 @@ was_systemd_check_lib_detected=no
 
 PKG_CHECK_MODULES([systemd], [libsystemd >= 200.0.0],
     [
-        AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The libsystemd library is to be used.])
+        AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The libsystemd library is to be used])
     ],
     [
         AC_MSG_WARN([Cannot find libsystemd 200.0.0 or higher])
@@ -302,7 +302,7 @@ case "${host_os}" in
         czmq_on_gnu="yes"
         ;;
     *)
-        AC_MSG_ERROR([unsupported system: ${host_os}.])
+        AC_MSG_ERROR([unsupported system: ${host_os}])
         ;;
 esac
 
@@ -347,7 +347,7 @@ AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 # Check for zmakecert intent
 AC_ARG_ENABLE([zmakecert],
     AS_HELP_STRING([--enable-zmakecert],
-        [Compile and install 'zmakecert' [default=yes].]),
+        [Compile and install 'zmakecert' [default=yes]]),
     [enable_zmakecert=$enableval],
     [enable_zmakecert=yes])
 
@@ -357,7 +357,7 @@ AM_COND_IF([ENABLE_ZMAKECERT], [AC_MSG_NOTICE([ENABLE_ZMAKECERT defined])])
 # Check for czmq_selftest intent
 AC_ARG_ENABLE([czmq_selftest],
     AS_HELP_STRING([--enable-czmq_selftest],
-        [Compile 'czmq_selftest' in src [default=yes].]),
+        [Compile 'czmq_selftest' in src [default=yes]]),
     [enable_czmq_selftest=$enableval],
     [enable_czmq_selftest=yes])
 
@@ -376,9 +376,9 @@ AC_SUBST([pkgconfigdir])
 
 
 # enable specific system integration features
-AC_ARG_WITH([systemd],
+AC_ARG_WITH([systemd-units],
     AS_HELP_STRING([--with-systemd-units],
-    [Build and install with systemd units integration [default=no].]),
+    [Build and install with systemd units integration [default=no]]),
     [with_systemd_units=$withval],
     [with_systemd_units=no])
 
@@ -391,24 +391,24 @@ AM_COND_IF([WITH_SYSTEMD_UNITS],
 
 if test "x$cross_compiling" = "xyes"; then
     #   Enable draft by default when cross-compiling
-    gitmaster=yes
+    defaultval=yes
 else
     # enable draft API by default if we're in a git repository
     # else disable it by default; then allow --enable-drafts=yes/no override
-    AC_CHECK_FILE($srcdir/.git, [gitmaster=yes], [gitmaster=no])
+    AC_CHECK_FILE($srcdir/.git, [defaultval=yes], [defaultval=no])
 fi
 
 AC_ARG_ENABLE([drafts],
     AS_HELP_STRING([--enable-drafts],
-        [Build and install draft classes and methods [default=yes.]]),
+        [Build and install draft classes and methods [default=yes]]),
     [enable_drafts=$enableval],
-    [enable_drafts=$gitmaster])
+    [enable_drafts=$defaultval])
 
 AM_CONDITIONAL([ENABLE_DRAFTS], [test x$enable_drafts != xno])
 
 if test "x$enable_drafts" = "xyes"; then
     AC_MSG_NOTICE([Building stable and legacy API + draft API])
-    AC_DEFINE(CZMQ_BUILD_DRAFT_API, 1, [Provide draft classes and methods.])
+    AC_DEFINE(CZMQ_BUILD_DRAFT_API, 1, [Provide draft classes and methods])
     AC_SUBST(pkg_config_defines, "-DCZMQ_BUILD_DRAFT_API=1")
 else
     AC_MSG_NOTICE([Building stable and legacy API (no draft API)])

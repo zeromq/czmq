@@ -26,7 +26,6 @@
 #include <zmq.h>
 
 //  CZMQ version macros for compile-time API detection
-
 #define CZMQ_VERSION_MAJOR 3
 #define CZMQ_VERSION_MINOR 0
 #define CZMQ_VERSION_PATCH 3
@@ -128,7 +127,7 @@ typedef struct _zsockopt_t zsockopt_t;
 #define ZSOCKOPT_T_DEFINED
 typedef struct _zthread_t zthread_t;
 #define ZTHREAD_T_DEFINED
-//  Draft classes are by default not built stable releases
+//  Draft classes are by default not built in stable releases
 #ifdef CZMQ_BUILD_DRAFT_API
 typedef struct _zproc_t zproc_t;
 #define ZPROC_T_DEFINED
