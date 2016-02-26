@@ -1,0 +1,3 @@
+usr/include/*
+usr/lib/*/libczmq.so
+usr/lib/*/pkgconfig/libczmq.pc

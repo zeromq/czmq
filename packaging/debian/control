@@ -9,18 +9,15 @@
 #    License, v. 2.0. If a copy of the MPL was not distributed with this
 #    file, You can obtain one at http://mozilla.org/MPL/2.0/.           
 
-Source:         CZMQ
+Source:         czmq
 Section:        net
 Priority:       optional
-Maintainer:     John Doe <John.Doe@example.com>
-Uploaders:      John Doe <John.Doe@example.com>
-Standards-Version: 3.9.5
-Build-Depends: bison, debhelper (>= 8),
+Maintainer:     czmq Developers <zeromq-dev@lists.zeromq.org>
+Standards-Version: 3.9.7
+Build-Depends: debhelper (>= 9),
     pkg-config,
-    automake,
-    autoconf,
-    libtool,
-    libzmq4-dev,
+    dh-autoreconf,
+    libzmq5-dev,
     uuid-dev,
     libsystemd-dev,
     dh-autoreconf,
@@ -32,18 +29,18 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: czmq
  This package contains shared library for czmq: the high-level c binding for 0mq
 
-Package: CZMQ-dev
-Architecture: all
+Package: libczmq-dev
+Architecture: any
 Section: libdevel
 Depends:
-    libzmq4-dev,
+    libzmq5-dev,
     uuid-dev,
     libsystemd-dev,
     libczmq3 (= ${binary:Version})
 Description: development files for czmq
  This package contains development files for czmq: the high-level c binding for 0mq
 
-Package: CZMQ
+Package: czmq
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: the high-level c binding for 0mq
@@ -54,7 +51,7 @@ Architecture: any
 Section: debug
 Priority: extra
 Depends:
-    CZMQ (= ${binary:Version}),
+    czmq (= ${binary:Version}),
     ${misc:Depends}
 Description: debugging symbols for czmq
  This package contains the debugging symbols for czmq : the high-level c binding for 0mq.
