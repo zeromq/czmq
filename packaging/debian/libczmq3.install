@@ -1,1 +1,1 @@
-debian/tmp/usr/lib/*/libczmq.so.*
+usr/lib/*/libczmq.so.*
