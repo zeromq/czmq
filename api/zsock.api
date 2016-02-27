@@ -371,5 +371,5 @@
         <return type = "anything" />
     </method>
 
-    <include filename = "zsock_option.xml" />
+    <include filename = "zsock_option.api" />
 </class>
