@@ -48,12 +48,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zarmour_encode (zarmour_t *self, const byte *data, size_t size);
 
-//  Decode an armoured string into a string of bytes.          
-//  The decoded output is null-terminated, so it may be treated
-//  as a string, if that's what it was prior to encoding.      
+//  Decode an armoured string into a chunk. The decoded output is    
+//  null-terminated, so it may be treated as a string, if that's what
+//  it was prior to encoding.                                        
 //  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT byte *
-    zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size);
+CZMQ_EXPORT zchunk_t *
+    zarmour_decode (zarmour_t *self, const char *data);
 
 //  Get the mode property.
 CZMQ_EXPORT zarmour_mode_t
