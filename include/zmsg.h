@@ -41,11 +41,11 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT zmsg_t *
     zmsg_load (FILE *file);
 
-//  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-//  there was insufficient memory to work.                                   
+//  Decodes a serialized message frame created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the frame was badly formatted or   
+//  there was insufficient memory to work.                                  
 CZMQ_EXPORT zmsg_t *
-    zmsg_decode (const byte *buffer, size_t buffer_size);
+    zmsg_decode (zframe_t *frame);
 
 //  Generate a signal message encoding the given status. A signal is a short
 //  message carrying a 1-byte success/failure code (by convention, 0 means  
@@ -143,7 +143,7 @@ CZMQ_EXPORT int
     zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
 
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesful.                                             
+//  decoding was not successful.                                            
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zmsg_t *
     zmsg_popmsg (zmsg_t *self);
@@ -174,12 +174,14 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zmsg_save (zmsg_t *self, FILE *file);
 
-//  Serialize multipart message to a single buffer. Use this method to send  
-//  structured messages across transports that do not support multipart data.
-//  Allocates and returns a new buffer containing the serialized message.    
-//  To decode a serialized message buffer, use zmsg_decode ().               
-CZMQ_EXPORT size_t
-    zmsg_encode (zmsg_t *self, byte **buffer);
+//  Serialize multipart message to a single message frame. Use this method
+//  to send structured messages across transports that do not support     
+//  multipart data. Allocates and returns a new frame containing the      
+//  serialized message. To decode a serialized message frame, use         
+//  zmsg_decode ().                                                       
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zframe_t *
+    zmsg_encode (zmsg_t *self);
 
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
 //  object. If message is null, or memory was exhausted, returns null.   
