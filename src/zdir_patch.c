@@ -29,7 +29,7 @@ struct _zdir_patch_t {
     char *path;                 //  Directory path
     char *vpath;                //  Virtual file path
     zfile_t *file;              //  File we refer to
-    zdir_patch_op_t op;         //  Operation
+    int op;                     //  Operation
     char *digest;               //  File SHA-1 digest
 };
 
@@ -39,8 +39,7 @@ struct _zdir_patch_t {
 //  Create new patch, create virtual path from alias
 
 zdir_patch_t *
-zdir_patch_new (const char *path, zfile_t *file,
-                zdir_patch_op_t op, const char *alias)
+zdir_patch_new (const char *path, zfile_t *file, int op, const char *alias)
 {
     zdir_patch_t *self = (zdir_patch_t *) zmalloc (sizeof (zdir_patch_t));
     assert (self);
@@ -140,7 +139,7 @@ zdir_patch_file (zdir_patch_t *self)
 //  --------------------------------------------------------------------------
 //  Return operation
 
-zdir_patch_op_t
+int
 zdir_patch_op (zdir_patch_t *self)
 {
     assert (self);

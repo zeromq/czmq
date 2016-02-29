@@ -27,15 +27,12 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-// 
-typedef enum {
-    ZDIR_PATCH_CREATE = 1,                                  //  
-    ZDIR_PATCH_DELETE = 2                                   //  
-} zdir_patch_op_t;
+#define ZDIR_PATCH_CREATE 1                 // Creates a new file
+#define ZDIR_PATCH_DELETE 2                 // Delete a file
 
 //  Create new patch
 CZMQ_EXPORT zdir_patch_t *
-    zdir_patch_new (const char *path, zfile_t *file, zdir_patch_op_t op, const char *alias);
+    zdir_patch_new (const char *path, zfile_t *file, int op, const char *alias);
 
 //  Destroy a patch
 CZMQ_EXPORT void
@@ -56,7 +53,7 @@ CZMQ_EXPORT zfile_t *
     zdir_patch_file (zdir_patch_t *self);
 
 //  Return operation
-CZMQ_EXPORT zdir_patch_op_t
+CZMQ_EXPORT int
     zdir_patch_op (zdir_patch_t *self);
 
 //  Return patch virtual file path

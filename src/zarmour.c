@@ -45,7 +45,7 @@
 //  Structure of our class
 
 struct _zarmour_t {
-    zarmour_mode_t mode;        //  The current mode (Base64/32/16/Z85, STD/URL)
+    int mode;                   //  The current mode (Base64/32/16/Z85, STD/URL)
     bool pad;                   //  Should output be padded?
     char pad_char;              //  The pad character
     bool line_breaks;           //  Should output be broken into lines?
@@ -460,6 +460,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
 //  Decode an armoured string into a chunk. The decoded output is
 //  null-terminated, so it may be treated as a string, if that's what
 //  it was prior to encoding.
+//  Caller owns return value and must destroy it when done.
 
 zchunk_t *
 zarmour_decode (zarmour_t *self, const char *data)
@@ -504,7 +505,7 @@ zarmour_decode (zarmour_t *self, const char *data)
 //  --------------------------------------------------------------------------
 //  Get the mode property.
 
-zarmour_mode_t
+int
 zarmour_mode (zarmour_t *self)
 {
     assert (self);
@@ -527,7 +528,7 @@ zarmour_mode_str (zarmour_t *self)
 //  Set the mode property.
 
 void
-zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode)
+zarmour_set_mode (zarmour_t *self, int mode)
 {
     assert (self);
     self->mode = mode;
@@ -712,7 +713,7 @@ zarmour_test (bool verbose)
     zarmour_t *self = zarmour_new ();
     assert (self);
 
-    zarmour_mode_t mode = zarmour_mode (self);
+    int mode = zarmour_mode (self);
     assert (mode == ZARMOUR_MODE_BASE64_STD);
 
     zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
