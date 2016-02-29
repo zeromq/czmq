@@ -477,18 +477,16 @@ zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p)
     assert (zmsg_is (self));
     assert (msg_p);
 
-    byte *data;
-    size_t length = zmsg_encode (*msg_p, &data);
+    zframe_t *frame = zmsg_encode (*msg_p);
+    zmsg_append (self, &frame);
     zmsg_destroy (msg_p);
-    zmsg_addmem (self, data, length);
-    free (data);
     return 0;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesfull. Caller now owns message and must destroy it
+//  decoding was not successful. Caller now owns message and must destroy it
 //  when finished with it.
 
 zmsg_t *
@@ -500,10 +498,7 @@ zmsg_popmsg (zmsg_t *self)
     zframe_t *frame = zmsg_pop (self);
     if (!frame)
         return NULL;
-
-    size_t len = zframe_size (frame);
-    byte *data = zframe_data (frame);
-    zmsg_t *msg = zmsg_decode (data, len);
+    zmsg_t *msg = zmsg_decode (frame);
     zframe_destroy (&frame);
     return msg;
 }
@@ -621,37 +616,38 @@ zmsg_load (FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Serialize multipart message to a single buffer. Use this method to send
-//  structured messages across transports that do not support multipart data.
-//  Allocates and returns a new buffer containing the serialized message.
-//  To decode a serialized message buffer, use zmsg_decode ().
-
+//  Serialize multipart message to a single message frame. Use this method
+//  to send structured messages across transports that do not support
+//  multipart data. Allocates and returns a new frame containing the
+//  serialized message. To decode a serialized message frame, use
+//  zmsg_decode ().
+//
 //  Frame lengths are encoded as 1 or 1+4 bytes
 //  0..254 bytes        octet + data
 //  255..4Gb-1 bytes    0xFF + 4octet + data
 
-size_t
-zmsg_encode (zmsg_t *self, byte **buffer)
+zframe_t *
+zmsg_encode (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
 
-    //  Calculate real size of buffer
-    size_t buffer_size = 0;
+    //  Calculate real size of frame
+    size_t total_size = 0;
     zframe_t *frame = zmsg_first (self);
     while (frame) {
         size_t frame_size = zframe_size (frame);
         if (frame_size < 255)
-            buffer_size += frame_size + 1;
+            total_size += frame_size + 1;
         else
-            buffer_size += frame_size + 1 + 4;
+            total_size += frame_size + 1 + 4;
         frame = zmsg_next (self);
     }
-    *buffer = (byte *) zmalloc (buffer_size);
-    assert (buffer);
+    zframe_t *encoded = zframe_new (NULL, total_size);
+    assert (encoded);
 
-    //  Encode message now
-    byte *dest = *buffer;
+    //  Encode message into frame
+    byte *dest = zframe_data (encoded);
     frame = zmsg_first (self);
     while (frame) {
         size_t frame_size = zframe_size (frame);
@@ -671,24 +667,25 @@ zmsg_encode (zmsg_t *self, byte **buffer)
         }
         frame = zmsg_next (self);
     }
-    assert ((size_t) (dest - *buffer) == buffer_size);
-    return buffer_size;
+    assert ((size_t) (dest - zframe_data (encoded)) == total_size);
+    return encoded;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or
+//  Decodes a serialized message frame created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the frame was badly formatted or
 //  there was insufficient memory to work.
 
 zmsg_t *
-zmsg_decode (const byte *buffer, size_t buffer_size)
+zmsg_decode (zframe_t *frame)
 {
+    assert (frame);
     zmsg_t *self = zmsg_new ();
     assert (self);
 
-    const byte *source = buffer;
-    const byte *limit = buffer + buffer_size;
+    const byte *source = zframe_data (frame);
+    const byte *limit = zframe_data (frame) + zframe_size (frame);
     while (source < limit) {
         size_t frame_size = *source++;
         if (frame_size == 255) {
@@ -706,9 +703,9 @@ zmsg_decode (const byte *buffer, size_t buffer_size)
             zmsg_destroy (&self);
             break;
         }
-        zframe_t *frame = zframe_new (source, frame_size);
-        assert (frame);
-        zmsg_append (self, &frame);
+        zframe_t *decoded = zframe_new (source, frame_size);
+        assert (decoded);
+        zmsg_append (self, &decoded);
         source += frame_size;
     }
     return self;
@@ -1102,13 +1099,12 @@ zmsg_test (bool verbose)
     assert (rc == 0);
     free (blank);
     assert (zmsg_size (msg) == 9);
-    byte *buffer;
-    size_t buffer_size = zmsg_encode (msg, &buffer);
+    frame = zmsg_encode (msg);
     zmsg_destroy (&msg);
-    msg = zmsg_decode (buffer, buffer_size);
+    msg = zmsg_decode (frame);
     assert (msg);
-    free (buffer);
     zmsg_destroy (&msg);
+    zframe_destroy (&frame);
 
     //  Test submessages
     msg = zmsg_new ();

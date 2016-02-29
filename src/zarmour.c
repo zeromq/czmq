@@ -45,7 +45,7 @@
 //  Structure of our class
 
 struct _zarmour_t {
-    zarmour_mode_t mode;        //  The current mode (Base64/32/16/Z85, STD/URL)
+    int mode;                   //  The current mode (Base64/32/16/Z85, STD/URL)
     bool pad;                   //  Should output be padded?
     char pad_char;              //  The pad character
     bool line_breaks;           //  Should output be broken into lines?
@@ -457,16 +457,16 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
 
 
 //  --------------------------------------------------------------------------
-//  Encode a stream of bytes into an armoured string. Returns the armoured
-//  string, or NULL if there was insufficient memory available to allocate
-//  a new string.
+//  Decode an armoured string into a chunk. The decoded output is
+//  null-terminated, so it may be treated as a string, if that's what
+//  it was prior to encoding.
+//  Caller owns return value and must destroy it when done.
 
-byte *
-zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
+zchunk_t *
+zarmour_decode (zarmour_t *self, const char *data)
 {
     assert (self);
     assert (data);
-    assert (decode_size);
 
     size_t linebreakchars = 0;
     char *line_end = self->line_end;
@@ -475,29 +475,37 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
         linebreakchars += strlen (line_end);
         pos += strlen (line_end);
     }
+    byte *decoded = NULL;
+    size_t size = 0;
+
     switch (self->mode) {
         case ZARMOUR_MODE_BASE64_STD:
-            return s_base64_decode (data, decode_size, s_base64_alphabet, linebreakchars);
+            decoded = s_base64_decode (data, &size, s_base64_alphabet, linebreakchars);
+            break;
         case ZARMOUR_MODE_BASE64_URL:
-            return s_base64_decode (data, decode_size, s_base64url_alphabet, linebreakchars);
+            decoded = s_base64_decode (data, &size, s_base64url_alphabet, linebreakchars);
+            break;
         case ZARMOUR_MODE_BASE32_STD:
-            return s_base32_decode (data, decode_size, s_base32_alphabet, linebreakchars);
+            decoded = s_base32_decode (data, &size, s_base32_alphabet, linebreakchars);
+            break;
         case ZARMOUR_MODE_BASE32_HEX:
-            return s_base32_decode (data, decode_size, s_base32hex_alphabet, linebreakchars);
+            decoded = s_base32_decode (data, &size, s_base32hex_alphabet, linebreakchars);
+            break;
         case ZARMOUR_MODE_BASE16:
-            return s_base16_decode (data, decode_size, s_base16_alphabet, linebreakchars);
+            decoded = s_base16_decode (data, &size, s_base16_alphabet, linebreakchars);
+            break;
         case ZARMOUR_MODE_Z85:
-            return s_z85_decode (data, decode_size);
+            decoded = s_z85_decode (data, &size);
             break;
     }
-    return NULL;
+    return zchunk_new (decoded, size);
 }
 
 
 //  --------------------------------------------------------------------------
 //  Get the mode property.
 
-zarmour_mode_t
+int
 zarmour_mode (zarmour_t *self)
 {
     assert (self);
@@ -520,7 +528,7 @@ zarmour_mode_str (zarmour_t *self)
 //  Set the mode property.
 
 void
-zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode)
+zarmour_set_mode (zarmour_t *self, int mode)
 {
     assert (self);
     self->mode = mode;
@@ -635,6 +643,22 @@ zarmour_print (zarmour_t *self)
 //  Self test support functions
 
 static void
+s_armour_decode (zarmour_t *self, const char *test_string, const char *expected, bool verbose)
+{
+    assert (self);
+    assert (test_string);
+    assert (expected);
+
+    zchunk_t *chunk = zarmour_decode (self, test_string);
+    assert (chunk);
+    if (verbose)
+        zsys_debug ("    decoded '%s' into '%s'", test_string, (char *) zchunk_data (chunk));
+    assert (zchunk_size (chunk) == strlen (expected) + 1);
+    assert (streq ((char *) zchunk_data (chunk), expected));
+    zchunk_destroy (&chunk);
+}
+
+static void
 s_armour_test (zarmour_t *self, const char *test_string, const char *expected, bool verbose)
 {
     assert (self);
@@ -647,35 +671,8 @@ s_armour_test (zarmour_t *self, const char *test_string, const char *expected, b
         zsys_debug ("    encoded '%s' into '%s' ('%s')", test_string, encoded, expected);
     assert (strlen (encoded) == strlen (expected));
     assert (streq (encoded, expected));
-
-    size_t size;
-    char *decoded = (char *) zarmour_decode (self, encoded, &size);
-    assert (decoded);
-    if (verbose)
-        zsys_debug ("    decoded '%s' into '%s'", encoded, decoded);
-    assert (size == strlen (decoded) + 1);
-    assert (streq (decoded, test_string));
-
+    s_armour_decode (self, encoded, test_string, verbose);
     free (encoded);
-    free (decoded);
-}
-
-static void
-s_armour_decode (zarmour_t *self, const char *test_string, const char *expected, bool verbose)
-{
-    assert (self);
-    assert (test_string);
-    assert (expected);
-
-    size_t size;
-    char *decoded = (char *) zarmour_decode (self, test_string, &size);
-    assert (decoded);
-    if (verbose)
-        zsys_debug ("    decoded '%s' into '%s'", test_string, decoded);
-    assert (size == strlen (decoded) + 1);
-    assert (streq (decoded, expected));
-
-    free (decoded);
 }
 
 static void
@@ -688,18 +685,16 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
     assert (test_string);
     if (verbose)
         zsys_debug ("    encoded %d bytes array to:\n%s", length, test_string);
-    size_t test_size;
-    byte *test_data2 = zarmour_decode (self, test_string, &test_size);
-    free (test_string);
-    assert (test_data2);
-    assert (test_size == length + 1);
-    unsigned int index;
-    for (index = 0; index < length; index++)
-        assert (test_data2 [index] == index);
 
-    free (test_data2);
+    zchunk_t *chunk = zarmour_decode (self, test_string);
+    assert (chunk);
+    assert (zchunk_size (chunk) == length + 1);
+    uint index;
+    for (index = 0; index < length; index++)
+        assert (zchunk_data (chunk)[index] == index);
+    zchunk_destroy (&chunk);
     if (verbose)
-        zsys_debug ("    decoded %d bytes, all match", test_size - 1);
+        zsys_debug ("    decoded %d bytes, all match", length);
 }
 
 
@@ -718,7 +713,7 @@ zarmour_test (bool verbose)
     zarmour_t *self = zarmour_new ();
     assert (self);
 
-    zarmour_mode_t mode = zarmour_mode (self);
+    int mode = zarmour_mode (self);
     assert (mode == ZARMOUR_MODE_BASE64_STD);
 
     zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
@@ -890,11 +885,10 @@ zarmour_test (bool verbose)
     //  there are no null bytes inside, so we can use our test utility
     zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
     zarmour_set_line_breaks (self, false);
-    size_t key_len;
-    byte *key_data = zarmour_decode (
-        self,
-        "4E6F87E2FB6EB22A1EF5E257B75D79124949565F0B8B36A878A4F03111C96E0B",
-        &key_len);
+
+    zchunk_t *chunk = zarmour_decode (self,
+        "4E6F87E2FB6EB22A1EF5E257B75D79124949565F0B8B36A878A4F03111C96E0B");
+    assert (chunk);
 
     zarmour_set_mode (self, ZARMOUR_MODE_Z85);  //  Z85 mode does not support padding or line breaks
     zarmour_set_pad (self, false);              //  so these two are superfluous;
@@ -905,9 +899,9 @@ zarmour_test (bool verbose)
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "foob", "w]zP%", verbose);
     s_armour_test (self, "foobar!!", "w]zP%vr9Im", verbose);
-    s_armour_test (self, (char *) key_data,
+    s_armour_test (self, (char *) zchunk_data (chunk),
                    "ph+{E}!&X?9}!I]W{sm(nL8@&3Yu{wC+<*-5Y[[#", verbose);
-    free (key_data);
+    zchunk_destroy (&chunk);
 #endif
 
     //  Armouring longer byte array to test line breaks

@@ -23,15 +23,12 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-// Enumeration defining different encoding modes
-typedef enum {
-    ZARMOUR_MODE_BASE64_STD = 0,                            //  Standard base 64
-    ZARMOUR_MODE_BASE64_URL = 1,                            //  URL and filename friendly base 64
-    ZARMOUR_MODE_BASE32_STD = 2,                            //  Standard base 32
-    ZARMOUR_MODE_BASE32_HEX = 3,                            //  Extended hex base 32
-    ZARMOUR_MODE_BASE16 = 4,                                //  Standard base 16
-    ZARMOUR_MODE_Z85 = 5                                    //  Z85 from ZeroMQ RFC 32
-} zarmour_mode_t;
+#define ZARMOUR_MODE_BASE64_STD 0           // Standard base 64
+#define ZARMOUR_MODE_BASE64_URL 1           // URL and filename friendly base 64
+#define ZARMOUR_MODE_BASE32_STD 2           // Standard base 32
+#define ZARMOUR_MODE_BASE32_HEX 3           // Extended hex base 32
+#define ZARMOUR_MODE_BASE16 4               // Standard base 16
+#define ZARMOUR_MODE_Z85 5                  // Z85 from ZeroMQ RFC 32
 
 //  Create a new zarmour.
 CZMQ_EXPORT zarmour_t *
@@ -48,15 +45,15 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zarmour_encode (zarmour_t *self, const byte *data, size_t size);
 
-//  Decode an armoured string into a string of bytes.          
-//  The decoded output is null-terminated, so it may be treated
-//  as a string, if that's what it was prior to encoding.      
+//  Decode an armoured string into a chunk. The decoded output is    
+//  null-terminated, so it may be treated as a string, if that's what
+//  it was prior to encoding.                                        
 //  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT byte *
-    zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size);
+CZMQ_EXPORT zchunk_t *
+    zarmour_decode (zarmour_t *self, const char *data);
 
 //  Get the mode property.
-CZMQ_EXPORT zarmour_mode_t
+CZMQ_EXPORT int
     zarmour_mode (zarmour_t *self);
 
 //  Get printable string for mode.
@@ -65,7 +62,7 @@ CZMQ_EXPORT const char *
 
 //  Set the mode property.
 CZMQ_EXPORT void
-    zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode);
+    zarmour_set_mode (zarmour_t *self, int mode);
 
 //  Return true if padding is turned on.
 CZMQ_EXPORT bool
