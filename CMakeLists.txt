@@ -90,17 +90,6 @@ ELSE (LIBZMQ_FOUND)
 ENDIF (LIBZMQ_FOUND)
 
 ########################################################################
-# UUID dependency
-########################################################################
-find_package(uuid)
-IF (UUID_FOUND)
-    include_directories(${UUID_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
-    add_definitions(-DHAVE_UUID)
-    list(APPEND OPTIONAL_LIBRARIES ${UUID_LIBRARIES})
-ENDIF (UUID_FOUND)
-
-########################################################################
 # SYSTEMD dependency
 ########################################################################
 find_package(systemd)
