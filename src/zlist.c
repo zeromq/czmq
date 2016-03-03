@@ -381,16 +381,21 @@ zlist_size (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Sort the list by ascending key value using a straight ASCII comparison.
-//  The sort is not stable, so may reorder items with the same keys.
+//  Sort the list. If the compare function is null, sorts the list by
+//  ascending key value using a straight ASCII comparison. If you specify
+//  a compare function, this decides how items are sorted. The sort is not
+//  stable, so may reorder items with the same keys. The algorithm used is
+//  combsort, a compromise between performance and simplicity.
 
 void
 zlist_sort (zlist_t *self, zlist_compare_fn compare_fn)
 {
     zlist_compare_fn *compare = compare_fn;
-    if (compare == NULL)
+    if (!compare) {
         compare = self->compare_fn;
-
+        if (!compare)
+            compare = (zlist_compare_fn *) strcmp;
+    }
     //  Uses a comb sort, which is simple and reasonably fast.
     //  See http://en.wikipedia.org/wiki/Comb_sort
     size_t gap = self->size;
@@ -406,7 +411,7 @@ zlist_sort (zlist_t *self, zlist_compare_fn compare_fn)
 
         swapped = false;
         while (base && test) {
-            if ((*compare)(base->item, test->item) > 0) {
+            if ((*compare) (base->item, test->item) > 0) {
                 //  It's trivial to swap items in a generic container
                 void *item = base->item;
                 base->item = test->item;
@@ -483,13 +488,6 @@ s_zlist_free (void *data)
     zlist_t *self = (zlist_t *) data;
     zlist_destroy (&self);
 }
-
-static int
-s_compare (void *item1, void *item2)
-{
-    return strcmp ((char *) item1, (char *) item2);
-}
-
 
 //  --------------------------------------------------------------------------
 //  Runs selftest of class
@@ -577,7 +575,7 @@ zlist_test (bool verbose)
     assert (sub_list);
     assert (zlist_size (sub_list) == 3);
 
-    zlist_sort (list, s_compare);
+    zlist_sort (list, NULL);
     char *item;
     item = (char *) zlist_pop (list);
     assert (item == bread);
@@ -600,7 +598,7 @@ zlist_test (bool verbose)
     assert (list);
     zlist_autofree (list);
     //  Set equals function otherwise equals will not work as autofree copies strings
-    zlist_comparefn (list, s_compare);
+    zlist_comparefn (list, (zlist_compare_fn *) strcmp);
     zlist_push (list, bread);
     zlist_append (list, cheese);
     assert (zlist_size (list) == 2);
