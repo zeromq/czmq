@@ -611,9 +611,15 @@ s_can_connect (zctx_t *ctx, void **server, void **client)
     assert (port_nbr > 0);
     int rc = zsocket_connect (*client, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc == 0);
+    //  Give the connection time to fail if that's the plan
+    zclock_sleep (200);
+
+    //  By default PUSH sockets block if there's no peer
+    zsock_set_sndtimeo (*server, 200);
     zstr_send (*server, "Hello, World");
+
     zpoller_t *poller = zpoller_new (*client, NULL);
-    bool success = (zpoller_wait (poller, 200) == *client);
+    bool success = (zpoller_wait (poller, 400) == *client);
     zpoller_destroy (&poller);
     zsocket_destroy (ctx, *client);
     zsocket_destroy (ctx, *server);
