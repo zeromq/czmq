@@ -107,6 +107,24 @@ You will need the pkg-config, libtool, and autoreconf packages. After building, 
 
     make check
 
+
+## Building in Windows
+
+    git clone git://github.com/zeromq/libzmq.git
+    cd libzmq\builds\msvc
+    configure.bat
+    cd build
+    buildall.bat
+    cd ..\..\..\..
+
+    git clone git://github.com/zeromq/czmq.git
+    cd libzmq\builds\msvc
+    configure.bat
+    cd build
+    buildall.bat
+    cd ..\..\..\..
+    
+
 ### Linking with an Application
 
 Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
