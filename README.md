@@ -19,6 +19,8 @@
 
 **<a href="#toc3-72">Building and Installing</a>**
 
+**<a href="#toc3-112">Building on Windows</a>**
+
 **<a href="#toc3-116">Linking with an Application</a>**
 
 **<a href="#toc3-123">Use from Other Languages</a>**
@@ -123,31 +125,60 @@ To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/
 <A name="toc3-72" title="Building and Installing" />
 ### Building and Installing
 
+To start with, you need at least these packages:
+
+* {{git-all}} -- git is how we share code with other people.
+
+* {{build-essential}}, {{libtool}}, {{pkg-config}} - the C compiler and related tools.
+
+* {{autotools-dev}}, {{autoconf}}, {{automake}} - the GNU autoconf makefile generators.
+
+* {{cmake}} - the CMake makefile generators (an alternative to autoconf).
+
+Plus some others:
+
+* {{uuid-dev}}, {{libpcre3-dev}} - utility libraries.
+
+* {{valgrind}} - a useful tool for checking your code.
+
+Which we install like this (using the Debian-style apt-get package manager):
+
+```
+sudo apt-get update
+sudo apt-get install -y \
+    git-all build-essential libtool \
+    pkg-config autotools-dev autoconf automake cmake \
+    uuid-dev libpcre3-dev valgrind
+
+# only execute this next line if interested in updating the man pages as well (adds to build time):
+sudo apt-get install -y asciidoc
+```
 Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libsodium (for security) and libzmq (ZeroMQ core) libraries:
 
-    git clone git://github.com/jedisct1/libsodium.git
+```
+    git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
     cd libsodium
-    ./autogen.sh
-    ./configure && make check
+    ./autogen.sh && ./configure && make check
     sudo make install
-    sudo ldconfig
     cd ..
 
     git clone git://github.com/zeromq/libzmq.git
     cd libzmq
     ./autogen.sh
-    ./configure && make check
+    # do not specify "--with-libsodium" if you prefer to use internal tweetnacl security implementation (recommended for development)
+    ./configure --with-libsodium
+    make check
     sudo make install
     sudo ldconfig
     cd ..
 
     git clone git://github.com/zeromq/czmq.git
     cd czmq
-    ./autogen.sh
-    ./configure && make check
+    ./autogen.sh && ./configure && make check
     sudo make install
     sudo ldconfig
     cd ..
+```
 
 In general CZMQ works best with the latest libzmq master. If you already have an older version of libzmq installed on your system, e.g. in /usr/, then you can install libzmq master to your home directory ($HOME/local):
 
@@ -163,6 +194,62 @@ And then to build CZMQ against this installation of libzmq:
 You will need the pkg-config, libtool, and autoreconf packages. After building, run the CZMQ selftests:
 
     make check
+
+<A name="toc3-112" title="Building on Windows" />
+### Building on Windows
+
+To start with, you need MS Visual Studio (C/C++). The free community edition works well.
+
+Then, install git, and make sure it works from a DevStudio command prompt:
+
+```
+git
+```
+
+Now let's build CZMQ from GitHub:
+
+```
+    git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
+    cd libsodium\builds\msvc\build
+    buildall.bat
+    cd ..\..\..\..
+
+    :: if libsodium is on disk, the Windows build of libzmq will automatically use it
+    git clone git://github.com/zeromq/libzmq.git
+    cd libzmq\builds\msvc
+    configure.bat
+    cd build
+    buildall.bat
+    cd ..\..\..\..
+
+    git clone git://github.com/zeromq/czmq.git
+    cd czmq\builds\msvc
+    configure.bat
+    cd build
+    buildall.bat
+    cd ..\..\..\..
+```
+
+Let's test by running `czmq_selftest`:
+
+```
+   czmq>dir/s/b czmq_selftest.exe
+   czmq\builds\msvc\vs2013\DebugDEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\DebugLEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\DebugSEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\ReleaseDEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\ReleaseLEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\ReleaseSEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\x64\DebugDEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\x64\DebugLEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\x64\DebugSEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\x64\ReleaseDEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\x64\ReleaseLEXE\czmq_selftest.exe
+   czmq\builds\msvc\vs2013\x64\ReleaseSEXE\czmq_selftest.exe
+
+    :: select your choice and run it
+    czmq\builds\msvc\vs2013\x64\ReleaseDEXE\czmq_selftest.exe
+```
 
 <A name="toc3-116" title="Linking with an Application" />
 ### Linking with an Application
