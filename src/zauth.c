@@ -354,67 +354,65 @@ static int
 s_self_authenticate (self_t *self)
 {
     zap_request_t *request = s_zap_request_new (self->handler, self->verbose);
-    if (request) {
-        //  Is address explicitly whitelisted or blacklisted?
-        bool allowed = false;
-        bool denied = false;
+    if (!request)
+        return 0;           //  Interrupted, no request to process
 
-        if (zhashx_size (self->whitelist)) {
-            if (zhashx_lookup (self->whitelist, request->address)) {
-                allowed = true;
-                if (self->verbose)
-                    zsys_info ("zauth: - passed (whitelist) address=%s", request->address);
-            }
-            else {
-                denied = true;
-                if (self->verbose)
-                    zsys_info ("zauth: - denied (not in whitelist) address=%s", request->address);
-            }
-        }
-        else
-        if (zhashx_size (self->blacklist)) {
-            if (zhashx_lookup (self->blacklist, request->address)) {
-                denied = true;
-                if (self->verbose)
-                    zsys_info ("zauth: - denied (blacklist) address=%s", request->address);
-            }
-            else {
-                allowed = true;
-                if (self->verbose)
-                    zsys_info ("zauth: - passed (not in blacklist) address=%s", request->address);
-            }
-        }
-        //  Mechanism-specific checks
-        if (!denied) {
-            if (streq (request->mechanism, "NULL") && !allowed) {
-                //  For NULL, we allow if the address wasn't blacklisted
-                if (self->verbose)
-                    zsys_info ("zauth: - allowed (NULL)");
-                allowed = true;
-            }
-            else
-            if (streq (request->mechanism, "PLAIN"))
-                //  For PLAIN, even a whitelisted address must authenticate
-                allowed = s_authenticate_plain (self, request);
-            else
-            if (streq (request->mechanism, "CURVE"))
-                //  For CURVE, even a whitelisted address must authenticate
-                allowed = s_authenticate_curve (self, request);
-            else
-            if (streq (request->mechanism, "GSSAPI"))
-                //  For GSSAPI, even a whitelisted address must authenticate
-                allowed = s_authenticate_gssapi (self, request);
-        }
-        if (allowed)
-            s_zap_request_reply (request, "200", "OK");
-        else
-            s_zap_request_reply (request, "400", "No access");
+    //  Is address explicitly whitelisted or blacklisted?
+    bool allowed = false;
+    bool denied = false;
 
-        s_zap_request_destroy (&request);
+    if (zhashx_size (self->whitelist)) {
+        if (zhashx_lookup (self->whitelist, request->address)) {
+            allowed = true;
+            if (self->verbose)
+                zsys_info ("zauth: - passed (whitelist) address=%s", request->address);
+        }
+        else {
+            denied = true;
+            if (self->verbose)
+                zsys_info ("zauth: - denied (not in whitelist) address=%s", request->address);
+        }
     }
     else
-        s_zap_request_reply (request, "500", "Internal error");
+    if (zhashx_size (self->blacklist)) {
+        if (zhashx_lookup (self->blacklist, request->address)) {
+            denied = true;
+            if (self->verbose)
+                zsys_info ("zauth: - denied (blacklist) address=%s", request->address);
+        }
+        else {
+            allowed = true;
+            if (self->verbose)
+                zsys_info ("zauth: - passed (not in blacklist) address=%s", request->address);
+        }
+    }
+    //  Mechanism-specific checks
+    if (!denied) {
+        if (streq (request->mechanism, "NULL") && !allowed) {
+            //  For NULL, we allow if the address wasn't blacklisted
+            if (self->verbose)
+                zsys_info ("zauth: - allowed (NULL)");
+            allowed = true;
+        }
+        else
+        if (streq (request->mechanism, "PLAIN"))
+            //  For PLAIN, even a whitelisted address must authenticate
+            allowed = s_authenticate_plain (self, request);
+        else
+        if (streq (request->mechanism, "CURVE"))
+            //  For CURVE, even a whitelisted address must authenticate
+            allowed = s_authenticate_curve (self, request);
+        else
+        if (streq (request->mechanism, "GSSAPI"))
+            //  For GSSAPI, even a whitelisted address must authenticate
+            allowed = s_authenticate_gssapi (self, request);
+    }
+    if (allowed)
+        s_zap_request_reply (request, "200", "OK");
+    else
+        s_zap_request_reply (request, "400", "No access");
 
+    s_zap_request_destroy (&request);
     return 0;
 }
 

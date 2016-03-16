@@ -13,7 +13,7 @@
 /*
 @header
     The zchunk class works with variable sized blobs. Not as efficient as
-    MQ's messages but they do less weirdness and so are easier to understand.
+    ZeroMQ's messages but they do less weirdness and so are easier to understand.
     The chunk class has methods to read and write chunks from disk.
 @discuss
 @end
