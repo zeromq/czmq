@@ -6,27 +6,27 @@
 module CZMQ
   module FFI
 
-    # Standard base 64
-    MODE_BASE64_STD = 0
-
-    # URL and filename friendly base 64
-    MODE_BASE64_URL = 1
-
-    # Standard base 32
-    MODE_BASE32_STD = 2
-
-    # Extended hex base 32
-    MODE_BASE32_HEX = 3
-
-    # Standard base 16
-    MODE_BASE16 = 4
-
-    # Z85 from ZeroMQ RFC 32
-    MODE_Z85 = 5
-
     # armoured text encoding and decoding
     # @note This class is 100% generated using zproject.
     class Zarmour
+      # Standard base 64
+      MODE_BASE64_STD = 0
+
+      # URL and filename friendly base 64
+      MODE_BASE64_URL = 1
+
+      # Standard base 32
+      MODE_BASE32_STD = 2
+
+      # Extended hex base 32
+      MODE_BASE32_HEX = 3
+
+      # Standard base 16
+      MODE_BASE16 = 4
+
+      # Z85 from ZeroMQ RFC 32
+      MODE_Z85 = 5
+
       # Raised when one tries to use an instance of {Zarmour} after
       # the internal pointer to the native object has been nullified.
       class DestroyedError < RuntimeError; end

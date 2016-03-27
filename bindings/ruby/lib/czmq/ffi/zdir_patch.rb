@@ -6,15 +6,15 @@
 module CZMQ
   module FFI
 
-    # Creates a new file
-    CREATE = 1
-
-    # Delete a file
-    DELETE = 2
-
     # work with directory patches
     # @note This class is 100% generated using zproject.
     class ZdirPatch
+      # Creates a new file
+      CREATE = 1
+
+      # Delete a file
+      DELETE = 2
+
       # Raised when one tries to use an instance of {ZdirPatch} after
       # the internal pointer to the native object has been nullified.
       class DestroyedError < RuntimeError; end
