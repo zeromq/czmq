@@ -6,18 +6,18 @@
 module CZMQ
   module FFI
 
-    # 
-    MORE = 1
-
-    # 
-    REUSE = 2
-
-    # 
-    DONTWAIT = 4
-
     # working with single message frames
     # @note This class is 100% generated using zproject.
     class Zframe
+      # 
+      MORE = 1
+
+      # 
+      REUSE = 2
+
+      # 
+      DONTWAIT = 4
+
       # Raised when one tries to use an instance of {Zframe} after
       # the internal pointer to the native object has been nullified.
       class DestroyedError < RuntimeError; end
