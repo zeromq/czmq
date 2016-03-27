@@ -233,12 +233,12 @@ module CZMQ
       # If certificate was loaded from public file, the secret key will be 
       # undefined, and this certificate will not work successfully.        
       #
-      # @param zocket [::FFI::Pointer, #to_ptr]
+      # @param socket [::FFI::Pointer, #to_ptr]
       # @return [void]
-      def apply(zocket)
+      def apply(socket)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        result = ::CZMQ::FFI.zcert_apply(self_p, zocket)
+        result = ::CZMQ::FFI.zcert_apply(self_p, socket)
         result
       end
 
