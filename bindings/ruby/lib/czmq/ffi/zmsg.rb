@@ -100,15 +100,14 @@ module CZMQ
         __new ptr
       end
 
-      # Decodes a serialized message buffer created by zmsg_encode () and returns
-      # a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-      # there was insufficient memory to work.                                   
-      # @param buffer [::FFI::Pointer, #to_ptr]
-      # @param buffer_size [Integer, #to_int, #to_i]
+      # Decodes a serialized message frame created by zmsg_encode () and returns
+      # a new zmsg_t object. Returns NULL if the frame was badly formatted or   
+      # there was insufficient memory to work.                                  
+      # @param frame [Zframe, #__ptr]
       # @return [CZMQ::Zmsg]
-      def self.decode(buffer, buffer_size)
-        buffer_size = Integer(buffer_size)
-        ptr = ::CZMQ::FFI.zmsg_decode(buffer, buffer_size)
+      def self.decode(frame)
+        frame = frame.__ptr if frame
+        ptr = ::CZMQ::FFI.zmsg_decode(frame)
         __new ptr
       end
 
@@ -353,7 +352,7 @@ module CZMQ
       end
 
       # Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-      # decoding was not succesful.                                             
+      # decoding was not successful.                                            
       #
       # @return [Zmsg]
       def popmsg()
@@ -426,17 +425,18 @@ module CZMQ
         result
       end
 
-      # Serialize multipart message to a single buffer. Use this method to send  
-      # structured messages across transports that do not support multipart data.
-      # Allocates and returns a new buffer containing the serialized message.    
-      # To decode a serialized message buffer, use zmsg_decode ().               
+      # Serialize multipart message to a single message frame. Use this method
+      # to send structured messages across transports that do not support     
+      # multipart data. Allocates and returns a new frame containing the      
+      # serialized message. To decode a serialized message frame, use         
+      # zmsg_decode ().                                                       
       #
-      # @param buffer [::FFI::Pointer, #to_ptr]
-      # @return [Integer]
-      def encode(buffer)
+      # @return [Zframe]
+      def encode()
         raise DestroyedError unless @ptr
         self_p = @ptr
-        result = ::CZMQ::FFI.zmsg_encode(self_p, buffer)
+        result = ::CZMQ::FFI.zmsg_encode(self_p)
+        result = Zframe.__new result, true
         result
       end
 

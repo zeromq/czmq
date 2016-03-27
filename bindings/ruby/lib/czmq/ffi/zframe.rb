@@ -6,6 +6,15 @@
 module CZMQ
   module FFI
 
+    # 
+    MORE = 1
+
+    # 
+    REUSE = 2
+
+    # 
+    DONTWAIT = 4
+
     # working with single message frames
     # @note This class is 100% generated using zproject.
     class Zframe

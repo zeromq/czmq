@@ -49,22 +49,13 @@ module CZMQ
 
       require_relative 'ffi/zactor'
 
-      enum :zarmour_mode, [
-        :mode_base64_std, 0,
-        :mode_base64_url, 1,
-        :mode_base32_std, 2,
-        :mode_base32_hex, 3,
-        :mode_base16, 4,
-        :mode_z85, 5,
-      ]
-
       attach_function :zarmour_new, [], :pointer, **opts
       attach_function :zarmour_destroy, [:pointer], :void, **opts
       attach_function :zarmour_encode, [:pointer, :pointer, :size_t], :pointer, **opts
-      attach_function :zarmour_decode, [:pointer, :string, :pointer], :pointer, **opts
-      attach_function :zarmour_mode, [:pointer], :zarmour_mode, **opts
+      attach_function :zarmour_decode, [:pointer, :string], :pointer, **opts
+      attach_function :zarmour_mode, [:pointer], :int, **opts
       attach_function :zarmour_mode_str, [:pointer], :string, **opts
-      attach_function :zarmour_set_mode, [:pointer, :zarmour_mode], :void, **opts
+      attach_function :zarmour_set_mode, [:pointer, :int], :void, **opts
       attach_function :zarmour_pad, [:pointer], :bool, **opts
       attach_function :zarmour_set_pad, [:pointer, :bool], :void, **opts
       attach_function :zarmour_pad_char, [:pointer], :pointer, **opts
@@ -218,17 +209,12 @@ module CZMQ
 
       require_relative 'ffi/zdir'
 
-      enum :zdir_patch_op, [
-        :create, 1,
-        :delete, 2,
-      ]
-
-      attach_function :zdir_patch_new, [:string, :pointer, :zdir_patch_op, :string], :pointer, **opts
+      attach_function :zdir_patch_new, [:string, :pointer, :int, :string], :pointer, **opts
       attach_function :zdir_patch_destroy, [:pointer], :void, **opts
       attach_function :zdir_patch_dup, [:pointer], :pointer, **opts
       attach_function :zdir_patch_path, [:pointer], :string, **opts
       attach_function :zdir_patch_file, [:pointer], :pointer, **opts
-      attach_function :zdir_patch_op, [:pointer], :zdir_patch_op, **opts
+      attach_function :zdir_patch_op, [:pointer], :int, **opts
       attach_function :zdir_patch_vpath, [:pointer], :string, **opts
       attach_function :zdir_patch_digest_set, [:pointer], :void, **opts
       attach_function :zdir_patch_digest, [:pointer], :string, **opts
@@ -480,7 +466,7 @@ module CZMQ
       attach_function :zmsg_new, [], :pointer, **opts
       attach_function :zmsg_recv, [:pointer], :pointer, **opts
       attach_function :zmsg_load, [:pointer], :pointer, **opts
-      attach_function :zmsg_decode, [:pointer, :size_t], :pointer, **opts
+      attach_function :zmsg_decode, [:pointer], :pointer, **opts
       attach_function :zmsg_new_signal, [:char], :pointer, **opts
       attach_function :zmsg_destroy, [:pointer], :void, **opts
       attach_function :zmsg_send, [:pointer, :pointer], :int, **opts
@@ -520,7 +506,7 @@ module CZMQ
       attach_function :zmsg_next, [:pointer], :pointer, **opts
       attach_function :zmsg_last, [:pointer], :pointer, **opts
       attach_function :zmsg_save, [:pointer, :pointer], :int, **opts
-      attach_function :zmsg_encode, [:pointer, :pointer], :size_t, **opts
+      attach_function :zmsg_encode, [:pointer], :pointer, **opts
       attach_function :zmsg_dup, [:pointer], :pointer, **opts
       attach_function :zmsg_print, [:pointer], :void, **opts
       attach_function :zmsg_eq, [:pointer, :pointer], :bool, **opts

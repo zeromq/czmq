@@ -6,6 +6,12 @@
 module CZMQ
   module FFI
 
+    # Creates a new file
+    CREATE = 1
+
+    # Delete a file
+    DELETE = 2
+
     # work with directory patches
     # @note This class is 100% generated using zproject.
     class ZdirPatch
@@ -76,11 +82,12 @@ module CZMQ
       # Create new patch
       # @param path [String, #to_s, nil]
       # @param file [Zfile, #__ptr]
-      # @param op [Symbol]
+      # @param op [Integer, #to_int, #to_i]
       # @param alias_ [String, #to_s, nil]
       # @return [CZMQ::ZdirPatch]
       def self.new(path, file, op, alias_)
         file = file.__ptr if file
+        op = Integer(op)
         ptr = ::CZMQ::FFI.zdir_patch_new(path, file, op, alias_)
         __new ptr
       end
@@ -130,7 +137,7 @@ module CZMQ
 
       # Return operation
       #
-      # @return [Symbol]
+      # @return [Integer]
       def op()
         raise DestroyedError unless @ptr
         self_p = @ptr
