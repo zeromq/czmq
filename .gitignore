@@ -20,8 +20,9 @@ save.xml
 
 # Executables
 src/czmq_selftest
+src/makecert
+src/test_zgossip
 src/zmakecert
-src/czmq_selftest
 *.exe
 *.out
 *.app
