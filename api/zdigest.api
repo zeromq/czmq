@@ -21,7 +21,7 @@
 
     <method name = "update">
         Add buffer into digest calculation
-        <argument name = "buffer" type = "buffer" mutable = "1" />
+        <argument name = "buffer" type = "buffer" />
         <argument name = "length" type = "size" />
     </method>
 

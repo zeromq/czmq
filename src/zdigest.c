@@ -72,7 +72,7 @@ zdigest_destroy (zdigest_t **self_p)
 //  Add buffer into digest calculation
 
 void
-zdigest_update (zdigest_t *self, byte *buffer, size_t length)
+zdigest_update (zdigest_t *self, const byte *buffer, size_t length)
 {
     //  Calling this after zdigest_data() is illegal use of the API
     assert (self);
