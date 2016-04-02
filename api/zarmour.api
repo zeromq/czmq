@@ -18,11 +18,11 @@
     <constant name = "mode z85" value = "5">Z85 from ZeroMQ RFC 32</constant>
 
     <constructor>
-        Create a new zarmour.
+        Create a new zarmour
     </constructor>
 
     <destructor>
-        Destroy the zarmour.
+        Destroy the zarmour
     </destructor>
 
     <method name = "encode">

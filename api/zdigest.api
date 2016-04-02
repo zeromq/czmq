@@ -26,9 +26,9 @@
     </method>
 
     <method name = "data">
-        Return final digest hash data. If built without crypto support, returns
-        NULL.
-        <return type = "buffer" mutable = "1" />
+        Return final digest hash data. If built without crypto support,
+        returns NULL.
+        <return type = "buffer" size = ".size" />
     </method>
 
     <method name = "size">
@@ -42,5 +42,4 @@
         on the same digest. If built without crypto support, returns NULL.
         <return type = "string" mutable = "1" />
     </method>
-
 </class>

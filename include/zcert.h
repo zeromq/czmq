@@ -44,19 +44,19 @@ CZMQ_EXPORT void
     zcert_destroy (zcert_t **self_p);
 
 //  Return public part of key pair as 32-byte binary string
-CZMQ_EXPORT byte *
+CZMQ_EXPORT const byte *
     zcert_public_key (zcert_t *self);
 
 //  Return secret part of key pair as 32-byte binary string
-CZMQ_EXPORT byte *
+CZMQ_EXPORT const byte *
     zcert_secret_key (zcert_t *self);
 
 //  Return public part of key pair as Z85 armored string
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zcert_public_txt (zcert_t *self);
 
 //  Return secret part of key pair as Z85 armored string
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zcert_secret_txt (zcert_t *self);
 
 //  Set certificate metadata from formatted string.
@@ -65,7 +65,7 @@ CZMQ_EXPORT void
 
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.                                              
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zcert_meta (zcert_t *self, const char *name);
 
 //  Get list of metadata fields from certificate. Caller is responsible for
@@ -90,7 +90,7 @@ CZMQ_EXPORT int
 //  If certificate was loaded from public file, the secret key will be 
 //  undefined, and this certificate will not work successfully.        
 CZMQ_EXPORT void
-    zcert_apply (zcert_t *self, void *zocket);
+    zcert_apply (zcert_t *self, void *socket);
 
 //  Return copy of certificate; if certificate is NULL or we exhausted
 //  heap memory, returns NULL.                                        

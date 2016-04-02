@@ -85,7 +85,7 @@ zdigest_update (zdigest_t *self, byte *buffer, size_t length)
 //  Return final digest hash data. If built without crypto support, returns
 //  NULL.
 
-byte *
+const byte *
 zdigest_data (zdigest_t *self)
 {
     assert (self);
@@ -117,7 +117,7 @@ char *
 zdigest_string (zdigest_t *self)
 {
     assert (self);
-    byte *data = zdigest_data (self);
+    const byte *data = zdigest_data (self);
     char hex_char [] = "0123456789ABCDEF";
     int byte_nbr;
     for (byte_nbr = 0; byte_nbr < SHA_DIGEST_LENGTH; byte_nbr++) {
@@ -144,7 +144,7 @@ zdigest_test (bool verbose)
     zdigest_t *digest = zdigest_new ();
     assert (digest);
     zdigest_update (digest, buffer, 1024);
-    byte *data = zdigest_data (digest);
+    const byte *data = zdigest_data (digest);
     assert (data [0] == 0xDE);
     assert (data [1] == 0xB2);
     assert (data [2] == 0x38);
