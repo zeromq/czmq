@@ -17,7 +17,7 @@ QZdirPatch::QZdirPatch (zdir_patch_t *self, QObject *qObjParent) : QObject (qObj
 
 ///
 //  Create new patch
-QZdirPatch::QZdirPatch (const QString &path, QZfile *file, zdir_patch_op_t op, const QString &alias, QObject *qObjParent) : QObject (qObjParent)
+QZdirPatch::QZdirPatch (const QString &path, QZfile *file, int op, const QString &alias, QObject *qObjParent) : QObject (qObjParent)
 {
     this->self = zdir_patch_new (path.toUtf8().data(), file->self, op, alias.toUtf8().data());
 }
@@ -56,9 +56,9 @@ QZfile * QZdirPatch::file ()
 
 ///
 //  Return operation
-zdir_patch_op_t QZdirPatch::op ()
+int QZdirPatch::op ()
 {
-    zdir_patch_op_t rv = zdir_patch_op (self);
+    int rv = zdir_patch_op (self);
     return rv;
 }
 

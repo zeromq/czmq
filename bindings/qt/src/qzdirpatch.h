@@ -18,7 +18,7 @@ public:
     QZdirPatch (zdir_patch_t *self, QObject *qObjParent = 0);
 
     //  Create new patch
-    explicit QZdirPatch (const QString &path, QZfile *file, zdir_patch_op_t op, const QString &alias, QObject *qObjParent = 0);
+    explicit QZdirPatch (const QString &path, QZfile *file, int op, const QString &alias, QObject *qObjParent = 0);
 
     //  Destroy a patch
     ~QZdirPatch ();
@@ -34,7 +34,7 @@ public:
     QZfile * file ();
 
     //  Return operation
-    zdir_patch_op_t op ();
+    int op ();
 
     //  Return patch virtual file path
     const QString vpath ();

@@ -45,6 +45,26 @@ Java_org_zeromq_czmq_Zcert__1_1destroy (JNIEnv *env, jclass c, jlong self)
     zcert_destroy ((zcert_t **) &self);
 }
 
+JNIEXPORT jbyteArray JNICALL
+Java_org_zeromq_czmq_Zcert__1_1publicKey (JNIEnv *env, jclass c, jlong self)
+{
+    jbyte *public_key_ = (jbyte *) zcert_public_key ((zcert_t *) (intptr_t) self);
+    jint return_size_ = (jint) 32;
+    jbyteArray return_data_ = (*env)->NewByteArray (env, return_size_);
+    (*env)->SetByteArrayRegion (env, return_data_, 0, return_size_, (jbyte *) public_key_);
+    return return_data_;
+}
+
+JNIEXPORT jbyteArray JNICALL
+Java_org_zeromq_czmq_Zcert__1_1secretKey (JNIEnv *env, jclass c, jlong self)
+{
+    jbyte *secret_key_ = (jbyte *) zcert_secret_key ((zcert_t *) (intptr_t) self);
+    jint return_size_ = (jint) 32;
+    jbyteArray return_data_ = (*env)->NewByteArray (env, return_size_);
+    (*env)->SetByteArrayRegion (env, return_data_, 0, return_size_, (jbyte *) secret_key_);
+    return return_data_;
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zcert__1_1publicTxt (JNIEnv *env, jclass c, jlong self)
 {
@@ -124,9 +144,9 @@ Java_org_zeromq_czmq_Zcert__1_1saveSecret (JNIEnv *env, jclass c, jlong self, js
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zcert__1_1apply (JNIEnv *env, jclass c, jlong self, jlong zocket)
+Java_org_zeromq_czmq_Zcert__1_1apply (JNIEnv *env, jclass c, jlong self, jlong socket)
 {
-    zcert_apply ((zcert_t *) (intptr_t) self, (void *) (intptr_t) zocket);
+    zcert_apply ((zcert_t *) (intptr_t) self, (void *) (intptr_t) socket);
 }
 
 JNIEXPORT jlong JNICALL

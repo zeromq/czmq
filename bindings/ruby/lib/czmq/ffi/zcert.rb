@@ -129,7 +129,7 @@ module CZMQ
 
       # Return public part of key pair as Z85 armored string
       #
-      # @return [::FFI::Pointer]
+      # @return [String]
       def public_txt()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -139,7 +139,7 @@ module CZMQ
 
       # Return secret part of key pair as Z85 armored string
       #
-      # @return [::FFI::Pointer]
+      # @return [String]
       def secret_txt()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -175,7 +175,7 @@ module CZMQ
       # exist, returns NULL.                                              
       #
       # @param name [String, #to_s, nil]
-      # @return [::FFI::Pointer]
+      # @return [String]
       def meta(name)
         raise DestroyedError unless @ptr
         self_p = @ptr

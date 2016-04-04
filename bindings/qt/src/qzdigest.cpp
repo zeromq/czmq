@@ -32,18 +32,18 @@ QZdigest::~QZdigest ()
 
 ///
 //  Add buffer into digest calculation
-void QZdigest::update (byte *buffer, size_t length)
+void QZdigest::update (const byte *buffer, size_t length)
 {
     zdigest_update (self, buffer, length);
     
 }
 
 ///
-//  Return final digest hash data. If built without crypto support, returns
-//  NULL.                                                                  
-byte * QZdigest::data ()
+//  Return final digest hash data. If built without crypto support,
+//  returns NULL.                                                  
+const byte * QZdigest::data ()
 {
-    byte * rv = zdigest_data (self);
+    const byte * rv = zdigest_data (self);
     return rv;
 }
 

@@ -20,16 +20,18 @@ QString QmlZarmour::encode (const byte *data, size_t size) {
 };
 
 ///
-//  Decode an armoured string into a string of bytes.          
-//  The decoded output is null-terminated, so it may be treated
-//  as a string, if that's what it was prior to encoding.      
-byte *QmlZarmour::decode (const QString &data, size_t *decodeSize) {
-    return zarmour_decode (self, data.toUtf8().data(), decodeSize);
+//  Decode an armoured string into a chunk. The decoded output is    
+//  null-terminated, so it may be treated as a string, if that's what
+//  it was prior to encoding.                                        
+QmlZchunk *QmlZarmour::decode (const QString &data) {
+    QmlZchunk *retQ_ = new QmlZchunk ();
+    retQ_->self = zarmour_decode (self, data.toUtf8().data());
+    return retQ_;
 };
 
 ///
 //  Get the mode property.
-zarmour_mode_t QmlZarmour::mode () {
+int QmlZarmour::mode () {
     return zarmour_mode (self);
 };
 
@@ -41,7 +43,7 @@ const QString QmlZarmour::modeStr () {
 
 ///
 //  Set the mode property.
-void QmlZarmour::setMode (zarmour_mode_t mode) {
+void QmlZarmour::setMode (int mode) {
     zarmour_set_mode (self, mode);
 };
 
@@ -112,7 +114,7 @@ void QmlZarmourAttached::test (bool verbose) {
 };
 
 ///
-//  Create a new zarmour.
+//  Create a new zarmour
 QmlZarmour *QmlZarmourAttached::construct () {
     QmlZarmour *qmlSelf = new QmlZarmour ();
     qmlSelf->self = zarmour_new ();
@@ -120,7 +122,7 @@ QmlZarmour *QmlZarmourAttached::construct () {
 };
 
 ///
-//  Destroy the zarmour.
+//  Destroy the zarmour
 void QmlZarmourAttached::destruct (QmlZarmour *qmlSelf) {
     zarmour_destroy (&qmlSelf->self);
 };

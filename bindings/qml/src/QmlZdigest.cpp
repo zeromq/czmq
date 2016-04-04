@@ -10,14 +10,14 @@
 
 ///
 //  Add buffer into digest calculation
-void QmlZdigest::update (byte *buffer, size_t length) {
+void QmlZdigest::update (const byte *buffer, size_t length) {
     zdigest_update (self, buffer, length);
 };
 
 ///
-//  Return final digest hash data. If built without crypto support, returns
-//  NULL.                                                                  
-byte *QmlZdigest::data () {
+//  Return final digest hash data. If built without crypto support,
+//  returns NULL.                                                  
+const byte *QmlZdigest::data () {
     return zdigest_data (self);
 };
 

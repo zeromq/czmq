@@ -33,19 +33,19 @@ public slots:
     //  a new string.                                                         
     QString encode (const byte *data, size_t size);
 
-    //  Decode an armoured string into a string of bytes.          
-    //  The decoded output is null-terminated, so it may be treated
-    //  as a string, if that's what it was prior to encoding.      
-    byte *decode (const QString &data, size_t *decodeSize);
+    //  Decode an armoured string into a chunk. The decoded output is    
+    //  null-terminated, so it may be treated as a string, if that's what
+    //  it was prior to encoding.                                        
+    QmlZchunk *decode (const QString &data);
 
     //  Get the mode property.
-    zarmour_mode_t mode ();
+    int mode ();
 
     //  Get printable string for mode.
     const QString modeStr ();
 
     //  Set the mode property.
-    void setMode (zarmour_mode_t mode);
+    void setMode (int mode);
 
     //  Return true if padding is turned on.
     bool pad ();
@@ -89,10 +89,10 @@ public slots:
     //  Self test of this class.
     void test (bool verbose);
 
-    //  Create a new zarmour.
+    //  Create a new zarmour
     QmlZarmour *construct ();
 
-    //  Destroy the zarmour.
+    //  Destroy the zarmour
     void destruct (QmlZarmour *qmlSelf);
 };
 

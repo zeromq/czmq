@@ -24,7 +24,6 @@ BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
 BuildRequires:  zeromq-devel
-BuildRequires:  uuid-devel
 BuildRequires:  systemd-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -52,7 +51,6 @@ Summary:        the high-level c binding for 0mq
 Group:          System/Libraries
 Requires:       libczmq3 = %{version}
 Requires:       zeromq-devel
-Requires:       uuid-devel
 Requires:       systemd-devel
 
 %description devel
@@ -70,7 +68,7 @@ This package contains development files.
 
 %build
 sh autogen.sh
-%{configure} --with-systemd
+%{configure} --with-systemd-units
 make %{_smp_mflags}
 
 %install

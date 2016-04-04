@@ -31,13 +31,6 @@ IF EXIST "..\..\..\libzmq" (
     ECHO TODO: resolve this problem automatically.
     GOTO error
 )
-IF EXIST "..\..\..\uuid" (
-    ECHO Building with uuid
-    ECHO #define HAVE_UUID 1>> platform.h
-) ELSE (
-    ECHO Building without uuid
-    ECHO #undef HAVE_UUID>> platform.h
-)
 IF EXIST "..\..\..\systemd" (
     ECHO Building with systemd
     ECHO #define HAVE_SYSTEMD 1>> platform.h

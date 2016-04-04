@@ -47,8 +47,8 @@ We get these classes:
 * Zcertstore - work with CURVE security certificate stores
 * Zchunk - work with memory chunks
 * Zclock - millisecond clocks and delays
-* Zconfig - zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
-* Zdigest - zdigest - provides hashing functions (SHA-1 at present)
+* Zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
+* Zdigest - provides hashing functions (SHA-1 at present)
 * Zdir - work with file-system directories
 * ZdirPatch - work with directory patches
 * Zfile - helper functions for working with files.

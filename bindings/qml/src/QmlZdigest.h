@@ -29,11 +29,11 @@ public:
     
 public slots:
     //  Add buffer into digest calculation
-    void update (byte *buffer, size_t length);
+    void update (const byte *buffer, size_t length);
 
-    //  Return final digest hash data. If built without crypto support, returns
-    //  NULL.                                                                  
-    byte *data ();
+    //  Return final digest hash data. If built without crypto support,
+    //  returns NULL.                                                  
+    const byte *data ();
 
     //  Return final digest hash size
     size_t size ();

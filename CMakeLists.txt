@@ -21,7 +21,6 @@ if (EXISTS "${SOURCE_DIR}/.git")
 else ()
     OPTION (ENABLE_DRAFTS "Build and install draft classes and methods" OFF)
 endif ()
-
 IF (ENABLE_DRAFTS)
     ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
 ENDIF (ENABLE_DRAFTS)
@@ -72,7 +71,7 @@ endif()
 
 # required libraries for cygwin
 if (CYGWIN)
-    set(MORE_LIBRARIES -luuid)
+    set(MORE_LIBRARIES)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")

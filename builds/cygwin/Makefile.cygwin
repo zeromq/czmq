@@ -17,11 +17,11 @@ OBJS = zactor.o zarmour.o zcert.o zcertstore.o zchunk.o zclock.o zconfig.o zdige
 all: libczmq.dll czmq_selftest.exe
 
 libczmq.dll: $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -Wl,--out-implib,$@.a $(LIBDIR) -lzmq -luuid
+	$(CC) -shared -o $@ $(OBJS) -Wl,--out-implib,$@.a $(LIBDIR) -lzmq
 
 # the test functions are not exported into the DLL
 czmq_selftest.exe: czmq_selftest.o $(OBJS)
-	$(CC) -o $@ $^ $(LIBDIR) -lzmq -luuid
+	$(CC) -o $@ $^ $(LIBDIR) -lzmq
 clean:
 	del *.o *.a *.dll *.exe
 

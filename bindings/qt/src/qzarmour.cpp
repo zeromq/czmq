@@ -16,14 +16,14 @@ QZarmour::QZarmour (zarmour_t *self, QObject *qObjParent) : QObject (qObjParent)
 
 
 ///
-//  Create a new zarmour.
+//  Create a new zarmour
 QZarmour::QZarmour (QObject *qObjParent) : QObject (qObjParent)
 {
     this->self = zarmour_new ();
 }
 
 ///
-//  Destroy the zarmour.
+//  Destroy the zarmour
 QZarmour::~QZarmour ()
 {
     zarmour_destroy (&self);
@@ -42,20 +42,20 @@ QString QZarmour::encode (const byte *data, size_t size)
 }
 
 ///
-//  Decode an armoured string into a string of bytes.          
-//  The decoded output is null-terminated, so it may be treated
-//  as a string, if that's what it was prior to encoding.      
-byte * QZarmour::decode (const QString &data, size_t *decodeSize)
+//  Decode an armoured string into a chunk. The decoded output is    
+//  null-terminated, so it may be treated as a string, if that's what
+//  it was prior to encoding.                                        
+QZchunk * QZarmour::decode (const QString &data)
 {
-    byte * rv = zarmour_decode (self, data.toUtf8().data(), decodeSize);
+    QZchunk *rv = new QZchunk (zarmour_decode (self, data.toUtf8().data()));
     return rv;
 }
 
 ///
 //  Get the mode property.
-zarmour_mode_t QZarmour::mode ()
+int QZarmour::mode ()
 {
-    zarmour_mode_t rv = zarmour_mode (self);
+    int rv = zarmour_mode (self);
     return rv;
 }
 
@@ -69,7 +69,7 @@ const QString QZarmour::modeStr ()
 
 ///
 //  Set the mode property.
-void QZarmour::setMode (zarmour_mode_t mode)
+void QZarmour::setMode (int mode)
 {
     zarmour_set_mode (self, mode);
     

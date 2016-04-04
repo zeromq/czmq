@@ -39,7 +39,7 @@ public slots:
     QmlZfile *file ();
 
     //  Return operation
-    zdir_patch_op_t op ();
+    int op ();
 
     //  Return patch virtual file path
     const QString vpath ();
@@ -66,7 +66,7 @@ public slots:
     void test (bool verbose);
 
     //  Create new patch
-    QmlZdirPatch *construct (const QString &path, QmlZfile *file, zdir_patch_op_t op, const QString &alias);
+    QmlZdirPatch *construct (const QString &path, QmlZfile *file, int op, const QString &alias);
 
     //  Destroy a patch
     void destruct (QmlZdirPatch *qmlSelf);

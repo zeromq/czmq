@@ -18,10 +18,10 @@ Build-Depends: debhelper (>= 9),
     pkg-config,
     dh-autoreconf,
     libzmq5-dev,
-    uuid-dev,
     libsystemd-dev,
     dh-autoreconf,
-    systemd
+    systemd,
+    dh-systemd
 
 Package: libczmq3
 Architecture: any
@@ -34,7 +34,6 @@ Architecture: any
 Section: libdevel
 Depends:
     libzmq5-dev,
-    uuid-dev,
     libsystemd-dev,
     libczmq3 (= ${binary:Version})
 Description: development files for czmq

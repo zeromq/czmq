@@ -30,10 +30,10 @@ public:
     //  Returns NULL if the message could not be loaded.              
     static QZmsg* load (FILE *file, QObject *qObjParent = 0);
 
-    //  Decodes a serialized message buffer created by zmsg_encode () and returns
-    //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-    //  there was insufficient memory to work.                                   
-    static QZmsg* decode (const byte *buffer, size_t bufferSize, QObject *qObjParent = 0);
+    //  Decodes a serialized message frame created by zmsg_encode () and returns
+    //  a new zmsg_t object. Returns NULL if the frame was badly formatted or   
+    //  there was insufficient memory to work.                                  
+    static QZmsg* decode (QZframe *frame, QObject *qObjParent = 0);
 
     //  Generate a signal message encoding the given status. A signal is a short
     //  message carrying a 1-byte success/failure code (by convention, 0 means  
@@ -120,7 +120,7 @@ public:
     int addmsg (QZmsg *msgP);
 
     //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-    //  decoding was not succesful.                                             
+    //  decoding was not successful.                                            
     QZmsg * popmsg ();
 
     //  Remove specified frame from list, if present. Does not destroy frame.
@@ -144,11 +144,12 @@ public:
     //  to arbitrary change.                                                   
     int save (FILE *file);
 
-    //  Serialize multipart message to a single buffer. Use this method to send  
-    //  structured messages across transports that do not support multipart data.
-    //  Allocates and returns a new buffer containing the serialized message.    
-    //  To decode a serialized message buffer, use zmsg_decode ().               
-    size_t encode (byte **buffer);
+    //  Serialize multipart message to a single message frame. Use this method
+    //  to send structured messages across transports that do not support     
+    //  multipart data. Allocates and returns a new frame containing the      
+    //  serialized message. To decode a serialized message frame, use         
+    //  zmsg_decode ().                                                       
+    QZframe * encode ();
 
     //  Create copy of message, as new message object. Returns a fresh zmsg_t
     //  object. If message is null, or memory was exhausted, returns null.   

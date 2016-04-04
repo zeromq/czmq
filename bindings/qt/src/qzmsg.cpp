@@ -41,12 +41,12 @@ QZmsg* QZmsg::load (FILE *file, QObject *qObjParent)
 }
 
 ///
-//  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-//  there was insufficient memory to work.                                   
-QZmsg* QZmsg::decode (const byte *buffer, size_t bufferSize, QObject *qObjParent)
+//  Decodes a serialized message frame created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the frame was badly formatted or   
+//  there was insufficient memory to work.                                  
+QZmsg* QZmsg::decode (QZframe *frame, QObject *qObjParent)
 {
-    return new QZmsg (zmsg_decode (buffer, bufferSize), qObjParent);
+    return new QZmsg (zmsg_decode (frame->self), qObjParent);
 }
 
 ///
@@ -230,7 +230,7 @@ int QZmsg::addmsg (QZmsg *msgP)
 
 ///
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesful.                                             
+//  decoding was not successful.                                            
 QZmsg * QZmsg::popmsg ()
 {
     QZmsg *rv = new QZmsg (zmsg_popmsg (self));
@@ -284,13 +284,14 @@ int QZmsg::save (FILE *file)
 }
 
 ///
-//  Serialize multipart message to a single buffer. Use this method to send  
-//  structured messages across transports that do not support multipart data.
-//  Allocates and returns a new buffer containing the serialized message.    
-//  To decode a serialized message buffer, use zmsg_decode ().               
-size_t QZmsg::encode (byte **buffer)
+//  Serialize multipart message to a single message frame. Use this method
+//  to send structured messages across transports that do not support     
+//  multipart data. Allocates and returns a new frame containing the      
+//  serialized message. To decode a serialized message frame, use         
+//  zmsg_decode ().                                                       
+QZframe * QZmsg::encode ()
 {
-    size_t rv = zmsg_encode (self, buffer);
+    QZframe *rv = new QZframe (zmsg_encode (self));
     return rv;
 }
 

@@ -94,14 +94,8 @@ sudo apt-get install -y \
 # only execute this next line if interested in updating the man pages as well (adds to build time):
 sudo apt-get install -y asciidoc
 ```
-Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libsodium (for security) and libzmq (ZeroMQ core) libraries:
 
-```
-    git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
-    cd libsodium
-    ./autogen.sh && ./configure && make check
-    sudo make install
-    cd ..
+Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libzmq (ZeroMQ core) library:
 
     git clone git://github.com/zeromq/libzmq.git
     cd libzmq

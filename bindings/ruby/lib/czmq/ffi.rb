@@ -75,8 +75,8 @@ module CZMQ
       attach_function :zcert_destroy, [:pointer], :void, **opts
       attach_function :zcert_public_key, [:pointer], :pointer, **opts
       attach_function :zcert_secret_key, [:pointer], :pointer, **opts
-      attach_function :zcert_public_txt, [:pointer], :pointer, **opts
-      attach_function :zcert_secret_txt, [:pointer], :pointer, **opts
+      attach_function :zcert_public_txt, [:pointer], :string, **opts
+      attach_function :zcert_secret_txt, [:pointer], :string, **opts
       attach_function :zcert_set_meta, [:pointer, :string, :string, :varargs], :void, **opts
       begin # DRAFT method
         attach_function :zcert_unset_meta, [:pointer, :string], :void, **opts
@@ -86,7 +86,7 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
-      attach_function :zcert_meta, [:pointer, :string], :pointer, **opts
+      attach_function :zcert_meta, [:pointer, :string], :string, **opts
       attach_function :zcert_meta_keys, [:pointer], :pointer, **opts
       attach_function :zcert_save, [:pointer, :string], :int, **opts
       attach_function :zcert_save_public, [:pointer, :string], :int, **opts
