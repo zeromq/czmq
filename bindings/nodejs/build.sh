@@ -68,6 +68,7 @@ export JOBS=$([[ $(uname) = 'Darwin' ]] \
     && sysctl -n hw.logicalcpu_max \
     || lscpu -p | egrep -v '^#' | wc -l)
 
-#   Build the binding using node-ninja
+#   Build the binding using node-ninja directly, not prebuild
 echo "I: building Node.js binding:"
-prebuild --all --backend=node-ninja
+node-ninja configure
+node-ninja build

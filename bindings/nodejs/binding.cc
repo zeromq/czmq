@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq Node.js binding
+    CZMQ Node.js binding implementation
 
     Copyright (c) the Contributors as noted in the AUTHORS file.       
     This file is part of CZMQ, the high-level C binding for 0MQ:       
@@ -11,4669 +11,3704 @@
     =========================================================================
 */
 
-#define CZMQ_BUILD_DRAFT_API
-#include "czmq.h.h"
-#include "nan.h"
+#include "binding.h"
 
 using namespace v8;
 using namespace Nan;
 
-class Zactor: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zactor").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "send", send);
-            Nan::SetPrototypeMethod (tpl, "recv", recv);
-            Nan::SetPrototypeMethod (tpl, "is", is);
-            Nan::SetPrototypeMethod (tpl, "resolve", resolve);
-            Nan::SetPrototypeMethod (tpl, "sock", sock);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zactor").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zactor (arguments) {
-            self = new (name);
-        }
-        ~Zactor () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zactor *zactor;
-        zactor = new Zactor ();
-        if (zactor) {
-            zactor->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        zactor_destroy (&zactor->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zactor->self != NULL));
-    }
-
-    static NAN_METHOD (send) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        zactor_send (zactor->self);
-    }
-
-    static NAN_METHOD (recv) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        zactor_recv (zactor->self);
-    }
-
-    static NAN_METHOD (is) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        zactor_is (zactor->self);
-    }
-
-    static NAN_METHOD (resolve) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        zactor_resolve (zactor->self);
-    }
-
-    static NAN_METHOD (sock) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        zactor_sock (zactor->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zactor *zactor = Nan::ObjectWrap::Unwrap <Zactor> (info.Holder ());
-        zactor_test (zactor->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zactor_t *self;
-    public:
-        zactor_t *get_self () {
-            return self;
-        }
-};
-
-class Zarmour: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zarmour").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "encode", encode);
-            Nan::SetPrototypeMethod (tpl, "decode", decode);
-            Nan::SetPrototypeMethod (tpl, "mode", mode);
-            Nan::SetPrototypeMethod (tpl, "modeStr", mode_str);
-            Nan::SetPrototypeMethod (tpl, "setMode", set_mode);
-            Nan::SetPrototypeMethod (tpl, "pad", pad);
-            Nan::SetPrototypeMethod (tpl, "setPad", set_pad);
-            Nan::SetPrototypeMethod (tpl, "padChar", pad_char);
-            Nan::SetPrototypeMethod (tpl, "setPadChar", set_pad_char);
-            Nan::SetPrototypeMethod (tpl, "lineBreaks", line_breaks);
-            Nan::SetPrototypeMethod (tpl, "setLineBreaks", set_line_breaks);
-            Nan::SetPrototypeMethod (tpl, "lineLength", line_length);
-            Nan::SetPrototypeMethod (tpl, "setLineLength", set_line_length);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zarmour").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zarmour (arguments) {
-            self = new (name);
-        }
-        ~Zarmour () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zarmour *zarmour;
-        zarmour = new Zarmour ();
-        if (zarmour) {
-            zarmour->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_destroy (&zarmour->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zarmour->self != NULL));
-    }
-
-    static NAN_METHOD (encode) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_encode (zarmour->self);
-    }
-
-    static NAN_METHOD (decode) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_decode (zarmour->self);
-    }
-
-    static NAN_METHOD (mode) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_mode (zarmour->self);
-    }
-
-    static NAN_METHOD (mode_str) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_mode_str (zarmour->self);
-    }
-
-    static NAN_METHOD (set_mode) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_set_mode (zarmour->self);
-    }
-
-    static NAN_METHOD (pad) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_pad (zarmour->self);
-    }
-
-    static NAN_METHOD (set_pad) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_set_pad (zarmour->self);
-    }
-
-    static NAN_METHOD (pad_char) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_pad_char (zarmour->self);
-    }
-
-    static NAN_METHOD (set_pad_char) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_set_pad_char (zarmour->self);
-    }
-
-    static NAN_METHOD (line_breaks) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_line_breaks (zarmour->self);
-    }
-
-    static NAN_METHOD (set_line_breaks) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_set_line_breaks (zarmour->self);
-    }
-
-    static NAN_METHOD (line_length) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_line_length (zarmour->self);
-    }
-
-    static NAN_METHOD (set_line_length) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_set_line_length (zarmour->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_print (zarmour->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
-        zarmour_test (zarmour->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zarmour_t *self;
-    public:
-        zarmour_t *get_self () {
-            return self;
-        }
-};
-
-class Zcert: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zcert").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "publicKey", public_key);
-            Nan::SetPrototypeMethod (tpl, "secretKey", secret_key);
-            Nan::SetPrototypeMethod (tpl, "publicTxt", public_txt);
-            Nan::SetPrototypeMethod (tpl, "secretTxt", secret_txt);
-            Nan::SetPrototypeMethod (tpl, "setMeta", set_meta);
-            Nan::SetPrototypeMethod (tpl, "unsetMeta", unset_meta);
-            Nan::SetPrototypeMethod (tpl, "meta", meta);
-            Nan::SetPrototypeMethod (tpl, "metaKeys", meta_keys);
-            Nan::SetPrototypeMethod (tpl, "save", save);
-            Nan::SetPrototypeMethod (tpl, "savePublic", save_public);
-            Nan::SetPrototypeMethod (tpl, "saveSecret", save_secret);
-            Nan::SetPrototypeMethod (tpl, "apply", apply);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "eq", eq);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "fprint", fprint);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zcert").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zcert (arguments) {
-            self = new (name);
-        }
-        ~Zcert () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zcert *zcert;
-        zcert = new Zcert ();
-        if (zcert) {
-            zcert->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_destroy (&zcert->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zcert->self != NULL));
-    }
-
-    static NAN_METHOD (public_key) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_public_key (zcert->self);
-    }
-
-    static NAN_METHOD (secret_key) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_secret_key (zcert->self);
-    }
-
-    static NAN_METHOD (public_txt) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_public_txt (zcert->self);
-    }
-
-    static NAN_METHOD (secret_txt) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_secret_txt (zcert->self);
-    }
-
-    static NAN_METHOD (set_meta) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_set_meta (zcert->self);
-    }
-
-    static NAN_METHOD (unset_meta) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_unset_meta (zcert->self);
-    }
-
-    static NAN_METHOD (meta) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_meta (zcert->self);
-    }
-
-    static NAN_METHOD (meta_keys) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_meta_keys (zcert->self);
-    }
-
-    static NAN_METHOD (save) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_save (zcert->self);
-    }
-
-    static NAN_METHOD (save_public) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_save_public (zcert->self);
-    }
-
-    static NAN_METHOD (save_secret) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_save_secret (zcert->self);
-    }
-
-    static NAN_METHOD (apply) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_apply (zcert->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_dup (zcert->self);
-    }
-
-    static NAN_METHOD (eq) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_eq (zcert->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_print (zcert->self);
-    }
-
-    static NAN_METHOD (fprint) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_fprint (zcert->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
-        zcert_test (zcert->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zcert_t *self;
-    public:
-        zcert_t *get_self () {
-            return self;
-        }
-};
-
-class Zcertstore: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zcertstore").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "lookup", lookup);
-            Nan::SetPrototypeMethod (tpl, "insert", insert);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "fprint", fprint);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zcertstore").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zcertstore (arguments) {
-            self = new (name);
-        }
-        ~Zcertstore () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zcertstore *zcertstore;
-        zcertstore = new Zcertstore ();
-        if (zcertstore) {
-            zcertstore->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
-        zcertstore_destroy (&zcertstore->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zcertstore->self != NULL));
-    }
-
-    static NAN_METHOD (lookup) {
-        Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
-        zcertstore_lookup (zcertstore->self);
-    }
-
-    static NAN_METHOD (insert) {
-        Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
-        zcertstore_insert (zcertstore->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
-        zcertstore_print (zcertstore->self);
-    }
-
-    static NAN_METHOD (fprint) {
-        Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
-        zcertstore_fprint (zcertstore->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
-        zcertstore_test (zcertstore->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zcertstore_t *self;
-    public:
-        zcertstore_t *get_self () {
-            return self;
-        }
-};
-
-class Zchunk: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zchunk").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "resize", resize);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "maxSize", max_size);
-            Nan::SetPrototypeMethod (tpl, "data", data);
-            Nan::SetPrototypeMethod (tpl, "set", set);
-            Nan::SetPrototypeMethod (tpl, "fill", fill);
-            Nan::SetPrototypeMethod (tpl, "append", append);
-            Nan::SetPrototypeMethod (tpl, "extend", extend);
-            Nan::SetPrototypeMethod (tpl, "consume", consume);
-            Nan::SetPrototypeMethod (tpl, "exhausted", exhausted);
-            Nan::SetPrototypeMethod (tpl, "read", read);
-            Nan::SetPrototypeMethod (tpl, "write", write);
-            Nan::SetPrototypeMethod (tpl, "slurp", slurp);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "strhex", strhex);
-            Nan::SetPrototypeMethod (tpl, "strdup", strdup);
-            Nan::SetPrototypeMethod (tpl, "streq", streq);
-            Nan::SetPrototypeMethod (tpl, "pack", pack);
-            Nan::SetPrototypeMethod (tpl, "unpack", unpack);
-            Nan::SetPrototypeMethod (tpl, "digest", digest);
-            Nan::SetPrototypeMethod (tpl, "fprint", fprint);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "is", is);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zchunk").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zchunk (arguments) {
-            self = new (name);
-        }
-        ~Zchunk () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zchunk *zchunk;
-        zchunk = new Zchunk ();
-        if (zchunk) {
-            zchunk->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_destroy (&zchunk->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zchunk->self != NULL));
-    }
-
-    static NAN_METHOD (resize) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_resize (zchunk->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_size (zchunk->self);
-    }
-
-    static NAN_METHOD (max_size) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_max_size (zchunk->self);
-    }
-
-    static NAN_METHOD (data) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_data (zchunk->self);
-    }
-
-    static NAN_METHOD (set) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_set (zchunk->self);
-    }
-
-    static NAN_METHOD (fill) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_fill (zchunk->self);
-    }
-
-    static NAN_METHOD (append) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_append (zchunk->self);
-    }
-
-    static NAN_METHOD (extend) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_extend (zchunk->self);
-    }
-
-    static NAN_METHOD (consume) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_consume (zchunk->self);
-    }
-
-    static NAN_METHOD (exhausted) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_exhausted (zchunk->self);
-    }
-
-    static NAN_METHOD (read) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_read (zchunk->self);
-    }
-
-    static NAN_METHOD (write) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_write (zchunk->self);
-    }
-
-    static NAN_METHOD (slurp) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_slurp (zchunk->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_dup (zchunk->self);
-    }
-
-    static NAN_METHOD (strhex) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_strhex (zchunk->self);
-    }
-
-    static NAN_METHOD (strdup) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_strdup (zchunk->self);
-    }
-
-    static NAN_METHOD (streq) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_streq (zchunk->self);
-    }
-
-    static NAN_METHOD (pack) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_pack (zchunk->self);
-    }
-
-    static NAN_METHOD (unpack) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_unpack (zchunk->self);
-    }
-
-    static NAN_METHOD (digest) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_digest (zchunk->self);
-    }
-
-    static NAN_METHOD (fprint) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_fprint (zchunk->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_print (zchunk->self);
-    }
-
-    static NAN_METHOD (is) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_is (zchunk->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
-        zchunk_test (zchunk->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zchunk_t *self;
-    public:
-        zchunk_t *get_self () {
-            return self;
-        }
-};
-
-class Zclock: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zclock").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "sleep", sleep);
-            Nan::SetPrototypeMethod (tpl, "time", time);
-            Nan::SetPrototypeMethod (tpl, "mono", mono);
-            Nan::SetPrototypeMethod (tpl, "usecs", usecs);
-            Nan::SetPrototypeMethod (tpl, "timestr", timestr);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zclock").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zclock () {
-        }
-        ~Zclock () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zclock *zclock;
-        zclock = new Zclock ();
-        if (zclock) {
-            zclock->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (sleep) {
-        Zclock *zclock = Nan::ObjectWrap::Unwrap <Zclock> (info.Holder ());
-        zclock_sleep (zclock->self);
-    }
-
-    static NAN_METHOD (time) {
-        Zclock *zclock = Nan::ObjectWrap::Unwrap <Zclock> (info.Holder ());
-        zclock_time (zclock->self);
-    }
-
-    static NAN_METHOD (mono) {
-        Zclock *zclock = Nan::ObjectWrap::Unwrap <Zclock> (info.Holder ());
-        zclock_mono (zclock->self);
-    }
-
-    static NAN_METHOD (usecs) {
-        Zclock *zclock = Nan::ObjectWrap::Unwrap <Zclock> (info.Holder ());
-        zclock_usecs (zclock->self);
-    }
-
-    static NAN_METHOD (timestr) {
-        Zclock *zclock = Nan::ObjectWrap::Unwrap <Zclock> (info.Holder ());
-        zclock_timestr (zclock->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zclock *zclock = Nan::ObjectWrap::Unwrap <Zclock> (info.Holder ());
-        zclock_test (zclock->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zconfig: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zconfig").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "name", name);
-            Nan::SetPrototypeMethod (tpl, "value", value);
-            Nan::SetPrototypeMethod (tpl, "put", put);
-            Nan::SetPrototypeMethod (tpl, "putf", putf);
-            Nan::SetPrototypeMethod (tpl, "get", get);
-            Nan::SetPrototypeMethod (tpl, "setName", set_name);
-            Nan::SetPrototypeMethod (tpl, "setValue", set_value);
-            Nan::SetPrototypeMethod (tpl, "child", child);
-            Nan::SetPrototypeMethod (tpl, "next", next);
-            Nan::SetPrototypeMethod (tpl, "locate", locate);
-            Nan::SetPrototypeMethod (tpl, "atDepth", at_depth);
-            Nan::SetPrototypeMethod (tpl, "execute", execute);
-            Nan::SetPrototypeMethod (tpl, "setComment", set_comment);
-            Nan::SetPrototypeMethod (tpl, "comments", comments);
-            Nan::SetPrototypeMethod (tpl, "save", save);
-            Nan::SetPrototypeMethod (tpl, "savef", savef);
-            Nan::SetPrototypeMethod (tpl, "filename", filename);
-            Nan::SetPrototypeMethod (tpl, "reload", reload);
-            Nan::SetPrototypeMethod (tpl, "chunkLoad", chunk_load);
-            Nan::SetPrototypeMethod (tpl, "chunkSave", chunk_save);
-            Nan::SetPrototypeMethod (tpl, "strLoad", str_load);
-            Nan::SetPrototypeMethod (tpl, "strSave", str_save);
-            Nan::SetPrototypeMethod (tpl, "hasChanged", has_changed);
-            Nan::SetPrototypeMethod (tpl, "fprint", fprint);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zconfig").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zconfig (arguments) {
-            self = new (name);
-        }
-        ~Zconfig () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zconfig *zconfig;
-        zconfig = new Zconfig ();
-        if (zconfig) {
-            zconfig->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_destroy (&zconfig->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zconfig->self != NULL));
-    }
-
-    static NAN_METHOD (name) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_name (zconfig->self);
-    }
-
-    static NAN_METHOD (value) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_value (zconfig->self);
-    }
-
-    static NAN_METHOD (put) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_put (zconfig->self);
-    }
-
-    static NAN_METHOD (putf) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_putf (zconfig->self);
-    }
-
-    static NAN_METHOD (get) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_get (zconfig->self);
-    }
-
-    static NAN_METHOD (set_name) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_set_name (zconfig->self);
-    }
-
-    static NAN_METHOD (set_value) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_set_value (zconfig->self);
-    }
-
-    static NAN_METHOD (child) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_child (zconfig->self);
-    }
-
-    static NAN_METHOD (next) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_next (zconfig->self);
-    }
-
-    static NAN_METHOD (locate) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_locate (zconfig->self);
-    }
-
-    static NAN_METHOD (at_depth) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_at_depth (zconfig->self);
-    }
-
-    static NAN_METHOD (execute) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_execute (zconfig->self);
-    }
-
-    static NAN_METHOD (set_comment) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_set_comment (zconfig->self);
-    }
-
-    static NAN_METHOD (comments) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_comments (zconfig->self);
-    }
-
-    static NAN_METHOD (save) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_save (zconfig->self);
-    }
-
-    static NAN_METHOD (savef) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_savef (zconfig->self);
-    }
-
-    static NAN_METHOD (filename) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_filename (zconfig->self);
-    }
-
-    static NAN_METHOD (reload) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_reload (zconfig->self);
-    }
-
-    static NAN_METHOD (chunk_load) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_chunk_load (zconfig->self);
-    }
-
-    static NAN_METHOD (chunk_save) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_chunk_save (zconfig->self);
-    }
-
-    static NAN_METHOD (str_load) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_str_load (zconfig->self);
-    }
-
-    static NAN_METHOD (str_save) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_str_save (zconfig->self);
-    }
-
-    static NAN_METHOD (has_changed) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_has_changed (zconfig->self);
-    }
-
-    static NAN_METHOD (fprint) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_fprint (zconfig->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_print (zconfig->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-        zconfig_test (zconfig->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zconfig_t *self;
-    public:
-        zconfig_t *get_self () {
-            return self;
-        }
-};
-
-class Zdigest: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zdigest").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "update", update);
-            Nan::SetPrototypeMethod (tpl, "data", data);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "string", string);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zdigest").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zdigest (arguments) {
-            self = new (name);
-        }
-        ~Zdigest () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zdigest *zdigest;
-        zdigest = new Zdigest ();
-        if (zdigest) {
-            zdigest->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
-        zdigest_destroy (&zdigest->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zdigest->self != NULL));
-    }
-
-    static NAN_METHOD (update) {
-        Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
-        zdigest_update (zdigest->self);
-    }
-
-    static NAN_METHOD (data) {
-        Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
-        zdigest_data (zdigest->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
-        zdigest_size (zdigest->self);
-    }
-
-    static NAN_METHOD (string) {
-        Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
-        zdigest_string (zdigest->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
-        zdigest_test (zdigest->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zdigest_t *self;
-    public:
-        zdigest_t *get_self () {
-            return self;
-        }
-};
-
-class Zdir: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zdir").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "path", path);
-            Nan::SetPrototypeMethod (tpl, "modified", modified);
-            Nan::SetPrototypeMethod (tpl, "cursize", cursize);
-            Nan::SetPrototypeMethod (tpl, "count", count);
-            Nan::SetPrototypeMethod (tpl, "list", list);
-            Nan::SetPrototypeMethod (tpl, "remove", remove);
-            Nan::SetPrototypeMethod (tpl, "diff", diff);
-            Nan::SetPrototypeMethod (tpl, "resync", resync);
-            Nan::SetPrototypeMethod (tpl, "cache", cache);
-            Nan::SetPrototypeMethod (tpl, "fprint", fprint);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "watch", watch);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zdir").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zdir (arguments) {
-            self = new (name);
-        }
-        ~Zdir () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zdir *zdir;
-        zdir = new Zdir ();
-        if (zdir) {
-            zdir->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_destroy (&zdir->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zdir->self != NULL));
-    }
-
-    static NAN_METHOD (path) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_path (zdir->self);
-    }
-
-    static NAN_METHOD (modified) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_modified (zdir->self);
-    }
-
-    static NAN_METHOD (cursize) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_cursize (zdir->self);
-    }
-
-    static NAN_METHOD (count) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_count (zdir->self);
-    }
-
-    static NAN_METHOD (list) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_list (zdir->self);
-    }
-
-    static NAN_METHOD (remove) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_remove (zdir->self);
-    }
-
-    static NAN_METHOD (diff) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_diff (zdir->self);
-    }
-
-    static NAN_METHOD (resync) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_resync (zdir->self);
-    }
-
-    static NAN_METHOD (cache) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_cache (zdir->self);
-    }
-
-    static NAN_METHOD (fprint) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_fprint (zdir->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_print (zdir->self);
-    }
-
-    static NAN_METHOD (watch) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_watch (zdir->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
-        zdir_test (zdir->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zdir_t *self;
-    public:
-        zdir_t *get_self () {
-            return self;
-        }
-};
-
-class ZdirPatch: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("ZdirPatch").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "path", path);
-            Nan::SetPrototypeMethod (tpl, "file", file);
-            Nan::SetPrototypeMethod (tpl, "op", op);
-            Nan::SetPrototypeMethod (tpl, "vpath", vpath);
-            Nan::SetPrototypeMethod (tpl, "digestSet", digest_set);
-            Nan::SetPrototypeMethod (tpl, "digest", digest);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("ZdirPatch").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit ZdirPatch (arguments) {
-            self = new (name);
-        }
-        ~ZdirPatch () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        ZdirPatch *zdir_patch;
-        zdir_patch = new ZdirPatch ();
-        if (zdir_patch) {
-            zdir_patch->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_destroy (&zdir_patch->self);
-    }
-
-    static NAN_METHOD (defined) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zdir_patch->self != NULL));
-    }
-
-    static NAN_METHOD (dup) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_dup (zdir_patch->self);
-    }
-
-    static NAN_METHOD (path) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_path (zdir_patch->self);
-    }
-
-    static NAN_METHOD (file) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_file (zdir_patch->self);
-    }
-
-    static NAN_METHOD (op) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_op (zdir_patch->self);
-    }
-
-    static NAN_METHOD (vpath) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_vpath (zdir_patch->self);
-    }
-
-    static NAN_METHOD (digest_set) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_digest_set (zdir_patch->self);
-    }
-
-    static NAN_METHOD (digest) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_digest (zdir_patch->self);
-    }
-
-    static NAN_METHOD (test) {
-        ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
-        zdir_patch_test (zdir_patch->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zdir_patch_t *self;
-    public:
-        zdir_patch_t *get_self () {
-            return self;
-        }
-};
-
-class Zfile: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zfile").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "filename", filename);
-            Nan::SetPrototypeMethod (tpl, "restat", restat);
-            Nan::SetPrototypeMethod (tpl, "modified", modified);
-            Nan::SetPrototypeMethod (tpl, "cursize", cursize);
-            Nan::SetPrototypeMethod (tpl, "isDirectory", is_directory);
-            Nan::SetPrototypeMethod (tpl, "isRegular", is_regular);
-            Nan::SetPrototypeMethod (tpl, "isReadable", is_readable);
-            Nan::SetPrototypeMethod (tpl, "isWriteable", is_writeable);
-            Nan::SetPrototypeMethod (tpl, "isStable", is_stable);
-            Nan::SetPrototypeMethod (tpl, "hasChanged", has_changed);
-            Nan::SetPrototypeMethod (tpl, "remove", remove);
-            Nan::SetPrototypeMethod (tpl, "input", input);
-            Nan::SetPrototypeMethod (tpl, "output", output);
-            Nan::SetPrototypeMethod (tpl, "read", read);
-            Nan::SetPrototypeMethod (tpl, "eof", eof);
-            Nan::SetPrototypeMethod (tpl, "write", write);
-            Nan::SetPrototypeMethod (tpl, "readln", readln);
-            Nan::SetPrototypeMethod (tpl, "close", close);
-            Nan::SetPrototypeMethod (tpl, "handle", handle);
-            Nan::SetPrototypeMethod (tpl, "digest", digest);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zfile").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zfile (arguments) {
-            self = new (name);
-        }
-        ~Zfile () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zfile *zfile;
-        zfile = new Zfile ();
-        if (zfile) {
-            zfile->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_destroy (&zfile->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zfile->self != NULL));
-    }
-
-    static NAN_METHOD (dup) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_dup (zfile->self);
-    }
-
-    static NAN_METHOD (filename) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_filename (zfile->self);
-    }
-
-    static NAN_METHOD (restat) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_restat (zfile->self);
-    }
-
-    static NAN_METHOD (modified) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_modified (zfile->self);
-    }
-
-    static NAN_METHOD (cursize) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_cursize (zfile->self);
-    }
-
-    static NAN_METHOD (is_directory) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_is_directory (zfile->self);
-    }
-
-    static NAN_METHOD (is_regular) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_is_regular (zfile->self);
-    }
-
-    static NAN_METHOD (is_readable) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_is_readable (zfile->self);
-    }
-
-    static NAN_METHOD (is_writeable) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_is_writeable (zfile->self);
-    }
-
-    static NAN_METHOD (is_stable) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_is_stable (zfile->self);
-    }
-
-    static NAN_METHOD (has_changed) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_has_changed (zfile->self);
-    }
-
-    static NAN_METHOD (remove) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_remove (zfile->self);
-    }
-
-    static NAN_METHOD (input) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_input (zfile->self);
-    }
-
-    static NAN_METHOD (output) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_output (zfile->self);
-    }
-
-    static NAN_METHOD (read) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_read (zfile->self);
-    }
-
-    static NAN_METHOD (eof) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_eof (zfile->self);
-    }
-
-    static NAN_METHOD (write) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_write (zfile->self);
-    }
-
-    static NAN_METHOD (readln) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_readln (zfile->self);
-    }
-
-    static NAN_METHOD (close) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_close (zfile->self);
-    }
-
-    static NAN_METHOD (handle) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_handle (zfile->self);
-    }
-
-    static NAN_METHOD (digest) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_digest (zfile->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
-        zfile_test (zfile->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zfile_t *self;
-    public:
-        zfile_t *get_self () {
-            return self;
-        }
-};
-
-class Zframe: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zframe").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "send", send);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "data", data);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "strhex", strhex);
-            Nan::SetPrototypeMethod (tpl, "strdup", strdup);
-            Nan::SetPrototypeMethod (tpl, "streq", streq);
-            Nan::SetPrototypeMethod (tpl, "more", more);
-            Nan::SetPrototypeMethod (tpl, "setMore", set_more);
-            Nan::SetPrototypeMethod (tpl, "routingId", routing_id);
-            Nan::SetPrototypeMethod (tpl, "setRoutingId", set_routing_id);
-            Nan::SetPrototypeMethod (tpl, "group", group);
-            Nan::SetPrototypeMethod (tpl, "setGroup", set_group);
-            Nan::SetPrototypeMethod (tpl, "eq", eq);
-            Nan::SetPrototypeMethod (tpl, "reset", reset);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "is", is);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zframe").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zframe (arguments) {
-            self = new (name);
-        }
-        ~Zframe () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zframe *zframe;
-        zframe = new Zframe ();
-        if (zframe) {
-            zframe->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_destroy (&zframe->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zframe->self != NULL));
-    }
-
-    static NAN_METHOD (send) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_send (zframe->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_size (zframe->self);
-    }
-
-    static NAN_METHOD (data) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_data (zframe->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_dup (zframe->self);
-    }
-
-    static NAN_METHOD (strhex) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_strhex (zframe->self);
-    }
-
-    static NAN_METHOD (strdup) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_strdup (zframe->self);
-    }
-
-    static NAN_METHOD (streq) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_streq (zframe->self);
-    }
-
-    static NAN_METHOD (more) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_more (zframe->self);
-    }
-
-    static NAN_METHOD (set_more) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_set_more (zframe->self);
-    }
-
-    static NAN_METHOD (routing_id) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_routing_id (zframe->self);
-    }
-
-    static NAN_METHOD (set_routing_id) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_set_routing_id (zframe->self);
-    }
-
-    static NAN_METHOD (group) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_group (zframe->self);
-    }
-
-    static NAN_METHOD (set_group) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_set_group (zframe->self);
-    }
-
-    static NAN_METHOD (eq) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_eq (zframe->self);
-    }
-
-    static NAN_METHOD (reset) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_reset (zframe->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_print (zframe->self);
-    }
-
-    static NAN_METHOD (is) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_is (zframe->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
-        zframe_test (zframe->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zframe_t *self;
-    public:
-        zframe_t *get_self () {
-            return self;
-        }
-};
-
-class Zhash: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zhash").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "insert", insert);
-            Nan::SetPrototypeMethod (tpl, "update", update);
-            Nan::SetPrototypeMethod (tpl, "delete", delete);
-            Nan::SetPrototypeMethod (tpl, "lookup", lookup);
-            Nan::SetPrototypeMethod (tpl, "rename", rename);
-            Nan::SetPrototypeMethod (tpl, "freefn", freefn);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "keys", keys);
-            Nan::SetPrototypeMethod (tpl, "first", first);
-            Nan::SetPrototypeMethod (tpl, "next", next);
-            Nan::SetPrototypeMethod (tpl, "cursor", cursor);
-            Nan::SetPrototypeMethod (tpl, "comment", comment);
-            Nan::SetPrototypeMethod (tpl, "pack", pack);
-            Nan::SetPrototypeMethod (tpl, "save", save);
-            Nan::SetPrototypeMethod (tpl, "load", load);
-            Nan::SetPrototypeMethod (tpl, "refresh", refresh);
-            Nan::SetPrototypeMethod (tpl, "autofree", autofree);
-            Nan::SetPrototypeMethod (tpl, "foreach", foreach);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zhash").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zhash (arguments) {
-            self = new (name);
-        }
-        ~Zhash () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zhash *zhash;
-        zhash = new Zhash ();
-        if (zhash) {
-            zhash->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_destroy (&zhash->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zhash->self != NULL));
-    }
-
-    static NAN_METHOD (insert) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_insert (zhash->self);
-    }
-
-    static NAN_METHOD (update) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_update (zhash->self);
-    }
-
-    static NAN_METHOD (delete) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_delete (zhash->self);
-    }
-
-    static NAN_METHOD (lookup) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_lookup (zhash->self);
-    }
-
-    static NAN_METHOD (rename) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_rename (zhash->self);
-    }
-
-    static NAN_METHOD (freefn) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_freefn (zhash->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_size (zhash->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_dup (zhash->self);
-    }
-
-    static NAN_METHOD (keys) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_keys (zhash->self);
-    }
-
-    static NAN_METHOD (first) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_first (zhash->self);
-    }
-
-    static NAN_METHOD (next) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_next (zhash->self);
-    }
-
-    static NAN_METHOD (cursor) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_cursor (zhash->self);
-    }
-
-    static NAN_METHOD (comment) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_comment (zhash->self);
-    }
-
-    static NAN_METHOD (pack) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_pack (zhash->self);
-    }
-
-    static NAN_METHOD (save) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_save (zhash->self);
-    }
-
-    static NAN_METHOD (load) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_load (zhash->self);
-    }
-
-    static NAN_METHOD (refresh) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_refresh (zhash->self);
-    }
-
-    static NAN_METHOD (autofree) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_autofree (zhash->self);
-    }
-
-    static NAN_METHOD (foreach) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_foreach (zhash->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
-        zhash_test (zhash->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zhash_t *self;
-    public:
-        zhash_t *get_self () {
-            return self;
-        }
-};
-
-class Zhashx: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zhashx").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "insert", insert);
-            Nan::SetPrototypeMethod (tpl, "update", update);
-            Nan::SetPrototypeMethod (tpl, "delete", delete);
-            Nan::SetPrototypeMethod (tpl, "purge", purge);
-            Nan::SetPrototypeMethod (tpl, "lookup", lookup);
-            Nan::SetPrototypeMethod (tpl, "rename", rename);
-            Nan::SetPrototypeMethod (tpl, "freefn", freefn);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "keys", keys);
-            Nan::SetPrototypeMethod (tpl, "values", values);
-            Nan::SetPrototypeMethod (tpl, "first", first);
-            Nan::SetPrototypeMethod (tpl, "next", next);
-            Nan::SetPrototypeMethod (tpl, "cursor", cursor);
-            Nan::SetPrototypeMethod (tpl, "comment", comment);
-            Nan::SetPrototypeMethod (tpl, "save", save);
-            Nan::SetPrototypeMethod (tpl, "load", load);
-            Nan::SetPrototypeMethod (tpl, "refresh", refresh);
-            Nan::SetPrototypeMethod (tpl, "pack", pack);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "setDestructor", set_destructor);
-            Nan::SetPrototypeMethod (tpl, "setDuplicator", set_duplicator);
-            Nan::SetPrototypeMethod (tpl, "setKeyDestructor", set_key_destructor);
-            Nan::SetPrototypeMethod (tpl, "setKeyDuplicator", set_key_duplicator);
-            Nan::SetPrototypeMethod (tpl, "setKeyComparator", set_key_comparator);
-            Nan::SetPrototypeMethod (tpl, "setKeyHasher", set_key_hasher);
-            Nan::SetPrototypeMethod (tpl, "dupV2", dup_v2);
-            Nan::SetPrototypeMethod (tpl, "autofree", autofree);
-            Nan::SetPrototypeMethod (tpl, "foreach", foreach);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zhashx").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zhashx (arguments) {
-            self = new (name);
-        }
-        ~Zhashx () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zhashx *zhashx;
-        zhashx = new Zhashx ();
-        if (zhashx) {
-            zhashx->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_destroy (&zhashx->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zhashx->self != NULL));
-    }
-
-    static NAN_METHOD (insert) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_insert (zhashx->self);
-    }
-
-    static NAN_METHOD (update) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_update (zhashx->self);
-    }
-
-    static NAN_METHOD (delete) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_delete (zhashx->self);
-    }
-
-    static NAN_METHOD (purge) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_purge (zhashx->self);
-    }
-
-    static NAN_METHOD (lookup) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_lookup (zhashx->self);
-    }
-
-    static NAN_METHOD (rename) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_rename (zhashx->self);
-    }
-
-    static NAN_METHOD (freefn) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_freefn (zhashx->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_size (zhashx->self);
-    }
-
-    static NAN_METHOD (keys) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_keys (zhashx->self);
-    }
-
-    static NAN_METHOD (values) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_values (zhashx->self);
-    }
-
-    static NAN_METHOD (first) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_first (zhashx->self);
-    }
-
-    static NAN_METHOD (next) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_next (zhashx->self);
-    }
-
-    static NAN_METHOD (cursor) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_cursor (zhashx->self);
-    }
-
-    static NAN_METHOD (comment) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_comment (zhashx->self);
-    }
-
-    static NAN_METHOD (save) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_save (zhashx->self);
-    }
-
-    static NAN_METHOD (load) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_load (zhashx->self);
-    }
-
-    static NAN_METHOD (refresh) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_refresh (zhashx->self);
-    }
-
-    static NAN_METHOD (pack) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_pack (zhashx->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_dup (zhashx->self);
-    }
-
-    static NAN_METHOD (set_destructor) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_set_destructor (zhashx->self);
-    }
-
-    static NAN_METHOD (set_duplicator) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_set_duplicator (zhashx->self);
-    }
-
-    static NAN_METHOD (set_key_destructor) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_set_key_destructor (zhashx->self);
-    }
-
-    static NAN_METHOD (set_key_duplicator) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_set_key_duplicator (zhashx->self);
-    }
-
-    static NAN_METHOD (set_key_comparator) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_set_key_comparator (zhashx->self);
-    }
-
-    static NAN_METHOD (set_key_hasher) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_set_key_hasher (zhashx->self);
-    }
-
-    static NAN_METHOD (dup_v2) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_dup_v2 (zhashx->self);
-    }
-
-    static NAN_METHOD (autofree) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_autofree (zhashx->self);
-    }
-
-    static NAN_METHOD (foreach) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_foreach (zhashx->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-        zhashx_test (zhashx->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zhashx_t *self;
-    public:
-        zhashx_t *get_self () {
-            return self;
-        }
-};
-
-class Ziflist: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Ziflist").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "reload", reload);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "first", first);
-            Nan::SetPrototypeMethod (tpl, "next", next);
-            Nan::SetPrototypeMethod (tpl, "address", address);
-            Nan::SetPrototypeMethod (tpl, "broadcast", broadcast);
-            Nan::SetPrototypeMethod (tpl, "netmask", netmask);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Ziflist").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Ziflist (arguments) {
-            self = new (name);
-        }
-        ~Ziflist () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Ziflist *ziflist;
-        ziflist = new Ziflist ();
-        if (ziflist) {
-            ziflist->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_destroy (&ziflist->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (ziflist->self != NULL));
-    }
-
-    static NAN_METHOD (reload) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_reload (ziflist->self);
-    }
-
-    static NAN_METHOD (size) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_size (ziflist->self);
-    }
-
-    static NAN_METHOD (first) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_first (ziflist->self);
-    }
-
-    static NAN_METHOD (next) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_next (ziflist->self);
-    }
-
-    static NAN_METHOD (address) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_address (ziflist->self);
-    }
-
-    static NAN_METHOD (broadcast) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_broadcast (ziflist->self);
-    }
-
-    static NAN_METHOD (netmask) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_netmask (ziflist->self);
-    }
-
-    static NAN_METHOD (print) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_print (ziflist->self);
-    }
-
-    static NAN_METHOD (test) {
-        Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
-        ziflist_test (ziflist->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    ziflist_t *self;
-    public:
-        ziflist_t *get_self () {
-            return self;
-        }
-};
-
-class Zlist: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zlist").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "first", first);
-            Nan::SetPrototypeMethod (tpl, "next", next);
-            Nan::SetPrototypeMethod (tpl, "last", last);
-            Nan::SetPrototypeMethod (tpl, "head", head);
-            Nan::SetPrototypeMethod (tpl, "tail", tail);
-            Nan::SetPrototypeMethod (tpl, "item", item);
-            Nan::SetPrototypeMethod (tpl, "append", append);
-            Nan::SetPrototypeMethod (tpl, "push", push);
-            Nan::SetPrototypeMethod (tpl, "pop", pop);
-            Nan::SetPrototypeMethod (tpl, "exists", exists);
-            Nan::SetPrototypeMethod (tpl, "remove", remove);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "purge", purge);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "sort", sort);
-            Nan::SetPrototypeMethod (tpl, "autofree", autofree);
-            Nan::SetPrototypeMethod (tpl, "comparefn", comparefn);
-            Nan::SetPrototypeMethod (tpl, "freefn", freefn);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zlist").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zlist (arguments) {
-            self = new (name);
-        }
-        ~Zlist () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zlist *zlist;
-        zlist = new Zlist ();
-        if (zlist) {
-            zlist->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_destroy (&zlist->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zlist->self != NULL));
-    }
-
-    static NAN_METHOD (first) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_first (zlist->self);
-    }
-
-    static NAN_METHOD (next) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_next (zlist->self);
-    }
-
-    static NAN_METHOD (last) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_last (zlist->self);
-    }
-
-    static NAN_METHOD (head) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_head (zlist->self);
-    }
-
-    static NAN_METHOD (tail) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_tail (zlist->self);
-    }
-
-    static NAN_METHOD (item) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_item (zlist->self);
-    }
-
-    static NAN_METHOD (append) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_append (zlist->self);
-    }
-
-    static NAN_METHOD (push) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_push (zlist->self);
-    }
-
-    static NAN_METHOD (pop) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_pop (zlist->self);
-    }
-
-    static NAN_METHOD (exists) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_exists (zlist->self);
-    }
-
-    static NAN_METHOD (remove) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_remove (zlist->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_dup (zlist->self);
-    }
-
-    static NAN_METHOD (purge) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_purge (zlist->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_size (zlist->self);
-    }
-
-    static NAN_METHOD (sort) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_sort (zlist->self);
-    }
-
-    static NAN_METHOD (autofree) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_autofree (zlist->self);
-    }
-
-    static NAN_METHOD (comparefn) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_comparefn (zlist->self);
-    }
-
-    static NAN_METHOD (freefn) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_freefn (zlist->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
-        zlist_test (zlist->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zlist_t *self;
-    public:
-        zlist_t *get_self () {
-            return self;
-        }
-};
-
-class Zlistx: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zlistx").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "addStart", add_start);
-            Nan::SetPrototypeMethod (tpl, "addEnd", add_end);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "head", head);
-            Nan::SetPrototypeMethod (tpl, "tail", tail);
-            Nan::SetPrototypeMethod (tpl, "first", first);
-            Nan::SetPrototypeMethod (tpl, "next", next);
-            Nan::SetPrototypeMethod (tpl, "prev", prev);
-            Nan::SetPrototypeMethod (tpl, "last", last);
-            Nan::SetPrototypeMethod (tpl, "item", item);
-            Nan::SetPrototypeMethod (tpl, "cursor", cursor);
-            Nan::SetPrototypeMethod (tpl, "handleItem", handle_item);
-            Nan::SetPrototypeMethod (tpl, "find", find);
-            Nan::SetPrototypeMethod (tpl, "detach", detach);
-            Nan::SetPrototypeMethod (tpl, "detachCur", detach_cur);
-            Nan::SetPrototypeMethod (tpl, "delete", delete);
-            Nan::SetPrototypeMethod (tpl, "moveStart", move_start);
-            Nan::SetPrototypeMethod (tpl, "moveEnd", move_end);
-            Nan::SetPrototypeMethod (tpl, "purge", purge);
-            Nan::SetPrototypeMethod (tpl, "sort", sort);
-            Nan::SetPrototypeMethod (tpl, "insert", insert);
-            Nan::SetPrototypeMethod (tpl, "reorder", reorder);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "setDestructor", set_destructor);
-            Nan::SetPrototypeMethod (tpl, "setDuplicator", set_duplicator);
-            Nan::SetPrototypeMethod (tpl, "setComparator", set_comparator);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zlistx").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zlistx (arguments) {
-            self = new (name);
-        }
-        ~Zlistx () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zlistx *zlistx;
-        zlistx = new Zlistx ();
-        if (zlistx) {
-            zlistx->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_destroy (&zlistx->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zlistx->self != NULL));
-    }
-
-    static NAN_METHOD (add_start) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_add_start (zlistx->self);
-    }
-
-    static NAN_METHOD (add_end) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_add_end (zlistx->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_size (zlistx->self);
-    }
-
-    static NAN_METHOD (head) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_head (zlistx->self);
-    }
-
-    static NAN_METHOD (tail) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_tail (zlistx->self);
-    }
-
-    static NAN_METHOD (first) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_first (zlistx->self);
-    }
-
-    static NAN_METHOD (next) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_next (zlistx->self);
-    }
-
-    static NAN_METHOD (prev) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_prev (zlistx->self);
-    }
-
-    static NAN_METHOD (last) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_last (zlistx->self);
-    }
-
-    static NAN_METHOD (item) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_item (zlistx->self);
-    }
-
-    static NAN_METHOD (cursor) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_cursor (zlistx->self);
-    }
-
-    static NAN_METHOD (handle_item) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_handle_item (zlistx->self);
-    }
-
-    static NAN_METHOD (find) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_find (zlistx->self);
-    }
-
-    static NAN_METHOD (detach) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_detach (zlistx->self);
-    }
-
-    static NAN_METHOD (detach_cur) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_detach_cur (zlistx->self);
-    }
-
-    static NAN_METHOD (delete) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_delete (zlistx->self);
-    }
-
-    static NAN_METHOD (move_start) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_move_start (zlistx->self);
-    }
-
-    static NAN_METHOD (move_end) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_move_end (zlistx->self);
-    }
-
-    static NAN_METHOD (purge) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_purge (zlistx->self);
-    }
-
-    static NAN_METHOD (sort) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_sort (zlistx->self);
-    }
-
-    static NAN_METHOD (insert) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_insert (zlistx->self);
-    }
-
-    static NAN_METHOD (reorder) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_reorder (zlistx->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_dup (zlistx->self);
-    }
-
-    static NAN_METHOD (set_destructor) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_set_destructor (zlistx->self);
-    }
-
-    static NAN_METHOD (set_duplicator) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_set_duplicator (zlistx->self);
-    }
-
-    static NAN_METHOD (set_comparator) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_set_comparator (zlistx->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
-        zlistx_test (zlistx->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zlistx_t *self;
-    public:
-        zlistx_t *get_self () {
-            return self;
-        }
-};
-
-class Zloop: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zloop").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "reader", reader);
-            Nan::SetPrototypeMethod (tpl, "readerEnd", reader_end);
-            Nan::SetPrototypeMethod (tpl, "readerSetTolerant", reader_set_tolerant);
-            Nan::SetPrototypeMethod (tpl, "poller", poller);
-            Nan::SetPrototypeMethod (tpl, "pollerEnd", poller_end);
-            Nan::SetPrototypeMethod (tpl, "pollerSetTolerant", poller_set_tolerant);
-            Nan::SetPrototypeMethod (tpl, "timer", timer);
-            Nan::SetPrototypeMethod (tpl, "timerEnd", timer_end);
-            Nan::SetPrototypeMethod (tpl, "ticket", ticket);
-            Nan::SetPrototypeMethod (tpl, "ticketReset", ticket_reset);
-            Nan::SetPrototypeMethod (tpl, "ticketDelete", ticket_delete);
-            Nan::SetPrototypeMethod (tpl, "setTicketDelay", set_ticket_delay);
-            Nan::SetPrototypeMethod (tpl, "setMaxTimers", set_max_timers);
-            Nan::SetPrototypeMethod (tpl, "setVerbose", set_verbose);
-            Nan::SetPrototypeMethod (tpl, "setNonstop", set_nonstop);
-            Nan::SetPrototypeMethod (tpl, "start", start);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zloop").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zloop (arguments) {
-            self = new (name);
-        }
-        ~Zloop () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zloop *zloop;
-        zloop = new Zloop ();
-        if (zloop) {
-            zloop->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_destroy (&zloop->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zloop->self != NULL));
-    }
-
-    static NAN_METHOD (reader) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_reader (zloop->self);
-    }
-
-    static NAN_METHOD (reader_end) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_reader_end (zloop->self);
-    }
-
-    static NAN_METHOD (reader_set_tolerant) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_reader_set_tolerant (zloop->self);
-    }
-
-    static NAN_METHOD (poller) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_poller (zloop->self);
-    }
-
-    static NAN_METHOD (poller_end) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_poller_end (zloop->self);
-    }
-
-    static NAN_METHOD (poller_set_tolerant) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_poller_set_tolerant (zloop->self);
-    }
-
-    static NAN_METHOD (timer) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_timer (zloop->self);
-    }
-
-    static NAN_METHOD (timer_end) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_timer_end (zloop->self);
-    }
-
-    static NAN_METHOD (ticket) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_ticket (zloop->self);
-    }
-
-    static NAN_METHOD (ticket_reset) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_ticket_reset (zloop->self);
-    }
-
-    static NAN_METHOD (ticket_delete) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_ticket_delete (zloop->self);
-    }
-
-    static NAN_METHOD (set_ticket_delay) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_set_ticket_delay (zloop->self);
-    }
-
-    static NAN_METHOD (set_max_timers) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_set_max_timers (zloop->self);
-    }
-
-    static NAN_METHOD (set_verbose) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_set_verbose (zloop->self);
-    }
-
-    static NAN_METHOD (set_nonstop) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_set_nonstop (zloop->self);
-    }
-
-    static NAN_METHOD (start) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_start (zloop->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
-        zloop_test (zloop->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zloop_t *self;
-    public:
-        zloop_t *get_self () {
-            return self;
-        }
-};
-
-class Zmsg: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zmsg").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "send", send);
-            Nan::SetPrototypeMethod (tpl, "sendm", sendm);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "contentSize", content_size);
-            Nan::SetPrototypeMethod (tpl, "routingId", routing_id);
-            Nan::SetPrototypeMethod (tpl, "setRoutingId", set_routing_id);
-            Nan::SetPrototypeMethod (tpl, "prepend", prepend);
-            Nan::SetPrototypeMethod (tpl, "append", append);
-            Nan::SetPrototypeMethod (tpl, "pop", pop);
-            Nan::SetPrototypeMethod (tpl, "pushmem", pushmem);
-            Nan::SetPrototypeMethod (tpl, "addmem", addmem);
-            Nan::SetPrototypeMethod (tpl, "pushstr", pushstr);
-            Nan::SetPrototypeMethod (tpl, "addstr", addstr);
-            Nan::SetPrototypeMethod (tpl, "pushstrf", pushstrf);
-            Nan::SetPrototypeMethod (tpl, "addstrf", addstrf);
-            Nan::SetPrototypeMethod (tpl, "popstr", popstr);
-            Nan::SetPrototypeMethod (tpl, "addmsg", addmsg);
-            Nan::SetPrototypeMethod (tpl, "popmsg", popmsg);
-            Nan::SetPrototypeMethod (tpl, "remove", remove);
-            Nan::SetPrototypeMethod (tpl, "first", first);
-            Nan::SetPrototypeMethod (tpl, "next", next);
-            Nan::SetPrototypeMethod (tpl, "last", last);
-            Nan::SetPrototypeMethod (tpl, "save", save);
-            Nan::SetPrototypeMethod (tpl, "encode", encode);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "eq", eq);
-            Nan::SetPrototypeMethod (tpl, "signal", signal);
-            Nan::SetPrototypeMethod (tpl, "is", is);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zmsg").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zmsg (arguments) {
-            self = new (name);
-        }
-        ~Zmsg () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zmsg *zmsg;
-        zmsg = new Zmsg ();
-        if (zmsg) {
-            zmsg->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_destroy (&zmsg->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zmsg->self != NULL));
-    }
-
-    static NAN_METHOD (send) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_send (zmsg->self);
-    }
-
-    static NAN_METHOD (sendm) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_sendm (zmsg->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_size (zmsg->self);
-    }
-
-    static NAN_METHOD (content_size) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_content_size (zmsg->self);
-    }
-
-    static NAN_METHOD (routing_id) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_routing_id (zmsg->self);
-    }
-
-    static NAN_METHOD (set_routing_id) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_set_routing_id (zmsg->self);
-    }
-
-    static NAN_METHOD (prepend) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_prepend (zmsg->self);
-    }
-
-    static NAN_METHOD (append) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_append (zmsg->self);
-    }
-
-    static NAN_METHOD (pop) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_pop (zmsg->self);
-    }
-
-    static NAN_METHOD (pushmem) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_pushmem (zmsg->self);
-    }
-
-    static NAN_METHOD (addmem) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_addmem (zmsg->self);
-    }
-
-    static NAN_METHOD (pushstr) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_pushstr (zmsg->self);
-    }
-
-    static NAN_METHOD (addstr) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_addstr (zmsg->self);
-    }
-
-    static NAN_METHOD (pushstrf) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_pushstrf (zmsg->self);
-    }
-
-    static NAN_METHOD (addstrf) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_addstrf (zmsg->self);
-    }
-
-    static NAN_METHOD (popstr) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_popstr (zmsg->self);
-    }
-
-    static NAN_METHOD (addmsg) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_addmsg (zmsg->self);
-    }
-
-    static NAN_METHOD (popmsg) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_popmsg (zmsg->self);
-    }
-
-    static NAN_METHOD (remove) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_remove (zmsg->self);
-    }
-
-    static NAN_METHOD (first) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_first (zmsg->self);
-    }
-
-    static NAN_METHOD (next) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_next (zmsg->self);
-    }
-
-    static NAN_METHOD (last) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_last (zmsg->self);
-    }
-
-    static NAN_METHOD (save) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_save (zmsg->self);
-    }
-
-    static NAN_METHOD (encode) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_encode (zmsg->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_dup (zmsg->self);
-    }
-
-    static NAN_METHOD (print) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_print (zmsg->self);
-    }
-
-    static NAN_METHOD (eq) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_eq (zmsg->self);
-    }
-
-    static NAN_METHOD (signal) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_signal (zmsg->self);
-    }
-
-    static NAN_METHOD (is) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_is (zmsg->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
-        zmsg_test (zmsg->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zmsg_t *self;
-    public:
-        zmsg_t *get_self () {
-            return self;
-        }
-};
-
-class Zpoller: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zpoller").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "add", add);
-            Nan::SetPrototypeMethod (tpl, "remove", remove);
-            Nan::SetPrototypeMethod (tpl, "setNonstop", set_nonstop);
-            Nan::SetPrototypeMethod (tpl, "wait", wait);
-            Nan::SetPrototypeMethod (tpl, "expired", expired);
-            Nan::SetPrototypeMethod (tpl, "terminated", terminated);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zpoller").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zpoller (arguments) {
-            self = new (name);
-        }
-        ~Zpoller () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zpoller *zpoller;
-        zpoller = new Zpoller ();
-        if (zpoller) {
-            zpoller->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_destroy (&zpoller->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zpoller->self != NULL));
-    }
-
-    static NAN_METHOD (add) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_add (zpoller->self);
-    }
-
-    static NAN_METHOD (remove) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_remove (zpoller->self);
-    }
-
-    static NAN_METHOD (set_nonstop) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_set_nonstop (zpoller->self);
-    }
-
-    static NAN_METHOD (wait) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_wait (zpoller->self);
-    }
-
-    static NAN_METHOD (expired) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_expired (zpoller->self);
-    }
-
-    static NAN_METHOD (terminated) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_terminated (zpoller->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
-        zpoller_test (zpoller->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zpoller_t *self;
-    public:
-        zpoller_t *get_self () {
-            return self;
-        }
-};
-
-class Zproc: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zproc").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "czmqVersion", czmq_version);
-            Nan::SetPrototypeMethod (tpl, "interrupted", interrupted);
-            Nan::SetPrototypeMethod (tpl, "hasCurve", has_curve);
-            Nan::SetPrototypeMethod (tpl, "hostname", hostname);
-            Nan::SetPrototypeMethod (tpl, "daemonize", daemonize);
-            Nan::SetPrototypeMethod (tpl, "runAs", run_as);
-            Nan::SetPrototypeMethod (tpl, "setIoThreads", set_io_threads);
-            Nan::SetPrototypeMethod (tpl, "setMaxSockets", set_max_sockets);
-            Nan::SetPrototypeMethod (tpl, "setBiface", set_biface);
-            Nan::SetPrototypeMethod (tpl, "biface", biface);
-            Nan::SetPrototypeMethod (tpl, "setLogIdent", set_log_ident);
-            Nan::SetPrototypeMethod (tpl, "setLogSender", set_log_sender);
-            Nan::SetPrototypeMethod (tpl, "setLogSystem", set_log_system);
-            Nan::SetPrototypeMethod (tpl, "logError", log_error);
-            Nan::SetPrototypeMethod (tpl, "logWarning", log_warning);
-            Nan::SetPrototypeMethod (tpl, "logNotice", log_notice);
-            Nan::SetPrototypeMethod (tpl, "logInfo", log_info);
-            Nan::SetPrototypeMethod (tpl, "logDebug", log_debug);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zproc").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zproc () {
-        }
-        ~Zproc () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zproc *zproc;
-        zproc = new Zproc ();
-        if (zproc) {
-            zproc->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (czmq_version) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_czmq_version (zproc->self);
-    }
-
-    static NAN_METHOD (interrupted) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_interrupted (zproc->self);
-    }
-
-    static NAN_METHOD (has_curve) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_has_curve (zproc->self);
-    }
-
-    static NAN_METHOD (hostname) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_hostname (zproc->self);
-    }
-
-    static NAN_METHOD (daemonize) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_daemonize (zproc->self);
-    }
-
-    static NAN_METHOD (run_as) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_run_as (zproc->self);
-    }
-
-    static NAN_METHOD (set_io_threads) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_set_io_threads (zproc->self);
-    }
-
-    static NAN_METHOD (set_max_sockets) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_set_max_sockets (zproc->self);
-    }
-
-    static NAN_METHOD (set_biface) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_set_biface (zproc->self);
-    }
-
-    static NAN_METHOD (biface) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_biface (zproc->self);
-    }
-
-    static NAN_METHOD (set_log_ident) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_set_log_ident (zproc->self);
-    }
-
-    static NAN_METHOD (set_log_sender) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_set_log_sender (zproc->self);
-    }
-
-    static NAN_METHOD (set_log_system) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_set_log_system (zproc->self);
-    }
-
-    static NAN_METHOD (log_error) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_log_error (zproc->self);
-    }
-
-    static NAN_METHOD (log_warning) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_log_warning (zproc->self);
-    }
-
-    static NAN_METHOD (log_notice) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_log_notice (zproc->self);
-    }
-
-    static NAN_METHOD (log_info) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_log_info (zproc->self);
-    }
-
-    static NAN_METHOD (log_debug) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_log_debug (zproc->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-        zproc_test (zproc->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zsock: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zsock").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "bind", bind);
-            Nan::SetPrototypeMethod (tpl, "endpoint", endpoint);
-            Nan::SetPrototypeMethod (tpl, "unbind", unbind);
-            Nan::SetPrototypeMethod (tpl, "connect", connect);
-            Nan::SetPrototypeMethod (tpl, "disconnect", disconnect);
-            Nan::SetPrototypeMethod (tpl, "attach", attach);
-            Nan::SetPrototypeMethod (tpl, "typeStr", type_str);
-            Nan::SetPrototypeMethod (tpl, "send", send);
-            Nan::SetPrototypeMethod (tpl, "vsend", vsend);
-            Nan::SetPrototypeMethod (tpl, "recv", recv);
-            Nan::SetPrototypeMethod (tpl, "vrecv", vrecv);
-            Nan::SetPrototypeMethod (tpl, "bsend", bsend);
-            Nan::SetPrototypeMethod (tpl, "brecv", brecv);
-            Nan::SetPrototypeMethod (tpl, "routingId", routing_id);
-            Nan::SetPrototypeMethod (tpl, "setRoutingId", set_routing_id);
-            Nan::SetPrototypeMethod (tpl, "setUnbounded", set_unbounded);
-            Nan::SetPrototypeMethod (tpl, "signal", signal);
-            Nan::SetPrototypeMethod (tpl, "wait", wait);
-            Nan::SetPrototypeMethod (tpl, "flush", flush);
-            Nan::SetPrototypeMethod (tpl, "join", join);
-            Nan::SetPrototypeMethod (tpl, "leave", leave);
-            Nan::SetPrototypeMethod (tpl, "is", is);
-            Nan::SetPrototypeMethod (tpl, "resolve", resolve);
-            Nan::SetPrototypeMethod (tpl, "heartbeatIvl", heartbeat_ivl);
-            Nan::SetPrototypeMethod (tpl, "setHeartbeatIvl", set_heartbeat_ivl);
-            Nan::SetPrototypeMethod (tpl, "heartbeatTtl", heartbeat_ttl);
-            Nan::SetPrototypeMethod (tpl, "setHeartbeatTtl", set_heartbeat_ttl);
-            Nan::SetPrototypeMethod (tpl, "heartbeatTimeout", heartbeat_timeout);
-            Nan::SetPrototypeMethod (tpl, "setHeartbeatTimeout", set_heartbeat_timeout);
-            Nan::SetPrototypeMethod (tpl, "useFd", use_fd);
-            Nan::SetPrototypeMethod (tpl, "setUseFd", set_use_fd);
-            Nan::SetPrototypeMethod (tpl, "tos", tos);
-            Nan::SetPrototypeMethod (tpl, "setTos", set_tos);
-            Nan::SetPrototypeMethod (tpl, "setRouterHandover", set_router_handover);
-            Nan::SetPrototypeMethod (tpl, "setRouterMandatory", set_router_mandatory);
-            Nan::SetPrototypeMethod (tpl, "setProbeRouter", set_probe_router);
-            Nan::SetPrototypeMethod (tpl, "setReqRelaxed", set_req_relaxed);
-            Nan::SetPrototypeMethod (tpl, "setReqCorrelate", set_req_correlate);
-            Nan::SetPrototypeMethod (tpl, "setConflate", set_conflate);
-            Nan::SetPrototypeMethod (tpl, "zapDomain", zap_domain);
-            Nan::SetPrototypeMethod (tpl, "setZapDomain", set_zap_domain);
-            Nan::SetPrototypeMethod (tpl, "mechanism", mechanism);
-            Nan::SetPrototypeMethod (tpl, "plainServer", plain_server);
-            Nan::SetPrototypeMethod (tpl, "setPlainServer", set_plain_server);
-            Nan::SetPrototypeMethod (tpl, "plainUsername", plain_username);
-            Nan::SetPrototypeMethod (tpl, "setPlainUsername", set_plain_username);
-            Nan::SetPrototypeMethod (tpl, "plainPassword", plain_password);
-            Nan::SetPrototypeMethod (tpl, "setPlainPassword", set_plain_password);
-            Nan::SetPrototypeMethod (tpl, "curveServer", curve_server);
-            Nan::SetPrototypeMethod (tpl, "setCurveServer", set_curve_server);
-            Nan::SetPrototypeMethod (tpl, "curvePublickey", curve_publickey);
-            Nan::SetPrototypeMethod (tpl, "setCurvePublickey", set_curve_publickey);
-            Nan::SetPrototypeMethod (tpl, "setCurvePublickeyBin", set_curve_publickey_bin);
-            Nan::SetPrototypeMethod (tpl, "curveSecretkey", curve_secretkey);
-            Nan::SetPrototypeMethod (tpl, "setCurveSecretkey", set_curve_secretkey);
-            Nan::SetPrototypeMethod (tpl, "setCurveSecretkeyBin", set_curve_secretkey_bin);
-            Nan::SetPrototypeMethod (tpl, "curveServerkey", curve_serverkey);
-            Nan::SetPrototypeMethod (tpl, "setCurveServerkey", set_curve_serverkey);
-            Nan::SetPrototypeMethod (tpl, "setCurveServerkeyBin", set_curve_serverkey_bin);
-            Nan::SetPrototypeMethod (tpl, "gssapiServer", gssapi_server);
-            Nan::SetPrototypeMethod (tpl, "setGssapiServer", set_gssapi_server);
-            Nan::SetPrototypeMethod (tpl, "gssapiPlaintext", gssapi_plaintext);
-            Nan::SetPrototypeMethod (tpl, "setGssapiPlaintext", set_gssapi_plaintext);
-            Nan::SetPrototypeMethod (tpl, "gssapiPrincipal", gssapi_principal);
-            Nan::SetPrototypeMethod (tpl, "setGssapiPrincipal", set_gssapi_principal);
-            Nan::SetPrototypeMethod (tpl, "gssapiServicePrincipal", gssapi_service_principal);
-            Nan::SetPrototypeMethod (tpl, "setGssapiServicePrincipal", set_gssapi_service_principal);
-            Nan::SetPrototypeMethod (tpl, "ipv6", ipv6);
-            Nan::SetPrototypeMethod (tpl, "setIpv6", set_ipv6);
-            Nan::SetPrototypeMethod (tpl, "immediate", immediate);
-            Nan::SetPrototypeMethod (tpl, "setImmediate", set_immediate);
-            Nan::SetPrototypeMethod (tpl, "setRouterRaw", set_router_raw);
-            Nan::SetPrototypeMethod (tpl, "ipv4only", ipv4only);
-            Nan::SetPrototypeMethod (tpl, "setIpv4only", set_ipv4only);
-            Nan::SetPrototypeMethod (tpl, "setDelayAttachOnConnect", set_delay_attach_on_connect);
-            Nan::SetPrototypeMethod (tpl, "type", type);
-            Nan::SetPrototypeMethod (tpl, "sndhwm", sndhwm);
-            Nan::SetPrototypeMethod (tpl, "setSndhwm", set_sndhwm);
-            Nan::SetPrototypeMethod (tpl, "rcvhwm", rcvhwm);
-            Nan::SetPrototypeMethod (tpl, "setRcvhwm", set_rcvhwm);
-            Nan::SetPrototypeMethod (tpl, "affinity", affinity);
-            Nan::SetPrototypeMethod (tpl, "setAffinity", set_affinity);
-            Nan::SetPrototypeMethod (tpl, "setSubscribe", set_subscribe);
-            Nan::SetPrototypeMethod (tpl, "setUnsubscribe", set_unsubscribe);
-            Nan::SetPrototypeMethod (tpl, "identity", identity);
-            Nan::SetPrototypeMethod (tpl, "setIdentity", set_identity);
-            Nan::SetPrototypeMethod (tpl, "rate", rate);
-            Nan::SetPrototypeMethod (tpl, "setRate", set_rate);
-            Nan::SetPrototypeMethod (tpl, "recoveryIvl", recovery_ivl);
-            Nan::SetPrototypeMethod (tpl, "setRecoveryIvl", set_recovery_ivl);
-            Nan::SetPrototypeMethod (tpl, "sndbuf", sndbuf);
-            Nan::SetPrototypeMethod (tpl, "setSndbuf", set_sndbuf);
-            Nan::SetPrototypeMethod (tpl, "rcvbuf", rcvbuf);
-            Nan::SetPrototypeMethod (tpl, "setRcvbuf", set_rcvbuf);
-            Nan::SetPrototypeMethod (tpl, "linger", linger);
-            Nan::SetPrototypeMethod (tpl, "setLinger", set_linger);
-            Nan::SetPrototypeMethod (tpl, "reconnectIvl", reconnect_ivl);
-            Nan::SetPrototypeMethod (tpl, "setReconnectIvl", set_reconnect_ivl);
-            Nan::SetPrototypeMethod (tpl, "reconnectIvlMax", reconnect_ivl_max);
-            Nan::SetPrototypeMethod (tpl, "setReconnectIvlMax", set_reconnect_ivl_max);
-            Nan::SetPrototypeMethod (tpl, "backlog", backlog);
-            Nan::SetPrototypeMethod (tpl, "setBacklog", set_backlog);
-            Nan::SetPrototypeMethod (tpl, "maxmsgsize", maxmsgsize);
-            Nan::SetPrototypeMethod (tpl, "setMaxmsgsize", set_maxmsgsize);
-            Nan::SetPrototypeMethod (tpl, "multicastHops", multicast_hops);
-            Nan::SetPrototypeMethod (tpl, "setMulticastHops", set_multicast_hops);
-            Nan::SetPrototypeMethod (tpl, "rcvtimeo", rcvtimeo);
-            Nan::SetPrototypeMethod (tpl, "setRcvtimeo", set_rcvtimeo);
-            Nan::SetPrototypeMethod (tpl, "sndtimeo", sndtimeo);
-            Nan::SetPrototypeMethod (tpl, "setSndtimeo", set_sndtimeo);
-            Nan::SetPrototypeMethod (tpl, "setXpubVerbose", set_xpub_verbose);
-            Nan::SetPrototypeMethod (tpl, "tcpKeepalive", tcp_keepalive);
-            Nan::SetPrototypeMethod (tpl, "setTcpKeepalive", set_tcp_keepalive);
-            Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIdle", tcp_keepalive_idle);
-            Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIdle", set_tcp_keepalive_idle);
-            Nan::SetPrototypeMethod (tpl, "tcpKeepaliveCnt", tcp_keepalive_cnt);
-            Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveCnt", set_tcp_keepalive_cnt);
-            Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIntvl", tcp_keepalive_intvl);
-            Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIntvl", set_tcp_keepalive_intvl);
-            Nan::SetPrototypeMethod (tpl, "tcpAcceptFilter", tcp_accept_filter);
-            Nan::SetPrototypeMethod (tpl, "setTcpAcceptFilter", set_tcp_accept_filter);
-            Nan::SetPrototypeMethod (tpl, "rcvmore", rcvmore);
-            Nan::SetPrototypeMethod (tpl, "fd", fd);
-            Nan::SetPrototypeMethod (tpl, "events", events);
-            Nan::SetPrototypeMethod (tpl, "lastEndpoint", last_endpoint);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zsock").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zsock (arguments) {
-            self = new (name);
-        }
-        ~Zsock () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zsock *zsock;
-        zsock = new Zsock ();
-        if (zsock) {
-            zsock->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_destroy (&zsock->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zsock->self != NULL));
-    }
-
-    static NAN_METHOD (bind) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_bind (zsock->self);
-    }
-
-    static NAN_METHOD (endpoint) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_endpoint (zsock->self);
-    }
-
-    static NAN_METHOD (unbind) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_unbind (zsock->self);
-    }
-
-    static NAN_METHOD (connect) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_connect (zsock->self);
-    }
-
-    static NAN_METHOD (disconnect) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_disconnect (zsock->self);
-    }
-
-    static NAN_METHOD (attach) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_attach (zsock->self);
-    }
-
-    static NAN_METHOD (type_str) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_type_str (zsock->self);
-    }
-
-    static NAN_METHOD (send) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_send (zsock->self);
-    }
-
-    static NAN_METHOD (vsend) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_vsend (zsock->self);
-    }
-
-    static NAN_METHOD (recv) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_recv (zsock->self);
-    }
-
-    static NAN_METHOD (vrecv) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_vrecv (zsock->self);
-    }
-
-    static NAN_METHOD (bsend) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_bsend (zsock->self);
-    }
-
-    static NAN_METHOD (brecv) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_brecv (zsock->self);
-    }
-
-    static NAN_METHOD (routing_id) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_routing_id (zsock->self);
-    }
-
-    static NAN_METHOD (set_routing_id) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_routing_id (zsock->self);
-    }
-
-    static NAN_METHOD (set_unbounded) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_unbounded (zsock->self);
-    }
-
-    static NAN_METHOD (signal) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_signal (zsock->self);
-    }
-
-    static NAN_METHOD (wait) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_wait (zsock->self);
-    }
-
-    static NAN_METHOD (flush) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_flush (zsock->self);
-    }
-
-    static NAN_METHOD (join) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_join (zsock->self);
-    }
-
-    static NAN_METHOD (leave) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_leave (zsock->self);
-    }
-
-    static NAN_METHOD (is) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_is (zsock->self);
-    }
-
-    static NAN_METHOD (resolve) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_resolve (zsock->self);
-    }
-
-    static NAN_METHOD (heartbeat_ivl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_heartbeat_ivl (zsock->self);
-    }
-
-    static NAN_METHOD (set_heartbeat_ivl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_heartbeat_ivl (zsock->self);
-    }
-
-    static NAN_METHOD (heartbeat_ttl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_heartbeat_ttl (zsock->self);
-    }
-
-    static NAN_METHOD (set_heartbeat_ttl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_heartbeat_ttl (zsock->self);
-    }
-
-    static NAN_METHOD (heartbeat_timeout) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_heartbeat_timeout (zsock->self);
-    }
-
-    static NAN_METHOD (set_heartbeat_timeout) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_heartbeat_timeout (zsock->self);
-    }
-
-    static NAN_METHOD (use_fd) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_use_fd (zsock->self);
-    }
-
-    static NAN_METHOD (set_use_fd) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_use_fd (zsock->self);
-    }
-
-    static NAN_METHOD (tos) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_tos (zsock->self);
-    }
-
-    static NAN_METHOD (set_tos) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_tos (zsock->self);
-    }
-
-    static NAN_METHOD (set_router_handover) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_router_handover (zsock->self);
-    }
-
-    static NAN_METHOD (set_router_mandatory) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_router_mandatory (zsock->self);
-    }
-
-    static NAN_METHOD (set_probe_router) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_probe_router (zsock->self);
-    }
-
-    static NAN_METHOD (set_req_relaxed) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_req_relaxed (zsock->self);
-    }
-
-    static NAN_METHOD (set_req_correlate) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_req_correlate (zsock->self);
-    }
-
-    static NAN_METHOD (set_conflate) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_conflate (zsock->self);
-    }
-
-    static NAN_METHOD (zap_domain) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_zap_domain (zsock->self);
-    }
-
-    static NAN_METHOD (set_zap_domain) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_zap_domain (zsock->self);
-    }
-
-    static NAN_METHOD (mechanism) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_mechanism (zsock->self);
-    }
-
-    static NAN_METHOD (plain_server) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_plain_server (zsock->self);
-    }
-
-    static NAN_METHOD (set_plain_server) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_plain_server (zsock->self);
-    }
-
-    static NAN_METHOD (plain_username) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_plain_username (zsock->self);
-    }
-
-    static NAN_METHOD (set_plain_username) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_plain_username (zsock->self);
-    }
-
-    static NAN_METHOD (plain_password) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_plain_password (zsock->self);
-    }
-
-    static NAN_METHOD (set_plain_password) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_plain_password (zsock->self);
-    }
-
-    static NAN_METHOD (curve_server) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_curve_server (zsock->self);
-    }
-
-    static NAN_METHOD (set_curve_server) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_curve_server (zsock->self);
-    }
-
-    static NAN_METHOD (curve_publickey) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_curve_publickey (zsock->self);
-    }
-
-    static NAN_METHOD (set_curve_publickey) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_curve_publickey (zsock->self);
-    }
-
-    static NAN_METHOD (set_curve_publickey_bin) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_curve_publickey_bin (zsock->self);
-    }
-
-    static NAN_METHOD (curve_secretkey) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_curve_secretkey (zsock->self);
-    }
-
-    static NAN_METHOD (set_curve_secretkey) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_curve_secretkey (zsock->self);
-    }
-
-    static NAN_METHOD (set_curve_secretkey_bin) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_curve_secretkey_bin (zsock->self);
-    }
-
-    static NAN_METHOD (curve_serverkey) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_curve_serverkey (zsock->self);
-    }
-
-    static NAN_METHOD (set_curve_serverkey) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_curve_serverkey (zsock->self);
-    }
-
-    static NAN_METHOD (set_curve_serverkey_bin) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_curve_serverkey_bin (zsock->self);
-    }
-
-    static NAN_METHOD (gssapi_server) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_gssapi_server (zsock->self);
-    }
-
-    static NAN_METHOD (set_gssapi_server) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_gssapi_server (zsock->self);
-    }
-
-    static NAN_METHOD (gssapi_plaintext) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_gssapi_plaintext (zsock->self);
-    }
-
-    static NAN_METHOD (set_gssapi_plaintext) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_gssapi_plaintext (zsock->self);
-    }
-
-    static NAN_METHOD (gssapi_principal) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_gssapi_principal (zsock->self);
-    }
-
-    static NAN_METHOD (set_gssapi_principal) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_gssapi_principal (zsock->self);
-    }
-
-    static NAN_METHOD (gssapi_service_principal) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_gssapi_service_principal (zsock->self);
-    }
-
-    static NAN_METHOD (set_gssapi_service_principal) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_gssapi_service_principal (zsock->self);
-    }
-
-    static NAN_METHOD (ipv6) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_ipv6 (zsock->self);
-    }
-
-    static NAN_METHOD (set_ipv6) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_ipv6 (zsock->self);
-    }
-
-    static NAN_METHOD (immediate) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_immediate (zsock->self);
-    }
-
-    static NAN_METHOD (set_immediate) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_immediate (zsock->self);
-    }
-
-    static NAN_METHOD (set_router_raw) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_router_raw (zsock->self);
-    }
-
-    static NAN_METHOD (ipv4only) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_ipv4only (zsock->self);
-    }
-
-    static NAN_METHOD (set_ipv4only) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_ipv4only (zsock->self);
-    }
-
-    static NAN_METHOD (set_delay_attach_on_connect) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_delay_attach_on_connect (zsock->self);
-    }
-
-    static NAN_METHOD (type) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_type (zsock->self);
-    }
-
-    static NAN_METHOD (sndhwm) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_sndhwm (zsock->self);
-    }
-
-    static NAN_METHOD (set_sndhwm) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_sndhwm (zsock->self);
-    }
-
-    static NAN_METHOD (rcvhwm) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_rcvhwm (zsock->self);
-    }
-
-    static NAN_METHOD (set_rcvhwm) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_rcvhwm (zsock->self);
-    }
-
-    static NAN_METHOD (affinity) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_affinity (zsock->self);
-    }
-
-    static NAN_METHOD (set_affinity) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_affinity (zsock->self);
-    }
-
-    static NAN_METHOD (set_subscribe) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_subscribe (zsock->self);
-    }
-
-    static NAN_METHOD (set_unsubscribe) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_unsubscribe (zsock->self);
-    }
-
-    static NAN_METHOD (identity) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_identity (zsock->self);
-    }
-
-    static NAN_METHOD (set_identity) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_identity (zsock->self);
-    }
-
-    static NAN_METHOD (rate) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_rate (zsock->self);
-    }
-
-    static NAN_METHOD (set_rate) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_rate (zsock->self);
-    }
-
-    static NAN_METHOD (recovery_ivl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_recovery_ivl (zsock->self);
-    }
-
-    static NAN_METHOD (set_recovery_ivl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_recovery_ivl (zsock->self);
-    }
-
-    static NAN_METHOD (sndbuf) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_sndbuf (zsock->self);
-    }
-
-    static NAN_METHOD (set_sndbuf) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_sndbuf (zsock->self);
-    }
-
-    static NAN_METHOD (rcvbuf) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_rcvbuf (zsock->self);
-    }
-
-    static NAN_METHOD (set_rcvbuf) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_rcvbuf (zsock->self);
-    }
-
-    static NAN_METHOD (linger) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_linger (zsock->self);
-    }
-
-    static NAN_METHOD (set_linger) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_linger (zsock->self);
-    }
-
-    static NAN_METHOD (reconnect_ivl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_reconnect_ivl (zsock->self);
-    }
-
-    static NAN_METHOD (set_reconnect_ivl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_reconnect_ivl (zsock->self);
-    }
-
-    static NAN_METHOD (reconnect_ivl_max) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_reconnect_ivl_max (zsock->self);
-    }
-
-    static NAN_METHOD (set_reconnect_ivl_max) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_reconnect_ivl_max (zsock->self);
-    }
-
-    static NAN_METHOD (backlog) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_backlog (zsock->self);
-    }
-
-    static NAN_METHOD (set_backlog) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_backlog (zsock->self);
-    }
-
-    static NAN_METHOD (maxmsgsize) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_maxmsgsize (zsock->self);
-    }
-
-    static NAN_METHOD (set_maxmsgsize) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_maxmsgsize (zsock->self);
-    }
-
-    static NAN_METHOD (multicast_hops) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_multicast_hops (zsock->self);
-    }
-
-    static NAN_METHOD (set_multicast_hops) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_multicast_hops (zsock->self);
-    }
-
-    static NAN_METHOD (rcvtimeo) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_rcvtimeo (zsock->self);
-    }
-
-    static NAN_METHOD (set_rcvtimeo) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_rcvtimeo (zsock->self);
-    }
-
-    static NAN_METHOD (sndtimeo) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_sndtimeo (zsock->self);
-    }
-
-    static NAN_METHOD (set_sndtimeo) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_sndtimeo (zsock->self);
-    }
-
-    static NAN_METHOD (set_xpub_verbose) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_xpub_verbose (zsock->self);
-    }
-
-    static NAN_METHOD (tcp_keepalive) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_tcp_keepalive (zsock->self);
-    }
-
-    static NAN_METHOD (set_tcp_keepalive) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_tcp_keepalive (zsock->self);
-    }
-
-    static NAN_METHOD (tcp_keepalive_idle) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_tcp_keepalive_idle (zsock->self);
-    }
-
-    static NAN_METHOD (set_tcp_keepalive_idle) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_tcp_keepalive_idle (zsock->self);
-    }
-
-    static NAN_METHOD (tcp_keepalive_cnt) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_tcp_keepalive_cnt (zsock->self);
-    }
-
-    static NAN_METHOD (set_tcp_keepalive_cnt) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_tcp_keepalive_cnt (zsock->self);
-    }
-
-    static NAN_METHOD (tcp_keepalive_intvl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_tcp_keepalive_intvl (zsock->self);
-    }
-
-    static NAN_METHOD (set_tcp_keepalive_intvl) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_tcp_keepalive_intvl (zsock->self);
-    }
-
-    static NAN_METHOD (tcp_accept_filter) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_tcp_accept_filter (zsock->self);
-    }
-
-    static NAN_METHOD (set_tcp_accept_filter) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_set_tcp_accept_filter (zsock->self);
-    }
-
-    static NAN_METHOD (rcvmore) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_rcvmore (zsock->self);
-    }
-
-    static NAN_METHOD (fd) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_fd (zsock->self);
-    }
-
-    static NAN_METHOD (events) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_events (zsock->self);
-    }
-
-    static NAN_METHOD (last_endpoint) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_last_endpoint (zsock->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-        zsock_test (zsock->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zsock_t *self;
-    public:
-        zsock_t *get_self () {
-            return self;
-        }
-};
-
-class Zstr: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zstr").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "recv", recv);
-            Nan::SetPrototypeMethod (tpl, "recvx", recvx);
-            Nan::SetPrototypeMethod (tpl, "send", send);
-            Nan::SetPrototypeMethod (tpl, "sendm", sendm);
-            Nan::SetPrototypeMethod (tpl, "sendf", sendf);
-            Nan::SetPrototypeMethod (tpl, "sendfm", sendfm);
-            Nan::SetPrototypeMethod (tpl, "sendx", sendx);
-            Nan::SetPrototypeMethod (tpl, "str", str);
-            Nan::SetPrototypeMethod (tpl, "free", free);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zstr").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zstr () {
-        }
-        ~Zstr () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zstr *zstr;
-        zstr = new Zstr ();
-        if (zstr) {
-            zstr->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (recv) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_recv (zstr->self);
-    }
-
-    static NAN_METHOD (recvx) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_recvx (zstr->self);
-    }
-
-    static NAN_METHOD (send) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_send (zstr->self);
-    }
-
-    static NAN_METHOD (sendm) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_sendm (zstr->self);
-    }
-
-    static NAN_METHOD (sendf) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_sendf (zstr->self);
-    }
-
-    static NAN_METHOD (sendfm) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_sendfm (zstr->self);
-    }
-
-    static NAN_METHOD (sendx) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_sendx (zstr->self);
-    }
-
-    static NAN_METHOD (str) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_str (zstr->self);
-    }
-
-    static NAN_METHOD (free) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_free (zstr->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zstr *zstr = Nan::ObjectWrap::Unwrap <Zstr> (info.Holder ());
-        zstr_test (zstr->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Ztrie: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Ztrie").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "insertRoute", insert_route);
-            Nan::SetPrototypeMethod (tpl, "removeRoute", remove_route);
-            Nan::SetPrototypeMethod (tpl, "matches", matches);
-            Nan::SetPrototypeMethod (tpl, "hitData", hit_data);
-            Nan::SetPrototypeMethod (tpl, "hitParameterCount", hit_parameter_count);
-            Nan::SetPrototypeMethod (tpl, "hitParameters", hit_parameters);
-            Nan::SetPrototypeMethod (tpl, "hitAsteriskMatch", hit_asterisk_match);
-            Nan::SetPrototypeMethod (tpl, "print", print);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Ztrie").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Ztrie (arguments) {
-            self = new (name);
-        }
-        ~Ztrie () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Ztrie *ztrie;
-        ztrie = new Ztrie ();
-        if (ztrie) {
-            ztrie->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_destroy (&ztrie->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (ztrie->self != NULL));
-    }
-
-    static NAN_METHOD (insert_route) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_insert_route (ztrie->self);
-    }
-
-    static NAN_METHOD (remove_route) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_remove_route (ztrie->self);
-    }
-
-    static NAN_METHOD (matches) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_matches (ztrie->self);
-    }
-
-    static NAN_METHOD (hit_data) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_hit_data (ztrie->self);
-    }
-
-    static NAN_METHOD (hit_parameter_count) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_hit_parameter_count (ztrie->self);
-    }
-
-    static NAN_METHOD (hit_parameters) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_hit_parameters (ztrie->self);
-    }
-
-    static NAN_METHOD (hit_asterisk_match) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_hit_asterisk_match (ztrie->self);
-    }
-
-    static NAN_METHOD (print) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_print (ztrie->self);
-    }
-
-    static NAN_METHOD (test) {
-        Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
-        ztrie_test (ztrie->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    ztrie_t *self;
-    public:
-        ztrie_t *get_self () {
-            return self;
-        }
-};
-
-class Zuuid: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zuuid").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "destroy", destroy);
-            Nan::SetPrototypeMethod (tpl, "set", set);
-            Nan::SetPrototypeMethod (tpl, "setStr", set_str);
-            Nan::SetPrototypeMethod (tpl, "data", data);
-            Nan::SetPrototypeMethod (tpl, "size", size);
-            Nan::SetPrototypeMethod (tpl, "str", str);
-            Nan::SetPrototypeMethod (tpl, "strCanonical", str_canonical);
-            Nan::SetPrototypeMethod (tpl, "export", export);
-            Nan::SetPrototypeMethod (tpl, "eq", eq);
-            Nan::SetPrototypeMethod (tpl, "neq", neq);
-            Nan::SetPrototypeMethod (tpl, "dup", dup);
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zuuid").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zuuid (arguments) {
-            self = new (name);
-        }
-        ~Zuuid () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zuuid *zuuid;
-        zuuid = new Zuuid ();
-        if (zuuid) {
-            zuuid->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (destroy) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_destroy (&zuuid->self);
-    }
-
-    static NAN_METHOD (defined) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        info.GetReturnValue ().Set (Nan::New (zuuid->self != NULL));
-    }
-
-    static NAN_METHOD (set) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_set (zuuid->self);
-    }
-
-    static NAN_METHOD (set_str) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_set_str (zuuid->self);
-    }
-
-    static NAN_METHOD (data) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_data (zuuid->self);
-    }
-
-    static NAN_METHOD (size) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_size (zuuid->self);
-    }
-
-    static NAN_METHOD (str) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_str (zuuid->self);
-    }
-
-    static NAN_METHOD (str_canonical) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_str_canonical (zuuid->self);
-    }
-
-    static NAN_METHOD (export) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_export (zuuid->self);
-    }
-
-    static NAN_METHOD (eq) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_eq (zuuid->self);
-    }
-
-    static NAN_METHOD (neq) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_neq (zuuid->self);
-    }
-
-    static NAN_METHOD (dup) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_dup (zuuid->self);
-    }
-
-    static NAN_METHOD (test) {
-        Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
-        zuuid_test (zuuid->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-    zuuid_t *self;
-    public:
-        zuuid_t *get_self () {
-            return self;
-        }
-};
-
-class Zauth: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zauth").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zauth").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zauth () {
-        }
-        ~Zauth () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zauth *zauth;
-        zauth = new Zauth ();
-        if (zauth) {
-            zauth->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (test) {
-        Zauth *zauth = Nan::ObjectWrap::Unwrap <Zauth> (info.Holder ());
-        zauth_test (zauth->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zbeacon: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zbeacon").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zbeacon").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zbeacon () {
-        }
-        ~Zbeacon () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zbeacon *zbeacon;
-        zbeacon = new Zbeacon ();
-        if (zbeacon) {
-            zbeacon->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (test) {
-        Zbeacon *zbeacon = Nan::ObjectWrap::Unwrap <Zbeacon> (info.Holder ());
-        zbeacon_test (zbeacon->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zgossip: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zgossip").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zgossip").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zgossip () {
-        }
-        ~Zgossip () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zgossip *zgossip;
-        zgossip = new Zgossip ();
-        if (zgossip) {
-            zgossip->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (test) {
-        Zgossip *zgossip = Nan::ObjectWrap::Unwrap <Zgossip> (info.Holder ());
-        zgossip_test (zgossip->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zmonitor: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zmonitor").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zmonitor").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zmonitor () {
-        }
-        ~Zmonitor () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zmonitor *zmonitor;
-        zmonitor = new Zmonitor ();
-        if (zmonitor) {
-            zmonitor->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (test) {
-        Zmonitor *zmonitor = Nan::ObjectWrap::Unwrap <Zmonitor> (info.Holder ());
-        zmonitor_test (zmonitor->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zproxy: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zproxy").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zproxy").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zproxy () {
-        }
-        ~Zproxy () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zproxy *zproxy;
-        zproxy = new Zproxy ();
-        if (zproxy) {
-            zproxy->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (test) {
-        Zproxy *zproxy = Nan::ObjectWrap::Unwrap <Zproxy> (info.Holder ());
-        zproxy_test (zproxy->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zrex: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zrex").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zrex").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zrex () {
-        }
-        ~Zrex () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zrex *zrex;
-        zrex = new Zrex ();
-        if (zrex) {
-            zrex->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (test) {
-        Zrex *zrex = Nan::ObjectWrap::Unwrap <Zrex> (info.Holder ());
-        zrex_test (zrex->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
-
-class Zsys: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init) {
-            Nan::HandleScope scope;
-
-            // Prepare constructor template
-            Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-            tpl->SetClassName (Nan::New ("Zsys").ToLocalChecked ());
-            tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-            // Prototypes
-            Nan::SetPrototypeMethod (tpl, "test", test);
-
-            constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-            Nan::Set (target, Nan::New ("Zsys").ToLocalChecked (),
-            Nan::GetFunction (tpl).ToLocalChecked ());
-        }
-    private:
-        explicit Zsys () {
-        }
-        ~Zsys () {
-        }
-
-    static NAN_METHOD (New) {
-        assert (info.IsConstructCall ());
-        Zsys *zsys;
-        zsys = new Zsys ();
-        if (zsys) {
-            zsys->Wrap (info.This ());
-            info.GetReturnValue ().Set (info.This ());
-        }
-    }
-
-    static NAN_METHOD (test) {
-        Zsys *zsys = Nan::ObjectWrap::Unwrap <Zsys> (info.Holder ());
-        zsys_test (zsys->self);
-    }
-
-    static Nan::Persistent <Function> & constructor () {
-        static Nan::Persistent <Function> my_constructor;
-        return my_constructor;
-    }
-
-};
+NAN_MODULE_INIT (Zarmour::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zarmour").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "encode", _encode);
+    Nan::SetPrototypeMethod (tpl, "decode", _decode);
+    Nan::SetPrototypeMethod (tpl, "mode", _mode);
+    Nan::SetPrototypeMethod (tpl, "modeStr", _mode_str);
+    Nan::SetPrototypeMethod (tpl, "pad", _pad);
+    Nan::SetPrototypeMethod (tpl, "padChar", _pad_char);
+    Nan::SetPrototypeMethod (tpl, "lineBreaks", _line_breaks);
+    Nan::SetPrototypeMethod (tpl, "lineLength", _line_length);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zarmour").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zarmour::Zarmour (void) {
+    self = zarmour_new ();
+}
+
+Zarmour::Zarmour (zarmour_t *self_) {
+    self = self_;
+}
+
+Zarmour::~Zarmour () {
+}
+
+NAN_METHOD (Zarmour::New) {
+    assert (info.IsConstructCall ());
+    Zarmour *zarmour = new Zarmour ();
+    if (zarmour) {
+        zarmour->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zarmour::destroy) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    zarmour_destroy (&zarmour->self);
+}
+
+
+NAN_METHOD (Zarmour::defined) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zarmour->self != NULL));
+}
+
+NAN_METHOD (Zarmour::_encode) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
+    size_t size = node::Buffer::Length (buffer_node);
+    char *result = (char *) zarmour_encode (zarmour->self, (const byte *)data, (size_t)size);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zarmour::_decode) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    char *data;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `data`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`data` must be a string");
+    else {
+        Nan::Utf8String data_utf8 (info [0].As<String>());
+        data = *data_utf8;
+    }
+    zchunk_t *result = zarmour_decode (zarmour->self, (const char *)data);
+    Zchunk *zchunk_result = new Zchunk (result);
+    if (zchunk_result) {
+    //  Don't yet know how to return a new object
+    //      zchunk->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zarmour::_mode) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    int result = zarmour_mode (zarmour->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zarmour::_mode_str) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    char *result = (char *) zarmour_mode_str (zarmour->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zarmour::_pad) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    bool result = zarmour_pad (zarmour->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zarmour::_pad_char) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    char result [2] = " ";
+    result [0] = zarmour_pad_char (zarmour->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zarmour::_line_breaks) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    bool result = zarmour_line_breaks (zarmour->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zarmour::_line_length) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    size_t result = zarmour_line_length (zarmour->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+Nan::Persistent <Function> &Zarmour::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zcert::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zcert").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "publicKey", _public_key);
+    Nan::SetPrototypeMethod (tpl, "secretKey", _secret_key);
+    Nan::SetPrototypeMethod (tpl, "publicTxt", _public_txt);
+    Nan::SetPrototypeMethod (tpl, "secretTxt", _secret_txt);
+    Nan::SetPrototypeMethod (tpl, "meta", _meta);
+    Nan::SetPrototypeMethod (tpl, "metaKeys", _meta_keys);
+    Nan::SetPrototypeMethod (tpl, "save", _save);
+    Nan::SetPrototypeMethod (tpl, "savePublic", _save_public);
+    Nan::SetPrototypeMethod (tpl, "saveSecret", _save_secret);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "eq", _eq);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zcert").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zcert::Zcert (void) {
+    self = zcert_new ();
+}
+
+Zcert::Zcert (zcert_t *self_) {
+    self = self_;
+}
+
+Zcert::~Zcert () {
+}
+
+NAN_METHOD (Zcert::New) {
+    assert (info.IsConstructCall ());
+    Zcert *zcert = new Zcert ();
+    if (zcert) {
+        zcert->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zcert::destroy) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    zcert_destroy (&zcert->self);
+}
+
+
+NAN_METHOD (Zcert::defined) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zcert->self != NULL));
+}
+
+NAN_METHOD (Zcert::_public_key) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    const char *result = (const char *) zcert_public_key (zcert->self);
+    info.GetReturnValue().Set (Nan::CopyBuffer (result, 32).ToLocalChecked ());
+}
+
+NAN_METHOD (Zcert::_secret_key) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    const char *result = (const char *) zcert_secret_key (zcert->self);
+    info.GetReturnValue().Set (Nan::CopyBuffer (result, 32).ToLocalChecked ());
+}
+
+NAN_METHOD (Zcert::_public_txt) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *result = (char *) zcert_public_txt (zcert->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zcert::_secret_txt) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *result = (char *) zcert_secret_txt (zcert->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zcert::_meta) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *name;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `name`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`name` must be a string");
+    else {
+        Nan::Utf8String name_utf8 (info [0].As<String>());
+        name = *name_utf8;
+    }
+    char *result = (char *) zcert_meta (zcert->self, (const char *)name);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zcert::_meta_keys) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    zlist_t *result = zcert_meta_keys (zcert->self);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zcert::_save) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zcert_save (zcert->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zcert::_save_public) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zcert_save_public (zcert->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zcert::_save_secret) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zcert_save_secret (zcert->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zcert::_dup) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    zcert_t *result = zcert_dup (zcert->self);
+    Zcert *zcert_result = new Zcert (result);
+    if (zcert_result) {
+    //  Don't yet know how to return a new object
+    //      zcert->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zcert::_eq) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    Zcert *compare = Nan::ObjectWrap::Unwrap<Zcert>(info [0].As<Object>());
+    bool result = zcert_eq (zcert->self, compare->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+Nan::Persistent <Function> &Zcert::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zcertstore::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zcertstore").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "lookup", _lookup);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zcertstore").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zcertstore::Zcertstore (const char *location) {
+    self = zcertstore_new ((const char *)location);
+}
+
+Zcertstore::Zcertstore (zcertstore_t *self_) {
+    self = self_;
+}
+
+Zcertstore::~Zcertstore () {
+}
+
+NAN_METHOD (Zcertstore::New) {
+    assert (info.IsConstructCall ());
+    char *location;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `location`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`location` must be a string");
+    else {
+        Nan::Utf8String location_utf8 (info [0].As<String>());
+        location = *location_utf8;
+    }
+    Zcertstore *zcertstore = new Zcertstore ((const char *)location);
+    if (zcertstore) {
+        zcertstore->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zcertstore::destroy) {
+    Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
+    zcertstore_destroy (&zcertstore->self);
+}
+
+
+NAN_METHOD (Zcertstore::defined) {
+    Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zcertstore->self != NULL));
+}
+
+NAN_METHOD (Zcertstore::_lookup) {
+    Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
+    char *public_key;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `public key`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`public key` must be a string");
+    else {
+        Nan::Utf8String public_key_utf8 (info [0].As<String>());
+        public_key = *public_key_utf8;
+    }
+    zcert_t *result = zcertstore_lookup (zcertstore->self, (const char *)public_key);
+    Zcert *zcert_result = new Zcert (result);
+    if (zcert_result) {
+    //  Don't yet know how to return a new object
+    //      zcert->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+Nan::Persistent <Function> &Zcertstore::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zchunk::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zchunk").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "maxSize", _max_size);
+    Nan::SetPrototypeMethod (tpl, "data", _data);
+    Nan::SetPrototypeMethod (tpl, "set", _set);
+    Nan::SetPrototypeMethod (tpl, "append", _append);
+    Nan::SetPrototypeMethod (tpl, "extend", _extend);
+    Nan::SetPrototypeMethod (tpl, "consume", _consume);
+    Nan::SetPrototypeMethod (tpl, "exhausted", _exhausted);
+    Nan::SetPrototypeMethod (tpl, "slurp", _slurp);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "strhex", _strhex);
+    Nan::SetPrototypeMethod (tpl, "strdup", _strdup);
+    Nan::SetPrototypeMethod (tpl, "streq", _streq);
+    Nan::SetPrototypeMethod (tpl, "pack", _pack);
+    Nan::SetPrototypeMethod (tpl, "unpack", _unpack);
+    Nan::SetPrototypeMethod (tpl, "digest", _digest);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zchunk").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zchunk::Zchunk (const void *data, size_t size) {
+    self = zchunk_new ((const void *)data, (size_t)size);
+}
+
+Zchunk::Zchunk (zchunk_t *self_) {
+    self = self_;
+}
+
+Zchunk::~Zchunk () {
+}
+
+NAN_METHOD (Zchunk::New) {
+    assert (info.IsConstructCall ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
+    size_t size = node::Buffer::Length (buffer_node);
+    Zchunk *zchunk = new Zchunk ((const void *)data, (size_t)size);
+    if (zchunk) {
+        zchunk->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zchunk::destroy) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    zchunk_destroy (&zchunk->self);
+}
+
+
+NAN_METHOD (Zchunk::defined) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zchunk->self != NULL));
+}
+
+NAN_METHOD (Zchunk::_size) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    size_t result = zchunk_size (zchunk->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zchunk::_max_size) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    size_t result = zchunk_max_size (zchunk->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zchunk::_data) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    const char *result = (const char *) zchunk_data (zchunk->self);
+    info.GetReturnValue().Set (Nan::CopyBuffer (result, zchunk_size (zchunk->self)).ToLocalChecked ());
+}
+
+NAN_METHOD (Zchunk::_set) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
+    size_t size = node::Buffer::Length (buffer_node);
+    size_t result = zchunk_set (zchunk->self, (const void *)data, (size_t)size);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zchunk::_append) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
+    size_t size = node::Buffer::Length (buffer_node);
+    size_t result = zchunk_append (zchunk->self, (const void *)data, (size_t)size);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zchunk::_extend) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
+    size_t size = node::Buffer::Length (buffer_node);
+    size_t result = zchunk_extend (zchunk->self, (const void *)data, (size_t)size);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zchunk::_consume) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    Zchunk *source = Nan::ObjectWrap::Unwrap<Zchunk>(info [0].As<Object>());
+    size_t result = zchunk_consume (zchunk->self, source->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zchunk::_exhausted) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    bool result = zchunk_exhausted (zchunk->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zchunk::_slurp) {
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `maxsize`");
+    else
+    if (!info [1]->IsNumber ())
+        return Nan::ThrowTypeError ("`maxsize` must be a number");
+    size_t maxsize = Nan::To<int64_t>(info [1]).FromJust ();
+    zchunk_t *result = zchunk_slurp ((const char *)filename, (size_t)maxsize);
+    Zchunk *zchunk_result = new Zchunk (result);
+    if (zchunk_result) {
+    //  Don't yet know how to return a new object
+    //      zchunk->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zchunk::_dup) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    zchunk_t *result = zchunk_dup (zchunk->self);
+    Zchunk *zchunk_result = new Zchunk (result);
+    if (zchunk_result) {
+    //  Don't yet know how to return a new object
+    //      zchunk->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zchunk::_strhex) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    char *result = (char *) zchunk_strhex (zchunk->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zchunk::_strdup) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    char *result = (char *) zchunk_strdup (zchunk->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zchunk::_streq) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    char *string;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`string` must be a string");
+    else {
+        Nan::Utf8String string_utf8 (info [0].As<String>());
+        string = *string_utf8;
+    }
+    bool result = zchunk_streq (zchunk->self, (const char *)string);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zchunk::_pack) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    zframe_t *result = zchunk_pack (zchunk->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zchunk::_unpack) {
+    Zframe *frame = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    zchunk_t *result = zchunk_unpack (frame->self);
+    Zchunk *zchunk_result = new Zchunk (result);
+    if (zchunk_result) {
+    //  Don't yet know how to return a new object
+    //      zchunk->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zchunk::_digest) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    char *result = (char *) zchunk_digest (zchunk->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Zchunk::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zclock::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zclock").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "time", _time);
+    Nan::SetPrototypeMethod (tpl, "mono", _mono);
+    Nan::SetPrototypeMethod (tpl, "usecs", _usecs);
+    Nan::SetPrototypeMethod (tpl, "timestr", _timestr);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zclock").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zclock::Zclock () {
+}
+
+Zclock::~Zclock () {
+}
+
+NAN_METHOD (Zclock::New) {
+    assert (info.IsConstructCall ());
+    Zclock *zclock = new Zclock ();
+    if (zclock) {
+        zclock->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zclock::_time) {
+    int64_t result = zclock_time ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zclock::_mono) {
+    int64_t result = zclock_mono ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zclock::_usecs) {
+    int64_t result = zclock_usecs ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zclock::_timestr) {
+    char *result = (char *) zclock_timestr ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Zclock::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zconfig::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zconfig").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "name", _name);
+    Nan::SetPrototypeMethod (tpl, "value", _value);
+    Nan::SetPrototypeMethod (tpl, "get", _get);
+    Nan::SetPrototypeMethod (tpl, "child", _child);
+    Nan::SetPrototypeMethod (tpl, "next", _next);
+    Nan::SetPrototypeMethod (tpl, "locate", _locate);
+    Nan::SetPrototypeMethod (tpl, "atDepth", _at_depth);
+    Nan::SetPrototypeMethod (tpl, "comments", _comments);
+    Nan::SetPrototypeMethod (tpl, "save", _save);
+    Nan::SetPrototypeMethod (tpl, "savef", _savef);
+    Nan::SetPrototypeMethod (tpl, "filename", _filename);
+    Nan::SetPrototypeMethod (tpl, "reload", _reload);
+    Nan::SetPrototypeMethod (tpl, "chunkLoad", _chunk_load);
+    Nan::SetPrototypeMethod (tpl, "chunkSave", _chunk_save);
+    Nan::SetPrototypeMethod (tpl, "strLoad", _str_load);
+    Nan::SetPrototypeMethod (tpl, "strSave", _str_save);
+    Nan::SetPrototypeMethod (tpl, "hasChanged", _has_changed);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zconfig").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zconfig::Zconfig (const char *name, zconfig_t *parent) {
+    self = zconfig_new ((const char *)name, parent);
+}
+
+Zconfig::Zconfig (zconfig_t *self_) {
+    self = self_;
+}
+
+Zconfig::~Zconfig () {
+}
+
+NAN_METHOD (Zconfig::New) {
+    assert (info.IsConstructCall ());
+    char *name;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `name`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`name` must be a string");
+    else {
+        Nan::Utf8String name_utf8 (info [0].As<String>());
+        name = *name_utf8;
+    }
+    Zconfig *parent = Nan::ObjectWrap::Unwrap<Zconfig>(info [1].As<Object>());
+    Zconfig *zconfig = new Zconfig ((const char *)name, parent->self);
+    if (zconfig) {
+        zconfig->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zconfig::destroy) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zconfig_destroy (&zconfig->self);
+}
+
+
+NAN_METHOD (Zconfig::defined) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zconfig->self != NULL));
+}
+
+NAN_METHOD (Zconfig::_name) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *result = (char *) zconfig_name (zconfig->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zconfig::_value) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *result = (char *) zconfig_value (zconfig->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zconfig::_get) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    char *default_value;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `default value`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`default value` must be a string");
+    else {
+        Nan::Utf8String default_value_utf8 (info [1].As<String>());
+        default_value = *default_value_utf8;
+    }
+    char *result = (char *) zconfig_get (zconfig->self, (const char *)path, (const char *)default_value);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zconfig::_child) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zconfig_t *result = zconfig_child (zconfig->self);
+    Zconfig *zconfig_result = new Zconfig (result);
+    if (zconfig_result) {
+    //  Don't yet know how to return a new object
+    //      zconfig->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_next) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zconfig_t *result = zconfig_next (zconfig->self);
+    Zconfig *zconfig_result = new Zconfig (result);
+    if (zconfig_result) {
+    //  Don't yet know how to return a new object
+    //      zconfig->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_locate) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    zconfig_t *result = zconfig_locate (zconfig->self, (const char *)path);
+    Zconfig *zconfig_result = new Zconfig (result);
+    if (zconfig_result) {
+    //  Don't yet know how to return a new object
+    //      zconfig->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_at_depth) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `level`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`level` must be a number");
+    int level = Nan::To<int>(info [0]).FromJust ();
+
+    zconfig_t *result = zconfig_at_depth (zconfig->self, (int)level);
+    Zconfig *zconfig_result = new Zconfig (result);
+    if (zconfig_result) {
+    //  Don't yet know how to return a new object
+    //      zconfig->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_comments) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zlist_t *result = zconfig_comments (zconfig->self);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_save) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zconfig_save (zconfig->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zconfig::_savef) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    int result = zconfig_savef (zconfig->self, "%s", format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zconfig::_filename) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *result = (char *) zconfig_filename (zconfig->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zconfig::_reload) {
+    Zconfig *self_p = Nan::ObjectWrap::Unwrap<Zconfig>(info [0].As<Object>());
+    int result = zconfig_reload (&self_p->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zconfig::_chunk_load) {
+    Zchunk *chunk = Nan::ObjectWrap::Unwrap<Zchunk>(info [0].As<Object>());
+    zconfig_t *result = zconfig_chunk_load (chunk->self);
+    Zconfig *zconfig_result = new Zconfig (result);
+    if (zconfig_result) {
+    //  Don't yet know how to return a new object
+    //      zconfig->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_chunk_save) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zchunk_t *result = zconfig_chunk_save (zconfig->self);
+    Zchunk *zchunk_result = new Zchunk (result);
+    if (zchunk_result) {
+    //  Don't yet know how to return a new object
+    //      zchunk->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_str_load) {
+    char *string;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`string` must be a string");
+    else {
+        Nan::Utf8String string_utf8 (info [0].As<String>());
+        string = *string_utf8;
+    }
+    zconfig_t *result = zconfig_str_load ((const char *)string);
+    Zconfig *zconfig_result = new Zconfig (result);
+    if (zconfig_result) {
+    //  Don't yet know how to return a new object
+    //      zconfig->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zconfig::_str_save) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *result = (char *) zconfig_str_save (zconfig->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zconfig::_has_changed) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    bool result = zconfig_has_changed (zconfig->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+Nan::Persistent <Function> &Zconfig::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zdigest::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zdigest").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "data", _data);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "string", _string);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zdigest").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zdigest::Zdigest (void) {
+    self = zdigest_new ();
+}
+
+Zdigest::Zdigest (zdigest_t *self_) {
+    self = self_;
+}
+
+Zdigest::~Zdigest () {
+}
+
+NAN_METHOD (Zdigest::New) {
+    assert (info.IsConstructCall ());
+    Zdigest *zdigest = new Zdigest ();
+    if (zdigest) {
+        zdigest->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zdigest::destroy) {
+    Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
+    zdigest_destroy (&zdigest->self);
+}
+
+
+NAN_METHOD (Zdigest::defined) {
+    Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zdigest->self != NULL));
+}
+
+NAN_METHOD (Zdigest::_data) {
+    Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
+    const char *result = (const char *) zdigest_data (zdigest->self);
+    info.GetReturnValue().Set (Nan::CopyBuffer (result, zdigest_size (zdigest->self)).ToLocalChecked ());
+}
+
+NAN_METHOD (Zdigest::_size) {
+    Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
+    size_t result = zdigest_size (zdigest->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zdigest::_string) {
+    Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
+    char *result = (char *) zdigest_string (zdigest->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Zdigest::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zdir::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zdir").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "path", _path);
+    Nan::SetPrototypeMethod (tpl, "modified", _modified);
+    Nan::SetPrototypeMethod (tpl, "cursize", _cursize);
+    Nan::SetPrototypeMethod (tpl, "count", _count);
+    Nan::SetPrototypeMethod (tpl, "list", _list);
+    Nan::SetPrototypeMethod (tpl, "diff", _diff);
+    Nan::SetPrototypeMethod (tpl, "resync", _resync);
+    Nan::SetPrototypeMethod (tpl, "cache", _cache);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zdir").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zdir::Zdir (const char *path, const char *parent) {
+    self = zdir_new ((const char *)path, (const char *)parent);
+}
+
+Zdir::Zdir (zdir_t *self_) {
+    self = self_;
+}
+
+Zdir::~Zdir () {
+}
+
+NAN_METHOD (Zdir::New) {
+    assert (info.IsConstructCall ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    char *parent;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `parent`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`parent` must be a string");
+    else {
+        Nan::Utf8String parent_utf8 (info [1].As<String>());
+        parent = *parent_utf8;
+    }
+    Zdir *zdir = new Zdir ((const char *)path, (const char *)parent);
+    if (zdir) {
+        zdir->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zdir::destroy) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    zdir_destroy (&zdir->self);
+}
+
+
+NAN_METHOD (Zdir::defined) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zdir->self != NULL));
+}
+
+NAN_METHOD (Zdir::_path) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    char *result = (char *) zdir_path (zdir->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zdir::_modified) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    time_t result = zdir_modified (zdir->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zdir::_cursize) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    off_t result = zdir_cursize (zdir->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zdir::_count) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    size_t result = zdir_count (zdir->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zdir::_list) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    zlist_t *result = zdir_list (zdir->self);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zdir::_diff) {
+    Zdir *older = Nan::ObjectWrap::Unwrap<Zdir>(info [0].As<Object>());
+    Zdir *newer = Nan::ObjectWrap::Unwrap<Zdir>(info [1].As<Object>());
+    char *alias;
+    if (info [2]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `alias`");
+    else
+    if (!info [2]->IsString ())
+        return Nan::ThrowTypeError ("`alias` must be a string");
+    else {
+        Nan::Utf8String alias_utf8 (info [2].As<String>());
+        alias = *alias_utf8;
+    }
+    zlist_t *result = zdir_diff (older->self, newer->self, (const char *)alias);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zdir::_resync) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    char *alias;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `alias`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`alias` must be a string");
+    else {
+        Nan::Utf8String alias_utf8 (info [0].As<String>());
+        alias = *alias_utf8;
+    }
+    zlist_t *result = zdir_resync (zdir->self, (const char *)alias);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zdir::_cache) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    zhash_t *result = zdir_cache (zdir->self);
+    Zhash *zhash_result = new Zhash (result);
+    if (zhash_result) {
+    //  Don't yet know how to return a new object
+    //      zhash->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+Nan::Persistent <Function> &Zdir::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (ZdirPatch::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("ZdirPatch").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "path", _path);
+    Nan::SetPrototypeMethod (tpl, "file", _file);
+    Nan::SetPrototypeMethod (tpl, "op", _op);
+    Nan::SetPrototypeMethod (tpl, "vpath", _vpath);
+    Nan::SetPrototypeMethod (tpl, "digest", _digest);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("ZdirPatch").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+ZdirPatch::ZdirPatch (const char *path, zfile_t *file, int op, const char *alias) {
+    self = zdir_patch_new ((const char *)path, file, (int)op, (const char *)alias);
+}
+
+ZdirPatch::ZdirPatch (zdir_patch_t *self_) {
+    self = self_;
+}
+
+ZdirPatch::~ZdirPatch () {
+}
+
+NAN_METHOD (ZdirPatch::New) {
+    assert (info.IsConstructCall ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    Zfile *file = Nan::ObjectWrap::Unwrap<Zfile>(info [1].As<Object>());
+    if (info [2]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `op`");
+    else
+    if (!info [2]->IsNumber ())
+        return Nan::ThrowTypeError ("`op` must be a number");
+    int op = Nan::To<int>(info [2]).FromJust ();
+
+    char *alias;
+    if (info [3]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `alias`");
+    else
+    if (!info [3]->IsString ())
+        return Nan::ThrowTypeError ("`alias` must be a string");
+    else {
+        Nan::Utf8String alias_utf8 (info [3].As<String>());
+        alias = *alias_utf8;
+    }
+    ZdirPatch *zdir_patch = new ZdirPatch ((const char *)path, file->self, (int)op, (const char *)alias);
+    if (zdir_patch) {
+        zdir_patch->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (ZdirPatch::destroy) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    zdir_patch_destroy (&zdir_patch->self);
+}
+
+
+NAN_METHOD (ZdirPatch::defined) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zdir_patch->self != NULL));
+}
+
+NAN_METHOD (ZdirPatch::_dup) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    zdir_patch_t *result = zdir_patch_dup (zdir_patch->self);
+    ZdirPatch *zdir_patch_result = new ZdirPatch (result);
+    if (zdir_patch_result) {
+    //  Don't yet know how to return a new object
+    //      zdir_patch->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (ZdirPatch::_path) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    char *result = (char *) zdir_patch_path (zdir_patch->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZdirPatch::_file) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    zfile_t *result = zdir_patch_file (zdir_patch->self);
+    Zfile *zfile_result = new Zfile (result);
+    if (zfile_result) {
+    //  Don't yet know how to return a new object
+    //      zfile->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (ZdirPatch::_op) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    int result = zdir_patch_op (zdir_patch->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZdirPatch::_vpath) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    char *result = (char *) zdir_patch_vpath (zdir_patch->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZdirPatch::_digest) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    char *result = (char *) zdir_patch_digest (zdir_patch->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &ZdirPatch::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zfile::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zfile").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "filename", _filename);
+    Nan::SetPrototypeMethod (tpl, "modified", _modified);
+    Nan::SetPrototypeMethod (tpl, "cursize", _cursize);
+    Nan::SetPrototypeMethod (tpl, "isDirectory", _is_directory);
+    Nan::SetPrototypeMethod (tpl, "isRegular", _is_regular);
+    Nan::SetPrototypeMethod (tpl, "isReadable", _is_readable);
+    Nan::SetPrototypeMethod (tpl, "isWriteable", _is_writeable);
+    Nan::SetPrototypeMethod (tpl, "isStable", _is_stable);
+    Nan::SetPrototypeMethod (tpl, "hasChanged", _has_changed);
+    Nan::SetPrototypeMethod (tpl, "input", _input);
+    Nan::SetPrototypeMethod (tpl, "output", _output);
+    Nan::SetPrototypeMethod (tpl, "read", _read);
+    Nan::SetPrototypeMethod (tpl, "eof", _eof);
+    Nan::SetPrototypeMethod (tpl, "write", _write);
+    Nan::SetPrototypeMethod (tpl, "readln", _readln);
+    Nan::SetPrototypeMethod (tpl, "digest", _digest);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zfile").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zfile::Zfile (const char *path, const char *name) {
+    self = zfile_new ((const char *)path, (const char *)name);
+}
+
+Zfile::Zfile (zfile_t *self_) {
+    self = self_;
+}
+
+Zfile::~Zfile () {
+}
+
+NAN_METHOD (Zfile::New) {
+    assert (info.IsConstructCall ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    char *name;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `name`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`name` must be a string");
+    else {
+        Nan::Utf8String name_utf8 (info [1].As<String>());
+        name = *name_utf8;
+    }
+    Zfile *zfile = new Zfile ((const char *)path, (const char *)name);
+    if (zfile) {
+        zfile->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zfile::destroy) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    zfile_destroy (&zfile->self);
+}
+
+
+NAN_METHOD (Zfile::defined) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zfile->self != NULL));
+}
+
+NAN_METHOD (Zfile::_dup) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    zfile_t *result = zfile_dup (zfile->self);
+    Zfile *zfile_result = new Zfile (result);
+    if (zfile_result) {
+    //  Don't yet know how to return a new object
+    //      zfile->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zfile::_filename) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    char *result = (char *) zfile_filename (zfile->self, (const char *)path);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zfile::_modified) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    time_t result = zfile_modified (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zfile::_cursize) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    off_t result = zfile_cursize (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zfile::_is_directory) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    bool result = zfile_is_directory (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_is_regular) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    bool result = zfile_is_regular (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_is_readable) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    bool result = zfile_is_readable (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_is_writeable) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    bool result = zfile_is_writeable (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_is_stable) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    bool result = zfile_is_stable (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_has_changed) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    bool result = zfile_has_changed (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_input) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    int result = zfile_input (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zfile::_output) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    int result = zfile_output (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zfile::_read) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `bytes`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`bytes` must be a number");
+    size_t bytes = Nan::To<int64_t>(info [0]).FromJust ();
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `offset`");
+    else
+    if (!info [1]->IsNumber ())
+        return Nan::ThrowTypeError ("`offset` must be a number");
+    off_t offset = Nan::To<int64_t>(info [1]).FromJust ();
+
+    zchunk_t *result = zfile_read (zfile->self, (size_t)bytes, (off_t)offset);
+    Zchunk *zchunk_result = new Zchunk (result);
+    if (zchunk_result) {
+    //  Don't yet know how to return a new object
+    //      zchunk->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zfile::_eof) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    bool result = zfile_eof (zfile->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_write) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    Zchunk *chunk = Nan::ObjectWrap::Unwrap<Zchunk>(info [0].As<Object>());
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `offset`");
+    else
+    if (!info [1]->IsNumber ())
+        return Nan::ThrowTypeError ("`offset` must be a number");
+    off_t offset = Nan::To<int64_t>(info [1]).FromJust ();
+
+    int result = zfile_write (zfile->self, chunk->self, (off_t)offset);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zfile::_readln) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    char *result = (char *) zfile_readln (zfile->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zfile::_digest) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    char *result = (char *) zfile_digest (zfile->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Zfile::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zframe::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zframe").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "data", _data);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "strhex", _strhex);
+    Nan::SetPrototypeMethod (tpl, "strdup", _strdup);
+    Nan::SetPrototypeMethod (tpl, "streq", _streq);
+    Nan::SetPrototypeMethod (tpl, "more", _more);
+    Nan::SetPrototypeMethod (tpl, "routingId", _routing_id);
+    Nan::SetPrototypeMethod (tpl, "group", _group);
+    Nan::SetPrototypeMethod (tpl, "setGroup", _set_group);
+    Nan::SetPrototypeMethod (tpl, "eq", _eq);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zframe").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zframe::Zframe (const void *data, size_t size) {
+    self = zframe_new ((const void *)data, (size_t)size);
+}
+
+Zframe::Zframe (zframe_t *self_) {
+    self = self_;
+}
+
+Zframe::~Zframe () {
+}
+
+NAN_METHOD (Zframe::New) {
+    assert (info.IsConstructCall ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
+    size_t size = node::Buffer::Length (buffer_node);
+    Zframe *zframe = new Zframe ((const void *)data, (size_t)size);
+    if (zframe) {
+        zframe->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zframe::destroy) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    zframe_destroy (&zframe->self);
+}
+
+
+NAN_METHOD (Zframe::defined) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zframe->self != NULL));
+}
+
+NAN_METHOD (Zframe::_size) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    size_t result = zframe_size (zframe->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zframe::_data) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    const char *result = (const char *) zframe_data (zframe->self);
+    info.GetReturnValue().Set (Nan::CopyBuffer (result, zframe_size (zframe->self)).ToLocalChecked ());
+}
+
+NAN_METHOD (Zframe::_dup) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    zframe_t *result = zframe_dup (zframe->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zframe::_strhex) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *result = (char *) zframe_strhex (zframe->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zframe::_strdup) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *result = (char *) zframe_strdup (zframe->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zframe::_streq) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *string;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`string` must be a string");
+    else {
+        Nan::Utf8String string_utf8 (info [0].As<String>());
+        string = *string_utf8;
+    }
+    bool result = zframe_streq (zframe->self, (const char *)string);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zframe::_more) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    int result = zframe_more (zframe->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zframe::_routing_id) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    uint32_t result = zframe_routing_id (zframe->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zframe::_group) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *result = (char *) zframe_group (zframe->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zframe::_set_group) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *group;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `group`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`group` must be a string");
+    else {
+        Nan::Utf8String group_utf8 (info [0].As<String>());
+        group = *group_utf8;
+    }
+    int result = zframe_set_group (zframe->self, (const char *)group);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zframe::_eq) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    Zframe *other = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    bool result = zframe_eq (zframe->self, other->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+Nan::Persistent <Function> &Zframe::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zhash::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zhash").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "rename", _rename);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "keys", _keys);
+    Nan::SetPrototypeMethod (tpl, "cursor", _cursor);
+    Nan::SetPrototypeMethod (tpl, "pack", _pack);
+    Nan::SetPrototypeMethod (tpl, "save", _save);
+    Nan::SetPrototypeMethod (tpl, "load", _load);
+    Nan::SetPrototypeMethod (tpl, "refresh", _refresh);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zhash").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zhash::Zhash (void) {
+    self = zhash_new ();
+}
+
+Zhash::Zhash (zhash_t *self_) {
+    self = self_;
+}
+
+Zhash::~Zhash () {
+}
+
+NAN_METHOD (Zhash::New) {
+    assert (info.IsConstructCall ());
+    Zhash *zhash = new Zhash ();
+    if (zhash) {
+        zhash->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zhash::destroy) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    zhash_destroy (&zhash->self);
+}
+
+
+NAN_METHOD (Zhash::defined) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zhash->self != NULL));
+}
+
+NAN_METHOD (Zhash::_rename) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    char *old_key;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `old key`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`old key` must be a string");
+    else {
+        Nan::Utf8String old_key_utf8 (info [0].As<String>());
+        old_key = *old_key_utf8;
+    }
+    char *new_key;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `new key`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`new key` must be a string");
+    else {
+        Nan::Utf8String new_key_utf8 (info [1].As<String>());
+        new_key = *new_key_utf8;
+    }
+    int result = zhash_rename (zhash->self, (const char *)old_key, (const char *)new_key);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhash::_size) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    size_t result = zhash_size (zhash->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhash::_dup) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    zhash_t *result = zhash_dup (zhash->self);
+    Zhash *zhash_result = new Zhash (result);
+    if (zhash_result) {
+    //  Don't yet know how to return a new object
+    //      zhash->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zhash::_keys) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    zlist_t *result = zhash_keys (zhash->self);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zhash::_cursor) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    char *result = (char *) zhash_cursor (zhash->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zhash::_pack) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    zframe_t *result = zhash_pack (zhash->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zhash::_save) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zhash_save (zhash->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhash::_load) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zhash_load (zhash->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhash::_refresh) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    int result = zhash_refresh (zhash->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+Nan::Persistent <Function> &Zhash::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zhashx::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zhashx").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "keys", _keys);
+    Nan::SetPrototypeMethod (tpl, "values", _values);
+    Nan::SetPrototypeMethod (tpl, "save", _save);
+    Nan::SetPrototypeMethod (tpl, "load", _load);
+    Nan::SetPrototypeMethod (tpl, "refresh", _refresh);
+    Nan::SetPrototypeMethod (tpl, "pack", _pack);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "dupV2", _dup_v2);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zhashx").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zhashx::Zhashx (void) {
+    self = zhashx_new ();
+}
+
+Zhashx::Zhashx (zhashx_t *self_) {
+    self = self_;
+}
+
+Zhashx::~Zhashx () {
+}
+
+NAN_METHOD (Zhashx::New) {
+    assert (info.IsConstructCall ());
+    Zhashx *zhashx = new Zhashx ();
+    if (zhashx) {
+        zhashx->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zhashx::destroy) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zhashx_destroy (&zhashx->self);
+}
+
+
+NAN_METHOD (Zhashx::defined) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zhashx->self != NULL));
+}
+
+NAN_METHOD (Zhashx::_size) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    size_t result = zhashx_size (zhashx->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhashx::_keys) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zlistx_t *result = zhashx_keys (zhashx->self);
+    Zlistx *zlistx_result = new Zlistx (result);
+    if (zlistx_result) {
+    //  Don't yet know how to return a new object
+    //      zlistx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zhashx::_values) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zlistx_t *result = zhashx_values (zhashx->self);
+    Zlistx *zlistx_result = new Zlistx (result);
+    if (zlistx_result) {
+    //  Don't yet know how to return a new object
+    //      zlistx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zhashx::_save) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zhashx_save (zhashx->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhashx::_load) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zhashx_load (zhashx->self, (const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhashx::_refresh) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    int result = zhashx_refresh (zhashx->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zhashx::_pack) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zframe_t *result = zhashx_pack (zhashx->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zhashx::_dup) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zhashx_t *result = zhashx_dup (zhashx->self);
+    Zhashx *zhashx_result = new Zhashx (result);
+    if (zhashx_result) {
+    //  Don't yet know how to return a new object
+    //      zhashx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zhashx::_dup_v2) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zhashx_t *result = zhashx_dup_v2 (zhashx->self);
+    Zhashx *zhashx_result = new Zhashx (result);
+    if (zhashx_result) {
+    //  Don't yet know how to return a new object
+    //      zhashx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+Nan::Persistent <Function> &Zhashx::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Ziflist::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Ziflist").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "first", _first);
+    Nan::SetPrototypeMethod (tpl, "next", _next);
+    Nan::SetPrototypeMethod (tpl, "address", _address);
+    Nan::SetPrototypeMethod (tpl, "broadcast", _broadcast);
+    Nan::SetPrototypeMethod (tpl, "netmask", _netmask);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Ziflist").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Ziflist::Ziflist (void) {
+    self = ziflist_new ();
+}
+
+Ziflist::Ziflist (ziflist_t *self_) {
+    self = self_;
+}
+
+Ziflist::~Ziflist () {
+}
+
+NAN_METHOD (Ziflist::New) {
+    assert (info.IsConstructCall ());
+    Ziflist *ziflist = new Ziflist ();
+    if (ziflist) {
+        ziflist->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Ziflist::destroy) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    ziflist_destroy (&ziflist->self);
+}
+
+
+NAN_METHOD (Ziflist::defined) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (ziflist->self != NULL));
+}
+
+NAN_METHOD (Ziflist::_size) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    size_t result = ziflist_size (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ziflist::_first) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    char *result = (char *) ziflist_first (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Ziflist::_next) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    char *result = (char *) ziflist_next (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Ziflist::_address) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    char *result = (char *) ziflist_address (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Ziflist::_broadcast) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    char *result = (char *) ziflist_broadcast (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Ziflist::_netmask) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    char *result = (char *) ziflist_netmask (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Ziflist::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zlist::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zlist").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zlist").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zlist::Zlist (void) {
+    self = zlist_new ();
+}
+
+Zlist::Zlist (zlist_t *self_) {
+    self = self_;
+}
+
+Zlist::~Zlist () {
+}
+
+NAN_METHOD (Zlist::New) {
+    assert (info.IsConstructCall ());
+    Zlist *zlist = new Zlist ();
+    if (zlist) {
+        zlist->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zlist::destroy) {
+    Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
+    zlist_destroy (&zlist->self);
+}
+
+
+NAN_METHOD (Zlist::defined) {
+    Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zlist->self != NULL));
+}
+
+NAN_METHOD (Zlist::_dup) {
+    Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
+    zlist_t *result = zlist_dup (zlist->self);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zlist::_size) {
+    Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
+    size_t result = zlist_size (zlist->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+Nan::Persistent <Function> &Zlist::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zlistx::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zlistx").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zlistx").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zlistx::Zlistx (void) {
+    self = zlistx_new ();
+}
+
+Zlistx::Zlistx (zlistx_t *self_) {
+    self = self_;
+}
+
+Zlistx::~Zlistx () {
+}
+
+NAN_METHOD (Zlistx::New) {
+    assert (info.IsConstructCall ());
+    Zlistx *zlistx = new Zlistx ();
+    if (zlistx) {
+        zlistx->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zlistx::destroy) {
+    Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
+    zlistx_destroy (&zlistx->self);
+}
+
+
+NAN_METHOD (Zlistx::defined) {
+    Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zlistx->self != NULL));
+}
+
+NAN_METHOD (Zlistx::_size) {
+    Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
+    size_t result = zlistx_size (zlistx->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zlistx::_dup) {
+    Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
+    zlistx_t *result = zlistx_dup (zlistx->self);
+    Zlistx *zlistx_result = new Zlistx (result);
+    if (zlistx_result) {
+    //  Don't yet know how to return a new object
+    //      zlistx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+Nan::Persistent <Function> &Zlistx::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zloop::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zloop").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "timerEnd", _timer_end);
+    Nan::SetPrototypeMethod (tpl, "start", _start);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zloop").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zloop::Zloop (void) {
+    self = zloop_new ();
+}
+
+Zloop::Zloop (zloop_t *self_) {
+    self = self_;
+}
+
+Zloop::~Zloop () {
+}
+
+NAN_METHOD (Zloop::New) {
+    assert (info.IsConstructCall ());
+    Zloop *zloop = new Zloop ();
+    if (zloop) {
+        zloop->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zloop::destroy) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    zloop_destroy (&zloop->self);
+}
+
+
+NAN_METHOD (Zloop::defined) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zloop->self != NULL));
+}
+
+NAN_METHOD (Zloop::_timer_end) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `timer id`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`timer id` must be a number");
+    int timer_id = Nan::To<int>(info [0]).FromJust ();
+
+    int result = zloop_timer_end (zloop->self, (int)timer_id);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zloop::_start) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    int result = zloop_start (zloop->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+Nan::Persistent <Function> &Zloop::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zmsg::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zmsg").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "contentSize", _content_size);
+    Nan::SetPrototypeMethod (tpl, "routingId", _routing_id);
+    Nan::SetPrototypeMethod (tpl, "prepend", _prepend);
+    Nan::SetPrototypeMethod (tpl, "append", _append);
+    Nan::SetPrototypeMethod (tpl, "pop", _pop);
+    Nan::SetPrototypeMethod (tpl, "pushstr", _pushstr);
+    Nan::SetPrototypeMethod (tpl, "addstr", _addstr);
+    Nan::SetPrototypeMethod (tpl, "pushstrf", _pushstrf);
+    Nan::SetPrototypeMethod (tpl, "addstrf", _addstrf);
+    Nan::SetPrototypeMethod (tpl, "popstr", _popstr);
+    Nan::SetPrototypeMethod (tpl, "addmsg", _addmsg);
+    Nan::SetPrototypeMethod (tpl, "popmsg", _popmsg);
+    Nan::SetPrototypeMethod (tpl, "first", _first);
+    Nan::SetPrototypeMethod (tpl, "next", _next);
+    Nan::SetPrototypeMethod (tpl, "last", _last);
+    Nan::SetPrototypeMethod (tpl, "encode", _encode);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "eq", _eq);
+    Nan::SetPrototypeMethod (tpl, "signal", _signal);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zmsg").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zmsg::Zmsg (void) {
+    self = zmsg_new ();
+}
+
+Zmsg::Zmsg (zmsg_t *self_) {
+    self = self_;
+}
+
+Zmsg::~Zmsg () {
+}
+
+NAN_METHOD (Zmsg::New) {
+    assert (info.IsConstructCall ());
+    Zmsg *zmsg = new Zmsg ();
+    if (zmsg) {
+        zmsg->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zmsg::destroy) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zmsg_destroy (&zmsg->self);
+}
+
+
+NAN_METHOD (Zmsg::defined) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zmsg->self != NULL));
+}
+
+NAN_METHOD (Zmsg::_size) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    size_t result = zmsg_size (zmsg->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_content_size) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    size_t result = zmsg_content_size (zmsg->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_routing_id) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    uint32_t result = zmsg_routing_id (zmsg->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_prepend) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    Zframe *frame_p = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    int result = zmsg_prepend (zmsg->self, &frame_p->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_append) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    Zframe *frame_p = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    int result = zmsg_append (zmsg->self, &frame_p->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_pop) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zframe_t *result = zmsg_pop (zmsg->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zmsg::_pushstr) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    char *string;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`string` must be a string");
+    else {
+        Nan::Utf8String string_utf8 (info [0].As<String>());
+        string = *string_utf8;
+    }
+    int result = zmsg_pushstr (zmsg->self, (const char *)string);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_addstr) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    char *string;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`string` must be a string");
+    else {
+        Nan::Utf8String string_utf8 (info [0].As<String>());
+        string = *string_utf8;
+    }
+    int result = zmsg_addstr (zmsg->self, (const char *)string);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_pushstrf) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    int result = zmsg_pushstrf (zmsg->self, "%s", format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_addstrf) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    int result = zmsg_addstrf (zmsg->self, "%s", format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_popstr) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    char *result = (char *) zmsg_popstr (zmsg->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zmsg::_addmsg) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    Zmsg *msg_p = Nan::ObjectWrap::Unwrap<Zmsg>(info [0].As<Object>());
+    int result = zmsg_addmsg (zmsg->self, &msg_p->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_popmsg) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zmsg_t *result = zmsg_popmsg (zmsg->self);
+    Zmsg *zmsg_result = new Zmsg (result);
+    if (zmsg_result) {
+    //  Don't yet know how to return a new object
+    //      zmsg->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zmsg::_first) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zframe_t *result = zmsg_first (zmsg->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zmsg::_next) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zframe_t *result = zmsg_next (zmsg->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zmsg::_last) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zframe_t *result = zmsg_last (zmsg->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zmsg::_encode) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zframe_t *result = zmsg_encode (zmsg->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zmsg::_dup) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zmsg_t *result = zmsg_dup (zmsg->self);
+    Zmsg *zmsg_result = new Zmsg (result);
+    if (zmsg_result) {
+    //  Don't yet know how to return a new object
+    //      zmsg->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zmsg::_eq) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    Zmsg *other = Nan::ObjectWrap::Unwrap<Zmsg>(info [0].As<Object>());
+    bool result = zmsg_eq (zmsg->self, other->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zmsg::_signal) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    int result = zmsg_signal (zmsg->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+Nan::Persistent <Function> &Zmsg::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zproc::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zproc").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "czmqVersion", _czmq_version);
+    Nan::SetPrototypeMethod (tpl, "interrupted", _interrupted);
+    Nan::SetPrototypeMethod (tpl, "hasCurve", _has_curve);
+    Nan::SetPrototypeMethod (tpl, "hostname", _hostname);
+    Nan::SetPrototypeMethod (tpl, "biface", _biface);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zproc").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zproc::Zproc () {
+}
+
+Zproc::~Zproc () {
+}
+
+NAN_METHOD (Zproc::New) {
+    assert (info.IsConstructCall ());
+    Zproc *zproc = new Zproc ();
+    if (zproc) {
+        zproc->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zproc::_czmq_version) {
+    int result = zproc_czmq_version ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zproc::_interrupted) {
+    bool result = zproc_interrupted ();
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zproc::_has_curve) {
+    bool result = zproc_has_curve ();
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zproc::_hostname) {
+    char *result = (char *) zproc_hostname ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zproc::_biface) {
+    char *result = (char *) zproc_biface ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Zproc::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zsock::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zsock").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "bind", _bind);
+    Nan::SetPrototypeMethod (tpl, "endpoint", _endpoint);
+    Nan::SetPrototypeMethod (tpl, "unbind", _unbind);
+    Nan::SetPrototypeMethod (tpl, "connect", _connect);
+    Nan::SetPrototypeMethod (tpl, "disconnect", _disconnect);
+    Nan::SetPrototypeMethod (tpl, "attach", _attach);
+    Nan::SetPrototypeMethod (tpl, "typeStr", _type_str);
+    Nan::SetPrototypeMethod (tpl, "send", _send);
+    Nan::SetPrototypeMethod (tpl, "recv", _recv);
+    Nan::SetPrototypeMethod (tpl, "bsend", _bsend);
+    Nan::SetPrototypeMethod (tpl, "brecv", _brecv);
+    Nan::SetPrototypeMethod (tpl, "routingId", _routing_id);
+    Nan::SetPrototypeMethod (tpl, "wait", _wait);
+    Nan::SetPrototypeMethod (tpl, "join", _join);
+    Nan::SetPrototypeMethod (tpl, "leave", _leave);
+    Nan::SetPrototypeMethod (tpl, "heartbeatIvl", _heartbeat_ivl);
+    Nan::SetPrototypeMethod (tpl, "heartbeatTtl", _heartbeat_ttl);
+    Nan::SetPrototypeMethod (tpl, "heartbeatTimeout", _heartbeat_timeout);
+    Nan::SetPrototypeMethod (tpl, "useFd", _use_fd);
+    Nan::SetPrototypeMethod (tpl, "tos", _tos);
+    Nan::SetPrototypeMethod (tpl, "zapDomain", _zap_domain);
+    Nan::SetPrototypeMethod (tpl, "mechanism", _mechanism);
+    Nan::SetPrototypeMethod (tpl, "plainServer", _plain_server);
+    Nan::SetPrototypeMethod (tpl, "plainUsername", _plain_username);
+    Nan::SetPrototypeMethod (tpl, "plainPassword", _plain_password);
+    Nan::SetPrototypeMethod (tpl, "curveServer", _curve_server);
+    Nan::SetPrototypeMethod (tpl, "curvePublickey", _curve_publickey);
+    Nan::SetPrototypeMethod (tpl, "curveSecretkey", _curve_secretkey);
+    Nan::SetPrototypeMethod (tpl, "curveServerkey", _curve_serverkey);
+    Nan::SetPrototypeMethod (tpl, "gssapiServer", _gssapi_server);
+    Nan::SetPrototypeMethod (tpl, "gssapiPlaintext", _gssapi_plaintext);
+    Nan::SetPrototypeMethod (tpl, "gssapiPrincipal", _gssapi_principal);
+    Nan::SetPrototypeMethod (tpl, "gssapiServicePrincipal", _gssapi_service_principal);
+    Nan::SetPrototypeMethod (tpl, "ipv6", _ipv6);
+    Nan::SetPrototypeMethod (tpl, "immediate", _immediate);
+    Nan::SetPrototypeMethod (tpl, "ipv4only", _ipv4only);
+    Nan::SetPrototypeMethod (tpl, "type", _type);
+    Nan::SetPrototypeMethod (tpl, "sndhwm", _sndhwm);
+    Nan::SetPrototypeMethod (tpl, "rcvhwm", _rcvhwm);
+    Nan::SetPrototypeMethod (tpl, "affinity", _affinity);
+    Nan::SetPrototypeMethod (tpl, "identity", _identity);
+    Nan::SetPrototypeMethod (tpl, "rate", _rate);
+    Nan::SetPrototypeMethod (tpl, "recoveryIvl", _recovery_ivl);
+    Nan::SetPrototypeMethod (tpl, "sndbuf", _sndbuf);
+    Nan::SetPrototypeMethod (tpl, "rcvbuf", _rcvbuf);
+    Nan::SetPrototypeMethod (tpl, "linger", _linger);
+    Nan::SetPrototypeMethod (tpl, "reconnectIvl", _reconnect_ivl);
+    Nan::SetPrototypeMethod (tpl, "reconnectIvlMax", _reconnect_ivl_max);
+    Nan::SetPrototypeMethod (tpl, "backlog", _backlog);
+    Nan::SetPrototypeMethod (tpl, "maxmsgsize", _maxmsgsize);
+    Nan::SetPrototypeMethod (tpl, "multicastHops", _multicast_hops);
+    Nan::SetPrototypeMethod (tpl, "rcvtimeo", _rcvtimeo);
+    Nan::SetPrototypeMethod (tpl, "sndtimeo", _sndtimeo);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepalive", _tcp_keepalive);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIdle", _tcp_keepalive_idle);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveCnt", _tcp_keepalive_cnt);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIntvl", _tcp_keepalive_intvl);
+    Nan::SetPrototypeMethod (tpl, "tcpAcceptFilter", _tcp_accept_filter);
+    Nan::SetPrototypeMethod (tpl, "rcvmore", _rcvmore);
+    Nan::SetPrototypeMethod (tpl, "events", _events);
+    Nan::SetPrototypeMethod (tpl, "lastEndpoint", _last_endpoint);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zsock").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zsock::Zsock (int type) {
+    self = zsock_new ((int)type);
+}
+
+Zsock::Zsock (zsock_t *self_) {
+    self = self_;
+}
+
+Zsock::~Zsock () {
+}
+
+NAN_METHOD (Zsock::New) {
+    assert (info.IsConstructCall ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `type`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`type` must be a number");
+    int type = Nan::To<int>(info [0]).FromJust ();
+
+    Zsock *zsock = new Zsock ((int)type);
+    if (zsock) {
+        zsock->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zsock::destroy) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    zsock_destroy (&zsock->self);
+}
+
+
+NAN_METHOD (Zsock::defined) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zsock->self != NULL));
+}
+
+NAN_METHOD (Zsock::_bind) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    int result = zsock_bind (zsock->self, "%s", format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_endpoint) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_endpoint (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_unbind) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    int result = zsock_unbind (zsock->self, "%s", format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_connect) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    int result = zsock_connect (zsock->self, "%s", format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_disconnect) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    int result = zsock_disconnect (zsock->self, "%s", format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_attach) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *endpoints;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `endpoints`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`endpoints` must be a string");
+    else {
+        Nan::Utf8String endpoints_utf8 (info [0].As<String>());
+        endpoints = *endpoints_utf8;
+    }
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `serverish`");
+    else
+    if (!info [1]->IsBoolean ())
+        return Nan::ThrowTypeError ("`serverish` must be a number");
+    bool serverish = Nan::To<bool>(info [1]).FromJust ();
+
+    int result = zsock_attach (zsock->self, (const char *)endpoints, (bool)serverish);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_type_str) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_type_str (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_send) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *picture;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `picture`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`picture` must be a string");
+    else {
+        Nan::Utf8String picture_utf8 (info [0].As<String>());
+        picture = *picture_utf8;
+    }
+    int result = zsock_send (zsock->self, (const char *)picture);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_recv) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *picture;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `picture`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`picture` must be a string");
+    else {
+        Nan::Utf8String picture_utf8 (info [0].As<String>());
+        picture = *picture_utf8;
+    }
+    int result = zsock_recv (zsock->self, (const char *)picture);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_bsend) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *picture;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `picture`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`picture` must be a string");
+    else {
+        Nan::Utf8String picture_utf8 (info [0].As<String>());
+        picture = *picture_utf8;
+    }
+    int result = zsock_bsend (zsock->self, (const char *)picture);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_brecv) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *picture;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `picture`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`picture` must be a string");
+    else {
+        Nan::Utf8String picture_utf8 (info [0].As<String>());
+        picture = *picture_utf8;
+    }
+    int result = zsock_brecv (zsock->self, (const char *)picture);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_routing_id) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    uint32_t result = zsock_routing_id (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_wait) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_wait (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_join) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *group;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `group`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`group` must be a string");
+    else {
+        Nan::Utf8String group_utf8 (info [0].As<String>());
+        group = *group_utf8;
+    }
+    int result = zsock_join (zsock->self, (const char *)group);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_leave) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *group;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `group`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`group` must be a string");
+    else {
+        Nan::Utf8String group_utf8 (info [0].As<String>());
+        group = *group_utf8;
+    }
+    int result = zsock_leave (zsock->self, (const char *)group);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_heartbeat_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_heartbeat_ivl (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_heartbeat_ttl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_heartbeat_ttl (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_heartbeat_timeout) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_heartbeat_timeout (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_use_fd) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_use_fd (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_tos) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tos (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_zap_domain) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_zap_domain (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_mechanism) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_mechanism (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_plain_server) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_plain_server (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_plain_username) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_plain_username (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_plain_password) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_plain_password (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_curve_server) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_curve_server (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_curve_publickey) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_curve_publickey (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_curve_secretkey) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_curve_secretkey (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_curve_serverkey) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_curve_serverkey (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_gssapi_server) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_gssapi_server (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_gssapi_plaintext) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_gssapi_plaintext (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_gssapi_principal) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_gssapi_principal (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_gssapi_service_principal) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_gssapi_service_principal (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_ipv6) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_ipv6 (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_immediate) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_immediate (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_ipv4only) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_ipv4only (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_type) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_type (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_sndhwm) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_sndhwm (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_rcvhwm) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_rcvhwm (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_affinity) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_affinity (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_identity) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_identity (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_rate) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_rate (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_recovery_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_recovery_ivl (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_sndbuf) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_sndbuf (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_rcvbuf) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_rcvbuf (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_linger) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_linger (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_reconnect_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_reconnect_ivl (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_reconnect_ivl_max) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_reconnect_ivl_max (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_backlog) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_backlog (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_maxmsgsize) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_maxmsgsize (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_multicast_hops) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_multicast_hops (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_rcvtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_rcvtimeo (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_sndtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_sndtimeo (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive_idle) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive_idle (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive_cnt) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive_cnt (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive_intvl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive_intvl (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_tcp_accept_filter) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_tcp_accept_filter (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_rcvmore) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_rcvmore (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_events) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_events (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_last_endpoint) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_last_endpoint (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Zsock::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zstr::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zstr").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zstr").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zstr::Zstr () {
+}
+
+Zstr::~Zstr () {
+}
+
+NAN_METHOD (Zstr::New) {
+    assert (info.IsConstructCall ());
+    Zstr *zstr = new Zstr ();
+    if (zstr) {
+        zstr->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+Nan::Persistent <Function> &Zstr::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Ztrie::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Ztrie").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "removeRoute", _remove_route);
+    Nan::SetPrototypeMethod (tpl, "matches", _matches);
+    Nan::SetPrototypeMethod (tpl, "hitParameterCount", _hit_parameter_count);
+    Nan::SetPrototypeMethod (tpl, "hitParameters", _hit_parameters);
+    Nan::SetPrototypeMethod (tpl, "hitAsteriskMatch", _hit_asterisk_match);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Ztrie").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Ztrie::Ztrie (char delimiter) {
+    self = ztrie_new ((char)delimiter);
+}
+
+Ztrie::Ztrie (ztrie_t *self_) {
+    self = self_;
+}
+
+Ztrie::~Ztrie () {
+}
+
+NAN_METHOD (Ztrie::New) {
+    assert (info.IsConstructCall ());
+    char delimiter;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `delimiter`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`delimiter` must be a string");
+    else {
+        Nan::Utf8String delimiter_utf8 (info [0].As<String>());
+        if (strlen (*delimiter_utf8) != 1)
+            return Nan::ThrowTypeError ("`delimiter` must be a single character");
+        delimiter = (*delimiter_utf8) [0];
+    }
+    Ztrie *ztrie = new Ztrie ((char)delimiter);
+    if (ztrie) {
+        ztrie->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Ztrie::destroy) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    ztrie_destroy (&ztrie->self);
+}
+
+
+NAN_METHOD (Ztrie::defined) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (ztrie->self != NULL));
+}
+
+NAN_METHOD (Ztrie::_remove_route) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    int result = ztrie_remove_route (ztrie->self, (const char *)path);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ztrie::_matches) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    bool result = ztrie_matches (ztrie->self, (const char *)path);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Ztrie::_hit_parameter_count) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    size_t result = ztrie_hit_parameter_count (ztrie->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ztrie::_hit_parameters) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    zhashx_t *result = ztrie_hit_parameters (ztrie->self);
+    Zhashx *zhashx_result = new Zhashx (result);
+    if (zhashx_result) {
+    //  Don't yet know how to return a new object
+    //      zhashx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Ztrie::_hit_asterisk_match) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    char *result = (char *) ztrie_hit_asterisk_match (ztrie->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+Nan::Persistent <Function> &Ztrie::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (Zuuid::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zuuid").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "setStr", _set_str);
+    Nan::SetPrototypeMethod (tpl, "data", _data);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "str", _str);
+    Nan::SetPrototypeMethod (tpl, "strCanonical", _str_canonical);
+    Nan::SetPrototypeMethod (tpl, "eq", _eq);
+    Nan::SetPrototypeMethod (tpl, "neq", _neq);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zuuid").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zuuid::Zuuid (void) {
+    self = zuuid_new ();
+}
+
+Zuuid::Zuuid (zuuid_t *self_) {
+    self = self_;
+}
+
+Zuuid::~Zuuid () {
+}
+
+NAN_METHOD (Zuuid::New) {
+    assert (info.IsConstructCall ());
+    Zuuid *zuuid = new Zuuid ();
+    if (zuuid) {
+        zuuid->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zuuid::destroy) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    zuuid_destroy (&zuuid->self);
+}
+
+
+NAN_METHOD (Zuuid::defined) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zuuid->self != NULL));
+}
+
+NAN_METHOD (Zuuid::_set_str) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    char *source;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `source`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`source` must be a string");
+    else {
+        Nan::Utf8String source_utf8 (info [0].As<String>());
+        source = *source_utf8;
+    }
+    int result = zuuid_set_str (zuuid->self, (const char *)source);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zuuid::_data) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    const char *result = (const char *) zuuid_data (zuuid->self);
+    info.GetReturnValue().Set (Nan::CopyBuffer (result, zuuid_size (zuuid->self)).ToLocalChecked ());
+}
+
+NAN_METHOD (Zuuid::_size) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    size_t result = zuuid_size (zuuid->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zuuid::_str) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    char *result = (char *) zuuid_str (zuuid->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zuuid::_str_canonical) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    char *result = (char *) zuuid_str_canonical (zuuid->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zuuid::_eq) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *compare = (const byte *) node::Buffer::Data (buffer_node);
+    bool result = zuuid_eq (zuuid->self, (const byte *)compare);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zuuid::_neq) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *compare = (const byte *) node::Buffer::Data (buffer_node);
+    bool result = zuuid_neq (zuuid->self, (const byte *)compare);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zuuid::_dup) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    zuuid_t *result = zuuid_dup (zuuid->self);
+    Zuuid *zuuid_result = new Zuuid (result);
+    if (zuuid_result) {
+    //  Don't yet know how to return a new object
+    //      zuuid->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+Nan::Persistent <Function> &Zuuid::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
 
 
 extern "C" NAN_MODULE_INIT (czmq_initialize)
 {
-    Zactor::Init (target);
     Zarmour::Init (target);
     Zcert::Init (target);
     Zcertstore::Init (target);
@@ -4692,19 +3727,11 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     Zlistx::Init (target);
     Zloop::Init (target);
     Zmsg::Init (target);
-    Zpoller::Init (target);
     Zproc::Init (target);
     Zsock::Init (target);
     Zstr::Init (target);
     Ztrie::Init (target);
     Zuuid::Init (target);
-    Zauth::Init (target);
-    Zbeacon::Init (target);
-    Zgossip::Init (target);
-    Zmonitor::Init (target);
-    Zproxy::Init (target);
-    Zrex::Init (target);
-    Zsys::Init (target);
 }
 
 NODE_MODULE (czmq, czmq_initialize)

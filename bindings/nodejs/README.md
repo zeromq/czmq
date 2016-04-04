@@ -42,7 +42,6 @@ This is a wrapping of the native C libczmq library. See binding.cc for the code.
 
 We get these classes:
 
-* Zactor - provides a simple actor framework
 * Zarmour - armoured text encoding and decoding
 * Zcert - work with CURVE security certificates
 * Zcertstore - work with CURVE security certificate stores
@@ -61,17 +60,8 @@ We get these classes:
 * Zlistx - extended generic list container
 * Zloop - event-driven reactor
 * Zmsg - working with multipart messages
-* Zpoller - event-driven reactor
 * Zproc - process configuration and status
 * Zsock - high-level socket API that hides libzmq contexts and sockets
 * Zstr - sending and receiving strings
 * Ztrie - simple trie for tokenizable strings
 * Zuuid - UUID support class
-* Zauth - 
-* Zbeacon - 
-* Zgossip - 
-* Zmonitor - 
-* Zproxy - 
-* Zrex - 
-* Zsys - 
-
