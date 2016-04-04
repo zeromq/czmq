@@ -36,6 +36,15 @@ Java_org_zeromq_czmq_Zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jbyt
     return return_string_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zarmour__1_1decode (JNIEnv *env, jclass c, jlong self, jstring data)
+{
+    char *data_ = (char *) (*env)->GetStringUTFChars (env, data, NULL);
+    jlong decode_ = (jlong) (intptr_t) zarmour_decode ((zarmour_t *) (intptr_t) self, data_);
+    (*env)->ReleaseStringUTFChars (env, data, data_);
+    return decode_;
+}
+
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1mode (JNIEnv *env, jclass c, jlong self)
 {
@@ -54,7 +63,7 @@ Java_org_zeromq_czmq_Zarmour__1_1modeStr (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1setMode (JNIEnv *env, jclass c, jlong self, jint mode)
 {
-    zarmour_set_mode ((zarmour_t *) (intptr_t) self, (zarmour_mode_t) mode);
+    zarmour_set_mode ((zarmour_t *) (intptr_t) self, (int) mode);
 }
 
 JNIEXPORT jboolean JNICALL

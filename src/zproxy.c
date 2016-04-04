@@ -634,8 +634,8 @@ zproxy_test (bool verbose)
         assert (server_cert);
         zcert_t *client_cert = zcert_new ();
         assert (client_cert);
-        char *public_key = zcert_public_txt (server_cert);
-        char *secret_key = zcert_secret_txt (server_cert);
+        const char *public_key = zcert_public_txt (server_cert);
+        const char *secret_key = zcert_secret_txt (server_cert);
 
         //  Try CURVE authentication
 

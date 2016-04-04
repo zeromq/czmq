@@ -155,8 +155,11 @@ size_t QZlist::size ()
 }
 
 ///
-//  Sort the list by ascending key value using a straight ASCII comparison.
-//  The sort is not stable, so may reorder items with the same keys.       
+//  Sort the list. If the compare function is null, sorts the list by     
+//  ascending key value using a straight ASCII comparison. If you specify 
+//  a compare function, this decides how items are sorted. The sort is not
+//  stable, so may reorder items with the same keys. The algorithm used is
+//  combsort, a compromise between performance and simplicity.            
 void QZlist::sort (zlist_compare_fn compare)
 {
     zlist_sort (self, compare);

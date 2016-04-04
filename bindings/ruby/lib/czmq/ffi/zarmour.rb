@@ -91,14 +91,14 @@ module CZMQ
         @finalizer = nil
       end
 
-      # Create a new zarmour.
+      # Create a new zarmour
       # @return [CZMQ::Zarmour]
       def self.new()
         ptr = ::CZMQ::FFI.zarmour_new()
         __new ptr
       end
 
-      # Destroy the zarmour.
+      # Destroy the zarmour
       #
       # @return [void]
       def destroy()

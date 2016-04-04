@@ -45,17 +45,17 @@ QZcert::~QZcert ()
 
 ///
 //  Return public part of key pair as 32-byte binary string
-byte * QZcert::publicKey ()
+const byte * QZcert::publicKey ()
 {
-    byte * rv = zcert_public_key (self);
+    const byte * rv = zcert_public_key (self);
     return rv;
 }
 
 ///
 //  Return secret part of key pair as 32-byte binary string
-byte * QZcert::secretKey ()
+const byte * QZcert::secretKey ()
 {
-    byte * rv = zcert_secret_key (self);
+    const byte * rv = zcert_secret_key (self);
     return rv;
 }
 
@@ -138,9 +138,9 @@ int QZcert::saveSecret (const QString &filename)
 //  Apply certificate to socket, i.e. use for CURVE security on socket.
 //  If certificate was loaded from public file, the secret key will be 
 //  undefined, and this certificate will not work successfully.        
-void QZcert::apply (void *zocket)
+void QZcert::apply (void *socket)
 {
-    zcert_apply (self, zocket);
+    zcert_apply (self, socket);
     
 }
 

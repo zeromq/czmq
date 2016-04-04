@@ -119,7 +119,7 @@ zthread.txt:
 zmakecert.txt:
 	./mkman $@
 clean:
-	rm -f *.1 *.3
+	rm -f *.1 *.3 *.7
 	./mkman zactor zarmour zcert zcertstore zchunk zclock zconfig zdigest zdir zdir_patch zfile zframe zhash zhashx ziflist zlist zlistx zloop zmsg zpoller zproc zsock zstr ztrie zuuid zauth zbeacon zgossip zmonitor zproxy zrex zsys zauth_v2 zbeacon_v2 zctx zmonitor_v2 zmutex zproxy_v2 zsocket zsockopt zthread zmakecert 
 endif
 ################################################################################

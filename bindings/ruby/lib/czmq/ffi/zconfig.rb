@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
+    # work with config files written in rfc.zeromq.org/spec:4/ZPL.
     # @note This class is 100% generated using zproject.
     class Zconfig
       # Raised when one tries to use an instance of {Zconfig} after

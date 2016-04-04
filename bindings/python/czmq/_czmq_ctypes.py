@@ -54,6 +54,10 @@ class zarmour_t(Structure):
     pass # Empty - only for type checking
 zarmour_p = POINTER(zarmour_t)
 
+class zchunk_t(Structure):
+    pass # Empty - only for type checking
+zchunk_p = POINTER(zchunk_t)
+
 class char_t(Structure):
     pass # Empty - only for type checking
 char_p = POINTER(char_t)
@@ -73,10 +77,6 @@ FILE_p = POINTER(FILE)
 class zcertstore_t(Structure):
     pass # Empty - only for type checking
 zcertstore_p = POINTER(zcertstore_t)
-
-class zchunk_t(Structure):
-    pass # Empty - only for type checking
-zchunk_p = POINTER(zchunk_t)
 
 class zframe_t(Structure):
     pass # Empty - only for type checking
@@ -326,8 +326,8 @@ lib.zarmour_destroy.restype = None
 lib.zarmour_destroy.argtypes = [POINTER(zarmour_p)]
 lib.zarmour_encode.restype = POINTER(c_char)
 lib.zarmour_encode.argtypes = [zarmour_p, c_void_p, c_size_t]
-lib.zarmour_decode.restype = c_void_p
-lib.zarmour_decode.argtypes = [zarmour_p, c_char_p, POINTER(c_size_t)]
+lib.zarmour_decode.restype = zchunk_p
+lib.zarmour_decode.argtypes = [zarmour_p, c_char_p]
 lib.zarmour_mode.restype = c_int
 lib.zarmour_mode.argtypes = [zarmour_p]
 lib.zarmour_mode_str.restype = c_char_p
@@ -360,28 +360,16 @@ class Zarmour(object):
     armoured text encoding and decoding
     """
 
-    Mode = {
-        'mode base64 std': 0,
-        'mode base64 url': 1,
-        'mode base32 std': 2,
-        'mode base32 hex': 3,
-        'mode base16': 4,
-        'mode z85': 5,
-    }
-
-    Mode_out = {
-         0: 'mode base64 std',
-         1: 'mode base64 url',
-         2: 'mode base32 std',
-         3: 'mode base32 hex',
-         4: 'mode base16',
-         5: 'mode z85',
-    }
-
+    MODE_BASE64_STD = 0 # Standard base 64
+    MODE_BASE64_URL = 1 # URL and filename friendly base 64
+    MODE_BASE32_STD = 2 # Standard base 32
+    MODE_BASE32_HEX = 3 # Extended hex base 32
+    MODE_BASE16 = 4 # Standard base 16
+    MODE_Z85 = 5 # Z85 from ZeroMQ RFC 32
     allow_destruct = False
     def __init__(self, *args):
         """
-        Create a new zarmour.
+        Create a new zarmour
         """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zarmour_p) # Conversion from raw type to binding
@@ -396,7 +384,7 @@ class Zarmour(object):
 
     def __del__(self):
         """
-        Destroy the zarmour.
+        Destroy the zarmour
         """
         if self.allow_destruct:
             lib.zarmour_destroy(byref(self._as_parameter_))
@@ -429,19 +417,19 @@ a new string.
         """
         return return_fresh_string(lib.zarmour_encode(self._as_parameter_, data, size))
 
-    def decode(self, data, decode_size):
+    def decode(self, data):
         """
-        Decode an armoured string into a string of bytes.
-The decoded output is null-terminated, so it may be treated
-as a string, if that's what it was prior to encoding.
+        Decode an armoured string into a chunk. The decoded output is
+null-terminated, so it may be treated as a string, if that's what
+it was prior to encoding.
         """
-        return lib.zarmour_decode(self._as_parameter_, data, byref(c_size_t.from_param(decode_size)))
+        return Zchunk(lib.zarmour_decode(self._as_parameter_, data), True)
 
     def mode(self):
         """
         Get the mode property.
         """
-        return Zarmour.Mode_out[lib.zarmour_mode(self._as_parameter_)]
+        return lib.zarmour_mode(self._as_parameter_)
 
     def mode_str(self):
         """
@@ -453,7 +441,7 @@ as a string, if that's what it was prior to encoding.
         """
         Set the mode property.
         """
-        return lib.zarmour_set_mode(self._as_parameter_, Zarmour.Mode[mode])
+        return lib.zarmour_set_mode(self._as_parameter_, mode)
 
     def pad(self):
         """
@@ -692,13 +680,13 @@ This creates one public file and one secret file (filename + "_secret").
         """
         return lib.zcert_save_secret(self._as_parameter_, filename)
 
-    def apply(self, zocket):
+    def apply(self, socket):
         """
         Apply certificate to socket, i.e. use for CURVE security on socket.
 If certificate was loaded from public file, the secret key will be
 undefined, and this certificate will not work successfully.
         """
-        return lib.zcert_apply(self._as_parameter_, zocket)
+        return lib.zcert_apply(self._as_parameter_, socket)
 
     def dup(self):
         """
@@ -1264,7 +1252,7 @@ lib.zconfig_test.argtypes = [c_bool]
 
 class Zconfig(object):
     """
-    zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
+    work with config files written in rfc.zeromq.org/spec:4/ZPL.
     """
 
     allow_destruct = False
@@ -1519,7 +1507,7 @@ lib.zdigest_test.argtypes = [c_bool]
 
 class Zdigest(object):
     """
-    zdigest - provides hashing functions (SHA-1 at present)
+    provides hashing functions (SHA-1 at present)
     """
 
     allow_destruct = False
@@ -1574,8 +1562,8 @@ digest by repeatedly calling zdigest_update() on chunks of data.
 
     def data(self):
         """
-        Return final digest hash data. If built without crypto support, returns
-NULL.
+        Return final digest hash data. If built without crypto support,
+returns NULL.
         """
         return lib.zdigest_data(self._as_parameter_)
 
@@ -1826,16 +1814,8 @@ class ZdirPatch(object):
     work with directory patches
     """
 
-    Op = {
-        'create': 1,
-        'delete': 2,
-    }
-
-    Op_out = {
-         1: 'create',
-         2: 'delete',
-    }
-
+    CREATE = 1 # Creates a new file
+    DELETE = 2 # Delete a file
     allow_destruct = False
     def __init__(self, *args):
         """
@@ -1849,7 +1829,7 @@ class ZdirPatch(object):
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 4)
-            self._as_parameter_ = lib.zdir_patch_new(args[0], args[1], ZdirPatch.Op[args[2]], args[3]) # Creation of new raw type
+            self._as_parameter_ = lib.zdir_patch_new(args[0], args[1], args[2], args[3]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -1902,7 +1882,7 @@ returns null.
         """
         Return operation
         """
-        return ZdirPatch.Op_out[lib.zdir_patch_op(self._as_parameter_)]
+        return lib.zdir_patch_op(self._as_parameter_)
 
     def vpath(self):
         """
@@ -3416,8 +3396,11 @@ NULL.
 
     def sort(self, compare):
         """
-        Sort the list by ascending key value using a straight ASCII comparison.
-The sort is not stable, so may reorder items with the same keys.
+        Sort the list. If the compare function is null, sorts the list by
+ascending key value using a straight ASCII comparison. If you specify
+a compare function, this decides how items are sorted. The sort is not
+stable, so may reorder items with the same keys. The algorithm used is
+combsort, a compromise between performance and simplicity.
         """
         return lib.zlist_sort(self._as_parameter_, compare)
 
@@ -4026,7 +4009,7 @@ lib.zmsg_recv.argtypes = [c_void_p]
 lib.zmsg_load.restype = zmsg_p
 lib.zmsg_load.argtypes = [FILE_p]
 lib.zmsg_decode.restype = zmsg_p
-lib.zmsg_decode.argtypes = [c_void_p, c_size_t]
+lib.zmsg_decode.argtypes = [zframe_p]
 lib.zmsg_new_signal.restype = zmsg_p
 lib.zmsg_new_signal.argtypes = [c_ubyte]
 lib.zmsg_send.restype = c_int
@@ -4075,8 +4058,8 @@ lib.zmsg_last.restype = zframe_p
 lib.zmsg_last.argtypes = [zmsg_p]
 lib.zmsg_save.restype = c_int
 lib.zmsg_save.argtypes = [zmsg_p, FILE_p]
-lib.zmsg_encode.restype = c_size_t
-lib.zmsg_encode.argtypes = [zmsg_p, POINTER(c_void_p)]
+lib.zmsg_encode.restype = zframe_p
+lib.zmsg_encode.argtypes = [zmsg_p]
 lib.zmsg_dup.restype = zmsg_p
 lib.zmsg_dup.argtypes = [zmsg_p]
 lib.zmsg_print.restype = None
@@ -4157,13 +4140,13 @@ Returns NULL if the message could not be loaded.
         return Zmsg(lib.zmsg_load(coerce_py_file(file)), True)
 
     @staticmethod
-    def decode(buffer, buffer_size):
+    def decode(frame):
         """
-        Decodes a serialized message buffer created by zmsg_encode () and returns
-a new zmsg_t object. Returns NULL if the buffer was badly formatted or
+        Decodes a serialized message frame created by zmsg_encode () and returns
+a new zmsg_t object. Returns NULL if the frame was badly formatted or
 there was insufficient memory to work.
         """
-        return Zmsg(lib.zmsg_decode(buffer, buffer_size), True)
+        return Zmsg(lib.zmsg_decode(frame), True)
 
     @staticmethod
     def new_signal(status):
@@ -4306,7 +4289,7 @@ success, -1 on error.
     def popmsg(self):
         """
         Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-decoding was not succesful.
+decoding was not successful.
         """
         return Zmsg(lib.zmsg_popmsg(self._as_parameter_), True)
 
@@ -4346,14 +4329,15 @@ to arbitrary change.
         """
         return lib.zmsg_save(self._as_parameter_, coerce_py_file(file))
 
-    def encode(self, buffer):
+    def encode(self):
         """
-        Serialize multipart message to a single buffer. Use this method to send
-structured messages across transports that do not support multipart data.
-Allocates and returns a new buffer containing the serialized message.
-To decode a serialized message buffer, use zmsg_decode ().
+        Serialize multipart message to a single message frame. Use this method
+to send structured messages across transports that do not support
+multipart data. Allocates and returns a new frame containing the
+serialized message. To decode a serialized message frame, use
+zmsg_decode ().
         """
-        return lib.zmsg_encode(self._as_parameter_, byref(c_void_p.from_param(buffer)))
+        return Zframe(lib.zmsg_encode(self._as_parameter_), True)
 
     def dup(self):
         """

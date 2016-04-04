@@ -27,11 +27,9 @@ Java_org_zeromq_czmq_Zmsg__1_1recv (JNIEnv *env, jclass c, jlong source)
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, jlong buffer_size)
+Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jlong frame)
 {
-    jbyte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
-    jlong decode_ = (jlong) (intptr_t) zmsg_decode (buffer_, (size_t) buffer_size);
-    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    jlong decode_ = (jlong) (intptr_t) zmsg_decode ((zframe_t *) (intptr_t) frame);
     return decode_;
 }
 
@@ -208,6 +206,13 @@ Java_org_zeromq_czmq_Zmsg__1_1last (JNIEnv *env, jclass c, jlong self)
 {
     jlong last_ = (jlong) (intptr_t) zmsg_last ((zmsg_t *) (intptr_t) self);
     return last_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zmsg__1_1encode (JNIEnv *env, jclass c, jlong self)
+{
+    jlong encode_ = (jlong) (intptr_t) zmsg_encode ((zmsg_t *) (intptr_t) self);
+    return encode_;
 }
 
 JNIEXPORT jlong JNICALL

@@ -17,7 +17,7 @@ public class Zarmour implements AutoCloseable{
     }
     public long self;
     /*
-    Create a new zarmour.
+    Create a new zarmour
     */
     native static long __new ();
     public Zarmour () {
@@ -28,7 +28,7 @@ public class Zarmour implements AutoCloseable{
         self = pointer;
     }
     /*
-    Destroy the zarmour.
+    Destroy the zarmour
     */
     native static void __destroy (long self);
     @Override
@@ -44,6 +44,15 @@ public class Zarmour implements AutoCloseable{
     native static String __encode (long self, byte [] data, long size);
     public String encode (byte [] data, long size) {
         return __encode (self, data, size);
+    }
+    /*
+    Decode an armoured string into a chunk. The decoded output is    
+    null-terminated, so it may be treated as a string, if that's what
+    it was prior to encoding.                                        
+    */
+    native static long __decode (long self, String data);
+    public Zchunk decode (String data) {
+        return new Zchunk (__decode (self, data));
     }
     /*
     Get the mode property.

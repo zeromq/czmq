@@ -34,11 +34,11 @@ CZMQ_EXPORT void
 
 //  Add buffer into digest calculation
 CZMQ_EXPORT void
-    zdigest_update (zdigest_t *self, byte *buffer, size_t length);
+    zdigest_update (zdigest_t *self, const byte *buffer, size_t length);
 
-//  Return final digest hash data. If built without crypto support, returns
-//  NULL.                                                                  
-CZMQ_EXPORT byte *
+//  Return final digest hash data. If built without crypto support,
+//  returns NULL.                                                  
+CZMQ_EXPORT const byte *
     zdigest_data (zdigest_t *self);
 
 //  Return final digest hash size

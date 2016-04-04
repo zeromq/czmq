@@ -7,7 +7,6 @@
     <include filename = "license.xml" />
     <version major = "3" minor = "0" patch = "3" />
     <use project = "libzmq" />
-    <use project = "uuid" optional = "1" implied = "1" />
     <use project = "systemd" optional = "1" implied = "1" min_major = "200" />
     <target name = "*" />
 

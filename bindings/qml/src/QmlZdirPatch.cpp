@@ -33,7 +33,7 @@ QmlZfile *QmlZdirPatch::file () {
 
 ///
 //  Return operation
-zdir_patch_op_t QmlZdirPatch::op () {
+int QmlZdirPatch::op () {
     return zdir_patch_op (self);
 };
 
@@ -69,7 +69,7 @@ void QmlZdirPatchAttached::test (bool verbose) {
 
 ///
 //  Create new patch
-QmlZdirPatch *QmlZdirPatchAttached::construct (const QString &path, QmlZfile *file, zdir_patch_op_t op, const QString &alias) {
+QmlZdirPatch *QmlZdirPatchAttached::construct (const QString &path, QmlZfile *file, int op, const QString &alias) {
     QmlZdirPatch *qmlSelf = new QmlZdirPatch ();
     qmlSelf->self = zdir_patch_new (path.toUtf8().data(), file->self, op, alias.toUtf8().data());
     return qmlSelf;

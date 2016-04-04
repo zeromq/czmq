@@ -12,7 +12,7 @@
       ],
       'include_dirs': [
           "<!(node -e \"require('nan')\")",
-          -- dependencies!
+          '../../../libzmq/include',
           '../../include'
       ],
       'conditions': [

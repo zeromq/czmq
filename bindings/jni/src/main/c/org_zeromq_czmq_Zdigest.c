@@ -33,6 +33,16 @@ Java_org_zeromq_czmq_Zdigest__1_1update (JNIEnv *env, jclass c, jlong self, jbyt
     (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
 }
 
+JNIEXPORT jbyteArray JNICALL
+Java_org_zeromq_czmq_Zdigest__1_1data (JNIEnv *env, jclass c, jlong self)
+{
+    jbyte *data_ = (jbyte *) zdigest_data ((zdigest_t *) (intptr_t) self);
+    jint return_size_ = (jint) zdigest_size ((zdigest_t *) (intptr_t) self);
+    jbyteArray return_data_ = (*env)->NewByteArray (env, return_size_);
+    (*env)->SetByteArrayRegion (env, return_data_, 0, return_size_, (jbyte *) data_);
+    return return_data_;
+}
+
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdigest__1_1size (JNIEnv *env, jclass c, jlong self)
 {

@@ -564,7 +564,7 @@ zauth_test (bool verbose)
         assert (server_cert);
         zcert_t *client_cert = zcert_new ();
         assert (client_cert);
-        char *server_key = zcert_public_txt (server_cert);
+        const char *server_key = zcert_public_txt (server_cert);
 
         //  Test without setting-up any authentication
         zcert_apply (server_cert, server);

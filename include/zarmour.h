@@ -30,11 +30,11 @@ extern "C" {
 #define ZARMOUR_MODE_BASE16 4               // Standard base 16
 #define ZARMOUR_MODE_Z85 5                  // Z85 from ZeroMQ RFC 32
 
-//  Create a new zarmour.
+//  Create a new zarmour
 CZMQ_EXPORT zarmour_t *
     zarmour_new (void);
 
-//  Destroy the zarmour.
+//  Destroy the zarmour
 CZMQ_EXPORT void
     zarmour_destroy (zarmour_t **self_p);
 

@@ -45,6 +45,14 @@ public class Zdigest implements AutoCloseable{
         __update (self, buffer, length);
     }
     /*
+    Return final digest hash data. If built without crypto support,
+    returns NULL.                                                  
+    */
+    native static byte [] __data (long self);
+    public byte [] data () {
+        return __data (self);
+    }
+    /*
     Return final digest hash size
     */
     native static long __size (long self);

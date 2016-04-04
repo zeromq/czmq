@@ -10,13 +10,13 @@
 
 ///
 //  Return public part of key pair as 32-byte binary string
-byte *QmlZcert::publicKey () {
+const byte *QmlZcert::publicKey () {
     return zcert_public_key (self);
 };
 
 ///
 //  Return secret part of key pair as 32-byte binary string
-byte *QmlZcert::secretKey () {
+const byte *QmlZcert::secretKey () {
     return zcert_secret_key (self);
 };
 
@@ -83,8 +83,8 @@ int QmlZcert::saveSecret (const QString &filename) {
 //  Apply certificate to socket, i.e. use for CURVE security on socket.
 //  If certificate was loaded from public file, the secret key will be 
 //  undefined, and this certificate will not work successfully.        
-void QmlZcert::apply (void *zocket) {
-    zcert_apply (self, zocket);
+void QmlZcert::apply (void *socket) {
+    zcert_apply (self, socket);
 };
 
 ///

@@ -38,13 +38,13 @@ public class Zmsg implements AutoCloseable{
         return new Zmsg (__recv (source));
     }
     /*
-    Decodes a serialized message buffer created by zmsg_encode () and returns
-    a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-    there was insufficient memory to work.                                   
+    Decodes a serialized message frame created by zmsg_encode () and returns
+    a new zmsg_t object. Returns NULL if the frame was badly formatted or   
+    there was insufficient memory to work.                                  
     */
-    native static long __decode (byte [] buffer, long bufferSize);
-    public Zmsg decode (byte [] buffer, long bufferSize) {
-        return new Zmsg (__decode (buffer, bufferSize));
+    native static long __decode (long frame);
+    public Zmsg decode (Zframe frame) {
+        return new Zmsg (__decode (frame.self));
     }
     /*
     Generate a signal message encoding the given status. A signal is a short
@@ -212,7 +212,7 @@ public class Zmsg implements AutoCloseable{
     }
     /*
     Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-    decoding was not succesful.                                             
+    decoding was not successful.                                            
     */
     native static long __popmsg (long self);
     public Zmsg popmsg () {
@@ -247,6 +247,17 @@ public class Zmsg implements AutoCloseable{
     native static long __last (long self);
     public Zframe last () {
         return new Zframe (__last (self));
+    }
+    /*
+    Serialize multipart message to a single message frame. Use this method
+    to send structured messages across transports that do not support     
+    multipart data. Allocates and returns a new frame containing the      
+    serialized message. To decode a serialized message frame, use         
+    zmsg_decode ().                                                       
+    */
+    native static long __encode (long self);
+    public Zframe encode () {
+        return new Zframe (__encode (self));
     }
     /*
     Create copy of message, as new message object. Returns a fresh zmsg_t

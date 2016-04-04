@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # zdigest - provides hashing functions (SHA-1 at present)
+    # provides hashing functions (SHA-1 at present)
     # @note This class is 100% generated using zproject.
     class Zdigest
       # Raised when one tries to use an instance of {Zdigest} after
@@ -104,8 +104,8 @@ module CZMQ
         result
       end
 
-      # Return final digest hash data. If built without crypto support, returns
-      # NULL.                                                                  
+      # Return final digest hash data. If built without crypto support,
+      # returns NULL.                                                  
       #
       # @return [::FFI::Pointer]
       def data()

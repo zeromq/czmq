@@ -8,7 +8,7 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
-    zdigest - provides hashing functions (SHA-1 at present)
+    provides hashing functions (SHA-1 at present)
     
     <constructor>
         Constructor - creates new digest object, which you use to build up a
@@ -21,14 +21,14 @@
 
     <method name = "update">
         Add buffer into digest calculation
-        <argument name = "buffer" type = "buffer" mutable = "1" />
+        <argument name = "buffer" type = "buffer" />
         <argument name = "length" type = "size" />
     </method>
 
     <method name = "data">
-        Return final digest hash data. If built without crypto support, returns
-        NULL.
-        <return type = "buffer" mutable = "1" />
+        Return final digest hash data. If built without crypto support,
+        returns NULL.
+        <return type = "buffer" size = ".size" />
     </method>
 
     <method name = "size">
@@ -42,5 +42,4 @@
         on the same digest. If built without crypto support, returns NULL.
         <return type = "string" mutable = "1" />
     </method>
-
 </class>

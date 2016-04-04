@@ -122,7 +122,7 @@ int QmlZmsg::addmsg (QmlZmsg *msgP) {
 
 ///
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesful.                                             
+//  decoding was not successful.                                            
 QmlZmsg *QmlZmsg::popmsg () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_popmsg (self);
@@ -172,12 +172,15 @@ int QmlZmsg::save (FILE *file) {
 };
 
 ///
-//  Serialize multipart message to a single buffer. Use this method to send  
-//  structured messages across transports that do not support multipart data.
-//  Allocates and returns a new buffer containing the serialized message.    
-//  To decode a serialized message buffer, use zmsg_decode ().               
-size_t QmlZmsg::encode (byte **buffer) {
-    return zmsg_encode (self, buffer);
+//  Serialize multipart message to a single message frame. Use this method
+//  to send structured messages across transports that do not support     
+//  multipart data. Allocates and returns a new frame containing the      
+//  serialized message. To decode a serialized message frame, use         
+//  zmsg_decode ().                                                       
+QmlZframe *QmlZmsg::encode () {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zmsg_encode (self);
+    return retQ_;
 };
 
 ///
@@ -277,12 +280,12 @@ QmlZmsg *QmlZmsgAttached::load (FILE *file) {
 };
 
 ///
-//  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-//  there was insufficient memory to work.                                   
-QmlZmsg *QmlZmsgAttached::decode (const byte *buffer, size_t bufferSize) {
+//  Decodes a serialized message frame created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the frame was badly formatted or   
+//  there was insufficient memory to work.                                  
+QmlZmsg *QmlZmsgAttached::decode (QmlZframe *frame) {
     QmlZmsg *qmlSelf = new QmlZmsg ();
-    qmlSelf->self = zmsg_decode (buffer, bufferSize);
+    qmlSelf->self = zmsg_decode (frame->self);
     return qmlSelf;
 };
 

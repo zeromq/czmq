@@ -30,10 +30,10 @@ public:
     ~QZcert ();
 
     //  Return public part of key pair as 32-byte binary string
-    byte * publicKey ();
+    const byte * publicKey ();
 
     //  Return secret part of key pair as 32-byte binary string
-    byte * secretKey ();
+    const byte * secretKey ();
 
     //  Return public part of key pair as Z85 armored string
     const QString publicTxt ();
@@ -68,7 +68,7 @@ public:
     //  Apply certificate to socket, i.e. use for CURVE security on socket.
     //  If certificate was loaded from public file, the secret key will be 
     //  undefined, and this certificate will not work successfully.        
-    void apply (void *zocket);
+    void apply (void *socket);
 
     //  Return copy of certificate; if certificate is NULL or we exhausted
     //  heap memory, returns NULL.                                        

@@ -21,8 +21,8 @@ public class Zchunk implements AutoCloseable{
     is copied into the chunk. If you do not specify the data, the chunk is  
     allocated and left empty, and you can then add data using zchunk_append.
     */
-    native static long __new (long data, long size);
-    public Zchunk (long data, long size) {
+    native static long __new (byte [] data, long size);
+    public Zchunk (byte [] data, long size) {
         /*  TODO: if __new fails, self is null...            */
         self = __new (data, size);
     }
@@ -60,11 +60,18 @@ public class Zchunk implements AutoCloseable{
         return __maxSize (self);
     }
     /*
+    Return chunk data
+    */
+    native static byte [] __data (long self);
+    public byte [] data () {
+        return __data (self);
+    }
+    /*
     Set chunk data from user-supplied data; truncate if too large. Data may
     be null. Returns actual size of chunk                                  
     */
-    native static long __set (long self, long data, long size);
-    public long set (long data, long size) {
+    native static long __set (long self, byte [] data, long size);
+    public long set (byte [] data, long size) {
         return __set (self, data, size);
     }
     /*
@@ -79,16 +86,16 @@ public class Zchunk implements AutoCloseable{
     data would exceeded the available space, it is truncated. If you want to
     grow the chunk to accommodate new data, use the zchunk_extend method.   
     */
-    native static long __append (long self, long data, long size);
-    public long append (long data, long size) {
+    native static long __append (long self, byte [] data, long size);
+    public long append (byte [] data, long size) {
         return __append (self, data, size);
     }
     /*
     Append user-supplied data to chunk, return resulting chunk size. If the
     data would exceeded the available space, the chunk grows in size.      
     */
-    native static long __extend (long self, long data, long size);
-    public long extend (long data, long size) {
+    native static long __extend (long self, byte [] data, long size);
+    public long extend (byte [] data, long size) {
         return __extend (self, data, size);
     }
     /*

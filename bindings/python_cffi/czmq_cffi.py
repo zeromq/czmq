@@ -51,11 +51,11 @@ typedef struct _zactor_t zactor_t;
 typedef struct _zsock_t zsock_t;
 typedef struct _zmsg_t zmsg_t;
 typedef struct _zarmour_t zarmour_t;
+typedef struct _zchunk_t zchunk_t;
 typedef struct _char_t char_t;
 typedef struct _zcert_t zcert_t;
 typedef struct _zlist_t zlist_t;
 typedef struct _zcertstore_t zcertstore_t;
-typedef struct _zchunk_t zchunk_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zclock_t zclock_t;
 typedef struct _msecs_t msecs_t;
@@ -81,22 +81,10 @@ typedef struct _zuuid_t zuuid_t;
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
 
-typedef enum {
-    ZARMOUR_MODE_BASE64_STD = 0,                            //  Standard base 64
-    ZARMOUR_MODE_BASE64_URL = 1,                            //  URL and filename friendly base 64
-    ZARMOUR_MODE_BASE32_STD = 2,                            //  Standard base 32
-    ZARMOUR_MODE_BASE32_HEX = 3,                            //  Extended hex base 32
-    ZARMOUR_MODE_BASE16 = 4,                                //  Standard base 16
-    ZARMOUR_MODE_Z85 = 5                                    //  Z85 from ZeroMQ RFC 32
-} zarmour_mode_t;
 // 
 typedef int (zconfig_fct) (
     zconfig_t *self, void *arg, int level);
 
-typedef enum {
-    ZDIR_PATCH_CREATE = 1,                                  //  
-    ZDIR_PATCH_DELETE = 2                                   //  
-} zdir_patch_op_t;
 // Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (
     void *data);
@@ -206,11 +194,11 @@ void
     zactor_test (bool verbose);
 
 // CLASS: zarmour
-// Create a new zarmour.
+// Create a new zarmour
 zarmour_t *
     zarmour_new (void);
 
-// Destroy the zarmour.
+// Destroy the zarmour
 void
     zarmour_destroy (zarmour_t **self_p);
 
@@ -220,14 +208,14 @@ void
 char *
     zarmour_encode (zarmour_t *self, const byte *data, size_t size);
 
-// Decode an armoured string into a string of bytes.          
-// The decoded output is null-terminated, so it may be treated
-// as a string, if that's what it was prior to encoding.      
-byte *
-    zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size);
+// Decode an armoured string into a chunk. The decoded output is    
+// null-terminated, so it may be treated as a string, if that's what
+// it was prior to encoding.                                        
+zchunk_t *
+    zarmour_decode (zarmour_t *self, const char *data);
 
 // Get the mode property.
-zarmour_mode_t
+int
     zarmour_mode (zarmour_t *self);
 
 // Get printable string for mode.
@@ -236,7 +224,7 @@ const char *
 
 // Set the mode property.
 void
-    zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode);
+    zarmour_set_mode (zarmour_t *self, int mode);
 
 // Return true if padding is turned on.
 bool
@@ -296,19 +284,19 @@ void
     zcert_destroy (zcert_t **self_p);
 
 // Return public part of key pair as 32-byte binary string
-byte *
+const byte *
     zcert_public_key (zcert_t *self);
 
 // Return secret part of key pair as 32-byte binary string
-byte *
+const byte *
     zcert_secret_key (zcert_t *self);
 
 // Return public part of key pair as Z85 armored string
-char *
+const char *
     zcert_public_txt (zcert_t *self);
 
 // Return secret part of key pair as Z85 armored string
-char *
+const char *
     zcert_secret_txt (zcert_t *self);
 
 // Set certificate metadata from formatted string.
@@ -321,7 +309,7 @@ void
 
 // Get metadata value from certificate; if the metadata value doesn't
 // exist, returns NULL.                                              
-char *
+const char *
     zcert_meta (zcert_t *self, const char *name);
 
 // Get list of metadata fields from certificate. Caller is responsible for
@@ -346,7 +334,7 @@ int
 // If certificate was loaded from public file, the secret key will be 
 // undefined, and this certificate will not work successfully.        
 void
-    zcert_apply (zcert_t *self, void *zocket);
+    zcert_apply (zcert_t *self, void *socket);
 
 // Return copy of certificate; if certificate is NULL or we exhausted
 // heap memory, returns NULL.                                        
@@ -712,11 +700,11 @@ void
 
 // Add buffer into digest calculation
 void
-    zdigest_update (zdigest_t *self, byte *buffer, size_t length);
+    zdigest_update (zdigest_t *self, const byte *buffer, size_t length);
 
-// Return final digest hash data. If built without crypto support, returns
-// NULL.                                                                  
-byte *
+// Return final digest hash data. If built without crypto support,
+// returns NULL.                                                  
+const byte *
     zdigest_data (zdigest_t *self);
 
 // Return final digest hash size
@@ -833,7 +821,7 @@ void
 // CLASS: zdir_patch
 // Create new patch
 zdir_patch_t *
-    zdir_patch_new (const char *path, zfile_t *file, zdir_patch_op_t op, const char *alias);
+    zdir_patch_new (const char *path, zfile_t *file, int op, const char *alias);
 
 // Destroy a patch
 void
@@ -853,7 +841,7 @@ zfile_t *
     zdir_patch_file (zdir_patch_t *self);
 
 // Return operation
-zdir_patch_op_t
+int
     zdir_patch_op (zdir_patch_t *self);
 
 // Return patch virtual file path
@@ -1578,8 +1566,11 @@ void
 size_t
     zlist_size (zlist_t *self);
 
-// Sort the list by ascending key value using a straight ASCII comparison.
-// The sort is not stable, so may reorder items with the same keys.       
+// Sort the list. If the compare function is null, sorts the list by     
+// ascending key value using a straight ASCII comparison. If you specify 
+// a compare function, this decides how items are sorted. The sort is not
+// stable, so may reorder items with the same keys. The algorithm used is
+// combsort, a compromise between performance and simplicity.            
 void
     zlist_sort (zlist_t *self, zlist_compare_fn compare);
 
@@ -1912,11 +1903,11 @@ zmsg_t *
 zmsg_t *
     zmsg_load (FILE *file);
 
-// Decodes a serialized message buffer created by zmsg_encode () and returns
-// a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-// there was insufficient memory to work.                                   
+// Decodes a serialized message frame created by zmsg_encode () and returns
+// a new zmsg_t object. Returns NULL if the frame was badly formatted or   
+// there was insufficient memory to work.                                  
 zmsg_t *
-    zmsg_decode (const byte *buffer, size_t buffer_size);
+    zmsg_decode (zframe_t *frame);
 
 // Generate a signal message encoding the given status. A signal is a short
 // message carrying a 1-byte success/failure code (by convention, 0 means  
@@ -2018,7 +2009,7 @@ int
     zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
 
 // Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-// decoding was not succesful.                                             
+// decoding was not successful.                                            
 zmsg_t *
     zmsg_popmsg (zmsg_t *self);
 
@@ -2048,12 +2039,13 @@ zframe_t *
 int
     zmsg_save (zmsg_t *self, FILE *file);
 
-// Serialize multipart message to a single buffer. Use this method to send  
-// structured messages across transports that do not support multipart data.
-// Allocates and returns a new buffer containing the serialized message.    
-// To decode a serialized message buffer, use zmsg_decode ().               
-size_t
-    zmsg_encode (zmsg_t *self, byte **buffer);
+// Serialize multipart message to a single message frame. Use this method
+// to send structured messages across transports that do not support     
+// multipart data. Allocates and returns a new frame containing the      
+// serialized message. To decode a serialized message frame, use         
+// zmsg_decode ().                                                       
+zframe_t *
+    zmsg_encode (zmsg_t *self);
 
 // Create copy of message, as new message object. Returns a fresh zmsg_t
 // object. If message is null, or memory was exhausted, returns null.   

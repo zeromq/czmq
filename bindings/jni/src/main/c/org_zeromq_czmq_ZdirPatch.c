@@ -17,7 +17,7 @@ Java_org_zeromq_czmq_ZdirPatch__1_1new (JNIEnv *env, jclass c, jstring path, jlo
     char *alias_ = (char *) (*env)->GetStringUTFChars (env, alias, NULL);
     //  Disable CZMQ signal handling; allow Java to deal with it
     zsys_handler_set (NULL);
-    jlong new_ = (jlong) (intptr_t) zdir_patch_new (path_, (zfile_t *) (intptr_t) file, (zdir_patch_op_t) op, alias_);
+    jlong new_ = (jlong) (intptr_t) zdir_patch_new (path_, (zfile_t *) (intptr_t) file, (int) op, alias_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
     (*env)->ReleaseStringUTFChars (env, alias, alias_);
     return new_;

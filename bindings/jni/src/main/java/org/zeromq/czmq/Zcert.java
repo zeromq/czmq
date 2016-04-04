@@ -51,6 +51,20 @@ public class Zcert implements AutoCloseable{
         self = 0;
     }
     /*
+    Return public part of key pair as 32-byte binary string
+    */
+    native static byte [] __publicKey (long self);
+    public byte [] publicKey () {
+        return __publicKey (self);
+    }
+    /*
+    Return secret part of key pair as 32-byte binary string
+    */
+    native static byte [] __secretKey (long self);
+    public byte [] secretKey () {
+        return __secretKey (self);
+    }
+    /*
     Return public part of key pair as Z85 armored string
     */
     native static String __publicTxt (long self);
@@ -121,9 +135,9 @@ public class Zcert implements AutoCloseable{
     If certificate was loaded from public file, the secret key will be 
     undefined, and this certificate will not work successfully.        
     */
-    native static void __apply (long self, long zocket);
-    public void apply (long zocket) {
-        __apply (self, zocket);
+    native static void __apply (long self, long socket);
+    public void apply (long socket) {
+        __apply (self, socket);
     }
     /*
     Return copy of certificate; if certificate is NULL or we exhausted

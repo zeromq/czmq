@@ -119,7 +119,7 @@ zcert_destroy (zcert_t **self_p)
 //  --------------------------------------------------------------------------
 //  Return public part of key pair as 32-byte binary string
 
-byte *
+const byte *
 zcert_public_key (zcert_t *self)
 {
     assert (self);
@@ -130,7 +130,7 @@ zcert_public_key (zcert_t *self)
 //  --------------------------------------------------------------------------
 //  Return secret part of key pair as 32-byte binary string
 
-byte *
+const byte *
 zcert_secret_key (zcert_t *self)
 {
     assert (self);
@@ -141,7 +141,7 @@ zcert_secret_key (zcert_t *self)
 //  --------------------------------------------------------------------------
 //  Return public part of key pair as Z85 armored string
 
-char *
+const char *
 zcert_public_txt (zcert_t *self)
 {
     assert (self);
@@ -152,7 +152,7 @@ zcert_public_txt (zcert_t *self)
 //  --------------------------------------------------------------------------
 //  Return secret part of key pair as Z85 armored string
 
-char *
+const char *
 zcert_secret_txt (zcert_t *self)
 {
     assert (self);
@@ -196,7 +196,7 @@ zcert_unset_meta (zcert_t *self, const char *name)
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.
 
-char *
+const char *
 zcert_meta (zcert_t *self, const char *name)
 {
     assert (self);

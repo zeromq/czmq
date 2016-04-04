@@ -11,11 +11,13 @@
 #include "org_zeromq_czmq_Zchunk.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zchunk__1_1new (JNIEnv *env, jclass c, jlong data, jlong size)
+Java_org_zeromq_czmq_Zchunk__1_1new (JNIEnv *env, jclass c, jbyteArray data, jlong size)
 {
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
     //  Disable CZMQ signal handling; allow Java to deal with it
     zsys_handler_set (NULL);
-    jlong new_ = (jlong) (intptr_t) zchunk_new ((const void *) (intptr_t) data, (size_t) size);
+    jlong new_ = (jlong) (intptr_t) zchunk_new (data_, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return new_;
 }
 
@@ -45,10 +47,22 @@ Java_org_zeromq_czmq_Zchunk__1_1maxSize (JNIEnv *env, jclass c, jlong self)
     return max_size_;
 }
 
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zchunk__1_1set (JNIEnv *env, jclass c, jlong self, jlong data, jlong size)
+JNIEXPORT jbyteArray JNICALL
+Java_org_zeromq_czmq_Zchunk__1_1data (JNIEnv *env, jclass c, jlong self)
 {
-    jlong set_ = (jlong) zchunk_set ((zchunk_t *) (intptr_t) self, (const void *) (intptr_t) data, (size_t) size);
+    jbyte *data_ = (jbyte *) zchunk_data ((zchunk_t *) (intptr_t) self);
+    jint return_size_ = (jint) zchunk_size ((zchunk_t *) (intptr_t) self);
+    jbyteArray return_data_ = (*env)->NewByteArray (env, return_size_);
+    (*env)->SetByteArrayRegion (env, return_data_, 0, return_size_, (jbyte *) data_);
+    return return_data_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zchunk__1_1set (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
+{
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
+    jlong set_ = (jlong) zchunk_set ((zchunk_t *) (intptr_t) self, data_, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return set_;
 }
 
@@ -60,16 +74,20 @@ Java_org_zeromq_czmq_Zchunk__1_1fill (JNIEnv *env, jclass c, jlong self, jbyte f
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zchunk__1_1append (JNIEnv *env, jclass c, jlong self, jlong data, jlong size)
+Java_org_zeromq_czmq_Zchunk__1_1append (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
-    jlong append_ = (jlong) zchunk_append ((zchunk_t *) (intptr_t) self, (const void *) (intptr_t) data, (size_t) size);
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
+    jlong append_ = (jlong) zchunk_append ((zchunk_t *) (intptr_t) self, data_, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return append_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zchunk__1_1extend (JNIEnv *env, jclass c, jlong self, jlong data, jlong size)
+Java_org_zeromq_czmq_Zchunk__1_1extend (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
-    jlong extend_ = (jlong) zchunk_extend ((zchunk_t *) (intptr_t) self, (const void *) (intptr_t) data, (size_t) size);
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
+    jlong extend_ = (jlong) zchunk_extend ((zchunk_t *) (intptr_t) self, data_, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return extend_;
 }
 

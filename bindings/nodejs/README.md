@@ -42,14 +42,13 @@ This is a wrapping of the native C libczmq library. See binding.cc for the code.
 
 We get these classes:
 
-* Zactor - provides a simple actor framework
 * Zarmour - armoured text encoding and decoding
 * Zcert - work with CURVE security certificates
 * Zcertstore - work with CURVE security certificate stores
 * Zchunk - work with memory chunks
 * Zclock - millisecond clocks and delays
-* Zconfig - zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
-* Zdigest - zdigest - provides hashing functions (SHA-1 at present)
+* Zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
+* Zdigest - provides hashing functions (SHA-1 at present)
 * Zdir - work with file-system directories
 * ZdirPatch - work with directory patches
 * Zfile - helper functions for working with files.
@@ -61,17 +60,8 @@ We get these classes:
 * Zlistx - extended generic list container
 * Zloop - event-driven reactor
 * Zmsg - working with multipart messages
-* Zpoller - event-driven reactor
 * Zproc - process configuration and status
 * Zsock - high-level socket API that hides libzmq contexts and sockets
 * Zstr - sending and receiving strings
 * Ztrie - simple trie for tokenizable strings
 * Zuuid - UUID support class
-* Zauth - 
-* Zbeacon - 
-* Zgossip - 
-* Zmonitor - 
-* Zproxy - 
-* Zrex - 
-* Zsys - 
-
