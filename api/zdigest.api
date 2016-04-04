@@ -8,7 +8,7 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
-    zdigest - provides hashing functions (SHA-1 at present)
+    provides hashing functions (SHA-1 at present)
     
     <constructor>
         Constructor - creates new digest object, which you use to build up a
