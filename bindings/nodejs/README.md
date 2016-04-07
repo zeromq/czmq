@@ -1,6 +1,8 @@
 # Node.js Binding for CZMQ
 
-This is a development kit.
+This is a development kit. Note: this README is generated automatically
+by zproject from project.xml. Please DO NOT modify by hand except for test
+purposes.
 
 ## Prerequisites
 
