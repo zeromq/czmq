@@ -159,6 +159,7 @@ sudo apt-get install -y asciidoc
 
 Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libzmq (ZeroMQ core) library:
 
+```
     git clone git://github.com/zeromq/libzmq.git
     cd libzmq
     ./autogen.sh
