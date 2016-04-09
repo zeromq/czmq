@@ -15,9 +15,9 @@
 var czmq = require ('bindings')('czmq')
 var zstr = new czmq.Zstr ();
 
-var server = new czmq.Zsock (12)
+var server = new czmq.Zsock ('server')
 server.bind ("inproc://test-endpoint")
-var client = new czmq.Zsock (13)
+var client = new czmq.Zsock ('client')
 client.connect ("inproc://test-endpoint")
 
 zstr.send (client, "Hello")
@@ -30,4 +30,3 @@ console.log (reply)
 
 server.destroy ()
 client.destroy ()
-

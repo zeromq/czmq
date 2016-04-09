@@ -84,7 +84,7 @@ NAN_METHOD (Zarmour::_encode) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    char *result = (char *) zarmour_encode (zarmour->self, (const byte *)data, (size_t)size);
+    char *result = (char *) zarmour_encode (zarmour->self, (const byte *)data, (size_t) size);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
@@ -458,7 +458,7 @@ NAN_MODULE_INIT (Zchunk::Init) {
 }
 
 Zchunk::Zchunk (const void *data, size_t size) {
-    self = zchunk_new ((const void *)data, (size_t)size);
+    self = zchunk_new ((const void *)data, (size_t) size);
 }
 
 Zchunk::Zchunk (zchunk_t *self_) {
@@ -475,7 +475,7 @@ NAN_METHOD (Zchunk::New) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    Zchunk *zchunk = new Zchunk ((const void *)data, (size_t)size);
+    Zchunk *zchunk = new Zchunk ((const void *)data, (size_t) size);
     if (zchunk) {
         zchunk->Wrap (info.This ());
         info.GetReturnValue ().Set (info.This ());
@@ -518,7 +518,7 @@ NAN_METHOD (Zchunk::_set) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    size_t result = zchunk_set (zchunk->self, (const void *)data, (size_t)size);
+    size_t result = zchunk_set (zchunk->self, (const void *)data, (size_t) size);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -529,7 +529,7 @@ NAN_METHOD (Zchunk::_append) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    size_t result = zchunk_append (zchunk->self, (const void *)data, (size_t)size);
+    size_t result = zchunk_append (zchunk->self, (const void *)data, (size_t) size);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -540,7 +540,7 @@ NAN_METHOD (Zchunk::_extend) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    size_t result = zchunk_extend (zchunk->self, (const void *)data, (size_t)size);
+    size_t result = zchunk_extend (zchunk->self, (const void *)data, (size_t) size);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -574,7 +574,7 @@ NAN_METHOD (Zchunk::_slurp) {
     if (!info [1]->IsNumber ())
         return Nan::ThrowTypeError ("`maxsize` must be a number");
     size_t maxsize = Nan::To<int64_t>(info [1]).FromJust ();
-    zchunk_t *result = zchunk_slurp ((const char *)filename, (size_t)maxsize);
+    zchunk_t *result = zchunk_slurp ((const char *)filename, (size_t) maxsize);
     Zchunk *zchunk_result = new Zchunk (result);
     if (zchunk_result) {
     //  Don't yet know how to return a new object
@@ -884,12 +884,13 @@ NAN_METHOD (Zconfig::_at_depth) {
     Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `level`");
-    else
-    if (!info [0]->IsNumber ())
-        return Nan::ThrowTypeError ("`level` must be a number");
-    int level = Nan::To<int>(info [0]).FromJust ();
 
-    zconfig_t *result = zconfig_at_depth (zconfig->self, (int)level);
+    int level;
+    if (info [0]->IsNumber ())
+        level = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`level` must be a number");
+    zconfig_t *result = zconfig_at_depth (zconfig->self, (int) level);
     Zconfig *zconfig_result = new Zconfig (result);
     if (zconfig_result) {
     //  Don't yet know how to return a new object
@@ -1292,7 +1293,7 @@ NAN_MODULE_INIT (ZdirPatch::Init) {
 }
 
 ZdirPatch::ZdirPatch (const char *path, zfile_t *file, int op, const char *alias) {
-    self = zdir_patch_new ((const char *)path, file, (int)op, (const char *)alias);
+    self = zdir_patch_new ((const char *)path, file, (int) op, (const char *)alias);
 }
 
 ZdirPatch::ZdirPatch (zdir_patch_t *self_) {
@@ -1317,11 +1318,12 @@ NAN_METHOD (ZdirPatch::New) {
     Zfile *file = Nan::ObjectWrap::Unwrap<Zfile>(info [1].As<Object>());
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `op`");
-    else
-    if (!info [2]->IsNumber ())
-        return Nan::ThrowTypeError ("`op` must be a number");
-    int op = Nan::To<int>(info [2]).FromJust ();
 
+    int op;
+    if (info [2]->IsNumber ())
+        op = Nan::To<int>(info [2]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`op` must be a number");
     char *alias;
     if (info [3]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `alias`");
@@ -1332,7 +1334,7 @@ NAN_METHOD (ZdirPatch::New) {
         Nan::Utf8String alias_utf8 (info [3].As<String>());
         alias = *alias_utf8;
     }
-    ZdirPatch *zdir_patch = new ZdirPatch ((const char *)path, file->self, (int)op, (const char *)alias);
+    ZdirPatch *zdir_patch = new ZdirPatch ((const char *)path, file->self, (int) op, (const char *)alias);
     if (zdir_patch) {
         zdir_patch->Wrap (info.This ());
         info.GetReturnValue ().Set (info.This ());
@@ -1587,12 +1589,13 @@ NAN_METHOD (Zfile::_read) {
     size_t bytes = Nan::To<int64_t>(info [0]).FromJust ();
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `offset`");
-    else
-    if (!info [1]->IsNumber ())
-        return Nan::ThrowTypeError ("`offset` must be a number");
-    off_t offset = Nan::To<int64_t>(info [1]).FromJust ();
 
-    zchunk_t *result = zfile_read (zfile->self, (size_t)bytes, (off_t)offset);
+    off_t offset;
+    if (info [1]->IsNumber ())
+        offset = Nan::To<int64_t>(info [1]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`offset` must be a number");
+    zchunk_t *result = zfile_read (zfile->self, (size_t) bytes, (off_t) offset);
     Zchunk *zchunk_result = new Zchunk (result);
     if (zchunk_result) {
     //  Don't yet know how to return a new object
@@ -1613,12 +1616,13 @@ NAN_METHOD (Zfile::_write) {
     Zchunk *chunk = Nan::ObjectWrap::Unwrap<Zchunk>(info [0].As<Object>());
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `offset`");
-    else
-    if (!info [1]->IsNumber ())
-        return Nan::ThrowTypeError ("`offset` must be a number");
-    off_t offset = Nan::To<int64_t>(info [1]).FromJust ();
 
-    int result = zfile_write (zfile->self, chunk->self, (off_t)offset);
+    off_t offset;
+    if (info [1]->IsNumber ())
+        offset = Nan::To<int64_t>(info [1]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`offset` must be a number");
+    int result = zfile_write (zfile->self, chunk->self, (off_t) offset);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -1670,7 +1674,7 @@ NAN_MODULE_INIT (Zframe::Init) {
 }
 
 Zframe::Zframe (const void *data, size_t size) {
-    self = zframe_new ((const void *)data, (size_t)size);
+    self = zframe_new ((const void *)data, (size_t) size);
 }
 
 Zframe::Zframe (zframe_t *self_) {
@@ -1687,7 +1691,7 @@ NAN_METHOD (Zframe::New) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    Zframe *zframe = new Zframe ((const void *)data, (size_t)size);
+    Zframe *zframe = new Zframe ((const void *)data, (size_t) size);
     if (zframe) {
         zframe->Wrap (info.This ());
         info.GetReturnValue ().Set (info.This ());
@@ -1710,12 +1714,13 @@ NAN_METHOD (Zframe::_send) {
     Zsock *dest = Nan::ObjectWrap::Unwrap<Zsock>(info [1].As<Object>());
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `flags`");
-    else
-    if (!info [2]->IsNumber ())
-        return Nan::ThrowTypeError ("`flags` must be a number");
-    int flags = Nan::To<int>(info [2]).FromJust ();
 
-    int result = zframe_send (&self_p->self, dest->self, (int)flags);
+    int flags;
+    if (info [2]->IsNumber ())
+        flags = Nan::To<int>(info [2]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`flags` must be a number");
+    int result = zframe_send (&self_p->self, dest->self, (int) flags);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -2458,12 +2463,13 @@ NAN_METHOD (Zloop::_timer_end) {
     Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `timer id`");
-    else
-    if (!info [0]->IsNumber ())
-        return Nan::ThrowTypeError ("`timer id` must be a number");
-    int timer_id = Nan::To<int>(info [0]).FromJust ();
 
-    int result = zloop_timer_end (zloop->self, (int)timer_id);
+    int timer_id;
+    if (info [0]->IsNumber ())
+        timer_id = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`timer id` must be a number");
+    int result = zloop_timer_end (zloop->self, (int) timer_id);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -2616,7 +2622,7 @@ NAN_METHOD (Zmsg::_pushmem) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    int result = zmsg_pushmem (zmsg->self, (void *)data, (size_t)size);
+    int result = zmsg_pushmem (zmsg->self, (const void *)data, (size_t) size);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -2627,7 +2633,7 @@ NAN_METHOD (Zmsg::_addmem) {
     Local<Object> buffer_node = info [0].As<Object> ();
     const byte *data = (const byte *) node::Buffer::Data (buffer_node);
     size_t size = node::Buffer::Length (buffer_node);
-    int result = zmsg_addmem (zmsg->self, (void *)data, (size_t)size);
+    int result = zmsg_addmem (zmsg->self, (const void *)data, (size_t) size);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -3021,7 +3027,7 @@ NAN_MODULE_INIT (Zsock::Init) {
 }
 
 Zsock::Zsock (int type) {
-    self = zsock_new ((int)type);
+    self = zsock_new ((int) type);
 }
 
 Zsock::Zsock (zsock_t *self_) {
@@ -3035,12 +3041,69 @@ NAN_METHOD (Zsock::New) {
     assert (info.IsConstructCall ());
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `type`");
-    else
-    if (!info [0]->IsNumber ())
-        return Nan::ThrowTypeError ("`type` must be a number");
-    int type = Nan::To<int>(info [0]).FromJust ();
 
-    Zsock *zsock = new Zsock ((int)type);
+    int type;
+    if (info [0]->IsString ()) {
+        Nan::Utf8String type_utf8 (info [0].As<String>());
+        char *type_name = *type_utf8;
+        for (char *type_ptr = type_name; *type_ptr; type_ptr++)
+            *type_ptr = tolower (*type_ptr);
+        if (streq (type_name, "pair"))
+            type = ZMQ_PAIR;
+        else
+        if (streq (type_name, "pub"))
+            type = ZMQ_PUB;
+        else
+        if (streq (type_name, "sub"))
+            type = ZMQ_SUB;
+        else
+        if (streq (type_name, "req"))
+            type = ZMQ_REQ;
+        else
+        if (streq (type_name, "rep"))
+            type = ZMQ_REP;
+        else
+        if (streq (type_name, "dealer"))
+            type = ZMQ_DEALER;
+        else
+        if (streq (type_name, "router"))
+            type = ZMQ_ROUTER;
+        else
+        if (streq (type_name, "pull"))
+            type = ZMQ_PULL;
+        else
+        if (streq (type_name, "push"))
+            type = ZMQ_PUSH;
+        else
+        if (streq (type_name, "xpub"))
+            type = ZMQ_XPUB;
+        else
+        if (streq (type_name, "xsub"))
+            type = ZMQ_XSUB;
+        else
+        if (streq (type_name, "stream"))
+            type = 11;
+        else
+        if (streq (type_name, "server"))
+            type = 12;
+        else
+        if (streq (type_name, "client"))
+            type = 13;
+        else
+        if (streq (type_name, "radio"))
+            type = 14;
+        else
+        if (streq (type_name, "dish"))
+            type = 15;
+        else
+            return Nan::ThrowTypeError ("`type` not a valid string");
+    }
+    else
+    if (info [0]->IsNumber ())
+        type = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`type` must be a number or string");
+    Zsock *zsock = new Zsock ((int) type);
     if (zsock) {
         zsock->Wrap (info.This ());
         info.GetReturnValue ().Set (info.This ());
@@ -3142,12 +3205,13 @@ NAN_METHOD (Zsock::_attach) {
     }
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `serverish`");
-    else
-    if (!info [1]->IsBoolean ())
-        return Nan::ThrowTypeError ("`serverish` must be a number");
-    bool serverish = Nan::To<bool>(info [1]).FromJust ();
 
-    int result = zsock_attach (zsock->self, (const char *)endpoints, (bool)serverish);
+    bool serverish;
+    if (info [1]->IsBoolean ())
+        serverish = Nan::To<bool>(info [1]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`serverish` must be a Boolean");
+    int result = zsock_attach (zsock->self, (const char *)endpoints, (bool) serverish);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
@@ -3722,7 +3786,7 @@ NAN_MODULE_INIT (Ztrie::Init) {
 }
 
 Ztrie::Ztrie (char delimiter) {
-    self = ztrie_new ((char)delimiter);
+    self = ztrie_new ((char) delimiter);
 }
 
 Ztrie::Ztrie (ztrie_t *self_) {
@@ -3746,7 +3810,7 @@ NAN_METHOD (Ztrie::New) {
             return Nan::ThrowTypeError ("`delimiter` must be a single character");
         delimiter = (*delimiter_utf8) [0];
     }
-    Ztrie *ztrie = new Ztrie ((char)delimiter);
+    Ztrie *ztrie = new Ztrie ((char) delimiter);
     if (ztrie) {
         ztrie->Wrap (info.This ());
         info.GetReturnValue ().Set (info.This ());

@@ -30,11 +30,12 @@
             <map name = "PUSH"  value = "ZMQ_PUSH" />
             <map name = "XPUB"  value = "ZMQ_XPUB" />
             <map name = "XSUB"  value = "ZMQ_XSUB" />
-            <map name = "STREAM"  value = "ZMQ_STREAM" />
-            <map name = "SERVER"  value = "ZMQ_SERVER" />
-            <map name = "CLIENT"  value = "ZMQ_CLIENT" />
-            <map name = "RADIO"  value = "ZMQ_RADIO" />
-            <map name = "DISH"  value = "ZMQ_DISH" />
+            <!-- These macros only exist in 4.x, so use the magic values instead -->
+            <map name = "STREAM"  value = "11" />
+            <map name = "SERVER"  value = "12" />
+            <map name = "CLIENT"  value = "13" />
+            <map name = "RADIO"  value = "14" />
+            <map name = "DISH"  value = "15" />
         </argument>
     </constructor>
 
