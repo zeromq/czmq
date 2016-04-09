@@ -277,6 +277,7 @@ class Zframe: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_send);
     static NAN_METHOD (_size);
     static NAN_METHOD (_data);
     static NAN_METHOD (_dup);
@@ -423,12 +424,16 @@ class Zmsg: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_send);
+    static NAN_METHOD (_sendm);
     static NAN_METHOD (_size);
     static NAN_METHOD (_content_size);
     static NAN_METHOD (_routing_id);
     static NAN_METHOD (_prepend);
     static NAN_METHOD (_append);
     static NAN_METHOD (_pop);
+    static NAN_METHOD (_pushmem);
+    static NAN_METHOD (_addmem);
     static NAN_METHOD (_pushstr);
     static NAN_METHOD (_addstr);
     static NAN_METHOD (_pushstrf);
@@ -443,6 +448,24 @@ class Zmsg: public Nan::ObjectWrap {
     static NAN_METHOD (_dup);
     static NAN_METHOD (_eq);
     static NAN_METHOD (_signal);
+};
+
+class Zpoller: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit Zpoller (zsock_t *reader);
+        explicit Zpoller (zpoller_t *self);
+        zpoller_t *self;
+    private:
+        ~Zpoller ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_add);
+    static NAN_METHOD (_expired);
+    static NAN_METHOD (_terminated);
 };
 
 class Zproc: public Nan::ObjectWrap {
@@ -546,6 +569,14 @@ class Zstr: public Nan::ObjectWrap {
     static Nan::Persistent <Function> &constructor ();
 
     static NAN_METHOD (New);
+    static NAN_METHOD (_recv);
+    static NAN_METHOD (_recvx);
+    static NAN_METHOD (_send);
+    static NAN_METHOD (_sendm);
+    static NAN_METHOD (_sendf);
+    static NAN_METHOD (_sendfm);
+    static NAN_METHOD (_sendx);
+    static NAN_METHOD (_str);
 };
 
 class Ztrie: public Nan::ObjectWrap {

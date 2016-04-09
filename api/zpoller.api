@@ -14,7 +14,7 @@
         Create new poller, specifying zero or more readers. The list of
         readers ends in a NULL. Each reader can be a zsock_t instance, a
         zactor_t instance, a libzmq socket (void *), or a file handle.
-        <argument name = "reader" type = "anything" variadic = "1" />
+        <argument name = "reader" type = "sockish" variadic = "1" />
     </constructor>
 
     <destructor>
@@ -24,7 +24,7 @@
     <method name = "add">
         Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
         be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
-        <argument name = "reader" type = "anything" />
+        <argument name = "reader" type = "sockish" />
         <return type = "integer" />
     </method>
 
@@ -54,7 +54,7 @@
         You can test the actual exit condition by calling zpoller_expired () and
         zpoller_terminated (). The timeout is in msec.
         <argument name = "timeout" type = "integer" />
-        <return  type = "anything" />
+        <return type = "sockish" />
     </method>
 
     <method name = "expired">

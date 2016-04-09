@@ -14,7 +14,7 @@
         Receive C string from socket. Caller must free returned string using
         zstr_free(). Returns NULL if the context is being terminated or the
         process was interrupted.
-        <argument name = "source" type = "anything" />
+        <argument name = "source" type = "sockish" />
         <return type = "string" fresh = "1" />
     </method>
 
@@ -26,7 +26,7 @@
         number of strings filled, zero or more. Free each returned string
         using zstr_free(). If not enough strings are provided, remaining
         multipart frames in the message are dropped.
-        <argument name = "source" type = "anything" />
+        <argument name = "source" type = "sockish" />
         <argument name = "string_p" type = "string" by_reference = "1" variadic = "1" />
         <return type = "integer" />
     </method>
@@ -36,7 +36,7 @@
         trailing null byte; to read this you can use zstr_recv, or a similar
         method that adds a null terminator on the received string. String
         may be NULL, which is sent as "".
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <argument name = "string" type = "string" />
         <return type = "integer" />
     </method>
@@ -44,7 +44,7 @@
     <method name = "sendm" singleton = "1">
         Send a C string to a socket, as zstr_send(), with a MORE flag, so that
         you can send further strings in the same multi-part message.
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <argument name = "string" type = "string" />
         <return type = "integer" />
     </method>
@@ -53,7 +53,7 @@
         Send a formatted string to a socket. Note that you should NOT use
         user-supplied strings in the format (they may contain '%' which
         will create security holes).
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <argument name = "format" type = "format" />
         <return type = "integer" />
     </method>
@@ -62,7 +62,7 @@
         Send a formatted string to a socket, as for zstr_sendf(), with a
         MORE flag, so that you can send further strings in the same multi-part
         message.
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <argument name = "format" type = "format" />
         <return type = "integer" />
     </method>
@@ -70,7 +70,7 @@
     <method name = "sendx" singleton = "1">
         Send a series of strings (until NULL) as multipart data
         Returns 0 if the strings could be sent OK, or -1 on error.
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <argument name = "string" type = "string" variadic = "1" />
         <return type = "integer" />
     </method>
@@ -78,7 +78,7 @@
     <method name = "str" singleton = "1" state = "draft" >
         Accepts a void pointer and returns a fresh character string. If source
         is null, returns an empty string.
-        <argument name = "source" type = "anything" />
+        <argument name = "source" type = "sockish" />
         <return type = "string" fresh = "1" />
     </method>
 

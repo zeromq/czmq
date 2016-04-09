@@ -96,7 +96,7 @@
         Apply certificate to socket, i.e. use for CURVE security on socket.
         If certificate was loaded from public file, the secret key will be
         undefined, and this certificate will not work successfully.
-        <argument name = "socket" type = "anything" />
+        <argument name = "socket" type = "sockish" />
     </method>
 
     <method name = "dup">

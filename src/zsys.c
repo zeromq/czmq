@@ -366,11 +366,14 @@ zsys_sockname (int socktype)
         "PAIR", "PUB", "SUB", "REQ", "REP",
         "DEALER", "ROUTER", "PULL", "PUSH",
         "XPUB", "XSUB", "STREAM",
-        "SERVER", "CLIENT"
+        "SERVER", "CLIENT",
+        "RADIO", "DISH"
     };
     //  This array matches ZMQ_XXX type definitions
     assert (ZMQ_PAIR == 0);
-#if defined (ZMQ_CLIENT)
+#if defined (ZMQ_DISH)
+    assert (socktype >= 0 && socktype <= ZMQ_DISH);
+#elif defined (ZMQ_CLIENT)
     assert (socktype >= 0 && socktype <= ZMQ_CLIENT);
 #elif defined (ZMQ_STREAM)
     assert (socktype >= 0 && socktype <= ZMQ_STREAM);

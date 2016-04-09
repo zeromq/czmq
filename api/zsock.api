@@ -17,7 +17,25 @@
         variant, enabling intelligent socket leak detection. This can have
         performance implications if you use a LOT of sockets. To turn off this
         redirection behaviour, define ZSOCK_NOCHECK.
-        <argument name = "type" type = "integer" />
+        <argument name = "type" type = "integer">
+            <!-- Allow text names in binding APIs -->
+            <map name = "PAIR" value = "ZMQ_PAIR" />
+            <map name = "PUB"  value = "ZMQ_PUB" />
+            <map name = "SUB"  value = "ZMQ_SUB" />
+            <map name = "REQ"  value = "ZMQ_REQ" />
+            <map name = "REP"  value = "ZMQ_REP" />
+            <map name = "DEALER"  value = "ZMQ_DEALER" />
+            <map name = "ROUTER"  value = "ZMQ_ROUTER" />
+            <map name = "PULL"  value = "ZMQ_PULL" />
+            <map name = "PUSH"  value = "ZMQ_PUSH" />
+            <map name = "XPUB"  value = "ZMQ_XPUB" />
+            <map name = "XSUB"  value = "ZMQ_XSUB" />
+            <map name = "STREAM"  value = "ZMQ_STREAM" />
+            <map name = "SERVER"  value = "ZMQ_SERVER" />
+            <map name = "CLIENT"  value = "ZMQ_CLIENT" />
+            <map name = "RADIO"  value = "ZMQ_RADIO" />
+            <map name = "DISH"  value = "ZMQ_DISH" />
+        </argument>
     </constructor>
 
     <destructor>

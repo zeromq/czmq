@@ -397,6 +397,7 @@ zsock_new_client (const char *endpoints)
     return zsock_new_client_checked (endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create a RADIO socket. Default action is bind.
 
@@ -419,8 +420,9 @@ zsock_new_radio (const char *endpoints)
     return zsock_new_radio_checked (endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
-//  Create a RADIO socket. Default action is connect.
+//  Create a DISH socket. Default action is connect.
 
 zsock_t *
 zsock_new_dish_checked (const char *endpoints, const char *filename, size_t line_nbr)
