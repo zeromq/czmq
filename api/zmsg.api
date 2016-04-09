@@ -96,7 +96,7 @@
     <method name = "pushmem">
         Push block of memory to front of message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name = "data" type = "buffer" />
+        <argument name = "data" type = "buffer" c_type = "const void *" />
         <argument name = "size" type = "size" />
         <return type = "integer" />
     </method>
@@ -104,7 +104,7 @@
     <method name = "addmem">
         Add block of memory to the end of the message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name = "data" type = "buffer" />
+        <argument name = "data" type = "buffer" c_type = "const void *" />
         <argument name = "size" type = "size" />
         <return type = "integer" />
     </method>

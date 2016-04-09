@@ -373,7 +373,7 @@ zsys_sockname (int socktype)
     assert (ZMQ_PAIR == 0);
 #if defined (ZMQ_DISH)
     assert (socktype >= 0 && socktype <= ZMQ_DISH);
-#if defined (ZMQ_CLIENT)
+#elif defined (ZMQ_CLIENT)
     assert (socktype >= 0 && socktype <= ZMQ_CLIENT);
 #elif defined (ZMQ_STREAM)
     assert (socktype >= 0 && socktype <= ZMQ_STREAM);
