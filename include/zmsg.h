@@ -103,12 +103,12 @@ CZMQ_EXPORT zframe_t *
 //  Push block of memory to front of message, as a new frame.
 //  Returns 0 on success, -1 on error.                       
 CZMQ_EXPORT int
-    zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
+    zmsg_pushmem (zmsg_t *self, const byte *data, size_t size);
 
 //  Add block of memory to the end of the message, as a new frame.
 //  Returns 0 on success, -1 on error.                            
 CZMQ_EXPORT int
-    zmsg_addmem (zmsg_t *self, const void *src, size_t size);
+    zmsg_addmem (zmsg_t *self, const byte *data, size_t size);
 
 //  Push string as new frame to front of message.
 //  Returns 0 on success, -1 on error.           

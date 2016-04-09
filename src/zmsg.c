@@ -318,12 +318,12 @@ zmsg_pop (zmsg_t *self)
 //  Returns 0 on success, -1 on error.
 
 int
-zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
+zmsg_pushmem (zmsg_t *self, const void *data, size_t size)
 {
     assert (self);
     assert (zmsg_is (self));
 
-    zframe_t *frame = zframe_new (src, size);
+    zframe_t *frame = zframe_new (data, size);
     assert (frame);
     self->content_size += size;
     zlist_push (self->frames, frame);
@@ -335,12 +335,12 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
 //  Returns 0 on success, -1 on error.
 
 int
-zmsg_addmem (zmsg_t *self, const void *src, size_t size)
+zmsg_addmem (zmsg_t *self, const void *data, size_t size)
 {
     assert (self);
     assert (zmsg_is (self));
 
-    zframe_t *frame = zframe_new (src, size);
+    zframe_t *frame = zframe_new (data, size);
     assert (frame);
     self->content_size += size;
     zlist_append (self->frames, frame);
