@@ -23,7 +23,7 @@
         was interrupted. Does a blocking recv. If you want to not block then use
         the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
         before receiving.
-        <argument name = "source" type = "anything" />
+        <argument name = "source" type = "sockish" />
     </constructor>
 
     <method name = "send" singleton = "1">
@@ -32,7 +32,7 @@
         the message anyhow. Nullifies the caller's reference to the message (as
         it is a destructor).
         <argument name = "self_p" type = "zmsg" by_reference = "1" />
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <return type = "integer" />
     </method>
 
@@ -44,7 +44,7 @@
         the message anyhow. Nullifies the caller's reference to the message (as
         it is a destructor).
         <argument name = "self_p" type = "zmsg" by_reference = "1" />
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <return type = "integer" />
     </method>
 
@@ -96,7 +96,7 @@
     <method name = "pushmem">
         Push block of memory to front of message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name = "src" type = "anything" mutable = "0" />
+        <argument name = "data" type = "buffer" />
         <argument name = "size" type = "size" />
         <return type = "integer" />
     </method>
@@ -104,7 +104,7 @@
     <method name = "addmem">
         Add block of memory to the end of the message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name = "src" type = "anything" mutable = "0" />
+        <argument name = "data" type = "buffer" />
         <argument name = "size" type = "size" />
         <return type = "integer" />
     </method>

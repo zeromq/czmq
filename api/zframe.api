@@ -39,14 +39,14 @@
         Receive frame from socket, returns zframe_t object or NULL if the recv
         was interrupted. Does a blocking recv, if you want to not block then use
         zpoller or zloop.
-        <argument name = "source" type = "anything" />
+        <argument name = "source" type = "sockish" />
     </constructor>
 
     <method name = "send" singleton = "1">
         Send a frame to a socket, destroy frame after sending.
         Return -1 on error, 0 on success.
         <argument name = "self_p" type = "zframe" by_reference = "1" />
-        <argument name = "dest" type = "anything" />
+        <argument name = "dest" type = "sockish" />
         <argument name = "flags" type = "integer" />
         <return type = "integer" />
     </method>
