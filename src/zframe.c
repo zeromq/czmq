@@ -223,6 +223,8 @@ zframe_data (zframe_t *self)
     return (byte *) zmq_msg_data (&self->zmsg);
 }
 
+
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
 //  --------------------------------------------------------------------------
 //  Return meta data property for frame.
 //  Caller must free string when finished with it.
@@ -235,6 +237,7 @@ zframe_meta (zframe_t *self, const char *property)
 
     return zmq_msg_gets (&self->zmsg, property);
 }
+#endif
 
 
 //  --------------------------------------------------------------------------
@@ -634,15 +637,19 @@ zframe_test (bool verbose)
     }
     assert (frame_nbr == 10);
 
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
     // Test zframe_meta
     frame = zframe_new ("Hello", 5);
     assert (frame);
     rc = zframe_send (&frame, output, 0);
     assert (rc == 0);
     frame = zframe_recv (input);
-    assert (streq (zframe_meta (frame, "Socket-Type"), "PAIR"));
+    const char *meta = zframe_meta (frame, "Socket-Type");
+    assert (meta != NULL);
+    assert (streq (meta, "PAIR"));
     assert (zframe_meta (frame, "nonexistent") == NULL);
     zframe_destroy (&frame);
+#endif
 
     zsock_destroy (&input);
     zsock_destroy (&output);
