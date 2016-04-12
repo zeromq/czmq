@@ -224,7 +224,6 @@ zframe_data (zframe_t *self)
 }
 
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
 //  --------------------------------------------------------------------------
 //  Return meta data property for frame.
 //  Caller must free string when finished with it.
@@ -232,12 +231,15 @@ zframe_data (zframe_t *self)
 const char *
 zframe_meta (zframe_t *self, const char *property)
 {
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
     assert (self);
     assert (zframe_is (self));
 
     return zmq_msg_gets (&self->zmsg, property);
-}
+#else
+    return NULL;
 #endif
+}
 
 
 //  --------------------------------------------------------------------------

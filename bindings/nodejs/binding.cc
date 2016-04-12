@@ -2134,6 +2134,7 @@ NAN_MODULE_INIT (Zframe::Init) {
     Nan::SetPrototypeMethod (tpl, "send", _send);
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "data", _data);
+    Nan::SetPrototypeMethod (tpl, "meta", _meta);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "strhex", _strhex);
     Nan::SetPrototypeMethod (tpl, "strdup", _strdup);
@@ -2215,6 +2216,22 @@ NAN_METHOD (Zframe::_data) {
     Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
     const char *result = (const char *) zframe_data (zframe->self);
     info.GetReturnValue().Set (Nan::CopyBuffer (result, zframe_size (zframe->self)).ToLocalChecked ());
+}
+
+NAN_METHOD (Zframe::_meta) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *property;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `property`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`property` must be a string");
+    else {
+        Nan::Utf8String property_utf8 (info [0].As<String>());
+        property = *property_utf8;
+    }
+    char *result = (char *) zframe_meta (zframe->self, (const char *)property);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zframe::_dup) {

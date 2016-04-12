@@ -1018,6 +1018,11 @@ size_t
 byte *
     zframe_data (zframe_t *self);
 
+// Return meta data property for frame           
+// Caller must free string when finished with it.
+const char *
+    zframe_meta (zframe_t *self, const char *property);
+
 // Create a new frame that duplicates an existing frame. If frame is null,
 // or memory was exhausted, returns null.                                 
 zframe_t *
@@ -1970,12 +1975,12 @@ zframe_t *
 // Push block of memory to front of message, as a new frame.
 // Returns 0 on success, -1 on error.                       
 int
-    zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
+    zmsg_pushmem (zmsg_t *self, const void *data, size_t size);
 
 // Add block of memory to the end of the message, as a new frame.
 // Returns 0 on success, -1 on error.                            
 int
-    zmsg_addmem (zmsg_t *self, const void *src, size_t size);
+    zmsg_addmem (zmsg_t *self, const void *data, size_t size);
 
 // Push string as new frame to front of message.
 // Returns 0 on success, -1 on error.           

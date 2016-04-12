@@ -48,7 +48,7 @@ Java_org_zeromq_czmq_Zpoller__1_1setNonstop (JNIEnv *env, jclass c, jlong self, 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zpoller__1_1wait (JNIEnv *env, jclass c, jlong self, jint timeout)
 {
-    jlong wait_ = (jlong) (intptr_t) zpoller_wait ((zpoller_t *) (intptr_t) self, (int) timeout);
+    jlong wait_ = (jlong) zpoller_wait ((zpoller_t *) (intptr_t) self, (int) timeout);
     return wait_;
 }
 

@@ -109,16 +109,20 @@ Java_org_zeromq_czmq_Zmsg__1_1pop (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1pushmem (JNIEnv *env, jclass c, jlong self, jlong src, jlong size)
+Java_org_zeromq_czmq_Zmsg__1_1pushmem (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
-    jint pushmem_ = (jint) zmsg_pushmem ((zmsg_t *) (intptr_t) self, (const void *) (intptr_t) src, (size_t) size);
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
+    jint pushmem_ = (jint) zmsg_pushmem ((zmsg_t *) (intptr_t) self, data_, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return pushmem_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1addmem (JNIEnv *env, jclass c, jlong self, jlong src, jlong size)
+Java_org_zeromq_czmq_Zmsg__1_1addmem (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
-    jint addmem_ = (jint) zmsg_addmem ((zmsg_t *) (intptr_t) self, (const void *) (intptr_t) src, (size_t) size);
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
+    jint addmem_ = (jint) zmsg_addmem ((zmsg_t *) (intptr_t) self, data_, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return addmem_;
 }
 

@@ -80,6 +80,15 @@ byte * QZframe::data ()
 }
 
 ///
+//  Return meta data property for frame           
+//  Caller must free string when finished with it.
+const QString QZframe::meta (const QString &property)
+{
+    const QString rv = QString (zframe_meta (self, property.toUtf8().data()));
+    return rv;
+}
+
+///
 //  Create a new frame that duplicates an existing frame. If frame is null,
 //  or memory was exhausted, returns null.                                 
 QZframe * QZframe::dup ()

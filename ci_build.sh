@@ -42,7 +42,6 @@ if [ "$BUILD_TYPE" == "default" ]; then
     ./configure "${CONFIG_OPTS[@]}"
     make -j4
     make check
-    make memcheck
     make install
 
     # Build and check this project without DRAFT APIs

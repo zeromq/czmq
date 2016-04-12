@@ -66,6 +66,11 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT byte *
     zframe_data (zframe_t *self);
 
+//  Return meta data property for frame           
+//  Caller must free string when finished with it.
+CZMQ_EXPORT const char *
+    zframe_meta (zframe_t *self, const char *property);
+
 //  Create a new frame that duplicates an existing frame. If frame is null,
 //  or memory was exhausted, returns null.                                 
 //  Caller owns return value and must destroy it when done.
