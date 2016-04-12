@@ -223,6 +223,19 @@ zframe_data (zframe_t *self)
     return (byte *) zmq_msg_data (&self->zmsg);
 }
 
+//  --------------------------------------------------------------------------
+//  Return meta data property for frame.
+//  Caller must free string when finished with it.
+
+const char *
+zframe_meta (zframe_t *self, const char *property)
+{
+    assert (self);
+    assert (zframe_is (self));
+
+    return zmq_msg_gets (&self->zmsg, property);
+}
+
 
 //  --------------------------------------------------------------------------
 //  Create a new frame that duplicates an existing frame. If frame is null,
