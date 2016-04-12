@@ -571,9 +571,9 @@ zframe_test (bool verbose)
 
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new_pair ("@inproc://zframe.test");
+    zsock_t *output = zsock_new_pair ("@tcp://127.0.0.1:9001");
     assert (output);
-    zsock_t *input = zsock_new_pair (">inproc://zframe.test");
+    zsock_t *input = zsock_new_pair (">tcp://127.0.0.1:9001");
     assert (input);
 
     //  Send five different frames, test ZFRAME_MORE
@@ -633,6 +633,16 @@ zframe_test (bool verbose)
         zframe_destroy (&frame);
     }
     assert (frame_nbr == 10);
+
+    // Test zframe_meta
+    frame = zframe_new ("Hello", 5);
+    assert (frame);
+    rc = zframe_send (&frame, output, 0);
+    assert (rc == 0);
+    frame = zframe_recv (input);
+    assert (streq (zframe_meta (frame, "Socket-Type"), "PAIR"));
+    assert (zframe_meta (frame, "nonexistent") == NULL);
+    zframe_destroy (&frame);
 
     zsock_destroy (&input);
     zsock_destroy (&output);

@@ -61,6 +61,13 @@
         <return type = "buffer" mutable = "1" size = ".size" />
     </method>
 
+    <method name = "meta">
+        Return meta data property for frame
+        Caller must free string when finished with it.
+        <argument name = "property" type = "string" />
+        <return type = "string" fresh = "1" />
+    </method>
+
     <method name = "dup">
         Create a new frame that duplicates an existing frame. If frame is null,
         or memory was exhausted, returns null.
