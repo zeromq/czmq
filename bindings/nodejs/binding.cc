@@ -36,10 +36,17 @@ NAN_MODULE_INIT (Zarmour::Init) {
     Nan::SetPrototypeMethod (tpl, "decode", _decode);
     Nan::SetPrototypeMethod (tpl, "mode", _mode);
     Nan::SetPrototypeMethod (tpl, "modeStr", _mode_str);
+    Nan::SetPrototypeMethod (tpl, "setMode", _set_mode);
     Nan::SetPrototypeMethod (tpl, "pad", _pad);
+    Nan::SetPrototypeMethod (tpl, "setPad", _set_pad);
     Nan::SetPrototypeMethod (tpl, "padChar", _pad_char);
+    Nan::SetPrototypeMethod (tpl, "setPadChar", _set_pad_char);
     Nan::SetPrototypeMethod (tpl, "lineBreaks", _line_breaks);
+    Nan::SetPrototypeMethod (tpl, "setLineBreaks", _set_line_breaks);
     Nan::SetPrototypeMethod (tpl, "lineLength", _line_length);
+    Nan::SetPrototypeMethod (tpl, "setLineLength", _set_line_length);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zarmour").ToLocalChecked (),
@@ -122,10 +129,36 @@ NAN_METHOD (Zarmour::_mode_str) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zarmour::_set_mode) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `mode`");
+
+    int mode;
+    if (info [0]->IsNumber ())
+        mode = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`mode` must be a number");
+    zarmour_set_mode (zarmour->self, (int) mode);
+}
+
 NAN_METHOD (Zarmour::_pad) {
     Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
     bool result = zarmour_pad (zarmour->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zarmour::_set_pad) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `pad`");
+
+    bool pad;
+    if (info [0]->IsBoolean ())
+        pad = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`pad` must be a Boolean");
+    zarmour_set_pad (zarmour->self, (bool) pad);
 }
 
 NAN_METHOD (Zarmour::_pad_char) {
@@ -135,16 +168,74 @@ NAN_METHOD (Zarmour::_pad_char) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zarmour::_set_pad_char) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    char pad_char;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `pad char`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`pad char` must be a string");
+    else {
+        Nan::Utf8String pad_char_utf8 (info [0].As<String>());
+        if (strlen (*pad_char_utf8) != 1)
+            return Nan::ThrowTypeError ("`pad char` must be a single character");
+        pad_char = (*pad_char_utf8) [0];
+    }
+    zarmour_set_pad_char (zarmour->self, (char) pad_char);
+}
+
 NAN_METHOD (Zarmour::_line_breaks) {
     Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
     bool result = zarmour_line_breaks (zarmour->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
+NAN_METHOD (Zarmour::_set_line_breaks) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `line breaks`");
+
+    bool line_breaks;
+    if (info [0]->IsBoolean ())
+        line_breaks = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`line breaks` must be a Boolean");
+    zarmour_set_line_breaks (zarmour->self, (bool) line_breaks);
+}
+
 NAN_METHOD (Zarmour::_line_length) {
     Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
     size_t result = zarmour_line_length (zarmour->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zarmour::_set_line_length) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `line length`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`line length` must be a number");
+    size_t line_length = Nan::To<int64_t>(info [0]).FromJust ();
+    zarmour_set_line_length (zarmour->self, (size_t) line_length);
+}
+
+NAN_METHOD (Zarmour::_print) {
+    Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
+    zarmour_print (zarmour->self);
+}
+
+NAN_METHOD (Zarmour::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zarmour_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zarmour::constructor () {
@@ -168,13 +259,18 @@ NAN_MODULE_INIT (Zcert::Init) {
     Nan::SetPrototypeMethod (tpl, "secretKey", _secret_key);
     Nan::SetPrototypeMethod (tpl, "publicTxt", _public_txt);
     Nan::SetPrototypeMethod (tpl, "secretTxt", _secret_txt);
+    Nan::SetPrototypeMethod (tpl, "setMeta", _set_meta);
+    Nan::SetPrototypeMethod (tpl, "unsetMeta", _unset_meta);
     Nan::SetPrototypeMethod (tpl, "meta", _meta);
     Nan::SetPrototypeMethod (tpl, "metaKeys", _meta_keys);
     Nan::SetPrototypeMethod (tpl, "save", _save);
     Nan::SetPrototypeMethod (tpl, "savePublic", _save_public);
     Nan::SetPrototypeMethod (tpl, "saveSecret", _save_secret);
+    Nan::SetPrototypeMethod (tpl, "apply", _apply);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zcert").ToLocalChecked (),
@@ -234,6 +330,46 @@ NAN_METHOD (Zcert::_secret_txt) {
     Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
     char *result = (char *) zcert_secret_txt (zcert->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zcert::_set_meta) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *name;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `name`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`name` must be a string");
+    else {
+        Nan::Utf8String name_utf8 (info [0].As<String>());
+        name = *name_utf8;
+    }
+    char *format;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [1].As<String>());
+        format = *format_utf8;
+    }
+    zcert_set_meta (zcert->self, (const char *)name, "%s", format);
+}
+
+NAN_METHOD (Zcert::_unset_meta) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    char *name;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `name`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`name` must be a string");
+    else {
+        Nan::Utf8String name_utf8 (info [0].As<String>());
+        name = *name_utf8;
+    }
+    zcert_unset_meta (zcert->self, (const char *)name);
 }
 
 NAN_METHOD (Zcert::_meta) {
@@ -312,6 +448,12 @@ NAN_METHOD (Zcert::_save_secret) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zcert::_apply) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    Zsock *socket = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    zcert_apply (zcert->self, socket->self);
+}
+
 NAN_METHOD (Zcert::_dup) {
     Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
     zcert_t *result = zcert_dup (zcert->self);
@@ -329,6 +471,23 @@ NAN_METHOD (Zcert::_eq) {
     Zcert *compare = Nan::ObjectWrap::Unwrap<Zcert>(info [0].As<Object>());
     bool result = zcert_eq (zcert->self, compare->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zcert::_print) {
+    Zcert *zcert = Nan::ObjectWrap::Unwrap <Zcert> (info.Holder ());
+    zcert_print (zcert->self);
+}
+
+NAN_METHOD (Zcert::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zcert_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zcert::constructor () {
@@ -349,6 +508,9 @@ NAN_MODULE_INIT (Zcertstore::Init) {
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "lookup", _lookup);
+    Nan::SetPrototypeMethod (tpl, "insert", _insert);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zcertstore").ToLocalChecked (),
@@ -418,6 +580,29 @@ NAN_METHOD (Zcertstore::_lookup) {
     }
 }
 
+NAN_METHOD (Zcertstore::_insert) {
+    Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
+    Zcert *cert_p = Nan::ObjectWrap::Unwrap<Zcert>(info [0].As<Object>());
+    zcertstore_insert (zcertstore->self, &cert_p->self);
+}
+
+NAN_METHOD (Zcertstore::_print) {
+    Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
+    zcertstore_print (zcertstore->self);
+}
+
+NAN_METHOD (Zcertstore::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zcertstore_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zcertstore::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -435,6 +620,7 @@ NAN_MODULE_INIT (Zchunk::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "resize", _resize);
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "maxSize", _max_size);
     Nan::SetPrototypeMethod (tpl, "data", _data);
@@ -451,6 +637,8 @@ NAN_MODULE_INIT (Zchunk::Init) {
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
     Nan::SetPrototypeMethod (tpl, "unpack", _unpack);
     Nan::SetPrototypeMethod (tpl, "digest", _digest);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zchunk").ToLocalChecked (),
@@ -491,6 +679,17 @@ NAN_METHOD (Zchunk::destroy) {
 NAN_METHOD (Zchunk::defined) {
     Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zchunk->self != NULL));
+}
+
+NAN_METHOD (Zchunk::_resize) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `size`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`size` must be a number");
+    size_t size = Nan::To<int64_t>(info [0]).FromJust ();
+    zchunk_resize (zchunk->self, (size_t) size);
 }
 
 NAN_METHOD (Zchunk::_size) {
@@ -654,6 +853,23 @@ NAN_METHOD (Zchunk::_digest) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zchunk::_print) {
+    Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
+    zchunk_print (zchunk->self);
+}
+
+NAN_METHOD (Zchunk::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zchunk_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zchunk::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -669,10 +885,12 @@ NAN_MODULE_INIT (Zclock::Init) {
     tpl->InstanceTemplate ()->SetInternalFieldCount (1);
 
     // Prototypes
+    Nan::SetPrototypeMethod (tpl, "sleep", _sleep);
     Nan::SetPrototypeMethod (tpl, "time", _time);
     Nan::SetPrototypeMethod (tpl, "mono", _mono);
     Nan::SetPrototypeMethod (tpl, "usecs", _usecs);
     Nan::SetPrototypeMethod (tpl, "timestr", _timestr);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zclock").ToLocalChecked (),
@@ -692,6 +910,18 @@ NAN_METHOD (Zclock::New) {
         zclock->Wrap (info.This ());
         info.GetReturnValue ().Set (info.This ());
     }
+}
+
+NAN_METHOD (Zclock::_sleep) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `msecs`");
+
+    int msecs;
+    if (info [0]->IsNumber ())
+        msecs = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`msecs` must be a number");
+    zclock_sleep ((int) msecs);
 }
 
 NAN_METHOD (Zclock::_time) {
@@ -714,6 +944,18 @@ NAN_METHOD (Zclock::_timestr) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zclock::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zclock_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zclock::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -733,11 +975,16 @@ NAN_MODULE_INIT (Zconfig::Init) {
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "name", _name);
     Nan::SetPrototypeMethod (tpl, "value", _value);
+    Nan::SetPrototypeMethod (tpl, "put", _put);
+    Nan::SetPrototypeMethod (tpl, "putf", _putf);
     Nan::SetPrototypeMethod (tpl, "get", _get);
+    Nan::SetPrototypeMethod (tpl, "setName", _set_name);
+    Nan::SetPrototypeMethod (tpl, "setValue", _set_value);
     Nan::SetPrototypeMethod (tpl, "child", _child);
     Nan::SetPrototypeMethod (tpl, "next", _next);
     Nan::SetPrototypeMethod (tpl, "locate", _locate);
     Nan::SetPrototypeMethod (tpl, "atDepth", _at_depth);
+    Nan::SetPrototypeMethod (tpl, "setComment", _set_comment);
     Nan::SetPrototypeMethod (tpl, "comments", _comments);
     Nan::SetPrototypeMethod (tpl, "save", _save);
     Nan::SetPrototypeMethod (tpl, "savef", _savef);
@@ -748,6 +995,8 @@ NAN_MODULE_INIT (Zconfig::Init) {
     Nan::SetPrototypeMethod (tpl, "strLoad", _str_load);
     Nan::SetPrototypeMethod (tpl, "strSave", _str_save);
     Nan::SetPrototypeMethod (tpl, "hasChanged", _has_changed);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zconfig").ToLocalChecked (),
@@ -808,6 +1057,56 @@ NAN_METHOD (Zconfig::_value) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zconfig::_put) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    char *value;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    else {
+        Nan::Utf8String value_utf8 (info [1].As<String>());
+        value = *value_utf8;
+    }
+    zconfig_put (zconfig->self, (const char *)path, (const char *)value);
+}
+
+NAN_METHOD (Zconfig::_putf) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *path;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `path`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`path` must be a string");
+    else {
+        Nan::Utf8String path_utf8 (info [0].As<String>());
+        path = *path_utf8;
+    }
+    char *format;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [1].As<String>());
+        format = *format_utf8;
+    }
+    zconfig_putf (zconfig->self, (const char *)path, "%s", format);
+}
+
 NAN_METHOD (Zconfig::_get) {
     Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
     char *path;
@@ -832,6 +1131,36 @@ NAN_METHOD (Zconfig::_get) {
     }
     char *result = (char *) zconfig_get (zconfig->self, (const char *)path, (const char *)default_value);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zconfig::_set_name) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *name;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `name`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`name` must be a string");
+    else {
+        Nan::Utf8String name_utf8 (info [0].As<String>());
+        name = *name_utf8;
+    }
+    zconfig_set_name (zconfig->self, (const char *)name);
+}
+
+NAN_METHOD (Zconfig::_set_value) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zconfig_set_value (zconfig->self, "%s", format);
 }
 
 NAN_METHOD (Zconfig::_child) {
@@ -898,6 +1227,21 @@ NAN_METHOD (Zconfig::_at_depth) {
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }
+}
+
+NAN_METHOD (Zconfig::_set_comment) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zconfig_set_comment (zconfig->self, "%s", format);
 }
 
 NAN_METHOD (Zconfig::_comments) {
@@ -1013,6 +1357,23 @@ NAN_METHOD (Zconfig::_has_changed) {
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
+NAN_METHOD (Zconfig::_print) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zconfig_print (zconfig->self);
+}
+
+NAN_METHOD (Zconfig::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zconfig_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zconfig::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -1030,9 +1391,11 @@ NAN_MODULE_INIT (Zdigest::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "update", _update);
     Nan::SetPrototypeMethod (tpl, "data", _data);
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "string", _string);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zdigest").ToLocalChecked (),
@@ -1070,6 +1433,16 @@ NAN_METHOD (Zdigest::defined) {
     info.GetReturnValue ().Set (Nan::New (zdigest->self != NULL));
 }
 
+NAN_METHOD (Zdigest::_update) {
+    Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *buffer = (const byte *) node::Buffer::Data (buffer_node);
+    size_t length = node::Buffer::Length (buffer_node);
+    zdigest_update (zdigest->self, (const byte *)buffer, (size_t) length);
+}
+
 NAN_METHOD (Zdigest::_data) {
     Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
     const char *result = (const char *) zdigest_data (zdigest->self);
@@ -1086,6 +1459,18 @@ NAN_METHOD (Zdigest::_string) {
     Zdigest *zdigest = Nan::ObjectWrap::Unwrap <Zdigest> (info.Holder ());
     char *result = (char *) zdigest_string (zdigest->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zdigest::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zdigest_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zdigest::constructor () {
@@ -1110,9 +1495,12 @@ NAN_MODULE_INIT (Zdir::Init) {
     Nan::SetPrototypeMethod (tpl, "cursize", _cursize);
     Nan::SetPrototypeMethod (tpl, "count", _count);
     Nan::SetPrototypeMethod (tpl, "list", _list);
+    Nan::SetPrototypeMethod (tpl, "remove", _remove);
     Nan::SetPrototypeMethod (tpl, "diff", _diff);
     Nan::SetPrototypeMethod (tpl, "resync", _resync);
     Nan::SetPrototypeMethod (tpl, "cache", _cache);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zdir").ToLocalChecked (),
@@ -1206,6 +1594,19 @@ NAN_METHOD (Zdir::_list) {
     }
 }
 
+NAN_METHOD (Zdir::_remove) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `force`");
+
+    bool force;
+    if (info [0]->IsBoolean ())
+        force = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`force` must be a Boolean");
+    zdir_remove (zdir->self, (bool) force);
+}
+
 NAN_METHOD (Zdir::_diff) {
     Zdir *older = Nan::ObjectWrap::Unwrap<Zdir>(info [0].As<Object>());
     Zdir *newer = Nan::ObjectWrap::Unwrap<Zdir>(info [1].As<Object>());
@@ -1263,6 +1664,31 @@ NAN_METHOD (Zdir::_cache) {
     }
 }
 
+NAN_METHOD (Zdir::_print) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `indent`");
+
+    int indent;
+    if (info [0]->IsNumber ())
+        indent = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`indent` must be a number");
+    zdir_print (zdir->self, (int) indent);
+}
+
+NAN_METHOD (Zdir::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zdir_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zdir::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -1285,7 +1711,9 @@ NAN_MODULE_INIT (ZdirPatch::Init) {
     Nan::SetPrototypeMethod (tpl, "file", _file);
     Nan::SetPrototypeMethod (tpl, "op", _op);
     Nan::SetPrototypeMethod (tpl, "vpath", _vpath);
+    Nan::SetPrototypeMethod (tpl, "digestSet", _digest_set);
     Nan::SetPrototypeMethod (tpl, "digest", _digest);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("ZdirPatch").ToLocalChecked (),
@@ -1394,10 +1822,27 @@ NAN_METHOD (ZdirPatch::_vpath) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (ZdirPatch::_digest_set) {
+    ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
+    zdir_patch_digest_set (zdir_patch->self);
+}
+
 NAN_METHOD (ZdirPatch::_digest) {
     ZdirPatch *zdir_patch = Nan::ObjectWrap::Unwrap <ZdirPatch> (info.Holder ());
     char *result = (char *) zdir_patch_digest (zdir_patch->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZdirPatch::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zdir_patch_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &ZdirPatch::constructor () {
@@ -1419,6 +1864,7 @@ NAN_MODULE_INIT (Zfile::Init) {
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "filename", _filename);
+    Nan::SetPrototypeMethod (tpl, "restat", _restat);
     Nan::SetPrototypeMethod (tpl, "modified", _modified);
     Nan::SetPrototypeMethod (tpl, "cursize", _cursize);
     Nan::SetPrototypeMethod (tpl, "isDirectory", _is_directory);
@@ -1427,13 +1873,16 @@ NAN_MODULE_INIT (Zfile::Init) {
     Nan::SetPrototypeMethod (tpl, "isWriteable", _is_writeable);
     Nan::SetPrototypeMethod (tpl, "isStable", _is_stable);
     Nan::SetPrototypeMethod (tpl, "hasChanged", _has_changed);
+    Nan::SetPrototypeMethod (tpl, "remove", _remove);
     Nan::SetPrototypeMethod (tpl, "input", _input);
     Nan::SetPrototypeMethod (tpl, "output", _output);
     Nan::SetPrototypeMethod (tpl, "read", _read);
     Nan::SetPrototypeMethod (tpl, "eof", _eof);
     Nan::SetPrototypeMethod (tpl, "write", _write);
     Nan::SetPrototypeMethod (tpl, "readln", _readln);
+    Nan::SetPrototypeMethod (tpl, "close", _close);
     Nan::SetPrototypeMethod (tpl, "digest", _digest);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zfile").ToLocalChecked (),
@@ -1519,6 +1968,11 @@ NAN_METHOD (Zfile::_filename) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zfile::_restat) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    zfile_restat (zfile->self);
+}
+
 NAN_METHOD (Zfile::_modified) {
     Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
     time_t result = zfile_modified (zfile->self);
@@ -1565,6 +2019,11 @@ NAN_METHOD (Zfile::_has_changed) {
     Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
     bool result = zfile_has_changed (zfile->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zfile::_remove) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    zfile_remove (zfile->self);
 }
 
 NAN_METHOD (Zfile::_input) {
@@ -1632,10 +2091,27 @@ NAN_METHOD (Zfile::_readln) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zfile::_close) {
+    Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
+    zfile_close (zfile->self);
+}
+
 NAN_METHOD (Zfile::_digest) {
     Zfile *zfile = Nan::ObjectWrap::Unwrap <Zfile> (info.Holder ());
     char *result = (char *) zfile_digest (zfile->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zfile::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zfile_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zfile::constructor () {
@@ -1663,10 +2139,15 @@ NAN_MODULE_INIT (Zframe::Init) {
     Nan::SetPrototypeMethod (tpl, "strdup", _strdup);
     Nan::SetPrototypeMethod (tpl, "streq", _streq);
     Nan::SetPrototypeMethod (tpl, "more", _more);
+    Nan::SetPrototypeMethod (tpl, "setMore", _set_more);
     Nan::SetPrototypeMethod (tpl, "routingId", _routing_id);
+    Nan::SetPrototypeMethod (tpl, "setRoutingId", _set_routing_id);
     Nan::SetPrototypeMethod (tpl, "group", _group);
     Nan::SetPrototypeMethod (tpl, "setGroup", _set_group);
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
+    Nan::SetPrototypeMethod (tpl, "reset", _reset);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zframe").ToLocalChecked (),
@@ -1782,10 +2263,36 @@ NAN_METHOD (Zframe::_more) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zframe::_set_more) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `more`");
+
+    int more;
+    if (info [0]->IsNumber ())
+        more = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`more` must be a number");
+    zframe_set_more (zframe->self, (int) more);
+}
+
 NAN_METHOD (Zframe::_routing_id) {
     Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
     uint32_t result = zframe_routing_id (zframe->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zframe::_set_routing_id) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `routing id`");
+
+    uint32_t routing_id;
+    if (info [0]->IsNumber ())
+        routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`routing id` must be a number");
+    zframe_set_routing_id (zframe->self, (uint32_t) routing_id);
 }
 
 NAN_METHOD (Zframe::_group) {
@@ -1817,6 +2324,43 @@ NAN_METHOD (Zframe::_eq) {
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
+NAN_METHOD (Zframe::_reset) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
+    size_t size = node::Buffer::Length (buffer_node);
+    zframe_reset (zframe->self, (const void *)data, (size_t) size);
+}
+
+NAN_METHOD (Zframe::_print) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *prefix;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `prefix`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`prefix` must be a string");
+    else {
+        Nan::Utf8String prefix_utf8 (info [0].As<String>());
+        prefix = *prefix_utf8;
+    }
+    zframe_print (zframe->self, (const char *)prefix);
+}
+
+NAN_METHOD (Zframe::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zframe_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zframe::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -1834,15 +2378,19 @@ NAN_MODULE_INIT (Zhash::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "delete", _delete);
     Nan::SetPrototypeMethod (tpl, "rename", _rename);
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "keys", _keys);
     Nan::SetPrototypeMethod (tpl, "cursor", _cursor);
+    Nan::SetPrototypeMethod (tpl, "comment", _comment);
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
     Nan::SetPrototypeMethod (tpl, "save", _save);
     Nan::SetPrototypeMethod (tpl, "load", _load);
     Nan::SetPrototypeMethod (tpl, "refresh", _refresh);
+    Nan::SetPrototypeMethod (tpl, "autofree", _autofree);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zhash").ToLocalChecked (),
@@ -1878,6 +2426,21 @@ NAN_METHOD (Zhash::destroy) {
 NAN_METHOD (Zhash::defined) {
     Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zhash->self != NULL));
+}
+
+NAN_METHOD (Zhash::_delete) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    char *key;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `key`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`key` must be a string");
+    else {
+        Nan::Utf8String key_utf8 (info [0].As<String>());
+        key = *key_utf8;
+    }
+    zhash_delete (zhash->self, (const char *)key);
 }
 
 NAN_METHOD (Zhash::_rename) {
@@ -1942,6 +2505,21 @@ NAN_METHOD (Zhash::_cursor) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zhash::_comment) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zhash_comment (zhash->self, "%s", format);
+}
+
 NAN_METHOD (Zhash::_pack) {
     Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
     zframe_t *result = zhash_pack (zhash->self);
@@ -1992,6 +2570,23 @@ NAN_METHOD (Zhash::_refresh) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zhash::_autofree) {
+    Zhash *zhash = Nan::ObjectWrap::Unwrap <Zhash> (info.Holder ());
+    zhash_autofree (zhash->self);
+}
+
+NAN_METHOD (Zhash::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhash_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zhash::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -2009,15 +2604,19 @@ NAN_MODULE_INIT (Zhashx::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "purge", _purge);
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "keys", _keys);
     Nan::SetPrototypeMethod (tpl, "values", _values);
+    Nan::SetPrototypeMethod (tpl, "comment", _comment);
     Nan::SetPrototypeMethod (tpl, "save", _save);
     Nan::SetPrototypeMethod (tpl, "load", _load);
     Nan::SetPrototypeMethod (tpl, "refresh", _refresh);
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "dupV2", _dup_v2);
+    Nan::SetPrototypeMethod (tpl, "autofree", _autofree);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zhashx").ToLocalChecked (),
@@ -2055,6 +2654,11 @@ NAN_METHOD (Zhashx::defined) {
     info.GetReturnValue ().Set (Nan::New (zhashx->self != NULL));
 }
 
+NAN_METHOD (Zhashx::_purge) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zhashx_purge (zhashx->self);
+}
+
 NAN_METHOD (Zhashx::_size) {
     Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
     size_t result = zhashx_size (zhashx->self);
@@ -2083,6 +2687,21 @@ NAN_METHOD (Zhashx::_values) {
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }
+}
+
+NAN_METHOD (Zhashx::_comment) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zhashx_comment (zhashx->self, "%s", format);
 }
 
 NAN_METHOD (Zhashx::_save) {
@@ -2159,6 +2778,23 @@ NAN_METHOD (Zhashx::_dup_v2) {
     }
 }
 
+NAN_METHOD (Zhashx::_autofree) {
+    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
+    zhashx_autofree (zhashx->self);
+}
+
+NAN_METHOD (Zhashx::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhashx_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zhashx::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -2176,12 +2812,15 @@ NAN_MODULE_INIT (Ziflist::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "reload", _reload);
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "first", _first);
     Nan::SetPrototypeMethod (tpl, "next", _next);
     Nan::SetPrototypeMethod (tpl, "address", _address);
     Nan::SetPrototypeMethod (tpl, "broadcast", _broadcast);
     Nan::SetPrototypeMethod (tpl, "netmask", _netmask);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Ziflist").ToLocalChecked (),
@@ -2217,6 +2856,11 @@ NAN_METHOD (Ziflist::destroy) {
 NAN_METHOD (Ziflist::defined) {
     Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (ziflist->self != NULL));
+}
+
+NAN_METHOD (Ziflist::_reload) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    ziflist_reload (ziflist->self);
 }
 
 NAN_METHOD (Ziflist::_size) {
@@ -2255,6 +2899,23 @@ NAN_METHOD (Ziflist::_netmask) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Ziflist::_print) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    ziflist_print (ziflist->self);
+}
+
+NAN_METHOD (Ziflist::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    ziflist_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Ziflist::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -2273,7 +2934,10 @@ NAN_MODULE_INIT (Zlist::Init) {
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "purge", _purge);
     Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "autofree", _autofree);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zlist").ToLocalChecked (),
@@ -2323,10 +2987,32 @@ NAN_METHOD (Zlist::_dup) {
     }
 }
 
+NAN_METHOD (Zlist::_purge) {
+    Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
+    zlist_purge (zlist->self);
+}
+
 NAN_METHOD (Zlist::_size) {
     Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
     size_t result = zlist_size (zlist->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zlist::_autofree) {
+    Zlist *zlist = Nan::ObjectWrap::Unwrap <Zlist> (info.Holder ());
+    zlist_autofree (zlist->self);
+}
+
+NAN_METHOD (Zlist::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zlist_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zlist::constructor () {
@@ -2347,7 +3033,10 @@ NAN_MODULE_INIT (Zlistx::Init) {
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "purge", _purge);
+    Nan::SetPrototypeMethod (tpl, "sort", _sort);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zlistx").ToLocalChecked (),
@@ -2391,6 +3080,16 @@ NAN_METHOD (Zlistx::_size) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zlistx::_purge) {
+    Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
+    zlistx_purge (zlistx->self);
+}
+
+NAN_METHOD (Zlistx::_sort) {
+    Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
+    zlistx_sort (zlistx->self);
+}
+
 NAN_METHOD (Zlistx::_dup) {
     Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
     zlistx_t *result = zlistx_dup (zlistx->self);
@@ -2401,6 +3100,18 @@ NAN_METHOD (Zlistx::_dup) {
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }
+}
+
+NAN_METHOD (Zlistx::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zlistx_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zlistx::constructor () {
@@ -2420,8 +3131,15 @@ NAN_MODULE_INIT (Zloop::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "readerEnd", _reader_end);
+    Nan::SetPrototypeMethod (tpl, "readerSetTolerant", _reader_set_tolerant);
     Nan::SetPrototypeMethod (tpl, "timerEnd", _timer_end);
+    Nan::SetPrototypeMethod (tpl, "setTicketDelay", _set_ticket_delay);
+    Nan::SetPrototypeMethod (tpl, "setMaxTimers", _set_max_timers);
+    Nan::SetPrototypeMethod (tpl, "setVerbose", _set_verbose);
+    Nan::SetPrototypeMethod (tpl, "setNonstop", _set_nonstop);
     Nan::SetPrototypeMethod (tpl, "start", _start);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zloop").ToLocalChecked (),
@@ -2459,6 +3177,18 @@ NAN_METHOD (Zloop::defined) {
     info.GetReturnValue ().Set (Nan::New (zloop->self != NULL));
 }
 
+NAN_METHOD (Zloop::_reader_end) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    Zsock *sock = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    zloop_reader_end (zloop->self, sock->self);
+}
+
+NAN_METHOD (Zloop::_reader_set_tolerant) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    Zsock *sock = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    zloop_reader_set_tolerant (zloop->self, sock->self);
+}
+
 NAN_METHOD (Zloop::_timer_end) {
     Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
     if (info [0]->IsUndefined ())
@@ -2473,10 +3203,70 @@ NAN_METHOD (Zloop::_timer_end) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zloop::_set_ticket_delay) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `ticket delay`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`ticket delay` must be a number");
+    size_t ticket_delay = Nan::To<int64_t>(info [0]).FromJust ();
+    zloop_set_ticket_delay (zloop->self, (size_t) ticket_delay);
+}
+
+NAN_METHOD (Zloop::_set_max_timers) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `max timers`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`max timers` must be a number");
+    size_t max_timers = Nan::To<int64_t>(info [0]).FromJust ();
+    zloop_set_max_timers (zloop->self, (size_t) max_timers);
+}
+
+NAN_METHOD (Zloop::_set_verbose) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zloop_set_verbose (zloop->self, (bool) verbose);
+}
+
+NAN_METHOD (Zloop::_set_nonstop) {
+    Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `nonstop`");
+
+    bool nonstop;
+    if (info [0]->IsBoolean ())
+        nonstop = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`nonstop` must be a Boolean");
+    zloop_set_nonstop (zloop->self, (bool) nonstop);
+}
+
 NAN_METHOD (Zloop::_start) {
     Zloop *zloop = Nan::ObjectWrap::Unwrap <Zloop> (info.Holder ());
     int result = zloop_start (zloop->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zloop::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zloop_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zloop::constructor () {
@@ -2501,6 +3291,7 @@ NAN_MODULE_INIT (Zmsg::Init) {
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "contentSize", _content_size);
     Nan::SetPrototypeMethod (tpl, "routingId", _routing_id);
+    Nan::SetPrototypeMethod (tpl, "setRoutingId", _set_routing_id);
     Nan::SetPrototypeMethod (tpl, "prepend", _prepend);
     Nan::SetPrototypeMethod (tpl, "append", _append);
     Nan::SetPrototypeMethod (tpl, "pop", _pop);
@@ -2513,13 +3304,16 @@ NAN_MODULE_INIT (Zmsg::Init) {
     Nan::SetPrototypeMethod (tpl, "popstr", _popstr);
     Nan::SetPrototypeMethod (tpl, "addmsg", _addmsg);
     Nan::SetPrototypeMethod (tpl, "popmsg", _popmsg);
+    Nan::SetPrototypeMethod (tpl, "remove", _remove);
     Nan::SetPrototypeMethod (tpl, "first", _first);
     Nan::SetPrototypeMethod (tpl, "next", _next);
     Nan::SetPrototypeMethod (tpl, "last", _last);
     Nan::SetPrototypeMethod (tpl, "encode", _encode);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
     Nan::SetPrototypeMethod (tpl, "signal", _signal);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zmsg").ToLocalChecked (),
@@ -2587,6 +3381,19 @@ NAN_METHOD (Zmsg::_routing_id) {
     Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
     uint32_t result = zmsg_routing_id (zmsg->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_set_routing_id) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `routing id`");
+
+    uint32_t routing_id;
+    if (info [0]->IsNumber ())
+        routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`routing id` must be a number");
+    zmsg_set_routing_id (zmsg->self, (uint32_t) routing_id);
 }
 
 NAN_METHOD (Zmsg::_prepend) {
@@ -2726,6 +3533,12 @@ NAN_METHOD (Zmsg::_popmsg) {
     }
 }
 
+NAN_METHOD (Zmsg::_remove) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    Zframe *frame = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    zmsg_remove (zmsg->self, frame->self);
+}
+
 NAN_METHOD (Zmsg::_first) {
     Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
     zframe_t *result = zmsg_first (zmsg->self);
@@ -2786,6 +3599,11 @@ NAN_METHOD (Zmsg::_dup) {
     }
 }
 
+NAN_METHOD (Zmsg::_print) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    zmsg_print (zmsg->self);
+}
+
 NAN_METHOD (Zmsg::_eq) {
     Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
     Zmsg *other = Nan::ObjectWrap::Unwrap<Zmsg>(info [0].As<Object>());
@@ -2797,6 +3615,18 @@ NAN_METHOD (Zmsg::_signal) {
     Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
     int result = zmsg_signal (zmsg->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zmsg::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zmsg_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zmsg::constructor () {
@@ -2817,8 +3647,10 @@ NAN_MODULE_INIT (Zpoller::Init) {
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "add", _add);
+    Nan::SetPrototypeMethod (tpl, "setNonstop", _set_nonstop);
     Nan::SetPrototypeMethod (tpl, "expired", _expired);
     Nan::SetPrototypeMethod (tpl, "terminated", _terminated);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zpoller").ToLocalChecked (),
@@ -2864,6 +3696,19 @@ NAN_METHOD (Zpoller::_add) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zpoller::_set_nonstop) {
+    Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `nonstop`");
+
+    bool nonstop;
+    if (info [0]->IsBoolean ())
+        nonstop = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`nonstop` must be a Boolean");
+    zpoller_set_nonstop (zpoller->self, (bool) nonstop);
+}
+
 NAN_METHOD (Zpoller::_expired) {
     Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
     bool result = zpoller_expired (zpoller->self);
@@ -2874,6 +3719,18 @@ NAN_METHOD (Zpoller::_terminated) {
     Zpoller *zpoller = Nan::ObjectWrap::Unwrap <Zpoller> (info.Holder ());
     bool result = zpoller_terminated (zpoller->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zpoller::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zpoller_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zpoller::constructor () {
@@ -2895,7 +3752,21 @@ NAN_MODULE_INIT (Zproc::Init) {
     Nan::SetPrototypeMethod (tpl, "interrupted", _interrupted);
     Nan::SetPrototypeMethod (tpl, "hasCurve", _has_curve);
     Nan::SetPrototypeMethod (tpl, "hostname", _hostname);
+    Nan::SetPrototypeMethod (tpl, "daemonize", _daemonize);
+    Nan::SetPrototypeMethod (tpl, "runAs", _run_as);
+    Nan::SetPrototypeMethod (tpl, "setIoThreads", _set_io_threads);
+    Nan::SetPrototypeMethod (tpl, "setMaxSockets", _set_max_sockets);
+    Nan::SetPrototypeMethod (tpl, "setBiface", _set_biface);
     Nan::SetPrototypeMethod (tpl, "biface", _biface);
+    Nan::SetPrototypeMethod (tpl, "setLogIdent", _set_log_ident);
+    Nan::SetPrototypeMethod (tpl, "setLogSender", _set_log_sender);
+    Nan::SetPrototypeMethod (tpl, "setLogSystem", _set_log_system);
+    Nan::SetPrototypeMethod (tpl, "logError", _log_error);
+    Nan::SetPrototypeMethod (tpl, "logWarning", _log_warning);
+    Nan::SetPrototypeMethod (tpl, "logNotice", _log_notice);
+    Nan::SetPrototypeMethod (tpl, "logInfo", _log_info);
+    Nan::SetPrototypeMethod (tpl, "logDebug", _log_debug);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zproc").ToLocalChecked (),
@@ -2937,9 +3808,213 @@ NAN_METHOD (Zproc::_hostname) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zproc::_daemonize) {
+    char *workdir;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `workdir`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`workdir` must be a string");
+    else {
+        Nan::Utf8String workdir_utf8 (info [0].As<String>());
+        workdir = *workdir_utf8;
+    }
+    zproc_daemonize ((const char *)workdir);
+}
+
+NAN_METHOD (Zproc::_run_as) {
+    char *lockfile;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `lockfile`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`lockfile` must be a string");
+    else {
+        Nan::Utf8String lockfile_utf8 (info [0].As<String>());
+        lockfile = *lockfile_utf8;
+    }
+    char *group;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `group`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`group` must be a string");
+    else {
+        Nan::Utf8String group_utf8 (info [1].As<String>());
+        group = *group_utf8;
+    }
+    char *user;
+    if (info [2]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `user`");
+    else
+    if (!info [2]->IsString ())
+        return Nan::ThrowTypeError ("`user` must be a string");
+    else {
+        Nan::Utf8String user_utf8 (info [2].As<String>());
+        user = *user_utf8;
+    }
+    zproc_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
+}
+
+NAN_METHOD (Zproc::_set_io_threads) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `io_threads`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`io_threads` must be a number");
+    size_t io_threads = Nan::To<int64_t>(info [0]).FromJust ();
+    zproc_set_io_threads ((size_t) io_threads);
+}
+
+NAN_METHOD (Zproc::_set_max_sockets) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `max_sockets`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`max_sockets` must be a number");
+    size_t max_sockets = Nan::To<int64_t>(info [0]).FromJust ();
+    zproc_set_max_sockets ((size_t) max_sockets);
+}
+
+NAN_METHOD (Zproc::_set_biface) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    else {
+        Nan::Utf8String value_utf8 (info [0].As<String>());
+        value = *value_utf8;
+    }
+    zproc_set_biface ((const char *)value);
+}
+
 NAN_METHOD (Zproc::_biface) {
     char *result = (char *) zproc_biface ();
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zproc::_set_log_ident) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    else {
+        Nan::Utf8String value_utf8 (info [0].As<String>());
+        value = *value_utf8;
+    }
+    zproc_set_log_ident ((const char *)value);
+}
+
+NAN_METHOD (Zproc::_set_log_sender) {
+    char *endpoint;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `endpoint`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`endpoint` must be a string");
+    else {
+        Nan::Utf8String endpoint_utf8 (info [0].As<String>());
+        endpoint = *endpoint_utf8;
+    }
+    zproc_set_log_sender ((const char *)endpoint);
+}
+
+NAN_METHOD (Zproc::_set_log_system) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `logsystem`");
+
+    bool logsystem;
+    if (info [0]->IsBoolean ())
+        logsystem = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`logsystem` must be a Boolean");
+    zproc_set_log_system ((bool) logsystem);
+}
+
+NAN_METHOD (Zproc::_log_error) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zproc_log_error ("%s", format);
+}
+
+NAN_METHOD (Zproc::_log_warning) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zproc_log_warning ("%s", format);
+}
+
+NAN_METHOD (Zproc::_log_notice) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zproc_log_notice ("%s", format);
+}
+
+NAN_METHOD (Zproc::_log_info) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zproc_log_info ("%s", format);
+}
+
+NAN_METHOD (Zproc::_log_debug) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zproc_log_debug ("%s", format);
+}
+
+NAN_METHOD (Zproc::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zproc_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zproc::constructor () {
@@ -2971,55 +4046,114 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "bsend", _bsend);
     Nan::SetPrototypeMethod (tpl, "brecv", _brecv);
     Nan::SetPrototypeMethod (tpl, "routingId", _routing_id);
+    Nan::SetPrototypeMethod (tpl, "setRoutingId", _set_routing_id);
+    Nan::SetPrototypeMethod (tpl, "setUnbounded", _set_unbounded);
     Nan::SetPrototypeMethod (tpl, "wait", _wait);
+    Nan::SetPrototypeMethod (tpl, "flush", _flush);
     Nan::SetPrototypeMethod (tpl, "join", _join);
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
     Nan::SetPrototypeMethod (tpl, "heartbeatIvl", _heartbeat_ivl);
+    Nan::SetPrototypeMethod (tpl, "setHeartbeatIvl", _set_heartbeat_ivl);
     Nan::SetPrototypeMethod (tpl, "heartbeatTtl", _heartbeat_ttl);
+    Nan::SetPrototypeMethod (tpl, "setHeartbeatTtl", _set_heartbeat_ttl);
     Nan::SetPrototypeMethod (tpl, "heartbeatTimeout", _heartbeat_timeout);
+    Nan::SetPrototypeMethod (tpl, "setHeartbeatTimeout", _set_heartbeat_timeout);
     Nan::SetPrototypeMethod (tpl, "useFd", _use_fd);
+    Nan::SetPrototypeMethod (tpl, "setUseFd", _set_use_fd);
     Nan::SetPrototypeMethod (tpl, "tos", _tos);
+    Nan::SetPrototypeMethod (tpl, "setTos", _set_tos);
+    Nan::SetPrototypeMethod (tpl, "setRouterHandover", _set_router_handover);
+    Nan::SetPrototypeMethod (tpl, "setRouterMandatory", _set_router_mandatory);
+    Nan::SetPrototypeMethod (tpl, "setProbeRouter", _set_probe_router);
+    Nan::SetPrototypeMethod (tpl, "setReqRelaxed", _set_req_relaxed);
+    Nan::SetPrototypeMethod (tpl, "setReqCorrelate", _set_req_correlate);
+    Nan::SetPrototypeMethod (tpl, "setConflate", _set_conflate);
     Nan::SetPrototypeMethod (tpl, "zapDomain", _zap_domain);
+    Nan::SetPrototypeMethod (tpl, "setZapDomain", _set_zap_domain);
     Nan::SetPrototypeMethod (tpl, "mechanism", _mechanism);
     Nan::SetPrototypeMethod (tpl, "plainServer", _plain_server);
+    Nan::SetPrototypeMethod (tpl, "setPlainServer", _set_plain_server);
     Nan::SetPrototypeMethod (tpl, "plainUsername", _plain_username);
+    Nan::SetPrototypeMethod (tpl, "setPlainUsername", _set_plain_username);
     Nan::SetPrototypeMethod (tpl, "plainPassword", _plain_password);
+    Nan::SetPrototypeMethod (tpl, "setPlainPassword", _set_plain_password);
     Nan::SetPrototypeMethod (tpl, "curveServer", _curve_server);
+    Nan::SetPrototypeMethod (tpl, "setCurveServer", _set_curve_server);
     Nan::SetPrototypeMethod (tpl, "curvePublickey", _curve_publickey);
+    Nan::SetPrototypeMethod (tpl, "setCurvePublickey", _set_curve_publickey);
+    Nan::SetPrototypeMethod (tpl, "setCurvePublickeyBin", _set_curve_publickey_bin);
     Nan::SetPrototypeMethod (tpl, "curveSecretkey", _curve_secretkey);
+    Nan::SetPrototypeMethod (tpl, "setCurveSecretkey", _set_curve_secretkey);
+    Nan::SetPrototypeMethod (tpl, "setCurveSecretkeyBin", _set_curve_secretkey_bin);
     Nan::SetPrototypeMethod (tpl, "curveServerkey", _curve_serverkey);
+    Nan::SetPrototypeMethod (tpl, "setCurveServerkey", _set_curve_serverkey);
+    Nan::SetPrototypeMethod (tpl, "setCurveServerkeyBin", _set_curve_serverkey_bin);
     Nan::SetPrototypeMethod (tpl, "gssapiServer", _gssapi_server);
+    Nan::SetPrototypeMethod (tpl, "setGssapiServer", _set_gssapi_server);
     Nan::SetPrototypeMethod (tpl, "gssapiPlaintext", _gssapi_plaintext);
+    Nan::SetPrototypeMethod (tpl, "setGssapiPlaintext", _set_gssapi_plaintext);
     Nan::SetPrototypeMethod (tpl, "gssapiPrincipal", _gssapi_principal);
+    Nan::SetPrototypeMethod (tpl, "setGssapiPrincipal", _set_gssapi_principal);
     Nan::SetPrototypeMethod (tpl, "gssapiServicePrincipal", _gssapi_service_principal);
+    Nan::SetPrototypeMethod (tpl, "setGssapiServicePrincipal", _set_gssapi_service_principal);
     Nan::SetPrototypeMethod (tpl, "ipv6", _ipv6);
+    Nan::SetPrototypeMethod (tpl, "setIpv6", _set_ipv6);
     Nan::SetPrototypeMethod (tpl, "immediate", _immediate);
+    Nan::SetPrototypeMethod (tpl, "setImmediate", _set_immediate);
+    Nan::SetPrototypeMethod (tpl, "setRouterRaw", _set_router_raw);
     Nan::SetPrototypeMethod (tpl, "ipv4only", _ipv4only);
+    Nan::SetPrototypeMethod (tpl, "setIpv4only", _set_ipv4only);
+    Nan::SetPrototypeMethod (tpl, "setDelayAttachOnConnect", _set_delay_attach_on_connect);
     Nan::SetPrototypeMethod (tpl, "type", _type);
     Nan::SetPrototypeMethod (tpl, "sndhwm", _sndhwm);
+    Nan::SetPrototypeMethod (tpl, "setSndhwm", _set_sndhwm);
     Nan::SetPrototypeMethod (tpl, "rcvhwm", _rcvhwm);
+    Nan::SetPrototypeMethod (tpl, "setRcvhwm", _set_rcvhwm);
     Nan::SetPrototypeMethod (tpl, "affinity", _affinity);
+    Nan::SetPrototypeMethod (tpl, "setAffinity", _set_affinity);
+    Nan::SetPrototypeMethod (tpl, "setSubscribe", _set_subscribe);
+    Nan::SetPrototypeMethod (tpl, "setUnsubscribe", _set_unsubscribe);
     Nan::SetPrototypeMethod (tpl, "identity", _identity);
+    Nan::SetPrototypeMethod (tpl, "setIdentity", _set_identity);
     Nan::SetPrototypeMethod (tpl, "rate", _rate);
+    Nan::SetPrototypeMethod (tpl, "setRate", _set_rate);
     Nan::SetPrototypeMethod (tpl, "recoveryIvl", _recovery_ivl);
+    Nan::SetPrototypeMethod (tpl, "setRecoveryIvl", _set_recovery_ivl);
     Nan::SetPrototypeMethod (tpl, "sndbuf", _sndbuf);
+    Nan::SetPrototypeMethod (tpl, "setSndbuf", _set_sndbuf);
     Nan::SetPrototypeMethod (tpl, "rcvbuf", _rcvbuf);
+    Nan::SetPrototypeMethod (tpl, "setRcvbuf", _set_rcvbuf);
     Nan::SetPrototypeMethod (tpl, "linger", _linger);
+    Nan::SetPrototypeMethod (tpl, "setLinger", _set_linger);
     Nan::SetPrototypeMethod (tpl, "reconnectIvl", _reconnect_ivl);
+    Nan::SetPrototypeMethod (tpl, "setReconnectIvl", _set_reconnect_ivl);
     Nan::SetPrototypeMethod (tpl, "reconnectIvlMax", _reconnect_ivl_max);
+    Nan::SetPrototypeMethod (tpl, "setReconnectIvlMax", _set_reconnect_ivl_max);
     Nan::SetPrototypeMethod (tpl, "backlog", _backlog);
+    Nan::SetPrototypeMethod (tpl, "setBacklog", _set_backlog);
     Nan::SetPrototypeMethod (tpl, "maxmsgsize", _maxmsgsize);
+    Nan::SetPrototypeMethod (tpl, "setMaxmsgsize", _set_maxmsgsize);
     Nan::SetPrototypeMethod (tpl, "multicastHops", _multicast_hops);
+    Nan::SetPrototypeMethod (tpl, "setMulticastHops", _set_multicast_hops);
     Nan::SetPrototypeMethod (tpl, "rcvtimeo", _rcvtimeo);
+    Nan::SetPrototypeMethod (tpl, "setRcvtimeo", _set_rcvtimeo);
     Nan::SetPrototypeMethod (tpl, "sndtimeo", _sndtimeo);
+    Nan::SetPrototypeMethod (tpl, "setSndtimeo", _set_sndtimeo);
+    Nan::SetPrototypeMethod (tpl, "setXpubVerbose", _set_xpub_verbose);
     Nan::SetPrototypeMethod (tpl, "tcpKeepalive", _tcp_keepalive);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepalive", _set_tcp_keepalive);
     Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIdle", _tcp_keepalive_idle);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIdle", _set_tcp_keepalive_idle);
     Nan::SetPrototypeMethod (tpl, "tcpKeepaliveCnt", _tcp_keepalive_cnt);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveCnt", _set_tcp_keepalive_cnt);
     Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIntvl", _tcp_keepalive_intvl);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIntvl", _set_tcp_keepalive_intvl);
     Nan::SetPrototypeMethod (tpl, "tcpAcceptFilter", _tcp_accept_filter);
+    Nan::SetPrototypeMethod (tpl, "setTcpAcceptFilter", _set_tcp_accept_filter);
     Nan::SetPrototypeMethod (tpl, "rcvmore", _rcvmore);
     Nan::SetPrototypeMethod (tpl, "events", _events);
     Nan::SetPrototypeMethod (tpl, "lastEndpoint", _last_endpoint);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zsock").ToLocalChecked (),
@@ -3291,10 +4425,33 @@ NAN_METHOD (Zsock::_routing_id) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_routing_id) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `routing id`");
+
+    uint32_t routing_id;
+    if (info [0]->IsNumber ())
+        routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`routing id` must be a number");
+    zsock_set_routing_id (zsock->self, (uint32_t) routing_id);
+}
+
+NAN_METHOD (Zsock::_set_unbounded) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    zsock_set_unbounded (zsock->self);
+}
+
 NAN_METHOD (Zsock::_wait) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_wait (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_flush) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    zsock_flush (zsock->self);
 }
 
 NAN_METHOD (Zsock::_join) {
@@ -3335,10 +4492,36 @@ NAN_METHOD (Zsock::_heartbeat_ivl) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_heartbeat_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `heartbeat ivl`");
+
+    int heartbeat_ivl;
+    if (info [0]->IsNumber ())
+        heartbeat_ivl = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`heartbeat ivl` must be a number");
+    zsock_set_heartbeat_ivl (zsock->self, (int) heartbeat_ivl);
+}
+
 NAN_METHOD (Zsock::_heartbeat_ttl) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_heartbeat_ttl (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_heartbeat_ttl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `heartbeat ttl`");
+
+    int heartbeat_ttl;
+    if (info [0]->IsNumber ())
+        heartbeat_ttl = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`heartbeat ttl` must be a number");
+    zsock_set_heartbeat_ttl (zsock->self, (int) heartbeat_ttl);
 }
 
 NAN_METHOD (Zsock::_heartbeat_timeout) {
@@ -3347,10 +4530,36 @@ NAN_METHOD (Zsock::_heartbeat_timeout) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_heartbeat_timeout) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `heartbeat timeout`");
+
+    int heartbeat_timeout;
+    if (info [0]->IsNumber ())
+        heartbeat_timeout = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`heartbeat timeout` must be a number");
+    zsock_set_heartbeat_timeout (zsock->self, (int) heartbeat_timeout);
+}
+
 NAN_METHOD (Zsock::_use_fd) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_use_fd (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_use_fd) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `use fd`");
+
+    int use_fd;
+    if (info [0]->IsNumber ())
+        use_fd = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`use fd` must be a number");
+    zsock_set_use_fd (zsock->self, (int) use_fd);
 }
 
 NAN_METHOD (Zsock::_tos) {
@@ -3359,10 +4568,116 @@ NAN_METHOD (Zsock::_tos) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_tos) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tos`");
+
+    int tos;
+    if (info [0]->IsNumber ())
+        tos = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tos` must be a number");
+    zsock_set_tos (zsock->self, (int) tos);
+}
+
+NAN_METHOD (Zsock::_set_router_handover) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `router handover`");
+
+    int router_handover;
+    if (info [0]->IsNumber ())
+        router_handover = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`router handover` must be a number");
+    zsock_set_router_handover (zsock->self, (int) router_handover);
+}
+
+NAN_METHOD (Zsock::_set_router_mandatory) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `router mandatory`");
+
+    int router_mandatory;
+    if (info [0]->IsNumber ())
+        router_mandatory = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`router mandatory` must be a number");
+    zsock_set_router_mandatory (zsock->self, (int) router_mandatory);
+}
+
+NAN_METHOD (Zsock::_set_probe_router) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `probe router`");
+
+    int probe_router;
+    if (info [0]->IsNumber ())
+        probe_router = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`probe router` must be a number");
+    zsock_set_probe_router (zsock->self, (int) probe_router);
+}
+
+NAN_METHOD (Zsock::_set_req_relaxed) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `req relaxed`");
+
+    int req_relaxed;
+    if (info [0]->IsNumber ())
+        req_relaxed = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`req relaxed` must be a number");
+    zsock_set_req_relaxed (zsock->self, (int) req_relaxed);
+}
+
+NAN_METHOD (Zsock::_set_req_correlate) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `req correlate`");
+
+    int req_correlate;
+    if (info [0]->IsNumber ())
+        req_correlate = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`req correlate` must be a number");
+    zsock_set_req_correlate (zsock->self, (int) req_correlate);
+}
+
+NAN_METHOD (Zsock::_set_conflate) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `conflate`");
+
+    int conflate;
+    if (info [0]->IsNumber ())
+        conflate = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`conflate` must be a number");
+    zsock_set_conflate (zsock->self, (int) conflate);
+}
+
 NAN_METHOD (Zsock::_zap_domain) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_zap_domain (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_zap_domain) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *zap_domain;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `zap domain`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`zap domain` must be a string");
+    else {
+        Nan::Utf8String zap_domain_utf8 (info [0].As<String>());
+        zap_domain = *zap_domain_utf8;
+    }
+    zsock_set_zap_domain (zsock->self, (const char *)zap_domain);
 }
 
 NAN_METHOD (Zsock::_mechanism) {
@@ -3377,10 +4692,38 @@ NAN_METHOD (Zsock::_plain_server) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_plain_server) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `plain server`");
+
+    int plain_server;
+    if (info [0]->IsNumber ())
+        plain_server = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`plain server` must be a number");
+    zsock_set_plain_server (zsock->self, (int) plain_server);
+}
+
 NAN_METHOD (Zsock::_plain_username) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_plain_username (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_plain_username) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *plain_username;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `plain username`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`plain username` must be a string");
+    else {
+        Nan::Utf8String plain_username_utf8 (info [0].As<String>());
+        plain_username = *plain_username_utf8;
+    }
+    zsock_set_plain_username (zsock->self, (const char *)plain_username);
 }
 
 NAN_METHOD (Zsock::_plain_password) {
@@ -3389,10 +4732,38 @@ NAN_METHOD (Zsock::_plain_password) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zsock::_set_plain_password) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *plain_password;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `plain password`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`plain password` must be a string");
+    else {
+        Nan::Utf8String plain_password_utf8 (info [0].As<String>());
+        plain_password = *plain_password_utf8;
+    }
+    zsock_set_plain_password (zsock->self, (const char *)plain_password);
+}
+
 NAN_METHOD (Zsock::_curve_server) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_curve_server (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_curve_server) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `curve server`");
+
+    int curve_server;
+    if (info [0]->IsNumber ())
+        curve_server = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`curve server` must be a number");
+    zsock_set_curve_server (zsock->self, (int) curve_server);
 }
 
 NAN_METHOD (Zsock::_curve_publickey) {
@@ -3401,10 +4772,58 @@ NAN_METHOD (Zsock::_curve_publickey) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zsock::_set_curve_publickey) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *curve_publickey;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `curve publickey`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`curve publickey` must be a string");
+    else {
+        Nan::Utf8String curve_publickey_utf8 (info [0].As<String>());
+        curve_publickey = *curve_publickey_utf8;
+    }
+    zsock_set_curve_publickey (zsock->self, (const char *)curve_publickey);
+}
+
+NAN_METHOD (Zsock::_set_curve_publickey_bin) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *curve_publickey = (const byte *) node::Buffer::Data (buffer_node);
+    zsock_set_curve_publickey_bin (zsock->self, (const byte *)curve_publickey);
+}
+
 NAN_METHOD (Zsock::_curve_secretkey) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_curve_secretkey (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_curve_secretkey) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *curve_secretkey;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `curve secretkey`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`curve secretkey` must be a string");
+    else {
+        Nan::Utf8String curve_secretkey_utf8 (info [0].As<String>());
+        curve_secretkey = *curve_secretkey_utf8;
+    }
+    zsock_set_curve_secretkey (zsock->self, (const char *)curve_secretkey);
+}
+
+NAN_METHOD (Zsock::_set_curve_secretkey_bin) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *curve_secretkey = (const byte *) node::Buffer::Data (buffer_node);
+    zsock_set_curve_secretkey_bin (zsock->self, (const byte *)curve_secretkey);
 }
 
 NAN_METHOD (Zsock::_curve_serverkey) {
@@ -3413,10 +4832,47 @@ NAN_METHOD (Zsock::_curve_serverkey) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zsock::_set_curve_serverkey) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *curve_serverkey;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `curve serverkey`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`curve serverkey` must be a string");
+    else {
+        Nan::Utf8String curve_serverkey_utf8 (info [0].As<String>());
+        curve_serverkey = *curve_serverkey_utf8;
+    }
+    zsock_set_curve_serverkey (zsock->self, (const char *)curve_serverkey);
+}
+
+NAN_METHOD (Zsock::_set_curve_serverkey_bin) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *curve_serverkey = (const byte *) node::Buffer::Data (buffer_node);
+    zsock_set_curve_serverkey_bin (zsock->self, (const byte *)curve_serverkey);
+}
+
 NAN_METHOD (Zsock::_gssapi_server) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_gssapi_server (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_gssapi_server) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `gssapi server`");
+
+    int gssapi_server;
+    if (info [0]->IsNumber ())
+        gssapi_server = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`gssapi server` must be a number");
+    zsock_set_gssapi_server (zsock->self, (int) gssapi_server);
 }
 
 NAN_METHOD (Zsock::_gssapi_plaintext) {
@@ -3425,10 +4881,38 @@ NAN_METHOD (Zsock::_gssapi_plaintext) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_gssapi_plaintext) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `gssapi plaintext`");
+
+    int gssapi_plaintext;
+    if (info [0]->IsNumber ())
+        gssapi_plaintext = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`gssapi plaintext` must be a number");
+    zsock_set_gssapi_plaintext (zsock->self, (int) gssapi_plaintext);
+}
+
 NAN_METHOD (Zsock::_gssapi_principal) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_gssapi_principal (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_gssapi_principal) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *gssapi_principal;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `gssapi principal`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`gssapi principal` must be a string");
+    else {
+        Nan::Utf8String gssapi_principal_utf8 (info [0].As<String>());
+        gssapi_principal = *gssapi_principal_utf8;
+    }
+    zsock_set_gssapi_principal (zsock->self, (const char *)gssapi_principal);
 }
 
 NAN_METHOD (Zsock::_gssapi_service_principal) {
@@ -3437,10 +4921,38 @@ NAN_METHOD (Zsock::_gssapi_service_principal) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zsock::_set_gssapi_service_principal) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *gssapi_service_principal;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `gssapi service principal`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`gssapi service principal` must be a string");
+    else {
+        Nan::Utf8String gssapi_service_principal_utf8 (info [0].As<String>());
+        gssapi_service_principal = *gssapi_service_principal_utf8;
+    }
+    zsock_set_gssapi_service_principal (zsock->self, (const char *)gssapi_service_principal);
+}
+
 NAN_METHOD (Zsock::_ipv6) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_ipv6 (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_ipv6) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `ipv6`");
+
+    int ipv6;
+    if (info [0]->IsNumber ())
+        ipv6 = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`ipv6` must be a number");
+    zsock_set_ipv6 (zsock->self, (int) ipv6);
 }
 
 NAN_METHOD (Zsock::_immediate) {
@@ -3449,10 +4961,62 @@ NAN_METHOD (Zsock::_immediate) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_immediate) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `immediate`");
+
+    int immediate;
+    if (info [0]->IsNumber ())
+        immediate = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`immediate` must be a number");
+    zsock_set_immediate (zsock->self, (int) immediate);
+}
+
+NAN_METHOD (Zsock::_set_router_raw) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `router raw`");
+
+    int router_raw;
+    if (info [0]->IsNumber ())
+        router_raw = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`router raw` must be a number");
+    zsock_set_router_raw (zsock->self, (int) router_raw);
+}
+
 NAN_METHOD (Zsock::_ipv4only) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_ipv4only (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_ipv4only) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `ipv4only`");
+
+    int ipv4only;
+    if (info [0]->IsNumber ())
+        ipv4only = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`ipv4only` must be a number");
+    zsock_set_ipv4only (zsock->self, (int) ipv4only);
+}
+
+NAN_METHOD (Zsock::_set_delay_attach_on_connect) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `delay attach on connect`");
+
+    int delay_attach_on_connect;
+    if (info [0]->IsNumber ())
+        delay_attach_on_connect = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`delay attach on connect` must be a number");
+    zsock_set_delay_attach_on_connect (zsock->self, (int) delay_attach_on_connect);
 }
 
 NAN_METHOD (Zsock::_type) {
@@ -3467,10 +5031,36 @@ NAN_METHOD (Zsock::_sndhwm) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_sndhwm) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `sndhwm`");
+
+    int sndhwm;
+    if (info [0]->IsNumber ())
+        sndhwm = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`sndhwm` must be a number");
+    zsock_set_sndhwm (zsock->self, (int) sndhwm);
+}
+
 NAN_METHOD (Zsock::_rcvhwm) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_rcvhwm (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_rcvhwm) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `rcvhwm`");
+
+    int rcvhwm;
+    if (info [0]->IsNumber ())
+        rcvhwm = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`rcvhwm` must be a number");
+    zsock_set_rcvhwm (zsock->self, (int) rcvhwm);
 }
 
 NAN_METHOD (Zsock::_affinity) {
@@ -3479,10 +5069,68 @@ NAN_METHOD (Zsock::_affinity) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_affinity) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `affinity`");
+
+    int affinity;
+    if (info [0]->IsNumber ())
+        affinity = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`affinity` must be a number");
+    zsock_set_affinity (zsock->self, (int) affinity);
+}
+
+NAN_METHOD (Zsock::_set_subscribe) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *subscribe;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `subscribe`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`subscribe` must be a string");
+    else {
+        Nan::Utf8String subscribe_utf8 (info [0].As<String>());
+        subscribe = *subscribe_utf8;
+    }
+    zsock_set_subscribe (zsock->self, (const char *)subscribe);
+}
+
+NAN_METHOD (Zsock::_set_unsubscribe) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *unsubscribe;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `unsubscribe`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`unsubscribe` must be a string");
+    else {
+        Nan::Utf8String unsubscribe_utf8 (info [0].As<String>());
+        unsubscribe = *unsubscribe_utf8;
+    }
+    zsock_set_unsubscribe (zsock->self, (const char *)unsubscribe);
+}
+
 NAN_METHOD (Zsock::_identity) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_identity (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_identity) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *identity;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `identity`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`identity` must be a string");
+    else {
+        Nan::Utf8String identity_utf8 (info [0].As<String>());
+        identity = *identity_utf8;
+    }
+    zsock_set_identity (zsock->self, (const char *)identity);
 }
 
 NAN_METHOD (Zsock::_rate) {
@@ -3491,10 +5139,36 @@ NAN_METHOD (Zsock::_rate) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_rate) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `rate`");
+
+    int rate;
+    if (info [0]->IsNumber ())
+        rate = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`rate` must be a number");
+    zsock_set_rate (zsock->self, (int) rate);
+}
+
 NAN_METHOD (Zsock::_recovery_ivl) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_recovery_ivl (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_recovery_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `recovery ivl`");
+
+    int recovery_ivl;
+    if (info [0]->IsNumber ())
+        recovery_ivl = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`recovery ivl` must be a number");
+    zsock_set_recovery_ivl (zsock->self, (int) recovery_ivl);
 }
 
 NAN_METHOD (Zsock::_sndbuf) {
@@ -3503,10 +5177,36 @@ NAN_METHOD (Zsock::_sndbuf) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_sndbuf) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `sndbuf`");
+
+    int sndbuf;
+    if (info [0]->IsNumber ())
+        sndbuf = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`sndbuf` must be a number");
+    zsock_set_sndbuf (zsock->self, (int) sndbuf);
+}
+
 NAN_METHOD (Zsock::_rcvbuf) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_rcvbuf (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_rcvbuf) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `rcvbuf`");
+
+    int rcvbuf;
+    if (info [0]->IsNumber ())
+        rcvbuf = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`rcvbuf` must be a number");
+    zsock_set_rcvbuf (zsock->self, (int) rcvbuf);
 }
 
 NAN_METHOD (Zsock::_linger) {
@@ -3515,10 +5215,36 @@ NAN_METHOD (Zsock::_linger) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_linger) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `linger`");
+
+    int linger;
+    if (info [0]->IsNumber ())
+        linger = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`linger` must be a number");
+    zsock_set_linger (zsock->self, (int) linger);
+}
+
 NAN_METHOD (Zsock::_reconnect_ivl) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_reconnect_ivl (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_reconnect_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `reconnect ivl`");
+
+    int reconnect_ivl;
+    if (info [0]->IsNumber ())
+        reconnect_ivl = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`reconnect ivl` must be a number");
+    zsock_set_reconnect_ivl (zsock->self, (int) reconnect_ivl);
 }
 
 NAN_METHOD (Zsock::_reconnect_ivl_max) {
@@ -3527,10 +5253,36 @@ NAN_METHOD (Zsock::_reconnect_ivl_max) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_reconnect_ivl_max) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `reconnect ivl max`");
+
+    int reconnect_ivl_max;
+    if (info [0]->IsNumber ())
+        reconnect_ivl_max = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`reconnect ivl max` must be a number");
+    zsock_set_reconnect_ivl_max (zsock->self, (int) reconnect_ivl_max);
+}
+
 NAN_METHOD (Zsock::_backlog) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_backlog (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_backlog) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `backlog`");
+
+    int backlog;
+    if (info [0]->IsNumber ())
+        backlog = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`backlog` must be a number");
+    zsock_set_backlog (zsock->self, (int) backlog);
 }
 
 NAN_METHOD (Zsock::_maxmsgsize) {
@@ -3539,10 +5291,36 @@ NAN_METHOD (Zsock::_maxmsgsize) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_maxmsgsize) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `maxmsgsize`");
+
+    int maxmsgsize;
+    if (info [0]->IsNumber ())
+        maxmsgsize = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`maxmsgsize` must be a number");
+    zsock_set_maxmsgsize (zsock->self, (int) maxmsgsize);
+}
+
 NAN_METHOD (Zsock::_multicast_hops) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_multicast_hops (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_multicast_hops) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `multicast hops`");
+
+    int multicast_hops;
+    if (info [0]->IsNumber ())
+        multicast_hops = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`multicast hops` must be a number");
+    zsock_set_multicast_hops (zsock->self, (int) multicast_hops);
 }
 
 NAN_METHOD (Zsock::_rcvtimeo) {
@@ -3551,10 +5329,49 @@ NAN_METHOD (Zsock::_rcvtimeo) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_rcvtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `rcvtimeo`");
+
+    int rcvtimeo;
+    if (info [0]->IsNumber ())
+        rcvtimeo = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`rcvtimeo` must be a number");
+    zsock_set_rcvtimeo (zsock->self, (int) rcvtimeo);
+}
+
 NAN_METHOD (Zsock::_sndtimeo) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_sndtimeo (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_sndtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `sndtimeo`");
+
+    int sndtimeo;
+    if (info [0]->IsNumber ())
+        sndtimeo = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`sndtimeo` must be a number");
+    zsock_set_sndtimeo (zsock->self, (int) sndtimeo);
+}
+
+NAN_METHOD (Zsock::_set_xpub_verbose) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `xpub verbose`");
+
+    int xpub_verbose;
+    if (info [0]->IsNumber ())
+        xpub_verbose = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`xpub verbose` must be a number");
+    zsock_set_xpub_verbose (zsock->self, (int) xpub_verbose);
 }
 
 NAN_METHOD (Zsock::_tcp_keepalive) {
@@ -3563,10 +5380,36 @@ NAN_METHOD (Zsock::_tcp_keepalive) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_tcp_keepalive) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive`");
+
+    int tcp_keepalive;
+    if (info [0]->IsNumber ())
+        tcp_keepalive = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive` must be a number");
+    zsock_set_tcp_keepalive (zsock->self, (int) tcp_keepalive);
+}
+
 NAN_METHOD (Zsock::_tcp_keepalive_idle) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_tcp_keepalive_idle (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_tcp_keepalive_idle) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive idle`");
+
+    int tcp_keepalive_idle;
+    if (info [0]->IsNumber ())
+        tcp_keepalive_idle = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive idle` must be a number");
+    zsock_set_tcp_keepalive_idle (zsock->self, (int) tcp_keepalive_idle);
 }
 
 NAN_METHOD (Zsock::_tcp_keepalive_cnt) {
@@ -3575,16 +5418,57 @@ NAN_METHOD (Zsock::_tcp_keepalive_cnt) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_tcp_keepalive_cnt) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive cnt`");
+
+    int tcp_keepalive_cnt;
+    if (info [0]->IsNumber ())
+        tcp_keepalive_cnt = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive cnt` must be a number");
+    zsock_set_tcp_keepalive_cnt (zsock->self, (int) tcp_keepalive_cnt);
+}
+
 NAN_METHOD (Zsock::_tcp_keepalive_intvl) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_tcp_keepalive_intvl (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsock::_set_tcp_keepalive_intvl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive intvl`");
+
+    int tcp_keepalive_intvl;
+    if (info [0]->IsNumber ())
+        tcp_keepalive_intvl = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive intvl` must be a number");
+    zsock_set_tcp_keepalive_intvl (zsock->self, (int) tcp_keepalive_intvl);
+}
+
 NAN_METHOD (Zsock::_tcp_accept_filter) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_tcp_accept_filter (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_tcp_accept_filter) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *tcp_accept_filter;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp accept filter`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`tcp accept filter` must be a string");
+    else {
+        Nan::Utf8String tcp_accept_filter_utf8 (info [0].As<String>());
+        tcp_accept_filter = *tcp_accept_filter_utf8;
+    }
+    zsock_set_tcp_accept_filter (zsock->self, (const char *)tcp_accept_filter);
 }
 
 NAN_METHOD (Zsock::_rcvmore) {
@@ -3603,6 +5487,18 @@ NAN_METHOD (Zsock::_last_endpoint) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_last_endpoint (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zsock_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zsock::constructor () {
@@ -3628,6 +5524,8 @@ NAN_MODULE_INIT (Zstr::Init) {
     Nan::SetPrototypeMethod (tpl, "sendfm", _sendfm);
     Nan::SetPrototypeMethod (tpl, "sendx", _sendx);
     Nan::SetPrototypeMethod (tpl, "str", _str);
+    Nan::SetPrototypeMethod (tpl, "free", _free);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zstr").ToLocalChecked (),
@@ -3757,6 +5655,32 @@ NAN_METHOD (Zstr::_str) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zstr::_free) {
+    char *string_p;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string_p`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`string_p` must be a string");
+    else {
+        Nan::Utf8String string_p_utf8 (info [0].As<String>());
+        string_p = *string_p_utf8;
+    }
+    zstr_free ((char **)&string_p);
+}
+
+NAN_METHOD (Zstr::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zstr_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Zstr::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -3779,6 +5703,8 @@ NAN_MODULE_INIT (Ztrie::Init) {
     Nan::SetPrototypeMethod (tpl, "hitParameterCount", _hit_parameter_count);
     Nan::SetPrototypeMethod (tpl, "hitParameters", _hit_parameters);
     Nan::SetPrototypeMethod (tpl, "hitAsteriskMatch", _hit_asterisk_match);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Ztrie").ToLocalChecked (),
@@ -3884,6 +5810,23 @@ NAN_METHOD (Ztrie::_hit_asterisk_match) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Ztrie::_print) {
+    Ztrie *ztrie = Nan::ObjectWrap::Unwrap <Ztrie> (info.Holder ());
+    ztrie_print (ztrie->self);
+}
+
+NAN_METHOD (Ztrie::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    ztrie_test ((bool) verbose);
+}
+
 Nan::Persistent <Function> &Ztrie::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
@@ -3901,14 +5844,17 @@ NAN_MODULE_INIT (Zuuid::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "set", _set);
     Nan::SetPrototypeMethod (tpl, "setStr", _set_str);
     Nan::SetPrototypeMethod (tpl, "data", _data);
     Nan::SetPrototypeMethod (tpl, "size", _size);
     Nan::SetPrototypeMethod (tpl, "str", _str);
     Nan::SetPrototypeMethod (tpl, "strCanonical", _str_canonical);
+    Nan::SetPrototypeMethod (tpl, "export", _export);
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
     Nan::SetPrototypeMethod (tpl, "neq", _neq);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
     Nan::Set (target, Nan::New ("Zuuid").ToLocalChecked (),
@@ -3944,6 +5890,15 @@ NAN_METHOD (Zuuid::destroy) {
 NAN_METHOD (Zuuid::defined) {
     Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zuuid->self != NULL));
+}
+
+NAN_METHOD (Zuuid::_set) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *source = (const byte *) node::Buffer::Data (buffer_node);
+    zuuid_set (zuuid->self, (const byte *)source);
 }
 
 NAN_METHOD (Zuuid::_set_str) {
@@ -3986,6 +5941,15 @@ NAN_METHOD (Zuuid::_str_canonical) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
+NAN_METHOD (Zuuid::_export) {
+    Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *target = (const byte *) node::Buffer::Data (buffer_node);
+    zuuid_export (zuuid->self, (byte *)target);
+}
+
 NAN_METHOD (Zuuid::_eq) {
     Zuuid *zuuid = Nan::ObjectWrap::Unwrap <Zuuid> (info.Holder ());
     if (info [0]->IsUndefined ())
@@ -4016,6 +5980,18 @@ NAN_METHOD (Zuuid::_dup) {
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }
+}
+
+NAN_METHOD (Zuuid::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zuuid_test ((bool) verbose);
 }
 
 Nan::Persistent <Function> &Zuuid::constructor () {
