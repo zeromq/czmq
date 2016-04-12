@@ -640,7 +640,9 @@ zframe_test (bool verbose)
     rc = zframe_send (&frame, output, 0);
     assert (rc == 0);
     frame = zframe_recv (input);
-    assert (streq (zframe_meta (frame, "Socket-Type"), "PAIR"));
+    const char *meta = zframe_meta (frame, "Socket-Type");
+    assert (meta != NULL);
+    assert (streq (meta, "PAIR"));
     assert (zframe_meta (frame, "nonexistent") == NULL);
     zframe_destroy (&frame);
 
