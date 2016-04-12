@@ -163,6 +163,18 @@ module CZMQ
         result
       end
 
+      # Return meta data property for frame           
+      # Caller must free string when finished with it.
+      #
+      # @param property [String, #to_s, nil]
+      # @return [String]
+      def meta(property)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zframe_meta(self_p, property)
+        result
+      end
+
       # Create a new frame that duplicates an existing frame. If frame is null,
       # or memory was exhausted, returns null.                                 
       #

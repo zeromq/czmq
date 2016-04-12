@@ -63,15 +63,15 @@ QmlZframe *QmlZmsg::pop () {
 ///
 //  Push block of memory to front of message, as a new frame.
 //  Returns 0 on success, -1 on error.                       
-int QmlZmsg::pushmem (const void *src, size_t size) {
-    return zmsg_pushmem (self, src, size);
+int QmlZmsg::pushmem (const void *data, size_t size) {
+    return zmsg_pushmem (self, data, size);
 };
 
 ///
 //  Add block of memory to the end of the message, as a new frame.
 //  Returns 0 on success, -1 on error.                            
-int QmlZmsg::addmem (const void *src, size_t size) {
-    return zmsg_addmem (self, src, size);
+int QmlZmsg::addmem (const void *data, size_t size) {
+    return zmsg_addmem (self, data, size);
 };
 
 ///

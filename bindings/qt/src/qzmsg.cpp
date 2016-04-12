@@ -156,18 +156,18 @@ QZframe * QZmsg::pop ()
 ///
 //  Push block of memory to front of message, as a new frame.
 //  Returns 0 on success, -1 on error.                       
-int QZmsg::pushmem (const void *src, size_t size)
+int QZmsg::pushmem (const void *data, size_t size)
 {
-    int rv = zmsg_pushmem (self, src, size);
+    int rv = zmsg_pushmem (self, data, size);
     return rv;
 }
 
 ///
 //  Add block of memory to the end of the message, as a new frame.
 //  Returns 0 on success, -1 on error.                            
-int QZmsg::addmem (const void *src, size_t size)
+int QZmsg::addmem (const void *data, size_t size)
 {
-    int rv = zmsg_addmem (self, src, size);
+    int rv = zmsg_addmem (self, data, size);
     return rv;
 }
 

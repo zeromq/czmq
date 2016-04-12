@@ -1097,6 +1097,13 @@ buffer my_zframe.data ()
 Return address of frame data
 
 ```
+string my_zframe.meta (String)
+```
+
+Return meta data property for frame
+Caller must free string when finished with it.
+
+```
 zframe my_zframe.dup ()
 ```
 

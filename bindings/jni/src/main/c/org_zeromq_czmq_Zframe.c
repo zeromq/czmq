@@ -74,6 +74,16 @@ Java_org_zeromq_czmq_Zframe__1_1data (JNIEnv *env, jclass c, jlong self)
     return return_data_;
 }
 
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zframe__1_1meta (JNIEnv *env, jclass c, jlong self, jstring property)
+{
+    char *property_ = (char *) (*env)->GetStringUTFChars (env, property, NULL);
+    char *meta_ = (char *) zframe_meta ((zframe_t *) (intptr_t) self, property_);
+    jstring return_string_ = (*env)->NewStringUTF (env, meta_);
+    (*env)->ReleaseStringUTFChars (env, property, property_);
+    return return_string_;
+}
+
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zframe__1_1dup (JNIEnv *env, jclass c, jlong self)
 {

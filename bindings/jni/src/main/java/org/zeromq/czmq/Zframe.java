@@ -85,6 +85,14 @@ public class Zframe implements AutoCloseable{
         return __data (self);
     }
     /*
+    Return meta data property for frame           
+    Caller must free string when finished with it.
+    */
+    native static String __meta (long self, String property);
+    public String meta (String property) {
+        return __meta (self, property);
+    }
+    /*
     Create a new frame that duplicates an existing frame. If frame is null,
     or memory was exhausted, returns null.                                 
     */

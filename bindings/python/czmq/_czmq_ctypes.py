@@ -2182,6 +2182,8 @@ lib.zframe_size.restype = c_size_t
 lib.zframe_size.argtypes = [zframe_p]
 lib.zframe_data.restype = c_void_p
 lib.zframe_data.argtypes = [zframe_p]
+lib.zframe_meta.restype = c_char_p
+lib.zframe_meta.argtypes = [zframe_p, c_char_p]
 lib.zframe_dup.restype = zframe_p
 lib.zframe_dup.argtypes = [zframe_p]
 lib.zframe_strhex.restype = POINTER(c_char)
@@ -2308,6 +2310,13 @@ Return -1 on error, 0 on success.
         Return address of frame data
         """
         return lib.zframe_data(self._as_parameter_)
+
+    def meta(self, property):
+        """
+        Return meta data property for frame
+Caller must free string when finished with it.
+        """
+        return lib.zframe_meta(self._as_parameter_, property)
 
     def dup(self):
         """
@@ -4229,19 +4238,19 @@ caller's frame reference.
         """
         return Zframe(lib.zmsg_pop(self._as_parameter_), True)
 
-    def pushmem(self, src, size):
+    def pushmem(self, data, size):
         """
         Push block of memory to front of message, as a new frame.
 Returns 0 on success, -1 on error.
         """
-        return lib.zmsg_pushmem(self._as_parameter_, src, size)
+        return lib.zmsg_pushmem(self._as_parameter_, data, size)
 
-    def addmem(self, src, size):
+    def addmem(self, data, size):
         """
         Add block of memory to the end of the message, as a new frame.
 Returns 0 on success, -1 on error.
         """
-        return lib.zmsg_addmem(self._as_parameter_, src, size)
+        return lib.zmsg_addmem(self._as_parameter_, data, size)
 
     def pushstr(self, string):
         """

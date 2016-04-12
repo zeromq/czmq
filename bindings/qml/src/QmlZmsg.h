@@ -59,11 +59,11 @@ public slots:
 
     //  Push block of memory to front of message, as a new frame.
     //  Returns 0 on success, -1 on error.                       
-    int pushmem (const void *src, size_t size);
+    int pushmem (const void *data, size_t size);
 
     //  Add block of memory to the end of the message, as a new frame.
     //  Returns 0 on success, -1 on error.                            
-    int addmem (const void *src, size_t size);
+    int addmem (const void *data, size_t size);
 
     //  Push string as new frame to front of message.
     //  Returns 0 on success, -1 on error.           

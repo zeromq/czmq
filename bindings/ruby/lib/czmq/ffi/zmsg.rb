@@ -250,28 +250,28 @@ module CZMQ
       # Push block of memory to front of message, as a new frame.
       # Returns 0 on success, -1 on error.                       
       #
-      # @param src [::FFI::Pointer, #to_ptr]
+      # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
       # @return [Integer]
-      def pushmem(src, size)
+      def pushmem(data, size)
         raise DestroyedError unless @ptr
         self_p = @ptr
         size = Integer(size)
-        result = ::CZMQ::FFI.zmsg_pushmem(self_p, src, size)
+        result = ::CZMQ::FFI.zmsg_pushmem(self_p, data, size)
         result
       end
 
       # Add block of memory to the end of the message, as a new frame.
       # Returns 0 on success, -1 on error.                            
       #
-      # @param src [::FFI::Pointer, #to_ptr]
+      # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
       # @return [Integer]
-      def addmem(src, size)
+      def addmem(data, size)
         raise DestroyedError unless @ptr
         self_p = @ptr
         size = Integer(size)
-        result = ::CZMQ::FFI.zmsg_addmem(self_p, src, size)
+        result = ::CZMQ::FFI.zmsg_addmem(self_p, data, size)
         result
       end
 

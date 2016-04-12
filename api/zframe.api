@@ -65,7 +65,7 @@
         Return meta data property for frame
         Caller must free string when finished with it.
         <argument name = "property" type = "string" />
-        <return type = "string" fresh = "1" />
+        <return type = "string" fresh = "0" />
     </method>
 
     <method name = "dup">

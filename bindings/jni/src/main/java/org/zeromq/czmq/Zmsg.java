@@ -149,17 +149,17 @@ public class Zmsg implements AutoCloseable{
     Push block of memory to front of message, as a new frame.
     Returns 0 on success, -1 on error.                       
     */
-    native static int __pushmem (long self, long src, long size);
-    public int pushmem (long src, long size) {
-        return __pushmem (self, src, size);
+    native static int __pushmem (long self, byte [] data, long size);
+    public int pushmem (byte [] data, long size) {
+        return __pushmem (self, data, size);
     }
     /*
     Add block of memory to the end of the message, as a new frame.
     Returns 0 on success, -1 on error.                            
     */
-    native static int __addmem (long self, long src, long size);
-    public int addmem (long src, long size) {
-        return __addmem (self, src, size);
+    native static int __addmem (long self, byte [] data, long size);
+    public int addmem (byte [] data, long size) {
+        return __addmem (self, data, size);
     }
     /*
     Push string as new frame to front of message.

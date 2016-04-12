@@ -318,6 +318,7 @@ class Zframe: public Nan::ObjectWrap {
     static NAN_METHOD (_send);
     static NAN_METHOD (_size);
     static NAN_METHOD (_data);
+    static NAN_METHOD (_meta);
     static NAN_METHOD (_dup);
     static NAN_METHOD (_strhex);
     static NAN_METHOD (_strdup);
