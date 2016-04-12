@@ -89,10 +89,22 @@ string my_zarmour.modeStr ()
 Get printable string for mode.
 
 ```
+nothing my_zarmour.setMode (Number)
+```
+
+Set the mode property.
+
+```
 boolean my_zarmour.pad ()
 ```
 
 Return true if padding is turned on.
+
+```
+nothing my_zarmour.setPad (Boolean)
+```
+
+Turn padding on or off. Default is on.
 
 ```
 char my_zarmour.padChar ()
@@ -101,16 +113,46 @@ char my_zarmour.padChar ()
 Get the padding character.
 
 ```
+nothing my_zarmour.setPadChar (String)
+```
+
+Set the padding character.
+
+```
 boolean my_zarmour.lineBreaks ()
 ```
 
 Return if splitting output into lines is turned on. Default is off.
 
 ```
+nothing my_zarmour.setLineBreaks (Boolean)
+```
+
+Turn splitting output into lines on or off.
+
+```
 size my_zarmour.lineLength ()
 ```
 
 Get the line length used for splitting lines.
+
+```
+nothing my_zarmour.setLineLength ()
+```
+
+Set the line length used for splitting lines.
+
+```
+nothing my_zarmour.print ()
+```
+
+Print properties of object
+
+```
+nothing my_zarmour.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zcert class - work with CURVE security certificates
 
@@ -154,6 +196,18 @@ string my_zcert.secretTxt ()
 Return secret part of key pair as Z85 armored string
 
 ```
+nothing my_zcert.setMeta (String, String)
+```
+
+Set certificate metadata from formatted string.
+
+```
+nothing my_zcert.unsetMeta (String)
+```
+
+Unset certificate metadata.
+
+```
 string my_zcert.meta (String)
 ```
 
@@ -187,6 +241,14 @@ integer my_zcert.saveSecret (String)
 Save secret certificate only to file for persistent storage
 
 ```
+nothing my_zcert.apply (Zsock)
+```
+
+Apply certificate to socket, i.e. use for CURVE security on socket.
+If certificate was loaded from public file, the secret key will be
+undefined, and this certificate will not work successfully.
+
+```
 zcert my_zcert.dup ()
 ```
 
@@ -198,6 +260,18 @@ boolean my_zcert.eq (Zcert)
 ```
 
 Return true if two certificates have the same keys
+
+```
+nothing my_zcert.print ()
+```
+
+Print certificate contents to stdout
+
+```
+nothing my_zcert.test (Boolean)
+```
+
+Self test of this class
 
 ### The Zcertstore class - work with CURVE security certificate stores
 
@@ -223,6 +297,26 @@ zcert my_zcertstore.lookup (String)
 Look up certificate by public key, returns zcert_t object if found,
 else returns NULL. The public key is provided in Z85 text format.
 
+```
+nothing my_zcertstore.insert (Zcert)
+```
+
+Insert certificate into certificate store in memory. Note that this
+does not save the certificate to disk. To do that, use zcert_save()
+directly on the certificate. Takes ownership of zcert_t object.
+
+```
+nothing my_zcertstore.print ()
+```
+
+Print list of certificates in store to logging facility
+
+```
+nothing my_zcertstore.test (Boolean)
+```
+
+Self test of this class
+
 ### The Zchunk class - work with memory chunks
 
 Constructor:
@@ -239,6 +333,12 @@ my_zchunk.destroy ()
 ```
 
 Methods:
+
+```
+nothing my_zchunk.resize ()
+```
+
+Resizes chunk max_size as requested; chunk_cur size is set to zero
 
 ```
 size my_zchunk.size ()
@@ -351,6 +451,19 @@ string my_zchunk.digest ()
 
 Calculate SHA1 digest for chunk, using zdigest class.
 
+```
+nothing my_zchunk.print ()
+```
+
+Dump message to stderr, for debugging and tracing.
+See zchunk_fprint for details
+
+```
+nothing my_zchunk.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Zclock class - millisecond clocks and delays
 
 Constructor:
@@ -361,6 +474,12 @@ var my_zclock = new czmq.Zclock ()
 ```
 
 Methods:
+
+```
+nothing my_zclock.sleep (Number)
+```
+
+Sleep for a number of milliseconds
 
 ```
 msecs my_zclock.time ()
@@ -392,6 +511,12 @@ string my_zclock.timestr ()
 
 Return formatted date/time as fresh string. Free using zstr_free().
 
+```
+nothing my_zclock.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Zconfig class - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
 Constructor:
@@ -422,11 +547,39 @@ string my_zconfig.value ()
 Return value of config item
 
 ```
+nothing my_zconfig.put (String, String)
+```
+
+Insert or update configuration key with value
+
+```
+nothing my_zconfig.putf (String, String)
+```
+
+Equivalent to zconfig_put, accepting a format specifier and variable
+argument list, instead of a single string value.
+
+```
 string my_zconfig.get (String, String)
 ```
 
 Get value for config item into a string value; leading slash is optional
 and ignored.
+
+```
+nothing my_zconfig.setName (String)
+```
+
+Set config item name, name may be NULL
+
+```
+nothing my_zconfig.setValue (String)
+```
+
+Set new value for config item. The new value may be a string, a printf
+format, or NULL. Note that if string may possibly contain '%', or if it
+comes from an insecure source, you must use '%s' as the format, followed
+by the string.
 
 ```
 zconfig my_zconfig.child ()
@@ -451,6 +604,14 @@ zconfig my_zconfig.atDepth (Number)
 ```
 
 Locate the last config item at a specified depth
+
+```
+nothing my_zconfig.setComment (String)
+```
+
+Add comment to config item before saving to disk. You can add as many
+comment lines as you like. If you use a null format, all comments are
+deleted.
 
 ```
 zlist my_zconfig.comments ()
@@ -517,6 +678,18 @@ boolean my_zconfig.hasChanged ()
 Return true if a configuration tree was loaded from a file and that
 file has changed in since the tree was loaded.
 
+```
+nothing my_zconfig.print ()
+```
+
+Print properties of object
+
+```
+nothing my_zconfig.test (Boolean)
+```
+
+Self test of this class
+
 ### The Zdigest class - provides hashing functions (SHA-1 at present)
 
 Constructor:
@@ -533,6 +706,12 @@ my_zdigest.destroy ()
 ```
 
 Methods:
+
+```
+nothing my_zdigest.update (String)
+```
+
+Add buffer into digest calculation
 
 ```
 buffer my_zdigest.data ()
@@ -554,6 +733,12 @@ string my_zdigest.string ()
 Return digest as printable hex string; caller should not modify nor
 free this string. After calling this, you may not use zdigest_update()
 on the same digest. If built without crypto support, returns NULL.
+
+```
+nothing my_zdigest.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zdir class - work with file-system directories
 
@@ -606,6 +791,14 @@ to a zfile_t item already allocated in the zdir tree. Do not destroy the
 original zdir tree until you are done with this list.
 
 ```
+nothing my_zdir.remove (Boolean)
+```
+
+Remove directory, optionally including all files that it contains, at
+all levels. If force is false, will only remove the directory if empty.
+If force is true, will remove all files and all subdirectories.
+
+```
 zlist my_zdir.diff (Zdir, Zdir, String)
 ```
 
@@ -626,6 +819,18 @@ zhash my_zdir.cache ()
 
 Load directory cache; returns a hash table containing the SHA-1 digests
 of every file in the tree. The cache is saved between runs in .cache.
+
+```
+nothing my_zdir.print (Number)
+```
+
+Print contents of directory to stdout
+
+```
+nothing my_zdir.test (Boolean)
+```
+
+Self test of this class.
 
 ### The ZdirPatch class - work with directory patches
 
@@ -676,10 +881,22 @@ string my_zdir_patch.vpath ()
 Return patch virtual file path
 
 ```
+nothing my_zdir_patch.digestSet ()
+```
+
+Calculate hash digest for file (create only)
+
+```
 string my_zdir_patch.digest ()
 ```
 
 Return hash digest for patch file
+
+```
+nothing my_zdir_patch.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zfile class - helper functions for working with files.
 
@@ -710,6 +927,14 @@ string my_zfile.filename (String)
 ```
 
 Return file name, remove path if provided
+
+```
+nothing my_zfile.restat ()
+```
+
+Refresh file properties from disk; this is not done automatically
+on access methods, otherwise it is not possible to compare directory
+snapshots.
 
 ```
 time my_zfile.modified ()
@@ -770,6 +995,12 @@ Return true if the file was changed on disk since the zfile_t object
 was created, or the last zfile_restat() call made on it.
 
 ```
+nothing my_zfile.remove ()
+```
+
+Remove the file from disk
+
+```
 integer my_zfile.input ()
 ```
 
@@ -812,10 +1043,22 @@ Read next line of text from file. Returns a pointer to the text line,
 or NULL if there was nothing more to read from the file.
 
 ```
+nothing my_zfile.close ()
+```
+
+Close file, if open
+
+```
 string my_zfile.digest ()
 ```
 
 Calculate SHA1 digest for file, using zdigest class.
+
+```
+nothing my_zfile.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zframe class - working with single message frames
 
@@ -888,11 +1131,25 @@ Return frame MORE indicator (1 or 0), set when reading frame from socket
 or by the zframe_set_more() method
 
 ```
+nothing my_zframe.setMore (Number)
+```
+
+Set frame MORE indicator (1 or 0). Note this is NOT used when sending
+frame to socket, you have to specify flag explicitly.
+
+```
 number my_zframe.routingId ()
 ```
 
 Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
 Else returns zero.
+
+```
+nothing my_zframe.setRoutingId (Number)
+```
+
+Set routing ID on frame. This is used if/when the frame is sent to a
+ZMQ_SERVER socket.
 
 ```
 string my_zframe.group ()
@@ -915,6 +1172,25 @@ boolean my_zframe.eq (Zframe)
 Return TRUE if two frames have identical size and data
 If either frame is NULL, equality is always false.
 
+```
+nothing my_zframe.reset (String)
+```
+
+Set new contents for frame
+
+```
+nothing my_zframe.print (String)
+```
+
+Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream). Prefix shows before frame, if not null.
+
+```
+nothing my_zframe.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Zhash class - generic type-free hash container (simple)
 
 Constructor:
@@ -931,6 +1207,13 @@ my_zhash.destroy ()
 ```
 
 Methods:
+
+```
+nothing my_zhash.delete (String)
+```
+
+Remove an item specified by key from the hash table. If there was no such
+item, this function does nothing.
 
 ```
 integer my_zhash.rename (String, String)
@@ -968,6 +1251,14 @@ After a successful first/next method, returns the key for the item that
 was returned. This is a constant string that you may not modify or
 deallocate, and which lasts as long as the item in the hash. After an
 unsuccessful first/next, returns NULL.
+
+```
+nothing my_zhash.comment (String)
+```
+
+Add a comment to hash table before saving to disk. You can add as many
+comment lines as you like. These comment lines are discarded when loading
+the file. If you use a null format, all comments are deleted.
 
 ```
 zframe my_zhash.pack ()
@@ -1019,6 +1310,18 @@ reload the file if it has been modified since, and is "stable", i.e. not
 still changing. Returns 0 if OK, -1 if there was an error reloading the 
 file.
 
+```
+nothing my_zhash.autofree ()
+```
+
+Set hash for automatic value destruction
+
+```
+nothing my_zhash.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Zhashx class - extended generic type-free hash container
 
 Constructor:
@@ -1035,6 +1338,14 @@ my_zhashx.destroy ()
 ```
 
 Methods:
+
+```
+nothing my_zhashx.purge ()
+```
+
+Delete all items from the hash table. If the key destructor is
+set, calls it on every key. If the item destructor is set, calls
+it on every item.
 
 ```
 size my_zhashx.size ()
@@ -1057,6 +1368,14 @@ zlistx my_zhashx.values ()
 Return a zlistx_t containing the values for the items in the
 table. Uses the duplicator to duplicate all items and sets the
 destructor as destructor for the list.
+
+```
+nothing my_zhashx.comment (String)
+```
+
+Add a comment to hash table before saving to disk. You can add as many
+comment lines as you like. These comment lines are discarded when loading
+the file. If you use a null format, all comments are deleted.
 
 ```
 integer my_zhashx.save (String)
@@ -1127,6 +1446,19 @@ Does not copy items themselves. Rebuilds new table so may be slow on
 very large tables. NOTE: only works with item values that are strings
 since there's no other way to know how to duplicate the item value.
 
+```
+nothing my_zhashx.autofree ()
+```
+
+Set hash for automatic value destruction. This method is deprecated
+and you should use set_destructor instead.
+
+```
+nothing my_zhashx.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Ziflist class - List of network interfaces available on system
 
 Constructor:
@@ -1143,6 +1475,12 @@ my_ziflist.destroy ()
 ```
 
 Methods:
+
+```
+nothing my_ziflist.reload ()
+```
+
+Reload network interfaces from system
 
 ```
 size my_ziflist.size ()
@@ -1180,6 +1518,18 @@ string my_ziflist.netmask ()
 
 Return the current interface network mask as a printable string
 
+```
+nothing my_ziflist.print ()
+```
+
+Return the list of interfaces.
+
+```
+nothing my_ziflist.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Zlist class - simple generic list container
 
 Constructor:
@@ -1207,10 +1557,35 @@ pointers back to the items in the original list. If list is null, returns
 NULL.
 
 ```
+nothing my_zlist.purge ()
+```
+
+Purge all items from list
+
+```
 size my_zlist.size ()
 ```
 
 Return number of items in the list
+
+```
+nothing my_zlist.autofree ()
+```
+
+Set list for automatic item destruction; item values MUST be strings.
+By default a list item refers to a value held elsewhere. When you set
+this, each time you append or push a list item, zlist will take a copy
+of the string value. Then, when you destroy the list, it will free all
+item values automatically. If you use any other technique to allocate
+list values, you must free them explicitly before destroying the list.
+The usual technique is to pop list items and destroy them, until the
+list is empty.
+
+```
+nothing my_zlist.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zlistx class - extended generic list container
 
@@ -1236,12 +1611,33 @@ size my_zlistx.size ()
 Return the number of items in the list
 
 ```
+nothing my_zlistx.purge ()
+```
+
+Remove all items from the list, and destroy them if the item destructor
+is set.
+
+```
+nothing my_zlistx.sort ()
+```
+
+Sort the list. If an item comparator was set, calls that to compare
+items, otherwise compares on item value. The sort is not stable, so may
+reorder equal items.
+
+```
 zlistx my_zlistx.dup ()
 ```
 
 Make a copy of the list; items are duplicated if you set a duplicator
 for the list, otherwise not. Copying a null reference returns a null
 reference.
+
+```
+nothing my_zlistx.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zloop class - event-driven reactor
 
@@ -1261,11 +1657,58 @@ my_zloop.destroy ()
 Methods:
 
 ```
+nothing my_zloop.readerEnd (Zsock)
+```
+
+Cancel a socket reader from the reactor. If multiple readers exist for
+same socket, cancels ALL of them.
+
+```
+nothing my_zloop.readerSetTolerant (Zsock)
+```
+
+Configure a registered reader to ignore errors. If you do not set this,
+then readers that have errors are removed from the reactor silently.
+
+```
 integer my_zloop.timerEnd (Number)
 ```
 
 Cancel a specific timer identified by a specific timer_id (as returned by
 zloop_timer).
+
+```
+nothing my_zloop.setTicketDelay ()
+```
+
+Set the ticket delay, which applies to all tickets. If you lower the
+delay and there are already tickets created, the results are undefined.
+
+```
+nothing my_zloop.setMaxTimers ()
+```
+
+Set hard limit on number of timers allowed. Setting more than a small
+number of timers (10-100) can have a dramatic impact on the performance
+of the reactor. For high-volume cases, use ticket timers. If the hard
+limit is reached, the reactor stops creating new timers and logs an
+error.
+
+```
+nothing my_zloop.setVerbose (Boolean)
+```
+
+Set verbose tracing of reactor on/off. The default verbose setting is
+off (false).
+
+```
+nothing my_zloop.setNonstop (Boolean)
+```
+
+By default the reactor stops if the process receives a SIGINT or SIGTERM
+signal. This makes it impossible to shut-down message based architectures
+like zactors. This method lets you switch off break handling. The default
+nonstop setting is off (false).
 
 ```
 integer my_zloop.start ()
@@ -1275,6 +1718,12 @@ Start the reactor. Takes control of the thread and returns when the 0MQ
 context is terminated or the process is interrupted, or any event handler
 returns -1. Event handlers may register new sockets and timers, and
 cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.
+
+```
+nothing my_zloop.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zmsg class - working with multipart messages
 
@@ -1331,6 +1780,13 @@ number my_zmsg.routingId ()
 
 Return message routing ID, if the message came from a ZMQ_SERVER socket.
 Else returns zero.
+
+```
+nothing my_zmsg.setRoutingId (Number)
+```
+
+Set routing ID on message. This is used if/when the message is sent to a
+ZMQ_SERVER socket.
 
 ```
 integer my_zmsg.prepend (Zframe)
@@ -1421,6 +1877,12 @@ Remove first submessage from message, if any. Returns zmsg_t, or NULL if
 decoding was not successful.
 
 ```
+nothing my_zmsg.remove (Zframe)
+```
+
+Remove specified frame from list, if present. Does not destroy frame.
+
+```
 zframe my_zmsg.first ()
 ```
 
@@ -1458,6 +1920,13 @@ Create copy of message, as new message object. Returns a fresh zmsg_t
 object. If message is null, or memory was exhausted, returns null.
 
 ```
+nothing my_zmsg.print ()
+```
+
+Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream).
+
+```
 boolean my_zmsg.eq (Zmsg)
 ```
 
@@ -1470,6 +1939,12 @@ integer my_zmsg.signal ()
 ```
 
 Return signal value, 0 or greater, if message is a signal, -1 if not.
+
+```
+nothing my_zmsg.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zpoller class - event-driven reactor
 
@@ -1496,6 +1971,15 @@ Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
 be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
 
 ```
+nothing my_zpoller.setNonstop (Boolean)
+```
+
+By default the poller stops if the process receives a SIGINT or SIGTERM
+signal. This makes it impossible to shut-down message based architectures
+like zactors. This method lets you switch off break handling. The default
+nonstop setting is off (false).
+
+```
 boolean my_zpoller.expired ()
 ```
 
@@ -1508,6 +1992,12 @@ boolean my_zpoller.terminated ()
 
 Return true if the last zpoller_wait () call ended because the process
 was interrupted, or the parent context was destroyed.
+
+```
+nothing my_zpoller.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zproc class - process configuration and status
 
@@ -1549,10 +2039,125 @@ Return current host name, for use in public tcp:// endpoints.
 If the host name is not resolvable, returns NULL.
 
 ```
+nothing my_zproc.daemonize (String)
+```
+
+Move the current process into the background. The precise effect
+depends on the operating system. On POSIX boxes, moves to a specified
+working directory (if specified), closes all file handles, reopens
+stdin, stdout, and stderr to the null device, and sets the process to
+ignore SIGHUP. On Windows, does nothing. Returns 0 if OK, -1 if there
+was an error.
+
+```
+nothing my_zproc.runAs (String, String, String)
+```
+
+Drop the process ID into the lockfile, with exclusive lock, and
+switch the process to the specified group and/or user. Any of the
+arguments may be null, indicating a no-op. Returns 0 on success,
+-1 on failure. Note if you combine this with zsys_daemonize, run
+after, not before that method, or the lockfile will hold the wrong
+process ID.
+
+```
+nothing my_zproc.setIoThreads ()
+```
+
+Configure the number of I/O threads that ZeroMQ will use. A good
+rule of thumb is one thread per gigabit of traffic in or out. The
+default is 1, sufficient for most applications. If the environment
+variable ZSYS_IO_THREADS is defined, that provides the default.
+Note that this method is valid only before any socket is created.
+
+```
+nothing my_zproc.setMaxSockets ()
+```
+
+Configure the number of sockets that ZeroMQ will allow. The default
+is 1024. The actual limit depends on the system, and you can query it
+by using zsys_socket_limit (). A value of zero means "maximum".
+Note that this method is valid only before any socket is created.
+
+```
+nothing my_zproc.setBiface (String)
+```
+
+Set network interface name to use for broadcasts, particularly zbeacon.
+This lets the interface be configured for test environments where required.
+For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
+the default when there is no specified interface. If the environment
+variable ZSYS_INTERFACE is set, use that as the default interface name.
+Setting the interface to "*" means "use all available interfaces".
+
+```
 string my_zproc.biface ()
 ```
 
 Return network interface to use for broadcasts, or "" if none was set.
+
+```
+nothing my_zproc.setLogIdent (String)
+```
+
+Set log identity, which is a string that prefixes all log messages sent
+by this process. The log identity defaults to the environment variable
+ZSYS_LOGIDENT, if that is set.
+
+```
+nothing my_zproc.setLogSender (String)
+```
+
+Sends log output to a PUB socket bound to the specified endpoint. To
+collect such log output, create a SUB socket, subscribe to the traffic
+you care about, and connect to the endpoint. Log traffic is sent as a
+single string frame, in the same format as when sent to stdout. The
+log system supports a single sender; multiple calls to this method will
+bind the same sender to multiple endpoints. To disable the sender, call
+this method with a null argument.
+
+```
+nothing my_zproc.setLogSystem (Boolean)
+```
+
+Enable or disable logging to the system facility (syslog on POSIX boxes,
+event log on Windows). By default this is disabled.
+
+```
+nothing my_zproc.logError (String)
+```
+
+Log error condition - highest priority
+
+```
+nothing my_zproc.logWarning (String)
+```
+
+Log warning condition - high priority
+
+```
+nothing my_zproc.logNotice (String)
+```
+
+Log normal, but significant, condition - normal priority
+
+```
+nothing my_zproc.logInfo (String)
+```
+
+Log informational message - low priority
+
+```
+nothing my_zproc.logDebug (String)
+```
+
+Log debug-level message - lowest priority
+
+```
+nothing my_zproc.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zsock class - high-level socket API that hides libzmq contexts and sockets
 
@@ -1754,6 +2359,21 @@ Return socket routing ID if any. This returns 0 if the socket is not
 of type ZMQ_SERVER or if no request was already received on it.
 
 ```
+nothing my_zsock.setRoutingId (Number)
+```
+
+Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
+This will be used when sending messages on the socket via the zsock API.
+
+```
+nothing my_zsock.setUnbounded ()
+```
+
+Set socket to use unbounded pipes (HWM=0); use this in cases when you are
+totally certain the message volume can fit in memory. This method works
+across all versions of ZeroMQ. Takes a polymorphic socket reference.
+
+```
 integer my_zsock.wait ()
 ```
 
@@ -1761,6 +2381,14 @@ Wait on a signal. Use this to coordinate between threads, over pipe
 pairs. Blocks until the signal is received. Returns -1 on error, 0 or
 greater on success. Accepts a zsock_t or a zactor_t as argument.
 Takes a polymorphic socket reference.
+
+```
+nothing my_zsock.flush ()
+```
+
+If there is a partial message still waiting on the socket, remove and
+discard it. This is useful when reading partial messages, to get specific
+message types.
 
 ```
 integer my_zsock.join (String)
@@ -1783,10 +2411,22 @@ integer my_zsock.heartbeatIvl ()
 Get socket option `heartbeat_ivl`.
 
 ```
+nothing my_zsock.setHeartbeatIvl (Number)
+```
+
+Set socket option `heartbeat_ivl`.
+
+```
 integer my_zsock.heartbeatTtl ()
 ```
 
 Get socket option `heartbeat_ttl`.
+
+```
+nothing my_zsock.setHeartbeatTtl (Number)
+```
+
+Set socket option `heartbeat_ttl`.
 
 ```
 integer my_zsock.heartbeatTimeout ()
@@ -1795,10 +2435,22 @@ integer my_zsock.heartbeatTimeout ()
 Get socket option `heartbeat_timeout`.
 
 ```
+nothing my_zsock.setHeartbeatTimeout (Number)
+```
+
+Set socket option `heartbeat_timeout`.
+
+```
 integer my_zsock.useFd ()
 ```
 
 Get socket option `use_fd`.
+
+```
+nothing my_zsock.setUseFd (Number)
+```
+
+Set socket option `use_fd`.
 
 ```
 integer my_zsock.tos ()
@@ -1807,10 +2459,58 @@ integer my_zsock.tos ()
 Get socket option `tos`.
 
 ```
+nothing my_zsock.setTos (Number)
+```
+
+Set socket option `tos`.
+
+```
+nothing my_zsock.setRouterHandover (Number)
+```
+
+Set socket option `router_handover`.
+
+```
+nothing my_zsock.setRouterMandatory (Number)
+```
+
+Set socket option `router_mandatory`.
+
+```
+nothing my_zsock.setProbeRouter (Number)
+```
+
+Set socket option `probe_router`.
+
+```
+nothing my_zsock.setReqRelaxed (Number)
+```
+
+Set socket option `req_relaxed`.
+
+```
+nothing my_zsock.setReqCorrelate (Number)
+```
+
+Set socket option `req_correlate`.
+
+```
+nothing my_zsock.setConflate (Number)
+```
+
+Set socket option `conflate`.
+
+```
 string my_zsock.zapDomain ()
 ```
 
 Get socket option `zap_domain`.
+
+```
+nothing my_zsock.setZapDomain (String)
+```
+
+Set socket option `zap_domain`.
 
 ```
 integer my_zsock.mechanism ()
@@ -1825,10 +2525,22 @@ integer my_zsock.plainServer ()
 Get socket option `plain_server`.
 
 ```
+nothing my_zsock.setPlainServer (Number)
+```
+
+Set socket option `plain_server`.
+
+```
 string my_zsock.plainUsername ()
 ```
 
 Get socket option `plain_username`.
+
+```
+nothing my_zsock.setPlainUsername (String)
+```
+
+Set socket option `plain_username`.
 
 ```
 string my_zsock.plainPassword ()
@@ -1837,10 +2549,22 @@ string my_zsock.plainPassword ()
 Get socket option `plain_password`.
 
 ```
+nothing my_zsock.setPlainPassword (String)
+```
+
+Set socket option `plain_password`.
+
+```
 integer my_zsock.curveServer ()
 ```
 
 Get socket option `curve_server`.
+
+```
+nothing my_zsock.setCurveServer (Number)
+```
+
+Set socket option `curve_server`.
 
 ```
 string my_zsock.curvePublickey ()
@@ -1849,10 +2573,34 @@ string my_zsock.curvePublickey ()
 Get socket option `curve_publickey`.
 
 ```
+nothing my_zsock.setCurvePublickey (String)
+```
+
+Set socket option `curve_publickey`.
+
+```
+nothing my_zsock.setCurvePublickeyBin (String)
+```
+
+Set socket option `curve_publickey` from 32-octet binary
+
+```
 string my_zsock.curveSecretkey ()
 ```
 
 Get socket option `curve_secretkey`.
+
+```
+nothing my_zsock.setCurveSecretkey (String)
+```
+
+Set socket option `curve_secretkey`.
+
+```
+nothing my_zsock.setCurveSecretkeyBin (String)
+```
+
+Set socket option `curve_secretkey` from 32-octet binary
 
 ```
 string my_zsock.curveServerkey ()
@@ -1861,10 +2609,28 @@ string my_zsock.curveServerkey ()
 Get socket option `curve_serverkey`.
 
 ```
+nothing my_zsock.setCurveServerkey (String)
+```
+
+Set socket option `curve_serverkey`.
+
+```
+nothing my_zsock.setCurveServerkeyBin (String)
+```
+
+Set socket option `curve_serverkey` from 32-octet binary
+
+```
 integer my_zsock.gssapiServer ()
 ```
 
 Get socket option `gssapi_server`.
+
+```
+nothing my_zsock.setGssapiServer (Number)
+```
+
+Set socket option `gssapi_server`.
 
 ```
 integer my_zsock.gssapiPlaintext ()
@@ -1873,10 +2639,22 @@ integer my_zsock.gssapiPlaintext ()
 Get socket option `gssapi_plaintext`.
 
 ```
+nothing my_zsock.setGssapiPlaintext (Number)
+```
+
+Set socket option `gssapi_plaintext`.
+
+```
 string my_zsock.gssapiPrincipal ()
 ```
 
 Get socket option `gssapi_principal`.
+
+```
+nothing my_zsock.setGssapiPrincipal (String)
+```
+
+Set socket option `gssapi_principal`.
 
 ```
 string my_zsock.gssapiServicePrincipal ()
@@ -1885,10 +2663,22 @@ string my_zsock.gssapiServicePrincipal ()
 Get socket option `gssapi_service_principal`.
 
 ```
+nothing my_zsock.setGssapiServicePrincipal (String)
+```
+
+Set socket option `gssapi_service_principal`.
+
+```
 integer my_zsock.ipv6 ()
 ```
 
 Get socket option `ipv6`.
+
+```
+nothing my_zsock.setIpv6 (Number)
+```
+
+Set socket option `ipv6`.
 
 ```
 integer my_zsock.immediate ()
@@ -1897,10 +2687,34 @@ integer my_zsock.immediate ()
 Get socket option `immediate`.
 
 ```
+nothing my_zsock.setImmediate (Number)
+```
+
+Set socket option `immediate`.
+
+```
+nothing my_zsock.setRouterRaw (Number)
+```
+
+Set socket option `router_raw`.
+
+```
 integer my_zsock.ipv4only ()
 ```
 
 Get socket option `ipv4only`.
+
+```
+nothing my_zsock.setIpv4only (Number)
+```
+
+Set socket option `ipv4only`.
+
+```
+nothing my_zsock.setDelayAttachOnConnect (Number)
+```
+
+Set socket option `delay_attach_on_connect`.
 
 ```
 integer my_zsock.type ()
@@ -1915,10 +2729,22 @@ integer my_zsock.sndhwm ()
 Get socket option `sndhwm`.
 
 ```
+nothing my_zsock.setSndhwm (Number)
+```
+
+Set socket option `sndhwm`.
+
+```
 integer my_zsock.rcvhwm ()
 ```
 
 Get socket option `rcvhwm`.
+
+```
+nothing my_zsock.setRcvhwm (Number)
+```
+
+Set socket option `rcvhwm`.
 
 ```
 integer my_zsock.affinity ()
@@ -1927,10 +2753,34 @@ integer my_zsock.affinity ()
 Get socket option `affinity`.
 
 ```
+nothing my_zsock.setAffinity (Number)
+```
+
+Set socket option `affinity`.
+
+```
+nothing my_zsock.setSubscribe (String)
+```
+
+Set socket option `subscribe`.
+
+```
+nothing my_zsock.setUnsubscribe (String)
+```
+
+Set socket option `unsubscribe`.
+
+```
 string my_zsock.identity ()
 ```
 
 Get socket option `identity`.
+
+```
+nothing my_zsock.setIdentity (String)
+```
+
+Set socket option `identity`.
 
 ```
 integer my_zsock.rate ()
@@ -1939,10 +2789,22 @@ integer my_zsock.rate ()
 Get socket option `rate`.
 
 ```
+nothing my_zsock.setRate (Number)
+```
+
+Set socket option `rate`.
+
+```
 integer my_zsock.recoveryIvl ()
 ```
 
 Get socket option `recovery_ivl`.
+
+```
+nothing my_zsock.setRecoveryIvl (Number)
+```
+
+Set socket option `recovery_ivl`.
 
 ```
 integer my_zsock.sndbuf ()
@@ -1951,10 +2813,22 @@ integer my_zsock.sndbuf ()
 Get socket option `sndbuf`.
 
 ```
+nothing my_zsock.setSndbuf (Number)
+```
+
+Set socket option `sndbuf`.
+
+```
 integer my_zsock.rcvbuf ()
 ```
 
 Get socket option `rcvbuf`.
+
+```
+nothing my_zsock.setRcvbuf (Number)
+```
+
+Set socket option `rcvbuf`.
 
 ```
 integer my_zsock.linger ()
@@ -1963,10 +2837,22 @@ integer my_zsock.linger ()
 Get socket option `linger`.
 
 ```
+nothing my_zsock.setLinger (Number)
+```
+
+Set socket option `linger`.
+
+```
 integer my_zsock.reconnectIvl ()
 ```
 
 Get socket option `reconnect_ivl`.
+
+```
+nothing my_zsock.setReconnectIvl (Number)
+```
+
+Set socket option `reconnect_ivl`.
 
 ```
 integer my_zsock.reconnectIvlMax ()
@@ -1975,10 +2861,22 @@ integer my_zsock.reconnectIvlMax ()
 Get socket option `reconnect_ivl_max`.
 
 ```
+nothing my_zsock.setReconnectIvlMax (Number)
+```
+
+Set socket option `reconnect_ivl_max`.
+
+```
 integer my_zsock.backlog ()
 ```
 
 Get socket option `backlog`.
+
+```
+nothing my_zsock.setBacklog (Number)
+```
+
+Set socket option `backlog`.
 
 ```
 integer my_zsock.maxmsgsize ()
@@ -1987,10 +2885,22 @@ integer my_zsock.maxmsgsize ()
 Get socket option `maxmsgsize`.
 
 ```
+nothing my_zsock.setMaxmsgsize (Number)
+```
+
+Set socket option `maxmsgsize`.
+
+```
 integer my_zsock.multicastHops ()
 ```
 
 Get socket option `multicast_hops`.
+
+```
+nothing my_zsock.setMulticastHops (Number)
+```
+
+Set socket option `multicast_hops`.
 
 ```
 integer my_zsock.rcvtimeo ()
@@ -1999,10 +2909,28 @@ integer my_zsock.rcvtimeo ()
 Get socket option `rcvtimeo`.
 
 ```
+nothing my_zsock.setRcvtimeo (Number)
+```
+
+Set socket option `rcvtimeo`.
+
+```
 integer my_zsock.sndtimeo ()
 ```
 
 Get socket option `sndtimeo`.
+
+```
+nothing my_zsock.setSndtimeo (Number)
+```
+
+Set socket option `sndtimeo`.
+
+```
+nothing my_zsock.setXpubVerbose (Number)
+```
+
+Set socket option `xpub_verbose`.
 
 ```
 integer my_zsock.tcpKeepalive ()
@@ -2011,10 +2939,22 @@ integer my_zsock.tcpKeepalive ()
 Get socket option `tcp_keepalive`.
 
 ```
+nothing my_zsock.setTcpKeepalive (Number)
+```
+
+Set socket option `tcp_keepalive`.
+
+```
 integer my_zsock.tcpKeepaliveIdle ()
 ```
 
 Get socket option `tcp_keepalive_idle`.
+
+```
+nothing my_zsock.setTcpKeepaliveIdle (Number)
+```
+
+Set socket option `tcp_keepalive_idle`.
 
 ```
 integer my_zsock.tcpKeepaliveCnt ()
@@ -2023,16 +2963,34 @@ integer my_zsock.tcpKeepaliveCnt ()
 Get socket option `tcp_keepalive_cnt`.
 
 ```
+nothing my_zsock.setTcpKeepaliveCnt (Number)
+```
+
+Set socket option `tcp_keepalive_cnt`.
+
+```
 integer my_zsock.tcpKeepaliveIntvl ()
 ```
 
 Get socket option `tcp_keepalive_intvl`.
 
 ```
+nothing my_zsock.setTcpKeepaliveIntvl (Number)
+```
+
+Set socket option `tcp_keepalive_intvl`.
+
+```
 string my_zsock.tcpAcceptFilter ()
 ```
 
 Get socket option `tcp_accept_filter`.
+
+```
+nothing my_zsock.setTcpAcceptFilter (String)
+```
+
+Set socket option `tcp_accept_filter`.
 
 ```
 integer my_zsock.rcvmore ()
@@ -2051,6 +3009,12 @@ string my_zsock.lastEndpoint ()
 ```
 
 Get socket option `last_endpoint`.
+
+```
+nothing my_zsock.test (Boolean)
+```
+
+Self test of this class.
 
 ### The Zstr class - sending and receiving strings
 
@@ -2129,6 +3093,19 @@ string my_zstr.str (Zsock)
 Accepts a void pointer and returns a fresh character string. If source
 is null, returns an empty string.
 
+```
+nothing my_zstr.free (String)
+```
+
+Free a provided string, and nullify the parent pointer. Safe to call on
+a null pointer.
+
+```
+nothing my_zstr.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Ztrie class - simple trie for tokenizable strings
 
 Constructor:
@@ -2181,6 +3158,18 @@ string my_ztrie.hitAsteriskMatch ()
 Returns the asterisk matched part of a route, if there has been no match
 or no asterisk match, returns NULL.
 
+```
+nothing my_ztrie.print ()
+```
+
+Print the trie
+
+```
+nothing my_ztrie.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Zuuid class - UUID support class
 
 Constructor:
@@ -2197,6 +3186,12 @@ my_zuuid.destroy ()
 ```
 
 Methods:
+
+```
+nothing my_zuuid.set (String)
+```
+
+Set UUID to new supplied ZUUID_LEN-octet value.
 
 ```
 integer my_zuuid.setStr (String)
@@ -2232,6 +3227,12 @@ case. Caller does not modify or free returned value. See
 http://en.wikipedia.org/wiki/Universally_unique_identifier
 
 ```
+nothing my_zuuid.export (String)
+```
+
+Store UUID blob in target array
+
+```
 boolean my_zuuid.eq (String)
 ```
 
@@ -2249,3 +3250,9 @@ zuuid my_zuuid.dup ()
 
 Make copy of UUID object; if uuid is null, or memory was exhausted,
 returns null.
+
+```
+nothing my_zuuid.test (Boolean)
+```
+
+Self test of this class.
