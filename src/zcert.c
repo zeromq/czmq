@@ -357,11 +357,11 @@ zcert_save_secret (zcert_t *self, const char *filename)
 //  undefined, and this certificate will not work successfully.
 
 void
-zcert_apply (zcert_t *self, void *zocket)
+zcert_apply (zcert_t *self, void *socket)
 {
     assert (self);
 #if (ZMQ_VERSION_MAJOR == 4)
-    void *handle = zsock_resolve (zocket);
+    void *handle = zsock_resolve (socket);
     if (zsys_has_curve ()) {
         zsock_set_curve_secretkey_bin (handle, self->secret_key);
         zsock_set_curve_publickey_bin (handle, self->public_key);
