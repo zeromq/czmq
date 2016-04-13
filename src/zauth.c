@@ -672,6 +672,7 @@ zauth_test (bool verbose)
         success = s_can_connect (&server, &client, false);
         assert (success);
 
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
         // Test send/recv certificate metadata
         zframe_t *frame = zframe_recv (server);
         assert (frame != NULL);
@@ -683,6 +684,7 @@ zauth_test (bool verbose)
 
         zcert_destroy (&server_cert);
         zcert_destroy (&client_cert);
+#endif
     }
     //  Remove the authenticator and check a normal connection works
     zactor_destroy (&auth);
