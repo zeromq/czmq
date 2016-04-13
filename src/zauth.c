@@ -380,12 +380,12 @@ s_authenticate_curve (self_t *self, zap_request_t *request, unsigned char **meta
                     break;
                 }
 
-                const char *val = zcert_meta(cert, key);
+                const char *val = zcert_meta(cert, (const char *) key);
                 if (val == NULL) {
                     break;
                 }
 
-                *metadata += s_add_property(*metadata, key, val, strlen (val));
+                *metadata += s_add_property(*metadata, (const char *) key, val, strlen (val));
             }
 
             if (self->verbose)
