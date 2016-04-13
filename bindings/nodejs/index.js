@@ -10,8 +10,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.           
  */
 
-module.exports = {
-    //  Socket types
+var czmq = require('bindings')('czmq')
+
+/**
+ * Expose the czmq bindings as the module.
+ */
+module.exports = czmq;
+
+var types = {
     ZMQ_PAIR: 0,
     ZMQ_PUB: 1,
     ZMQ_SUB: 2,
@@ -27,6 +33,7 @@ module.exports = {
     ZMQ_SERVER: 12,
     ZMQ_CLIENT: 13,
     ZMQ_RADIO: 14,
-    ZMQ_DISH: 15
-}
+    ZMQ_DISH: 15,
+};
 
+Object.assign(module.exports, types);
