@@ -17,7 +17,7 @@ var zstr = new czmq.Zstr ();
 
 var server = new czmq.Zsock ('server')
 server.bind ("inproc://test-endpoint")
-var client = new czmq.Zsock ('client')
+var client = new czmq.Zsock (ZMQ_CLIENT)
 client.connect ("inproc://test-endpoint")
 
 zstr.send (client, "Hello")
