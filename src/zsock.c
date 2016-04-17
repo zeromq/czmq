@@ -947,7 +947,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             char *string = zmsg_popstr (msg);
             uint32_t *uint32_p = va_arg (argptr, uint32_t *);
             if (uint32_p)
-                *uint32_p = string? (uint32_t) atol (string): 0;
+                *uint32_p = string? (uint32_t) strtoul (string, NULL, 10): 0;
             free (string);
         }
         else
@@ -955,7 +955,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             char *string = zmsg_popstr (msg);
             uint64_t *uint64_p = va_arg (argptr, uint64_t *);
             if (uint64_p)
-                *uint64_p = string? (uint64_t) atoll (string): 0;
+                *uint64_p = string? (uint64_t) strtoull (string, NULL, 10): 0;
             free (string);
         }
         else
@@ -963,7 +963,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             char *string = zmsg_popstr (msg);
             uint *uint_p = va_arg (argptr, uint *);
             if (uint_p)
-                *uint_p = string? (uint) atol (string): 0;
+                *uint_p = string? (uint) strtoul (string, NULL, 10): 0;
             free (string);
         }
         else
@@ -1856,7 +1856,9 @@ zsock_test (bool verbose)
     uint8_t  number1 = 123;
     uint16_t number2 = 123 * 123;
     uint32_t number4 = 123 * 123 * 123;
+    uint64_t number4_MAX = UINT32_MAX;
     uint64_t number8 = 123 * 123 * 123 * 123;
+    uint64_t number8_MAX = UINT64_MAX;
 
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
     assert (chunk);
@@ -1872,8 +1874,9 @@ zsock_test (bool verbose)
     char *original = "pointer";
 
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "i1248zsbcfUhp",
-                -12345, number1, number2, number4, number8,
+    zsock_send (writer, "i124488zsbcfUhp",
+                -12345, number1, number2, number4, number4_MAX,
+                number8, number8_MAX,
                 "This is a string", "ABCDE", 5,
                 chunk, frame, uuid, hash, original);
     char *uuid_str = strdup (zuuid_str (uuid));
@@ -1886,16 +1889,19 @@ zsock_test (bool verbose)
     byte *data;
     size_t size;
     char *pointer;
-    number8 = number4 = number2 = number1 = 0;
-    rc = zsock_recv (reader, "i1248zsbcfUhp",
-                     &integer, &number1, &number2, &number4, &number8,
-                     &string, &data, &size, &chunk, &frame, &uuid, &hash, &pointer);
+    number8_MAX = number8 = number4 = number2 = number1 = 0;
+    rc = zsock_recv (reader, "i124488zsbcfUhp",
+                     &integer, &number1, &number2, &number4, &number4_MAX,
+                     &number8, &number8_MAX, &string, &data, &size, &chunk,
+                     &frame, &uuid, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (number1 == 123);
     assert (number2 == 123 * 123);
     assert (number4 == 123 * 123 * 123);
+    assert (number4_MAX == UINT32_MAX);
     assert (number8 == 123 * 123 * 123 * 123);
+    assert (number8_MAX == UINT64_MAX);
     assert (streq (string, "This is a string"));
     assert (memcmp (data, "ABCDE", 5) == 0);
     assert (size == 5);
