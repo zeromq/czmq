@@ -16,7 +16,7 @@
     The zuuid class generates UUIDs and provides methods for working with
     them. If you build CZMQ with libuuid, on Unix/Linux, it will use that
     library. On Windows it will use UuidCreate(). Otherwise it will use a
-    random number generator to produce convincing imitations of uuids.
+    random number generator to produce convincing imitations of UUIDs.
 @discuss
 @end
 */
