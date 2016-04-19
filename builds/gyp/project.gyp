@@ -153,6 +153,7 @@
         '../../src/czmq_classes.h'
       ],
       'dependencies': [
+        '../../../libzmq/builds/gyp/project.gyp:libzmq',
       ],
       'copies': [
         {
