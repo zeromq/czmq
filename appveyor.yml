@@ -69,7 +69,7 @@ after_build:
   - cmd: cd "%CZMQ_BUILDDIR%\%Configuration%"
   - cmd: copy "%SODIUM_LIBRARY_DIR%\libsodium.dll" .
   - cmd: copy "%LIBZMQ_BUILDDIR%\bin\%Configuration%\libzmq-*dll" .
-  - cmd: 7z a -y -bd -mx=9 czmq.zip czmq_selftest.exe czmq.dll libsodium.dll libzmq-*.dll
+  - cmd: 7z a -y -bd -mx=9 czmq.zip "%APPVEYOR_BUILD_FOLDER%\src\%CONFIGURATION%\zmakecert.exe" "%APPVEYOR_BUILD_FOLDER%\src\%CONFIGURATION%\czmq_selftest.exe" czmq.dll libsodium.dll libzmq-*.dll
   - ps: Push-AppveyorArtifact "czmq.zip" -Filename "czmq-${env:Platform}-${env:Configuration}.zip"
   - cmd: cd "%CZMQ_BUILDDIR%"
   - cmd: ctest -C "%Configuration%" -V
