@@ -36,6 +36,14 @@ QZcertstore::~QZcertstore ()
 }
 
 ///
+//  Override the default disk loader with a custom loader fn.
+void QZcertstore::setLoader (zcertstore_loader loader)
+{
+    zcertstore_set_loader (self, loader);
+    
+}
+
+///
 //  Look up certificate by public key, returns zcert_t object if found,
 //  else returns NULL. The public key is provided in Z85 text format.  
 QZcert * QZcertstore::lookup (const QString &publicKey)
@@ -51,6 +59,15 @@ QZcert * QZcertstore::lookup (const QString &publicKey)
 void QZcertstore::insert (QZcert *certP)
 {
     zcertstore_insert (self, &certP->self);
+    
+}
+
+///
+//  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+//  which don't usually have access to struct internals.                        
+void QZcertstore::empty ()
+{
+    zcertstore_empty (self);
     
 }
 

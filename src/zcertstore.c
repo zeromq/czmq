@@ -40,6 +40,7 @@
 //  Structure of our class
 
 struct _zcertstore_t {
+    zcertstore_loader *loader;  //  Certificate loader fn
     char *location;             //  Directory location
     //  This isn't sufficient; we should check the hash of all files
     //  or else use a trigger like inotify on Linux.
@@ -48,6 +49,8 @@ struct _zcertstore_t {
     size_t cursize;             //  Total size of certificates
     zhashx_t *certs;            //  Loaded certificates
 };
+
+static void s_load_certs_from_disk (zcertstore_t *self);
 
 
 //  --------------------------------------------------------------------------
@@ -60,8 +63,6 @@ struct _zcertstore_t {
 //  location is specified as NULL, creates a pure-memory store, which you
 //  can work with by inserting certificates at runtime.
 
-static void s_load_certs_from_disk (zcertstore_t *self);
-
 zcertstore_t *
 zcertstore_new (const char *location)
 {
@@ -73,8 +74,12 @@ zcertstore_new (const char *location)
     zhashx_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
 
     if (location) {
+        self->loader = s_load_certs_from_disk;
         self->location = strdup (location);
         assert (self->location);
+        self->modified = 0;
+        self->count = 0;
+        self->cursize = 0;
         s_load_certs_from_disk (self);
     }
     return self;
@@ -86,9 +91,14 @@ zcertstore_new (const char *location)
 static void
 s_load_certs_from_disk (zcertstore_t *self)
 {
-    zhashx_purge (self->certs);
     zdir_t *dir = zdir_new (self->location, NULL);
-    if (dir) {
+    if (dir
+    && (self->modified != zdir_modified (dir)
+    ||  self->count != zdir_count (dir)
+    ||  self->cursize != (size_t) zdir_cursize (dir)))
+    {
+        zhashx_purge (self->certs);
+
         //  Load all certificates including those in subdirectories
         zfile_t **filelist = zdir_flatten (dir);
         assert (filelist);
@@ -139,23 +149,26 @@ zcertstore_destroy (zcertstore_t **self_p)
 
 
 //  --------------------------------------------------------------------------
+//  Override the default disk loader with a custom loader fn.
+
+void
+zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader)
+{
+    self->loader = loader;
+    self->loader (self);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Look up certificate by public key, returns zcert_t object if found,
 //  else returns NULL. The public key is provided in Z85 text format.
 
 zcert_t *
 zcertstore_lookup (zcertstore_t *self, const char *public_key)
 {
-    //  If directory has changed, reload all certificates
-    if (self->location) {
-        zdir_t *dir = zdir_new (self->location, NULL);
-        if (dir
-        && (self->modified != zdir_modified (dir)
-        ||  self->count != zdir_count (dir)
-        ||  self->cursize != (size_t) zdir_cursize (dir)))
-            s_load_certs_from_disk (self);
-            
-        zdir_destroy (&dir);
-    }
+    if (self->loader)
+        self->loader (self);
+
     return (zcert_t *) zhashx_lookup (self->certs, public_key);
 }
 
@@ -171,6 +184,18 @@ zcertstore_insert (zcertstore_t *self, zcert_t **cert_p)
     int rc = zhashx_insert (self->certs, zcert_public_txt (*cert_p), *cert_p);
     assert (rc == 0);
     *cert_p = NULL;             //  We own this now
+}
+
+
+//  --------------------------------------------------------------------------
+//  Empty certificate hashtable
+//  This wrapper exists to be friendly to bindings, which don't usually have
+//  access to struct internals (e.g. self->certs).
+
+void
+zcertstore_empty (zcertstore_t *self)
+{
+    zhashx_purge (self->certs);
 }
 
 
@@ -216,6 +241,24 @@ zcertstore_fprint (zcertstore_t *self, FILE *file)
 //  --------------------------------------------------------------------------
 //  Selftest
 
+static void
+s_test_loader (zcertstore_t *certstore)
+{
+    zcertstore_empty (certstore);
+
+    byte public_key [32] = { 31, 133, 154, 36, 47, 67, 155, 5, 63, 1,
+                             155, 230, 78, 191, 156, 199, 94, 125, 157, 168,
+                             109, 69, 19, 241, 44, 29, 154, 216, 59, 219,
+                             155, 185 };
+    byte secret_key [32] = { 31, 133, 154, 36, 47, 67, 155, 5, 63, 1,
+                             155, 230, 78, 191, 156, 199, 94, 125, 157, 168,
+                             109, 69, 19, 241, 44, 29, 154, 216, 59, 219,
+                             155, 185 };
+
+    zcert_t *cert = zcert_new_from (public_key, secret_key);
+    zcertstore_insert (certstore, &cert);
+}
+
 void
 zcertstore_test (bool verbose)
 {
@@ -245,6 +288,16 @@ zcertstore_test (bool verbose)
     cert = zcertstore_lookup (certstore, client_key);
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
+
+    //  Test custom loader
+    zcertstore_set_loader (certstore, s_test_loader);
+#if (ZMQ_VERSION_MAJOR >= 4)
+    cert = zcertstore_lookup (certstore, client_key);
+    assert (cert == NULL);
+    cert = zcertstore_lookup (certstore, "abcdefghijklmnopqrstuvwxyzabcdefghijklmn");
+    assert (cert);
+#endif
+
     free (client_key);
 
     if (verbose)

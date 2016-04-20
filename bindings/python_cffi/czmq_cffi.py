@@ -81,6 +81,10 @@ typedef struct _zuuid_t zuuid_t;
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
 
+// Loaders retrieve certificates from an arbitrary source.
+typedef void (zcertstore_loader) (
+    zcertstore_t *self);
+
 // 
 typedef int (zconfig_fct) (
     zconfig_t *self, void *arg, int level);
@@ -373,6 +377,10 @@ zcertstore_t *
 void
     zcertstore_destroy (zcertstore_t **self_p);
 
+// Override the default disk loader with a custom loader fn.
+void
+    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader);
+
 // Look up certificate by public key, returns zcert_t object if found,
 // else returns NULL. The public key is provided in Z85 text format.  
 zcert_t *
@@ -383,6 +391,11 @@ zcert_t *
 // directly on the certificate. Takes ownership of zcert_t object.    
 void
     zcertstore_insert (zcertstore_t *self, zcert_t **cert_p);
+
+// Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+// which don't usually have access to struct internals.                        
+void
+    zcertstore_empty (zcertstore_t *self);
 
 // Print list of certificates in store to logging facility
 void

@@ -43,6 +43,12 @@ Java_org_zeromq_czmq_Zcertstore__1_1insert (JNIEnv *env, jclass c, jlong self, j
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zcertstore__1_1empty (JNIEnv *env, jclass c, jlong self)
+{
+    zcertstore_empty ((zcertstore_t *) (intptr_t) self);
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zcertstore__1_1print (JNIEnv *env, jclass c, jlong self)
 {
     zcertstore_print ((zcertstore_t *) (intptr_t) self);

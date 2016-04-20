@@ -723,14 +723,19 @@ and you should use the print method.
 
 
 # zcertstore
+zcertstore_loader = CFUNCTYPE(None, zcertstore_p)
 lib.zcertstore_new.restype = zcertstore_p
 lib.zcertstore_new.argtypes = [c_char_p]
 lib.zcertstore_destroy.restype = None
 lib.zcertstore_destroy.argtypes = [POINTER(zcertstore_p)]
+lib.zcertstore_set_loader.restype = None
+lib.zcertstore_set_loader.argtypes = [zcertstore_p, zcertstore_loader]
 lib.zcertstore_lookup.restype = zcert_p
 lib.zcertstore_lookup.argtypes = [zcertstore_p, c_char_p]
 lib.zcertstore_insert.restype = None
 lib.zcertstore_insert.argtypes = [zcertstore_p, POINTER(zcert_p)]
+lib.zcertstore_empty.restype = None
+lib.zcertstore_empty.argtypes = [zcertstore_p]
 lib.zcertstore_print.restype = None
 lib.zcertstore_print.argtypes = [zcertstore_p]
 lib.zcertstore_fprint.restype = None
@@ -792,6 +797,12 @@ stored on disk.
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
+    def set_loader(self, loader):
+        """
+        Override the default disk loader with a custom loader fn.
+        """
+        return lib.zcertstore_set_loader(self._as_parameter_, loader)
+
     def lookup(self, public_key):
         """
         Look up certificate by public key, returns zcert_t object if found,
@@ -806,6 +817,13 @@ does not save the certificate to disk. To do that, use zcert_save()
 directly on the certificate. Takes ownership of zcert_t object.
         """
         return lib.zcertstore_insert(self._as_parameter_, byref(zcert_p.from_param(cert_p)))
+
+    def empty(self):
+        """
+        Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+which don't usually have access to struct internals.
+        """
+        return lib.zcertstore_empty(self._as_parameter_)
 
     def print(self):
         """
