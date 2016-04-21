@@ -86,7 +86,7 @@ extern "C" {
 //
 //  This is the zauth constructor as a zactor_fn:
 CZMQ_EXPORT void
-    zauth (zsock_t *pipe, void *unused);
+    zauth (zsock_t *pipe, void *certstore);
 
 //  Selftest
 CZMQ_EXPORT void

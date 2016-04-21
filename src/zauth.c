@@ -62,10 +62,14 @@ s_self_destroy (self_t **self_p)
 }
 
 static self_t *
-s_self_new (zsock_t *pipe)
+s_self_new (zsock_t *pipe, zcertstore_t *certstore)
 {
     self_t *self = (self_t *) zmalloc (sizeof (self_t));
     assert (self);
+    if (certstore) {
+        self->certstore = certstore;
+        self->allow_any = false;
+    }
     self->pipe = pipe;
     self->whitelist = zhashx_new ();
     assert (self->whitelist);
@@ -487,9 +491,9 @@ s_self_authenticate (self_t *self)
 //  zauth() implements the zauth actor interface
 
 void
-zauth (zsock_t *pipe, void *unused)
+zauth (zsock_t *pipe, void *certstore)
 {
-    self_t *self = s_self_new (pipe);
+    self_t *self = s_self_new (pipe, (zcertstore_t *)certstore);
     assert (self);
 
     //  Signal successful initialization
@@ -550,6 +554,25 @@ s_can_connect (zsock_t **server, zsock_t **client, bool renew)
         s_renew_sockets (server, client);
 
     return success;
+}
+
+static void
+s_test_loader (zcertstore_t *certstore)
+{
+    zcertstore_empty (certstore);
+
+    byte public_key [32] = { 105, 76, 150, 58, 214, 191, 218, 65, 50, 172,
+                             131, 188, 247, 211, 136, 170, 227, 26, 57, 170,
+                             185, 63, 246, 225, 177, 230, 12, 8, 134, 136,
+                             105, 106 };
+    byte secret_key [32] = { 245, 217, 172, 73, 106, 28, 195, 17, 218, 132,
+                             135, 209, 99, 240, 98, 232, 7, 137, 244, 100,
+                             242, 23, 29, 114, 70, 223, 83, 1, 113, 207,
+                             132, 149 };
+
+    zcert_t *cert = zcert_new_from (public_key, secret_key);
+    assert (cert);
+    zcertstore_insert (certstore, &cert);
 }
 #endif
 
@@ -681,10 +704,39 @@ zauth_test (bool verbose)
         assert (streq (meta, "World!"));
         zframe_destroy (&frame);
         s_renew_sockets(&server, &client);
+#endif
 
         zcert_destroy (&server_cert);
         zcert_destroy (&client_cert);
-#endif
+
+        // Test custom zcertstore
+        zcertstore_t *certstore = zcertstore_new (NULL);
+        zcertstore_set_loader (certstore, s_test_loader);
+        zactor_destroy(&auth);
+        auth = zactor_new (zauth, certstore);
+        assert (auth);
+        if (verbose) {
+            zstr_sendx (auth, "VERBOSE", NULL);
+            zsock_wait (auth);
+        }
+
+        byte public_key [32] = { 105, 76, 150, 58, 214, 191, 218, 65, 50, 172,
+                                 131, 188, 247, 211, 136, 170, 227, 26, 57, 170,
+                                 185, 63, 246, 225, 177, 230, 12, 8, 134, 136,
+                                 105, 106 };
+        byte secret_key [32] = { 245, 217, 172, 73, 106, 28, 195, 17, 218, 132,
+                                 135, 209, 99, 240, 98, 232, 7, 137, 244, 100,
+                                 242, 23, 29, 114, 70, 223, 83, 1, 113, 207,
+                                 132, 149 };
+        zcert_t *shared_cert = zcert_new_from (public_key, secret_key);
+        assert (shared_cert);
+        zcert_apply (shared_cert, server);
+        zcert_apply (shared_cert, client);
+        zsock_set_curve_server (server, 1);
+        zsock_set_curve_serverkey (client, "x?T*N/1Y{8goubv{Ts}#&#f}TXJ//DVe#D2HkoLU");
+        success = s_can_connect (&server, &client, true);
+        assert (success);
+        zcert_destroy (&shared_cert);
     }
     //  Remove the authenticator and check a normal connection works
     zactor_destroy (&auth);
