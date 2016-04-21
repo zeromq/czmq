@@ -445,6 +445,52 @@ zsock_new_dish (const char *endpoints)
 
 
 //  --------------------------------------------------------------------------
+//  Create a GATHER socket. Default action is bind.
+
+zsock_t *
+zsock_new_gather_checked (const char *endpoints, const char *filename, size_t line_nbr)
+{
+#if defined ZMQ_GATHER
+    zsock_t *sock = zsock_new_checked (ZMQ_GATHER, filename, line_nbr);
+    if (zsock_attach (sock, endpoints, true))
+        zsock_destroy (&sock);
+    return sock;
+#else
+    return NULL;
+#endif
+}
+
+zsock_t *
+zsock_new_gather (const char *endpoints)
+{
+    return zsock_new_gather_checked (endpoints, NULL, 0);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a scatter socket. Default action is connect.
+
+zsock_t *
+zsock_new_scatter_checked (const char *endpoints, const char *filename, size_t line_nbr)
+{
+#if defined ZMQ_SCATTER
+    zsock_t *sock = zsock_new_checked (ZMQ_SCATTER, filename, line_nbr);
+    if (zsock_attach (sock, endpoints, false))
+        zsock_destroy (&sock);
+    return sock;
+#else
+    return NULL;
+#endif
+}
+
+zsock_t *
+zsock_new_scatter (const char *endpoints)
+{
+    return zsock_new_scatter_checked (endpoints, NULL, 0);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
 //  ephemeral ports, if you specify the port number as "*". By default
 //  zsock uses the IANA designated range from C000 (49152) to FFFF (65535).
@@ -2068,6 +2114,26 @@ zsock_test (bool verbose)
 
     zsock_destroy (&client);
     zsock_destroy (&server);
+
+#endif
+
+#ifdef ZMQ_SCATTER
+
+    zsock_t* gather = zsock_new_gather ("inproc://test-gather-scatter");
+    assert (gather);
+    zsock_t* scatter = zsock_new_scatter ("inproc://test-gather-scatter");
+    assert (scatter);
+
+    rc = zstr_send (scatter, "HELLO");
+    assert (rc == 0);
+
+    char* message;
+    message = zstr_recv (gather);
+    assert (streq(message, "HELLO"));
+    zstr_free (&message);    
+
+    zsock_destroy (&gather);
+    zsock_destroy (&scatter);
 
 #endif
 

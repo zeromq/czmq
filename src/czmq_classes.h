@@ -109,6 +109,18 @@ CZMQ_EXPORT zsock_t *
     zsock_new_dish (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
+//  Create a GATHER socket. Default action is bind.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zsock_t *
+    zsock_new_gather (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
+//  Create a GATHER socket. Default action is connect.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zsock_t *
+    zsock_new_scatter (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.     
 CZMQ_EXPORT uint32_t
