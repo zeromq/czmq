@@ -126,6 +126,16 @@
         <argument name = "endpoint" type = "string" />
     </constructor>
 
+    <constructor name = "new gather" state = "draft">
+        Create a GATHER socket. Default action is bind.
+        <argument name = "endpoint" type = "string" />
+    </constructor>
+
+    <constructor name = "new scatter" state = "draft">
+        Create a GATHER socket. Default action is connect.
+        <argument name = "endpoint" type = "string" />
+    </constructor>
+
     <method name = "bind">
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
         ephemeral ports, if you specify the port number as "*". By default

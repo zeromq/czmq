@@ -743,6 +743,16 @@ CZMQ_EXPORT zsock_t *
     zsock_new_dish (const char *endpoint);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Create a GATHER socket. Default action is bind.
+CZMQ_EXPORT zsock_t *
+    zsock_new_gather (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Create a GATHER socket. Default action is connect.
+CZMQ_EXPORT zsock_t *
+    zsock_new_scatter (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.     
 CZMQ_EXPORT uint32_t
@@ -897,6 +907,12 @@ CZMQ_EXPORT zsock_t *
 
 CZMQ_EXPORT zsock_t *
     zsock_new_dish_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_gather_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_scatter_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
 #ifdef __cplusplus
 }
