@@ -748,7 +748,7 @@ CZMQ_EXPORT zsock_t *
     zsock_new_gather (const char *endpoint);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Create a GATHER socket. Default action is connect.
+//  Create a SCATTER socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_scatter (const char *endpoint);
 

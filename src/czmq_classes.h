@@ -115,7 +115,7 @@ CZMQ_EXPORT zsock_t *
     zsock_new_gather (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
-//  Create a GATHER socket. Default action is connect.
+//  Create a SCATTER socket. Default action is connect.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zsock_t *
     zsock_new_scatter (const char *endpoint);

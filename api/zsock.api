@@ -36,6 +36,8 @@
             <map name = "CLIENT"  value = "13" />
             <map name = "RADIO"  value = "14" />
             <map name = "DISH"  value = "15" />
+            <map name = "GATHER"  value = "16" />
+            <map name = "SCATTER"  value = "17" />
         </argument>
     </constructor>
 
@@ -132,7 +134,7 @@
     </constructor>
 
     <constructor name = "new scatter" state = "draft">
-        Create a GATHER socket. Default action is connect.
+        Create a SCATTER socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
     </constructor>
 
