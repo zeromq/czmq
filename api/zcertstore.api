@@ -25,6 +25,16 @@
         stored on disk.
     </destructor>
 
+    <callback_type name = "loader">
+        Loaders retrieve certificates from an arbitrary source.
+        <argument name = "self" type = "zcertstore" />
+    </callback_type>
+
+    <method name = "set_loader">
+      Override the default disk loader with a custom loader fn.
+      <argument name = "loader" type = "zcertstore_loader" callback = "1" />
+    </method>
+
     <method name = "lookup">
         Look up certificate by public key, returns zcert_t object if found,
         else returns NULL. The public key is provided in Z85 text format.
@@ -37,6 +47,11 @@
         does not save the certificate to disk. To do that, use zcert_save()
         directly on the certificate. Takes ownership of zcert_t object.
         <argument name = "cert p" type = "zcert" by_reference = "1" />
+    </method>
+
+    <method name = "empty">
+        Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+        which don't usually have access to struct internals.
     </method>
 
     <method name = "print">

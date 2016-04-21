@@ -73,6 +73,23 @@ module CZMQ
         @finalizer = nil
       end
 
+      # Create a new callback of the following type:
+      # Loaders retrieve certificates from an arbitrary source.
+      #     typedef void (zcertstore_loader) (
+      #         zcertstore_t *self);          
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.loader
+        ::FFI::Function.new :void, [:pointer], blocking: true do |self_|
+          self_ = Zcertstore.__new self_, false
+          result = yield self_
+          result
+        end
+      end
+
       # Create a new certificate store from a disk directory, loading and        
       # indexing all certificates in that location. The directory itself may be  
       # absent, and created later, or modified at any time. The certificate store
@@ -94,6 +111,17 @@ module CZMQ
         return unless @ptr
         self_p = __ptr_give_ref
         result = ::CZMQ::FFI.zcertstore_destroy(self_p)
+        result
+      end
+
+      # Override the default disk loader with a custom loader fn.
+      #
+      # @param loader [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def set_loader(loader)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zcertstore_set_loader(self_p, loader)
         result
       end
 
@@ -121,6 +149,17 @@ module CZMQ
         self_p = @ptr
         cert_p = cert_p.__ptr_give_ref
         result = ::CZMQ::FFI.zcertstore_insert(self_p, cert_p)
+        result
+      end
+
+      # Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+      # which don't usually have access to struct internals.                        
+      #
+      # @return [void]
+      def empty()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zcertstore_empty(self_p)
         result
       end
 

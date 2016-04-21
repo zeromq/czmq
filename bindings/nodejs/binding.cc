@@ -509,6 +509,7 @@ NAN_MODULE_INIT (Zcertstore::Init) {
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "lookup", _lookup);
     Nan::SetPrototypeMethod (tpl, "insert", _insert);
+    Nan::SetPrototypeMethod (tpl, "empty", _empty);
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
@@ -584,6 +585,11 @@ NAN_METHOD (Zcertstore::_insert) {
     Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
     Zcert *cert_p = Nan::ObjectWrap::Unwrap<Zcert>(info [0].As<Object>());
     zcertstore_insert (zcertstore->self, &cert_p->self);
+}
+
+NAN_METHOD (Zcertstore::_empty) {
+    Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
+    zcertstore_empty (zcertstore->self);
 }
 
 NAN_METHOD (Zcertstore::_print) {

@@ -60,6 +60,14 @@ public class Zcertstore implements AutoCloseable{
         __insert (self, certP.self);
     }
     /*
+    Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+    which don't usually have access to struct internals.                        
+    */
+    native static void __empty (long self);
+    public void empty () {
+        __empty (self);
+    }
+    /*
     Print list of certificates in store to logging facility
     */
     native static void __print (long self);

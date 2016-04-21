@@ -306,6 +306,13 @@ does not save the certificate to disk. To do that, use zcert_save()
 directly on the certificate. Takes ownership of zcert_t object.
 
 ```
+nothing my_zcertstore.empty ()
+```
+
+Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+which don't usually have access to struct internals.
+
+```
 nothing my_zcertstore.print ()
 ```
 

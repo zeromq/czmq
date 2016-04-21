@@ -9,6 +9,12 @@
 
 
 ///
+//  Override the default disk loader with a custom loader fn.
+void QmlZcertstore::setLoader (zcertstore_loader loader) {
+    zcertstore_set_loader (self, loader);
+};
+
+///
 //  Look up certificate by public key, returns zcert_t object if found,
 //  else returns NULL. The public key is provided in Z85 text format.  
 QmlZcert *QmlZcertstore::lookup (const QString &publicKey) {
@@ -23,6 +29,13 @@ QmlZcert *QmlZcertstore::lookup (const QString &publicKey) {
 //  directly on the certificate. Takes ownership of zcert_t object.    
 void QmlZcertstore::insert (QmlZcert *certP) {
     zcertstore_insert (self, &certP->self);
+};
+
+///
+//  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+//  which don't usually have access to struct internals.                        
+void QmlZcertstore::empty () {
+    zcertstore_empty (self);
 };
 
 ///

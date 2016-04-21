@@ -102,8 +102,10 @@ module CZMQ
 
       attach_function :zcertstore_new, [:string], :pointer, **opts
       attach_function :zcertstore_destroy, [:pointer], :void, **opts
+      attach_function :zcertstore_set_loader, [:pointer, :pointer], :void, **opts
       attach_function :zcertstore_lookup, [:pointer, :string], :pointer, **opts
       attach_function :zcertstore_insert, [:pointer, :pointer], :void, **opts
+      attach_function :zcertstore_empty, [:pointer], :void, **opts
       attach_function :zcertstore_print, [:pointer], :void, **opts
       attach_function :zcertstore_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zcertstore_test, [:bool], :void, **opts

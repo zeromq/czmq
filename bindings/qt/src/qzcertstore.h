@@ -29,6 +29,9 @@ public:
     //  stored on disk.                                                       
     ~QZcertstore ();
 
+    //  Override the default disk loader with a custom loader fn.
+    void setLoader (zcertstore_loader loader);
+
     //  Look up certificate by public key, returns zcert_t object if found,
     //  else returns NULL. The public key is provided in Z85 text format.  
     QZcert * lookup (const QString &publicKey);
@@ -37,6 +40,10 @@ public:
     //  does not save the certificate to disk. To do that, use zcert_save()
     //  directly on the certificate. Takes ownership of zcert_t object.    
     void insert (QZcert *certP);
+
+    //  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+    //  which don't usually have access to struct internals.                        
+    void empty ();
 
     //  Print list of certificates in store to logging facility
     void print ();
