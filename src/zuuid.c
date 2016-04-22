@@ -157,8 +157,8 @@ zuuid_set_str (zuuid_t *self, const char *source)
                 return -1;
             if (byte_nbr < ZUUID_LEN) {
                 self->uuid [byte_nbr] = (byte) value;
-                self->str [byte_nbr * 2 + 0] = *source++;
-                self->str [byte_nbr * 2 + 1] = *source++;
+                self->str [byte_nbr * 2 + 0] = toupper(*source++);
+                self->str [byte_nbr * 2 + 1] = toupper(*source++);
                 byte_nbr++;
             }
             else
