@@ -724,12 +724,13 @@ and you should use the print method.
 
 # zcertstore
 zcertstore_loader = CFUNCTYPE(None, zcertstore_p)
+zcertstore_destructor = CFUNCTYPE(None, c_void_p)
 lib.zcertstore_new.restype = zcertstore_p
 lib.zcertstore_new.argtypes = [c_char_p]
 lib.zcertstore_destroy.restype = None
 lib.zcertstore_destroy.argtypes = [POINTER(zcertstore_p)]
 lib.zcertstore_set_loader.restype = None
-lib.zcertstore_set_loader.argtypes = [zcertstore_p, zcertstore_loader]
+lib.zcertstore_set_loader.argtypes = [zcertstore_p, zcertstore_loader, zcertstore_destructor, c_void_p]
 lib.zcertstore_lookup.restype = zcert_p
 lib.zcertstore_lookup.argtypes = [zcertstore_p, c_char_p]
 lib.zcertstore_insert.restype = None
@@ -797,11 +798,11 @@ stored on disk.
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
-    def set_loader(self, loader):
+    def set_loader(self, loader, destructor, state):
         """
         Override the default disk loader with a custom loader fn.
         """
-        return lib.zcertstore_set_loader(self._as_parameter_, loader)
+        return lib.zcertstore_set_loader(self._as_parameter_, loader, destructor, state)
 
     def lookup(self, public_key):
         """
@@ -4810,6 +4811,10 @@ lib.zsock_new_radio.restype = zsock_p
 lib.zsock_new_radio.argtypes = [c_char_p]
 lib.zsock_new_dish.restype = zsock_p
 lib.zsock_new_dish.argtypes = [c_char_p]
+lib.zsock_new_gather.restype = zsock_p
+lib.zsock_new_gather.argtypes = [c_char_p]
+lib.zsock_new_scatter.restype = zsock_p
+lib.zsock_new_scatter.argtypes = [c_char_p]
 lib.zsock_bind.restype = c_int
 lib.zsock_bind.argtypes = [zsock_p, c_char_p]
 lib.zsock_endpoint.restype = c_char_p
@@ -5229,6 +5234,20 @@ action is connect.
         Create a DISH socket. Default action is connect.
         """
         return Zsock(lib.zsock_new_dish(endpoint), True)
+
+    @staticmethod
+    def new_gather(endpoint):
+        """
+        Create a GATHER socket. Default action is bind.
+        """
+        return Zsock(lib.zsock_new_gather(endpoint), True)
+
+    @staticmethod
+    def new_scatter(endpoint):
+        """
+        Create a SCATTER socket. Default action is connect.
+        """
+        return Zsock(lib.zsock_new_scatter(endpoint), True)
 
     def bind(self, format, *args):
         """

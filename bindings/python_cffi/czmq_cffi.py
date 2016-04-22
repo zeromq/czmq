@@ -85,6 +85,10 @@ typedef void (zactor_fn) (
 typedef void (zcertstore_loader) (
     zcertstore_t *self);
 
+// Destructor for loader state.
+typedef void (zcertstore_destructor) (
+    void **self_p);
+
 // 
 typedef int (zconfig_fct) (
     zconfig_t *self, void *arg, int level);
@@ -379,7 +383,7 @@ void
 
 // Override the default disk loader with a custom loader fn.
 void
-    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader);
+    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader, zcertstore_destructor destructor, void *state);
 
 // Look up certificate by public key, returns zcert_t object if found,
 // else returns NULL. The public key is provided in Z85 text format.  
@@ -2338,6 +2342,14 @@ zsock_t *
 // Create a DISH socket. Default action is connect.
 zsock_t *
     zsock_new_dish (const char *endpoint);
+
+// Create a GATHER socket. Default action is bind.
+zsock_t *
+    zsock_new_gather (const char *endpoint);
+
+// Create a SCATTER socket. Default action is connect.
+zsock_t *
+    zsock_new_scatter (const char *endpoint);
 
 // Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
 // ephemeral ports, if you specify the port number as "*". By default      

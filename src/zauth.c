@@ -711,7 +711,7 @@ zauth_test (bool verbose)
 
         // Test custom zcertstore
         zcertstore_t *certstore = zcertstore_new (NULL);
-        zcertstore_set_loader (certstore, s_test_loader);
+        zcertstore_set_loader (certstore, s_test_loader, NULL, NULL);
         zactor_destroy(&auth);
         auth = zactor_new (zauth, certstore);
         assert (auth);

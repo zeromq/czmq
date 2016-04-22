@@ -74,6 +74,12 @@ public:
     //  Create a DISH socket. Default action is connect.
     static QZsock* newDish (const QString &endpoint, QObject *qObjParent = 0);
 
+    //  Create a GATHER socket. Default action is bind.
+    static QZsock* newGather (const QString &endpoint, QObject *qObjParent = 0);
+
+    //  Create a SCATTER socket. Default action is connect.
+    static QZsock* newScatter (const QString &endpoint, QObject *qObjParent = 0);
+
     //  Destroy the socket. You must use this for any socket created via the
     //  zsock_new method.                                                   
     ~QZsock ();

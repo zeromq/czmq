@@ -4253,6 +4253,12 @@ NAN_METHOD (Zsock::New) {
         if (streq (type_name, "dish"))
             type = 15;
         else
+        if (streq (type_name, "gather"))
+            type = 16;
+        else
+        if (streq (type_name, "scatter"))
+            type = 17;
+        else
             return Nan::ThrowTypeError ("`type` not a valid string");
     }
     else

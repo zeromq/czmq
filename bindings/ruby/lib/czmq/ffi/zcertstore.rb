@@ -90,6 +90,22 @@ module CZMQ
         end
       end
 
+      # Create a new callback of the following type:
+      # Destructor for loader state.
+      #     typedef void (zcertstore_destructor) (
+      #         void **self_p);                   
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.destructor
+        ::FFI::Function.new :void, [:pointer], blocking: true do |self_p|
+          result = yield self_p
+          result
+        end
+      end
+
       # Create a new certificate store from a disk directory, loading and        
       # indexing all certificates in that location. The directory itself may be  
       # absent, and created later, or modified at any time. The certificate store
@@ -117,11 +133,13 @@ module CZMQ
       # Override the default disk loader with a custom loader fn.
       #
       # @param loader [::FFI::Pointer, #to_ptr]
+      # @param destructor [::FFI::Pointer, #to_ptr]
+      # @param state [::FFI::Pointer, #to_ptr]
       # @return [void]
-      def set_loader(loader)
+      def set_loader(loader, destructor, state)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        result = ::CZMQ::FFI.zcertstore_set_loader(self_p, loader)
+        result = ::CZMQ::FFI.zcertstore_set_loader(self_p, loader, destructor, state)
         result
       end
 

@@ -29,7 +29,7 @@ public:
     
 public slots:
     //  Override the default disk loader with a custom loader fn.
-    void setLoader (zcertstore_loader loader);
+    void setLoader (zcertstore_loader loader, zcertstore_destructor destructor, void *state);
 
     //  Look up certificate by public key, returns zcert_t object if found,
     //  else returns NULL. The public key is provided in Z85 text format.  

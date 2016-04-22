@@ -141,6 +141,20 @@ QZsock* QZsock::newDish (const QString &endpoint, QObject *qObjParent)
 }
 
 ///
+//  Create a GATHER socket. Default action is bind.
+QZsock* QZsock::newGather (const QString &endpoint, QObject *qObjParent)
+{
+    return new QZsock (zsock_new_gather (endpoint.toUtf8().data()), qObjParent);
+}
+
+///
+//  Create a SCATTER socket. Default action is connect.
+QZsock* QZsock::newScatter (const QString &endpoint, QObject *qObjParent)
+{
+    return new QZsock (zsock_new_scatter (endpoint.toUtf8().data()), qObjParent);
+}
+
+///
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.                                                   
 QZsock::~QZsock ()
