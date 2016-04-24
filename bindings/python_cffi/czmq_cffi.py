@@ -75,6 +75,7 @@ typedef struct _zproc_t zproc_t;
 typedef struct _va_list_t va_list_t;
 typedef struct _socket_t socket_t;
 typedef struct _zstr_t zstr_t;
+typedef struct _ztimerset_t ztimerset_t;
 typedef struct _ztrie_t ztrie_t;
 typedef struct _zuuid_t zuuid_t;
 // Actors get a pipe and arguments from caller
@@ -157,6 +158,10 @@ typedef int (zloop_fn) (
 // Callback for reactor timer events
 typedef int (zloop_timer_fn) (
     zloop_t *loop, int timer_id, void *arg);
+
+// Callback function for timer event.
+typedef void (ztimerset_fn) (
+    int timer_id, void *arg);
 
 // Callback function for ztrie_node to destroy node data.
 typedef void (ztrie_destroy_data_fn) (
@@ -3046,6 +3051,49 @@ void
 // Self test of this class.
 void
     zstr_test (bool verbose);
+
+// CLASS: ztimerset
+// Create new timer set.
+ztimerset_t *
+    ztimerset_new (void);
+
+// Destroy a timer set
+void
+    ztimerset_destroy (ztimerset_t **self_p);
+
+// Add a timer to the set. Returns timer id if OK, -1 on failure.
+int
+    ztimerset_add (ztimerset_t *self, size_t interval, ztimerset_fn handler, void *arg);
+
+// Cancel a timer. Returns 0 if OK, -1 on failure.
+int
+    ztimerset_cancel (ztimerset_t *self, int timer_id);
+
+// Set timer interval. Returns 0 if OK, -1 on failure.                                    
+// This method is slow, canceling the timer and adding a new one yield better performance.
+int
+    ztimerset_set_interval (ztimerset_t *self, int timer_id, size_t interval);
+
+// Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
+// This method is slow, canceling the timer and adding a new one yield better performance.  
+int
+    ztimerset_reset (ztimerset_t *self, int timer_id);
+
+// Return the time until the next interval.                        
+// Should be used as timeout parameter for the zpoller wait method.
+// The timeout is in msec.                                         
+int
+    ztimerset_timeout (ztimerset_t *self);
+
+// Invoke callback function of all timers which their interval has elapsed.
+// Should be call after zpoller wait method.                               
+// Returns 0 if OK, -1 on failure.                                         
+int
+    ztimerset_execute (ztimerset_t *self);
+
+// Self test of this class.
+void
+    ztimerset_test (bool verbose);
 
 // CLASS: ztrie
 // Creates a new ztrie.

@@ -136,6 +136,8 @@
         '../../include/zsys.h',
         '../../src/zthread.c',
         '../../include/zthread.h',
+        '../../src/ztimerset.c',
+        '../../include/ztimerset.h',
         '../../src/ztrie.c',
         '../../include/ztrie.h',
         '../../src/zuuid.c',
@@ -153,6 +155,7 @@
         '../../src/czmq_classes.h'
       ],
       'dependencies': [
+        '../../../libzmq/builds/gyp/project.gyp:libzmq',
       ],
       'copies': [
         {

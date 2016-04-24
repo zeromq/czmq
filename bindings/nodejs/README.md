@@ -3120,6 +3120,65 @@ nothing my_zstr.test (Boolean)
 
 Self test of this class.
 
+### The Ztimerset class - timer set
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_ztimerset = new czmq.Ztimerset ()
+```
+
+You *must* call the destructor on every Ztimerset instance:
+
+```
+my_ztimerset.destroy ()
+```
+
+Methods:
+
+```
+integer my_ztimerset.cancel (Number)
+```
+
+Cancel a timer. Returns 0 if OK, -1 on failure.
+
+```
+integer my_ztimerset.setInterval (Number)
+```
+
+Set timer interval. Returns 0 if OK, -1 on failure.
+This method is slow, canceling the timer and adding a new one yield better performance.
+
+```
+integer my_ztimerset.reset (Number)
+```
+
+Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
+This method is slow, canceling the timer and adding a new one yield better performance.
+
+```
+integer my_ztimerset.timeout ()
+```
+
+Return the time until the next interval.
+Should be used as timeout parameter for the zpoller wait method.
+The timeout is in msec.
+
+```
+integer my_ztimerset.execute ()
+```
+
+Invoke callback function of all timers which their interval has elapsed.
+Should be call after zpoller wait method.
+Returns 0 if OK, -1 on failure.
+
+```
+nothing my_ztimerset.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Ztrie class - simple trie for tokenizable strings
 
 Constructor:

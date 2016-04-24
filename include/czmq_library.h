@@ -131,6 +131,8 @@ typedef struct _zthread_t zthread_t;
 #ifdef CZMQ_BUILD_DRAFT_API
 typedef struct _zproc_t zproc_t;
 #define ZPROC_T_DEFINED
+typedef struct _ztimerset_t ztimerset_t;
+#define ZTIMERSET_T_DEFINED
 typedef struct _ztrie_t ztrie_t;
 #define ZTRIE_T_DEFINED
 #endif // CZMQ_BUILD_DRAFT_API
@@ -178,6 +180,7 @@ typedef struct _ztrie_t ztrie_t;
 #include "zthread.h"
 #ifdef CZMQ_BUILD_DRAFT_API
 #include "zproc.h"
+#include "ztimerset.h"
 #include "ztrie.h"
 #endif // CZMQ_BUILD_DRAFT_API
 

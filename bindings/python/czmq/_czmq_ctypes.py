@@ -142,6 +142,10 @@ class socket_t(Structure):
     pass # Empty - only for type checking
 socket_p = POINTER(socket_t)
 
+class ztimerset_t(Structure):
+    pass # Empty - only for type checking
+ztimerset_p = POINTER(ztimerset_t)
+
 class ztrie_t(Structure):
     pass # Empty - only for type checking
 ztrie_p = POINTER(ztrie_t)
@@ -6277,6 +6281,125 @@ a null pointer.
         Self test of this class.
         """
         return lib.zstr_test(verbose)
+
+
+# ztimerset
+ztimerset_fn = CFUNCTYPE(None, c_int, c_void_p)
+lib.ztimerset_new.restype = ztimerset_p
+lib.ztimerset_new.argtypes = []
+lib.ztimerset_destroy.restype = None
+lib.ztimerset_destroy.argtypes = [POINTER(ztimerset_p)]
+lib.ztimerset_add.restype = c_int
+lib.ztimerset_add.argtypes = [ztimerset_p, c_size_t, ztimerset_fn, c_void_p]
+lib.ztimerset_cancel.restype = c_int
+lib.ztimerset_cancel.argtypes = [ztimerset_p, c_int]
+lib.ztimerset_set_interval.restype = c_int
+lib.ztimerset_set_interval.argtypes = [ztimerset_p, c_int, c_size_t]
+lib.ztimerset_reset.restype = c_int
+lib.ztimerset_reset.argtypes = [ztimerset_p, c_int]
+lib.ztimerset_timeout.restype = c_int
+lib.ztimerset_timeout.argtypes = [ztimerset_p]
+lib.ztimerset_execute.restype = c_int
+lib.ztimerset_execute.argtypes = [ztimerset_p]
+lib.ztimerset_test.restype = None
+lib.ztimerset_test.argtypes = [c_bool]
+
+class Ztimerset(object):
+    """
+    timer set
+    """
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create new timer set.
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], ztimerset_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is ztimerset_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.ztimerset_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy a timer set
+        """
+        if self.allow_destruct:
+            lib.ztimerset_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def add(self, interval, handler, arg):
+        """
+        Add a timer to the set. Returns timer id if OK, -1 on failure.
+        """
+        return lib.ztimerset_add(self._as_parameter_, interval, handler, arg)
+
+    def cancel(self, timer_id):
+        """
+        Cancel a timer. Returns 0 if OK, -1 on failure.
+        """
+        return lib.ztimerset_cancel(self._as_parameter_, timer_id)
+
+    def set_interval(self, timer_id, interval):
+        """
+        Set timer interval. Returns 0 if OK, -1 on failure.
+This method is slow, canceling the timer and adding a new one yield better performance.
+        """
+        return lib.ztimerset_set_interval(self._as_parameter_, timer_id, interval)
+
+    def reset(self, timer_id):
+        """
+        Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
+This method is slow, canceling the timer and adding a new one yield better performance.
+        """
+        return lib.ztimerset_reset(self._as_parameter_, timer_id)
+
+    def timeout(self):
+        """
+        Return the time until the next interval.
+Should be used as timeout parameter for the zpoller wait method.
+The timeout is in msec.
+        """
+        return lib.ztimerset_timeout(self._as_parameter_)
+
+    def execute(self):
+        """
+        Invoke callback function of all timers which their interval has elapsed.
+Should be call after zpoller wait method.
+Returns 0 if OK, -1 on failure.
+        """
+        return lib.ztimerset_execute(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.ztimerset_test(verbose)
 
 
 # ztrie

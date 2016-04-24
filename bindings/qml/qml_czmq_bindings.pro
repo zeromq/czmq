@@ -61,6 +61,7 @@ HEADERS += \
   $$SRCDIR/QmlZproc.h \
   $$SRCDIR/QmlZsock.h \
   $$SRCDIR/QmlZstr.h \
+  $$SRCDIR/QmlZtimerset.h \
   $$SRCDIR/QmlZtrie.h \
   $$SRCDIR/QmlZuuid.h 
 
@@ -88,6 +89,7 @@ SOURCES += \
   $$SRCDIR/QmlZproc.cpp \
   $$SRCDIR/QmlZsock.cpp \
   $$SRCDIR/QmlZstr.cpp \
+  $$SRCDIR/QmlZtimerset.cpp \
   $$SRCDIR/QmlZtrie.cpp \
   $$SRCDIR/QmlZuuid.cpp 
 

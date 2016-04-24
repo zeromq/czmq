@@ -729,6 +729,27 @@ class Zstr: public Nan::ObjectWrap {
     static NAN_METHOD (_test);
 };
 
+class Ztimerset: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit Ztimerset (void);
+        explicit Ztimerset (ztimerset_t *self);
+        ztimerset_t *self;
+    private:
+        ~Ztimerset ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_cancel);
+    static NAN_METHOD (_set_interval);
+    static NAN_METHOD (_reset);
+    static NAN_METHOD (_timeout);
+    static NAN_METHOD (_execute);
+    static NAN_METHOD (_test);
+};
+
 class Ztrie: public Nan::ObjectWrap {
     public:
         static NAN_MODULE_INIT (Init);

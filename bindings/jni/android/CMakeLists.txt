@@ -44,6 +44,7 @@ set (czmqjni_sources
     ../src/main/c/org_zeromq_czmq_Zproc.c
     ../src/main/c/org_zeromq_czmq_Zsock.c
     ../src/main/c/org_zeromq_czmq_Zstr.c
+    ../src/main/c/org_zeromq_czmq_Ztimerset.c
     ../src/main/c/org_zeromq_czmq_Ztrie.c
     ../src/main/c/org_zeromq_czmq_Zuuid.c
 )

@@ -5716,6 +5716,138 @@ Nan::Persistent <Function> &Zstr::constructor () {
 }
 
 
+NAN_MODULE_INIT (Ztimerset::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Ztimerset").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "cancel", _cancel);
+    Nan::SetPrototypeMethod (tpl, "setInterval", _set_interval);
+    Nan::SetPrototypeMethod (tpl, "reset", _reset);
+    Nan::SetPrototypeMethod (tpl, "timeout", _timeout);
+    Nan::SetPrototypeMethod (tpl, "execute", _execute);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Ztimerset").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Ztimerset::Ztimerset (void) {
+    self = ztimerset_new ();
+}
+
+Ztimerset::Ztimerset (ztimerset_t *self_) {
+    self = self_;
+}
+
+Ztimerset::~Ztimerset () {
+}
+
+NAN_METHOD (Ztimerset::New) {
+    assert (info.IsConstructCall ());
+    Ztimerset *ztimerset = new Ztimerset ();
+    if (ztimerset) {
+        ztimerset->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Ztimerset::destroy) {
+    Ztimerset *ztimerset = Nan::ObjectWrap::Unwrap <Ztimerset> (info.Holder ());
+    ztimerset_destroy (&ztimerset->self);
+}
+
+
+NAN_METHOD (Ztimerset::defined) {
+    Ztimerset *ztimerset = Nan::ObjectWrap::Unwrap <Ztimerset> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (ztimerset->self != NULL));
+}
+
+NAN_METHOD (Ztimerset::_cancel) {
+    Ztimerset *ztimerset = Nan::ObjectWrap::Unwrap <Ztimerset> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `timer id`");
+
+    int timer_id;
+    if (info [0]->IsNumber ())
+        timer_id = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`timer id` must be a number");
+    int result = ztimerset_cancel (ztimerset->self, (int) timer_id);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ztimerset::_set_interval) {
+    Ztimerset *ztimerset = Nan::ObjectWrap::Unwrap <Ztimerset> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `timer id`");
+
+    int timer_id;
+    if (info [0]->IsNumber ())
+        timer_id = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`timer id` must be a number");
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `interval`");
+    else
+    if (!info [1]->IsNumber ())
+        return Nan::ThrowTypeError ("`interval` must be a number");
+    size_t interval = Nan::To<int64_t>(info [1]).FromJust ();
+    int result = ztimerset_set_interval (ztimerset->self, (int) timer_id, (size_t) interval);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ztimerset::_reset) {
+    Ztimerset *ztimerset = Nan::ObjectWrap::Unwrap <Ztimerset> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `timer id`");
+
+    int timer_id;
+    if (info [0]->IsNumber ())
+        timer_id = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`timer id` must be a number");
+    int result = ztimerset_reset (ztimerset->self, (int) timer_id);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ztimerset::_timeout) {
+    Ztimerset *ztimerset = Nan::ObjectWrap::Unwrap <Ztimerset> (info.Holder ());
+    int result = ztimerset_timeout (ztimerset->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ztimerset::_execute) {
+    Ztimerset *ztimerset = Nan::ObjectWrap::Unwrap <Ztimerset> (info.Holder ());
+    int result = ztimerset_execute (ztimerset->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Ztimerset::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    ztimerset_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &Ztimerset::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
 NAN_MODULE_INIT (Ztrie::Init) {
     Nan::HandleScope scope;
 
@@ -6053,6 +6185,7 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     Zproc::Init (target);
     Zsock::Init (target);
     Zstr::Init (target);
+    Ztimerset::Init (target);
     Ztrie::Init (target);
     Zuuid::Init (target);
 }
