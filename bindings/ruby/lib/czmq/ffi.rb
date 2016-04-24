@@ -102,10 +102,24 @@ module CZMQ
 
       attach_function :zcertstore_new, [:string], :pointer, **opts
       attach_function :zcertstore_destroy, [:pointer], :void, **opts
-      attach_function :zcertstore_set_loader, [:pointer, :pointer, :pointer, :pointer], :void, **opts
+      begin # DRAFT method
+        attach_function :zcertstore_set_loader, [:pointer, :pointer, :pointer, :pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zcertstore_set_loader() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zcertstore_lookup, [:pointer, :string], :pointer, **opts
       attach_function :zcertstore_insert, [:pointer, :pointer], :void, **opts
-      attach_function :zcertstore_empty, [:pointer], :void, **opts
+      begin # DRAFT method
+        attach_function :zcertstore_empty, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zcertstore_empty() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zcertstore_print, [:pointer], :void, **opts
       attach_function :zcertstore_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zcertstore_test, [:bool], :void, **opts

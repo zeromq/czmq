@@ -25,17 +25,17 @@
         stored on disk.
     </destructor>
 
-    <callback_type name = "loader">
+    <callback_type name = "loader" state = "draft">
         Loaders retrieve certificates from an arbitrary source.
         <argument name = "self" type = "zcertstore" />
     </callback_type>
 
-    <callback_type name = "destructor">
+    <callback_type name = "destructor" state = "draft">
         Destructor for loader state.
         <argument name = "self_p" type = "buffer" c_type = "void **" />
     </callback_type>
 
-    <method name = "set_loader">
+    <method name = "set_loader" state = "draft">
       Override the default disk loader with a custom loader fn.
       <argument name = "loader" type = "zcertstore_loader" callback = "1" />
       <argument name = "destructor" type = "zcertstore_destructor" callback = "1" />
@@ -56,7 +56,7 @@
         <argument name = "cert p" type = "zcert" by_reference = "1" />
     </method>
 
-    <method name = "empty">
+    <method name = "empty" state = "draft">
         Empty certificate hashtable. This wrapper exists to be friendly to bindings,
         which don't usually have access to struct internals.
     </method>
