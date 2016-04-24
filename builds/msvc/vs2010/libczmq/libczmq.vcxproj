@@ -159,6 +159,9 @@
     <ClCompile Include="..\..\..\..\src\zstr.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ztimerset.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\ztrie.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

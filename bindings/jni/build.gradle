@@ -49,6 +49,7 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'org.zeromq.czmq.Zproc',
             'org.zeromq.czmq.Zsock',
             'org.zeromq.czmq.Zstr',
+            'org.zeromq.czmq.Ztimerset',
             'org.zeromq.czmq.Ztrie',
             'org.zeromq.czmq.Zuuid'
     ]

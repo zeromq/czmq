@@ -76,6 +76,9 @@
     <ClCompile Include="..\..\..\..\src\zstr.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ztimerset.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\ztrie.c">
       <Filter>src</Filter>
     </ClCompile>

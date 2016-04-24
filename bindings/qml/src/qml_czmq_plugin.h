@@ -57,6 +57,8 @@ class QmlZsock;
 class QmlZsockAttached;
 class QmlZstr;
 class QmlZstrAttached;
+class QmlZtimerset;
+class QmlZtimersetAttached;
 class QmlZtrie;
 class QmlZtrieAttached;
 class QmlZuuid;
@@ -85,6 +87,7 @@ class QmlZuuidAttached;
 #include "QmlZproc.h"
 #include "QmlZsock.h"
 #include "QmlZstr.h"
+#include "QmlZtimerset.h"
 #include "QmlZtrie.h"
 #include "QmlZuuid.h"
 
@@ -142,6 +145,8 @@ public:
         qmlRegisterType<QmlZsockAttached>();
         qmlRegisterType<QmlZstr> (uri, 1, 0, "QmlZstr");
         qmlRegisterType<QmlZstrAttached>();
+        qmlRegisterType<QmlZtimerset> (uri, 1, 0, "QmlZtimerset");
+        qmlRegisterType<QmlZtimersetAttached>();
         qmlRegisterType<QmlZtrie> (uri, 1, 0, "QmlZtrie");
         qmlRegisterType<QmlZtrieAttached>();
         qmlRegisterType<QmlZuuid> (uri, 1, 0, "QmlZuuid");

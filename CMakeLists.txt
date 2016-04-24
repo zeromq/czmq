@@ -159,6 +159,7 @@ set (czmq_headers
 IF (ENABLE_DRAFTS)
     list(APPEND czmq_headers
         include/zproc.h
+        include/ztimerset.h
         include/ztrie.h
     )
 ENDIF (ENABLE_DRAFTS)
@@ -216,6 +217,7 @@ set (czmq_sources
 IF (ENABLE_DRAFTS)
     list (APPEND czmq_sources
         src/zproc.c
+        src/ztimerset.c
         src/ztrie.c
     )
 ENDIF (ENABLE_DRAFTS)
@@ -350,6 +352,7 @@ set(TEST_CLASSES
 IF (ENABLE_DRAFTS)
     list (APPEND TEST_CLASSES
     zproc
+    ztimerset
     ztrie
     )
 ENDIF (ENABLE_DRAFTS)

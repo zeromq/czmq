@@ -34,6 +34,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzproc.h \
                      $$PWD/qzsock.h \
                      $$PWD/qzstr.h \
+                     $$PWD/qztimerset.h \
                      $$PWD/qztrie.h \
                      $$PWD/qzuuid.h
 
@@ -61,6 +62,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzproc.cpp \
                      $$PWD/qzsock.cpp \
                      $$PWD/qzstr.cpp \
+                     $$PWD/qztimerset.cpp \
                      $$PWD/qztrie.cpp \
                      $$PWD/qzuuid.cpp
 }

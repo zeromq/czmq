@@ -70,6 +70,9 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zsock.h GOTO HAVE_Zsock
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zstr.h GOTO HAVE_Zstr
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zstr
 :HAVE_Zstr
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Ztimerset.h GOTO HAVE_Ztimerset
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Ztimerset
+:HAVE_Ztimerset
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Ztrie.h GOTO HAVE_Ztrie
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Ztrie
 :HAVE_Ztrie

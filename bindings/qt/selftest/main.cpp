@@ -40,6 +40,7 @@ int main(int argc, char **argv)
     QZproc::test (verbose);
     QZsock::test (verbose);
     QZstr::test (verbose);
+    QZtimerset::test (verbose);
     QZtrie::test (verbose);
     QZuuid::test (verbose);
 
