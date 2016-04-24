@@ -70,6 +70,7 @@ all_tests [] = {
     { "zthread", zthread_test },
 #ifdef CZMQ_BUILD_DRAFT_API
     { "zproc", zproc_test },
+    { "ztimerset", ztimerset_test },
     { "ztrie", ztrie_test },
 #endif // CZMQ_BUILD_DRAFT_API
     {0, 0}          //  Sentinel
@@ -129,7 +130,7 @@ main (int argc, char **argv)
         else
         if (streq (argv [argn], "--number")
         ||  streq (argv [argn], "-n")) {
-            puts ("42");
+            puts ("43");
             return 0;
         }
         else
@@ -159,6 +160,7 @@ main (int argc, char **argv)
             puts ("    zproc");
             puts ("    zsock");
             puts ("    zstr");
+            puts ("    ztimerset");
             puts ("    ztrie");
             puts ("    zuuid");
             puts ("    zauth");
