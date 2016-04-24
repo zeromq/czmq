@@ -33,6 +33,25 @@ CZMQ_EXPORT void
     zcert_unset_meta (zcert_t *self, const char *name);
 
 //  *** Draft method, defined for internal use only ***
+//  Override the default disk loader with a custom loader fn.
+CZMQ_EXPORT void
+    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader, zcertstore_destructor destructor, void *state);
+
+//  *** Draft method, defined for internal use only ***
+//  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+//  which don't usually have access to struct internals.                        
+CZMQ_EXPORT void
+    zcertstore_empty (zcertstore_t *self);
+
+//  *** Draft callbacks, defined for internal use only ***
+// Loaders retrieve certificates from an arbitrary source.
+typedef void (zcertstore_loader) (
+    zcertstore_t *self);
+// Destructor for loader state.
+typedef void (zcertstore_destructor) (
+    void **self_p);
+
+//  *** Draft method, defined for internal use only ***
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
 //  Else returns zero.                                                  
 CZMQ_EXPORT uint32_t

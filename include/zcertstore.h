@@ -23,16 +23,10 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  This class has legacy methods, which will be removed over time. You
 //  should not use them, and migrate any code that is still using them.
-// Loaders retrieve certificates from an arbitrary source.
-typedef void (zcertstore_loader) (
-    zcertstore_t *self);
-
-// Destructor for loader state.
-typedef void (zcertstore_destructor) (
-    void **self_p);
-
 //  Create a new certificate store from a disk directory, loading and        
 //  indexing all certificates in that location. The directory itself may be  
 //  absent, and created later, or modified at any time. The certificate store
@@ -47,10 +41,6 @@ CZMQ_EXPORT zcertstore_t *
 CZMQ_EXPORT void
     zcertstore_destroy (zcertstore_t **self_p);
 
-//  Override the default disk loader with a custom loader fn.
-CZMQ_EXPORT void
-    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader, zcertstore_destructor destructor, void *state);
-
 //  Look up certificate by public key, returns zcert_t object if found,
 //  else returns NULL. The public key is provided in Z85 text format.  
 CZMQ_EXPORT zcert_t *
@@ -61,11 +51,6 @@ CZMQ_EXPORT zcert_t *
 //  directly on the certificate. Takes ownership of zcert_t object.    
 CZMQ_EXPORT void
     zcertstore_insert (zcertstore_t *self, zcert_t **cert_p);
-
-//  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
-//  which don't usually have access to struct internals.                        
-CZMQ_EXPORT void
-    zcertstore_empty (zcertstore_t *self);
 
 //  Print list of certificates in store to logging facility
 CZMQ_EXPORT void
@@ -81,6 +66,27 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zcertstore_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+// Loaders retrieve certificates from an arbitrary source.
+typedef void (zcertstore_loader) (
+    zcertstore_t *self);
+
+// Destructor for loader state.
+typedef void (zcertstore_destructor) (
+    void **self_p);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Override the default disk loader with a custom loader fn.
+CZMQ_EXPORT void
+    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader, zcertstore_destructor destructor, void *state);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
+//  which don't usually have access to struct internals.                        
+CZMQ_EXPORT void
+    zcertstore_empty (zcertstore_t *self);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 
