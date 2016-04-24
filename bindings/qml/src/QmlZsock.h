@@ -607,6 +607,12 @@ public slots:
     //  Create a DISH socket. Default action is connect.
     QmlZsock *constructDish (const QString &endpoint);
 
+    //  Create a GATHER socket. Default action is bind.
+    QmlZsock *constructGather (const QString &endpoint);
+
+    //  Create a SCATTER socket. Default action is connect.
+    QmlZsock *constructScatter (const QString &endpoint);
+
     //  Destroy the socket. You must use this for any socket created via the
     //  zsock_new method.                                                   
     void destruct (QmlZsock *qmlSelf);

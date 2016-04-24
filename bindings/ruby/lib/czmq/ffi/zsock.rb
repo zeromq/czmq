@@ -217,6 +217,22 @@ module CZMQ
         __new ptr
       end
 
+      # Create a GATHER socket. Default action is bind.
+      # @param endpoint [String, #to_s, nil]
+      # @return [CZMQ::Zsock]
+      def self.new_gather(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_gather(endpoint)
+        __new ptr
+      end
+
+      # Create a SCATTER socket. Default action is connect.
+      # @param endpoint [String, #to_s, nil]
+      # @return [CZMQ::Zsock]
+      def self.new_scatter(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_scatter(endpoint)
+        __new ptr
+      end
+
       # Destroy the socket. You must use this for any socket created via the
       # zsock_new method.                                                   
       #

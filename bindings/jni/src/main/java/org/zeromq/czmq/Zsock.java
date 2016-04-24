@@ -146,6 +146,20 @@ public class Zsock implements AutoCloseable{
         return new Zsock (__newDish (endpoint));
     }
     /*
+    Create a GATHER socket. Default action is bind.
+    */
+    native static long __newGather (String endpoint);
+    public Zsock newGather (String endpoint) {
+        return new Zsock (__newGather (endpoint));
+    }
+    /*
+    Create a SCATTER socket. Default action is connect.
+    */
+    native static long __newScatter (String endpoint);
+    public Zsock newScatter (String endpoint) {
+        return new Zsock (__newScatter (endpoint));
+    }
+    /*
     Destroy the socket. You must use this for any socket created via the
     zsock_new method.                                                   
     */

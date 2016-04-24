@@ -165,6 +165,24 @@ Java_org_zeromq_czmq_Zsock__1_1newDish (JNIEnv *env, jclass c, jstring endpoint)
     return new_dish_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zsock__1_1newGather (JNIEnv *env, jclass c, jstring endpoint)
+{
+    char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
+    jlong new_gather_ = (jlong) (intptr_t) zsock_new_gather (endpoint_);
+    (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
+    return new_gather_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zsock__1_1newScatter (JNIEnv *env, jclass c, jstring endpoint)
+{
+    char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
+    jlong new_scatter_ = (jlong) (intptr_t) zsock_new_scatter (endpoint_);
+    (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
+    return new_scatter_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {

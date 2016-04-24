@@ -37,9 +37,9 @@ QZcertstore::~QZcertstore ()
 
 ///
 //  Override the default disk loader with a custom loader fn.
-void QZcertstore::setLoader (zcertstore_loader loader)
+void QZcertstore::setLoader (zcertstore_loader loader, zcertstore_destructor destructor, void *state)
 {
-    zcertstore_set_loader (self, loader);
+    zcertstore_set_loader (self, loader, destructor, state);
     
 }
 

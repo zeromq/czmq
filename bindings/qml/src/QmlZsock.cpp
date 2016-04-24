@@ -1078,6 +1078,22 @@ QmlZsock *QmlZsockAttached::constructDish (const QString &endpoint) {
 };
 
 ///
+//  Create a GATHER socket. Default action is bind.
+QmlZsock *QmlZsockAttached::constructGather (const QString &endpoint) {
+    QmlZsock *qmlSelf = new QmlZsock ();
+    qmlSelf->self = zsock_new_gather (endpoint.toUtf8().data());
+    return qmlSelf;
+};
+
+///
+//  Create a SCATTER socket. Default action is connect.
+QmlZsock *QmlZsockAttached::constructScatter (const QString &endpoint) {
+    QmlZsock *qmlSelf = new QmlZsock ();
+    qmlSelf->self = zsock_new_scatter (endpoint.toUtf8().data());
+    return qmlSelf;
+};
+
+///
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.                                                   
 void QmlZsockAttached::destruct (QmlZsock *qmlSelf) {

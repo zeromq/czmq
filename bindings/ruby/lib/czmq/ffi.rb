@@ -102,7 +102,7 @@ module CZMQ
 
       attach_function :zcertstore_new, [:string], :pointer, **opts
       attach_function :zcertstore_destroy, [:pointer], :void, **opts
-      attach_function :zcertstore_set_loader, [:pointer, :pointer], :void, **opts
+      attach_function :zcertstore_set_loader, [:pointer, :pointer, :pointer, :pointer], :void, **opts
       attach_function :zcertstore_lookup, [:pointer, :string], :pointer, **opts
       attach_function :zcertstore_insert, [:pointer, :pointer], :void, **opts
       attach_function :zcertstore_empty, [:pointer], :void, **opts
@@ -735,6 +735,22 @@ module CZMQ
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
           warn "The function zsock_new_dish() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_new_gather, [:string], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zsock_new_gather() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_new_scatter, [:string], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zsock_new_scatter() can't be used through " +
                "this Ruby binding because it's not available."
         end
       end

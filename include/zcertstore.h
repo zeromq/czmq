@@ -29,6 +29,10 @@ extern "C" {
 typedef void (zcertstore_loader) (
     zcertstore_t *self);
 
+// Destructor for loader state.
+typedef void (zcertstore_destructor) (
+    void **self_p);
+
 //  Create a new certificate store from a disk directory, loading and        
 //  indexing all certificates in that location. The directory itself may be  
 //  absent, and created later, or modified at any time. The certificate store
@@ -45,7 +49,7 @@ CZMQ_EXPORT void
 
 //  Override the default disk loader with a custom loader fn.
 CZMQ_EXPORT void
-    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader);
+    zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader, zcertstore_destructor destructor, void *state);
 
 //  Look up certificate by public key, returns zcert_t object if found,
 //  else returns NULL. The public key is provided in Z85 text format.  
