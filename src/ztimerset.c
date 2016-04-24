@@ -160,6 +160,7 @@ void handler(int timer_id, void* arg)
 void
 ztimerset_test (bool verbose)
 {
+#ifdef ZMQ_HAVE_TIMERS
     printf (" * ztimerset: ");
 
     //  @selftest
@@ -214,4 +215,5 @@ ztimerset_test (bool verbose)
     ztimerset_destroy (&self);
     //  @end
     printf ("OK\n");
+#endif
 }
