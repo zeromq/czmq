@@ -27,10 +27,21 @@
 //  Internal API
 #include "zgossip_msg.h"
 
+//  *** To avoid double-definitions, only define if building without draft ***
+#ifndef CZMQ_BUILD_DRAFT_API
+
 //  *** Draft method, defined for internal use only ***
 //  Unset certificate metadata.
 CZMQ_EXPORT void
     zcert_unset_meta (zcert_t *self, const char *name);
+
+//  *** Draft callbacks, defined for internal use only ***
+// Loaders retrieve certificates from an arbitrary source.
+typedef void (zcertstore_loader) (
+    zcertstore_t *self);
+// Destructor for loader state.
+typedef void (zcertstore_destructor) (
+    void **self_p);
 
 //  *** Draft method, defined for internal use only ***
 //  Override the default disk loader with a custom loader fn.
@@ -42,14 +53,6 @@ CZMQ_EXPORT void
 //  which don't usually have access to struct internals.                        
 CZMQ_EXPORT void
     zcertstore_empty (zcertstore_t *self);
-
-//  *** Draft callbacks, defined for internal use only ***
-// Loaders retrieve certificates from an arbitrary source.
-typedef void (zcertstore_loader) (
-    zcertstore_t *self);
-// Destructor for loader state.
-typedef void (zcertstore_destructor) (
-    void **self_p);
 
 //  *** Draft method, defined for internal use only ***
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
@@ -214,6 +217,13 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zstr_str (void *source);
 
+//  *** Draft constants, defined for internal use only ***
+#define ZGOSSIP_MSG_HELLO 1                 // 
+#define ZGOSSIP_MSG_PUBLISH 2               // 
+#define ZGOSSIP_MSG_PING 3                  // 
+#define ZGOSSIP_MSG_PONG 4                  // 
+#define ZGOSSIP_MSG_INVALID 5               // 
+
 //  *** Draft method, defined for internal use only ***
 //  Create a new empty zgossip_msg
 //  Caller owns return value and must destroy it when done.
@@ -301,11 +311,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zgossip_msg_test (bool verbose);
 
-//  *** Draft constants, defined for internal use only ***
-#define ZGOSSIP_MSG_HELLO 1                 // 
-#define ZGOSSIP_MSG_PUBLISH 2               // 
-#define ZGOSSIP_MSG_PING 3                  // 
-#define ZGOSSIP_MSG_PONG 4                  // 
-#define ZGOSSIP_MSG_INVALID 5               // 
+#endif // CZMQ_BUILD_DRAFT_API
 
 #endif
