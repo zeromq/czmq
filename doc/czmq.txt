@@ -163,7 +163,7 @@ All classes (with some exceptions) are based on a flat C class system and follow
 Return values for methods are:
 
 * For methods that return an object reference, either the reference, or NULL on failure.
-* For methods that signal success/failure, a return value of 0 means sucess, -1 failure.
+* For methods that signal success/failure, a return value of 0 means success, -1 failure.
 
 Private/static functions in a class are named `s_functionname` and are not exported via the header file.
 
