@@ -85,16 +85,14 @@ Plus some others:
 
 Which we install like this (using the Debian-style apt-get package manager):
 
-```
-sudo apt-get update
-sudo apt-get install -y \
-    git-all build-essential libtool \
-    pkg-config autotools-dev autoconf automake cmake \
-    uuid-dev libpcre3-dev valgrind
+    sudo apt-get update
+    sudo apt-get install -y \
+        git-all build-essential libtool \
+        pkg-config autotools-dev autoconf automake cmake \
+        uuid-dev libpcre3-dev valgrind
 
-# only execute this next line if interested in updating the man pages as well (adds to build time):
-sudo apt-get install -y asciidoc
-```
+    # only execute this next line if interested in updating the man pages as well (adds to build time):
+    sudo apt-get install -y asciidoc
 
 Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libzmq (ZeroMQ core) library:
 
@@ -114,7 +112,6 @@ Here's how to build CZMQ from GitHub (building from packages is very similar, yo
     sudo make install
     sudo ldconfig
     cd ..
-```
 
 In general CZMQ works best with the latest libzmq master. If you already have an older version of libzmq installed on your system, e.g. in /usr/, then you can install libzmq master to your home directory ($HOME/local):
 
