@@ -112,6 +112,7 @@
     <method name = "set group">
         Set group on frame. This is used if/when the frame is sent to a
         ZMQ_RADIO socket. Return -1 on error, 0 on success.
+        <argument name = "group" type = "string" fresh = "0" />
         <return type = "integer" />
     </method>
 
