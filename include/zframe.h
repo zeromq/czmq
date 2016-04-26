@@ -110,7 +110,7 @@ CZMQ_EXPORT const char *
 //  Set group on frame. This is used if/when the frame is sent to a
 //  ZMQ_RADIO socket. Return -1 on error, 0 on success.            
 CZMQ_EXPORT int
-    zframe_set_group (zframe_t *self);
+    zframe_set_group (zframe_t *self, const char *group);
 
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    
