@@ -103,6 +103,15 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zframe_set_more (zframe_t *self, int more);
 
+//  Return frame group of radio-dish pattern.
+CZMQ_EXPORT const char *
+    zframe_group (zframe_t *self);
+
+//  Set group on frame. This is used if/when the frame is sent to a
+//  ZMQ_RADIO socket. Return -1 on error, 0 on success.            
+CZMQ_EXPORT int
+    zframe_set_group (zframe_t *self);
+
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    
 CZMQ_EXPORT bool

@@ -104,6 +104,17 @@
         <argument name = "more" type = "integer" />
     </method>
 
+    <method name = "group">
+        Return frame group of radio-dish pattern.
+        <return type = "string" fresh = "0" />
+    </method>
+
+    <method name = "set group">
+        Set group on frame. This is used if/when the frame is sent to a
+        ZMQ_RADIO socket. Return -1 on error, 0 on success.
+        <return type = "integer" />
+    </method>
+
     <method name = "routing id" state = "draft" >
         Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
         Else returns zero.
