@@ -101,7 +101,7 @@ PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
         fi
 
 
-        AC_CHECK_LIB([libzmq], [zmq_init],
+        AC_CHECK_LIB([zmq], [zmq_init],
             [
                 CFLAGS="${libzmq_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${libzmq_synthetic_libs} ${LDFLAGS}"
