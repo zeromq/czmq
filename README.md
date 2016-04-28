@@ -2,9 +2,9 @@
 <A name="toc1-3" title="CZMQ - High-level C binding for ØMQ" />
 # CZMQ - High-level C binding for ØMQ
 
-| Linux & MacOSX | Windows  |
-|:--------------:|:--------:|
-|[![Build Status](https://travis-ci.org/zeromq/czmq.png?branch=master)](https://travis-ci.org/zeromq/czmq)|[![Build status](https://ci.appveyor.com/api/projects/status/q7y22juu3pnl5wq6?svg=true)](https://ci.appveyor.com/project/zeromq/czmq)|
+| Linux & MacOSX | Windows  | Chat |
+|:--------------:|:--------:|:----:|
+|[![Build Status](https://travis-ci.org/zeromq/czmq.png?branch=master)](https://travis-ci.org/zeromq/czmq)|[![Build status](https://ci.appveyor.com/api/projects/status/q7y22juu3pnl5wq6?svg=true)](https://ci.appveyor.com/project/zeromq/czmq)|<a target="_blank" href="http://webchat.freenode.net?channels=%23zeromq&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>|
 
 <A name="toc2-10" title="Contents" />
 ## Contents
