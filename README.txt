@@ -188,7 +188,7 @@ Let's test by running `czmq_selftest`:
 
 Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
-    gcc -lczmq -lzmq myapp.c -o myapp
+    gcc myapp.c -o myapp -lczmq -lzmq
 
 ### Use from Other Languages
 

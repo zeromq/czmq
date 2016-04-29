@@ -249,7 +249,7 @@ Let's test by running `czmq_selftest`:
 
 Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
-    gcc -lczmq -lzmq myapp.c -o myapp
+    gcc myapp.c -o myapp -lczmq -lzmq
 
 <A name="toc3-201" title="Use from Other Languages" />
 ### Use from Other Languages
