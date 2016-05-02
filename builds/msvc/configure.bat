@@ -48,7 +48,10 @@ IF EXIST "..\..\..\systemd" (
 )
 
 :-  Check if we want to build the draft API
+if "%1" == "--enable-drafts" goto :with_draft
+if "%1" == "--disable-drafts" goto :no_draft
 IF NOT EXIST "..\..\.git" GOTO no_draft
+:with_draft
     ECHO Building with draft API (stable + legacy + draft API)
     ECHO //  Provide draft classes and methods>>platform.h
     ECHO #define CZMQ_BUILD_DRAFT_API 1>>platform.h
