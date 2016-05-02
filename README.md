@@ -56,38 +56,39 @@
 *  <a href="#toc4-5547">zsock - high-level socket API that hides libzmq contexts and sockets</a>
 *  <a href="#toc4-6644">zstr - sending and receiving strings</a>
 *  <a href="#toc4-6815">zsys - system-level methods</a>
-*  <a href="#toc4-7276">ztrie - simple trie for tokenizable strings</a>
-*  <a href="#toc4-7515">zuuid - UUID support class</a>
+*  <a href="#toc4-7276">ztimerset - timer set</a>
+*  <a href="#toc4-7398">ztrie - simple trie for tokenizable strings</a>
+*  <a href="#toc4-7637">zuuid - UUID support class</a>
 
-**<a href="#toc3-7632">API v2 Summary</a>**
-*  <a href="#toc4-7637">zauth_v2 - authentication for ZeroMQ servers (deprecated)</a>
-*  <a href="#toc4-7829">zctx - working with ØMQ contexts (deprecated)</a>
-*  <a href="#toc4-7957">zmonitor_v2 - socket event monitor (deprecated)</a>
-*  <a href="#toc4-8041">zmutex - working with mutexes (deprecated)</a>
-*  <a href="#toc4-8090">zproxy_v2 - run a steerable proxy in the background (deprecated)</a>
-*  <a href="#toc4-8198">zsocket - working with ØMQ sockets (deprecated)</a>
-*  <a href="#toc4-8363">zsockopt - get/set ØMQ socket options (deprecated)</a>
-*  <a href="#toc4-9385">zthread - working with system threads (deprecated)</a>
+**<a href="#toc3-7754">API v2 Summary</a>**
+*  <a href="#toc4-7759">zauth_v2 - authentication for ZeroMQ servers (deprecated)</a>
+*  <a href="#toc4-7951">zctx - working with ØMQ contexts (deprecated)</a>
+*  <a href="#toc4-8079">zmonitor_v2 - socket event monitor (deprecated)</a>
+*  <a href="#toc4-8163">zmutex - working with mutexes (deprecated)</a>
+*  <a href="#toc4-8212">zproxy_v2 - run a steerable proxy in the background (deprecated)</a>
+*  <a href="#toc4-8320">zsocket - working with ØMQ sockets (deprecated)</a>
+*  <a href="#toc4-8485">zsockopt - get/set ØMQ socket options (deprecated)</a>
+*  <a href="#toc4-9507">zthread - working with system threads (deprecated)</a>
 
-**<a href="#toc2-9502">Error Handling</a>**
+**<a href="#toc2-9624">Error Handling</a>**
 
-**<a href="#toc2-9519">CZMQ Actors</a>**
+**<a href="#toc2-9641">CZMQ Actors</a>**
 
-**<a href="#toc2-9665">Under the Hood</a>**
+**<a href="#toc2-9787">Under the Hood</a>**
 
-**<a href="#toc3-9668">Adding a New Class</a>**
+**<a href="#toc3-9790">Adding a New Class</a>**
 
-**<a href="#toc3-9680">Documentation</a>**
+**<a href="#toc3-9802">Documentation</a>**
 
-**<a href="#toc3-9719">Development</a>**
+**<a href="#toc3-9841">Development</a>**
 
-**<a href="#toc3-9729">Porting CZMQ</a>**
+**<a href="#toc3-9851">Porting CZMQ</a>**
 
-**<a href="#toc3-9740">Hints to Contributors</a>**
+**<a href="#toc3-9862">Hints to Contributors</a>**
 
-**<a href="#toc3-9751">Code Generation</a>**
+**<a href="#toc3-9873">Code Generation</a>**
 
-**<a href="#toc3-9756">This Document</a>**
+**<a href="#toc3-9878">This Document</a>**
 
 <A name="toc2-15" title="Overview" />
 ## Overview
@@ -7326,7 +7327,129 @@ This is the class self test code:
     }
     zsys_close (logger, NULL, 0);
 
-<A name="toc4-7276" title="ztrie - simple trie for tokenizable strings" />
+<A name="toc4-7276" title="ztimerset - timer set" />
+#### ztimerset - timer set
+
+ztimerset - timer set
+
+Please add @discuss section in ../src/ztimerset.c.
+
+This is the class interface:
+
+    //  This is a draft class, and may change without notice. It is disabled in
+    //  stable builds by default. If you use this in applications, please ask
+    //  for it to be pushed to stable state. Use --enable-drafts to enable.
+    #ifdef CZMQ_BUILD_DRAFT_API
+    // Callback function for timer event.
+    typedef void (ztimerset_fn) (
+        int timer_id, void *arg);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Create new timer set.
+    CZMQ_EXPORT ztimerset_t *
+        ztimerset_new (void);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Destroy a timer set
+    CZMQ_EXPORT void
+        ztimerset_destroy (ztimerset_t **self_p);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Add a timer to the set. Returns timer id if OK, -1 on failure.
+    CZMQ_EXPORT int
+        ztimerset_add (ztimerset_t *self, size_t interval, ztimerset_fn handler, void *arg);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Cancel a timer. Returns 0 if OK, -1 on failure.
+    CZMQ_EXPORT int
+        ztimerset_cancel (ztimerset_t *self, int timer_id);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Set timer interval. Returns 0 if OK, -1 on failure.                                    
+    //  This method is slow, canceling the timer and adding a new one yield better performance.
+    CZMQ_EXPORT int
+        ztimerset_set_interval (ztimerset_t *self, int timer_id, size_t interval);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
+    //  This method is slow, canceling the timer and adding a new one yield better performance.  
+    CZMQ_EXPORT int
+        ztimerset_reset (ztimerset_t *self, int timer_id);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Return the time until the next interval.                        
+    //  Should be used as timeout parameter for the zpoller wait method.
+    //  The timeout is in msec.                                         
+    CZMQ_EXPORT int
+        ztimerset_timeout (ztimerset_t *self);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Invoke callback function of all timers which their interval has elapsed.
+    //  Should be call after zpoller wait method.                               
+    //  Returns 0 if OK, -1 on failure.                                         
+    CZMQ_EXPORT int
+        ztimerset_execute (ztimerset_t *self);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Self test of this class.
+    CZMQ_EXPORT void
+        ztimerset_test (bool verbose);
+    
+    #endif // CZMQ_BUILD_DRAFT_API
+
+This is the class self test code:
+
+    //  Simple create/destroy test
+    ztimerset_t *self = ztimerset_new ();
+    assert (self);
+    
+    //  Adding timer
+    bool timer_invoked = false;
+    int timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    assert (timer_id != -1);
+    int rc = ztimerset_execute (self);
+    assert (rc == 0);
+    assert (!timer_invoked);
+    int timeout = ztimerset_timeout (self);
+    assert (timeout > 0);
+    zclock_sleep (timeout);
+    rc = ztimerset_execute (self);
+    assert (rc == 0);
+    assert (timer_invoked);
+    
+    //  Cancel timer
+    timeout = ztimerset_timeout (self);
+    assert (timeout > 0);
+    rc = ztimerset_cancel (self, timer_id);
+    assert (rc == 0);
+    timeout = ztimerset_timeout (self);
+    assert(timeout == -1);
+    
+    //  Reset a timer
+    timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    assert (timer_id != -1);
+    timeout = ztimerset_timeout (self);
+    assert (timeout > 0);
+    zclock_sleep (timeout / 2);
+    timeout = ztimerset_timeout (self);
+    rc = ztimerset_reset(self, timer_id);
+    assert (rc == 0);
+    int timeout2 = ztimerset_timeout (self);
+    assert (timeout2 > timeout);
+    rc = ztimerset_cancel (self, timer_id);
+    assert (rc == 0);
+    
+    //  Set interval
+    timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    assert (timer_id != -1);
+    timeout = ztimerset_timeout (self);
+    rc = ztimerset_set_interval(self, timer_id, 20);
+    timeout2 = ztimerset_timeout (self);
+    assert (timeout2 > timeout);
+    
+    ztimerset_destroy (&self);
+
+<A name="toc4-7398" title="ztrie - simple trie for tokenizable strings" />
 #### ztrie - simple trie for tokenizable strings
 
 This is a variant of a trie or prefix tree where all the descendants of a
@@ -7565,7 +7688,7 @@ This is the class self test code:
     zstr_free (&data);
     ztrie_destroy (&self);
 
-<A name="toc4-7515" title="zuuid - UUID support class" />
+<A name="toc4-7637" title="zuuid - UUID support class" />
 #### zuuid - UUID support class
 
 The zuuid class generates UUIDs and provides methods for working with
@@ -7682,12 +7805,12 @@ This is the class self test code:
     zuuid_destroy (&copy);
 
 
-<A name="toc3-7632" title="API v2 Summary" />
+<A name="toc3-7754" title="API v2 Summary" />
 ### API v2 Summary
 
 This is the deprecated API provided by CZMQ v2.x, in alphabetical order.
 
-<A name="toc4-7637" title="zauth_v2 - authentication for ZeroMQ servers (deprecated)" />
+<A name="toc4-7759" title="zauth_v2 - authentication for ZeroMQ servers (deprecated)" />
 #### zauth_v2 - authentication for ZeroMQ servers (deprecated)
 
 A zauth object takes over authentication for all incoming connections in
@@ -7879,7 +8002,7 @@ This is the class self test code:
     zdir_remove (dir, true);
     zdir_destroy (&dir);
 
-<A name="toc4-7829" title="zctx - working with ØMQ contexts (deprecated)" />
+<A name="toc4-7951" title="zctx - working with ØMQ contexts (deprecated)" />
 #### zctx - working with ØMQ contexts (deprecated)
 
 The zctx class wraps ØMQ contexts. It manages open sockets in the context
@@ -8007,7 +8130,7 @@ This is the class self test code:
     assert (zctx_underlying (ctx));
     zctx_destroy (&ctx);
 
-<A name="toc4-7957" title="zmonitor_v2 - socket event monitor (deprecated)" />
+<A name="toc4-8079" title="zmonitor_v2 - socket event monitor (deprecated)" />
 #### zmonitor_v2 - socket event monitor (deprecated)
 
 The zmonitor class provides an API for obtaining socket events such as
@@ -8091,7 +8214,7 @@ This is the class self test code:
     zmonitor_destroy (&sourcemon);
     zctx_destroy (&ctx);
 
-<A name="toc4-8041" title="zmutex - working with mutexes (deprecated)" />
+<A name="toc4-8163" title="zmutex - working with mutexes (deprecated)" />
 #### zmutex - working with mutexes (deprecated)
 
 The zmutex class provides a portable wrapper for mutexes. Please do not
@@ -8140,7 +8263,7 @@ This is the class self test code:
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);
 
-<A name="toc4-8090" title="zproxy_v2 - run a steerable proxy in the background (deprecated)" />
+<A name="toc4-8212" title="zproxy_v2 - run a steerable proxy in the background (deprecated)" />
 #### zproxy_v2 - run a steerable proxy in the background (deprecated)
 
 The zproxy class provides an equivalent to the ZMQ steerable proxy, on
@@ -8248,7 +8371,7 @@ This is the class self test code:
     zctx_destroy (&ctx);
     
 
-<A name="toc4-8198" title="zsocket - working with ØMQ sockets (deprecated)" />
+<A name="toc4-8320" title="zsocket - working with ØMQ sockets (deprecated)" />
 #### zsocket - working with ØMQ sockets (deprecated)
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
@@ -8413,7 +8536,7 @@ This is the class self test code:
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
 
-<A name="toc4-8363" title="zsockopt - get/set ØMQ socket options (deprecated)" />
+<A name="toc4-8485" title="zsockopt - get/set ØMQ socket options (deprecated)" />
 #### zsockopt - get/set ØMQ socket options (deprecated)
 
 The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
@@ -9435,7 +9558,7 @@ This is the class self test code:
     
     zctx_destroy (&ctx);
 
-<A name="toc4-9385" title="zthread - working with system threads (deprecated)" />
+<A name="toc4-9507" title="zthread - working with system threads (deprecated)" />
 #### zthread - working with system threads (deprecated)
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -9552,7 +9675,7 @@ This is the class self test code:
     zctx_destroy (&ctx);
 
 
-<A name="toc2-9502" title="Error Handling" />
+<A name="toc2-9624" title="Error Handling" />
 ## Error Handling
 
 The CZMQ policy is to reduce the error flow to 0/-1 where possible. libzmq still does a lot of errno setting. CZMQ does not do that, as it creates a fuzzy API. Things either work as expected, or they fail, and the application's best strategy is usually to assert on non-zero return codes.
@@ -9569,7 +9692,7 @@ There are a few cases where the return value is overloaded to return -1, 0, or o
 
 The overall goal with this strategy is robustness, and absolute minimal and predictable expression in the code. You can see that it works: the CZMQ code is generally very simple and clear, with a few exceptions of places where people have used their old C style (we fix these over time).
 
-<A name="toc2-9519" title="CZMQ Actors" />
+<A name="toc2-9641" title="CZMQ Actors" />
 ## CZMQ Actors
 
 The v2 API had a zthread class that let you create "attached threads" connected to their parent by an inproc:// PIPE socket. In v3 this has been simplified and better wrapped as the zactor class. CZMQ actors are in effect threads with a socket interface. A zactor_t instance works like a socket, and the CZMQ classes that deal with sockets (like zmsg and zpoller) all accept zactor_t references as well as zsock_t and libzmq void * socket handles.
@@ -9715,10 +9838,10 @@ To write an actor, use this template. Note that your actor is a single function 
 
 The selftest code shows how to create, talk to, and destroy an actor.
 
-<A name="toc2-9665" title="Under the Hood" />
+<A name="toc2-9787" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-9668" title="Adding a New Class" />
+<A name="toc3-9790" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -9730,7 +9853,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
-<A name="toc3-9680" title="Documentation" />
+<A name="toc3-9802" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -9769,7 +9892,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-9719" title="Development" />
+<A name="toc3-9841" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -9779,7 +9902,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-9729" title="Porting CZMQ" />
+<A name="toc3-9851" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -9790,7 +9913,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-9740" title="Hints to Contributors" />
+<A name="toc3-9862" title="Hints to Contributors" />
 ### Hints to Contributors
 
 CZMQ is a nice, neat library, and you may not immediately appreciate why. Read the CLASS style guide please, and write your code to make it indistinguishable from the rest of the code in the library. That is the only real criteria for good style: it's invisible.
@@ -9801,12 +9924,12 @@ Do read your code after you write it and ask, "Can I make this simpler?" We do u
 
 Before opening a pull request read our [contribution guidelines](https://github.com/zeromq/czmq/blob/master/CONTRIBUTING.md). Thanks!
 
-<A name="toc3-9751" title="Code Generation" />
+<A name="toc3-9873" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
 
-<A name="toc3-9756" title="This Document" />
+<A name="toc3-9878" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
