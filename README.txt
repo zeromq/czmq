@@ -236,6 +236,7 @@ This is the API provided by CZMQ v3.x, in alphabetical order.
 .pull doc/zsock.doc
 .pull doc/zstr.doc
 .pull doc/zsys.doc
+.pull doc/ztimerset.doc
 .pull doc/ztrie.doc
 .pull doc/zuuid.doc
 
