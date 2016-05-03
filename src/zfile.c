@@ -391,22 +391,26 @@ zfile_read (zfile_t *self, size_t bytes, off_t offset)
 {
     assert (self);
     assert (self->handle);
-    
-    //  Calculate real number of bytes to read
-    if (offset > self->cursize)
-        bytes = 0;
-    else
-    if (bytes > (size_t) (self->cursize - offset))
-        bytes = (size_t) (self->cursize - offset);
-
-    if (fseek (self->handle, (long) offset, SEEK_SET) == -1)
-        return NULL;
 
     self->eof = false;
-    zchunk_t *chunk = zchunk_read (self->handle, bytes);
-    if (chunk)
-        self->eof = zchunk_size (chunk) < bytes;
-    return chunk;
+    //  Calculate real number of bytes to read
+    if (offset > self->cursize) {
+        // if we tried to read 'after' the cursise, then we are at the end
+        bytes = 0;
+        self->eof = true;
+    }
+    else
+    if (bytes > (size_t) (self->cursize - offset)) {
+        // if we are trying to read more than there is, we are at the end
+        self->eof = true;
+        bytes = (size_t) (self->cursize - offset);
+    }
+
+    if (fseek (self->handle, (long) offset, SEEK_SET) == -1) {
+        return NULL;
+    }
+
+    return zchunk_read (self->handle, bytes);
 }
 
 
