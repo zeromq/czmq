@@ -700,7 +700,45 @@ zfile_test (bool verbose)
     rc = zfile_input (file);
     assert (rc == -1);
     zfile_destroy (&file);
+
+    file = zfile_new ("./", "eof_checkfile");
+    assert (file);
+    //  1. Write something first
+    rc = zfile_output (file);
+    assert (rc == 0);
+    chunk = zchunk_new ("123456789", 9);
+    assert (chunk);
+
+    rc = zfile_write (file, chunk, 0);
+    assert (rc == 0);
+    zchunk_destroy (&chunk);
+    zfile_close (file);
+    assert (zfile_cursize (file) == 9);
+
+    // 2. Read the written something
+    rc = zfile_input (file);
+    assert (rc != -1);
+    // try to read more bytes than there is in the file
+    chunk = zfile_read (file, 1000, 0);
+    assert (zfile_eof(file));
+    assert (zchunk_streq (chunk, "123456789"));
+    zchunk_destroy (&chunk);
+
+    // reading is ok
+    chunk = zfile_read (file, 5, 0);
+    assert (!zfile_eof(file));
+    assert (zchunk_streq (chunk, "12345"));
+    zchunk_destroy (&chunk);
+
+    // read from non zero offset until the end
+    chunk = zfile_read (file, 5, 5);
+    assert (zfile_eof(file));
+    assert (zchunk_streq (chunk, "6789"));
+    zchunk_destroy (&chunk);
+    zfile_remove (file);
     //  @end
+    zfile_close (file);
+    zfile_destroy (&file);
 
     printf ("OK\n");
 }
