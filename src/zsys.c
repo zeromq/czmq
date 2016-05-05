@@ -1598,10 +1598,6 @@ s_log (char loglevel, char *string)
     else
 #   endif
 #endif
-    //  Set s_logstream to stdout by default, unless we're using s_logsystem
-    if (!s_logstream)
-        s_logstream = stdout;
-
     if (s_logstream || s_logsender) {
         time_t curtime = time (NULL);
         struct tm *loctime = localtime (&curtime);
