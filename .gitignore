@@ -83,6 +83,11 @@ src/app/jni/output
 # Python build directory
 build/
 
+# MSVC build directories
+obj/
+bin/
+*.tlog
+
 # Temporary files
 *.swp
 *~
