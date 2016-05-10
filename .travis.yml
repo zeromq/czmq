@@ -9,16 +9,16 @@ os:
 sudo: false
 
 env:
-- BUILD_TYPE=default
-- BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq2-x
-- BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq3-x
-- BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
-- BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
-- BUILD_TYPE=android
-# As we have errors in bindings/python/test.py I'm suspending this...
-#- BUILD_TYPE=check-py
-- BUILD_TYPE=cmake
-
+  matrix:
+  - BUILD_TYPE=default
+  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq2-x
+  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq3-x
+  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
+  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
+  - BUILD_TYPE=android
+  # As we have errors in bindings/python/test.py I'm suspending this...
+  #- BUILD_TYPE=check-py
+  - BUILD_TYPE=cmake
 addons:
   apt:
     packages:
@@ -37,3 +37,15 @@ before_script:
 
 # Build and check this project according to the BUILD_TYPE
 script: ./ci_build.sh
+before_deploy: . ./ci_deploy.sh
+deploy:
+  provider: releases
+  api_key:
+    secure: mmpmM0uhaMIKjL7ZkZduDOHkhAWA4Ngaq2FtjQVnUXrsCelSObSLe6BwcvvPp7yYGW44mAmoYPEPWAADatt+6bdVCcf0hgSJS02G4EiuxRAOiZ/ffTaAOhaqfmjuwmZ1cftFUFwehS9JEE9Be59Hv+tGnOOZSkxMWhkQ7xTvidQ=
+  file_glob: true
+  file: ${CZMQ_DEPLOYMENT}
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
+    condition: $TRAVIS_OS_NAME =~ (linux) && $BUILD_TYPE =~ (default)
