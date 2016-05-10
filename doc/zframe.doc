@@ -57,6 +57,11 @@ This is the class interface:
     CZMQ_EXPORT byte *
         zframe_data (zframe_t *self);
     
+    //  Return meta data property for frame           
+    //  Caller must free string when finished with it.
+    CZMQ_EXPORT const char *
+        zframe_meta (zframe_t *self, const char *property);
+    
     //  Create a new frame that duplicates an existing frame. If frame is null,
     //  or memory was exhausted, returns null.                                 
     //  Caller owns return value and must destroy it when done.
@@ -124,14 +129,26 @@ This is the class interface:
     CZMQ_EXPORT void
         zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
     
+    //  *** Draft method, for development use, may change without warning ***
+    //  Return frame group of radio-dish pattern.
+    CZMQ_EXPORT const char *
+        zframe_group (zframe_t *self);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Set group on frame. This is used if/when the frame is sent to a
+    //  ZMQ_RADIO socket.                                              
+    //  Return -1 on error, 0 on success.                              
+    CZMQ_EXPORT int
+        zframe_set_group (zframe_t *self, const char *group);
+    
     #endif // CZMQ_BUILD_DRAFT_API
 
 This is the class self test code:
 
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new_pair ("@inproc://zframe.test");
+    zsock_t *output = zsock_new_pair ("@tcp://127.0.0.1:9001");
     assert (output);
-    zsock_t *input = zsock_new_pair (">inproc://zframe.test");
+    zsock_t *input = zsock_new_pair (">tcp://127.0.0.1:9001");
     assert (input);
     
     //  Send five different frames, test ZFRAME_MORE
@@ -192,6 +209,20 @@ This is the class self test code:
     }
     assert (frame_nbr == 10);
     
+    #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
+    // Test zframe_meta
+    frame = zframe_new ("Hello", 5);
+    assert (frame);
+    rc = zframe_send (&frame, output, 0);
+    assert (rc == 0);
+    frame = zframe_recv (input);
+    const char *meta = zframe_meta (frame, "Socket-Type");
+    assert (meta != NULL);
+    assert (streq (meta, "PAIR"));
+    assert (zframe_meta (frame, "nonexistent") == NULL);
+    zframe_destroy (&frame);
+    #endif
+    
     zsock_destroy (&input);
     zsock_destroy (&output);
     
@@ -238,6 +269,37 @@ This is the class self test code:
     
     zsock_destroy (&client);
     zsock_destroy (&server);
+    #endif
+    
+    #ifdef ZMQ_RADIO
+    //  Create radio and dish sockets and connect over inproc
+    zsock_t *radio = zsock_new_radio ("inproc://zframe-test-radio");
+    assert (radio);
+    zsock_t *dish = zsock_new_dish ("inproc://zframe-test-radio");
+    assert (dish);
+    
+    //  Join the group
+    rc = zsock_join (dish, "World");
+    assert (rc == 0);
+    
+    //  Publish message from radio
+    zframe_t *message = zframe_new ("Hello", 5);
+    assert (message);
+    rc = zframe_set_group (message, "World");
+    assert (rc == 0);
+    rc = zframe_send (&message, radio, 0);
+    assert (rc == 0);
+    assert (!message);
+    
+    //  Receive the message from dish
+    message = zframe_recv (dish);
+    assert (message);
+    assert (zframe_streq (message, "Hello"));
+    assert (strcmp("World", zframe_group (message)) == 0);
+    zframe_destroy (&message);
+    
+    zsock_destroy (&dish);
+    zsock_destroy (&radio);
     #endif
     
 

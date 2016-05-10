@@ -267,8 +267,8 @@ This is the class self test code:
         assert (server_cert);
         zcert_t *client_cert = zcert_new ();
         assert (client_cert);
-        char *public_key = zcert_public_txt (server_cert);
-        char *secret_key = zcert_secret_txt (server_cert);
+        const char *public_key = zcert_public_txt (server_cert);
+        const char *secret_key = zcert_secret_txt (server_cert);
     
         //  Try CURVE authentication
     
@@ -318,10 +318,16 @@ This is the class self test code:
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (success);
     
+    //  Cleanup
     zsock_destroy (&faucet);
     zsock_destroy (&sink);
     zactor_destroy (&proxy);
     zstr_free (&frontend);
     zstr_free (&backend);
+    
+    //  Delete temporary directory and test files
+    zsys_file_delete (TESTDIR "/password-file");
+    zsys_file_delete (TESTDIR "/mycert.txt");
+    zsys_dir_delete (TESTDIR);
     #endif
 

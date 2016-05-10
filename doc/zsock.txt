@@ -96,7 +96,7 @@ CZMQ_EXPORT void
 //  clients being aware. Protocols that run on ephemeral ports should take  
 //  this into account.                                                      
 CZMQ_EXPORT int
-    zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_bind (zsock_t *self, const char *format, ...);
 
 //  Returns last bound endpoint, if any.
 CZMQ_EXPORT const char *
@@ -106,18 +106,18 @@ CZMQ_EXPORT const char *
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.                                               
 CZMQ_EXPORT int
-    zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_unbind (zsock_t *self, const char *format, ...);
 
 //  Connect a socket to a formatted endpoint        
 //  Returns 0 if OK, -1 if the endpoint was invalid.
 CZMQ_EXPORT int
-    zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_connect (zsock_t *self, const char *format, ...);
 
 //  Disconnect a socket from a formatted endpoint                  
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.                                               
 CZMQ_EXPORT int
-    zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+    zsock_disconnect (zsock_t *self, const char *format, ...);
 
 //  Attach a socket to zero or more endpoints. If endpoints is not null,     
 //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by 
@@ -714,6 +714,26 @@ CZMQ_EXPORT zsock_t *
     zsock_new_client (const char *endpoint);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Create a RADIO socket. Default action is bind.
+CZMQ_EXPORT zsock_t *
+    zsock_new_radio (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Create a DISH socket. Default action is connect.
+CZMQ_EXPORT zsock_t *
+    zsock_new_dish (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Create a GATHER socket. Default action is bind.
+CZMQ_EXPORT zsock_t *
+    zsock_new_gather (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Create a SCATTER socket. Default action is connect.
+CZMQ_EXPORT zsock_t *
+    zsock_new_scatter (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.     
 CZMQ_EXPORT uint32_t
@@ -724,6 +744,18 @@ CZMQ_EXPORT uint32_t
 //  This will be used when sending messages on the socket via the zsock API.
 CZMQ_EXPORT void
     zsock_set_routing_id (zsock_t *self, uint32_t routing_id);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                 
+CZMQ_EXPORT int
+    zsock_join (void *self, const char *group);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                  
+CZMQ_EXPORT int
+    zsock_leave (void *self, const char *group);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get socket option `heartbeat_ivl`.
@@ -757,6 +789,17 @@ CZMQ_EXPORT int
 //  Set socket option `heartbeat_timeout`.
 CZMQ_EXPORT void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Get socket option `use_fd`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_use_fd (void *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set socket option `use_fd`.
+CZMQ_EXPORT void
+    zsock_set_use_fd (void *self, int use_fd);
 
 #endif // CZMQ_BUILD_DRAFT_API
 ----
@@ -886,7 +929,9 @@ assert (rc == 123);
 uint8_t  number1 = 123;
 uint16_t number2 = 123 * 123;
 uint32_t number4 = 123 * 123 * 123;
+uint64_t number4_MAX = UINT32_MAX;
 uint64_t number8 = 123 * 123 * 123 * 123;
+uint64_t number8_MAX = UINT64_MAX;
 
 zchunk_t *chunk = zchunk_new ("HELLO", 5);
 assert (chunk);
@@ -902,8 +947,9 @@ zhashx_insert (hash, "2", "value B");
 char *original = "pointer";
 
 //  Test zsock_recv into each supported type
-zsock_send (writer, "i1248zsbcfUhp",
-            -12345, number1, number2, number4, number8,
+zsock_send (writer, "i124488zsbcfUhp",
+            -12345, number1, number2, number4, number4_MAX,
+            number8, number8_MAX,
             "This is a string", "ABCDE", 5,
             chunk, frame, uuid, hash, original);
 char *uuid_str = strdup (zuuid_str (uuid));
@@ -916,16 +962,19 @@ int integer;
 byte *data;
 size_t size;
 char *pointer;
-number8 = number4 = number2 = number1 = 0;
-rc = zsock_recv (reader, "i1248zsbcfUhp",
-                 &integer, &number1, &number2, &number4, &number8,
-                 &string, &data, &size, &chunk, &frame, &uuid, &hash, &pointer);
+number8_MAX = number8 = number4 = number2 = number1 = 0;
+rc = zsock_recv (reader, "i124488zsbcfUhp",
+                 &integer, &number1, &number2, &number4, &number4_MAX,
+                 &number8, &number8_MAX, &string, &data, &size, &chunk,
+                 &frame, &uuid, &hash, &pointer);
 assert (rc == 0);
 assert (integer == -12345);
 assert (number1 == 123);
 assert (number2 == 123 * 123);
 assert (number4 == 123 * 123 * 123);
+assert (number4_MAX == UINT32_MAX);
 assert (number8 == 123 * 123 * 123 * 123);
+assert (number8_MAX == UINT64_MAX);
 assert (streq (string, "This is a string"));
 assert (memcmp (data, "ABCDE", 5) == 0);
 assert (size == 5);
@@ -1092,6 +1141,26 @@ zchunk_destroy (&chunk);
 
 zsock_destroy (&client);
 zsock_destroy (&server);
+
+#endif
+
+#ifdef ZMQ_SCATTER
+
+zsock_t* gather = zsock_new_gather ("inproc://test-gather-scatter");
+assert (gather);
+zsock_t* scatter = zsock_new_scatter ("inproc://test-gather-scatter");
+assert (scatter);
+
+rc = zstr_send (scatter, "HELLO");
+assert (rc == 0);
+
+char* message;
+message = zstr_recv (gather);
+assert (streq(message, "HELLO"));
+zstr_free (&message);    
+
+zsock_destroy (&gather);
+zsock_destroy (&scatter);
 
 #endif
 

@@ -75,7 +75,7 @@ SYNOPSIS
 //
 //  This is the zauth constructor as a zactor_fn:
 CZMQ_EXPORT void
-    zauth (zsock_t *pipe, void *unused);
+    zauth (zsock_t *pipe, void *certstore);
 
 //  Selftest
 CZMQ_EXPORT void
@@ -101,11 +101,11 @@ EXAMPLE
 zsys_dir_create (TESTDIR);
 
 //  Check there's no authentication
-zsock_t *server = zsock_new (ZMQ_PUSH);
+zsock_t *server = zsock_new (ZMQ_PULL);
 assert (server);
-zsock_t *client = zsock_new (ZMQ_PULL);
+zsock_t *client = zsock_new (ZMQ_PUSH);
 assert (client);
-bool success = s_can_connect (&server, &client);
+bool success = s_can_connect (&server, &client, true);
 assert (success);
 
 //  Install the authenticator
@@ -116,35 +116,35 @@ if (verbose) {
     zsock_wait (auth);
 }
 //  Check there's no authentication on a default NULL server
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (success);
 
 //  When we set a domain on the server, we switch on authentication
 //  for NULL sockets, but with no policies, the client connection
 //  will be allowed.
 zsock_set_zap_domain (server, "global");
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (success);
 
 //  Blacklist 127.0.0.1, connection should fail
 zsock_set_zap_domain (server, "global");
 zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
 zsock_wait (auth);
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (!success);
 
 //  Whitelist our address, which overrides the blacklist
 zsock_set_zap_domain (server, "global");
 zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
 zsock_wait (auth);
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (success);
 
 //  Try PLAIN authentication
 zsock_set_plain_server (server, 1);
 zsock_set_plain_username (client, "admin");
 zsock_set_plain_password (client, "Password");
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (!success);
 
 FILE *password = fopen (TESTDIR "/password-file", "w");
@@ -156,13 +156,13 @@ zsock_set_plain_username (client, "admin");
 zsock_set_plain_password (client, "Password");
 zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
 zsock_wait (auth);
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (success);
 
 zsock_set_plain_server (server, 1);
 zsock_set_plain_username (client, "admin");
 zsock_set_plain_password (client, "Bogus");
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (!success);
 
 if (zsys_has_curve ()) {
@@ -174,14 +174,14 @@ if (zsys_has_curve ()) {
     assert (server_cert);
     zcert_t *client_cert = zcert_new ();
     assert (client_cert);
-    char *server_key = zcert_public_txt (server_cert);
+    const char *server_key = zcert_public_txt (server_cert);
 
     //  Test without setting-up any authentication
     zcert_apply (server_cert, server);
     zcert_apply (client_cert, client);
     zsock_set_curve_server (server, 1);
     zsock_set_curve_serverkey (client, server_key);
-    success = s_can_connect (&server, &client);
+    success = s_can_connect (&server, &client, true);
     assert (!success);
 
     //  Test CURVE_ALLOW_ANY
@@ -191,10 +191,11 @@ if (zsys_has_curve ()) {
     zsock_set_curve_serverkey (client, server_key);
     zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
     zsock_wait (auth);
-    success = s_can_connect (&server, &client);
+    success = s_can_connect (&server, &client, true);
     assert (success);
 
     //  Test full client authentication using certificates
+    zcert_set_meta (client_cert, "Hello", "%s", "World!");
     zcert_apply (server_cert, server);
     zcert_apply (client_cert, client);
     zsock_set_curve_server (server, 1);
@@ -202,15 +203,55 @@ if (zsys_has_curve ()) {
     zcert_save_public (client_cert, TESTDIR "/mycert.txt");
     zstr_sendx (auth, "CURVE", TESTDIR, NULL);
     zsock_wait (auth);
-    success = s_can_connect (&server, &client);
+    success = s_can_connect (&server, &client, false);
     assert (success);
+
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
+    // Test send/recv certificate metadata
+    zframe_t *frame = zframe_recv (server);
+    assert (frame != NULL);
+    const char *meta = zframe_meta (frame, "Hello");
+    assert (meta != NULL);
+    assert (streq (meta, "World!"));
+    zframe_destroy (&frame);
+    s_renew_sockets(&server, &client);
+#endif
 
     zcert_destroy (&server_cert);
     zcert_destroy (&client_cert);
+
+    // Test custom zcertstore
+    zcertstore_t *certstore = zcertstore_new (NULL);
+    zcertstore_set_loader (certstore, s_test_loader, NULL, NULL);
+    zactor_destroy(&auth);
+    auth = zactor_new (zauth, certstore);
+    assert (auth);
+    if (verbose) {
+        zstr_sendx (auth, "VERBOSE", NULL);
+        zsock_wait (auth);
+    }
+
+    byte public_key [32] = { 105, 76, 150, 58, 214, 191, 218, 65, 50, 172,
+                             131, 188, 247, 211, 136, 170, 227, 26, 57, 170,
+                             185, 63, 246, 225, 177, 230, 12, 8, 134, 136,
+                             105, 106 };
+    byte secret_key [32] = { 245, 217, 172, 73, 106, 28, 195, 17, 218, 132,
+                             135, 209, 99, 240, 98, 232, 7, 137, 244, 100,
+                             242, 23, 29, 114, 70, 223, 83, 1, 113, 207,
+                             132, 149 };
+    zcert_t *shared_cert = zcert_new_from (public_key, secret_key);
+    assert (shared_cert);
+    zcert_apply (shared_cert, server);
+    zcert_apply (shared_cert, client);
+    zsock_set_curve_server (server, 1);
+    zsock_set_curve_serverkey (client, "x?T*N/1Y{8goubv{Ts}#&#f}TXJ//DVe#D2HkoLU");
+    success = s_can_connect (&server, &client, true);
+    assert (success);
+    zcert_destroy (&shared_cert);
 }
 //  Remove the authenticator and check a normal connection works
 zactor_destroy (&auth);
-success = s_can_connect (&server, &client);
+success = s_can_connect (&server, &client, true);
 assert (success);
 
 zsock_destroy (&client);
