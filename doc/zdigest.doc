@@ -23,11 +23,11 @@ This is the class interface:
     
     //  Add buffer into digest calculation
     CZMQ_EXPORT void
-        zdigest_update (zdigest_t *self, byte *buffer, size_t length);
+        zdigest_update (zdigest_t *self, const byte *buffer, size_t length);
     
-    //  Return final digest hash data. If built without crypto support, returns
-    //  NULL.                                                                  
-    CZMQ_EXPORT byte *
+    //  Return final digest hash data. If built without crypto support,
+    //  returns NULL.                                                  
+    CZMQ_EXPORT const byte *
         zdigest_data (zdigest_t *self);
     
     //  Return final digest hash size
@@ -53,7 +53,7 @@ This is the class self test code:
     zdigest_t *digest = zdigest_new ();
     assert (digest);
     zdigest_update (digest, buffer, 1024);
-    byte *data = zdigest_data (digest);
+    const byte *data = zdigest_data (digest);
     assert (data [0] == 0xDE);
     assert (data [1] == 0xB2);
     assert (data [2] == 0x38);

@@ -12,6 +12,8 @@ SYNOPSIS
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
 //  in stable releases, by default. Use --enable-drafts to enable.
+//  This class has legacy methods, which will be removed over time. You
+//  should not use them, and migrate any code that is still using them.
 //  Create and initialize a new certificate in memory
 CZMQ_EXPORT zcert_t *
     zcert_new (void);
@@ -29,28 +31,28 @@ CZMQ_EXPORT void
     zcert_destroy (zcert_t **self_p);
 
 //  Return public part of key pair as 32-byte binary string
-CZMQ_EXPORT byte *
+CZMQ_EXPORT const byte *
     zcert_public_key (zcert_t *self);
 
 //  Return secret part of key pair as 32-byte binary string
-CZMQ_EXPORT byte *
+CZMQ_EXPORT const byte *
     zcert_secret_key (zcert_t *self);
 
 //  Return public part of key pair as Z85 armored string
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zcert_public_txt (zcert_t *self);
 
 //  Return secret part of key pair as Z85 armored string
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zcert_secret_txt (zcert_t *self);
 
 //  Set certificate metadata from formatted string.
 CZMQ_EXPORT void
-    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
+    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...);
 
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.                                              
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zcert_meta (zcert_t *self, const char *name);
 
 //  Get list of metadata fields from certificate. Caller is responsible for
@@ -75,7 +77,7 @@ CZMQ_EXPORT int
 //  If certificate was loaded from public file, the secret key will be 
 //  undefined, and this certificate will not work successfully.        
 CZMQ_EXPORT void
-    zcert_apply (zcert_t *self, void *zocket);
+    zcert_apply (zcert_t *self, void *socket);
 
 //  Return copy of certificate; if certificate is NULL or we exhausted
 //  heap memory, returns NULL.                                        
@@ -91,8 +93,9 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zcert_print (zcert_t *self);
 
-//  DEPRECATED as incompatible with centralized logging
-//  Print certificate contents to open stream          
+//  *** Deprecated method, slated for removal: avoid using it ***
+//  Print certificate contents to open stream. This method is deprecated
+//  and you should use the print method.                                
 CZMQ_EXPORT void
     zcert_fprint (zcert_t *self, FILE *file);
 

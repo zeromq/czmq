@@ -59,7 +59,7 @@ This is the class interface:
     //  Equivalent to zconfig_load, taking a format string instead of a fixed
     //  filename.                                                            
     CZMQ_EXPORT zconfig_t *
-        zconfig_loadf (const char *format, ...) CHECK_PRINTF (1);
+        zconfig_loadf (const char *format, ...);
     
     //  Destroy a config item and all its children
     CZMQ_EXPORT void
@@ -80,7 +80,7 @@ This is the class interface:
     //  Equivalent to zconfig_put, accepting a format specifier and variable
     //  argument list, instead of a single string value.                    
     CZMQ_EXPORT void
-        zconfig_putf (zconfig_t *self, const char *path, const char *format, ...) CHECK_PRINTF (3);
+        zconfig_putf (zconfig_t *self, const char *path, const char *format, ...);
     
     //  Get value for config item into a string value; leading slash is optional
     //  and ignored.                                                            
@@ -96,7 +96,7 @@ This is the class interface:
     //  comes from an insecure source, you must use '%s' as the format, followed
     //  by the string.                                                          
     CZMQ_EXPORT void
-        zconfig_set_value (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
+        zconfig_set_value (zconfig_t *self, const char *format, ...);
     
     //  Find our first child, if any
     CZMQ_EXPORT zconfig_t *
@@ -123,7 +123,7 @@ This is the class interface:
     //  comment lines as you like. If you use a null format, all comments are
     //  deleted.                                                             
     CZMQ_EXPORT void
-        zconfig_set_comment (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
+        zconfig_set_comment (zconfig_t *self, const char *format, ...);
     
     //  Return comments of config item, as zlist.
     CZMQ_EXPORT zlist_t *
@@ -137,7 +137,7 @@ This is the class interface:
     //  Equivalent to zconfig_save, taking a format string instead of a fixed
     //  filename.                                                            
     CZMQ_EXPORT int
-        zconfig_savef (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
+        zconfig_savef (zconfig_t *self, const char *format, ...);
     
     //  Report filename used during zconfig_load, or NULL if none
     CZMQ_EXPORT const char *

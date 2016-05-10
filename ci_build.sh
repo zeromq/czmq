@@ -47,11 +47,12 @@ if [ "$BUILD_TYPE" == "default" ]; then
     # Build and check this project without DRAFT APIs
     make clean
     git reset --hard HEAD
-    ./autogen.sh 2> /dev/null
-    ./configure --enable-drafts=no "${CONFIG_OPTS[@]}"
-    make -j4
-    make check
-    make install
+    (
+        ./autogen.sh 2> /dev/null
+        ./configure --enable-drafts=no "${CONFIG_OPTS[@]}"
+        export DISTCHECK_CONFIGURE_FLAGS="${CONFIG_OPTS[@]}" &&
+        make VERBOSE=1 distcheck
+    ) || exit 1
 else
     pushd "./builds/${BUILD_TYPE}" && REPO_DIR="$(dirs -l +1)" ./ci_build.sh
 fi
