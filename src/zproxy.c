@@ -685,11 +685,17 @@ zproxy_test (bool verbose)
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (success);
 
+    //  Cleanup
     zsock_destroy (&faucet);
     zsock_destroy (&sink);
     zactor_destroy (&proxy);
     zstr_free (&frontend);
     zstr_free (&backend);
+
+    //  Delete temporary directory and test files
+    zsys_file_delete (TESTDIR "/password-file");
+    zsys_file_delete (TESTDIR "/mycert.txt");
+    zsys_dir_delete (TESTDIR);
 #endif
     //  @end
     printf ("OK\n");
