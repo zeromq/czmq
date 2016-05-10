@@ -12,7 +12,7 @@ AC_INIT([czmq],[3.0.3],[zeromq-dev@lists.zeromq.org])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
 AC_CONFIG_HEADERS([src/platform.h])
-AM_INIT_AUTOMAKE([subdir-objects tar-ustar foreign])
+AM_INIT_AUTOMAKE([subdir-objects tar-ustar dist-zip foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # This defines PACKAGE_VERSION_... in src/platform.h
