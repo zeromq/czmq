@@ -12,7 +12,7 @@ AC_INIT([czmq],[3.0.3],[zeromq-dev@lists.zeromq.org])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
 AC_CONFIG_HEADERS([src/platform.h])
-AM_INIT_AUTOMAKE([subdir-objects tar-ustar dist-zip foreign])
+AM_INIT_AUTOMAKE([subdir-objects tar-ustar foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # This defines PACKAGE_VERSION_... in src/platform.h
@@ -117,6 +117,53 @@ PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
 if test "x$was_libzmq_check_lib_detected" = "xno"; then
     CFLAGS="${libzmq_CFLAGS} ${CFLAGS}"
     LIBS="${libzmq_LIBS} ${LIBS}"
+fi
+
+was_uuid_check_lib_detected=no
+
+PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
+    [
+        AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
+    ],
+    [
+        AC_ARG_WITH([uuid],
+            [
+                AS_HELP_STRING([--with-uuid],
+                [Specify uuid prefix])
+            ],
+            [search_uuid="yes"],
+            [])
+
+        uuid_synthetic_cflags=""
+        uuid_synthetic_libs="-luuid"
+
+        if test "x$search_uuid" = "xyes"; then
+            if test -r "${with_uuid}/include/uuid/uuid.h"; then
+                uuid_synthetic_cflags="-I${with_uuid}/include"
+                uuid_synthetic_libs="-L${with_uuid}/lib -luuid"
+            else
+                AC_MSG_ERROR([${with_uuid}/include/uuid/uuid.h not found. Please check uuid prefix])
+            fi
+        fi
+
+
+        AC_CHECK_LIB([uuid], [uuid_generate],
+            [
+                CFLAGS="${uuid_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${uuid_synthetic_libs} ${LDFLAGS}"
+                LIBS="${uuid_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([uuid_CFLAGS],[${uuid_synthetic_cflags}])
+                AC_SUBST([uuid_LIBS],[${uuid_synthetic_libs}])
+                was_uuid_check_lib_detected=yes
+                AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
+            ],
+            [])
+    ])
+
+if test "x$was_uuid_check_lib_detected" = "xno"; then
+    CFLAGS="${uuid_CFLAGS} ${CFLAGS}"
+    LIBS="${uuid_LIBS} ${LIBS}"
 fi
 
 was_systemd_check_lib_detected=no
