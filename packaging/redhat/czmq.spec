@@ -14,8 +14,8 @@ Name:           czmq
 Version:        3.0.3
 Release:        1
 Summary:        the high-level c binding for 0mq
-License:        MIT
-URL:            http://example.com/
+License:        MPLv2
+URL:            http://czmq.zeromq.org/
 Source0:        %{name}-%{version}.tar.gz
 Group:          System/Libraries
 BuildRequires:  automake
