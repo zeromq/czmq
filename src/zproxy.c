@@ -543,10 +543,10 @@ zproxy_test (bool verbose)
     proxy = zactor_new (zproxy, NULL);
     assert (proxy);
 
-    sink = zsock_new_sub (">inproc://backend", "whatever");
+    sink = zsock_new_sub (">ipc://backend", "whatever");
     assert (sink);
 
-    zstr_sendx (proxy, "BACKEND", "XPUB", "inproc://backend", NULL);
+    zstr_sendx (proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
     zsock_wait (proxy);
 
     zsock_destroy(&sink);
