@@ -198,11 +198,18 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket 
     assert (*sock_p == NULL);
     *sock_p = s_self_create_socket (self, type_name, endpoints, selected_socket);
     assert (*sock_p);
-    zpoller_add (self->poller, *sock_p);
     zstr_free (&type_name);
     zstr_free (&endpoints);
 }
 
+static void
+s_self_add_to_poller_when_configured (self_t *self)
+{
+    if (self->frontend && self->backend) {
+        zpoller_add(self->poller, self->frontend);
+        zpoller_add(self->poller, self->backend);
+    }
+}
 
 //  --------------------------------------------------------------------------
 //  Handle a command from calling application
@@ -222,11 +229,13 @@ s_self_handle_pipe (self_t *self)
 
     if (streq (command, "FRONTEND")) {
         s_self_configure (self, &self->frontend, request, FRONTEND);
+        s_self_add_to_poller_when_configured (self);
         zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "BACKEND")) {
         s_self_configure (self, &self->backend, request, BACKEND);
+        s_self_add_to_poller_when_configured (self);
         zsock_signal (self->pipe, 0);
     }
     else
@@ -529,6 +538,19 @@ zproxy_test (bool verbose)
     zsock_destroy (&sink);
     zsock_destroy (&capture);
     zactor_destroy (&proxy);
+
+    //  Test socket creation dependency
+    proxy = zactor_new (zproxy, NULL);
+    assert (proxy);
+
+    sink = zsock_new_sub (">inproc://backend", "whatever");
+    assert (sink);
+
+    zstr_sendx (proxy, "BACKEND", "XPUB", "inproc://backend", NULL);
+    zsock_wait (proxy);
+
+    zsock_destroy(&sink);
+    zactor_destroy(&proxy);
 
 #if (ZMQ_VERSION_MAJOR == 4)
     // Test authentication functionality
