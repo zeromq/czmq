@@ -198,7 +198,6 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket 
     assert (*sock_p == NULL);
     *sock_p = s_self_create_socket (self, type_name, endpoints, selected_socket);
     assert (*sock_p);
-    zpoller_add (self->poller, *sock_p);
     zstr_free (&type_name);
     zstr_free (&endpoints);
 }
@@ -230,11 +229,13 @@ s_self_handle_pipe (self_t *self)
 
     if (streq (command, "FRONTEND")) {
         s_self_configure (self, &self->frontend, request, FRONTEND);
+        s_self_add_to_poller_when_configured (self);
         zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "BACKEND")) {
         s_self_configure (self, &self->backend, request, BACKEND);
+        s_self_add_to_poller_when_configured (self);
         zsock_signal (self->pipe, 0);
     }
     else
