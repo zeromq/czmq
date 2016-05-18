@@ -203,6 +203,14 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket 
     zstr_free (&endpoints);
 }
 
+static void
+s_self_add_to_poller_when_configured (self_t *self)
+{
+    if (self->frontend && self->backend) {
+        zpoller_add(self->poller, self->frontend);
+        zpoller_add(self->poller, self->backend);
+    }
+}
 
 //  --------------------------------------------------------------------------
 //  Handle a command from calling application
