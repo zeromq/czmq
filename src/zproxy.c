@@ -530,6 +530,19 @@ zproxy_test (bool verbose)
     zsock_destroy (&capture);
     zactor_destroy (&proxy);
 
+    //  Test socket creation dependency
+    proxy = zactor_new (zproxy, NULL);
+    assert (proxy);
+
+    sink = zsock_new_sub (">inproc://backend", "whatever");
+    assert (sink);
+
+    zstr_sendx (proxy, "BACKEND", "XPUB", "inproc://backend", NULL);
+    zsock_wait (proxy);
+
+    zsock_destroy(&sink);
+    zactor_destroy(&proxy);
+
 #if (ZMQ_VERSION_MAJOR == 4)
     // Test authentication functionality
 #   define TESTDIR ".test_zproxy"
