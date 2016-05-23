@@ -9,6 +9,11 @@ Ensure you have gradle and cmake installed, then run:
     gradle build jar
     gradle test
 
+If you don't like to install gradle beforehand just use the gradle wrapper
+
+    ./gradlew build jar
+    ./gradlew test
+
 This calls javah to build the headers in src/native/include, and then compiles the C and Java pieces to create a jar file a sharable library (.so).
 
 ## Building the JNI Layer for Android
@@ -48,6 +53,14 @@ You need the Java SDK. Set the JAVA_HOME environment to the installation locatio
 3. In this project, open a console in bindings/jni/msvc/vs2010 and run the build.bat batch file.
 
 The resulting libraries (czmqjni.dll, czmqjni.lib) are created in bindings/jni/msvc/bin.
+
+## Building the gradle wrapper (for maintainers)
+
+The gradle wrapper is a tool that allows to use gradle on multiple platforms without installing it beforehand. As maintainers make sure you have gradle installed. Then just run
+
+    gradle wrapper
+
+Now commit all generated files to the project. Users will now be able to call the gradle wrapper which will install gradle for them.
 
 ## Using the JNI API
 

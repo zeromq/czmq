@@ -14,51 +14,39 @@ set (BUILD_ANDROID True)
 include (CMakeForceCompiler)
 include (FindPkgConfig)
 
-# where is the target environment
+# Where is the target environment
 set (ANDROID_NDK_ROOT $ENV{ANDROID_NDK_ROOT})
 set (ANDROID_SYS_ROOT $ENV{ANDROID_SYS_ROOT})
 set (ANDROID_API_LEVEL $ENV{ANDROID_API_LEVEL})
 set (TOOLCHAIN_PATH $ENV{TOOLCHAIN_PATH})
 set (TOOLCHAIN_HOST $ENV{TOOLCHAIN_HOST})
 set (TOOLCHAIN_ARCH $ENV{TOOLCHAIN_ARCH})
+set (LIBRARIES_BUILD_PREFIX $ENV{ANDROID_BUILD_PREFIX})
 
-# api level see doc https://github.com/taka-no-me/android-cmake
-set (CMAKE_INSTALL_PREFIX /tmp)
+# Here is the target environment located
+set (CMAKE_INSTALL_PREFIX "${LIBRARIES_BUILD_PREFIX}")
 set (CMAKE_FIND_ROOT_PATH
     "${TOOLCHAIN_PATH}"
-    "${CMAKE_INSTALL_PREFIX}"
-    "${CMAKE_INSTALL_PREFIX}/share")
+    "${LIBRARIES_BUILD_PREFIX}"
+    "${LIBRARIES_BUILD_PREFIX}/share")
+
+# pkg_config should not search for packages of the host system,
+# but for the target system. To do this, there is the environment variable
+# PKG_CONFIG_LIBDIR, which was added to pkg_config explicitely for crosscompiling.
+# So set this here to point inside the CMAKE_FIND_ROOT_PATH so it can find
+# only packages for the target system when crosscompiling.
+set(pkgconfigLibDir)
+foreach(currentFindRoot ${CMAKE_FIND_ROOT_PATH})
+    set(pkgconfigLibDir "${pkgconfigLibDir}:${currentFindRoot}/lib/pkgconfig")
+endforeach(currentFindRoot)
+set(ENV{PKG_CONFIG_LIBDIR} "${pkgconfigLibDir}")
+set(ENV{PKG_CONFIG_PATH} "")
 
 # Prefix detection only works with compiler id "GNU"
 # CMake will look for prefixed g++, cpp, ld, etc. automatically
 CMAKE_FORCE_C_COMPILER (${TOOLCHAIN_PATH}/arm-linux-androideabi-gcc GNU)
 
-#   Find location of zmq.h file
-pkg_check_modules (PC_LIBZMQ "libzmq")
-if (NOT PC_LIBZMQ_FOUND)
-    pkg_check_modules(PC_LIBZMQ "zmq")
-endif (NOT PC_LIBZMQ_FOUND)
-
-if (PC_LIBZMQ_FOUND)
-    set (PC_LIBZMQ_INCLUDE_HINTS ${PC_LIBZMQ_INCLUDE_DIRS} ${PC_LIBZMQ_INCLUDE_DIRS}/*)
-endif (PC_LIBZMQ_FOUND)
-
-find_path (
-    LIBZMQ_INCLUDE_DIR
-    NAMES zmq.h
-    HINTS ${PC_LIBZMQ_INCLUDE_HINTS}
-)
-
 cmake_policy (SET CMP0015 NEW)   #  Use relative paths in link_directories
 
-include_directories (
-    ${LIBZMQ_INCLUDE_DIR}
-    ../../../include
-    ../../../bindings/jni/src/native/include
-    ../../../builds/android/prefix/arm-linux-androideabi-4.9/include
-    ${ANDROID_SYS_ROOT}/usr/include
-)
-link_directories (
-    ../../../builds/android/prefix/arm-linux-androideabi-4.9/lib
-    ${ANDROID_SYS_ROOT}/usr/lib
-)
+include_directories (${ANDROID_SYS_ROOT}/usr/include)
+link_directories (${ANDROID_SYS_ROOT}/usr/lib)

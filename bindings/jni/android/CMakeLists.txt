@@ -7,19 +7,37 @@ cmake_minimum_required (VERSION 2.8)
 project (czmqjni CXX)
 enable_language (C)
 
-find_package (JNI REQUIRED)
+# Search for Find*.cmake files in the following locations
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../..")
 
+########################################################################
+# JNI dependency
+########################################################################
+find_package (JNI REQUIRED)
 include_directories (${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} ../src/native/include)
 
-# message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
-# message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
-# message (STATUS "JNI_FOUND=${JNI_FOUND}")
-# message (STATUS "JAVA_AWT_LIBRARY=${JAVA_AWT_LIBRARY}")
-# message (STATUS "JAVA_JVM_LIBRARY=${JAVA_JVM_LIBRARY}")
-# message (STATUS "JAVA_INCLUDE_PATH=${JAVA_INCLUDE_PATH}")
-# message (STATUS "JAVA_INCLUDE_PATH2=${JAVA_INCLUDE_PATH2}")
-# message (STATUS "JAVA_AWT_INCLUDE_PATH=${JAVA_AWT_INCLUDE_PATH}")
-# message (STATUS "CMAKE_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}")
+########################################################################
+# LIBZMQ dependency
+########################################################################
+find_package(libzmq REQUIRED)
+IF (LIBZMQ_FOUND)
+    include_directories(${LIBZMQ_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
+ELSE (LIBZMQ_FOUND)
+    message( FATAL_ERROR "libzmq not found." )
+ENDIF (LIBZMQ_FOUND)
+
+########################################################################
+# CZMQ dependency
+########################################################################
+find_package(czmq REQUIRED)
+IF (CZMQ_FOUND)
+    include_directories(${CZMQ_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
+ELSE (CZMQ_FOUND)
+    message( FATAL_ERROR "czmq not found." )
+ENDIF (CZMQ_FOUND)
 
 set (czmqjni_sources
     ../src/main/c/org_zeromq_czmq_Zarmour.c
@@ -51,12 +69,10 @@ set (czmqjni_sources
 
 add_library (czmqjni SHARED ${czmqjni_sources})
 add_definitions (-DCZMQ_BUILD_DRAFT_API)
-target_link_libraries (czmqjni
-    czmq
-    zmq
-)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O2")
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+
+target_link_libraries (czmqjni ${MORE_LIBRARIES})

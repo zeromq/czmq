@@ -15,7 +15,7 @@ Version:        3.0.3
 Release:        1
 Summary:        the high-level c binding for 0mq
 License:        MPLv2
-URL:            http://czmq.zeromq.org/
+URL:            https://github.com/zeromq/czmq
 Source0:        %{name}-%{version}.tar.gz
 Group:          System/Libraries
 BuildRequires:  automake
@@ -44,7 +44,6 @@ This package contains shared library.
 
 %files -n libczmq3
 %defattr(-,root,root)
-%doc COPYING
 %{_libdir}/libczmq.so.*
 
 %package devel

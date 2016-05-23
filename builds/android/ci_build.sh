@@ -26,6 +26,7 @@ unset FILENAME
 
 export ANDROID_NDK_ROOT="/tmp/$NDK_VER"
 export TOOLCHAIN_PATH="$ANDROID_NDK_ROOT/toolchains/arm-linux-androideabi-$NDK_ABI_VER/prebuilt/$NDK_PLATFORM/bin"
+export TOOLCHAIN_VERSION=$NDK_ABI_VER
 export TOOLCHAIN_NAME="arm-linux-androideabi-$NDK_ABI_VER"
 export TOOLCHAIN_HOST="arm-linux-androideabi"
 export TOOLCHAIN_ARCH="arm"
