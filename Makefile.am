@@ -27,6 +27,10 @@ noinst_LTLIBRARIES =
 TESTS =
 
 EXTRA_DIST = \
+    CMakeLists.txt \
+    Findlibzmq.cmake \
+    Finduuid.cmake \
+    Findsystemd.cmake \
     src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
