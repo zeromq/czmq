@@ -8,7 +8,7 @@
 set -x
 set -e
 
-if [[ $BUILD_TYPE == "default" ]]; then
+if [ "$BUILD_TYPE" == "default" ]; then
     # Tell travis to deploy all files in dist
     mkdir dist
     export CZMQ_DEPLOYMENT=dist/*
@@ -20,6 +20,8 @@ if [[ $BUILD_TYPE == "default" ]]; then
     md5sum *.zip *.tar.gz > MD5SUMS
     sha1sum *.zip *.tar.gz > SHA1SUMS
     cd -
+elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ]; then
+    export CZMQ_DEPLOYMENT=bindings/jni/android/czmq-android.jar
 else
     export CZMQ_DEPLOYMENT=""
 fi

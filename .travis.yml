@@ -1,6 +1,6 @@
 # Travis CI script
 
-language: c
+language: java
 
 os:
 - linux
@@ -9,7 +9,6 @@ os:
 sudo: false
 
 env:
-  matrix:
   - BUILD_TYPE=default
   - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq2-x
   - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq3-x
@@ -19,6 +18,13 @@ env:
   # As we have errors in bindings/python/test.py I'm suspending this...
   #- BUILD_TYPE=check-py
   - BUILD_TYPE=cmake
+  - BUILD_TYPE=bindings BINDING=jni
+
+matrix:
+  exclude:
+  - env: BUILD_TYPE=bindings BINDING=jni
+    os: osx
+
 addons:
   apt:
     packages:
@@ -48,4 +54,4 @@ deploy:
   on:
     branch: master
     tags: true
-    condition: $TRAVIS_OS_NAME =~ (linux) && $BUILD_TYPE =~ (default)
+    condition: $TRAVIS_OS_NAME =~ (linux) && $BUILD_TYPE =~ (default|bindings)
