@@ -39,18 +39,18 @@ if [ "$BUILD_TYPE" == "default" ]; then
 
     # Build and check this project
     ./autogen.sh 2> /dev/null
-    ./configure "${CONFIG_OPTS[@]}"
-    make -j4
-    make check
-    make install
+    ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
+    export DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=yes ${CONFIG_OPTS[@]}"
+    make VERBOSE=1 distcheck
 
     # Build and check this project without DRAFT APIs
-    make clean
+    make distclean
+    git clean -f
     git reset --hard HEAD
     (
         ./autogen.sh 2> /dev/null
         ./configure --enable-drafts=no "${CONFIG_OPTS[@]}"
-        export DISTCHECK_CONFIGURE_FLAGS="${CONFIG_OPTS[@]}" &&
+        export DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=no ${CONFIG_OPTS[@]}" &&
         make VERBOSE=1 distcheck
     ) || exit 1
 elif [ "$BUILD_TYPE" == "bindings" ]; then
