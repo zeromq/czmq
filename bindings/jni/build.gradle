@@ -27,6 +27,9 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.8'
 }
 
+//  ------------------------------------------------------------------
+//  Build section
+
 task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def classpath = sourceSets.main.output.classesDir
     def appclasspath = configurations.runtime.files*.getAbsolutePath().join(":")
@@ -71,6 +74,27 @@ task buildNative(type: Exec, dependsOn: 'initCMake') {
 }
 jar.dependsOn buildNative
 test.dependsOn buildNative
+
+//  ------------------------------------------------------------------
+//  Install section
+
+task sourcesJar(type: Jar, dependsOn: 'classes') {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+//  ------------------------------------------------------------------
+//  Cleanup section
 
 clean.doFirst {
     delete "${rootDir}/CMakeCache.txt"
