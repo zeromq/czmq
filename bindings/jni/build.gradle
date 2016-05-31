@@ -5,14 +5,19 @@
 ################################################################################
 */
 
-apply plugin: 'java'
-apply plugin: 'maven'
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id "com.jfrog.bintray" version "1.6"
+}
+
 group = "org.zeromq"
 version = "3.0.3"
 
 repositories {
     mavenLocal()
     mavenCentral()
+    jcenter()
 }
 
 sourceCompatibility = 1.7
@@ -24,7 +29,7 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+    gradleVersion = '2.13'
 }
 
 //  ------------------------------------------------------------------
@@ -76,7 +81,7 @@ jar.dependsOn buildNative
 test.dependsOn buildNative
 
 //  ------------------------------------------------------------------
-//  Install section
+//  Install and Publish section
 
 task sourcesJar(type: Jar, dependsOn: 'classes') {
     classifier = 'sources'
@@ -88,9 +93,51 @@ task javadocJar(type: Jar, dependsOn: 'javadoc') {
     from javadoc.destinationDir
 }
 
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom.withXml {
+                asNode().appendNode('packaging', 'jar')
+                asNode().appendNode('name', 'czmq-jni')
+                asNode().appendNode('description', 'The high-level C binding for 0MQ')
+                asNode().appendNode('url', 'https://github.com/zeromq/czmq')
+
+                def license = asNode().appendNode('licenses').appendNode('license')
+                license.appendNode('name', 'Mozilla Public License Version 2.0')
+                license.appendNode('url', 'https://www.mozilla.org/en-US/MPL/2.0/')
+
+                def scm = asNode().appendNode('scm')
+                scm.appendNode('connection', 'https://github.com/zeromq/czmq.git')
+                scm.appendNode('developerConnection', 'https://github.com/zeromq/czmq.git')
+                scm.appendNode('url', 'https://github.com/zeromq/czmq')
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['mavenJava']
+    publish = true
+    pkg {
+        repo = "maven"
+        name = "czmq-jni"
+        desc = "The high-level C binding for 0MQ"
+        userOrg = 'zeromq'
+        licenses = ["MPL-2.0"]
+        websiteUrl = 'https://github.com/zeromq/czmq'
+        issueTrackerUrl = 'https://github.com/zeromq/czmq/issues'
+        vcsUrl = 'https://github.com/zeromq/czmq.git'
+        githubRepo = 'zeromq/czmq'
+        version {
+            name = '3.0.3'
+            vcsTag= '3.0.3'
+        }
+    }
 }
 
 //  ------------------------------------------------------------------
@@ -98,4 +145,5 @@ artifacts {
 
 clean.doFirst {
     delete "${rootDir}/CMakeCache.txt"
+    delete "${rootDir}/libczmqjni.so"
 }
