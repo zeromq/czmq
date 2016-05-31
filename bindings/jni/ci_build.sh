@@ -21,13 +21,20 @@ CONFIG_OPTS+=("--quiet")
 
 pushd ../../..
 
+# Clone and build dependencies
 git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq
 cd libzmq
 git --no-pager log --oneline -n1
-./autogen.sh 2> /dev/null
+if [ -e autogen.sh ]; then
+    ./autogen.sh 2> /dev/null
+fi
+if [ -e buildconf ]; then
+    ./buildconf 2> /dev/null
+fi
 ./configure "${CONFIG_OPTS[@]}"
 make -j4
 make install
+cd ..
 
 popd
 pushd ../..
