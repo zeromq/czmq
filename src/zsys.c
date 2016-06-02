@@ -912,7 +912,9 @@ zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
 {
     char buffer [UDP_FRAME_MAX];
     in6addr_t address6;
+#if (!defined (__WINDOWS__))
     inaddr_t *address = (inaddr_t *) &address6;
+#endif
     socklen_t address_len = sizeof (in6addr_t);
     ssize_t size = recvfrom (
         udpsock,

@@ -38,6 +38,12 @@
 #if defined (__WINDOWS__)
 #   if defined CZMQ_STATIC
 #       define CZMQ_EXPORT
+#   elif defined CZMQ_INTERNAL_BUILD
+#       if defined DLL_EXPORT
+#           define CZMQ_EXPORT __declspec(dllexport)
+#       else
+#           define CZMQ_EXPORT
+#       endif
 #   elif defined CZMQ_EXPORTS
 #       define CZMQ_EXPORT __declspec(dllexport)
 #   else
