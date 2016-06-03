@@ -391,6 +391,7 @@ s_authenticate_curve (self_t *self, zap_request_t *request, unsigned char **meta
 
                 *metadata += s_add_property(*metadata, (const char *) key, val, strlen (val));
             }
+            zlist_destroy (&meta_k);
 
             if (self->verbose)
                 zsys_info ("zauth: - allowed (CURVE) client_key=%s", request->client_key);
