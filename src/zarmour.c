@@ -695,6 +695,7 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
     zchunk_destroy (&chunk);
     if (verbose)
         zsys_debug ("    decoded %d bytes, all match", length);
+    free (test_string);
 }
 
 
