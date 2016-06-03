@@ -170,7 +170,7 @@ ztimerset_test (bool verbose)
 
     //  Adding timer
     bool timer_invoked = false;
-    int timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    int timer_id = ztimerset_add (self, 100, handler, &timer_invoked);
     assert (timer_id != -1);
     int rc = ztimerset_execute (self);
     assert (rc == 0);
@@ -191,7 +191,7 @@ ztimerset_test (bool verbose)
     assert(timeout == -1);
 
     //  Reset a timer
-    timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    timer_id = ztimerset_add (self, 100, handler, &timer_invoked);
     assert (timer_id != -1);
     timeout = ztimerset_timeout (self);
     assert (timeout > 0);
@@ -205,10 +205,10 @@ ztimerset_test (bool verbose)
     assert (rc == 0);
 
     //  Set interval
-    timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    timer_id = ztimerset_add (self, 100, handler, &timer_invoked);
     assert (timer_id != -1);
     timeout = ztimerset_timeout (self);
-    rc = ztimerset_set_interval(self, timer_id, 20);
+    rc = ztimerset_set_interval(self, timer_id, 200);
     timeout2 = ztimerset_timeout (self);
     assert (timeout2 > timeout);
 
