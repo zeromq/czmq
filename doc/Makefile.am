@@ -119,7 +119,7 @@ zsockopt.txt:
 zthread.txt:
 	./mkman $@
 zmakecert.txt:
-	./mkman $@
+	./mkman zmakecert $@
 clean:
 	rm -f *.1 *.3 *.7
 	./mkman zactor

@@ -18,11 +18,13 @@ License:        MPLv2
 URL:            https://github.com/zeromq/czmq
 Source0:        %{name}-%{version}.tar.gz
 Group:          System/Libraries
+BuildRequires:  asciidoc
 BuildRequires:  automake
 BuildRequires:  autoconf
 BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
+BuildRequires:  xmlto
 BuildRequires:  zeromq-devel
 BuildRequires:  uuid-devel
 BuildRequires:  systemd-devel
@@ -63,6 +65,8 @@ This package contains development files.
 %{_includedir}/*
 %{_libdir}/libczmq.so
 %{_libdir}/pkgconfig/libczmq.pc
+%{_mandir}/man3/*
+%{_mandir}/man7/*
 
 %prep
 %setup -q
@@ -84,5 +88,6 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %doc README.md
 %doc README.txt
 %{_bindir}/zmakecert
+%{_mandir}/man1/zmakecert*
 
 %changelog

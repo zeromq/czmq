@@ -127,12 +127,12 @@ bintray {
         repo = "maven"
         name = "czmq-jni"
         desc = "The high-level C binding for 0MQ"
-        userOrg = 'zeromq'
+        userOrg = System.getenv('BINTRAY_USER_ORG')
         licenses = ["MPL-2.0"]
         websiteUrl = 'https://github.com/zeromq/czmq'
         issueTrackerUrl = 'https://github.com/zeromq/czmq/issues'
         vcsUrl = 'https://github.com/zeromq/czmq.git'
-        githubRepo = 'zeromq/czmq'
+        githubRepo = System.getenv('BINTRAY_USER_ORG') + '/czmq'
         version {
             name = '3.0.3'
             vcsTag= '3.0.3'
