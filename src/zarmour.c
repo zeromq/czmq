@@ -498,7 +498,9 @@ zarmour_decode (zarmour_t *self, const char *data)
             decoded = s_z85_decode (data, &size);
             break;
     }
-    return zchunk_new (decoded, size);
+    zchunk_t *ret = zchunk_new (decoded, size);
+    free (decoded);
+    return ret;
 }
 
 
