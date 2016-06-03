@@ -72,7 +72,7 @@ after_build:
   - cmd: 7z a -y -bd -mx=9 czmq.zip "%APPVEYOR_BUILD_FOLDER%\src\%CONFIGURATION%\zmakecert.exe" "%APPVEYOR_BUILD_FOLDER%\src\%CONFIGURATION%\czmq_selftest.exe" czmq.dll libsodium.dll libzmq-*.dll
   - ps: Push-AppveyorArtifact "czmq.zip" -Filename "czmq-${env:Platform}-${env:Configuration}.zip"
   - cmd: cd "%CZMQ_BUILDDIR%"
-  - cmd: ctest -C "%Configuration%" -V
+  - cmd: ctest -C "%Configuration%" -VV --timeout 120
 
 test:
   none
