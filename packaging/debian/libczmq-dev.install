@@ -1,3 +1,5 @@
 usr/include/*
 usr/lib/*/libczmq.so
 usr/lib/*/pkgconfig/libczmq.pc
+usr/share/man/man3/*
+usr/share/man/man7/*

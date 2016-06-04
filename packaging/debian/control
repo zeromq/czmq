@@ -23,6 +23,8 @@ Build-Depends: debhelper (>= 9),
     dh-autoreconf,
     systemd,
     dh-systemd
+Build-Depends-Indep: asciidoc,
+                     xmlto
 
 Package: libczmq3
 Architecture: any

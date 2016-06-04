@@ -16,6 +16,15 @@ If you don't like to install gradle beforehand just use the gradle wrapper
 
 This calls javah to build the headers in src/native/include, and then compiles the C and Java pieces to create a jar file a sharable library (.so).
 
+## Installing the JNI Layer for Linux
+
+If you like to use this JNI Layer in another project you'll need to distribute it
+to a location where the other project can locate it. The easiest way to do this
+is by leveraging maven and install to the local maven repository located at
+$HOME/.m2. Therefore simply run:
+
+    ./gradlew publishToMavenLocal
+
 ## Building the JNI Layer for Android
 
 See bindings/jni/android/build.sh.

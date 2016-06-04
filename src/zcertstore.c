@@ -103,8 +103,8 @@ s_disk_loader (zcertstore_t *certstore)
         state->cursize = zdir_cursize (dir);
 
         zrex_destroy (&rex);
-        zdir_destroy (&dir);
     }
+    zdir_destroy (&dir);
 }
 
 
@@ -188,6 +188,8 @@ zcertstore_destroy (zcertstore_t **self_p)
 void
 zcertstore_set_loader (zcertstore_t *self, zcertstore_loader loader, zcertstore_destructor destructor, void *state)
 {
+    if (self->destructor && self->state)
+        self->destructor (&self->state);
     self->loader = loader;
     self->destructor = destructor;
     self->state = state;

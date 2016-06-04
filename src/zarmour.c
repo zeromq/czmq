@@ -498,7 +498,9 @@ zarmour_decode (zarmour_t *self, const char *data)
             decoded = s_z85_decode (data, &size);
             break;
     }
-    return zchunk_new (decoded, size);
+    zchunk_t *ret = zchunk_new (decoded, size);
+    free (decoded);
+    return ret;
 }
 
 
@@ -695,6 +697,7 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
     zchunk_destroy (&chunk);
     if (verbose)
         zsys_debug ("    decoded %d bytes, all match", length);
+    free (test_string);
 }
 
 

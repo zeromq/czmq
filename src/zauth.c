@@ -391,6 +391,7 @@ s_authenticate_curve (self_t *self, zap_request_t *request, unsigned char **meta
 
                 *metadata += s_add_property(*metadata, (const char *) key, val, strlen (val));
             }
+            zlist_destroy (&meta_k);
 
             if (self->verbose)
                 zsys_info ("zauth: - allowed (CURVE) client_key=%s", request->client_key);
@@ -539,7 +540,10 @@ s_can_connect (zsock_t **server, zsock_t **client, bool renew)
     int rc = zsock_connect (*client, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc == 0);
     //  Give the connection time to fail if that's the plan
-    zclock_sleep (200);
+    if (zsock_mechanism (*client) == ZMQ_CURVE)
+        zclock_sleep (1500);
+    else
+        zclock_sleep (200);
 
     //  By default PUSH sockets block if there's no peer
     zsock_set_sndtimeo (*client, 200);
