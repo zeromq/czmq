@@ -33,7 +33,7 @@ You need the Android Native Development Kit (NDK) installed.
 
 Set these environment variables, e.g:
 
-    ANDROID_NDK_ROOT=$HOME/android-ndk-r10e
+    ANDROID_NDK_ROOT=$HOME/android-ndk-r11c
     TOOLCHAIN_VERSION=4.9
     TOOLCHAIN_HOST=arm-linux-androideabi
     TOOLCHAIN_NAME=$TOOLCHAIN_HOST-$TOOLCHAIN_VERSION
