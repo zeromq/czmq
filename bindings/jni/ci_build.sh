@@ -7,7 +7,7 @@ set -e
 # Build and check the jni binding
 ########################################################################
 
-export BUILD_PREFIX=/tmp
+BUILD_PREFIX=/tmp
 
 CONFIG_OPTS=()
 CONFIG_OPTS+=("CFLAGS=-I${BUILD_PREFIX}/include")
