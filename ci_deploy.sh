@@ -21,7 +21,7 @@ if [ "$BUILD_TYPE" == "default" ]; then
     sha1sum *.zip *.tar.gz > SHA1SUMS
     cd -
 elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ]; then
-    ( cd bindings/jni && TERM=dumb PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig ./gradlew clean bintrayUpload )
+    ( cd bindings/jni && TERM=dumb PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./gradlew clean bintrayUpload )
     export CZMQ_DEPLOYMENT=bindings/jni/android/czmq-android.jar
 else
     export CZMQ_DEPLOYMENT=""
