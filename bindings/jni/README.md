@@ -9,7 +9,7 @@ Ensure you have gradle and cmake installed, then run:
     gradle build jar
     gradle test
 
-If you don't like to install gradle beforehand just use the gradle wrapper
+If you don't like to install gradle beforehand just use the gradle wrapper.
 
     ./gradlew build jar
     ./gradlew test
@@ -63,14 +63,6 @@ You need the Java SDK. Set the JAVA_HOME environment to the installation locatio
 
 The resulting libraries (czmqjni.dll, czmqjni.lib) are created in bindings/jni/msvc/bin.
 
-## Building the gradle wrapper (for maintainers)
-
-The gradle wrapper is a tool that allows to use gradle on multiple platforms without installing it beforehand. As maintainers make sure you have gradle installed. Then just run
-
-    gradle wrapper
-
-Now commit all generated files to the project. Users will now be able to call the gradle wrapper which will install gradle for them.
-
 ## Using the JNI API
 
 - to be written.
@@ -85,4 +77,52 @@ http://czmq.zeromq.org.
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
+## Information for maintainers
+
+### Building the gradle wrapper
+
+The gradle wrapper is a tool that allows to use gradle on multiple platforms
+without installing it beforehand. Make sure you have installed a version of
+gradle that is at least the version the wrapper should have (local version >=  wrapper version).
+Then just run
+
+    gradle wrapper
+
+Now commit all generated files to the project. Yes the jar file as well! Users
+will now be able to call the gradle wrapper (gradlew) which will install gradle
+for them.
+
+### Travis build
+
+Travis can build and check this jni layer there add the following line to your
+travis environment matrix
+
+    - BUILD_TYPE=bindings BINDING=jni
+
+### Travis deploy to bintray
+
+When tagging a release travis can automatically deploy this jni layer to bintray.
+Therefore you'll need to supply travis with three environment variables:
+
+* BINTRAY_USER - your personal user name
+* BINTRAY_KEY - your personal api key
+* BINTRAY_USER_ORG - the organisation you like to publish to
+
+You may extent .travis.yml as follows
+
+    - BUILD_TYPE=bindings BINDING=jni BINTRAY_USER=<user> BINTRAY_KEY=<key> BINTRAY_USER_ORG=<org>
+
+But I recommend to encrypt your bintray api key. This can be done with the
+travis commandline client
+
+    travis encrypt BINTRAY_KEY=123...
+
+Please be aware that secure environmental variables can only be added as global.
+
+    global:
+       - secure: "ZMvDhR..."
+    matrix:
+       - BUILD_TYPE=bindings BINDING=jni BINTRAY_USER=<user> BINTRAY_USER_ORG=<org>
 
