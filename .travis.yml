@@ -9,16 +9,24 @@ os:
 sudo: false
 
 env:
-  - BUILD_TYPE=default
-  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq2-x
-  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq3-x
-  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
-  - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
-  - BUILD_TYPE=android
-  # As we have errors in bindings/python/test.py I'm suspending this...
-  #- BUILD_TYPE=check-py
-  - BUILD_TYPE=cmake
-  - BUILD_TYPE=bindings BINDING=jni
+  global:
+    # Bintray upload credentials. (BINTRAY_USER and BINTRAY_KEY are encrypted!)
+    # These are used to publish the czmq jni bindings to bintray when the deploy
+    # step is triggered.
+    - secure: "ZMvDhR/PxayFeHd70j8J5f260ydu4pSkMV4HFAjRd1e0YuYCy5PUCFIbXWpZ8XujlxcFVSOkfaekIvs4P5KejkKNxoJM+caJ4DAUW/zwtsrHhL1jT7HsCFdEpL2vcOZFXsfWBXkniVU800vgaV+YK4jfewyv0rPTQaImuMlrgRU="
+    - secure: "Tc1HPM1HnWr4ZwtPKFMasrLLFgW0WHMZs6ncBFZMhKVKTjUnBO7zdKw4ZXvSEaa1pxqvJhuQRjcbmVL2H8NmT3IdWg7ToSTuDHazUP03QBGvXVKMxIhnPI9cOzsz6LQUklNY4WihairAwlt8hnD+85pU1vl0hEhMNmHLJ7RiT+4="
+    - BINTRAY_USER_ORG=zeromq
+  matrix:
+    - BUILD_TYPE=default
+    - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq2-x
+    - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq3-x
+    - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
+    - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
+    - BUILD_TYPE=android
+    # As we have errors in bindings/python/test.py I'm suspending this...
+    #- BUILD_TYPE=check-py
+    - BUILD_TYPE=cmake
+    - BUILD_TYPE=bindings BINDING=jni
 
 matrix:
   exclude:
