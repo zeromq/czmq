@@ -1,6 +1,6 @@
 # Travis CI script
 
-language: java
+language: c
 
 os:
 - linux
@@ -8,8 +8,13 @@ os:
 
 sudo: false
 
+compiler:
+- gcc
+
 env:
   global:
+    # Note: Secure variables must be global!
+    #
     # Bintray upload credentials. (BINTRAY_USER and BINTRAY_KEY are encrypted!)
     # These are used to publish the czmq jni bindings to bintray when the deploy
     # step is triggered.
@@ -22,26 +27,32 @@ env:
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq3-x
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
-    - BUILD_TYPE=android
     # As we have errors in bindings/python/test.py I'm suspending this...
     #- BUILD_TYPE=check-py
     - BUILD_TYPE=cmake
-    - BUILD_TYPE=bindings BINDING=jni
 
 matrix:
-  exclude:
-  - env: BUILD_TYPE=bindings BINDING=jni
-    os: osx
   include:
   - env: BUILD_TYPE=valgrind
     os: linux
-    dist: trusty
-    sudo: required
+    compiler: gcc
     addons:
       apt:
         packages:
-        - uuid-dev
         - valgrind
+  - env: BUILD_TYPE=android
+    os: osx
+    compiler: clang
+  - env: BUILD_TYPE=android
+    os: linux
+    compiler: clang
+  - env: BUILD_TYPE=bindings BINDING=jni
+    os: linux
+    compiler: clang
+    addons:
+      apt:
+        packages:
+        - openjdk-7-jdk
 
 addons:
   apt:
