@@ -2,13 +2,17 @@
 :: Usage: buildall.bat
 
 :: Build all configurations for all solutions.
-CALL buildbase.bat ..\vs2015\czmq.sln 14
+@echo Building with VS2015
+CALL ..\vs2015\build.bat
 ECHO.
-CALL buildbase.bat ..\vs2013\czmq.sln 12
+@echo Building with VS2013
+CALL ..\vs2013\build.bat
 ECHO.
-CALL buildbase.bat ..\vs2012\czmq.sln 11
+@echo Building with VS2012
+CALL ..\vs2012\build.bat
 ECHO.
-CALL buildbase.bat ..\vs2010\czmq.sln 10
+@echo Building with VS2010
+CALL ..\vs2010\build.bat
 ECHO.
 
 PAUSE
