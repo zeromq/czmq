@@ -5,6 +5,7 @@
     email = "zeromq-dev@lists.zeromq.org"
     license = "MPLv2"
     url = "https://github.com/zeromq/czmq"
+    repository = "https://github.com/zeromq/czmq"
     >
     <include filename = "license.xml" />
     <version major = "3" minor = "0" patch = "3" />

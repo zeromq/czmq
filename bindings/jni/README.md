@@ -1,5 +1,7 @@
 # czmq-jni
 
+[ ![Download](https://api.bintray.com/packages/zeromq/maven/czmq-jni/images/download.svg) ](https://bintray.com/zeromq/maven/czmq-jni/_latestVersion)
+
 JNI Binding for CZMQ
 
 ## Building the JNI Layer for Linux
