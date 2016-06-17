@@ -122,6 +122,16 @@ typedef void (zhashx_free_fn) (
 typedef size_t (zhashx_hash_fn) (
     const void *key);
 
+// Serializes an item to a longstr.                       
+// The caller takes ownership of the newly created object.
+typedef char * (zhashx_serializer_fn) (
+    const void *item);
+
+// Deserializes a longstr into an item.                   
+// The caller takes ownership of the newly created object.
+typedef void * (zhashx_deserializer_fn) (
+    const char *item_str);
+
 // Callback function for zhashx_foreach method.                              
 // This callback is deprecated and you should use zhashx_first/_next instead.
 typedef int (zhashx_foreach_fn) (
@@ -1280,6 +1290,11 @@ void
 zhashx_t *
     zhashx_unpack (zframe_t *frame);
 
+// Same as unpack but uses a user-defined deserializer function to convert
+// a longstr back into item format.                                       
+zhashx_t *
+    zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer);
+
 // Insert item into hash table with specified key and item.               
 // If key is already present returns -1 and leaves existing item unchanged
 // Returns 0 on success.                                                  
@@ -1408,6 +1423,11 @@ int
 // strings.                                                             
 zframe_t *
     zhashx_pack (zhashx_t *self);
+
+// Same as pack but uses a user-defined serializer function to convert items
+// into longstr.                                                            
+zframe_t *
+    zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer);
 
 // Make a copy of the list; items are duplicated if you set a duplicator 
 // for the list, otherwise not. Copying a null reference returns a null  

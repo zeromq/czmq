@@ -32,6 +32,14 @@ QZhashx* QZhashx::unpack (QZframe *frame, QObject *qObjParent)
 }
 
 ///
+//  Same as unpack but uses a user-defined deserializer function to convert
+//  a longstr back into item format.                                       
+QZhashx* QZhashx::unpackOwn (QZframe *frame, zhashx_deserializer_fn deserializer, QObject *qObjParent)
+{
+    return new QZhashx (zhashx_unpack_own (frame->self, deserializer), qObjParent);
+}
+
+///
 //  Destroy a hash container and all items in it
 QZhashx::~QZhashx ()
 {
@@ -236,6 +244,15 @@ int QZhashx::refresh ()
 QZframe * QZhashx::pack ()
 {
     QZframe *rv = new QZframe (zhashx_pack (self));
+    return rv;
+}
+
+///
+//  Same as pack but uses a user-defined serializer function to convert items
+//  into longstr.                                                            
+QZframe * QZhashx::packOwn (zhashx_serializer_fn serializer)
+{
+    QZframe *rv = new QZframe (zhashx_pack_own (self, serializer));
     return rv;
 }
 

@@ -79,6 +79,20 @@ CZMQ_EXPORT int
     zframe_set_group (zframe_t *self, const char *group);
 
 //  *** Draft method, defined for internal use only ***
+//  Same as pack but uses a user-defined serializer function to convert items
+//  into longstr.                                                            
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zframe_t *
+    zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer);
+
+//  *** Draft method, defined for internal use only ***
+//  Same as unpack but uses a user-defined deserializer function to convert
+//  a longstr back into item format.                                       
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zhashx_t *
+    zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer);
+
+//  *** Draft method, defined for internal use only ***
 //  By default the reactor stops if the process receives a SIGINT or SIGTERM 
 //  signal. This makes it impossible to shut-down message based architectures
 //  like zactors. This method lets you switch off break handling. The default

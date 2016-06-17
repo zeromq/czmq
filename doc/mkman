@@ -136,7 +136,7 @@ END
     printf "Generating $outp.doc...\n";
     die "Can't create $outp.doc: $!"
         unless open (OUTPUT, ">$outp.doc");
-    print OUTPUT "#### $oupt - $title\n\n";
+    print OUTPUT "#### $outp - $title\n\n";
     print OUTPUT pull ("$source\@header,left");
     print OUTPUT "\n";
     print OUTPUT pull ("$source\@discuss,left");

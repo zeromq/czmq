@@ -348,6 +348,14 @@ module CZMQ
 
       attach_function :zhashx_new, [], :pointer, **opts
       attach_function :zhashx_unpack, [:pointer], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zhashx_unpack_own, [:pointer, :pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zhashx_unpack_own() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zhashx_destroy, [:pointer], :void, **opts
       attach_function :zhashx_insert, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zhashx_update, [:pointer, :pointer, :pointer], :void, **opts
@@ -367,6 +375,14 @@ module CZMQ
       attach_function :zhashx_load, [:pointer, :string], :int, **opts
       attach_function :zhashx_refresh, [:pointer], :int, **opts
       attach_function :zhashx_pack, [:pointer], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zhashx_pack_own, [:pointer, :pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function zhashx_pack_own() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zhashx_dup, [:pointer], :pointer, **opts
       attach_function :zhashx_set_destructor, [:pointer, :pointer], :void, **opts
       attach_function :zhashx_set_duplicator, [:pointer, :pointer], :void, **opts

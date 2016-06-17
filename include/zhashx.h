@@ -24,6 +24,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  This class has legacy methods, which will be removed over time. You
 //  should not use them, and migrate any code that is still using them.
 // Destroy an item
@@ -45,6 +47,16 @@ typedef void (zhashx_free_fn) (
 // compare two items, for sorting
 typedef size_t (zhashx_hash_fn) (
     const void *key);
+
+// Serializes an item to a longstr.                       
+// The caller takes ownership of the newly created object.
+typedef char * (zhashx_serializer_fn) (
+    const void *item);
+
+// Deserializes a longstr into an item.                   
+// The caller takes ownership of the newly created object.
+typedef void * (zhashx_deserializer_fn) (
+    const char *item_str);
 
 // Callback function for zhashx_foreach method.                              
 // This callback is deprecated and you should use zhashx_first/_next instead.
@@ -261,6 +273,21 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zhashx_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Same as unpack but uses a user-defined deserializer function to convert
+//  a longstr back into item format.                                       
+CZMQ_EXPORT zhashx_t *
+    zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Same as pack but uses a user-defined serializer function to convert items
+//  into longstr.                                                            
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zframe_t *
+    zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @ignore
 CZMQ_EXPORT void
     zhashx_comment (zhashx_t *self, const char *format, ...) CHECK_PRINTF (2);

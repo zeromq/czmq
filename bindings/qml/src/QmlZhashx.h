@@ -139,6 +139,10 @@ public slots:
     //  strings.                                                             
     QmlZframe *pack ();
 
+    //  Same as pack but uses a user-defined serializer function to convert items
+    //  into longstr.                                                            
+    QmlZframe *packOwn (zhashx_serializer_fn serializer);
+
     //  Make a copy of the list; items are duplicated if you set a duplicator 
     //  for the list, otherwise not. Copying a null reference returns a null  
     //  reference. Note that this method's behavior changed slightly for CZMQ 
@@ -208,6 +212,10 @@ public slots:
     //  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
     //  unpacks to an empty hash table.                                          
     QmlZhashx *unpack (QmlZframe *frame);
+
+    //  Same as unpack but uses a user-defined deserializer function to convert
+    //  a longstr back into item format.                                       
+    QmlZhashx *unpackOwn (QmlZframe *frame, zhashx_deserializer_fn deserializer);
 
     //  Destroy a hash container and all items in it
     void destruct (QmlZhashx *qmlSelf);

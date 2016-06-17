@@ -1413,7 +1413,7 @@ integer my_zhashx.refresh ()
 
 When a hash table was loaded from a file by zhashx_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
-still changing. Returns 0 if OK, -1 if there was an error reloading the 
+still changing. Returns 0 if OK, -1 if there was an error reloading the
 file.
 
 ```
