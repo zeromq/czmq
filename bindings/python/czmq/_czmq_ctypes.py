@@ -2734,6 +2734,8 @@ zhashx_duplicator_fn = CFUNCTYPE(c_void_p, c_void_p)
 zhashx_comparator_fn = CFUNCTYPE(c_int, c_void_p, c_void_p)
 zhashx_free_fn = CFUNCTYPE(None, c_void_p)
 zhashx_hash_fn = CFUNCTYPE(c_size_t, c_void_p)
+zhashx_serializer_fn = CFUNCTYPE(POINTER(c_char), c_void_p)
+zhashx_deserializer_fn = CFUNCTYPE(c_void_p, c_char_p)
 zhashx_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhashx_new.restype = zhashx_p
 lib.zhashx_new.argtypes = []
@@ -2741,6 +2743,8 @@ lib.zhashx_destroy.restype = None
 lib.zhashx_destroy.argtypes = [POINTER(zhashx_p)]
 lib.zhashx_unpack.restype = zhashx_p
 lib.zhashx_unpack.argtypes = [zframe_p]
+lib.zhashx_unpack_own.restype = zhashx_p
+lib.zhashx_unpack_own.argtypes = [zframe_p, zhashx_deserializer_fn]
 lib.zhashx_insert.restype = c_int
 lib.zhashx_insert.argtypes = [zhashx_p, c_void_p, c_void_p]
 lib.zhashx_update.restype = None
@@ -2777,6 +2781,8 @@ lib.zhashx_refresh.restype = c_int
 lib.zhashx_refresh.argtypes = [zhashx_p]
 lib.zhashx_pack.restype = zframe_p
 lib.zhashx_pack.argtypes = [zhashx_p]
+lib.zhashx_pack_own.restype = zframe_p
+lib.zhashx_pack_own.argtypes = [zhashx_p, zhashx_serializer_fn]
 lib.zhashx_dup.restype = zhashx_p
 lib.zhashx_dup.argtypes = [zhashx_p]
 lib.zhashx_set_destructor.restype = None
@@ -2856,6 +2862,14 @@ defined by zhashx_pack. Hash table is set to autofree. An empty frame
 unpacks to an empty hash table.
         """
         return Zhashx(lib.zhashx_unpack(frame), True)
+
+    @staticmethod
+    def unpack_own(frame, deserializer):
+        """
+        Same as unpack but uses a user-defined deserializer function to convert
+a longstr back into item format.
+        """
+        return Zhashx(lib.zhashx_unpack_own(frame, deserializer), True)
 
     def insert(self, key, item):
         """
@@ -2992,7 +3006,7 @@ already exist. Hash values must printable strings; keys may not contain
         """
         When a hash table was loaded from a file by zhashx_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
-still changing. Returns 0 if OK, -1 if there was an error reloading the 
+still changing. Returns 0 if OK, -1 if there was an error reloading the
 file.
         """
         return lib.zhashx_refresh(self._as_parameter_)
@@ -3021,6 +3035,13 @@ Comments are not included in the packed data. Item values MUST be
 strings.
         """
         return Zframe(lib.zhashx_pack(self._as_parameter_), True)
+
+    def pack_own(self, serializer):
+        """
+        Same as pack but uses a user-defined serializer function to convert items
+into longstr.
+        """
+        return Zframe(lib.zhashx_pack_own(self._as_parameter_, serializer), True)
 
     def dup(self):
         """

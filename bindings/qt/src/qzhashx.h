@@ -25,6 +25,10 @@ public:
     //  unpacks to an empty hash table.                                          
     static QZhashx* unpack (QZframe *frame, QObject *qObjParent = 0);
 
+    //  Same as unpack but uses a user-defined deserializer function to convert
+    //  a longstr back into item format.                                       
+    static QZhashx* unpackOwn (QZframe *frame, zhashx_deserializer_fn deserializer, QObject *qObjParent = 0);
+
     //  Destroy a hash container and all items in it
     ~QZhashx ();
 
@@ -138,6 +142,10 @@ public:
     //  Comments are not included in the packed data. Item values MUST be    
     //  strings.                                                             
     QZframe * pack ();
+
+    //  Same as pack but uses a user-defined serializer function to convert items
+    //  into longstr.                                                            
+    QZframe * packOwn (zhashx_serializer_fn serializer);
 
     //  Make a copy of the list; items are duplicated if you set a duplicator 
     //  for the list, otherwise not. Copying a null reference returns a null  

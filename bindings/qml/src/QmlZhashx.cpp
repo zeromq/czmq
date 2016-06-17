@@ -180,6 +180,15 @@ QmlZframe *QmlZhashx::pack () {
 };
 
 ///
+//  Same as pack but uses a user-defined serializer function to convert items
+//  into longstr.                                                            
+QmlZframe *QmlZhashx::packOwn (zhashx_serializer_fn serializer) {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zhashx_pack_own (self, serializer);
+    return retQ_;
+};
+
+///
 //  Make a copy of the list; items are duplicated if you set a duplicator 
 //  for the list, otherwise not. Copying a null reference returns a null  
 //  reference. Note that this method's behavior changed slightly for CZMQ 
@@ -287,6 +296,15 @@ QmlZhashx *QmlZhashxAttached::construct () {
 QmlZhashx *QmlZhashxAttached::unpack (QmlZframe *frame) {
     QmlZhashx *qmlSelf = new QmlZhashx ();
     qmlSelf->self = zhashx_unpack (frame->self);
+    return qmlSelf;
+};
+
+///
+//  Same as unpack but uses a user-defined deserializer function to convert
+//  a longstr back into item format.                                       
+QmlZhashx *QmlZhashxAttached::unpackOwn (QmlZframe *frame, zhashx_deserializer_fn deserializer) {
+    QmlZhashx *qmlSelf = new QmlZhashx ();
+    qmlSelf->self = zhashx_unpack_own (frame->self, deserializer);
     return qmlSelf;
 };
 

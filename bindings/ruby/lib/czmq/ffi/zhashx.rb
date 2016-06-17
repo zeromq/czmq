@@ -156,6 +156,40 @@ module CZMQ
       end
 
       # Create a new callback of the following type:
+      # Serializes an item to a longstr.                       
+      # The caller takes ownership of the newly created object.
+      #     typedef char * (zhashx_serializer_fn) (
+      #         const void *item);                 
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.serializer_fn
+        ::FFI::Function.new :pointer, [:pointer], blocking: true do |item|
+          result = yield item
+          result
+        end
+      end
+
+      # Create a new callback of the following type:
+      # Deserializes a longstr into an item.                   
+      # The caller takes ownership of the newly created object.
+      #     typedef void * (zhashx_deserializer_fn) (
+      #         const char *item_str);               
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.deserializer_fn
+        ::FFI::Function.new :pointer, [:string], blocking: true do |item_str|
+          result = yield item_str
+          result
+        end
+      end
+
+      # Create a new callback of the following type:
       # Callback function for zhashx_foreach method.                              
       # This callback is deprecated and you should use zhashx_first/_next instead.
       #     typedef int (zhashx_foreach_fn) (                
@@ -188,6 +222,17 @@ module CZMQ
       def self.unpack(frame)
         frame = frame.__ptr if frame
         ptr = ::CZMQ::FFI.zhashx_unpack(frame)
+        __new ptr
+      end
+
+      # Same as unpack but uses a user-defined deserializer function to convert
+      # a longstr back into item format.                                       
+      # @param frame [Zframe, #__ptr]
+      # @param deserializer [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Zhashx]
+      def self.unpack_own(frame, deserializer)
+        frame = frame.__ptr if frame
+        ptr = ::CZMQ::FFI.zhashx_unpack_own(frame, deserializer)
         __new ptr
       end
 
@@ -451,6 +496,19 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zhashx_pack(self_p)
+        result = Zframe.__new result, true
+        result
+      end
+
+      # Same as pack but uses a user-defined serializer function to convert items
+      # into longstr.                                                            
+      #
+      # @param serializer [::FFI::Pointer, #to_ptr]
+      # @return [Zframe]
+      def pack_own(serializer)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhashx_pack_own(self_p, serializer)
         result = Zframe.__new result, true
         result
       end
