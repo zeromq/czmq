@@ -527,7 +527,7 @@ zhashx_keys (zhashx_t *self)
 //  is a destructor then it set as the destructor for the list.
 
 zlistx_t *
-zhashx_values (zhashx_t *self) 
+zhashx_values (zhashx_t *self)
 {
     assert (self);
 
@@ -764,6 +764,69 @@ zhashx_refresh (zhashx_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Same as pack but uses a user-defined serializer function to convert items
+//  into longstr.
+//  Caller owns return value and must destroy it when done.
+
+zframe_t *
+zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
+{
+    assert (self);
+
+    //  First, calculate packed data size
+    size_t frame_size = 4;      //  Dictionary size, number-4
+    uint index;
+    size_t limit = primes [self->prime_index];
+    char *values[limit];
+    for (index = 0; index < limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            //  We store key as short string
+            frame_size += 1 + strlen ((char *) item->key);
+            //  We store value as long string
+            if (serializer)
+                values[index] = serializer(item->value);
+            else
+                values[index] = (char *) item->value;
+
+            frame_size += 4 + strlen ((char *) values[index]);
+            item = item->next;
+        }
+    }
+    //  Now serialize items into the frame
+    zframe_t *frame = zframe_new (NULL, frame_size);
+    if (!frame)
+        return NULL;
+    byte *needle = zframe_data (frame);
+    //  Store size as number-4
+    *(uint32_t *) needle = htonl ((u_long) self->size);
+    needle += 4;
+    for (index = 0; index < limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            //  Store key as string
+            *needle++ = (byte) strlen ((char *) item->key);
+            memcpy (needle, item->key, strlen ((char *) item->key));
+            needle += strlen ((char *) item->key);
+
+            //  Store value as longstr
+            size_t lenth = strlen ((char *) values[index]);
+            *(uint32_t *) needle = htonl ((u_long) lenth);
+            needle += 4;
+            memcpy (needle, (char *) values[index], strlen ((char *) values[index]));
+            needle += strlen ((char *) values[index]);
+            item = item->next;
+
+            //  Destroy serialized value
+            if (serializer)
+                zstr_free (&values[index]);
+        }
+    }
+    return frame;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Serialize hash table to a binary frame that can be sent in a message.
 //  The packed format is compatible with the 'dictionary' type defined in
 //  http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
@@ -788,62 +851,21 @@ zhashx_refresh (zhashx_t *self)
 zframe_t *
 zhashx_pack (zhashx_t *self)
 {
-    assert (self);
-
-    //  First, calculate packed data size
-    size_t frame_size = 4;      //  Dictionary size, number-4
-    uint index;
-    size_t limit = primes [self->prime_index];
-    for (index = 0; index < limit; index++) {
-        item_t *item = self->items [index];
-        while (item) {
-            //  We store key as short string
-            frame_size += 1 + strlen ((char *) item->key);
-            //  We store value as long string
-            frame_size += 4 + strlen ((char *) item->value);
-            item = item->next;
-        }
-    }
-    //  Now serialize items into the frame
-    zframe_t *frame = zframe_new (NULL, frame_size);
-    if (!frame)
-        return NULL;
-    byte *needle = zframe_data (frame);
-    //  Store size as number-4
-    *(uint32_t *) needle = htonl ((u_long) self->size);
-    needle += 4;
-    for (index = 0; index < limit; index++) {
-        item_t *item = self->items [index];
-        while (item) {
-            //  Store key as string
-            *needle++ = (byte) strlen ((char *) item->key);
-            memcpy (needle, item->key, strlen ((char *) item->key));
-            needle += strlen ((char *) item->key);
-
-            //  Store value as longstr
-            size_t lenth = strlen ((char *) item->value);
-            *(uint32_t *) needle = htonl ((u_long) lenth);
-            needle += 4;
-            memcpy (needle, (char *) item->value, strlen ((char *) item->value));
-            needle += strlen ((char *) item->value);
-            item = item->next;
-        }
-    }
-    return frame;
+    return zhashx_pack_own (self, NULL);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Unpack binary frame into a new hash table. Packed data must follow format
-//  defined by zhashx_pack. Hash table is set to autofree. An empty frame
-//  unpacks to an empty hash table.
+//  Same as unpack but uses a user-defined deserializer function to convert
+//  a longstr back into item format.
 
 zhashx_t *
-zhashx_unpack (zframe_t *frame)
+zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
 {
     zhashx_t *self = zhashx_new ();
     if (!self)
         return NULL;
+
     assert (frame);
     if (zframe_size (frame) < 4)
         return self;            //  Arguable...
@@ -873,8 +895,17 @@ zhashx_unpack (zframe_t *frame)
                     value [value_size] = 0;
                     needle += value_size;
 
-                    //  Hash takes ownership of value
-                    if (zhashx_insert (self, key, value)) {
+                    //  Convert string to real value
+                    void *real_value;
+                    if (deserializer) {
+                        real_value = deserializer (value);
+                        zstr_free (&value);
+                    }
+                    else
+                        real_value = value;
+
+                    //  Hash takes ownership of real_value
+                    if (zhashx_insert (self, key, real_value)) {
                         zhashx_destroy (&self);
                         break;
                     }
@@ -886,6 +917,18 @@ zhashx_unpack (zframe_t *frame)
     if (self)
         zhashx_autofree (self);
     return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhashx_pack. Hash table is set to autofree. An empty frame
+//  unpacks to an empty hash table.
+
+zhashx_t *
+zhashx_unpack (zframe_t *frame)
+{
+    return zhashx_unpack_own (frame, NULL);
 }
 
 
@@ -1074,6 +1117,32 @@ zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument)
 //  Runs selftest of class
 //
 
+#ifdef CZMQ_BUILD_DRAFT_API
+char *
+s_test_serialize_int (const void *item)
+{
+    int *int_item = (int *) item;
+    char *str_item = (char *) zmalloc (sizeof (char) * 10);
+    sprintf (str_item, "%d", *int_item);
+    return str_item;
+}
+
+void *
+s_test_deserialze_int (const char *str_item)
+{
+    int *int_item = (int *) zmalloc (sizeof (int));
+    sscanf (str_item, "%d", int_item);
+    return int_item;
+}
+
+void
+s_test_destroy_int (void **item)
+{
+    int *int_item = (int *) *item;
+    free (int_item);
+}
+#endif // CZMQ_BUILD_DRAFT_API
+
 void
 zhashx_test (bool verbose)
 {
@@ -1173,6 +1242,28 @@ zhashx_test (bool verbose)
     assert (item);
     assert (streq (item, "dead beef"));
     zhashx_destroy (&copy);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    //  Test own pack/unpack methods
+    zhashx_t *own_hash = zhashx_new ();
+    zhashx_set_destructor (own_hash, s_test_destroy_int);
+    assert (own_hash);
+    int *val1 = (int *) zmalloc (sizeof (int));
+    int *val2 = (int *) zmalloc (sizeof (int));
+    *val1 = 25;
+    *val2 = 100;
+    zhashx_insert (own_hash, "val1", val1);
+    zhashx_insert (own_hash, "val2", val2);
+    frame = zhashx_pack_own (own_hash, s_test_serialize_int);
+    copy = zhashx_unpack_own (frame, s_test_deserialze_int);
+    zhashx_set_destructor (copy, s_test_destroy_int);
+    zframe_destroy (&frame);
+    assert (zhashx_size (copy) == 2);
+    assert (*((int *) zhashx_lookup (copy, "val1")) == 25);
+    assert (*((int *) zhashx_lookup (copy, "val2")) == 100);
+    zhashx_destroy (&copy);
+    zhashx_destroy (&own_hash);
+#endif // CZMQ_BUILD_DRAFT_API
 
     //  Test save and load
     zhashx_comment (hash, "This is a test file");

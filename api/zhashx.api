@@ -39,6 +39,20 @@
         <return type = "size"/>
     </callback_type>
 
+    <callback_type name = "serializer_fn">
+        Serializes an item to a longstr.
+        The caller takes ownership of the newly created object.
+        <argument name = "item" type = "anything" mutable = "0"/>
+        <return type = "string" fresh = "1" />
+    </callback_type>
+
+    <callback_type name = "deserializer_fn">
+        Deserializes a longstr into an item.
+        The caller takes ownership of the newly created object.
+        <argument name = "item_str" type = "string" />
+        <return type = "anything"/>
+    </callback_type>
+
     <constructor>
         Create a new, empty hash container
     </constructor>
@@ -161,7 +175,7 @@
         else -1 if a file error occurred.
         <argument name = "filename" type = "string" />
         <return type = "integer" />
-    </method>     
+    </method>
 
     <method name = "load">
         Load hash table from a text file in name=value format; hash table must
@@ -174,7 +188,7 @@
     <method name = "refresh">
         When a hash table was loaded from a file by zhashx_load, this method will
         reload the file if it has been modified since, and is "stable", i.e. not
-        still changing. Returns 0 if OK, -1 if there was an error reloading the 
+        still changing. Returns 0 if OK, -1 if there was an error reloading the
         file.
         <return type = "integer" />
     </method>
@@ -203,11 +217,25 @@
         <return type = "zframe" fresh = "1" />
     </method>
 
+    <method name = "pack own" state = "draft">
+        Same as pack but uses a user-defined serializer function to convert items
+        into longstr.
+        <argument name = "serializer" type = "zhashx_serializer_fn" callback = "1"/>
+        <return type = "zframe" fresh = "1" />
+    </method>
+
     <constructor name = "unpack">
         Unpack binary frame into a new hash table. Packed data must follow format
         defined by zhashx_pack. Hash table is set to autofree. An empty frame
         unpacks to an empty hash table.
         <argument name = "frame" type = "zframe" />
+    </constructor>
+
+    <constructor name = "unpack own" state = "draft">
+        Same as unpack but uses a user-defined deserializer function to convert
+        a longstr back into item format.
+        <argument name = "frame" type = "zframe" />
+        <argument name = "deserializer" type = "zhashx_deserializer_fn" callback = "1"/>
     </constructor>
 
     <method name = "dup">
