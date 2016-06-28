@@ -16,6 +16,7 @@ exists but is implemented in zsys now).
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  If file exists, populates properties. CZMQ supports portable symbolic
@@ -158,9 +159,11 @@ This is the class interface:
         zfile_mode_private (void);
     CZMQ_EXPORT void
         zfile_mode_default (void);
+```
 
 This is the class self test code:
 
+```c
     zfile_t *file = zfile_new (NULL, "bilbo");
     assert (file);
     assert (streq (zfile_filename (file, "."), "bilbo"));
@@ -288,4 +291,5 @@ This is the class self test code:
     assert (zchunk_streq (chunk, "6789"));
     zchunk_destroy (&chunk);
     zfile_remove (file);
+```
 

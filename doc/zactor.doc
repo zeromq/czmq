@@ -19,6 +19,7 @@ Please add @discuss section in ../src/zactor.c.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     // Actors get a pipe and arguments from caller
@@ -64,9 +65,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zactor_test (bool verbose);
     
+```
 
 This is the class self test code:
 
+```c
     zactor_t *actor = zactor_new (echo_actor, "Hello, World");
     assert (actor);
     zstr_sendx (actor, "ECHO", "This is a string", NULL);
@@ -74,4 +77,5 @@ This is the class self test code:
     assert (streq (string, "This is a string"));
     free (string);
     zactor_destroy (&actor);
+```
 

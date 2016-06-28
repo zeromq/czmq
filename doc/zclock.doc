@@ -10,6 +10,7 @@ timer resolution is increased with a call to timeBeginPeriod() permitting
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  Sleep for a number of milliseconds
@@ -43,9 +44,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zclock_test (bool verbose);
     
+```
 
 This is the class self test code:
 
+```c
     int64_t start = zclock_time ();
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
@@ -58,4 +61,5 @@ This is the class self test code:
     if (verbose)
         puts (timestr);
     free (timestr);
+```
 

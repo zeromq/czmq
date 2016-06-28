@@ -11,6 +11,7 @@ API (meaning, zsock).
 
 This is the class interface:
 
+```h
     //  Create new zmonitor actor instance to monitor a zsock_t socket:
     //
     //      zactor_t *monitor = zactor_new (zmonitor, mysocket);
@@ -57,9 +58,11 @@ This is the class interface:
     //  Selftest
     CZMQ_EXPORT void
         zmonitor_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zactor_t *clientmon = zactor_new (zmonitor, client);
@@ -100,4 +103,5 @@ This is the class self test code:
     zsock_destroy (&client);
     zsock_destroy (&server);
     #endif
+```
 

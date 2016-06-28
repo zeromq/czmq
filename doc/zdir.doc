@@ -9,6 +9,7 @@ Please add @discuss section in ../src/zdir.c.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  Create a new directory item that loads in the full tree of the specified
@@ -111,9 +112,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zdir_test (bool verbose);
     
+```
 
 This is the class self test code:
 
+```c
     // need to create a file in the test directory we're watching
     // in order to ensure the directory exists
     zfile_t *initfile = zfile_new ("./zdir-test-dir", "initial_file");
@@ -228,4 +231,5 @@ This is the class self test code:
     zdir_t *testdir = zdir_new ("zdir-test-dir", NULL);
     zdir_remove (testdir, true);
     zdir_destroy (&testdir);
+```
 

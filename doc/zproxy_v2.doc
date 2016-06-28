@@ -9,6 +9,7 @@ interface, based on zactor, together with the zsock class for sockets.
 
 This is the class interface:
 
+```h
     
     //  Constructor
     //  Create a new zproxy object. You must create the frontend and backend
@@ -43,9 +44,11 @@ This is the class interface:
     // Self test of this class
     CZMQ_EXPORT void
         zproxy_v2_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     void *frontend = zsocket_new (ctx, ZMQ_PULL);
@@ -104,4 +107,5 @@ This is the class self test code:
     zproxy_destroy (&proxy);
     zctx_destroy (&ctx);
     
+```
 

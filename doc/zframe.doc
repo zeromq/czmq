@@ -12,6 +12,7 @@ Please add @discuss section in ../src/zframe.c.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  This class has draft methods, which may change over time. They are not
@@ -142,9 +143,11 @@ This is the class interface:
         zframe_set_group (zframe_t *self, const char *group);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     //  Create two PAIR sockets and connect over inproc
     zsock_t *output = zsock_new_pair ("@tcp://127.0.0.1:9001");
     assert (output);
@@ -302,4 +305,5 @@ This is the class self test code:
     zsock_destroy (&radio);
     #endif
     
+```
 

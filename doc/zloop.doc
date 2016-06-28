@@ -9,6 +9,7 @@ Please add @discuss section in ../src/zloop.c.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  This class has draft methods, which may change over time. They are not
@@ -143,9 +144,11 @@ This is the class interface:
         zloop_set_nonstop (zloop_t *self, bool nonstop);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     //  Create two PAIR sockets and connect over inproc
     zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
@@ -207,4 +210,5 @@ This is the class self test code:
     
     zsock_destroy (&input);
     zsock_destroy (&output);
+```
 

@@ -23,8 +23,8 @@ IF NOT EXIST %environment% SET environment="%programfiles%\%tools%"
 IF NOT EXIST %environment% GOTO no_tools
 
 SET packages=
-IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2015\libzmq.import.props" (
-    COPY /Y "..\..\..\..\libzmq\builds/msvc/vs2015\libzmq.import.props" . > %log%
+IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2013\libzmq.import.props" (
+    COPY /Y "..\..\..\..\libzmq\builds/msvc/vs2013\libzmq.import.props" . > %log%
     IF errorlevel 1 GOTO error
 ) ELSE (
     ECHO Did not find libzmq, aborting.

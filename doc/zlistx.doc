@@ -11,6 +11,7 @@ insert and delete items anywhere in the list, and to keep ordered lists.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     // Destroy an item
@@ -185,9 +186,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zlistx_test (bool verbose);
     
+```
 
 This is the class self test code:
 
+```c
     zlistx_t *list = zlistx_new ();
     assert (list);
     assert (zlistx_size (list) == 0);
@@ -289,4 +292,5 @@ This is the class self test code:
     
     zlistx_purge (list);
     zlistx_destroy (&list);
+```
 

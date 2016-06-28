@@ -31,6 +31,7 @@ Please add @discuss section in ../src/zrex.c.
 
 This is the class interface:
 
+```h
     //  Constructor. Optionally, sets an expression against which we can match
     //  text and capture hits. If there is an error in the expression, reports
     //  zrex_valid() as false and provides the error in zrex_strerror(). If you
@@ -85,9 +86,11 @@ This is the class interface:
     //  Self test of this class
     CZMQ_EXPORT void
         zrex_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     //  This shows the pattern of matching many lines to a single pattern
     zrex_t *rex = zrex_new ("\\d+-\\d+-\\d+");
     assert (rex);
@@ -131,4 +134,5 @@ This is the class self test code:
     assert (streq (mechanism, "CURVE"));
     zrex_destroy (&rex);
     
+```
 

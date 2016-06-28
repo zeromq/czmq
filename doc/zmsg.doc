@@ -9,6 +9,7 @@ Please add @discuss section in ../src/zmsg.c.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  This class has draft methods, which may change over time. They are not
@@ -214,9 +215,11 @@ This is the class interface:
         zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     //  Create two PAIR sockets and connect over inproc
     zsock_t *output = zsock_new_pair ("@inproc://zmsg.test");
     assert (output);
@@ -486,4 +489,5 @@ This is the class self test code:
     zsock_destroy (&client);
     zsock_destroy (&server);
     #endif
+```
 

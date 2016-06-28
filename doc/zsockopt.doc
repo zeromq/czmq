@@ -8,6 +8,7 @@ which does the work.
 
 This is the class interface:
 
+```h
     #if (ZMQ_VERSION_MAJOR == 4)
     //  Get socket options
     CZMQ_EXPORT int zsocket_heartbeat_ivl (void *zocket);
@@ -230,9 +231,11 @@ This is the class interface:
     
     //  Self test of this class
     CZMQ_EXPORT void zsockopt_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     void *zocket;
@@ -1028,4 +1031,5 @@ This is the class self test code:
     #endif
     
     zctx_destroy (&ctx);
+```
 

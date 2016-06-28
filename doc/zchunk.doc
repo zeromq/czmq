@@ -8,6 +8,7 @@ Please add @discuss section in ../src/zchunk.c.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  Create a new chunk of the specified size. If you specify the data, it   
@@ -139,9 +140,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zchunk_test (bool verbose);
     
+```
 
 This is the class self test code:
 
+```c
     zchunk_t *chunk = zchunk_new ("1234567890", 10);
     assert (chunk);
     assert (zchunk_size (chunk) == 10);
@@ -206,4 +209,5 @@ This is the class self test code:
     assert (memcmp (zchunk_data (chunk), "ghij", 4) == 0);
     zchunk_destroy (&copy);
     zchunk_destroy (&chunk);
+```
 

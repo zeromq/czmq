@@ -11,8 +11,11 @@ and 63 items depending on table size) is detected.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
+    //  This class has draft methods, which may change over time. They are not
+    //  in stable releases, by default. Use --enable-drafts to enable.
     //  This class has legacy methods, which will be removed over time. You
     //  should not use them, and migrate any code that is still using them.
     // Destroy an item
@@ -34,6 +37,16 @@ This is the class interface:
     // compare two items, for sorting
     typedef size_t (zhashx_hash_fn) (
         const void *key);
+    
+    // Serializes an item to a longstr.                       
+    // The caller takes ownership of the newly created object.
+    typedef char * (zhashx_serializer_fn) (
+        const void *item);
+    
+    // Deserializes a longstr into an item.                   
+    // The caller takes ownership of the newly created object.
+    typedef void * (zhashx_deserializer_fn) (
+        const char *item_str);
     
     // Callback function for zhashx_foreach method.                              
     // This callback is deprecated and you should use zhashx_first/_next instead.
@@ -250,9 +263,26 @@ This is the class interface:
     CZMQ_EXPORT void
         zhashx_test (bool verbose);
     
+    #ifdef CZMQ_BUILD_DRAFT_API
+    //  *** Draft method, for development use, may change without warning ***
+    //  Same as unpack but uses a user-defined deserializer function to convert
+    //  a longstr back into item format.                                       
+    CZMQ_EXPORT zhashx_t *
+        zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Same as pack but uses a user-defined serializer function to convert items
+    //  into longstr.                                                            
+    //  Caller owns return value and must destroy it when done.
+    CZMQ_EXPORT zframe_t *
+        zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer);
+    
+    #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     zhashx_t *hash = zhashx_new ();
     assert (hash);
     assert (zhashx_size (hash) == 0);
@@ -347,6 +377,28 @@ This is the class self test code:
     assert (streq (item, "dead beef"));
     zhashx_destroy (&copy);
     
+    #ifdef CZMQ_BUILD_DRAFT_API
+    //  Test own pack/unpack methods
+    zhashx_t *own_hash = zhashx_new ();
+    zhashx_set_destructor (own_hash, s_test_destroy_int);
+    assert (own_hash);
+    int *val1 = (int *) zmalloc (sizeof (int));
+    int *val2 = (int *) zmalloc (sizeof (int));
+    *val1 = 25;
+    *val2 = 100;
+    zhashx_insert (own_hash, "val1", val1);
+    zhashx_insert (own_hash, "val2", val2);
+    frame = zhashx_pack_own (own_hash, s_test_serialize_int);
+    copy = zhashx_unpack_own (frame, s_test_deserialze_int);
+    zhashx_set_destructor (copy, s_test_destroy_int);
+    zframe_destroy (&frame);
+    assert (zhashx_size (copy) == 2);
+    assert (*((int *) zhashx_lookup (copy, "val1")) == 25);
+    assert (*((int *) zhashx_lookup (copy, "val2")) == 100);
+    zhashx_destroy (&copy);
+    zhashx_destroy (&own_hash);
+    #endif // CZMQ_BUILD_DRAFT_API
+    
     //  Test save and load
     zhashx_comment (hash, "This is a test file");
     zhashx_comment (hash, "Created by %s", "czmq_selftest");
@@ -412,4 +464,5 @@ This is the class self test code:
     assert (streq ((char *) zhashx_lookup (hash, "key1"), "This is a string"));
     assert (streq ((char *) zhashx_lookup (hash, "key2"), "Ring a ding ding"));
     zhashx_destroy (&hash);
+```
 
