@@ -13,6 +13,7 @@ interface, based on zactor, together with the zsock class for sockets.
 
 This is the class interface:
 
+```h
     //  This code needs backporting to work with ZMQ v3.2
     #if (ZMQ_VERSION_MAJOR == 4)
     
@@ -41,9 +42,11 @@ This is the class interface:
     // Self test of this class
     CZMQ_EXPORT void
         zmonitor_v2_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     bool result;
@@ -80,4 +83,5 @@ This is the class self test code:
     zmonitor_destroy (&sinkmon);
     zmonitor_destroy (&sourcemon);
     zctx_destroy (&ctx);
+```
 

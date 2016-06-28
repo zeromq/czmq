@@ -9,6 +9,7 @@ Please add @discuss section in ../src/zsock.c.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  This class has draft methods, which may change over time. They are not
@@ -803,9 +804,11 @@ This is the class interface:
         zsock_set_use_fd (void *self, int use_fd);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     zsock_t *writer = zsock_new_push ("@tcp://127.0.0.1:5560");
     assert (writer);
     assert (zsock_resolve (writer) != writer);
@@ -1162,4 +1165,5 @@ This is the class self test code:
     zsock_destroy (&reader);
     zsock_destroy (&writer);
     
+```
 

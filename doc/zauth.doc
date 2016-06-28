@@ -9,6 +9,7 @@ CZMQ v3 API (meaning, zsock).
 
 This is the class interface:
 
+```h
     #define CURVE_ALLOW_ANY "*"
     
     //  CZMQ v3 API (for use with zsock, not zsocket, which is deprecated).
@@ -81,9 +82,11 @@ This is the class interface:
     //  Selftest
     CZMQ_EXPORT void
         zauth_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     //  Create temporary directory for test files
     #   define TESTDIR ".test_zauth"
     zsys_dir_create (TESTDIR);
@@ -250,4 +253,5 @@ This is the class self test code:
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
+```
 

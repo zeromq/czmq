@@ -8,6 +8,7 @@ Please add @discuss section in ../src/zsys.c.
 
 This is the class interface:
 
+```h
     #define UDP_FRAME_MAX   255         //  Max size of UDP frame
     
     //  Callback for interrupt signal handler
@@ -366,9 +367,11 @@ This is the class interface:
     CZMQ_EXPORT extern volatile int zsys_interrupted;
     //  Deprecated name for this variable
     CZMQ_EXPORT extern volatile int zctx_interrupted;
+```
 
 This is the class self test code:
 
+```c
     zsys_catch_interrupts ();
     
     //  Check capabilities without using the return value
@@ -470,4 +473,5 @@ This is the class self test code:
         zstr_free (&received);
     }
     zsys_close (logger, NULL, 0);
+```
 

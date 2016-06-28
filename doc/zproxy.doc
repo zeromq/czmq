@@ -9,6 +9,7 @@ CZMQ v3 API (meaning, zsock).
 
 This is the class interface:
 
+```h
     //  Create new zproxy actor instance. The proxy switches messages between
     //  a frontend socket and a backend socket; use the FRONTEND and BACKEND
     //  commands to configure these:
@@ -92,9 +93,11 @@ This is the class interface:
     //  Selftest
     CZMQ_EXPORT void
         zproxy_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     //  Create and configure our proxy
     zactor_t *proxy = zactor_new (zproxy, NULL);
     assert (proxy);
@@ -162,6 +165,19 @@ This is the class self test code:
     zsock_destroy (&sink);
     zsock_destroy (&capture);
     zactor_destroy (&proxy);
+    
+    //  Test socket creation dependency
+    proxy = zactor_new (zproxy, NULL);
+    assert (proxy);
+    
+    sink = zsock_new_sub (">ipc://backend", "whatever");
+    assert (sink);
+    
+    zstr_sendx (proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
+    zsock_wait (proxy);
+    
+    zsock_destroy(&sink);
+    zactor_destroy(&proxy);
     
     #if (ZMQ_VERSION_MAJOR == 4)
     // Test authentication functionality
@@ -330,4 +346,5 @@ This is the class self test code:
     zsys_file_delete (TESTDIR "/mycert.txt");
     zsys_dir_delete (TESTDIR);
     #endif
+```
 

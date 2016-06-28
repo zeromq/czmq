@@ -30,6 +30,7 @@ context.
 
 This is the class interface:
 
+```h
     //  Create new context, returns context object, replaces zmq_init
     CZMQ_EXPORT zctx_t *
         zctx_new (void);
@@ -84,9 +85,11 @@ This is the class interface:
     //  Self test of this class
     CZMQ_EXPORT void
         zctx_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     //  Create and destroy a context without using it
     zctx_t *ctx = zctx_new ();
     assert (ctx);
@@ -124,4 +127,5 @@ This is the class self test code:
     assert (rc == 0);
     assert (zctx_underlying (ctx));
     zctx_destroy (&ctx);
+```
 

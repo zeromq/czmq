@@ -8,6 +8,7 @@ Please add @discuss section in ../src/zsocket.c.
 
 This is the class interface:
 
+```h
     //  This port range is defined by IANA for dynamic or private ports
     //  We use this when choosing a port for dynamic binding.
     #define ZSOCKET_DYNFROM     0xc000
@@ -81,9 +82,11 @@ This is the class interface:
     //  Self test of this class
     CZMQ_EXPORT void
         zsocket_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     
@@ -161,4 +164,5 @@ This is the class self test code:
     zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
+```
 

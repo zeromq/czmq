@@ -76,6 +76,7 @@ The assumptions in this design are:
 
 This is the class interface:
 
+```h
     //  To work with zgossip, use the CZMQ zactor API:
     //
     //  Create new zgossip instance, passing logging prefix:
@@ -132,9 +133,11 @@ This is the class interface:
     //  Self test of this class
     CZMQ_EXPORT void
         zgossip_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
     assert (server);
@@ -191,4 +194,5 @@ This is the class self test code:
     zactor_destroy (&alpha);
     zactor_destroy (&beta);
     
+```
 

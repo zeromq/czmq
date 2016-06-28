@@ -10,6 +10,7 @@ else does the work itself.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  This class has draft methods, which may change over time. They are not
@@ -70,9 +71,11 @@ This is the class interface:
         zpoller_set_nonstop (zpoller_t *self, bool nonstop);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     //  Create a few sockets
     zsock_t *vent = zsock_new (ZMQ_PUSH);
     assert (vent);
@@ -163,4 +166,5 @@ This is the class self test code:
     zsock_destroy (&client);
     zsock_destroy (&server);
     #endif
+```
 

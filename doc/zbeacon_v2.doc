@@ -17,6 +17,7 @@ interface, based on zactor, together with the zsock class for sockets.
 
 This is the class interface:
 
+```h
     //  Create a new beacon on a certain UDP port. If the system does not
     //  support UDP broadcasts (lacking a useful interface), returns NULL.
     //  To force the beacon to operate on a given port, set the environment
@@ -64,9 +65,11 @@ This is the class interface:
     //  Self test of this class
     CZMQ_EXPORT void
         zbeacon_v2_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     //  Create beacon to broadcast our service
     zctx_t *ctx = zctx_new ();
     assert (ctx);
@@ -163,4 +166,5 @@ This is the class self test code:
     
     zsock_destroy (&service);
     zctx_destroy (&ctx);
+```
 

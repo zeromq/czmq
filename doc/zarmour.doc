@@ -23,6 +23,7 @@ divisible by 5.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     #define ZARMOUR_MODE_BASE64_STD 0           // Standard base 64
@@ -106,9 +107,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zarmour_test (bool verbose);
     
+```
 
 This is the class self test code:
 
+```c
     zarmour_t *self = zarmour_new ();
     assert (self);
     
@@ -327,4 +330,5 @@ This is the class self test code:
     #endif
     
     zarmour_destroy (&self);
+```
 

@@ -28,21 +28,26 @@ sub pull {
         $tag = $2;
         $opts = $4;
         $text = "";
+        $ext = (fileparse("$file", qr/[^.]*/))[2];
         die "Can't read $file: $!"
             unless open (SOURCE, $file);
+
         while (<SOURCE>) {
             if (/$tag/) {
                 while (<SOURCE>) {
                     last if /\@discuss/ || /\@end/ || /\@ignore/;
-                    $_ = "    $_" if $opts eq "code";
-                    s/^    // if $opts eq "left";
-                    $_ = "    $_" if $opts eq "test";
-                    s/^        /    / if $opts eq "test";
+                    $_ = "    $_" if ($opts eq "code");
+                    s/^    // if ($opts eq "left");
+                    $_ = "    $_" if ($opts eq "test");
+                    s/^        /    / if ($opts eq "test");
                     $text .= $_;
                 }
             }
         }
         close (SOURCE);
+        # Add code fences for markdown highlighting
+        $text = "```$ext\n$text```\n" if (length $text) and ($opts eq "code" or $opts eq "test");
+
         $text = "Please add $tag section in $file.\n" unless $text;
         return $text;
     }

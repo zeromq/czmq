@@ -6,6 +6,7 @@ Please add @discuss section in ../src/ztimerset.c.
 
 This is the class interface:
 
+```h
     //  This is a draft class, and may change without notice. It is disabled in
     //  stable builds by default. If you use this in applications, please ask
     //  for it to be pushed to stable state. Use --enable-drafts to enable.
@@ -66,16 +67,18 @@ This is the class interface:
         ztimerset_test (bool verbose);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     //  Simple create/destroy test
     ztimerset_t *self = ztimerset_new ();
     assert (self);
     
     //  Adding timer
     bool timer_invoked = false;
-    int timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    int timer_id = ztimerset_add (self, 100, handler, &timer_invoked);
     assert (timer_id != -1);
     int rc = ztimerset_execute (self);
     assert (rc == 0);
@@ -96,7 +99,7 @@ This is the class self test code:
     assert(timeout == -1);
     
     //  Reset a timer
-    timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    timer_id = ztimerset_add (self, 100, handler, &timer_invoked);
     assert (timer_id != -1);
     timeout = ztimerset_timeout (self);
     assert (timeout > 0);
@@ -110,12 +113,13 @@ This is the class self test code:
     assert (rc == 0);
     
     //  Set interval
-    timer_id = ztimerset_add (self, 10, handler, &timer_invoked);
+    timer_id = ztimerset_add (self, 100, handler, &timer_invoked);
     assert (timer_id != -1);
     timeout = ztimerset_timeout (self);
-    rc = ztimerset_set_interval(self, timer_id, 20);
+    rc = ztimerset_set_interval(self, timer_id, 200);
     timeout2 = ztimerset_timeout (self);
     assert (timeout2 > timeout);
     
     ztimerset_destroy (&self);
+```
 

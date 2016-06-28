@@ -12,6 +12,7 @@ the CZMQ v3 API (meaning, zsock).
 
 This is the class interface:
 
+```h
     //  Create new zbeacon actor instance:
     //
     //      zactor_t *beacon = zactor_new (zbeacon, NULL);
@@ -70,9 +71,11 @@ This is the class interface:
     //  Self test of this class
     CZMQ_EXPORT void
         zbeacon_test (bool verbose);
+```
 
 This is the class self test code:
 
+```c
     //  Test 1 - two beacons, one speaking, one listening
     //  Create speaker beacon to broadcast our service
     zactor_t *speaker = zactor_new (zbeacon, NULL);
@@ -180,4 +183,5 @@ This is the class self test code:
     zactor_destroy (&node1);
     zactor_destroy (&node2);
     zactor_destroy (&node3);
+```
 

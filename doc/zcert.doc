@@ -19,6 +19,7 @@ section has a 'public-key = keyvalue' and, for secret certificates, a
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  This class has draft methods, which may change over time. They are not
@@ -121,9 +122,11 @@ This is the class interface:
         zcert_unset_meta (zcert_t *self, const char *name);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     //  Create temporary directory for test files
     #   define TESTDIR ".test_zcert"
     zsys_dir_create (TESTDIR);
@@ -174,4 +177,5 @@ This is the class self test code:
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
+```
 

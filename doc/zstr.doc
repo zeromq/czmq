@@ -17,6 +17,7 @@ Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  This class has draft methods, which may change over time. They are not
@@ -85,9 +86,11 @@ This is the class interface:
         zstr_str (void *source);
     
     #endif // CZMQ_BUILD_DRAFT_API
+```
 
 This is the class self test code:
 
+```c
     //  Create two PAIR sockets and connect over inproc
     zsock_t *output = zsock_new_pair ("@inproc://zstr.test");
     assert (output);
@@ -167,4 +170,5 @@ This is the class self test code:
     zsock_destroy (&client);
     zsock_destroy (&server);
     #endif
+```
 

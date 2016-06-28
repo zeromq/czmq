@@ -10,6 +10,7 @@ coded SHA-1 implementation to reduce build dependencies.
 
 This is the class interface:
 
+```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
     //  Constructor - creates new digest object, which you use to build up a
@@ -44,9 +45,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zdigest_test (bool verbose);
     
+```
 
 This is the class self test code:
 
+```c
     byte *buffer = (byte *) zmalloc (1024);
     memset (buffer, 0xAA, 1024);
     
@@ -62,4 +65,5 @@ This is the class self test code:
                    "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
     zdigest_destroy (&digest);
     free (buffer);
+```
 
