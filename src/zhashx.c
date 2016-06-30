@@ -776,8 +776,9 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
     //  First, calculate packed data size
     size_t frame_size = 4;      //  Dictionary size, number-4
     uint index;
+    uint vindex = 0;
     size_t limit = primes [self->prime_index];
-    char *values[limit];
+    char *values [self->size];
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
@@ -785,22 +786,25 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
             frame_size += 1 + strlen ((char *) item->key);
             //  We store value as long string
             if (serializer)
-                values[index] = serializer(item->value);
+                values [vindex] = serializer (item->value);
             else
-                values[index] = (char *) item->value;
+                values [vindex] = (char *) item->value;
 
-            frame_size += 4 + strlen ((char *) values[index]);
+            frame_size += 4 + strlen ((char *) values [vindex]);
             item = item->next;
+            vindex++;
         }
     }
     //  Now serialize items into the frame
     zframe_t *frame = zframe_new (NULL, frame_size);
     if (!frame)
         return NULL;
+
     byte *needle = zframe_data (frame);
     //  Store size as number-4
     *(uint32_t *) needle = htonl ((u_long) self->size);
     needle += 4;
+    vindex = 0;
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
@@ -810,16 +814,18 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
             needle += strlen ((char *) item->key);
 
             //  Store value as longstr
-            size_t lenth = strlen ((char *) values[index]);
+            size_t lenth = strlen (values [vindex]);
             *(uint32_t *) needle = htonl ((u_long) lenth);
             needle += 4;
-            memcpy (needle, (char *) values[index], strlen ((char *) values[index]));
-            needle += strlen ((char *) values[index]);
+            memcpy (needle, (char *) values [vindex], strlen ((char *) values [vindex]));
+            needle += strlen ((char *) values [vindex]);
             item = item->next;
 
             //  Destroy serialized value
             if (serializer)
-                zstr_free (&values[index]);
+                zstr_free (&values [vindex]);
+
+            vindex++;
         }
     }
     return frame;
