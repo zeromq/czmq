@@ -778,7 +778,7 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
     uint index;
     uint vindex = 0;
     size_t limit = primes [self->prime_index];
-    char *values [self->size];
+	char **values = (char **)zmalloc(self->size * sizeof(char*));
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
@@ -797,8 +797,10 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
     }
     //  Now serialize items into the frame
     zframe_t *frame = zframe_new (NULL, frame_size);
-    if (!frame)
+	if (!frame) {
+		free(values);
         return NULL;
+	}
 
     byte *needle = zframe_data (frame);
     //  Store size as number-4
@@ -828,6 +830,7 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
             vindex++;
         }
     }
+	free(values);
     return frame;
 }
 
