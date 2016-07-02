@@ -143,6 +143,8 @@ Plus some others:
 
 * {{valgrind}} - a useful tool for checking your code.
 
+* {{pkg-config}} - an optional useful tool to make building with dependencies easier.
+
 Which we install like this (using the Debian-style apt-get package manager):
 
     sudo apt-get update
@@ -182,7 +184,10 @@ And then to build CZMQ against this installation of libzmq:
 
     export CFLAGS=-I$HOME/local/include
     export LDFLAGS=-L$HOME/local/lib64
+    export PKG_CONFIG_PATH=$HOME/local/lib64/pkgconfig
     ./configure
+
+NOTE: the PKG_CONFIG_PATH is not mandatory, and the actual directory might be different. If you cannot or do not want to use pkg-config, please make sure to MANUALLY add all the necessary CFLAGS and LDFLAGS from all dependencies (for example -DZMQ_BUILD_DRAFT_API=1 if you want the DRAFT APIs).
 
 You will need the pkg-config, libtool, and autoreconf packages. After building, run the CZMQ selftests:
 
