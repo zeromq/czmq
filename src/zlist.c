@@ -333,6 +333,9 @@ zlist_dup (zlist_t *self)
     zlist_t *copy = zlist_new ();
     assert (copy);
 
+    if (self->autofree)
+        zlist_autofree(copy);
+
     node_t *node;
     for (node = self->head; node; node = node->next) {
         if (zlist_append (copy, node->item) == -1) {
