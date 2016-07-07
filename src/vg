@@ -1,2 +1,0 @@
-c -l $1
-valgrind --tool=memcheck --leak-check=full --suppressions=valgrind.supp $*
