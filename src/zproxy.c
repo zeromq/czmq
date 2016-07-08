@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zproxy - run a steerable proxy in the background
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
