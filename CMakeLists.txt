@@ -314,8 +314,8 @@ set_target_properties(
 ########################################################################
 # tests
 ########################################################################
-set(CLASSTEST_TIMEOUT 5 CACHE STRING "Timeout of the selftest of a class")
-set(TOTAL_TIMEOUT 20 CACHE STRING "Timout of the total testsuite")
+set(CLASSTEST_TIMEOUT 20 CACHE STRING "Timeout of the selftest of a class")
+set(TOTAL_TIMEOUT 120 CACHE STRING "Timout of the total testsuite")
 
 set(TEST_CLASSES
     zactor
@@ -379,6 +379,33 @@ foreach(TEST_CLASS ${TEST_CLASSES})
     )
 endforeach(TEST_CLASS)
 
+########################################################################
+# cleanup
+########################################################################
+add_custom_target (distclean @echo Cleaning for source distribution)
+
+set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt
+                    ${CMAKE_BINARY_DIR}/cmake_install.cmake
+                    ${CMAKE_BINARY_DIR}/Makefile
+                    ${CMAKE_BINARY_DIR}/CMakeFiles
+                    ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
+                    ${CMAKE_BINARY_DIR}/Testing
+                    ${CMAKE_BINARY_DIR}/compile_commands.json
+                    ${CMAKE_BINARY_DIR}/src/platform.h
+                    ${CMAKE_BINARY_DIR}/src/libczmq.pc
+                    ${CMAKE_BINARY_DIR}/src/libczmq.so
+                    ${CMAKE_BINARY_DIR}/src/czmq_selftest
+                    ${CMAKE_BINARY_DIR}/src/zmakecert
+                    ${CMAKE_BINARY_DIR}/src/czmq_selftest
+)
+
+add_custom_command(
+    DEPENDS clean
+    COMMENT "distribution clean"
+    COMMAND rm
+    ARGS    -rf CMakeTmp ${cmake_generated}
+    TARGET  distclean
+)
 
 ########################################################################
 # summary
