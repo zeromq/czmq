@@ -27,9 +27,8 @@ env:
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq3-x
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
-    # As we have errors in bindings/python/test.py I'm suspending this...
-    #- BUILD_TYPE=check-py
     - BUILD_TYPE=cmake
+    - BUILD_TYPE=bindings BINDING=python
 
 matrix:
   include:

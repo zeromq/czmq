@@ -144,7 +144,7 @@ class TestCZMQ(unittest.TestCase):
     def test_zdir_patch(self):
         file = Zfile(b".", b"bilbo")
         self.assertTrue(file)
-        patch = ZdirPatch(b".", file, 'create', b"/")
+        patch = ZdirPatch(b".", file, ZdirPatch.CREATE, b"/")
         self.assertTrue(patch)
         del file
 
@@ -704,12 +704,10 @@ class TestCZMQ(unittest.TestCase):
         self.assertEqual(msg.addmem(blank, 65537), 0)
         del blank
         self.assertEqual(msg.size(), 9)
-        buffer = POINTER(c_byte)()
-        buffer_size = msg.encode(buffer)
+        frame = msg.encode()
         del msg
-        msg = Zmsg.decode(buffer, buffer_size)
+        msg = Zmsg.decode(frame)
         self.assertTrue(msg)
-        libc.free (buffer)
         del msg
 
         # Test submessages
