@@ -10,6 +10,8 @@ if (NOT MSVC)
         pkg_check_modules(PC_UUID "uuid")
     endif (NOT PC_UUID_FOUND)
     if (PC_UUID_FOUND)
+        # add CFLAGS from pkg-config file, e.g. draft api.
+        add_definitions(${PC_UUID_CFLAGS} ${PC_UUID_CFLAGS_OTHER})
         # some libraries install the headers is a subdirectory of the include dir
         # returned by pkg-config, so use a wildcard match to improve chances of finding
         # headers and SOs.
