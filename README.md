@@ -1,99 +1,102 @@
 
-<A name="toc1-3" title="CZMQ - High-level C binding for ØMQ" />
+[![GitHub release](https://img.shields.io/github/release/zeromq/czmq.svg)](https://github.com/zeromq/czmq/releases)
+[![license](https://img.shields.io/github/license/zeromq/czmq.svg)](https://github.com/zeromq/czmq/blob/master/LICENSE)
+
+<A name="toc1-6" title="CZMQ - High-level C binding for ØMQ" />
 # CZMQ - High-level C binding for ØMQ
 
 | Linux & MacOSX | Windows  | Chat |
 |:--------------:|:--------:|:----:|
 |[![Build Status](https://travis-ci.org/zeromq/czmq.png?branch=master)](https://travis-ci.org/zeromq/czmq)|[![Build status](https://ci.appveyor.com/api/projects/status/q7y22juu3pnl5wq6?svg=true)](https://ci.appveyor.com/project/zeromq/czmq)|<a target="_blank" href="http://webchat.freenode.net?channels=%23zeromq&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>|
 
-<A name="toc2-10" title="Contents" />
+<A name="toc2-13" title="Contents" />
 ## Contents
 
 
-**<a href="#toc2-15">Overview</a>**
+**<a href="#toc2-18">Overview</a>**
 
-**<a href="#toc3-18">Scope and Goals</a>**
+**<a href="#toc3-21">Scope and Goals</a>**
 
-**<a href="#toc3-59">Ownership and License</a>**
+**<a href="#toc3-62">Ownership and License</a>**
 
-**<a href="#toc2-70">Using CZMQ</a>**
+**<a href="#toc2-73">Using CZMQ</a>**
 
-**<a href="#toc3-73">Building and Installing</a>**
+**<a href="#toc3-76">Building and Installing</a>**
 
-**<a href="#toc3-138">Building on Windows</a>**
+**<a href="#toc3-146">Building on Windows</a>**
 
-**<a href="#toc3-194">Linking with an Application</a>**
+**<a href="#toc3-202">Linking with an Application</a>**
 
-**<a href="#toc3-201">Use from Other Languages</a>**
+**<a href="#toc3-209">Use from Other Languages</a>**
 
-**<a href="#toc3-215">API v3 Summary</a>**
-*  <a href="#toc4-220">zactor - simple actor framework</a>
-*  <a href="#toc4-302">zauth - authentication for ZeroMQ security mechanisms</a>
-*  <a href="#toc4-560">zbeacon - LAN discovery and presence</a>
-*  <a href="#toc4-748">zcert - work with CURVE security certificates</a>
-*  <a href="#toc4-930">zcertstore - work with CURVE security certificate stores</a>
-*  <a href="#toc4-1073">zchunk - work with memory chunks</a>
-*  <a href="#toc4-1287">zclock - millisecond clocks and delays</a>
-*  <a href="#toc4-1353">zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.</a>
-*  <a href="#toc4-1627">zdigest - provides hashing functions (SHA-1 at present)</a>
-*  <a href="#toc4-1697">zdir - work with file-system directories</a>
-*  <a href="#toc4-1933">zdir_patch - work with directory patches</a>
-*  <a href="#toc4-2009">zfile - provides methods to work with files in a portable fashion.</a>
-*  <a href="#toc4-2305">zframe - working with single message frames</a>
-*  <a href="#toc4-2615">zgossip - decentralized configuration management</a>
-*  <a href="#toc4-2814">zhash - simple generic hash container</a>
-*  <a href="#toc4-3156">zhashx - extended generic hash container</a>
-*  <a href="#toc4-3625">ziflist - list of network interfaces available on system</a>
-*  <a href="#toc4-3709">zlist - simple generic list container</a>
-*  <a href="#toc4-3975">zlistx - extended generic list container</a>
-*  <a href="#toc4-4272">zloop - event-driven reactor</a>
-*  <a href="#toc4-4487">zmonitor - socket event monitor</a>
-*  <a href="#toc4-4595">zmsg - working with multipart messages</a>
-*  <a href="#toc4-5089">zpoller - trivial socket poller class</a>
-*  <a href="#toc4-5260">zproc - process configuration and status</a>
-*  <a href="#toc4-5412">zproxy - run a steerable proxy in the background</a>
-*  <a href="#toc4-5763">zrex - work with regular expressions</a>
-*  <a href="#toc4-5902">zsock - high-level socket API that hides libzmq contexts and sockets</a>
-*  <a href="#toc4-7072">zstr - sending and receiving strings</a>
-*  <a href="#toc4-7247">zsys - system-level methods</a>
-*  <a href="#toc4-7725">ztimerset - timer set</a>
-*  <a href="#toc4-7851">ztrie - simple trie for tokenizable strings</a>
-*  <a href="#toc4-8094">zuuid - UUID support class</a>
+**<a href="#toc3-223">API v3 Summary</a>**
+*  <a href="#toc4-228">zactor - simple actor framework</a>
+*  <a href="#toc4-310">zauth - authentication for ZeroMQ security mechanisms</a>
+*  <a href="#toc4-568">zbeacon - LAN discovery and presence</a>
+*  <a href="#toc4-756">zcert - work with CURVE security certificates</a>
+*  <a href="#toc4-938">zcertstore - work with CURVE security certificate stores</a>
+*  <a href="#toc4-1081">zchunk - work with memory chunks</a>
+*  <a href="#toc4-1295">zclock - millisecond clocks and delays</a>
+*  <a href="#toc4-1361">zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.</a>
+*  <a href="#toc4-1635">zdigest - provides hashing functions (SHA-1 at present)</a>
+*  <a href="#toc4-1705">zdir - work with file-system directories</a>
+*  <a href="#toc4-1941">zdir_patch - work with directory patches</a>
+*  <a href="#toc4-2017">zfile - provides methods to work with files in a portable fashion.</a>
+*  <a href="#toc4-2313">zframe - working with single message frames</a>
+*  <a href="#toc4-2623">zgossip - decentralized configuration management</a>
+*  <a href="#toc4-2822">zhash - simple generic hash container</a>
+*  <a href="#toc4-3164">zhashx - extended generic hash container</a>
+*  <a href="#toc4-3633">ziflist - list of network interfaces available on system</a>
+*  <a href="#toc4-3717">zlist - simple generic list container</a>
+*  <a href="#toc4-3983">zlistx - extended generic list container</a>
+*  <a href="#toc4-4280">zloop - event-driven reactor</a>
+*  <a href="#toc4-4495">zmonitor - socket event monitor</a>
+*  <a href="#toc4-4603">zmsg - working with multipart messages</a>
+*  <a href="#toc4-5097">zpoller - trivial socket poller class</a>
+*  <a href="#toc4-5268">zproc - process configuration and status</a>
+*  <a href="#toc4-5420">zproxy - run a steerable proxy in the background</a>
+*  <a href="#toc4-5771">zrex - work with regular expressions</a>
+*  <a href="#toc4-5910">zsock - high-level socket API that hides libzmq contexts and sockets</a>
+*  <a href="#toc4-7080">zstr - sending and receiving strings</a>
+*  <a href="#toc4-7255">zsys - system-level methods</a>
+*  <a href="#toc4-7733">ztimerset - timer set</a>
+*  <a href="#toc4-7859">ztrie - simple trie for tokenizable strings</a>
+*  <a href="#toc4-8102">zuuid - UUID support class</a>
 
-**<a href="#toc3-8215">API v2 Summary</a>**
-*  <a href="#toc4-8220">zauth_v2 - authentication for ZeroMQ servers (deprecated)</a>
-*  <a href="#toc4-8416">zctx - working with ØMQ contexts (deprecated)</a>
-*  <a href="#toc4-8548">zmonitor_v2 - socket event monitor (deprecated)</a>
-*  <a href="#toc4-8636">zmutex - working with mutexes (deprecated)</a>
-*  <a href="#toc4-8689">zproxy_v2 - run a steerable proxy in the background (deprecated)</a>
-*  <a href="#toc4-8801">zsocket - working with ØMQ sockets (deprecated)</a>
-*  <a href="#toc4-8970">zsockopt - get/set ØMQ socket options (deprecated)</a>
-*  <a href="#toc4-10006">zthread - working with system threads (deprecated)</a>
+**<a href="#toc3-8223">API v2 Summary</a>**
+*  <a href="#toc4-8228">zauth_v2 - authentication for ZeroMQ servers (deprecated)</a>
+*  <a href="#toc4-8424">zctx - working with ØMQ contexts (deprecated)</a>
+*  <a href="#toc4-8556">zmonitor_v2 - socket event monitor (deprecated)</a>
+*  <a href="#toc4-8644">zmutex - working with mutexes (deprecated)</a>
+*  <a href="#toc4-8697">zproxy_v2 - run a steerable proxy in the background (deprecated)</a>
+*  <a href="#toc4-8809">zsocket - working with ØMQ sockets (deprecated)</a>
+*  <a href="#toc4-8978">zsockopt - get/set ØMQ socket options (deprecated)</a>
+*  <a href="#toc4-10014">zthread - working with system threads (deprecated)</a>
 
-**<a href="#toc2-10127">Error Handling</a>**
+**<a href="#toc2-10135">Error Handling</a>**
 
-**<a href="#toc2-10144">CZMQ Actors</a>**
+**<a href="#toc2-10152">CZMQ Actors</a>**
 
-**<a href="#toc2-10290">Under the Hood</a>**
+**<a href="#toc2-10298">Under the Hood</a>**
 
-**<a href="#toc3-10293">Adding a New Class</a>**
+**<a href="#toc3-10301">Adding a New Class</a>**
 
-**<a href="#toc3-10305">Documentation</a>**
+**<a href="#toc3-10313">Documentation</a>**
 
-**<a href="#toc3-10344">Development</a>**
+**<a href="#toc3-10352">Development</a>**
 
-**<a href="#toc3-10354">Porting CZMQ</a>**
+**<a href="#toc3-10362">Porting CZMQ</a>**
 
-**<a href="#toc3-10365">Hints to Contributors</a>**
+**<a href="#toc3-10373">Hints to Contributors</a>**
 
-**<a href="#toc3-10376">Code Generation</a>**
+**<a href="#toc3-10384">Code Generation</a>**
 
-**<a href="#toc3-10381">This Document</a>**
+**<a href="#toc3-10389">This Document</a>**
 
-<A name="toc2-15" title="Overview" />
+<A name="toc2-18" title="Overview" />
 ## Overview
 
-<A name="toc3-18" title="Scope and Goals" />
+<A name="toc3-21" title="Scope and Goals" />
 ### Scope and Goals
 
 CZMQ has these goals:
@@ -110,7 +113,7 @@ CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 <img src="https://github.com/zeromq/czmq/raw/master/images/README_1.png" alt="1">
 </center>
 
-<A name="toc3-59" title="Ownership and License" />
+<A name="toc3-62" title="Ownership and License" />
 ### Ownership and License
 
 The contributors are listed in AUTHORS. This project uses the MPL v2 license, see LICENSE.
@@ -121,10 +124,10 @@ CZMQ uses the [CLASS (C Language Style for Scalabilty)](http://rfc.zeromq.org/sp
 
 To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/issues) at github.com.
 
-<A name="toc2-70" title="Using CZMQ" />
+<A name="toc2-73" title="Using CZMQ" />
 ## Using CZMQ
 
-<A name="toc3-73" title="Building and Installing" />
+<A name="toc3-76" title="Building and Installing" />
 ### Building and Installing
 
 To start with, you need at least these packages:
@@ -194,7 +197,7 @@ You will need the pkg-config, libtool, and autoreconf packages. After building, 
     make check
 
 
-<A name="toc3-138" title="Building on Windows" />
+<A name="toc3-146" title="Building on Windows" />
 ### Building on Windows
 
 To start with, you need MS Visual Studio (C/C++). The free community edition works well.
@@ -250,14 +253,14 @@ Let's test by running `czmq_selftest`:
     czmq\builds\msvc\vs2013\x64\ReleaseDEXE\czmq_selftest.exe
 ```
 
-<A name="toc3-194" title="Linking with an Application" />
+<A name="toc3-202" title="Linking with an Application" />
 ### Linking with an Application
 
 Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
     gcc myapp.c -o myapp -lczmq -lzmq
 
-<A name="toc3-201" title="Use from Other Languages" />
+<A name="toc3-209" title="Use from Other Languages" />
 ### Use from Other Languages
 
 This is a list of known higher-level wrappers around CZMQ:
@@ -271,12 +274,12 @@ This is a list of known higher-level wrappers around CZMQ:
 * https://github.com/mtortonesi/ruby-czmq-ffi - Ruby FFI
 * https://github.com/zeromq/goczmq - Go
 
-<A name="toc3-215" title="API v3 Summary" />
+<A name="toc3-223" title="API v3 Summary" />
 ### API v3 Summary
 
 This is the API provided by CZMQ v3.x, in alphabetical order.
 
-<A name="toc4-220" title="zactor - simple actor framework" />
+<A name="toc4-228" title="zactor - simple actor framework" />
 #### zactor - simple actor framework
 
 The zactor class provides a simple actor framework. It replaces the
@@ -358,7 +361,7 @@ This is the class self test code:
     zactor_destroy (&actor);
 ```
 
-<A name="toc4-302" title="zauth - authentication for ZeroMQ security mechanisms" />
+<A name="toc4-310" title="zauth - authentication for ZeroMQ security mechanisms" />
 #### zauth - authentication for ZeroMQ security mechanisms
 
 A zauth actor takes over authentication for all incoming connections in
@@ -616,7 +619,7 @@ This is the class self test code:
     zdir_destroy (&dir);
 ```
 
-<A name="toc4-560" title="zbeacon - LAN discovery and presence" />
+<A name="toc4-568" title="zbeacon - LAN discovery and presence" />
 #### zbeacon - LAN discovery and presence
 
 The zbeacon class implements a peer-to-peer discovery service for local
@@ -804,7 +807,7 @@ This is the class self test code:
     zactor_destroy (&node3);
 ```
 
-<A name="toc4-748" title="zcert - work with CURVE security certificates" />
+<A name="toc4-756" title="zcert - work with CURVE security certificates" />
 #### zcert - work with CURVE security certificates
 
 The zcert class provides a way to create and work with security
@@ -986,7 +989,7 @@ This is the class self test code:
     zdir_destroy (&dir);
 ```
 
-<A name="toc4-930" title="zcertstore - work with CURVE security certificate stores" />
+<A name="toc4-938" title="zcertstore - work with CURVE security certificate stores" />
 #### zcertstore - work with CURVE security certificate stores
 
 To authenticate new clients using the ZeroMQ CURVE security mechanism,
@@ -1129,7 +1132,7 @@ This is the class self test code:
     zdir_destroy (&dir);
 ```
 
-<A name="toc4-1073" title="zchunk - work with memory chunks" />
+<A name="toc4-1081" title="zchunk - work with memory chunks" />
 #### zchunk - work with memory chunks
 
 The zchunk class works with variable sized blobs. Not as efficient as
@@ -1343,7 +1346,7 @@ This is the class self test code:
     zchunk_destroy (&chunk);
 ```
 
-<A name="toc4-1287" title="zclock - millisecond clocks and delays" />
+<A name="toc4-1295" title="zclock - millisecond clocks and delays" />
 #### zclock - millisecond clocks and delays
 
 The zclock class provides essential sleep and system time functions,
@@ -1409,7 +1412,7 @@ This is the class self test code:
     free (timestr);
 ```
 
-<A name="toc4-1353" title="zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL." />
+<A name="toc4-1361" title="zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL." />
 #### zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
 Lets applications load, work with, and save configuration files.
@@ -1683,7 +1686,7 @@ This is the class self test code:
     zdir_destroy (&dir);
 ```
 
-<A name="toc4-1627" title="zdigest - provides hashing functions (SHA-1 at present)" />
+<A name="toc4-1635" title="zdigest - provides hashing functions (SHA-1 at present)" />
 #### zdigest - provides hashing functions (SHA-1 at present)
 
 The zdigest class generates a hash from zchunks of data. The current
@@ -1753,7 +1756,7 @@ This is the class self test code:
     free (buffer);
 ```
 
-<A name="toc4-1697" title="zdir - work with file-system directories" />
+<A name="toc4-1705" title="zdir - work with file-system directories" />
 #### zdir - work with file-system directories
 
 The zdir class gives access to the file system index. It will load
@@ -1989,7 +1992,7 @@ This is the class self test code:
     zdir_destroy (&testdir);
 ```
 
-<A name="toc4-1933" title="zdir_patch - work with directory patches" />
+<A name="toc4-1941" title="zdir_patch - work with directory patches" />
 #### zdir_patch - work with directory patches
 
 The zdir_patch class works with one patch, which says "create this
@@ -2065,7 +2068,7 @@ This is the class self test code:
     zdir_patch_destroy (&patch);
 ```
 
-<A name="toc4-2009" title="zfile - provides methods to work with files in a portable fashion." />
+<A name="toc4-2017" title="zfile - provides methods to work with files in a portable fashion." />
 #### zfile - provides methods to work with files in a portable fashion.
 
 The zfile class provides methods to work with disk files. A file object
@@ -2361,7 +2364,7 @@ This is the class self test code:
     zfile_remove (file);
 ```
 
-<A name="toc4-2305" title="zframe - working with single message frames" />
+<A name="toc4-2313" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
 
 The zframe class provides methods to send and receive single message
@@ -2671,7 +2674,7 @@ This is the class self test code:
     
 ```
 
-<A name="toc4-2615" title="zgossip - decentralized configuration management" />
+<A name="toc4-2623" title="zgossip - decentralized configuration management" />
 #### zgossip - decentralized configuration management
 
 Implements a gossip protocol for decentralized configuration management.
@@ -2870,7 +2873,7 @@ This is the class self test code:
     
 ```
 
-<A name="toc4-2814" title="zhash - simple generic hash container" />
+<A name="toc4-2822" title="zhash - simple generic hash container" />
 #### zhash - simple generic hash container
 
 zhash is an expandable hash table container. This is a simple container.
@@ -3212,7 +3215,7 @@ This is the class self test code:
     zhash_destroy (&hash);
 ```
 
-<A name="toc4-3156" title="zhashx - extended generic hash container" />
+<A name="toc4-3164" title="zhashx - extended generic hash container" />
 #### zhashx - extended generic hash container
 
 zhashx is an extended hash table container with more functionality than
@@ -3681,7 +3684,7 @@ This is the class self test code:
     zhashx_destroy (&hash);
 ```
 
-<A name="toc4-3625" title="ziflist - list of network interfaces available on system" />
+<A name="toc4-3633" title="ziflist - list of network interfaces available on system" />
 #### ziflist - list of network interfaces available on system
 
 The ziflist class takes a snapshot of the network interfaces that the
@@ -3765,7 +3768,7 @@ This is the class self test code:
     ziflist_destroy (&iflist);
 ```
 
-<A name="toc4-3709" title="zlist - simple generic list container" />
+<A name="toc4-3717" title="zlist - simple generic list container" />
 #### zlist - simple generic list container
 
 Provides a generic container implementing a fast singly-linked list. You
@@ -4031,7 +4034,7 @@ This is the class self test code:
     assert (list == NULL);
 ```
 
-<A name="toc4-3975" title="zlistx - extended generic list container" />
+<A name="toc4-3983" title="zlistx - extended generic list container" />
 #### zlistx - extended generic list container
 
 Provides a generic doubly-linked list container. This container provides
@@ -4328,7 +4331,7 @@ This is the class self test code:
     zlistx_destroy (&list);
 ```
 
-<A name="toc4-4272" title="zloop - event-driven reactor" />
+<A name="toc4-4280" title="zloop - event-driven reactor" />
 #### zloop - event-driven reactor
 
 The zloop class provides an event-driven reactor pattern. The reactor
@@ -4543,7 +4546,7 @@ This is the class self test code:
     zsock_destroy (&output);
 ```
 
-<A name="toc4-4487" title="zmonitor - socket event monitor" />
+<A name="toc4-4495" title="zmonitor - socket event monitor" />
 #### zmonitor - socket event monitor
 
 The zmonitor actor provides an API for obtaining socket events such as
@@ -4651,7 +4654,7 @@ This is the class self test code:
     #endif
 ```
 
-<A name="toc4-4595" title="zmsg - working with multipart messages" />
+<A name="toc4-4603" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
 The zmsg class provides methods to send and receive multipart messages
@@ -5145,7 +5148,7 @@ This is the class self test code:
     #endif
 ```
 
-<A name="toc4-5089" title="zpoller - trivial socket poller class" />
+<A name="toc4-5097" title="zpoller - trivial socket poller class" />
 #### zpoller - trivial socket poller class
 
 The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll
@@ -5316,7 +5319,7 @@ This is the class self test code:
     #endif
 ```
 
-<A name="toc4-5260" title="zproc - process configuration and status" />
+<A name="toc4-5268" title="zproc - process configuration and status" />
 #### zproc - process configuration and status
 
 zproc - process configuration and status
@@ -5468,7 +5471,7 @@ This is the class self test code:
 
 Please add @selftest section in ../src/zproc.c.
 
-<A name="toc4-5412" title="zproxy - run a steerable proxy in the background" />
+<A name="toc4-5420" title="zproxy - run a steerable proxy in the background" />
 #### zproxy - run a steerable proxy in the background
 
 A zproxy actor switches messages between a frontend and a backend socket.
@@ -5819,7 +5822,7 @@ This is the class self test code:
     #endif
 ```
 
-<A name="toc4-5763" title="zrex - work with regular expressions" />
+<A name="toc4-5771" title="zrex - work with regular expressions" />
 #### zrex - work with regular expressions
 
 Wraps a very simple regular expression library (SLRE) as a CZMQ class.
@@ -5958,7 +5961,7 @@ This is the class self test code:
     
 ```
 
-<A name="toc4-5902" title="zsock - high-level socket API that hides libzmq contexts and sockets" />
+<A name="toc4-5910" title="zsock - high-level socket API that hides libzmq contexts and sockets" />
 #### zsock - high-level socket API that hides libzmq contexts and sockets
 
 The zsock class wraps the libzmq socket handle (a void *) with a proper
@@ -7128,7 +7131,7 @@ This is the class self test code:
     
 ```
 
-<A name="toc4-7072" title="zstr - sending and receiving strings" />
+<A name="toc4-7080" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C
@@ -7303,7 +7306,7 @@ This is the class self test code:
     #endif
 ```
 
-<A name="toc4-7247" title="zsys - system-level methods" />
+<A name="toc4-7255" title="zsys - system-level methods" />
 #### zsys - system-level methods
 
 The zsys class provides a portable wrapper for system calls. We collect
@@ -7781,7 +7784,7 @@ This is the class self test code:
     zsys_close (logger, NULL, 0);
 ```
 
-<A name="toc4-7725" title="ztimerset - timer set" />
+<A name="toc4-7733" title="ztimerset - timer set" />
 #### ztimerset - timer set
 
 ztimerset - timer set
@@ -7907,7 +7910,7 @@ This is the class self test code:
     ztimerset_destroy (&self);
 ```
 
-<A name="toc4-7851" title="ztrie - simple trie for tokenizable strings" />
+<A name="toc4-7859" title="ztrie - simple trie for tokenizable strings" />
 #### ztrie - simple trie for tokenizable strings
 
 This is a variant of a trie or prefix tree where all the descendants of a
@@ -8150,7 +8153,7 @@ This is the class self test code:
     ztrie_destroy (&self);
 ```
 
-<A name="toc4-8094" title="zuuid - UUID support class" />
+<A name="toc4-8102" title="zuuid - UUID support class" />
 #### zuuid - UUID support class
 
 The zuuid class generates UUIDs and provides methods for working with
@@ -8271,12 +8274,12 @@ This is the class self test code:
 ```
 
 
-<A name="toc3-8215" title="API v2 Summary" />
+<A name="toc3-8223" title="API v2 Summary" />
 ### API v2 Summary
 
 This is the deprecated API provided by CZMQ v2.x, in alphabetical order.
 
-<A name="toc4-8220" title="zauth_v2 - authentication for ZeroMQ servers (deprecated)" />
+<A name="toc4-8228" title="zauth_v2 - authentication for ZeroMQ servers (deprecated)" />
 #### zauth_v2 - authentication for ZeroMQ servers (deprecated)
 
 A zauth object takes over authentication for all incoming connections in
@@ -8472,7 +8475,7 @@ This is the class self test code:
     zdir_destroy (&dir);
 ```
 
-<A name="toc4-8416" title="zctx - working with ØMQ contexts (deprecated)" />
+<A name="toc4-8424" title="zctx - working with ØMQ contexts (deprecated)" />
 #### zctx - working with ØMQ contexts (deprecated)
 
 The zctx class wraps ØMQ contexts. It manages open sockets in the context
@@ -8604,7 +8607,7 @@ This is the class self test code:
     zctx_destroy (&ctx);
 ```
 
-<A name="toc4-8548" title="zmonitor_v2 - socket event monitor (deprecated)" />
+<A name="toc4-8556" title="zmonitor_v2 - socket event monitor (deprecated)" />
 #### zmonitor_v2 - socket event monitor (deprecated)
 
 The zmonitor class provides an API for obtaining socket events such as
@@ -8692,7 +8695,7 @@ This is the class self test code:
     zctx_destroy (&ctx);
 ```
 
-<A name="toc4-8636" title="zmutex - working with mutexes (deprecated)" />
+<A name="toc4-8644" title="zmutex - working with mutexes (deprecated)" />
 #### zmutex - working with mutexes (deprecated)
 
 The zmutex class provides a portable wrapper for mutexes. Please do not
@@ -8745,7 +8748,7 @@ This is the class self test code:
     zmutex_destroy (&mutex);
 ```
 
-<A name="toc4-8689" title="zproxy_v2 - run a steerable proxy in the background (deprecated)" />
+<A name="toc4-8697" title="zproxy_v2 - run a steerable proxy in the background (deprecated)" />
 #### zproxy_v2 - run a steerable proxy in the background (deprecated)
 
 The zproxy class provides an equivalent to the ZMQ steerable proxy, on
@@ -8857,7 +8860,7 @@ This is the class self test code:
     
 ```
 
-<A name="toc4-8801" title="zsocket - working with ØMQ sockets (deprecated)" />
+<A name="toc4-8809" title="zsocket - working with ØMQ sockets (deprecated)" />
 #### zsocket - working with ØMQ sockets (deprecated)
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
@@ -9026,7 +9029,7 @@ This is the class self test code:
     zctx_destroy (&ctx);
 ```
 
-<A name="toc4-8970" title="zsockopt - get/set ØMQ socket options (deprecated)" />
+<A name="toc4-8978" title="zsockopt - get/set ØMQ socket options (deprecated)" />
 #### zsockopt - get/set ØMQ socket options (deprecated)
 
 The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
@@ -10062,7 +10065,7 @@ This is the class self test code:
     zctx_destroy (&ctx);
 ```
 
-<A name="toc4-10006" title="zthread - working with system threads (deprecated)" />
+<A name="toc4-10014" title="zthread - working with system threads (deprecated)" />
 #### zthread - working with system threads (deprecated)
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -10183,7 +10186,7 @@ This is the class self test code:
 ```
 
 
-<A name="toc2-10127" title="Error Handling" />
+<A name="toc2-10135" title="Error Handling" />
 ## Error Handling
 
 The CZMQ policy is to reduce the error flow to 0/-1 where possible. libzmq still does a lot of errno setting. CZMQ does not do that, as it creates a fuzzy API. Things either work as expected, or they fail, and the application's best strategy is usually to assert on non-zero return codes.
@@ -10200,7 +10203,7 @@ There are a few cases where the return value is overloaded to return -1, 0, or o
 
 The overall goal with this strategy is robustness, and absolute minimal and predictable expression in the code. You can see that it works: the CZMQ code is generally very simple and clear, with a few exceptions of places where people have used their old C style (we fix these over time).
 
-<A name="toc2-10144" title="CZMQ Actors" />
+<A name="toc2-10152" title="CZMQ Actors" />
 ## CZMQ Actors
 
 The v2 API had a zthread class that let you create "attached threads" connected to their parent by an inproc:// PIPE socket. In v3 this has been simplified and better wrapped as the zactor class. CZMQ actors are in effect threads with a socket interface. A zactor_t instance works like a socket, and the CZMQ classes that deal with sockets (like zmsg and zpoller) all accept zactor_t references as well as zsock_t and libzmq void * socket handles.
@@ -10346,10 +10349,10 @@ To write an actor, use this template. Note that your actor is a single function 
 
 The selftest code shows how to create, talk to, and destroy an actor.
 
-<A name="toc2-10290" title="Under the Hood" />
+<A name="toc2-10298" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-10293" title="Adding a New Class" />
+<A name="toc3-10301" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -10361,7 +10364,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
-<A name="toc3-10305" title="Documentation" />
+<A name="toc3-10313" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -10400,7 +10403,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-10344" title="Development" />
+<A name="toc3-10352" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -10410,7 +10413,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-10354" title="Porting CZMQ" />
+<A name="toc3-10362" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -10421,7 +10424,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-10365" title="Hints to Contributors" />
+<A name="toc3-10373" title="Hints to Contributors" />
 ### Hints to Contributors
 
 CZMQ is a nice, neat library, and you may not immediately appreciate why. Read the CLASS style guide please, and write your code to make it indistinguishable from the rest of the code in the library. That is the only real criteria for good style: it's invisible.
@@ -10432,12 +10435,12 @@ Do read your code after you write it and ask, "Can I make this simpler?" We do u
 
 Before opening a pull request read our [contribution guidelines](https://github.com/zeromq/czmq/blob/master/CONTRIBUTING.md). Thanks!
 
-<A name="toc3-10376" title="Code Generation" />
+<A name="toc3-10384" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
 
-<A name="toc3-10381" title="This Document" />
+<A name="toc3-10389" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
