@@ -1,6 +1,9 @@
 .set GIT=https://github.com/zeromq/czmq
 .sub 0MQ=ØMQ
 
+[![GitHub release](https://img.shields.io/github/release/zeromq/czmq.svg)](https://github.com/zeromq/czmq/releases)
+[![license](https://img.shields.io/github/license/zeromq/czmq.svg)](https://github.com/zeromq/czmq/blob/master/LICENSE)
+
 # CZMQ - High-level C binding for 0MQ
 
 | Linux & MacOSX | Windows  | Chat |
