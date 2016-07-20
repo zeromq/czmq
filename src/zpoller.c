@@ -191,7 +191,7 @@ void
 zpoller_set_nonstop (zpoller_t *self, bool nonstop)
 {
     assert (self);
-    self->nonstop = true;
+    self->nonstop = nonstop;
 }
 
 
