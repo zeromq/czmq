@@ -1,6 +1,6 @@
 # Pull Request Notice
 
-Before sending a pull request make sure each commit solve one clear, minimal,
+Before sending a pull request make sure each commit solves one clear, minimal,
 plausible problem. Further each commit should have the following format:
 
 ```
