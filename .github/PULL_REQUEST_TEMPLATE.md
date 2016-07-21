@@ -18,5 +18,11 @@ git fetch upstream
 git rebase upstream/master
 git push -f
 
-If you are new please have a look at our contributing guidelines:
+In case you already merged instead of rebasing you can drop the merge commit.
+
+git rebase -i HEAD~10
+
+Now, find your merge commit and mark it as drop and save. Finally rebase!
+
+If you are a new contributor please have a look at our contributing guidelines:
 [CONTRIBUTING.md](https://github.com/zeromq/czmq/blob/master/CONTRIBUTING.md)
