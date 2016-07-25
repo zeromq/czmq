@@ -42,7 +42,7 @@ QZdirPatch * QZdirPatch::dup ()
 //  Return patch file directory path
 const QString QZdirPatch::path ()
 {
-    const QString rv = QString (zdir_patch_vpath (self));
+    const QString rv = QString (zdir_patch_path (self));
     return rv;
 }
 

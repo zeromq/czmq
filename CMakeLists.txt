@@ -324,8 +324,9 @@ set(TOTAL_TIMEOUT 600 CACHE STRING "Timout of the total testsuite")
 
 if(UNIX)
     find_program(MEMORYCHECK_COMMAND valgrind)
-    set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --show-reachable=yes --error-exitcode=1")
-    set(MEMORYCHECK_SUPPRESSIONS_FILE "${SOURCE_DIR}/src/.valgrind.supp")
+    set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --show-reachable=yes \
+                                     --error-exitcode=1 \
+                                     --suppressions=src/.valgrind.supp")
 endif()
 
 set(TEST_CLASSES
