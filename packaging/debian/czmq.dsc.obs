@@ -1,0 +1,20 @@
+Format: 3.0 (quilt)
+Binary: czmq
+Source: czmq
+Version: 3.0.3
+Maintainer: czmq Developers <zeromq-dev@lists.zeromq.org>
+Architecture: any
+Build-Depends: debhelper (>= 9),
+    pkg-config,
+    dh-autoreconf,
+    libzmq3-dev,
+    uuid-dev,
+    libsystemd-dev,
+    dh-autoreconf,
+    systemd,
+    dh-systemd
+Build-Depends-Indep: asciidoc,
+                     xmlto
+
+Files:
+ 7697688bf65a35bc33ae2db51ebb0e3b 818110 czmq.tar.gz
