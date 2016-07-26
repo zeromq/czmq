@@ -18,11 +18,13 @@ License:        MPLv2
 URL:            https://github.com/zeromq/czmq
 Source0:        %{name}-%{version}.tar.gz
 Group:          System/Libraries
-BuildRequires:  ghostscript-core
+# Note: ghostscript is required by graphviz which is required by
+#       asciidoc. On Fedora 24 the ghostscript dependencies cannot
+#       be resolved automatically. Thus add working dependency here!
+BuildRequires:  ghostscript
 BuildRequires:  asciidoc
 BuildRequires:  automake
 BuildRequires:  autoconf
-BuildRequires:  ghostscript-core
 BuildRequires:  libtool
 BuildRequires:  pkgconfig
 BuildRequires:  systemd-devel
@@ -69,7 +71,8 @@ This package contains development files.
 %{_libdir}/pkgconfig/libczmq.pc
 %{_mandir}/man3/*
 %{_mandir}/man7/*
-%{_datarootdir}/zproject/czmq/*
+%{_datadir}/zproject/
+%{_datadir}/zproject/czmq/
 
 %prep
 %setup -q
