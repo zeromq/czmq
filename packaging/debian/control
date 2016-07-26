@@ -17,7 +17,7 @@ Standards-Version: 3.9.7
 Build-Depends: debhelper (>= 9),
     pkg-config,
     dh-autoreconf,
-    libzmq5-dev,
+    libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
     dh-autoreconf,
@@ -36,7 +36,7 @@ Package: libczmq-dev
 Architecture: any
 Section: libdevel
 Depends:
-    libzmq5-dev,
+    libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
     libczmq3 (= ${binary:Version})
