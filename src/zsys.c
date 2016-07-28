@@ -1079,7 +1079,9 @@ zsys_daemonize (const char *workdir)
 
 int
 zsys_run_as (const char *lockfile, const char *group, const char *user)
-{
+{   if (!lockfile && !group && !user) {
+        return 0;
+    }
 #if (defined (__UNIX__))
     //  Switch to effective user ID (who owns executable); for
     //  system services this should be root, so that we can write
