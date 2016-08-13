@@ -204,6 +204,7 @@ This is a list of known higher-level wrappers around CZMQ:
 
 * https://github.com/1100110/CZMQ - D bindings
 * https://github.com/methodmissing/rbczmq - Ruby
+* https://github.com/paddor/cztop - Ruby, based on generated FFI binding
 * https://github.com/zeromq/pyczmq - Python
 * https://github.com/lhope/cl-czmq - Common Lisp
 * https://github.com/fmp88/ocaml-czmq - Ocaml
