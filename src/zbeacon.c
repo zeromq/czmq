@@ -134,9 +134,14 @@ s_self_prepare_udp (self_t *self)
 #else
         inaddr_t sockaddr = self->broadcast;
 #endif
-        //  Bind must succeed; we treat failure here as a hard violation (assert)
+        //  If bind fails, we close the socket for opening again later (next poll interval)
         if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (inaddr_t)))
-            zsys_socket_error ("bind");
+        {
+            zsys_debug ("zbeacon: Unable to bind to broadcast address, reason=%s", strerror (errno));
+            zsys_udp_close (self->udpsock);
+            self->udpsock = INVALID_SOCKET;
+            return;
+        }
 
         //  Get our hostname so we can send it back to the API
         if (getnameinfo ((struct sockaddr *) &address, sizeof (inaddr_t),
@@ -285,7 +290,7 @@ zbeacon (zsock_t *pipe, void *args)
             if (timeout < 0)
                 timeout = 0;
         }
-        int pollset_size = self->udpsock? 2: 1;
+        int pollset_size = (self->udpsock && self->udpsock != INVALID_SOCKET) ? 2: 1;
         if (zmq_poll (pollitems, pollset_size, timeout * ZMQ_POLL_MSEC) == -1)
             break;              //  Interrupted
 
@@ -297,9 +302,14 @@ zbeacon (zsock_t *pipe, void *args)
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
-            if (zsys_udp_send (self->udpsock, self->transmit, &self->broadcast, sizeof (inaddr_t)))
+            if (!self->udpsock || self->udpsock == INVALID_SOCKET ||
+                zsys_udp_send (self->udpsock, self->transmit, &self->broadcast, sizeof(inaddr_t)))
+            {
+                const char *reason = (!self->udpsock || self->udpsock == INVALID_SOCKET) ? "invalid socket" : strerror (errno);
+                zsys_debug ("zbeacon: failed to transmit, attempting reconnection. reason=%s", reason);
                 //  Try to recreate UDP socket on interface
                 s_self_prepare_udp (self);
+            }
             self->ping_at = zclock_mono () + self->interval;
         }
     }
