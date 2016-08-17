@@ -959,6 +959,8 @@ zsys_socket_error (const char *reason)
         case WSAECONNABORTED: errno = EPIPE;      break;
         case WSAESHUTDOWN:    errno = ECONNRESET; break;
         case WSAEINVAL:       errno = EPIPE;      break;
+        case WSAEADDRNOTAVAIL: errno = EADDRNOTAVAIL; break;
+        case WSAEADDRINUSE:   errno = EADDRINUSE; break;
         default:              errno = GetLastError ();
     }
 #endif
