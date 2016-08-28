@@ -18,7 +18,7 @@ dist_man_MANS = $(MAN_DOC)
 endif
 
 if BUILD_DOC
-MAINTAINERCLEANFILES = $(MAN_DOC)
+DISTCLEANFILES = $(MAN_DOC)
 
 dist-hook : $(MAN_DOC)
 

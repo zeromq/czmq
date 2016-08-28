@@ -1,6 +1,27 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
+DRAFTS=no
+
+# OBS build: add
+#   Macros:
+#   %_with_drafts 1
+# at the BOTTOM of the OBS prjconf
+OBS_BUILD_CFG=/.build/build.dist
+ifeq ("$(wildcard $(OBS_BUILD_CFG))","")
+BUILDCONFIG=$(shell ls -1 /usr/src/packages/SOURCES/_buildconfig* | head -n 1)
+endif
+ifneq ("$(wildcard $(OBS_BUILD_CFG))","")
+ifneq ("$(shell grep drafts $(OBS_BUILD_CFG))","")
+DRAFTS=yes
+endif
+endif
+
+# User build: DEB_BUILD_OPTIONS=drafts dpkg-buildpackage
+ifneq (,$(findstring drafts,$(DEB_BUILD_OPTIONS)))
+DRAFTS=yes
+endif
+
 override_dh_strip:
 	dh_strip --dbg-package=czmq-dbg
 
@@ -8,8 +29,9 @@ override_dh_auto_test:
 	echo "Skipped for now"
 
 override_dh_auto_configure:
-	dh_auto_configure -- --with-systemd-units
+	dh_auto_configure -- \
+		--enable-drafts=$(DRAFTS)
 
 %:
-	dh $@ --with autoreconf,systemd
-
+	dh $@ \
+		--with autoreconf
