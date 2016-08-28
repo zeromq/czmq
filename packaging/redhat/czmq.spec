@@ -10,6 +10,16 @@
 #    file, You can obtain one at http://mozilla.org/MPL/2.0/.           
 #
 
+# To build with draft APIs, use "--with drafts" in rpmbuild for local builds or add
+#   Macros:
+#   %_with_drafts 1
+# at the BOTTOM of the OBS prjconf
+%bcond_with drafts
+%if %{with drafts}
+%define DRAFTS yes
+%else
+%define DRAFTS no
+%endif
 Name:           czmq
 Version:        3.0.3
 Release:        1
@@ -27,7 +37,6 @@ BuildRequires:  automake
 BuildRequires:  autoconf
 BuildRequires:  libtool
 BuildRequires:  pkgconfig
-BuildRequires:  systemd-devel
 BuildRequires:  xmlto
 BuildRequires:  zeromq-devel
 BuildRequires:  uuid-devel
@@ -79,7 +88,7 @@ This package contains development files.
 
 %build
 sh autogen.sh
-%{configure} --with-systemd-units
+%{configure} --enable-drafts=%{DRAFTS}
 make %{_smp_mflags}
 
 %install
