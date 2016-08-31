@@ -125,7 +125,7 @@ CZMQ_EXPORT const char *
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.            
 CZMQ_EXPORT void
-    zhash_comment (zhash_t *self, const char *format, ...);
+    zhash_comment (zhash_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Serialize hash table to a binary frame that can be sent in a message.
 //  The packed format is compatible with the 'dictionary' type defined in
@@ -185,9 +185,6 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zhash_test (bool verbose);
 
-//  @ignore
-CZMQ_EXPORT void
-    zhash_comment (zhash_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
 

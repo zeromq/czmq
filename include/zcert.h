@@ -61,7 +61,7 @@ CZMQ_EXPORT const char *
 
 //  Set certificate metadata from formatted string.
 CZMQ_EXPORT void
-    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...);
+    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
 
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.                                              
@@ -123,9 +123,6 @@ CZMQ_EXPORT void
     zcert_unset_meta (zcert_t *self, const char *name);
 
 #endif // CZMQ_BUILD_DRAFT_API
-//  @ignore
-CZMQ_EXPORT void
-    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
 //  @end
 
 

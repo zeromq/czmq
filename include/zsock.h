@@ -115,7 +115,7 @@ CZMQ_EXPORT void
 //  clients being aware. Protocols that run on ephemeral ports should take  
 //  this into account.                                                      
 CZMQ_EXPORT int
-    zsock_bind (zsock_t *self, const char *format, ...);
+    zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Returns last bound endpoint, if any.
 CZMQ_EXPORT const char *
@@ -125,18 +125,18 @@ CZMQ_EXPORT const char *
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.                                               
 CZMQ_EXPORT int
-    zsock_unbind (zsock_t *self, const char *format, ...);
+    zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Connect a socket to a formatted endpoint        
 //  Returns 0 if OK, -1 if the endpoint was invalid.
 CZMQ_EXPORT int
-    zsock_connect (zsock_t *self, const char *format, ...);
+    zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Disconnect a socket from a formatted endpoint                  
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.                                               
 CZMQ_EXPORT int
-    zsock_disconnect (zsock_t *self, const char *format, ...);
+    zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Attach a socket to zero or more endpoints. If endpoints is not null,     
 //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by 
@@ -821,15 +821,6 @@ CZMQ_EXPORT void
     zsock_set_use_fd (void *self, int use_fd);
 
 #endif // CZMQ_BUILD_DRAFT_API
-//  @ignore
-CZMQ_EXPORT int
-    zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
-CZMQ_EXPORT int
-    zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
-CZMQ_EXPORT int
-    zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
-CZMQ_EXPORT int
-    zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
 

@@ -58,13 +58,13 @@ CZMQ_EXPORT int
 //  user-supplied strings in the format (they may contain '%' which  
 //  will create security holes).                                     
 CZMQ_EXPORT int
-    zstr_sendf (void *dest, const char *format, ...);
+    zstr_sendf (void *dest, const char *format, ...) CHECK_PRINTF (2);
 
 //  Send a formatted string to a socket, as for zstr_sendf(), with a      
 //  MORE flag, so that you can send further strings in the same multi-part
 //  message.                                                              
 CZMQ_EXPORT int
-    zstr_sendfm (void *dest, const char *format, ...);
+    zstr_sendfm (void *dest, const char *format, ...) CHECK_PRINTF (2);
 
 //  Send a series of strings (until NULL) as multipart data   
 //  Returns 0 if the strings could be sent OK, or -1 on error.
@@ -89,11 +89,6 @@ CZMQ_EXPORT char *
     zstr_str (void *source);
 
 #endif // CZMQ_BUILD_DRAFT_API
-//  @ignore
-CZMQ_EXPORT int
-    zstr_sendf (void *dest, const char *format, ...) CHECK_PRINTF (2);
-CZMQ_EXPORT int
-    zstr_sendfm (void *dest, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
 

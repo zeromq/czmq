@@ -123,12 +123,12 @@ CZMQ_EXPORT int
 //  Push formatted string as new frame to front of message.
 //  Returns 0 on success, -1 on error.                     
 CZMQ_EXPORT int
-    zmsg_pushstrf (zmsg_t *self, const char *format, ...);
+    zmsg_pushstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Push formatted string as new frame to end of message.
 //  Returns 0 on success, -1 on error.                   
 CZMQ_EXPORT int
-    zmsg_addstrf (zmsg_t *self, const char *format, ...);
+    zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Pop frame off front of message, return as fresh string. If there were
 //  no more frames in the message, returns NULL.                         
@@ -226,11 +226,6 @@ CZMQ_EXPORT void
     zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
 
 #endif // CZMQ_BUILD_DRAFT_API
-//  @ignore
-CZMQ_EXPORT int
-    zmsg_pushstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
-CZMQ_EXPORT int
-    zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
 //  @end
 
 
