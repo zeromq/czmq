@@ -91,6 +91,9 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
 }
 #endif
 
+#ifndef WIN32
+static pthread_mutex_t s_readdir_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 //  --------------------------------------------------------------------------
 //  Create a new directory item that loads in the full tree of the specified
@@ -175,22 +178,22 @@ zdir_new (const char *path, const char *parent)
 
     DIR *handle = opendir (self->path);
     if (handle) {
-        //  Calculate system-specific size of dirent block
-        int dirent_size = offsetof (struct dirent, d_name)
-                          + pathconf (self->path, _PC_NAME_MAX) + 1;
-        struct dirent *entry = (struct dirent *) zmalloc (dirent_size);
-        if (!entry) {
-            zdir_destroy (&self);
-            return NULL;
-        }
-        struct dirent *result;
-
-        int rc = readdir_r (handle, entry, &result);
-        while (rc == 0 && result != NULL) {
+        // readdir_r is deprecated in glibc 2.24, but readdir is still not
+        // guaranteed to be thread safe if the same directory is accessed
+        // by different threads at the same time. Unfortunately given it was
+        // not a constraint before we cannot change it now as it would be an
+        // API breakage. Use a global lock when scanning the directory to
+        // work around it.
+        pthread_mutex_lock (&s_readdir_mutex);
+        struct dirent *entry = readdir (handle);
+        pthread_mutex_unlock (&s_readdir_mutex);
+        while (entry != NULL) {
+            // Beware of recursion. Lock only around readdir calls.
             s_posix_populate_entry (self, entry);
-            rc = readdir_r (handle, entry, &result);
+            pthread_mutex_lock (&s_readdir_mutex);
+            entry = readdir (handle);
+            pthread_mutex_unlock (&s_readdir_mutex);
         }
-        free (entry);
         closedir (handle);
     }
 #endif
