@@ -130,27 +130,27 @@ CZMQ_EXPORT void
 //  *** Draft method, for development use, may change without warning ***
 //  Log error condition - highest priority
 CZMQ_EXPORT void
-    zproc_log_error (const char *format, ...);
+    zproc_log_error (const char *format, ...) CHECK_PRINTF (1);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Log warning condition - high priority
 CZMQ_EXPORT void
-    zproc_log_warning (const char *format, ...);
+    zproc_log_warning (const char *format, ...) CHECK_PRINTF (1);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Log normal, but significant, condition - normal priority
 CZMQ_EXPORT void
-    zproc_log_notice (const char *format, ...);
+    zproc_log_notice (const char *format, ...) CHECK_PRINTF (1);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Log informational message - low priority
 CZMQ_EXPORT void
-    zproc_log_info (const char *format, ...);
+    zproc_log_info (const char *format, ...) CHECK_PRINTF (1);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Log debug-level message - lowest priority
 CZMQ_EXPORT void
-    zproc_log_debug (const char *format, ...);
+    zproc_log_debug (const char *format, ...) CHECK_PRINTF (1);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.
@@ -158,17 +158,6 @@ CZMQ_EXPORT void
     zproc_test (bool verbose);
 
 #endif // CZMQ_BUILD_DRAFT_API
-//  @ignore
-CZMQ_EXPORT void
-    zproc_log_error (const char *format, ...) CHECK_PRINTF (1);
-CZMQ_EXPORT void
-    zproc_log_warning (const char *format, ...) CHECK_PRINTF (1);
-CZMQ_EXPORT void
-    zproc_log_notice (const char *format, ...) CHECK_PRINTF (1);
-CZMQ_EXPORT void
-    zproc_log_info (const char *format, ...) CHECK_PRINTF (1);
-CZMQ_EXPORT void
-    zproc_log_debug (const char *format, ...) CHECK_PRINTF (1);
 //  @end
 
 
