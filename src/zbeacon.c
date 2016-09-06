@@ -93,11 +93,13 @@ s_self_prepare_udp (self_t *self)
     const char *iface = zsys_interface ();
     in_addr_t bind_to = 0;
     in_addr_t send_to = 0;
+    int found_iface = 0;
 
     if (streq (iface, "*")) {
         //  Wildcard means bind to INADDR_ANY and send to INADDR_BROADCAST
         bind_to = INADDR_ANY;
         send_to = INADDR_BROADCAST;
+        found_iface = 1;
     }
     else {
         //  Look for matching interface, or first ziflist item
@@ -113,13 +115,14 @@ s_self_prepare_udp (self_t *self)
                 if (self->verbose)
                     zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
                                name, ziflist_address (iflist), ziflist_broadcast (iflist));
+                found_iface = 1;
                 break;      //  iface is known, so allow it
             }
             name = ziflist_next (iflist);
         }
         ziflist_destroy (&iflist);
     }
-    if (bind_to) {
+    if (found_iface) {
         self->broadcast.sin_family = AF_INET;
         self->broadcast.sin_port = htons (self->port_nbr);
         self->broadcast.sin_addr.s_addr = send_to;
