@@ -147,8 +147,13 @@ s_self_prepare_udp (self_t *self)
         }
 
         //  Get our hostname so we can send it back to the API
-        if (getnameinfo ((struct sockaddr *) &address, sizeof (inaddr_t),
-                          self->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {
+        if (address.sin_addr.s_addr == INADDR_ANY) {
+            strcpy(self->hostname, "*");
+            if (self->verbose)
+                zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
+        }
+        else if (getnameinfo ((struct sockaddr *) &address, sizeof (inaddr_t),
+                              self->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {
             if (self->verbose)
                 zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
         }
