@@ -8,7 +8,7 @@ CC=gcc
 PREFIX=c:/mingw/msys/1.0/local
 INCDIR=-I$(PREFIX)/include -I.
 LIBDIR=-L$(PREFIX)/lib
-CFLAGS=-Wall -Os -g -DLIBCZMQ_EXPORTS $(INCDIR)
+CFLAGS=-Wall -Os -g -DCZMQ_EXPORTS $(INCDIR)
 
 OBJS = zactor.o zarmour.o zcert.o zcertstore.o zchunk.o zclock.o zconfig.o zdigest.o zdir.o zdir_patch.o zfile.o zframe.o zhash.o zhashx.o ziflist.o zlist.o zlistx.o zloop.o zmsg.o zpoller.o zproc.o zsock.o zstr.o ztimerset.o ztrie.o zuuid.o zauth.o zbeacon.o zgossip.o zmonitor.o zproxy.o zrex.o zsys.o zgossip_msg.o zauth_v2.o zbeacon_v2.o zctx.o zmonitor_v2.o zmutex.o zproxy_v2.o zsocket.o zsockopt.o zthread.o
 %.o: ../../src/%.c

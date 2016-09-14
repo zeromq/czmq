@@ -244,7 +244,7 @@ if (NOT DEFINED BUILD_SHARED_LIBS)
 endif()
 add_library(czmq ${czmq_sources})
 set_target_properties(czmq
-    PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS"
+    PROPERTIES DEFINE_SYMBOL "CZMQ_EXPORTS"
 )
 set_target_properties(czmq
     PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
