@@ -535,8 +535,10 @@ typedef struct {
 #   if (!defined (__cplusplus) && (!defined (inline)))
 #       define inline __inline
 #   endif
-#   define strtoull _strtoui64
-#   define atoll _atoi64
+#   if (!defined (__MINGW32__))
+#     define strtoull _strtoui64
+#     define atoll _atoi64
+#   endif
 #   define srandom srand
 #   define TIMEZONE _timezone
 #   if (!defined (__MINGW32__))
