@@ -3391,7 +3391,7 @@ module CZMQ
 
       # Get socket option `fd`.
       #
-      # @return [::FFI::Pointer]
+      # @return [Integer or FFI::Pointer]
       def fd()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -3405,7 +3405,7 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @return [::FFI::Pointer]
+      # @return [Integer or FFI::Pointer]
       def self.fd(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_fd(self_p)
