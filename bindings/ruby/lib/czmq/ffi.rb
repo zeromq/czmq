@@ -22,8 +22,10 @@ module CZMQ
 
     begin
       lib_name = 'libczmq'
-      lib_paths = ['/usr/local/lib', '/opt/local/lib', '/usr/lib64']
-        .map { |path| "#{path}/#{lib_name}.#{::FFI::Platform::LIBSUFFIX}" }
+      lib_dirs = ['/usr/local/lib', '/opt/local/lib', '/usr/lib64']
+      env_path = ENV["#{lib_name.upcase}_PATH"]
+      lib_dirs = [*env_path.split(':'), *lib_dirs] if env_path
+      lib_paths = lib_dirs.map { |path| "#{path}/#{lib_name}.#{::FFI::Platform::LIBSUFFIX}" }
       ffi_lib lib_paths + [lib_name]
       @available = true
     rescue LoadError
