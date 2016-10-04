@@ -9,6 +9,14 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
+
+  "Tell them I was a writer.
+   A maker of software.
+   A humanist. A father.
+   And many things.
+   But above all, a writer.
+   Thank You. :)
+   - Pieter Hintjens
 */
 
 #ifndef __CZMQ_H_INCLUDED__
