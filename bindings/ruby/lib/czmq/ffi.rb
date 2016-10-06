@@ -23,8 +23,8 @@ module CZMQ
     begin
       lib_name = 'libczmq'
       lib_dirs = ['/usr/local/lib', '/opt/local/lib', '/usr/lib64']
-      env_path = ENV["#{lib_name.upcase}_PATH"]
-      lib_dirs = [*env_path.split(':'), *lib_dirs] if env_path
+      env_name = "#{lib_name.upcase}_PATH"
+      lib_dirs = [*ENV[env_name].split(':'), *lib_dirs] if ENV[env_name]
       lib_paths = lib_dirs.map { |path| "#{path}/#{lib_name}.#{::FFI::Platform::LIBSUFFIX}" }
       ffi_lib lib_paths + [lib_name]
       @available = true

@@ -70,6 +70,9 @@ else
     AM_CONDITIONAL(WITH_GCOV, false)
 fi
 
+# Will be used to add flags to pkg-config useful when apps want to statically link
+PKGCFG_LIBS_PRIVATE=""
+
 PREVIOUS_CFLAGS="${CFLAGS}"
 PREVIOUS_LIBS="${LIBS}"
 
@@ -78,6 +81,7 @@ was_libzmq_check_lib_detected=no
 
 PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
     [
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libzmq_LIBS"
     ],
     [
         AC_ARG_WITH([libzmq],
@@ -110,6 +114,7 @@ PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
                 AC_SUBST([libzmq_CFLAGS],[${libzmq_synthetic_cflags}])
                 AC_SUBST([libzmq_LIBS],[${libzmq_synthetic_libs}])
                 was_libzmq_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lzmq"
             ],
             [AC_MSG_ERROR([cannot link with -lzmq, install libzmq])])
     ])
@@ -124,6 +129,7 @@ was_uuid_check_lib_detected=no
 PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
     [
         AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $uuid_LIBS"
     ],
     [
         AC_ARG_WITH([uuid],
@@ -156,6 +162,7 @@ PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
                 AC_SUBST([uuid_CFLAGS],[${uuid_synthetic_cflags}])
                 AC_SUBST([uuid_LIBS],[${uuid_synthetic_libs}])
                 was_uuid_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -luuid"
                 AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
             ],
             [])
@@ -171,6 +178,7 @@ was_systemd_check_lib_detected=no
 PKG_CHECK_MODULES([systemd], [libsystemd >= 200.0.0],
     [
         AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The libsystemd library is to be used])
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $systemd_LIBS"
     ],
     [
         AC_MSG_WARN([Cannot find libsystemd 200.0.0 or higher])
@@ -183,6 +191,8 @@ fi
 
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
+
+AC_SUBST(pkg_config_libs_private, $PKGCFG_LIBS_PRIVATE)
 
 # Platform specific checks
 czmq_on_mingw32="no"
