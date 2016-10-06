@@ -206,6 +206,9 @@ zlist_append (zlist_t *self, void *item)
 int
 zlist_push (zlist_t *self, void *item)
 {
+    if (!item)
+        return -1;
+
     node_t *node = (node_t *) zmalloc (sizeof (node_t));
     assert (node);
 
