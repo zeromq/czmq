@@ -28,6 +28,19 @@ The first time you install a library onto the Raspberry Pi you'll need to run
 
     sudo ldconfig
 
+During development running the build script with all dependencies just to test
+a minor change is overkill. To run an incremental build use the option
+`-i|--incremental` which will only build this project.
+
+    ./build.sh --incremental
+
+Once in a while you might want to update the dependencies. You can do this by
+adding the option `-u|--update`.
+
+    ./build.sh --update
+
+Note that incremental and update are exclusiv options.
+
 ## Cross compile and install to Raspbian image
 
 This requires sudo access rights on your local maschine. Also make sure
