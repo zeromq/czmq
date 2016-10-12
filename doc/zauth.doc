@@ -39,7 +39,7 @@ This is the class interface:
     //  these addresses will be accepted. For PLAIN and CURVE, they will be
     //  allowed to continue with authentication. You can call this method
     //  multiple times to whitelist more IP addresses. If you whitelist one
-    //  or nmore addresses, any non-whitelisted addresses are treated as
+    //  or more addresses, any non-whitelisted addresses are treated as
     //  blacklisted:
     //  
     //      zstr_sendx (auth, "ALLOW", "127.0.0.1", "127.0.0.2", NULL);
