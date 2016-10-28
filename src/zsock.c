@@ -899,7 +899,12 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
         }
         picture++;
     }
-    return zmsg_send (&msg, self);
+
+    int rc = zmsg_send (&msg, self);
+    if (rc != 0)
+        zmsg_destroy (&msg);
+
+    return rc;
 }
 
 
