@@ -2,7 +2,7 @@
 .#  language. See https://github.com/imatix/gsl for details. This script 
 .#  is licensed under MIT/X11.
 .#
-.output "../api/zsock_option.xml"
+.output "../api/zsock_option.api"
 <!--
 ******************************************************************
 *   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
