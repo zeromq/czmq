@@ -84,7 +84,7 @@ static size_t s_open_sockets = 0;
 //  We keep a list of open sockets to report leaks to developers
 static zlist_t *s_sockref_list = NULL;
 
-//  This defines a single zsocket_new() caller instance
+//  This defines a single zsock_new() caller instance
 typedef struct {
     void *handle;
     int type;
@@ -291,10 +291,14 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
         //  Configure socket with process defaults
         zsock_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
-        //  For ZeroMQ/2.x we use sndhwm for both send and receive
-        //  Use the deprecated zsockopt API as the current zsock_option
-        //  API does not support ZeroMQ/2.x
-        zsocket_set_hwm (handle, s_sndhwm);
+        // TODO: v2/v3 socket api in zsock_option.inc are not public (not
+        // added to include/zsock.h) so we have to use zmq_setsockopt directly
+        // This should be fixed and zsock_set_hwm should be used instead
+#       if defined (ZMQ_HWM)
+        uint64_t value = s_sndhwm;
+        int rc = zmq_setsockopt (handle, ZMQ_HWM, &value, sizeof (uint64_t));
+        assert (rc == 0 || zmq_errno () == ETERM);
+#       endif
 #else
         //  For later versions we use separate SNDHWM and RCVHWM
         zsock_set_sndhwm (handle, (int) s_sndhwm);
@@ -401,10 +405,19 @@ zsys_create_pipe (zsock_t **backend_p)
     assert (backend);
 
 #if (ZMQ_VERSION_MAJOR == 2)
-    //  Use the deprecated zsockopt API as the current zsock_option
-    //  API does not support ZeroMQ/2.x
-    zsocket_set_hwm (zsock_resolve (frontend), zsys_pipehwm ());
-    zsocket_set_hwm (zsock_resolve (backend), zsys_pipehwm ());
+    // TODO: v2/v3 socket api in zsock_option.inc are not public (not
+    // added to include/zsock.h) so we have to use zmq_setsockopt directly
+    // This should be fixed and zsock_set_hwm should be used instead
+#   if defined (ZMQ_HWM)
+    uint64_t value = zsys_pipehwm ();
+    int ret = zmq_setsockopt (zsock_resolve (frontend), ZMQ_HWM, &value,
+        sizeof (uint64_t));
+    assert (ret == 0 || zmq_errno () == ETERM);
+    value = zsys_pipehwm ();
+    ret = zmq_setsockopt (zsock_resolve (backend), ZMQ_HWM, &value,
+        sizeof (uint64_t));
+    assert (ret == 0 || zmq_errno () == ETERM);
+#   endif
 #else
     zsock_set_sndhwm (frontend, (int) zsys_pipehwm ());
     zsock_set_sndhwm (backend, (int) zsys_pipehwm ());

@@ -531,7 +531,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
     if (zrex_eq (rex, endpoint, "^tcp://.*:(\\d+)$")) {
         assert (zrex_hits (rex) == 2);
         int port = atoi (zrex_hit (rex, 1));
-#if defined (HAVE_LIBSYSTEMD)
+#if defined (HAVE_LIBSYSTEMD) && (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 2, 0))
         if (zsys_auto_use_fd ()) {
             int last_handle = SD_LISTEN_FDS_START + sd_listen_fds (0);
             int handle;
@@ -580,7 +580,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
         }
     }
     else {
-#if defined (HAVE_LIBSYSTEMD)
+#if defined (HAVE_LIBSYSTEMD) && (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 2, 0))
         if (zsys_auto_use_fd () && zrex_eq (rex, endpoint, "^ipc://(.*)$")) {
             assert (zrex_hits (rex) == 2);
             const char *sock_path;
