@@ -84,7 +84,7 @@ static size_t s_open_sockets = 0;
 //  We keep a list of open sockets to report leaks to developers
 static zlist_t *s_sockref_list = NULL;
 
-//  This defines a single zsocket_new() caller instance
+//  This defines a single zsock_new() caller instance
 typedef struct {
     void *handle;
     int type;
