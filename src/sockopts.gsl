@@ -33,5 +33,4 @@ for version
     endfor
 endfor
 .endtemplate
-.gsl from "zsockopt.gsl"
 .gsl from "zsock_option.gsl"

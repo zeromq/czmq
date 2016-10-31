@@ -59,15 +59,6 @@ all_tests [] = {
     { "zrex", zrex_test },
     { "zsys", zsys_test },
     { "zgossip_msg", zgossip_msg_test },
-    { "zauth_v2", zauth_v2_test },
-    { "zbeacon_v2", zbeacon_v2_test },
-    { "zctx", zctx_test },
-    { "zmonitor_v2", zmonitor_v2_test },
-    { "zmutex", zmutex_test },
-    { "zproxy_v2", zproxy_v2_test },
-    { "zsocket", zsocket_test },
-    { "zsockopt", zsockopt_test },
-    { "zthread", zthread_test },
 #ifdef CZMQ_BUILD_DRAFT_API
     { "zproc", zproc_test },
     { "ztimerset", ztimerset_test },
@@ -130,7 +121,7 @@ main (int argc, char **argv)
         else
         if (streq (argv [argn], "--number")
         ||  streq (argv [argn], "-n")) {
-            puts ("43");
+            puts ("34");
             return 0;
         }
         else
@@ -171,15 +162,6 @@ main (int argc, char **argv)
             puts ("    zrex");
             puts ("    zsys");
             puts ("    zgossip_msg");
-            puts ("    zauth_v2");
-            puts ("    zbeacon_v2");
-            puts ("    zctx");
-            puts ("    zmonitor_v2");
-            puts ("    zmutex");
-            puts ("    zproxy_v2");
-            puts ("    zsocket");
-            puts ("    zsockopt");
-            puts ("    zthread");
             return 0;
         }
         else

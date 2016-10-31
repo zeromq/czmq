@@ -3,7 +3,7 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 MAN1 = zmakecert.1
-MAN3 = zactor.3 zarmour.3 zcert.3 zcertstore.3 zchunk.3 zclock.3 zconfig.3 zdigest.3 zdir.3 zdir_patch.3 zfile.3 zframe.3 zhash.3 zhashx.3 ziflist.3 zlist.3 zlistx.3 zloop.3 zmsg.3 zpoller.3 zproc.3 zsock.3 zstr.3 ztimerset.3 ztrie.3 zuuid.3 zauth.3 zbeacon.3 zgossip.3 zmonitor.3 zproxy.3 zrex.3 zsys.3 zauth_v2.3 zbeacon_v2.3 zctx.3 zmonitor_v2.3 zmutex.3 zproxy_v2.3 zsocket.3 zsockopt.3 zthread.3
+MAN3 = zactor.3 zarmour.3 zcert.3 zcertstore.3 zchunk.3 zclock.3 zconfig.3 zdigest.3 zdir.3 zdir_patch.3 zfile.3 zframe.3 zhash.3 zhashx.3 ziflist.3 zlist.3 zlistx.3 zloop.3 zmsg.3 zpoller.3 zproc.3 zsock.3 zstr.3 ztimerset.3 ztrie.3 zuuid.3 zauth.3 zbeacon.3 zgossip.3 zmonitor.3 zproxy.3 zrex.3 zsys.3
 MAN7 = czmq.7
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
 
@@ -100,24 +100,6 @@ zrex.txt:
 	./mkman $@
 zsys.txt:
 	./mkman $@
-zauth_v2.txt:
-	./mkman $@
-zbeacon_v2.txt:
-	./mkman $@
-zctx.txt:
-	./mkman $@
-zmonitor_v2.txt:
-	./mkman $@
-zmutex.txt:
-	./mkman $@
-zproxy_v2.txt:
-	./mkman $@
-zsocket.txt:
-	./mkman $@
-zsockopt.txt:
-	./mkman $@
-zthread.txt:
-	./mkman $@
 zmakecert.txt:
 	./mkman zmakecert $@
 clean:
@@ -155,15 +137,6 @@ clean:
 	./mkman zproxy
 	./mkman zrex
 	./mkman zsys
-	./mkman zauth_v2
-	./mkman zbeacon_v2
-	./mkman zctx
-	./mkman zmonitor_v2
-	./mkman zmutex
-	./mkman zproxy_v2
-	./mkman zsocket
-	./mkman zsockopt
-	./mkman zthread
 	./mkman zmakecert zmakecert
 
 endif
