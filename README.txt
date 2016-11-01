@@ -249,19 +249,6 @@ This is the API provided by CZMQ v3.x, in alphabetical order.
 .pull doc/ztrie.doc
 .pull doc/zuuid.doc
 
-### API v2 Summary
-
-This is the deprecated API provided by CZMQ v2.x, in alphabetical order.
-
-.pull doc/zauth_v2.doc
-.pull doc/zctx.doc
-.pull doc/zmonitor_v2.doc
-.pull doc/zmutex.doc
-.pull doc/zproxy_v2.doc
-.pull doc/zsocket.doc
-.pull doc/zsockopt.doc
-.pull doc/zthread.doc
-
 ## Error Handling
 
 The CZMQ policy is to reduce the error flow to 0/-1 where possible. libzmq still does a lot of errno setting. CZMQ does not do that, as it creates a fuzzy API. Things either work as expected, or they fail, and the application's best strategy is usually to assert on non-zero return codes.

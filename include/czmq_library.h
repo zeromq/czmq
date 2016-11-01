@@ -115,24 +115,6 @@ typedef struct _zrex_t zrex_t;
 #define ZREX_T_DEFINED
 typedef struct _zsys_t zsys_t;
 #define ZSYS_T_DEFINED
-typedef struct _zauth_v2_t zauth_v2_t;
-#define ZAUTH_V2_T_DEFINED
-typedef struct _zbeacon_v2_t zbeacon_v2_t;
-#define ZBEACON_V2_T_DEFINED
-typedef struct _zctx_t zctx_t;
-#define ZCTX_T_DEFINED
-typedef struct _zmonitor_v2_t zmonitor_v2_t;
-#define ZMONITOR_V2_T_DEFINED
-typedef struct _zmutex_t zmutex_t;
-#define ZMUTEX_T_DEFINED
-typedef struct _zproxy_v2_t zproxy_v2_t;
-#define ZPROXY_V2_T_DEFINED
-typedef struct _zsocket_t zsocket_t;
-#define ZSOCKET_T_DEFINED
-typedef struct _zsockopt_t zsockopt_t;
-#define ZSOCKOPT_T_DEFINED
-typedef struct _zthread_t zthread_t;
-#define ZTHREAD_T_DEFINED
 //  Draft classes are by default not built in stable releases
 #ifdef CZMQ_BUILD_DRAFT_API
 typedef struct _zproc_t zproc_t;
@@ -175,15 +157,6 @@ typedef struct _ztrie_t ztrie_t;
 #include "zproxy.h"
 #include "zrex.h"
 #include "zsys.h"
-#include "zauth_v2.h"
-#include "zbeacon_v2.h"
-#include "zctx.h"
-#include "zmonitor_v2.h"
-#include "zmutex.h"
-#include "zproxy_v2.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zthread.h"
 #ifdef CZMQ_BUILD_DRAFT_API
 #include "zproc.h"
 #include "ztimerset.h"

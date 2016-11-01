@@ -163,15 +163,6 @@ set (czmq_headers
     include/zproxy.h
     include/zrex.h
     include/zsys.h
-    include/zauth_v2.h
-    include/zbeacon_v2.h
-    include/zctx.h
-    include/zmonitor_v2.h
-    include/zmutex.h
-    include/zproxy_v2.h
-    include/zsocket.h
-    include/zsockopt.h
-    include/zthread.h
     src/zgossip_msg.h
     src/zsock_option.inc
     src/zgossip_engine.inc
@@ -230,15 +221,6 @@ set (czmq_sources
     src/zrex.c
     src/zsys.c
     src/zgossip_msg.c
-    src/zauth_v2.c
-    src/zbeacon_v2.c
-    src/zctx.c
-    src/zmonitor_v2.c
-    src/zmutex.c
-    src/zproxy_v2.c
-    src/zsocket.c
-    src/zsockopt.c
-    src/zthread.c
 )
 
 IF (ENABLE_DRAFTS)
@@ -372,15 +354,6 @@ set(TEST_CLASSES
     zrex
     zsys
     zgossip_msg
-    zauth_v2
-    zbeacon_v2
-    zctx
-    zmonitor_v2
-    zmutex
-    zproxy_v2
-    zsocket
-    zsockopt
-    zthread
 )
 
 IF (ENABLE_DRAFTS)

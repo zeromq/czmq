@@ -499,6 +499,8 @@ echo "                           (requires zproject and zproto)"
 echo "    - 'make debug'         run the project's selftest under gdb"
 echo "    - 'make memcheck'      run the project's selftest with valgrind to"
 echo "                           check for memory leaks"
+echo "    - 'make coverage'      generate project's selftest coverage report"
+echo "                           expects --with-gcov option for configure"
 echo
 ])
 
