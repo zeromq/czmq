@@ -298,6 +298,42 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
+//  Get socket option `heartbeat_ivl`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_heartbeat_ivl (void *self);
+
+//  Set socket option `heartbeat_ivl`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
+
+//  Get socket option `heartbeat_ttl`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_heartbeat_ttl (void *self);
+
+//  Set socket option `heartbeat_ttl`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
+
+//  Get socket option `heartbeat_timeout`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_heartbeat_timeout (void *self);
+
+//  Set socket option `heartbeat_timeout`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
+
+//  Get socket option `use_fd`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_use_fd (void *self);
+
+//  Set socket option `use_fd`.
+CZMQ_EXPORT void
+    zsock_set_use_fd (void *self, int use_fd);
+
 //  Get socket option `tos`.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
@@ -775,50 +811,6 @@ CZMQ_EXPORT int
 //  Returns 0 if OK, -1 if failed.                                  
 CZMQ_EXPORT int
     zsock_leave (void *self, const char *group);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Get socket option `heartbeat_ivl`.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT int
-    zsock_heartbeat_ivl (void *self);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Set socket option `heartbeat_ivl`.
-CZMQ_EXPORT void
-    zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Get socket option `heartbeat_ttl`.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT int
-    zsock_heartbeat_ttl (void *self);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Set socket option `heartbeat_ttl`.
-CZMQ_EXPORT void
-    zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Get socket option `heartbeat_timeout`.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT int
-    zsock_heartbeat_timeout (void *self);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Set socket option `heartbeat_timeout`.
-CZMQ_EXPORT void
-    zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Get socket option `use_fd`.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT int
-    zsock_use_fd (void *self);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Set socket option `use_fd`.
-CZMQ_EXPORT void
-    zsock_set_use_fd (void *self, int use_fd);
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
