@@ -15,9 +15,9 @@ try:
     # load the library.  If we use find_library below, we get the wrong result.
     if os.name == 'posix':
         if sys.platform == 'darwin':
-            libpath = 'libczmq.3.dylib'
+            libpath = 'libczmq.4.dylib'
         else:
-            libpath = 'libczmq.so.3'
+            libpath = 'libczmq.so.4'
     elif os.name == 'nt':
         libpath = 'libczmq.dll'
     lib = ffi.dlopen(libpath)

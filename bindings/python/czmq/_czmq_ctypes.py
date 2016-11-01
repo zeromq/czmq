@@ -43,9 +43,9 @@ if not lib:
         # load the library.  If we use find_library below, we get the wrong result.
         if os.name == 'posix':
             if sys.platform == 'darwin':
-                lib = cdll.LoadLibrary('libczmq.3.dylib')
+                lib = cdll.LoadLibrary('libczmq.4.dylib')
             else:
-                lib = cdll.LoadLibrary("libczmq.so.3")
+                lib = cdll.LoadLibrary("libczmq.so.4")
         elif os.name == 'nt':
             lib = cdll.LoadLibrary('libczmq.dll')
     except OSError:

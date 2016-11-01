@@ -23,7 +23,7 @@ Build-Depends: debhelper (>= 9),
 Build-Depends-Indep: asciidoc,
                      xmlto
 
-Package: libczmq3
+Package: libczmq4
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: czmq
@@ -36,7 +36,7 @@ Depends:
     libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
-    libczmq3 (= ${binary:Version})
+    libczmq4 (= ${binary:Version})
 Description: development files for czmq
  This package contains development files for czmq: the high-level c binding for 0mq
 

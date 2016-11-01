@@ -21,7 +21,7 @@
 %define DRAFTS no
 %endif
 Name:           czmq
-Version:        3.0.3
+Version:        4.0.0
 Release:        1
 Summary:        the high-level c binding for 0mq
 License:        MPLv2
@@ -46,25 +46,25 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 czmq the high-level c binding for 0mq.
 
-%package -n libczmq3
+%package -n libczmq4
 Group:          System/Libraries
 Summary:        the high-level c binding for 0mq
 
-%description -n libczmq3
+%description -n libczmq4
 czmq the high-level c binding for 0mq.
 This package contains shared library.
 
-%post -n libczmq3 -p /sbin/ldconfig
-%postun -n libczmq3 -p /sbin/ldconfig
+%post -n libczmq4 -p /sbin/ldconfig
+%postun -n libczmq4 -p /sbin/ldconfig
 
-%files -n libczmq3
+%files -n libczmq4
 %defattr(-,root,root)
 %{_libdir}/libczmq.so.*
 
 %package devel
 Summary:        the high-level c binding for 0mq
 Group:          System/Libraries
-Requires:       libczmq3 = %{version}
+Requires:       libczmq4 = %{version}
 Requires:       zeromq-devel
 Requires:       uuid-devel
 Requires:       systemd-devel
