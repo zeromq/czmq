@@ -7,7 +7,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 #
-AC_INIT([czmq],[3.0.3],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[4.0.0],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -36,7 +36,7 @@ AC_SUBST(PACKAGE_VERSION)
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
 # libczmq -version-info
-LTVER="3:0:0"
+LTVER="4:0:0"
 AC_SUBST(LTVER)
 
 # Capture c flags

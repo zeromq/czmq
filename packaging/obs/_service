@@ -52,8 +52,8 @@
   </service>
   <service name="extract_file">
     <param name="archive">*.tar</param>
-    <param name="files">*/packaging/debian/libczmq3.install</param>
-    <param name="outfilename">debian.libczmq3.install</param>
+    <param name="files">*/packaging/debian/libczmq4.install</param>
+    <param name="outfilename">debian.libczmq4.install</param>
   </service>
   <service name="extract_file">
     <param name="archive">*.tar</param>
