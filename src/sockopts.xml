@@ -18,6 +18,42 @@
             test_value = "6000" />
         <option name = "use_fd"            type = "int"    mode = "rw"  test = "REQ"
             test_value = "3" />
+        <option name = "xpub_manual"       type = "int"    mode = "w"  test = "XPUB"
+            test_value = "1" >
+            <restrict type = "XPUB" />
+        </option>
+        <option name = "xpub_welcome_msg"  type = "string" mode = "w"  test = "XPUB"
+            test_value = "welcome" >
+            <restrict type = "XPUB" />
+        </option>
+        <option name = "stream_notify"     type = "int"    mode = "w"  test = "STREAM"
+            test_value = "1" >
+            <restrict type = "STREAM" />
+        </option>
+        <option name = "invert_matching"   type = "int"    mode = "rw" test = "XPUB"
+            test_value = "1" >
+            <restrict type = "XPUB" />
+            <restrict type = "PUB" />
+            <restrict type = "SUB" />
+        </option>
+        <option name = "xpub_verboser"     type = "int"    mode = "w"  test = "XPUB"
+            test_value = "1" >
+            <restrict type = "XPUB" />
+        </option>
+        <option name = "connect_timeout"   type = "int"    mode = "rw" test = "DEALER"
+            test_value = "200" />
+        <option name = "tcp_maxrt"         type = "int"    mode = "rw" test = "DEALER"
+            test_value = "200" />
+        <option name = "thread_safe"       type = "int"    mode = "r"  test = "DEALER"
+            test_value = "0" />
+        <option name = "multicast_maxtpdu" type = "int"    mode = "rw" test = "DEALER"
+            test_value = "1400" />
+
+        <!-- We don't test these as libzmq doesn't always support VMCI -->
+        <option name = "vmci_buffer_size"  type = "uint64" mode = "rw" />
+        <option name = "vmci_buffer_min_size" type = "uint64" mode = "rw" />
+        <option name = "vmci_buffer_max_size" type = "uint64" mode = "rw" />
+        <option name = "vmci_connect_timeout" type = "int" mode = "rw" />
 
         <!-- Options that are new in 4.1 -->
         <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />
