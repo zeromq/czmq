@@ -48,6 +48,111 @@
     <argument name = "use fd" type = "integer" />
 </method>
 
+<method name = "set xpub manual" polymorphic = "1">
+    Set socket option `xpub_manual`.
+    <argument name = "xpub manual" type = "integer" />
+</method>
+
+<method name = "set xpub welcome msg" polymorphic = "1">
+    Set socket option `xpub_welcome_msg`.
+    <argument name = "xpub welcome msg" type = "string" />
+</method>
+
+<method name = "set stream notify" polymorphic = "1">
+    Set socket option `stream_notify`.
+    <argument name = "stream notify" type = "integer" />
+</method>
+
+<method name = "invert matching" polymorphic = "1">
+    Get socket option `invert_matching`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set invert matching" polymorphic = "1">
+    Set socket option `invert_matching`.
+    <argument name = "invert matching" type = "integer" />
+</method>
+
+<method name = "set xpub verboser" polymorphic = "1">
+    Set socket option `xpub_verboser`.
+    <argument name = "xpub verboser" type = "integer" />
+</method>
+
+<method name = "connect timeout" polymorphic = "1">
+    Get socket option `connect_timeout`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set connect timeout" polymorphic = "1">
+    Set socket option `connect_timeout`.
+    <argument name = "connect timeout" type = "integer" />
+</method>
+
+<method name = "tcp maxrt" polymorphic = "1">
+    Get socket option `tcp_maxrt`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set tcp maxrt" polymorphic = "1">
+    Set socket option `tcp_maxrt`.
+    <argument name = "tcp maxrt" type = "integer" />
+</method>
+
+<method name = "thread safe" polymorphic = "1">
+    Get socket option `thread_safe`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "multicast maxtpdu" polymorphic = "1">
+    Get socket option `multicast_maxtpdu`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set multicast maxtpdu" polymorphic = "1">
+    Set socket option `multicast_maxtpdu`.
+    <argument name = "multicast maxtpdu" type = "integer" />
+</method>
+
+<method name = "vmci buffer size" polymorphic = "1">
+    Get socket option `vmci_buffer_size`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set vmci buffer size" polymorphic = "1">
+    Set socket option `vmci_buffer_size`.
+    <argument name = "vmci buffer size" type = "integer" />
+</method>
+
+<method name = "vmci buffer min size" polymorphic = "1">
+    Get socket option `vmci_buffer_min_size`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set vmci buffer min size" polymorphic = "1">
+    Set socket option `vmci_buffer_min_size`.
+    <argument name = "vmci buffer min size" type = "integer" />
+</method>
+
+<method name = "vmci buffer max size" polymorphic = "1">
+    Get socket option `vmci_buffer_max_size`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set vmci buffer max size" polymorphic = "1">
+    Set socket option `vmci_buffer_max_size`.
+    <argument name = "vmci buffer max size" type = "integer" />
+</method>
+
+<method name = "vmci connect timeout" polymorphic = "1">
+    Get socket option `vmci_connect_timeout`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set vmci connect timeout" polymorphic = "1">
+    Set socket option `vmci_connect_timeout`.
+    <argument name = "vmci connect timeout" type = "integer" />
+</method>
+
 <method name = "tos" polymorphic = "1">
     Get socket option `tos`.
     <return type = "integer" fresh = "1" />
@@ -61,6 +166,41 @@
 <method name = "set router handover" polymorphic = "1">
     Set socket option `router_handover`.
     <argument name = "router handover" type = "integer" />
+</method>
+
+<method name = "set connect rid" polymorphic = "1">
+    Set socket option `connect_rid`.
+    <argument name = "connect rid" type = "string" />
+</method>
+
+<method name = "set connect rid bin" polymorphic = "1">
+    Set socket option `connect_rid` from 32-octet binary
+    <argument name = "connect rid" type = "buffer" />
+</method>
+
+<method name = "handshake ivl" polymorphic = "1">
+    Get socket option `handshake_ivl`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set handshake ivl" polymorphic = "1">
+    Set socket option `handshake_ivl`.
+    <argument name = "handshake ivl" type = "integer" />
+</method>
+
+<method name = "socks proxy" polymorphic = "1">
+    Get socket option `socks_proxy`.
+    <return type = "string" fresh = "1" />
+</method>
+
+<method name = "set socks proxy" polymorphic = "1">
+    Set socket option `socks_proxy`.
+    <argument name = "socks proxy" type = "string" />
+</method>
+
+<method name = "set xpub nodrop" polymorphic = "1">
+    Set socket option `xpub_nodrop`.
+    <argument name = "xpub nodrop" type = "integer" />
 </method>
 
 <method name = "set router mandatory" polymorphic = "1">

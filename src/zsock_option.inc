@@ -153,6 +153,373 @@ zsock_use_fd (void *self)
 }
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_XPUB_MANUAL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_xpub_manual (void *self, int xpub_manual)
+{
+    assert (self);
+#   if defined (ZMQ_XPUB_MANUAL)
+    if (zsock_type (self) != ZMQ_XPUB) {
+        printf ("ZMQ_XPUB_MANUAL is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_XPUB_MANUAL, &xpub_manual, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_XPUB_WELCOME_MSG value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_xpub_welcome_msg (void *self, const char * xpub_welcome_msg)
+{
+    assert (self);
+#   if defined (ZMQ_XPUB_WELCOME_MSG)
+    if (zsock_type (self) != ZMQ_XPUB) {
+        printf ("ZMQ_XPUB_WELCOME_MSG is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_XPUB_WELCOME_MSG, xpub_welcome_msg, strlen (xpub_welcome_msg));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_STREAM_NOTIFY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_stream_notify (void *self, int stream_notify)
+{
+    assert (self);
+#   if defined (ZMQ_STREAM_NOTIFY)
+    if (zsock_type (self) != ZMQ_STREAM) {
+        printf ("ZMQ_STREAM_NOTIFY is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_STREAM_NOTIFY, &stream_notify, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_INVERT_MATCHING value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_invert_matching (void *self, int invert_matching)
+{
+    assert (self);
+#   if defined (ZMQ_INVERT_MATCHING)
+    if (zsock_type (self) != ZMQ_XPUB
+    &&  zsock_type (self) != ZMQ_PUB
+    &&  zsock_type (self) != ZMQ_SUB) {
+        printf ("ZMQ_INVERT_MATCHING is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_INVERT_MATCHING, &invert_matching, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_INVERT_MATCHING value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_invert_matching (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_INVERT_MATCHING)
+    int invert_matching;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_INVERT_MATCHING, &invert_matching, &option_len);
+    return invert_matching;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_XPUB_VERBOSER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_xpub_verboser (void *self, int xpub_verboser)
+{
+    assert (self);
+#   if defined (ZMQ_XPUB_VERBOSER)
+    if (zsock_type (self) != ZMQ_XPUB) {
+        printf ("ZMQ_XPUB_VERBOSER is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_XPUB_VERBOSER, &xpub_verboser, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_CONNECT_TIMEOUT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_connect_timeout (void *self, int connect_timeout)
+{
+    assert (self);
+#   if defined (ZMQ_CONNECT_TIMEOUT)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CONNECT_TIMEOUT, &connect_timeout, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_CONNECT_TIMEOUT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_connect_timeout (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_CONNECT_TIMEOUT)
+    int connect_timeout;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_CONNECT_TIMEOUT, &connect_timeout, &option_len);
+    return connect_timeout;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_TCP_MAXRT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_tcp_maxrt (void *self, int tcp_maxrt)
+{
+    assert (self);
+#   if defined (ZMQ_TCP_MAXRT)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_MAXRT, &tcp_maxrt, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_TCP_MAXRT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_tcp_maxrt (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_TCP_MAXRT)
+    int tcp_maxrt;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_MAXRT, &tcp_maxrt, &option_len);
+    return tcp_maxrt;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_THREAD_SAFE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_thread_safe (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_THREAD_SAFE)
+    int thread_safe;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_THREAD_SAFE, &thread_safe, &option_len);
+    return thread_safe;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_MULTICAST_MAXTPDU value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_multicast_maxtpdu (void *self, int multicast_maxtpdu)
+{
+    assert (self);
+#   if defined (ZMQ_MULTICAST_MAXTPDU)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_MULTICAST_MAXTPDU, &multicast_maxtpdu, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_MULTICAST_MAXTPDU value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_multicast_maxtpdu (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_MULTICAST_MAXTPDU)
+    int multicast_maxtpdu;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MULTICAST_MAXTPDU, &multicast_maxtpdu, &option_len);
+    return multicast_maxtpdu;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_VMCI_BUFFER_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_vmci_buffer_size (void *self, int vmci_buffer_size)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_BUFFER_SIZE)
+    uint64_t value = vmci_buffer_size;
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_VMCI_BUFFER_SIZE, &value, sizeof (uint64_t));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_VMCI_BUFFER_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_vmci_buffer_size (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_BUFFER_SIZE)
+    uint64_t vmci_buffer_size;
+    size_t option_len = sizeof (uint64_t);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_VMCI_BUFFER_SIZE, &vmci_buffer_size, &option_len);
+    return (int) vmci_buffer_size;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_VMCI_BUFFER_MIN_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_vmci_buffer_min_size (void *self, int vmci_buffer_min_size)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_BUFFER_MIN_SIZE)
+    uint64_t value = vmci_buffer_min_size;
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_VMCI_BUFFER_MIN_SIZE, &value, sizeof (uint64_t));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_VMCI_BUFFER_MIN_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_vmci_buffer_min_size (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_BUFFER_MIN_SIZE)
+    uint64_t vmci_buffer_min_size;
+    size_t option_len = sizeof (uint64_t);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_VMCI_BUFFER_MIN_SIZE, &vmci_buffer_min_size, &option_len);
+    return (int) vmci_buffer_min_size;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_VMCI_BUFFER_MAX_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_vmci_buffer_max_size (void *self, int vmci_buffer_max_size)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_BUFFER_MAX_SIZE)
+    uint64_t value = vmci_buffer_max_size;
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_VMCI_BUFFER_MAX_SIZE, &value, sizeof (uint64_t));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_VMCI_BUFFER_MAX_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_vmci_buffer_max_size (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_BUFFER_MAX_SIZE)
+    uint64_t vmci_buffer_max_size;
+    size_t option_len = sizeof (uint64_t);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_VMCI_BUFFER_MAX_SIZE, &vmci_buffer_max_size, &option_len);
+    return (int) vmci_buffer_max_size;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_VMCI_CONNECT_TIMEOUT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_vmci_connect_timeout (void *self, int vmci_connect_timeout)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_CONNECT_TIMEOUT)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_VMCI_CONNECT_TIMEOUT, &vmci_connect_timeout, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_VMCI_CONNECT_TIMEOUT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_vmci_connect_timeout (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_VMCI_CONNECT_TIMEOUT)
+    int vmci_connect_timeout;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_VMCI_CONNECT_TIMEOUT, &vmci_connect_timeout, &option_len);
+    return vmci_connect_timeout;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_TOS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -199,6 +566,126 @@ zsock_set_router_handover (void *self, int router_handover)
         assert (false);
     }
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ROUTER_HANDOVER, &router_handover, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_CONNECT_RID value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_connect_rid (void *self, const char * connect_rid)
+{
+    assert (self);
+#   if defined (ZMQ_CONNECT_RID)
+    if (zsock_type (self) != ZMQ_ROUTER
+    &&  zsock_type (self) != ZMQ_STREAM) {
+        printf ("ZMQ_CONNECT_RID is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CONNECT_RID, connect_rid, strlen (connect_rid));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_CONNECT_RID value from 32-octet binary
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_connect_rid_bin (void *self, const byte *connect_rid)
+{
+#   if defined (ZMQ_CONNECT_RID)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CONNECT_RID, connect_rid, 32);
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_HANDSHAKE_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_handshake_ivl (void *self, int handshake_ivl)
+{
+    assert (self);
+#   if defined (ZMQ_HANDSHAKE_IVL)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_HANDSHAKE_IVL, &handshake_ivl, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_HANDSHAKE_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_handshake_ivl (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_HANDSHAKE_IVL)
+    int handshake_ivl;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_HANDSHAKE_IVL, &handshake_ivl, &option_len);
+    return handshake_ivl;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_SOCKS_PROXY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_socks_proxy (void *self, const char * socks_proxy)
+{
+    assert (self);
+#   if defined (ZMQ_SOCKS_PROXY)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SOCKS_PROXY, socks_proxy, strlen (socks_proxy));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_SOCKS_PROXY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char *
+zsock_socks_proxy (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_SOCKS_PROXY)
+    size_t option_len = 255;
+    char *socks_proxy = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SOCKS_PROXY, socks_proxy, &option_len);
+    return (char *) socks_proxy;
+#   else
+    return NULL;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_XPUB_NODROP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_xpub_nodrop (void *self, int xpub_nodrop)
+{
+    assert (self);
+#   if defined (ZMQ_XPUB_NODROP)
+    if (zsock_type (self) != ZMQ_XPUB
+    &&  zsock_type (self) != ZMQ_PUB) {
+        printf ("ZMQ_XPUB_NODROP is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_XPUB_NODROP, &xpub_nodrop, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -3362,6 +3849,68 @@ zsock_option_test (bool verbose)
     zsock_use_fd (self);
     zsock_destroy (&self);
 #     endif
+#     if defined (ZMQ_XPUB_MANUAL)
+    self = zsock_new (ZMQ_XPUB);
+    assert (self);
+    zsock_set_xpub_manual (self, 1);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_XPUB_WELCOME_MSG)
+    self = zsock_new (ZMQ_XPUB);
+    assert (self);
+    zsock_set_xpub_welcome_msg (self, "welcome");
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_STREAM_NOTIFY)
+    self = zsock_new (ZMQ_STREAM);
+    assert (self);
+    zsock_set_stream_notify (self, 1);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_INVERT_MATCHING)
+    self = zsock_new (ZMQ_XPUB);
+    assert (self);
+    zsock_set_invert_matching (self, 1);
+    assert (zsock_invert_matching (self) == 1);
+    zsock_invert_matching (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_XPUB_VERBOSER)
+    self = zsock_new (ZMQ_XPUB);
+    assert (self);
+    zsock_set_xpub_verboser (self, 1);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_CONNECT_TIMEOUT)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_connect_timeout (self, 200);
+    assert (zsock_connect_timeout (self) == 200);
+    zsock_connect_timeout (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_TCP_MAXRT)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_tcp_maxrt (self, 200);
+    assert (zsock_tcp_maxrt (self) == 200);
+    zsock_tcp_maxrt (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_THREAD_SAFE)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_thread_safe (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_MULTICAST_MAXTPDU)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_multicast_maxtpdu (self, 1400);
+    assert (zsock_multicast_maxtpdu (self) == 1400);
+    zsock_multicast_maxtpdu (self);
+    zsock_destroy (&self);
+#     endif
 #     if defined (ZMQ_TOS)
     self = zsock_new (ZMQ_DEALER);
     assert (self);
@@ -3374,6 +3923,35 @@ zsock_option_test (bool verbose)
     self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_handover (self, 1);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_CONNECT_RID)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_connect_rid (self, "ABCD");
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_HANDSHAKE_IVL)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_handshake_ivl (self, 200);
+    assert (zsock_handshake_ivl (self) == 200);
+    zsock_handshake_ivl (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_SOCKS_PROXY)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_socks_proxy (self, "127.0.0.1");
+    char *socks_proxy = zsock_socks_proxy (self);
+    assert (socks_proxy);
+    free (socks_proxy);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_XPUB_NODROP)
+    self = zsock_new (ZMQ_XPUB);
+    assert (self);
+    zsock_set_xpub_nodrop (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_MANDATORY)

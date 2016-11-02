@@ -334,6 +334,99 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zsock_set_use_fd (void *self, int use_fd);
 
+//  Set socket option `xpub_manual`.
+CZMQ_EXPORT void
+    zsock_set_xpub_manual (void *self, int xpub_manual);
+
+//  Set socket option `xpub_welcome_msg`.
+CZMQ_EXPORT void
+    zsock_set_xpub_welcome_msg (void *self, const char *xpub_welcome_msg);
+
+//  Set socket option `stream_notify`.
+CZMQ_EXPORT void
+    zsock_set_stream_notify (void *self, int stream_notify);
+
+//  Get socket option `invert_matching`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_invert_matching (void *self);
+
+//  Set socket option `invert_matching`.
+CZMQ_EXPORT void
+    zsock_set_invert_matching (void *self, int invert_matching);
+
+//  Set socket option `xpub_verboser`.
+CZMQ_EXPORT void
+    zsock_set_xpub_verboser (void *self, int xpub_verboser);
+
+//  Get socket option `connect_timeout`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_connect_timeout (void *self);
+
+//  Set socket option `connect_timeout`.
+CZMQ_EXPORT void
+    zsock_set_connect_timeout (void *self, int connect_timeout);
+
+//  Get socket option `tcp_maxrt`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_tcp_maxrt (void *self);
+
+//  Set socket option `tcp_maxrt`.
+CZMQ_EXPORT void
+    zsock_set_tcp_maxrt (void *self, int tcp_maxrt);
+
+//  Get socket option `thread_safe`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_thread_safe (void *self);
+
+//  Get socket option `multicast_maxtpdu`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_multicast_maxtpdu (void *self);
+
+//  Set socket option `multicast_maxtpdu`.
+CZMQ_EXPORT void
+    zsock_set_multicast_maxtpdu (void *self, int multicast_maxtpdu);
+
+//  Get socket option `vmci_buffer_size`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_vmci_buffer_size (void *self);
+
+//  Set socket option `vmci_buffer_size`.
+CZMQ_EXPORT void
+    zsock_set_vmci_buffer_size (void *self, int vmci_buffer_size);
+
+//  Get socket option `vmci_buffer_min_size`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_vmci_buffer_min_size (void *self);
+
+//  Set socket option `vmci_buffer_min_size`.
+CZMQ_EXPORT void
+    zsock_set_vmci_buffer_min_size (void *self, int vmci_buffer_min_size);
+
+//  Get socket option `vmci_buffer_max_size`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_vmci_buffer_max_size (void *self);
+
+//  Set socket option `vmci_buffer_max_size`.
+CZMQ_EXPORT void
+    zsock_set_vmci_buffer_max_size (void *self, int vmci_buffer_max_size);
+
+//  Get socket option `vmci_connect_timeout`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_vmci_connect_timeout (void *self);
+
+//  Set socket option `vmci_connect_timeout`.
+CZMQ_EXPORT void
+    zsock_set_vmci_connect_timeout (void *self, int vmci_connect_timeout);
+
 //  Get socket option `tos`.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
@@ -346,6 +439,36 @@ CZMQ_EXPORT void
 //  Set socket option `router_handover`.
 CZMQ_EXPORT void
     zsock_set_router_handover (void *self, int router_handover);
+
+//  Set socket option `connect_rid`.
+CZMQ_EXPORT void
+    zsock_set_connect_rid (void *self, const char *connect_rid);
+
+//  Set socket option `connect_rid` from 32-octet binary
+CZMQ_EXPORT void
+    zsock_set_connect_rid_bin (void *self, const byte *connect_rid);
+
+//  Get socket option `handshake_ivl`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_handshake_ivl (void *self);
+
+//  Set socket option `handshake_ivl`.
+CZMQ_EXPORT void
+    zsock_set_handshake_ivl (void *self, int handshake_ivl);
+
+//  Get socket option `socks_proxy`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zsock_socks_proxy (void *self);
+
+//  Set socket option `socks_proxy`.
+CZMQ_EXPORT void
+    zsock_set_socks_proxy (void *self, const char *socks_proxy);
+
+//  Set socket option `xpub_nodrop`.
+CZMQ_EXPORT void
+    zsock_set_xpub_nodrop (void *self, int xpub_nodrop);
 
 //  Set socket option `router_mandatory`.
 CZMQ_EXPORT void
