@@ -203,6 +203,16 @@ Include `czmq.h` in your application and link with libczmq. Here is a typical gc
 
 ### Use from Other Languages
 
+This is a list of auto-generated bindings:
+
+* https://github.com/zeromq/czmq/tree/master/bindings/jni - Java
+* https://github.com/zeromq/czmq/tree/master/bindings/nodejs - NodeJS
+* https://github.com/zeromq/czmq/tree/master/bindings/python - Python
+* https://github.com/zeromq/czmq/tree/master/bindings/python_cffi - Python (cffi)
+* https://github.com/zeromq/czmq/tree/master/bindings/qml - QML
+* https://github.com/zeromq/czmq/tree/master/bindings/qt - Qt
+* https://github.com/zeromq/czmq/tree/master/bindings/ruby - Ruby (FFI)
+
 This is a list of known higher-level wrappers around CZMQ:
 
 * https://github.com/1100110/CZMQ - D bindings
