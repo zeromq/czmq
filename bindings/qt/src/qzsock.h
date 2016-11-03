@@ -273,6 +273,69 @@ public:
     //  Set socket option `use_fd`.
     void setUseFd (int useFd);
 
+    //  Set socket option `xpub_manual`.
+    void setXpubManual (int xpubManual);
+
+    //  Set socket option `xpub_welcome_msg`.
+    void setXpubWelcomeMsg (const QString &xpubWelcomeMsg);
+
+    //  Set socket option `stream_notify`.
+    void setStreamNotify (int streamNotify);
+
+    //  Get socket option `invert_matching`.
+    int invertMatching ();
+
+    //  Set socket option `invert_matching`.
+    void setInvertMatching (int invertMatching);
+
+    //  Set socket option `xpub_verboser`.
+    void setXpubVerboser (int xpubVerboser);
+
+    //  Get socket option `connect_timeout`.
+    int connectTimeout ();
+
+    //  Set socket option `connect_timeout`.
+    void setConnectTimeout (int connectTimeout);
+
+    //  Get socket option `tcp_maxrt`.
+    int tcpMaxrt ();
+
+    //  Set socket option `tcp_maxrt`.
+    void setTcpMaxrt (int tcpMaxrt);
+
+    //  Get socket option `thread_safe`.
+    int threadSafe ();
+
+    //  Get socket option `multicast_maxtpdu`.
+    int multicastMaxtpdu ();
+
+    //  Set socket option `multicast_maxtpdu`.
+    void setMulticastMaxtpdu (int multicastMaxtpdu);
+
+    //  Get socket option `vmci_buffer_size`.
+    int vmciBufferSize ();
+
+    //  Set socket option `vmci_buffer_size`.
+    void setVmciBufferSize (int vmciBufferSize);
+
+    //  Get socket option `vmci_buffer_min_size`.
+    int vmciBufferMinSize ();
+
+    //  Set socket option `vmci_buffer_min_size`.
+    void setVmciBufferMinSize (int vmciBufferMinSize);
+
+    //  Get socket option `vmci_buffer_max_size`.
+    int vmciBufferMaxSize ();
+
+    //  Set socket option `vmci_buffer_max_size`.
+    void setVmciBufferMaxSize (int vmciBufferMaxSize);
+
+    //  Get socket option `vmci_connect_timeout`.
+    int vmciConnectTimeout ();
+
+    //  Set socket option `vmci_connect_timeout`.
+    void setVmciConnectTimeout (int vmciConnectTimeout);
+
     //  Get socket option `tos`.
     int tos ();
 
@@ -281,6 +344,27 @@ public:
 
     //  Set socket option `router_handover`.
     void setRouterHandover (int routerHandover);
+
+    //  Set socket option `connect_rid`.
+    void setConnectRid (const QString &connectRid);
+
+    //  Set socket option `connect_rid` from 32-octet binary
+    void setConnectRidBin (const byte *connectRid);
+
+    //  Get socket option `handshake_ivl`.
+    int handshakeIvl ();
+
+    //  Set socket option `handshake_ivl`.
+    void setHandshakeIvl (int handshakeIvl);
+
+    //  Get socket option `socks_proxy`.
+    QString socksProxy ();
+
+    //  Set socket option `socks_proxy`.
+    void setSocksProxy (const QString &socksProxy);
+
+    //  Set socket option `xpub_nodrop`.
+    void setXpubNodrop (int xpubNodrop);
 
     //  Set socket option `router_mandatory`.
     void setRouterMandatory (int routerMandatory);

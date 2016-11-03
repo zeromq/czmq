@@ -4083,9 +4083,37 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "setHeartbeatTimeout", _set_heartbeat_timeout);
     Nan::SetPrototypeMethod (tpl, "useFd", _use_fd);
     Nan::SetPrototypeMethod (tpl, "setUseFd", _set_use_fd);
+    Nan::SetPrototypeMethod (tpl, "setXpubManual", _set_xpub_manual);
+    Nan::SetPrototypeMethod (tpl, "setXpubWelcomeMsg", _set_xpub_welcome_msg);
+    Nan::SetPrototypeMethod (tpl, "setStreamNotify", _set_stream_notify);
+    Nan::SetPrototypeMethod (tpl, "invertMatching", _invert_matching);
+    Nan::SetPrototypeMethod (tpl, "setInvertMatching", _set_invert_matching);
+    Nan::SetPrototypeMethod (tpl, "setXpubVerboser", _set_xpub_verboser);
+    Nan::SetPrototypeMethod (tpl, "connectTimeout", _connect_timeout);
+    Nan::SetPrototypeMethod (tpl, "setConnectTimeout", _set_connect_timeout);
+    Nan::SetPrototypeMethod (tpl, "tcpMaxrt", _tcp_maxrt);
+    Nan::SetPrototypeMethod (tpl, "setTcpMaxrt", _set_tcp_maxrt);
+    Nan::SetPrototypeMethod (tpl, "threadSafe", _thread_safe);
+    Nan::SetPrototypeMethod (tpl, "multicastMaxtpdu", _multicast_maxtpdu);
+    Nan::SetPrototypeMethod (tpl, "setMulticastMaxtpdu", _set_multicast_maxtpdu);
+    Nan::SetPrototypeMethod (tpl, "vmciBufferSize", _vmci_buffer_size);
+    Nan::SetPrototypeMethod (tpl, "setVmciBufferSize", _set_vmci_buffer_size);
+    Nan::SetPrototypeMethod (tpl, "vmciBufferMinSize", _vmci_buffer_min_size);
+    Nan::SetPrototypeMethod (tpl, "setVmciBufferMinSize", _set_vmci_buffer_min_size);
+    Nan::SetPrototypeMethod (tpl, "vmciBufferMaxSize", _vmci_buffer_max_size);
+    Nan::SetPrototypeMethod (tpl, "setVmciBufferMaxSize", _set_vmci_buffer_max_size);
+    Nan::SetPrototypeMethod (tpl, "vmciConnectTimeout", _vmci_connect_timeout);
+    Nan::SetPrototypeMethod (tpl, "setVmciConnectTimeout", _set_vmci_connect_timeout);
     Nan::SetPrototypeMethod (tpl, "tos", _tos);
     Nan::SetPrototypeMethod (tpl, "setTos", _set_tos);
     Nan::SetPrototypeMethod (tpl, "setRouterHandover", _set_router_handover);
+    Nan::SetPrototypeMethod (tpl, "setConnectRid", _set_connect_rid);
+    Nan::SetPrototypeMethod (tpl, "setConnectRidBin", _set_connect_rid_bin);
+    Nan::SetPrototypeMethod (tpl, "handshakeIvl", _handshake_ivl);
+    Nan::SetPrototypeMethod (tpl, "setHandshakeIvl", _set_handshake_ivl);
+    Nan::SetPrototypeMethod (tpl, "socksProxy", _socks_proxy);
+    Nan::SetPrototypeMethod (tpl, "setSocksProxy", _set_socks_proxy);
+    Nan::SetPrototypeMethod (tpl, "setXpubNodrop", _set_xpub_nodrop);
     Nan::SetPrototypeMethod (tpl, "setRouterMandatory", _set_router_mandatory);
     Nan::SetPrototypeMethod (tpl, "setProbeRouter", _set_probe_router);
     Nan::SetPrototypeMethod (tpl, "setReqRelaxed", _set_req_relaxed);
@@ -4591,6 +4619,218 @@ NAN_METHOD (Zsock::_set_use_fd) {
     zsock_set_use_fd (zsock->self, (int) use_fd);
 }
 
+NAN_METHOD (Zsock::_set_xpub_manual) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `xpub manual`");
+
+    int xpub_manual;
+    if (info [0]->IsNumber ())
+        xpub_manual = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`xpub manual` must be a number");
+    zsock_set_xpub_manual (zsock->self, (int) xpub_manual);
+}
+
+NAN_METHOD (Zsock::_set_xpub_welcome_msg) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *xpub_welcome_msg;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `xpub welcome msg`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`xpub welcome msg` must be a string");
+    else {
+        Nan::Utf8String xpub_welcome_msg_utf8 (info [0].As<String>());
+        xpub_welcome_msg = *xpub_welcome_msg_utf8;
+    }
+    zsock_set_xpub_welcome_msg (zsock->self, (const char *)xpub_welcome_msg);
+}
+
+NAN_METHOD (Zsock::_set_stream_notify) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `stream notify`");
+
+    int stream_notify;
+    if (info [0]->IsNumber ())
+        stream_notify = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`stream notify` must be a number");
+    zsock_set_stream_notify (zsock->self, (int) stream_notify);
+}
+
+NAN_METHOD (Zsock::_invert_matching) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_invert_matching (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_invert_matching) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `invert matching`");
+
+    int invert_matching;
+    if (info [0]->IsNumber ())
+        invert_matching = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`invert matching` must be a number");
+    zsock_set_invert_matching (zsock->self, (int) invert_matching);
+}
+
+NAN_METHOD (Zsock::_set_xpub_verboser) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `xpub verboser`");
+
+    int xpub_verboser;
+    if (info [0]->IsNumber ())
+        xpub_verboser = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`xpub verboser` must be a number");
+    zsock_set_xpub_verboser (zsock->self, (int) xpub_verboser);
+}
+
+NAN_METHOD (Zsock::_connect_timeout) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_connect_timeout (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_connect_timeout) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `connect timeout`");
+
+    int connect_timeout;
+    if (info [0]->IsNumber ())
+        connect_timeout = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`connect timeout` must be a number");
+    zsock_set_connect_timeout (zsock->self, (int) connect_timeout);
+}
+
+NAN_METHOD (Zsock::_tcp_maxrt) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_maxrt (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_tcp_maxrt) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp maxrt`");
+
+    int tcp_maxrt;
+    if (info [0]->IsNumber ())
+        tcp_maxrt = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp maxrt` must be a number");
+    zsock_set_tcp_maxrt (zsock->self, (int) tcp_maxrt);
+}
+
+NAN_METHOD (Zsock::_thread_safe) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_thread_safe (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_multicast_maxtpdu) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_multicast_maxtpdu (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_multicast_maxtpdu) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `multicast maxtpdu`");
+
+    int multicast_maxtpdu;
+    if (info [0]->IsNumber ())
+        multicast_maxtpdu = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`multicast maxtpdu` must be a number");
+    zsock_set_multicast_maxtpdu (zsock->self, (int) multicast_maxtpdu);
+}
+
+NAN_METHOD (Zsock::_vmci_buffer_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_vmci_buffer_size (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_vmci_buffer_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `vmci buffer size`");
+
+    int vmci_buffer_size;
+    if (info [0]->IsNumber ())
+        vmci_buffer_size = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`vmci buffer size` must be a number");
+    zsock_set_vmci_buffer_size (zsock->self, (int) vmci_buffer_size);
+}
+
+NAN_METHOD (Zsock::_vmci_buffer_min_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_vmci_buffer_min_size (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_vmci_buffer_min_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `vmci buffer min size`");
+
+    int vmci_buffer_min_size;
+    if (info [0]->IsNumber ())
+        vmci_buffer_min_size = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`vmci buffer min size` must be a number");
+    zsock_set_vmci_buffer_min_size (zsock->self, (int) vmci_buffer_min_size);
+}
+
+NAN_METHOD (Zsock::_vmci_buffer_max_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_vmci_buffer_max_size (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_vmci_buffer_max_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `vmci buffer max size`");
+
+    int vmci_buffer_max_size;
+    if (info [0]->IsNumber ())
+        vmci_buffer_max_size = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`vmci buffer max size` must be a number");
+    zsock_set_vmci_buffer_max_size (zsock->self, (int) vmci_buffer_max_size);
+}
+
+NAN_METHOD (Zsock::_vmci_connect_timeout) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_vmci_connect_timeout (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_vmci_connect_timeout) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `vmci connect timeout`");
+
+    int vmci_connect_timeout;
+    if (info [0]->IsNumber ())
+        vmci_connect_timeout = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`vmci connect timeout` must be a number");
+    zsock_set_vmci_connect_timeout (zsock->self, (int) vmci_connect_timeout);
+}
+
 NAN_METHOD (Zsock::_tos) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_tos (zsock->self);
@@ -4621,6 +4861,83 @@ NAN_METHOD (Zsock::_set_router_handover) {
     else
         return Nan::ThrowTypeError ("`router handover` must be a number");
     zsock_set_router_handover (zsock->self, (int) router_handover);
+}
+
+NAN_METHOD (Zsock::_set_connect_rid) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *connect_rid;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `connect rid`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`connect rid` must be a string");
+    else {
+        Nan::Utf8String connect_rid_utf8 (info [0].As<String>());
+        connect_rid = *connect_rid_utf8;
+    }
+    zsock_set_connect_rid (zsock->self, (const char *)connect_rid);
+}
+
+NAN_METHOD (Zsock::_set_connect_rid_bin) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a argument to provide data");
+    Local<Object> buffer_node = info [0].As<Object> ();
+    const byte *connect_rid = (const byte *) node::Buffer::Data (buffer_node);
+    zsock_set_connect_rid_bin (zsock->self, (const byte *)connect_rid);
+}
+
+NAN_METHOD (Zsock::_handshake_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_handshake_ivl (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_handshake_ivl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `handshake ivl`");
+
+    int handshake_ivl;
+    if (info [0]->IsNumber ())
+        handshake_ivl = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`handshake ivl` must be a number");
+    zsock_set_handshake_ivl (zsock->self, (int) handshake_ivl);
+}
+
+NAN_METHOD (Zsock::_socks_proxy) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_socks_proxy (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_socks_proxy) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *socks_proxy;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `socks proxy`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`socks proxy` must be a string");
+    else {
+        Nan::Utf8String socks_proxy_utf8 (info [0].As<String>());
+        socks_proxy = *socks_proxy_utf8;
+    }
+    zsock_set_socks_proxy (zsock->self, (const char *)socks_proxy);
+}
+
+NAN_METHOD (Zsock::_set_xpub_nodrop) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `xpub nodrop`");
+
+    int xpub_nodrop;
+    if (info [0]->IsNumber ())
+        xpub_nodrop = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`xpub nodrop` must be a number");
+    zsock_set_xpub_nodrop (zsock->self, (int) xpub_nodrop);
 }
 
 NAN_METHOD (Zsock::_set_router_mandatory) {
