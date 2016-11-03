@@ -257,23 +257,6 @@ zcertstore_print (zcertstore_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  DEPRECATED as incompatible with centralized logging
-//  Print list of certificates in store to open stream
-
-void
-zcertstore_fprint (zcertstore_t *self, FILE *file)
-{
-    fprintf (file, "Certificate store\n");
-
-    zcert_t *cert = (zcert_t *) zhashx_first (self->certs);
-    while (cert) {
-        zcert_fprint (cert, file);
-        cert = (zcert_t *) zhashx_next (self->certs);
-    }
-}
-
-
-//  --------------------------------------------------------------------------
 //  Selftest
 
 // Trivial example state for testing

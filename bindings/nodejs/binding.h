@@ -388,7 +388,6 @@ class Zhashx: public Nan::ObjectWrap {
     static NAN_METHOD (_pack);
     static NAN_METHOD (_dup);
     static NAN_METHOD (_dup_v2);
-    static NAN_METHOD (_autofree);
     static NAN_METHOD (_test);
 };
 

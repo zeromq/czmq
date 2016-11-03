@@ -86,13 +86,13 @@ class zlist_t(Structure):
     pass # Empty - only for type checking
 zlist_p = POINTER(zlist_t)
 
-class FILE(Structure):
-    pass # Empty - only for type checking
-FILE_p = POINTER(FILE)
-
 class zcertstore_t(Structure):
     pass # Empty - only for type checking
 zcertstore_p = POINTER(zcertstore_t)
+
+class FILE(Structure):
+    pass # Empty - only for type checking
+FILE_p = POINTER(FILE)
 
 class zframe_t(Structure):
     pass # Empty - only for type checking
@@ -564,8 +564,6 @@ lib.zcert_eq.restype = c_bool
 lib.zcert_eq.argtypes = [zcert_p, zcert_p]
 lib.zcert_print.restype = None
 lib.zcert_print.argtypes = [zcert_p]
-lib.zcert_fprint.restype = None
-lib.zcert_fprint.argtypes = [zcert_p, FILE_p]
 lib.zcert_test.restype = None
 lib.zcert_test.argtypes = [c_bool]
 
@@ -727,13 +725,6 @@ heap memory, returns NULL.
         """
         return lib.zcert_print(self._as_parameter_)
 
-    def fprint(self, file):
-        """
-        Print certificate contents to open stream. This method is deprecated
-and you should use the print method.
-        """
-        return lib.zcert_fprint(self._as_parameter_, coerce_py_file(file))
-
     @staticmethod
     def test(verbose):
         """
@@ -759,8 +750,6 @@ lib.zcertstore_empty.restype = None
 lib.zcertstore_empty.argtypes = [zcertstore_p]
 lib.zcertstore_print.restype = None
 lib.zcertstore_print.argtypes = [zcertstore_p]
-lib.zcertstore_fprint.restype = None
-lib.zcertstore_fprint.argtypes = [zcertstore_p, FILE_p]
 lib.zcertstore_test.restype = None
 lib.zcertstore_test.argtypes = [c_bool]
 
@@ -851,13 +840,6 @@ which don't usually have access to struct internals.
         Print list of certificates in store to logging facility
         """
         return lib.zcertstore_print(self._as_parameter_)
-
-    def fprint(self, file):
-        """
-        Print list of certificates in store to open stream. This method is
-deprecated, and you should use the print method.
-        """
-        return lib.zcertstore_fprint(self._as_parameter_, coerce_py_file(file))
 
     @staticmethod
     def test(verbose):
@@ -2463,7 +2445,6 @@ configured by zsys_set_logstream). Prefix shows before frame, if not null.
 
 # zhash
 zhash_free_fn = CFUNCTYPE(None, c_void_p)
-zhash_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhash_new.restype = zhash_p
 lib.zhash_new.argtypes = []
 lib.zhash_destroy.restype = None
@@ -2506,8 +2487,6 @@ lib.zhash_refresh.restype = c_int
 lib.zhash_refresh.argtypes = [zhash_p]
 lib.zhash_autofree.restype = None
 lib.zhash_autofree.argtypes = [zhash_p]
-lib.zhash_foreach.restype = c_int
-lib.zhash_foreach.argtypes = [zhash_p, zhash_foreach_fn, c_void_p]
 lib.zhash_test.restype = None
 lib.zhash_test.argtypes = [c_bool]
 
@@ -2728,14 +2707,6 @@ file.
         """
         return lib.zhash_autofree(self._as_parameter_)
 
-    def foreach(self, callback, argument):
-        """
-        Apply function to each item in the hash table. Items are iterated in no
-defined order. Stops if callback function returns non-zero and returns
-final return code from callback function (zero = success). Deprecated.
-        """
-        return lib.zhash_foreach(self._as_parameter_, callback, argument)
-
     @staticmethod
     def test(verbose):
         """
@@ -2752,7 +2723,6 @@ zhashx_free_fn = CFUNCTYPE(None, c_void_p)
 zhashx_hash_fn = CFUNCTYPE(c_size_t, c_void_p)
 zhashx_serializer_fn = CFUNCTYPE(POINTER(c_char), c_void_p)
 zhashx_deserializer_fn = CFUNCTYPE(c_void_p, c_char_p)
-zhashx_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhashx_new.restype = zhashx_p
 lib.zhashx_new.argtypes = []
 lib.zhashx_destroy.restype = None
@@ -2815,10 +2785,6 @@ lib.zhashx_set_key_hasher.restype = None
 lib.zhashx_set_key_hasher.argtypes = [zhashx_p, zhashx_hash_fn]
 lib.zhashx_dup_v2.restype = zhashx_p
 lib.zhashx_dup_v2.argtypes = [zhashx_p]
-lib.zhashx_autofree.restype = None
-lib.zhashx_autofree.argtypes = [zhashx_p]
-lib.zhashx_foreach.restype = c_int
-lib.zhashx_foreach.argtypes = [zhashx_p, zhashx_foreach_fn, c_void_p]
 lib.zhashx_test.restype = None
 lib.zhashx_test.argtypes = [c_bool]
 
@@ -3119,22 +3085,6 @@ very large tables. NOTE: only works with item values that are strings
 since there's no other way to know how to duplicate the item value.
         """
         return Zhashx(lib.zhashx_dup_v2(self._as_parameter_), False)
-
-    def autofree(self):
-        """
-        Set hash for automatic value destruction. This method is deprecated
-and you should use set_destructor instead.
-        """
-        return lib.zhashx_autofree(self._as_parameter_)
-
-    def foreach(self, callback, argument):
-        """
-        Apply function to each item in the hash table. Items are iterated in no
-defined order. Stops if callback function returns non-zero and returns
-final return code from callback function (zero = success). This method
-is deprecated and you should use zhashx_first/_next instead.
-        """
-        return lib.zhashx_foreach(self._as_parameter_, callback, argument)
 
     @staticmethod
     def test(verbose):

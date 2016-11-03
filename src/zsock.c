@@ -1919,7 +1919,8 @@ zsock_test (bool verbose)
     assert (hash);
     zuuid_t *uuid = zuuid_new ();
     assert (uuid);
-    zhashx_autofree (hash);
+    zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
     zhashx_insert (hash, "1", "value A");
     zhashx_insert (hash, "2", "value B");
     char *original = "pointer";

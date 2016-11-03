@@ -65,12 +65,6 @@
         Print list of certificates in store to logging facility
     </method>
 
-    <method name = "fprint" state = "legacy">
-        Print list of certificates in store to open stream. This method is
-        deprecated, and you should use the print method.
-        <argument name = "file" type = "FILE" />
-    </method>
-
     <method name = "test" singleton = "1">
         Self test of this class
         <argument name = "verbose" type = "boolean" />

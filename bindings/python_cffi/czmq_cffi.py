@@ -98,10 +98,6 @@ typedef int (zconfig_fct) (
 typedef void (zhash_free_fn) (
     void *data);
 
-// Callback function for zhash_foreach method. Deprecated.
-typedef int (zhash_foreach_fn) (
-    const char *key, void *item, void *argument);
-
 // Destroy an item
 typedef void (zhashx_destructor_fn) (
     void **item);
@@ -131,11 +127,6 @@ typedef char * (zhashx_serializer_fn) (
 // The caller takes ownership of the newly created object.
 typedef void * (zhashx_deserializer_fn) (
     const char *item_str);
-
-// Callback function for zhashx_foreach method.                              
-// This callback is deprecated and you should use zhashx_first/_next instead.
-typedef int (zhashx_foreach_fn) (
-    const char *key, void *item, void *argument);
 
 // Comparison function e.g. for sorting and removing.
 typedef int (zlist_compare_fn) (
@@ -372,11 +363,6 @@ bool
 void
     zcert_print (zcert_t *self);
 
-// Print certificate contents to open stream. This method is deprecated
-// and you should use the print method.                                
-void
-    zcert_fprint (zcert_t *self, FILE *file);
-
 // Self test of this class
 void
     zcert_test (bool verbose);
@@ -419,11 +405,6 @@ void
 // Print list of certificates in store to logging facility
 void
     zcertstore_print (zcertstore_t *self);
-
-// Print list of certificates in store to open stream. This method is
-// deprecated, and you should use the print method.                  
-void
-    zcertstore_fprint (zcertstore_t *self, FILE *file);
 
 // Self test of this class
 void
@@ -1265,12 +1246,6 @@ int
 void
     zhash_autofree (zhash_t *self);
 
-// Apply function to each item in the hash table. Items are iterated in no
-// defined order. Stops if callback function returns non-zero and returns 
-// final return code from callback function (zero = success). Deprecated. 
-int
-    zhash_foreach (zhash_t *self, zhash_foreach_fn callback, void *argument);
-
 // Self test of this class.
 void
     zhash_test (bool verbose);
@@ -1473,18 +1448,6 @@ void
 // since there's no other way to know how to duplicate the item value.  
 zhashx_t *
     zhashx_dup_v2 (zhashx_t *self);
-
-// Set hash for automatic value destruction. This method is deprecated
-// and you should use set_destructor instead.                         
-void
-    zhashx_autofree (zhashx_t *self);
-
-// Apply function to each item in the hash table. Items are iterated in no
-// defined order. Stops if callback function returns non-zero and returns 
-// final return code from callback function (zero = success). This method 
-// is deprecated and you should use zhashx_first/_next instead.           
-int
-    zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
 // Self test of this class.
 void

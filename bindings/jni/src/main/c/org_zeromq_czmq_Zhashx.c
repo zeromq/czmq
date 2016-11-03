@@ -168,12 +168,6 @@ Java_org_zeromq_czmq_Zhashx__1_1dupV2 (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zhashx__1_1autofree (JNIEnv *env, jclass c, jlong self)
-{
-    zhashx_autofree ((zhashx_t *) (intptr_t) self);
-}
-
-JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zhashx__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     zhashx_test ((bool) verbose);

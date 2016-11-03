@@ -97,7 +97,6 @@ module CZMQ
       attach_function :zcert_dup, [:pointer], :pointer, **opts
       attach_function :zcert_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zcert_print, [:pointer], :void, **opts
-      attach_function :zcert_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zcert_test, [:bool], :void, **opts
 
       require_relative 'ffi/zcert'
@@ -123,7 +122,6 @@ module CZMQ
         end
       end
       attach_function :zcertstore_print, [:pointer], :void, **opts
-      attach_function :zcertstore_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zcertstore_test, [:bool], :void, **opts
 
       require_relative 'ffi/zcertstore'
@@ -343,7 +341,6 @@ module CZMQ
       attach_function :zhash_load, [:pointer, :string], :int, **opts
       attach_function :zhash_refresh, [:pointer], :int, **opts
       attach_function :zhash_autofree, [:pointer], :void, **opts
-      attach_function :zhash_foreach, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zhash_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhash'
@@ -393,8 +390,6 @@ module CZMQ
       attach_function :zhashx_set_key_comparator, [:pointer, :pointer], :void, **opts
       attach_function :zhashx_set_key_hasher, [:pointer, :pointer], :void, **opts
       attach_function :zhashx_dup_v2, [:pointer], :pointer, **opts
-      attach_function :zhashx_autofree, [:pointer], :void, **opts
-      attach_function :zhashx_foreach, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zhashx_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhashx'

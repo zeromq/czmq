@@ -2638,7 +2638,6 @@ NAN_MODULE_INIT (Zhashx::Init) {
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "dupV2", _dup_v2);
-    Nan::SetPrototypeMethod (tpl, "autofree", _autofree);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -2799,11 +2798,6 @@ NAN_METHOD (Zhashx::_dup_v2) {
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }
-}
-
-NAN_METHOD (Zhashx::_autofree) {
-    Zhashx *zhashx = Nan::ObjectWrap::Unwrap <Zhashx> (info.Holder ());
-    zhashx_autofree (zhashx->self);
 }
 
 NAN_METHOD (Zhashx::_test) {

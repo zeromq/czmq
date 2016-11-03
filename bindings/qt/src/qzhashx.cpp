@@ -334,26 +334,6 @@ QZhashx * QZhashx::dupV2 ()
 }
 
 ///
-//  Set hash for automatic value destruction. This method is deprecated
-//  and you should use set_destructor instead.                         
-void QZhashx::autofree ()
-{
-    zhashx_autofree (self);
-    
-}
-
-///
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order. Stops if callback function returns non-zero and returns 
-//  final return code from callback function (zero = success). This method 
-//  is deprecated and you should use zhashx_first/_next instead.           
-int QZhashx::foreachNoConflict (zhashx_foreach_fn callback, void *argument)
-{
-    int rv = zhashx_foreach (self, callback, argument);
-    return rv;
-}
-
-///
 //  Self test of this class.
 void QZhashx::test (bool verbose)
 {

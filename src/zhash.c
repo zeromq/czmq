@@ -777,33 +777,6 @@ zhash_autofree (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  DEPRECATED as clumsy -- use zhash_first/_next instead
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order.  Stops if callback function returns non-zero and returns
-//  final return code from callback function (zero = success).
-
-int
-zhash_foreach (zhash_t *self, zhash_foreach_fn callback, void *argument)
-{
-    assert (self);
-
-    uint index;
-    for (index = 0; index < self->limit; index++) {
-        item_t *item = self->items [index];
-        while (item) {
-            //  Invoke callback, passing item properties and argument
-            item_t *next = item->next;
-            int rc = callback ((const char *) item->key, item->value, argument);
-            if (rc)
-                return rc;      //  End if non-zero return code
-            item = next;
-        }
-    }
-    return 0;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Runs selftest of class
 //
 

@@ -26,8 +26,6 @@ extern "C" {
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
 //  in stable releases, by default. Use --enable-drafts to enable.
-//  This class has legacy methods, which will be removed over time. You
-//  should not use them, and migrate any code that is still using them.
 // Destroy an item
 typedef void (zhashx_destructor_fn) (
     void **item);
@@ -57,11 +55,6 @@ typedef char * (zhashx_serializer_fn) (
 // The caller takes ownership of the newly created object.
 typedef void * (zhashx_deserializer_fn) (
     const char *item_str);
-
-// Callback function for zhashx_foreach method.                              
-// This callback is deprecated and you should use zhashx_first/_next instead.
-typedef int (zhashx_foreach_fn) (
-    const char *key, void *item, void *argument);
 
 //  Create a new, empty hash container
 CZMQ_EXPORT zhashx_t *
@@ -254,20 +247,6 @@ CZMQ_EXPORT void
 //  since there's no other way to know how to duplicate the item value.  
 CZMQ_EXPORT zhashx_t *
     zhashx_dup_v2 (zhashx_t *self);
-
-//  *** Deprecated method, slated for removal: avoid using it ***
-//  Set hash for automatic value destruction. This method is deprecated
-//  and you should use set_destructor instead.                         
-CZMQ_EXPORT void
-    zhashx_autofree (zhashx_t *self);
-
-//  *** Deprecated method, slated for removal: avoid using it ***
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order. Stops if callback function returns non-zero and returns 
-//  final return code from callback function (zero = success). This method 
-//  is deprecated and you should use zhashx_first/_next instead.           
-CZMQ_EXPORT int
-    zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
 //  Self test of this class.
 CZMQ_EXPORT void

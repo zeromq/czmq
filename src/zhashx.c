@@ -44,8 +44,6 @@ typedef struct _item_t {
     struct _item_t *next;       //  Next item in the hash slot
     size_t index;               //  Index of item in table
     const void *key;            //  Item's original key
-    //  Supporting deprecated v2 functionality; we can't quite replace
-    //  this with strdup/zstr_free as zhashx_insert also uses autofree.
     zhashx_free_fn *free_fn;     //  Value free function if any
 } item_t;
 
@@ -690,7 +688,8 @@ int
 zhashx_load (zhashx_t *self, const char *filename)
 {
     assert (self);
-    zhashx_autofree (self);
+    zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
 
     //  Whether or not file exists, we'll track the filename and last
     //  modification date (0 for unknown files), so that zhashx_refresh ()
@@ -923,8 +922,11 @@ zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
         }
     }
     //  Hash will free values in destructor
-    if (self)
-        zhashx_autofree (self);
+    if (self) {
+        zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
+        zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
+    }
+
     return self;
 }
 
@@ -1063,7 +1065,8 @@ zhashx_dup_v2 (zhashx_t *self)
 
     zhashx_t *copy = zhashx_new ();
     if (copy) {
-        zhashx_autofree (copy);
+        zhashx_set_destructor (copy, (zhashx_destructor_fn *) zstr_free);
+        zhashx_set_duplicator (copy, (zhashx_duplicator_fn *) strdup);
         uint index;
         size_t limit = primes [self->prime_index];
         for (index = 0; index < limit; index++) {
@@ -1078,47 +1081,6 @@ zhashx_dup_v2 (zhashx_t *self)
         }
     }
     return copy;
-}
-
-
-//  --------------------------------------------------------------------------
-//  DEPRECATED as clumsy -- use set_destructor instead
-//  Set hash for automatic value destruction
-
-void
-zhashx_autofree (zhashx_t *self)
-{
-    assert (self);
-    zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
-    zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
-}
-
-
-//  --------------------------------------------------------------------------
-//  DEPRECATED as clumsy -- use zhashx_first/_next instead
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order.  Stops if callback function returns non-zero and returns
-//  final return code from callback function (zero = success).
-
-int
-zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument)
-{
-    assert (self);
-
-    uint index;
-    size_t limit = primes [self->prime_index];
-    for (index = 0; index < limit; index++) {
-        item_t *item = self->items [index];
-        while (item) {
-            //  Invoke callback, passing item properties and argument
-            item_t *next = item->next;
-            int rc = callback ((const char *) item->key, item->value, argument);
-            if (rc)
-                return rc;      //  End if non-zero return code
-            item = next;
-        }
-    }
-    return 0;
 }
 
 
@@ -1325,10 +1287,11 @@ zhashx_test (bool verbose)
     zhashx_destroy (&hash);
     assert (hash == NULL);
 
-    //  Test autofree; automatically copies and frees string values
+    //  Test destructor; automatically copies and frees string values
     hash = zhashx_new ();
     assert (hash);
-    zhashx_autofree (hash);
+    zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
     char value [255];
     strcpy (value, "This is a string");
     rc = zhashx_insert (hash, "key1", value);

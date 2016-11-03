@@ -133,11 +133,6 @@ public slots:
 
     //  Set hash for automatic value destruction
     void autofree ();
-
-    //  Apply function to each item in the hash table. Items are iterated in no
-    //  defined order. Stops if callback function returns non-zero and returns 
-    //  final return code from callback function (zero = success). Deprecated. 
-    int foreach (zhash_foreach_fn callback, void *argument);
 };
 
 class QmlZhashAttached : public QObject

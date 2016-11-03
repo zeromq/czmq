@@ -276,18 +276,6 @@ module CZMQ
         result
       end
 
-      # Print certificate contents to open stream. This method is deprecated
-      # and you should use the print method.                                
-      #
-      # @param file [::FFI::Pointer, #to_ptr]
-      # @return [void]
-      def fprint(file)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.zcert_fprint(self_p, file)
-        result
-      end
-
       # Self test of this class
       #
       # @param verbose [Boolean]

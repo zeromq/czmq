@@ -89,23 +89,6 @@ module CZMQ
         end
       end
 
-      # Create a new callback of the following type:
-      # Callback function for zhash_foreach method. Deprecated.
-      #     typedef int (zhash_foreach_fn) (                 
-      #         const char *key, void *item, void *argument);
-      #
-      # @note WARNING: If your Ruby code doesn't retain a reference to the
-      #   FFI::Function object after passing it to a C function call,
-      #   it may be garbage collected while C still holds the pointer,
-      #   potentially resulting in a segmentation fault.
-      def self.foreach_fn
-        ::FFI::Function.new :int, [:string, :pointer, :pointer], blocking: true do |key, item, argument|
-          result = yield key, item, argument
-          result = Integer(result)
-          result
-        end
-      end
-
       # Create a new, empty hash container
       # @return [CZMQ::Zhash]
       def self.new()
@@ -380,20 +363,6 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zhash_autofree(self_p)
-        result
-      end
-
-      # Apply function to each item in the hash table. Items are iterated in no
-      # defined order. Stops if callback function returns non-zero and returns 
-      # final return code from callback function (zero = success). Deprecated. 
-      #
-      # @param callback [::FFI::Pointer, #to_ptr]
-      # @param argument [::FFI::Pointer, #to_ptr]
-      # @return [Integer]
-      def foreach(callback, argument)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.zhash_foreach(self_p, callback, argument)
         result
       end
 

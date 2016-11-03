@@ -180,21 +180,4 @@
     <method name = "autofree">
         Set hash for automatic value destruction
     </method>
-
-    <callback_type name = "foreach_fn" state = "legacy">
-        Callback function for zhash_foreach method. Deprecated.
-        <argument name = "key" type = "string" />
-        <argument name = "item" type = "anything" />
-        <argument name = "argument" type = "anything" />
-        <return type = "integer" />
-    </callback_type>
-
-    <method name = "foreach" state = "legacy">
-        Apply function to each item in the hash table. Items are iterated in no
-        defined order. Stops if callback function returns non-zero and returns
-        final return code from callback function (zero = success). Deprecated.
-        <argument name = "callback" type = "zhash_foreach_fn" callback = "1" />
-        <argument name = "argument" type = "anything" />
-        <return type = "integer" />
-    </method>
 </class>

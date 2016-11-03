@@ -179,16 +179,6 @@ public slots:
     //  very large tables. NOTE: only works with item values that are strings
     //  since there's no other way to know how to duplicate the item value.  
     QmlZhashx *dupV2 ();
-
-    //  Set hash for automatic value destruction. This method is deprecated
-    //  and you should use set_destructor instead.                         
-    void autofree ();
-
-    //  Apply function to each item in the hash table. Items are iterated in no
-    //  defined order. Stops if callback function returns non-zero and returns 
-    //  final return code from callback function (zero = success). This method 
-    //  is deprecated and you should use zhashx_first/_next instead.           
-    int foreach (zhashx_foreach_fn callback, void *argument);
 };
 
 class QmlZhashxAttached : public QObject

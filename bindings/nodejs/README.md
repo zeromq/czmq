@@ -1461,13 +1461,6 @@ very large tables. NOTE: only works with item values that are strings
 since there's no other way to know how to duplicate the item value.
 
 ```
-nothing my_zhashx.autofree ()
-```
-
-Set hash for automatic value destruction. This method is deprecated
-and you should use set_destructor instead.
-
-```
 nothing my_zhashx.test (Boolean)
 ```
 
