@@ -290,28 +290,4 @@
         since there's no other way to know how to duplicate the item value.
         <return type = "zhashx"/>
     </method>
-
-    <method name = "autofree" state = "legacy">
-        Set hash for automatic value destruction. This method is deprecated
-        and you should use set_destructor instead.
-    </method>
-
-    <callback_type name = "foreach_fn">
-        Callback function for zhashx_foreach method.
-        This callback is deprecated and you should use zhashx_first/_next instead.
-        <argument name = "key" type = "string" />
-        <argument name = "item" type = "anything" />
-        <argument name = "argument" type = "anything" />
-        <return type = "integer" />
-    </callback_type>
-
-    <method name = "foreach" state = "legacy">
-        Apply function to each item in the hash table. Items are iterated in no
-        defined order. Stops if callback function returns non-zero and returns
-        final return code from callback function (zero = success). This method
-        is deprecated and you should use zhashx_first/_next instead.
-        <argument name = "callback" type = "zhashx_foreach_fn" callback = "1" />
-        <argument name = "argument" type = "anything" />
-        <return type = "integer" />
-    </method>
 </class>
