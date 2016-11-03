@@ -12,8 +12,6 @@ SYNOPSIS
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
 //  in stable releases, by default. Use --enable-drafts to enable.
-//  This class has legacy methods, which will be removed over time. You
-//  should not use them, and migrate any code that is still using them.
 // Destroy an item
 typedef void (zhashx_destructor_fn) (
     void **item);
@@ -43,11 +41,6 @@ typedef char * (zhashx_serializer_fn) (
 // The caller takes ownership of the newly created object.
 typedef void * (zhashx_deserializer_fn) (
     const char *item_str);
-
-// Callback function for zhashx_foreach method.                              
-// This callback is deprecated and you should use zhashx_first/_next instead.
-typedef int (zhashx_foreach_fn) (
-    const char *key, void *item, void *argument);
 
 //  Create a new, empty hash container
 CZMQ_EXPORT zhashx_t *
@@ -150,7 +143,7 @@ CZMQ_EXPORT const void *
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.            
 CZMQ_EXPORT void
-    zhashx_comment (zhashx_t *self, const char *format, ...);
+    zhashx_comment (zhashx_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 //  Save hash table to a text file in name=value format. Hash values must be
 //  printable strings; keys may not contain '=' character. Returns 0 if OK, 
@@ -233,27 +226,6 @@ CZMQ_EXPORT void
 //  compared using strcmp.                                     
 CZMQ_EXPORT void
     zhashx_set_key_hasher (zhashx_t *self, zhashx_hash_fn hasher);
-
-//  Make copy of hash table; if supplied table is null, returns null.    
-//  Does not copy items themselves. Rebuilds new table so may be slow on 
-//  very large tables. NOTE: only works with item values that are strings
-//  since there's no other way to know how to duplicate the item value.  
-CZMQ_EXPORT zhashx_t *
-    zhashx_dup_v2 (zhashx_t *self);
-
-//  *** Deprecated method, slated for removal: avoid using it ***
-//  Set hash for automatic value destruction. This method is deprecated
-//  and you should use set_destructor instead.                         
-CZMQ_EXPORT void
-    zhashx_autofree (zhashx_t *self);
-
-//  *** Deprecated method, slated for removal: avoid using it ***
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order. Stops if callback function returns non-zero and returns 
-//  final return code from callback function (zero = success). This method 
-//  is deprecated and you should use zhashx_first/_next instead.           
-CZMQ_EXPORT int
-    zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
 //  Self test of this class.
 CZMQ_EXPORT void
@@ -459,10 +431,11 @@ zhashx_destroy (&hash);
 zhashx_destroy (&hash);
 assert (hash == NULL);
 
-//  Test autofree; automatically copies and frees string values
+//  Test destructor; automatically copies and frees string values
 hash = zhashx_new ();
 assert (hash);
-zhashx_autofree (hash);
+zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
+zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
 char value [255];
 strcpy (value, "This is a string");
 rc = zhashx_insert (hash, "key1", value);
