@@ -4918,12 +4918,68 @@ lib.zsock_use_fd.restype = c_int
 lib.zsock_use_fd.argtypes = [zsock_p]
 lib.zsock_set_use_fd.restype = None
 lib.zsock_set_use_fd.argtypes = [zsock_p, c_int]
+lib.zsock_set_xpub_manual.restype = None
+lib.zsock_set_xpub_manual.argtypes = [zsock_p, c_int]
+lib.zsock_set_xpub_welcome_msg.restype = None
+lib.zsock_set_xpub_welcome_msg.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_stream_notify.restype = None
+lib.zsock_set_stream_notify.argtypes = [zsock_p, c_int]
+lib.zsock_invert_matching.restype = c_int
+lib.zsock_invert_matching.argtypes = [zsock_p]
+lib.zsock_set_invert_matching.restype = None
+lib.zsock_set_invert_matching.argtypes = [zsock_p, c_int]
+lib.zsock_set_xpub_verboser.restype = None
+lib.zsock_set_xpub_verboser.argtypes = [zsock_p, c_int]
+lib.zsock_connect_timeout.restype = c_int
+lib.zsock_connect_timeout.argtypes = [zsock_p]
+lib.zsock_set_connect_timeout.restype = None
+lib.zsock_set_connect_timeout.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_maxrt.restype = c_int
+lib.zsock_tcp_maxrt.argtypes = [zsock_p]
+lib.zsock_set_tcp_maxrt.restype = None
+lib.zsock_set_tcp_maxrt.argtypes = [zsock_p, c_int]
+lib.zsock_thread_safe.restype = c_int
+lib.zsock_thread_safe.argtypes = [zsock_p]
+lib.zsock_multicast_maxtpdu.restype = c_int
+lib.zsock_multicast_maxtpdu.argtypes = [zsock_p]
+lib.zsock_set_multicast_maxtpdu.restype = None
+lib.zsock_set_multicast_maxtpdu.argtypes = [zsock_p, c_int]
+lib.zsock_vmci_buffer_size.restype = c_int
+lib.zsock_vmci_buffer_size.argtypes = [zsock_p]
+lib.zsock_set_vmci_buffer_size.restype = None
+lib.zsock_set_vmci_buffer_size.argtypes = [zsock_p, c_int]
+lib.zsock_vmci_buffer_min_size.restype = c_int
+lib.zsock_vmci_buffer_min_size.argtypes = [zsock_p]
+lib.zsock_set_vmci_buffer_min_size.restype = None
+lib.zsock_set_vmci_buffer_min_size.argtypes = [zsock_p, c_int]
+lib.zsock_vmci_buffer_max_size.restype = c_int
+lib.zsock_vmci_buffer_max_size.argtypes = [zsock_p]
+lib.zsock_set_vmci_buffer_max_size.restype = None
+lib.zsock_set_vmci_buffer_max_size.argtypes = [zsock_p, c_int]
+lib.zsock_vmci_connect_timeout.restype = c_int
+lib.zsock_vmci_connect_timeout.argtypes = [zsock_p]
+lib.zsock_set_vmci_connect_timeout.restype = None
+lib.zsock_set_vmci_connect_timeout.argtypes = [zsock_p, c_int]
 lib.zsock_tos.restype = c_int
 lib.zsock_tos.argtypes = [zsock_p]
 lib.zsock_set_tos.restype = None
 lib.zsock_set_tos.argtypes = [zsock_p, c_int]
 lib.zsock_set_router_handover.restype = None
 lib.zsock_set_router_handover.argtypes = [zsock_p, c_int]
+lib.zsock_set_connect_rid.restype = None
+lib.zsock_set_connect_rid.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_connect_rid_bin.restype = None
+lib.zsock_set_connect_rid_bin.argtypes = [zsock_p, c_void_p]
+lib.zsock_handshake_ivl.restype = c_int
+lib.zsock_handshake_ivl.argtypes = [zsock_p]
+lib.zsock_set_handshake_ivl.restype = None
+lib.zsock_set_handshake_ivl.argtypes = [zsock_p, c_int]
+lib.zsock_socks_proxy.restype = POINTER(c_char)
+lib.zsock_socks_proxy.argtypes = [zsock_p]
+lib.zsock_set_socks_proxy.restype = None
+lib.zsock_set_socks_proxy.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_xpub_nodrop.restype = None
+lib.zsock_set_xpub_nodrop.argtypes = [zsock_p, c_int]
 lib.zsock_set_router_mandatory.restype = None
 lib.zsock_set_router_mandatory.argtypes = [zsock_p, c_int]
 lib.zsock_set_probe_router.restype = None
@@ -5610,6 +5666,132 @@ return the supplied value. Takes a polymorphic socket reference.
         """
         return lib.zsock_set_use_fd(self._as_parameter_, use_fd)
 
+    def set_xpub_manual(self, xpub_manual):
+        """
+        Set socket option `xpub_manual`.
+        """
+        return lib.zsock_set_xpub_manual(self._as_parameter_, xpub_manual)
+
+    def set_xpub_welcome_msg(self, xpub_welcome_msg):
+        """
+        Set socket option `xpub_welcome_msg`.
+        """
+        return lib.zsock_set_xpub_welcome_msg(self._as_parameter_, xpub_welcome_msg)
+
+    def set_stream_notify(self, stream_notify):
+        """
+        Set socket option `stream_notify`.
+        """
+        return lib.zsock_set_stream_notify(self._as_parameter_, stream_notify)
+
+    def invert_matching(self):
+        """
+        Get socket option `invert_matching`.
+        """
+        return lib.zsock_invert_matching(self._as_parameter_)
+
+    def set_invert_matching(self, invert_matching):
+        """
+        Set socket option `invert_matching`.
+        """
+        return lib.zsock_set_invert_matching(self._as_parameter_, invert_matching)
+
+    def set_xpub_verboser(self, xpub_verboser):
+        """
+        Set socket option `xpub_verboser`.
+        """
+        return lib.zsock_set_xpub_verboser(self._as_parameter_, xpub_verboser)
+
+    def connect_timeout(self):
+        """
+        Get socket option `connect_timeout`.
+        """
+        return lib.zsock_connect_timeout(self._as_parameter_)
+
+    def set_connect_timeout(self, connect_timeout):
+        """
+        Set socket option `connect_timeout`.
+        """
+        return lib.zsock_set_connect_timeout(self._as_parameter_, connect_timeout)
+
+    def tcp_maxrt(self):
+        """
+        Get socket option `tcp_maxrt`.
+        """
+        return lib.zsock_tcp_maxrt(self._as_parameter_)
+
+    def set_tcp_maxrt(self, tcp_maxrt):
+        """
+        Set socket option `tcp_maxrt`.
+        """
+        return lib.zsock_set_tcp_maxrt(self._as_parameter_, tcp_maxrt)
+
+    def thread_safe(self):
+        """
+        Get socket option `thread_safe`.
+        """
+        return lib.zsock_thread_safe(self._as_parameter_)
+
+    def multicast_maxtpdu(self):
+        """
+        Get socket option `multicast_maxtpdu`.
+        """
+        return lib.zsock_multicast_maxtpdu(self._as_parameter_)
+
+    def set_multicast_maxtpdu(self, multicast_maxtpdu):
+        """
+        Set socket option `multicast_maxtpdu`.
+        """
+        return lib.zsock_set_multicast_maxtpdu(self._as_parameter_, multicast_maxtpdu)
+
+    def vmci_buffer_size(self):
+        """
+        Get socket option `vmci_buffer_size`.
+        """
+        return lib.zsock_vmci_buffer_size(self._as_parameter_)
+
+    def set_vmci_buffer_size(self, vmci_buffer_size):
+        """
+        Set socket option `vmci_buffer_size`.
+        """
+        return lib.zsock_set_vmci_buffer_size(self._as_parameter_, vmci_buffer_size)
+
+    def vmci_buffer_min_size(self):
+        """
+        Get socket option `vmci_buffer_min_size`.
+        """
+        return lib.zsock_vmci_buffer_min_size(self._as_parameter_)
+
+    def set_vmci_buffer_min_size(self, vmci_buffer_min_size):
+        """
+        Set socket option `vmci_buffer_min_size`.
+        """
+        return lib.zsock_set_vmci_buffer_min_size(self._as_parameter_, vmci_buffer_min_size)
+
+    def vmci_buffer_max_size(self):
+        """
+        Get socket option `vmci_buffer_max_size`.
+        """
+        return lib.zsock_vmci_buffer_max_size(self._as_parameter_)
+
+    def set_vmci_buffer_max_size(self, vmci_buffer_max_size):
+        """
+        Set socket option `vmci_buffer_max_size`.
+        """
+        return lib.zsock_set_vmci_buffer_max_size(self._as_parameter_, vmci_buffer_max_size)
+
+    def vmci_connect_timeout(self):
+        """
+        Get socket option `vmci_connect_timeout`.
+        """
+        return lib.zsock_vmci_connect_timeout(self._as_parameter_)
+
+    def set_vmci_connect_timeout(self, vmci_connect_timeout):
+        """
+        Set socket option `vmci_connect_timeout`.
+        """
+        return lib.zsock_set_vmci_connect_timeout(self._as_parameter_, vmci_connect_timeout)
+
     def tos(self):
         """
         Get socket option `tos`.
@@ -5627,6 +5809,48 @@ return the supplied value. Takes a polymorphic socket reference.
         Set socket option `router_handover`.
         """
         return lib.zsock_set_router_handover(self._as_parameter_, router_handover)
+
+    def set_connect_rid(self, connect_rid):
+        """
+        Set socket option `connect_rid`.
+        """
+        return lib.zsock_set_connect_rid(self._as_parameter_, connect_rid)
+
+    def set_connect_rid_bin(self, connect_rid):
+        """
+        Set socket option `connect_rid` from 32-octet binary
+        """
+        return lib.zsock_set_connect_rid_bin(self._as_parameter_, connect_rid)
+
+    def handshake_ivl(self):
+        """
+        Get socket option `handshake_ivl`.
+        """
+        return lib.zsock_handshake_ivl(self._as_parameter_)
+
+    def set_handshake_ivl(self, handshake_ivl):
+        """
+        Set socket option `handshake_ivl`.
+        """
+        return lib.zsock_set_handshake_ivl(self._as_parameter_, handshake_ivl)
+
+    def socks_proxy(self):
+        """
+        Get socket option `socks_proxy`.
+        """
+        return return_fresh_string(lib.zsock_socks_proxy(self._as_parameter_))
+
+    def set_socks_proxy(self, socks_proxy):
+        """
+        Set socket option `socks_proxy`.
+        """
+        return lib.zsock_set_socks_proxy(self._as_parameter_, socks_proxy)
+
+    def set_xpub_nodrop(self, xpub_nodrop):
+        """
+        Set socket option `xpub_nodrop`.
+        """
+        return lib.zsock_set_xpub_nodrop(self._as_parameter_, xpub_nodrop)
 
     def set_router_mandatory(self, router_mandatory):
         """

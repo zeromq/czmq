@@ -2467,6 +2467,132 @@ nothing my_zsock.setUseFd (Number)
 Set socket option `use_fd`.
 
 ```
+nothing my_zsock.setXpubManual (Number)
+```
+
+Set socket option `xpub_manual`.
+
+```
+nothing my_zsock.setXpubWelcomeMsg (String)
+```
+
+Set socket option `xpub_welcome_msg`.
+
+```
+nothing my_zsock.setStreamNotify (Number)
+```
+
+Set socket option `stream_notify`.
+
+```
+integer my_zsock.invertMatching ()
+```
+
+Get socket option `invert_matching`.
+
+```
+nothing my_zsock.setInvertMatching (Number)
+```
+
+Set socket option `invert_matching`.
+
+```
+nothing my_zsock.setXpubVerboser (Number)
+```
+
+Set socket option `xpub_verboser`.
+
+```
+integer my_zsock.connectTimeout ()
+```
+
+Get socket option `connect_timeout`.
+
+```
+nothing my_zsock.setConnectTimeout (Number)
+```
+
+Set socket option `connect_timeout`.
+
+```
+integer my_zsock.tcpMaxrt ()
+```
+
+Get socket option `tcp_maxrt`.
+
+```
+nothing my_zsock.setTcpMaxrt (Number)
+```
+
+Set socket option `tcp_maxrt`.
+
+```
+integer my_zsock.threadSafe ()
+```
+
+Get socket option `thread_safe`.
+
+```
+integer my_zsock.multicastMaxtpdu ()
+```
+
+Get socket option `multicast_maxtpdu`.
+
+```
+nothing my_zsock.setMulticastMaxtpdu (Number)
+```
+
+Set socket option `multicast_maxtpdu`.
+
+```
+integer my_zsock.vmciBufferSize ()
+```
+
+Get socket option `vmci_buffer_size`.
+
+```
+nothing my_zsock.setVmciBufferSize (Number)
+```
+
+Set socket option `vmci_buffer_size`.
+
+```
+integer my_zsock.vmciBufferMinSize ()
+```
+
+Get socket option `vmci_buffer_min_size`.
+
+```
+nothing my_zsock.setVmciBufferMinSize (Number)
+```
+
+Set socket option `vmci_buffer_min_size`.
+
+```
+integer my_zsock.vmciBufferMaxSize ()
+```
+
+Get socket option `vmci_buffer_max_size`.
+
+```
+nothing my_zsock.setVmciBufferMaxSize (Number)
+```
+
+Set socket option `vmci_buffer_max_size`.
+
+```
+integer my_zsock.vmciConnectTimeout ()
+```
+
+Get socket option `vmci_connect_timeout`.
+
+```
+nothing my_zsock.setVmciConnectTimeout (Number)
+```
+
+Set socket option `vmci_connect_timeout`.
+
+```
 integer my_zsock.tos ()
 ```
 
@@ -2483,6 +2609,48 @@ nothing my_zsock.setRouterHandover (Number)
 ```
 
 Set socket option `router_handover`.
+
+```
+nothing my_zsock.setConnectRid (String)
+```
+
+Set socket option `connect_rid`.
+
+```
+nothing my_zsock.setConnectRidBin (String)
+```
+
+Set socket option `connect_rid` from 32-octet binary
+
+```
+integer my_zsock.handshakeIvl ()
+```
+
+Get socket option `handshake_ivl`.
+
+```
+nothing my_zsock.setHandshakeIvl (Number)
+```
+
+Set socket option `handshake_ivl`.
+
+```
+string my_zsock.socksProxy ()
+```
+
+Get socket option `socks_proxy`.
+
+```
+nothing my_zsock.setSocksProxy (String)
+```
+
+Set socket option `socks_proxy`.
+
+```
+nothing my_zsock.setXpubNodrop (Number)
+```
+
+Set socket option `xpub_nodrop`.
 
 ```
 nothing my_zsock.setRouterMandatory (Number)

@@ -501,6 +501,153 @@ public class Zsock implements AutoCloseable{
         __setUseFd (self, useFd);
     }
     /*
+    Set socket option `xpub_manual`.
+    */
+    native static void __setXpubManual (long self, int xpubManual);
+    public void setXpubManual (int xpubManual) {
+        __setXpubManual (self, xpubManual);
+    }
+    /*
+    Set socket option `xpub_welcome_msg`.
+    */
+    native static void __setXpubWelcomeMsg (long self, String xpubWelcomeMsg);
+    public void setXpubWelcomeMsg (String xpubWelcomeMsg) {
+        __setXpubWelcomeMsg (self, xpubWelcomeMsg);
+    }
+    /*
+    Set socket option `stream_notify`.
+    */
+    native static void __setStreamNotify (long self, int streamNotify);
+    public void setStreamNotify (int streamNotify) {
+        __setStreamNotify (self, streamNotify);
+    }
+    /*
+    Get socket option `invert_matching`.
+    */
+    native static int __invertMatching (long self);
+    public int invertMatching () {
+        return __invertMatching (self);
+    }
+    /*
+    Set socket option `invert_matching`.
+    */
+    native static void __setInvertMatching (long self, int invertMatching);
+    public void setInvertMatching (int invertMatching) {
+        __setInvertMatching (self, invertMatching);
+    }
+    /*
+    Set socket option `xpub_verboser`.
+    */
+    native static void __setXpubVerboser (long self, int xpubVerboser);
+    public void setXpubVerboser (int xpubVerboser) {
+        __setXpubVerboser (self, xpubVerboser);
+    }
+    /*
+    Get socket option `connect_timeout`.
+    */
+    native static int __connectTimeout (long self);
+    public int connectTimeout () {
+        return __connectTimeout (self);
+    }
+    /*
+    Set socket option `connect_timeout`.
+    */
+    native static void __setConnectTimeout (long self, int connectTimeout);
+    public void setConnectTimeout (int connectTimeout) {
+        __setConnectTimeout (self, connectTimeout);
+    }
+    /*
+    Get socket option `tcp_maxrt`.
+    */
+    native static int __tcpMaxrt (long self);
+    public int tcpMaxrt () {
+        return __tcpMaxrt (self);
+    }
+    /*
+    Set socket option `tcp_maxrt`.
+    */
+    native static void __setTcpMaxrt (long self, int tcpMaxrt);
+    public void setTcpMaxrt (int tcpMaxrt) {
+        __setTcpMaxrt (self, tcpMaxrt);
+    }
+    /*
+    Get socket option `thread_safe`.
+    */
+    native static int __threadSafe (long self);
+    public int threadSafe () {
+        return __threadSafe (self);
+    }
+    /*
+    Get socket option `multicast_maxtpdu`.
+    */
+    native static int __multicastMaxtpdu (long self);
+    public int multicastMaxtpdu () {
+        return __multicastMaxtpdu (self);
+    }
+    /*
+    Set socket option `multicast_maxtpdu`.
+    */
+    native static void __setMulticastMaxtpdu (long self, int multicastMaxtpdu);
+    public void setMulticastMaxtpdu (int multicastMaxtpdu) {
+        __setMulticastMaxtpdu (self, multicastMaxtpdu);
+    }
+    /*
+    Get socket option `vmci_buffer_size`.
+    */
+    native static int __vmciBufferSize (long self);
+    public int vmciBufferSize () {
+        return __vmciBufferSize (self);
+    }
+    /*
+    Set socket option `vmci_buffer_size`.
+    */
+    native static void __setVmciBufferSize (long self, int vmciBufferSize);
+    public void setVmciBufferSize (int vmciBufferSize) {
+        __setVmciBufferSize (self, vmciBufferSize);
+    }
+    /*
+    Get socket option `vmci_buffer_min_size`.
+    */
+    native static int __vmciBufferMinSize (long self);
+    public int vmciBufferMinSize () {
+        return __vmciBufferMinSize (self);
+    }
+    /*
+    Set socket option `vmci_buffer_min_size`.
+    */
+    native static void __setVmciBufferMinSize (long self, int vmciBufferMinSize);
+    public void setVmciBufferMinSize (int vmciBufferMinSize) {
+        __setVmciBufferMinSize (self, vmciBufferMinSize);
+    }
+    /*
+    Get socket option `vmci_buffer_max_size`.
+    */
+    native static int __vmciBufferMaxSize (long self);
+    public int vmciBufferMaxSize () {
+        return __vmciBufferMaxSize (self);
+    }
+    /*
+    Set socket option `vmci_buffer_max_size`.
+    */
+    native static void __setVmciBufferMaxSize (long self, int vmciBufferMaxSize);
+    public void setVmciBufferMaxSize (int vmciBufferMaxSize) {
+        __setVmciBufferMaxSize (self, vmciBufferMaxSize);
+    }
+    /*
+    Get socket option `vmci_connect_timeout`.
+    */
+    native static int __vmciConnectTimeout (long self);
+    public int vmciConnectTimeout () {
+        return __vmciConnectTimeout (self);
+    }
+    /*
+    Set socket option `vmci_connect_timeout`.
+    */
+    native static void __setVmciConnectTimeout (long self, int vmciConnectTimeout);
+    public void setVmciConnectTimeout (int vmciConnectTimeout) {
+        __setVmciConnectTimeout (self, vmciConnectTimeout);
+    }
+    /*
     Get socket option `tos`.
     */
     native static int __tos (long self);
@@ -520,6 +667,55 @@ public class Zsock implements AutoCloseable{
     native static void __setRouterHandover (long self, int routerHandover);
     public void setRouterHandover (int routerHandover) {
         __setRouterHandover (self, routerHandover);
+    }
+    /*
+    Set socket option `connect_rid`.
+    */
+    native static void __setConnectRid (long self, String connectRid);
+    public void setConnectRid (String connectRid) {
+        __setConnectRid (self, connectRid);
+    }
+    /*
+    Set socket option `connect_rid` from 32-octet binary
+    */
+    native static void __setConnectRidBin (long self, byte [] connectRid);
+    public void setConnectRidBin (byte [] connectRid) {
+        __setConnectRidBin (self, connectRid);
+    }
+    /*
+    Get socket option `handshake_ivl`.
+    */
+    native static int __handshakeIvl (long self);
+    public int handshakeIvl () {
+        return __handshakeIvl (self);
+    }
+    /*
+    Set socket option `handshake_ivl`.
+    */
+    native static void __setHandshakeIvl (long self, int handshakeIvl);
+    public void setHandshakeIvl (int handshakeIvl) {
+        __setHandshakeIvl (self, handshakeIvl);
+    }
+    /*
+    Get socket option `socks_proxy`.
+    */
+    native static String __socksProxy (long self);
+    public String socksProxy () {
+        return __socksProxy (self);
+    }
+    /*
+    Set socket option `socks_proxy`.
+    */
+    native static void __setSocksProxy (long self, String socksProxy);
+    public void setSocksProxy (String socksProxy) {
+        __setSocksProxy (self, socksProxy);
+    }
+    /*
+    Set socket option `xpub_nodrop`.
+    */
+    native static void __setXpubNodrop (long self, int xpubNodrop);
+    public void setXpubNodrop (int xpubNodrop) {
+        __setXpubNodrop (self, xpubNodrop);
     }
     /*
     Set socket option `router_mandatory`.
