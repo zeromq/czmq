@@ -231,6 +231,13 @@ This is the class interface:
     CZMQ_EXPORT void
         zhashx_set_key_hasher (zhashx_t *self, zhashx_hash_fn hasher);
     
+    //  Make copy of hash table; if supplied table is null, returns null.    
+    //  Does not copy items themselves. Rebuilds new table so may be slow on 
+    //  very large tables. NOTE: only works with item values that are strings
+    //  since there's no other way to know how to duplicate the item value.  
+    CZMQ_EXPORT zhashx_t *
+        zhashx_dup_v2 (zhashx_t *self);
+    
     //  Self test of this class.
     CZMQ_EXPORT void
         zhashx_test (bool verbose);
