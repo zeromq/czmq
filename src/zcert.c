@@ -428,27 +428,6 @@ zcert_print (zcert_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  DEPRECATED as incompatible with centralized logging
-//  Print certificate contents to open stream
-
-void
-zcert_fprint (zcert_t *self, FILE *file)
-{
-    assert (self);
-    fprintf (file, "metadata\n");
-
-    char *value = (char *) zhash_first (self->metadata);
-    while (value) {
-        fprintf (file, "    %s = \"%s\"\n", zhash_cursor (self->metadata), value);
-        value = (char *) zhash_next (self->metadata);
-    }
-    fprintf (file, "curve\n");
-    fprintf (file, "    public-key = \"%s\"\n", self->public_txt);
-    fprintf (file, "    secret-key = \"%s\"\n", self->secret_txt);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Selftest
 
 void
