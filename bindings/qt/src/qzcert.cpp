@@ -170,15 +170,6 @@ void QZcert::print ()
 }
 
 ///
-//  Print certificate contents to open stream. This method is deprecated
-//  and you should use the print method.                                
-void QZcert::fprint (FILE *file)
-{
-    zcert_fprint (self, file);
-    
-}
-
-///
 //  Self test of this class
 void QZcert::test (bool verbose)
 {

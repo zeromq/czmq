@@ -1102,6 +1102,535 @@ module CZMQ
         result
       end
 
+      # Set socket option `xpub_manual`.
+      #
+      # @param xpub_manual [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_xpub_manual(xpub_manual)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        xpub_manual = Integer(xpub_manual)
+        result = ::CZMQ::FFI.zsock_set_xpub_manual(self_p, xpub_manual)
+        result
+      end
+
+      # Set socket option `xpub_manual`.
+      #
+      # This is the polymorphic version of #set_xpub_manual.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param xpub_manual [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_xpub_manual(self_p, xpub_manual)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        xpub_manual = Integer(xpub_manual)
+        result = ::CZMQ::FFI.zsock_set_xpub_manual(self_p, xpub_manual)
+        result
+      end
+
+      # Set socket option `xpub_welcome_msg`.
+      #
+      # @param xpub_welcome_msg [String, #to_s, nil]
+      # @return [void]
+      def set_xpub_welcome_msg(xpub_welcome_msg)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_xpub_welcome_msg(self_p, xpub_welcome_msg)
+        result
+      end
+
+      # Set socket option `xpub_welcome_msg`.
+      #
+      # This is the polymorphic version of #set_xpub_welcome_msg.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param xpub_welcome_msg [String, #to_s, nil]
+      # @return [void]
+      def self.set_xpub_welcome_msg(self_p, xpub_welcome_msg)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_xpub_welcome_msg(self_p, xpub_welcome_msg)
+        result
+      end
+
+      # Set socket option `stream_notify`.
+      #
+      # @param stream_notify [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_stream_notify(stream_notify)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        stream_notify = Integer(stream_notify)
+        result = ::CZMQ::FFI.zsock_set_stream_notify(self_p, stream_notify)
+        result
+      end
+
+      # Set socket option `stream_notify`.
+      #
+      # This is the polymorphic version of #set_stream_notify.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param stream_notify [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_stream_notify(self_p, stream_notify)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        stream_notify = Integer(stream_notify)
+        result = ::CZMQ::FFI.zsock_set_stream_notify(self_p, stream_notify)
+        result
+      end
+
+      # Get socket option `invert_matching`.
+      #
+      # @return [Integer]
+      def invert_matching()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_invert_matching(self_p)
+        result
+      end
+
+      # Get socket option `invert_matching`.
+      #
+      # This is the polymorphic version of #invert_matching.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.invert_matching(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_invert_matching(self_p)
+        result
+      end
+
+      # Set socket option `invert_matching`.
+      #
+      # @param invert_matching [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_invert_matching(invert_matching)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        invert_matching = Integer(invert_matching)
+        result = ::CZMQ::FFI.zsock_set_invert_matching(self_p, invert_matching)
+        result
+      end
+
+      # Set socket option `invert_matching`.
+      #
+      # This is the polymorphic version of #set_invert_matching.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param invert_matching [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_invert_matching(self_p, invert_matching)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        invert_matching = Integer(invert_matching)
+        result = ::CZMQ::FFI.zsock_set_invert_matching(self_p, invert_matching)
+        result
+      end
+
+      # Set socket option `xpub_verboser`.
+      #
+      # @param xpub_verboser [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_xpub_verboser(xpub_verboser)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        xpub_verboser = Integer(xpub_verboser)
+        result = ::CZMQ::FFI.zsock_set_xpub_verboser(self_p, xpub_verboser)
+        result
+      end
+
+      # Set socket option `xpub_verboser`.
+      #
+      # This is the polymorphic version of #set_xpub_verboser.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param xpub_verboser [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_xpub_verboser(self_p, xpub_verboser)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        xpub_verboser = Integer(xpub_verboser)
+        result = ::CZMQ::FFI.zsock_set_xpub_verboser(self_p, xpub_verboser)
+        result
+      end
+
+      # Get socket option `connect_timeout`.
+      #
+      # @return [Integer]
+      def connect_timeout()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_connect_timeout(self_p)
+        result
+      end
+
+      # Get socket option `connect_timeout`.
+      #
+      # This is the polymorphic version of #connect_timeout.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.connect_timeout(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_connect_timeout(self_p)
+        result
+      end
+
+      # Set socket option `connect_timeout`.
+      #
+      # @param connect_timeout [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_connect_timeout(connect_timeout)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        connect_timeout = Integer(connect_timeout)
+        result = ::CZMQ::FFI.zsock_set_connect_timeout(self_p, connect_timeout)
+        result
+      end
+
+      # Set socket option `connect_timeout`.
+      #
+      # This is the polymorphic version of #set_connect_timeout.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param connect_timeout [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_connect_timeout(self_p, connect_timeout)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        connect_timeout = Integer(connect_timeout)
+        result = ::CZMQ::FFI.zsock_set_connect_timeout(self_p, connect_timeout)
+        result
+      end
+
+      # Get socket option `tcp_maxrt`.
+      #
+      # @return [Integer]
+      def tcp_maxrt()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_maxrt(self_p)
+        result
+      end
+
+      # Get socket option `tcp_maxrt`.
+      #
+      # This is the polymorphic version of #tcp_maxrt.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.tcp_maxrt(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_tcp_maxrt(self_p)
+        result
+      end
+
+      # Set socket option `tcp_maxrt`.
+      #
+      # @param tcp_maxrt [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_tcp_maxrt(tcp_maxrt)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_maxrt = Integer(tcp_maxrt)
+        result = ::CZMQ::FFI.zsock_set_tcp_maxrt(self_p, tcp_maxrt)
+        result
+      end
+
+      # Set socket option `tcp_maxrt`.
+      #
+      # This is the polymorphic version of #set_tcp_maxrt.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param tcp_maxrt [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_tcp_maxrt(self_p, tcp_maxrt)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        tcp_maxrt = Integer(tcp_maxrt)
+        result = ::CZMQ::FFI.zsock_set_tcp_maxrt(self_p, tcp_maxrt)
+        result
+      end
+
+      # Get socket option `thread_safe`.
+      #
+      # @return [Integer]
+      def thread_safe()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_thread_safe(self_p)
+        result
+      end
+
+      # Get socket option `thread_safe`.
+      #
+      # This is the polymorphic version of #thread_safe.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.thread_safe(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_thread_safe(self_p)
+        result
+      end
+
+      # Get socket option `multicast_maxtpdu`.
+      #
+      # @return [Integer]
+      def multicast_maxtpdu()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_multicast_maxtpdu(self_p)
+        result
+      end
+
+      # Get socket option `multicast_maxtpdu`.
+      #
+      # This is the polymorphic version of #multicast_maxtpdu.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.multicast_maxtpdu(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_multicast_maxtpdu(self_p)
+        result
+      end
+
+      # Set socket option `multicast_maxtpdu`.
+      #
+      # @param multicast_maxtpdu [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_multicast_maxtpdu(multicast_maxtpdu)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        multicast_maxtpdu = Integer(multicast_maxtpdu)
+        result = ::CZMQ::FFI.zsock_set_multicast_maxtpdu(self_p, multicast_maxtpdu)
+        result
+      end
+
+      # Set socket option `multicast_maxtpdu`.
+      #
+      # This is the polymorphic version of #set_multicast_maxtpdu.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param multicast_maxtpdu [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_multicast_maxtpdu(self_p, multicast_maxtpdu)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        multicast_maxtpdu = Integer(multicast_maxtpdu)
+        result = ::CZMQ::FFI.zsock_set_multicast_maxtpdu(self_p, multicast_maxtpdu)
+        result
+      end
+
+      # Get socket option `vmci_buffer_size`.
+      #
+      # @return [Integer]
+      def vmci_buffer_size()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_vmci_buffer_size(self_p)
+        result
+      end
+
+      # Get socket option `vmci_buffer_size`.
+      #
+      # This is the polymorphic version of #vmci_buffer_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.vmci_buffer_size(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_vmci_buffer_size(self_p)
+        result
+      end
+
+      # Set socket option `vmci_buffer_size`.
+      #
+      # @param vmci_buffer_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_vmci_buffer_size(vmci_buffer_size)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        vmci_buffer_size = Integer(vmci_buffer_size)
+        result = ::CZMQ::FFI.zsock_set_vmci_buffer_size(self_p, vmci_buffer_size)
+        result
+      end
+
+      # Set socket option `vmci_buffer_size`.
+      #
+      # This is the polymorphic version of #set_vmci_buffer_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param vmci_buffer_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_vmci_buffer_size(self_p, vmci_buffer_size)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        vmci_buffer_size = Integer(vmci_buffer_size)
+        result = ::CZMQ::FFI.zsock_set_vmci_buffer_size(self_p, vmci_buffer_size)
+        result
+      end
+
+      # Get socket option `vmci_buffer_min_size`.
+      #
+      # @return [Integer]
+      def vmci_buffer_min_size()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_vmci_buffer_min_size(self_p)
+        result
+      end
+
+      # Get socket option `vmci_buffer_min_size`.
+      #
+      # This is the polymorphic version of #vmci_buffer_min_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.vmci_buffer_min_size(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_vmci_buffer_min_size(self_p)
+        result
+      end
+
+      # Set socket option `vmci_buffer_min_size`.
+      #
+      # @param vmci_buffer_min_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_vmci_buffer_min_size(vmci_buffer_min_size)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        vmci_buffer_min_size = Integer(vmci_buffer_min_size)
+        result = ::CZMQ::FFI.zsock_set_vmci_buffer_min_size(self_p, vmci_buffer_min_size)
+        result
+      end
+
+      # Set socket option `vmci_buffer_min_size`.
+      #
+      # This is the polymorphic version of #set_vmci_buffer_min_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param vmci_buffer_min_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_vmci_buffer_min_size(self_p, vmci_buffer_min_size)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        vmci_buffer_min_size = Integer(vmci_buffer_min_size)
+        result = ::CZMQ::FFI.zsock_set_vmci_buffer_min_size(self_p, vmci_buffer_min_size)
+        result
+      end
+
+      # Get socket option `vmci_buffer_max_size`.
+      #
+      # @return [Integer]
+      def vmci_buffer_max_size()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_vmci_buffer_max_size(self_p)
+        result
+      end
+
+      # Get socket option `vmci_buffer_max_size`.
+      #
+      # This is the polymorphic version of #vmci_buffer_max_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.vmci_buffer_max_size(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_vmci_buffer_max_size(self_p)
+        result
+      end
+
+      # Set socket option `vmci_buffer_max_size`.
+      #
+      # @param vmci_buffer_max_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_vmci_buffer_max_size(vmci_buffer_max_size)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        vmci_buffer_max_size = Integer(vmci_buffer_max_size)
+        result = ::CZMQ::FFI.zsock_set_vmci_buffer_max_size(self_p, vmci_buffer_max_size)
+        result
+      end
+
+      # Set socket option `vmci_buffer_max_size`.
+      #
+      # This is the polymorphic version of #set_vmci_buffer_max_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param vmci_buffer_max_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_vmci_buffer_max_size(self_p, vmci_buffer_max_size)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        vmci_buffer_max_size = Integer(vmci_buffer_max_size)
+        result = ::CZMQ::FFI.zsock_set_vmci_buffer_max_size(self_p, vmci_buffer_max_size)
+        result
+      end
+
+      # Get socket option `vmci_connect_timeout`.
+      #
+      # @return [Integer]
+      def vmci_connect_timeout()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_vmci_connect_timeout(self_p)
+        result
+      end
+
+      # Get socket option `vmci_connect_timeout`.
+      #
+      # This is the polymorphic version of #vmci_connect_timeout.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.vmci_connect_timeout(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_vmci_connect_timeout(self_p)
+        result
+      end
+
+      # Set socket option `vmci_connect_timeout`.
+      #
+      # @param vmci_connect_timeout [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_vmci_connect_timeout(vmci_connect_timeout)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        vmci_connect_timeout = Integer(vmci_connect_timeout)
+        result = ::CZMQ::FFI.zsock_set_vmci_connect_timeout(self_p, vmci_connect_timeout)
+        result
+      end
+
+      # Set socket option `vmci_connect_timeout`.
+      #
+      # This is the polymorphic version of #set_vmci_connect_timeout.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param vmci_connect_timeout [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_vmci_connect_timeout(self_p, vmci_connect_timeout)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        vmci_connect_timeout = Integer(vmci_connect_timeout)
+        result = ::CZMQ::FFI.zsock_set_vmci_connect_timeout(self_p, vmci_connect_timeout)
+        result
+      end
+
       # Get socket option `tos`.
       #
       # @return [Integer]
@@ -1176,6 +1705,183 @@ module CZMQ
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         router_handover = Integer(router_handover)
         result = ::CZMQ::FFI.zsock_set_router_handover(self_p, router_handover)
+        result
+      end
+
+      # Set socket option `connect_rid`.
+      #
+      # @param connect_rid [String, #to_s, nil]
+      # @return [void]
+      def set_connect_rid(connect_rid)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_connect_rid(self_p, connect_rid)
+        result
+      end
+
+      # Set socket option `connect_rid`.
+      #
+      # This is the polymorphic version of #set_connect_rid.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param connect_rid [String, #to_s, nil]
+      # @return [void]
+      def self.set_connect_rid(self_p, connect_rid)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_connect_rid(self_p, connect_rid)
+        result
+      end
+
+      # Set socket option `connect_rid` from 32-octet binary
+      #
+      # @param connect_rid [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def set_connect_rid_bin(connect_rid)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_connect_rid_bin(self_p, connect_rid)
+        result
+      end
+
+      # Set socket option `connect_rid` from 32-octet binary
+      #
+      # This is the polymorphic version of #set_connect_rid_bin.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param connect_rid [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def self.set_connect_rid_bin(self_p, connect_rid)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_connect_rid_bin(self_p, connect_rid)
+        result
+      end
+
+      # Get socket option `handshake_ivl`.
+      #
+      # @return [Integer]
+      def handshake_ivl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_handshake_ivl(self_p)
+        result
+      end
+
+      # Get socket option `handshake_ivl`.
+      #
+      # This is the polymorphic version of #handshake_ivl.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.handshake_ivl(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_handshake_ivl(self_p)
+        result
+      end
+
+      # Set socket option `handshake_ivl`.
+      #
+      # @param handshake_ivl [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_handshake_ivl(handshake_ivl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        handshake_ivl = Integer(handshake_ivl)
+        result = ::CZMQ::FFI.zsock_set_handshake_ivl(self_p, handshake_ivl)
+        result
+      end
+
+      # Set socket option `handshake_ivl`.
+      #
+      # This is the polymorphic version of #set_handshake_ivl.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param handshake_ivl [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_handshake_ivl(self_p, handshake_ivl)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        handshake_ivl = Integer(handshake_ivl)
+        result = ::CZMQ::FFI.zsock_set_handshake_ivl(self_p, handshake_ivl)
+        result
+      end
+
+      # Get socket option `socks_proxy`.
+      #
+      # @return [::FFI::AutoPointer]
+      def socks_proxy()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_socks_proxy(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Get socket option `socks_proxy`.
+      #
+      # This is the polymorphic version of #socks_proxy.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [::FFI::AutoPointer]
+      def self.socks_proxy(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_socks_proxy(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Set socket option `socks_proxy`.
+      #
+      # @param socks_proxy [String, #to_s, nil]
+      # @return [void]
+      def set_socks_proxy(socks_proxy)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_socks_proxy(self_p, socks_proxy)
+        result
+      end
+
+      # Set socket option `socks_proxy`.
+      #
+      # This is the polymorphic version of #set_socks_proxy.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param socks_proxy [String, #to_s, nil]
+      # @return [void]
+      def self.set_socks_proxy(self_p, socks_proxy)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_socks_proxy(self_p, socks_proxy)
+        result
+      end
+
+      # Set socket option `xpub_nodrop`.
+      #
+      # @param xpub_nodrop [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_xpub_nodrop(xpub_nodrop)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        xpub_nodrop = Integer(xpub_nodrop)
+        result = ::CZMQ::FFI.zsock_set_xpub_nodrop(self_p, xpub_nodrop)
+        result
+      end
+
+      # Set socket option `xpub_nodrop`.
+      #
+      # This is the polymorphic version of #set_xpub_nodrop.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param xpub_nodrop [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_xpub_nodrop(self_p, xpub_nodrop)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        xpub_nodrop = Integer(xpub_nodrop)
+        result = ::CZMQ::FFI.zsock_set_xpub_nodrop(self_p, xpub_nodrop)
         result
       end
 

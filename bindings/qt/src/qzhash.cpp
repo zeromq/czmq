@@ -235,16 +235,6 @@ void QZhash::autofree ()
 }
 
 ///
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order. Stops if callback function returns non-zero and returns 
-//  final return code from callback function (zero = success). Deprecated. 
-int QZhash::foreachNoConflict (zhash_foreach_fn callback, void *argument)
-{
-    int rv = zhash_foreach (self, callback, argument);
-    return rv;
-}
-
-///
 //  Self test of this class.
 void QZhash::test (bool verbose)
 {

@@ -44,13 +44,6 @@ void QmlZcertstore::print () {
     zcertstore_print (self);
 };
 
-///
-//  Print list of certificates in store to open stream. This method is
-//  deprecated, and you should use the print method.                  
-void QmlZcertstore::fprint (FILE *file) {
-    zcertstore_fprint (self, file);
-};
-
 
 QObject* QmlZcertstore::qmlAttachedProperties(QObject* object) {
     return new QmlZcertstoreAttached(object);

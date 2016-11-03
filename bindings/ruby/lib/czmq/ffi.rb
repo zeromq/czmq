@@ -97,7 +97,6 @@ module CZMQ
       attach_function :zcert_dup, [:pointer], :pointer, **opts
       attach_function :zcert_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zcert_print, [:pointer], :void, **opts
-      attach_function :zcert_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zcert_test, [:bool], :void, **opts
 
       require_relative 'ffi/zcert'
@@ -123,7 +122,6 @@ module CZMQ
         end
       end
       attach_function :zcertstore_print, [:pointer], :void, **opts
-      attach_function :zcertstore_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zcertstore_test, [:bool], :void, **opts
 
       require_relative 'ffi/zcertstore'
@@ -343,7 +341,6 @@ module CZMQ
       attach_function :zhash_load, [:pointer, :string], :int, **opts
       attach_function :zhash_refresh, [:pointer], :int, **opts
       attach_function :zhash_autofree, [:pointer], :void, **opts
-      attach_function :zhash_foreach, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zhash_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhash'
@@ -393,8 +390,6 @@ module CZMQ
       attach_function :zhashx_set_key_comparator, [:pointer, :pointer], :void, **opts
       attach_function :zhashx_set_key_hasher, [:pointer, :pointer], :void, **opts
       attach_function :zhashx_dup_v2, [:pointer], :pointer, **opts
-      attach_function :zhashx_autofree, [:pointer], :void, **opts
-      attach_function :zhashx_foreach, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zhashx_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhashx'
@@ -838,73 +833,45 @@ module CZMQ
       end
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
-      begin # DRAFT method
-        attach_function :zsock_heartbeat_ivl, [:pointer], :int, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_heartbeat_ivl() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zsock_set_heartbeat_ivl, [:pointer, :int], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_set_heartbeat_ivl() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zsock_heartbeat_ttl, [:pointer], :int, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_heartbeat_ttl() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zsock_set_heartbeat_ttl, [:pointer, :int], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_set_heartbeat_ttl() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zsock_heartbeat_timeout, [:pointer], :int, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_heartbeat_timeout() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zsock_set_heartbeat_timeout, [:pointer, :int], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_set_heartbeat_timeout() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zsock_use_fd, [:pointer], :int, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_use_fd() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zsock_set_use_fd, [:pointer, :int], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zsock_set_use_fd() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
+      attach_function :zsock_heartbeat_ivl, [:pointer], :int, **opts
+      attach_function :zsock_set_heartbeat_ivl, [:pointer, :int], :void, **opts
+      attach_function :zsock_heartbeat_ttl, [:pointer], :int, **opts
+      attach_function :zsock_set_heartbeat_ttl, [:pointer, :int], :void, **opts
+      attach_function :zsock_heartbeat_timeout, [:pointer], :int, **opts
+      attach_function :zsock_set_heartbeat_timeout, [:pointer, :int], :void, **opts
+      attach_function :zsock_use_fd, [:pointer], :int, **opts
+      attach_function :zsock_set_use_fd, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_xpub_manual, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_xpub_welcome_msg, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_stream_notify, [:pointer, :int], :void, **opts
+      attach_function :zsock_invert_matching, [:pointer], :int, **opts
+      attach_function :zsock_set_invert_matching, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_xpub_verboser, [:pointer, :int], :void, **opts
+      attach_function :zsock_connect_timeout, [:pointer], :int, **opts
+      attach_function :zsock_set_connect_timeout, [:pointer, :int], :void, **opts
+      attach_function :zsock_tcp_maxrt, [:pointer], :int, **opts
+      attach_function :zsock_set_tcp_maxrt, [:pointer, :int], :void, **opts
+      attach_function :zsock_thread_safe, [:pointer], :int, **opts
+      attach_function :zsock_multicast_maxtpdu, [:pointer], :int, **opts
+      attach_function :zsock_set_multicast_maxtpdu, [:pointer, :int], :void, **opts
+      attach_function :zsock_vmci_buffer_size, [:pointer], :int, **opts
+      attach_function :zsock_set_vmci_buffer_size, [:pointer, :int], :void, **opts
+      attach_function :zsock_vmci_buffer_min_size, [:pointer], :int, **opts
+      attach_function :zsock_set_vmci_buffer_min_size, [:pointer, :int], :void, **opts
+      attach_function :zsock_vmci_buffer_max_size, [:pointer], :int, **opts
+      attach_function :zsock_set_vmci_buffer_max_size, [:pointer, :int], :void, **opts
+      attach_function :zsock_vmci_connect_timeout, [:pointer], :int, **opts
+      attach_function :zsock_set_vmci_connect_timeout, [:pointer, :int], :void, **opts
       attach_function :zsock_tos, [:pointer], :int, **opts
       attach_function :zsock_set_tos, [:pointer, :int], :void, **opts
       attach_function :zsock_set_router_handover, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_connect_rid, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_connect_rid_bin, [:pointer, :pointer], :void, **opts
+      attach_function :zsock_handshake_ivl, [:pointer], :int, **opts
+      attach_function :zsock_set_handshake_ivl, [:pointer, :int], :void, **opts
+      attach_function :zsock_socks_proxy, [:pointer], :pointer, **opts
+      attach_function :zsock_set_socks_proxy, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_xpub_nodrop, [:pointer, :int], :void, **opts
       attach_function :zsock_set_router_mandatory, [:pointer, :int], :void, **opts
       attach_function :zsock_set_probe_router, [:pointer, :int], :void, **opts
       attach_function :zsock_set_req_relaxed, [:pointer, :int], :void, **opts

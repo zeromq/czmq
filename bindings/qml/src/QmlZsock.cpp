@@ -311,6 +311,132 @@ void QmlZsock::setUseFd (int useFd) {
 };
 
 ///
+//  Set socket option `xpub_manual`.
+void QmlZsock::setXpubManual (int xpubManual) {
+    zsock_set_xpub_manual (self, xpubManual);
+};
+
+///
+//  Set socket option `xpub_welcome_msg`.
+void QmlZsock::setXpubWelcomeMsg (const QString &xpubWelcomeMsg) {
+    zsock_set_xpub_welcome_msg (self, xpubWelcomeMsg.toUtf8().data());
+};
+
+///
+//  Set socket option `stream_notify`.
+void QmlZsock::setStreamNotify (int streamNotify) {
+    zsock_set_stream_notify (self, streamNotify);
+};
+
+///
+//  Get socket option `invert_matching`.
+int QmlZsock::invertMatching () {
+    return zsock_invert_matching (self);
+};
+
+///
+//  Set socket option `invert_matching`.
+void QmlZsock::setInvertMatching (int invertMatching) {
+    zsock_set_invert_matching (self, invertMatching);
+};
+
+///
+//  Set socket option `xpub_verboser`.
+void QmlZsock::setXpubVerboser (int xpubVerboser) {
+    zsock_set_xpub_verboser (self, xpubVerboser);
+};
+
+///
+//  Get socket option `connect_timeout`.
+int QmlZsock::connectTimeout () {
+    return zsock_connect_timeout (self);
+};
+
+///
+//  Set socket option `connect_timeout`.
+void QmlZsock::setConnectTimeout (int connectTimeout) {
+    zsock_set_connect_timeout (self, connectTimeout);
+};
+
+///
+//  Get socket option `tcp_maxrt`.
+int QmlZsock::tcpMaxrt () {
+    return zsock_tcp_maxrt (self);
+};
+
+///
+//  Set socket option `tcp_maxrt`.
+void QmlZsock::setTcpMaxrt (int tcpMaxrt) {
+    zsock_set_tcp_maxrt (self, tcpMaxrt);
+};
+
+///
+//  Get socket option `thread_safe`.
+int QmlZsock::threadSafe () {
+    return zsock_thread_safe (self);
+};
+
+///
+//  Get socket option `multicast_maxtpdu`.
+int QmlZsock::multicastMaxtpdu () {
+    return zsock_multicast_maxtpdu (self);
+};
+
+///
+//  Set socket option `multicast_maxtpdu`.
+void QmlZsock::setMulticastMaxtpdu (int multicastMaxtpdu) {
+    zsock_set_multicast_maxtpdu (self, multicastMaxtpdu);
+};
+
+///
+//  Get socket option `vmci_buffer_size`.
+int QmlZsock::vmciBufferSize () {
+    return zsock_vmci_buffer_size (self);
+};
+
+///
+//  Set socket option `vmci_buffer_size`.
+void QmlZsock::setVmciBufferSize (int vmciBufferSize) {
+    zsock_set_vmci_buffer_size (self, vmciBufferSize);
+};
+
+///
+//  Get socket option `vmci_buffer_min_size`.
+int QmlZsock::vmciBufferMinSize () {
+    return zsock_vmci_buffer_min_size (self);
+};
+
+///
+//  Set socket option `vmci_buffer_min_size`.
+void QmlZsock::setVmciBufferMinSize (int vmciBufferMinSize) {
+    zsock_set_vmci_buffer_min_size (self, vmciBufferMinSize);
+};
+
+///
+//  Get socket option `vmci_buffer_max_size`.
+int QmlZsock::vmciBufferMaxSize () {
+    return zsock_vmci_buffer_max_size (self);
+};
+
+///
+//  Set socket option `vmci_buffer_max_size`.
+void QmlZsock::setVmciBufferMaxSize (int vmciBufferMaxSize) {
+    zsock_set_vmci_buffer_max_size (self, vmciBufferMaxSize);
+};
+
+///
+//  Get socket option `vmci_connect_timeout`.
+int QmlZsock::vmciConnectTimeout () {
+    return zsock_vmci_connect_timeout (self);
+};
+
+///
+//  Set socket option `vmci_connect_timeout`.
+void QmlZsock::setVmciConnectTimeout (int vmciConnectTimeout) {
+    zsock_set_vmci_connect_timeout (self, vmciConnectTimeout);
+};
+
+///
 //  Get socket option `tos`.
 int QmlZsock::tos () {
     return zsock_tos (self);
@@ -326,6 +452,51 @@ void QmlZsock::setTos (int tos) {
 //  Set socket option `router_handover`.
 void QmlZsock::setRouterHandover (int routerHandover) {
     zsock_set_router_handover (self, routerHandover);
+};
+
+///
+//  Set socket option `connect_rid`.
+void QmlZsock::setConnectRid (const QString &connectRid) {
+    zsock_set_connect_rid (self, connectRid.toUtf8().data());
+};
+
+///
+//  Set socket option `connect_rid` from 32-octet binary
+void QmlZsock::setConnectRidBin (const byte *connectRid) {
+    zsock_set_connect_rid_bin (self, connectRid);
+};
+
+///
+//  Get socket option `handshake_ivl`.
+int QmlZsock::handshakeIvl () {
+    return zsock_handshake_ivl (self);
+};
+
+///
+//  Set socket option `handshake_ivl`.
+void QmlZsock::setHandshakeIvl (int handshakeIvl) {
+    zsock_set_handshake_ivl (self, handshakeIvl);
+};
+
+///
+//  Get socket option `socks_proxy`.
+QString QmlZsock::socksProxy () {
+    char *retStr_ = zsock_socks_proxy (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `socks_proxy`.
+void QmlZsock::setSocksProxy (const QString &socksProxy) {
+    zsock_set_socks_proxy (self, socksProxy.toUtf8().data());
+};
+
+///
+//  Set socket option `xpub_nodrop`.
+void QmlZsock::setXpubNodrop (int xpubNodrop) {
+    zsock_set_xpub_nodrop (self, xpubNodrop);
 };
 
 ///

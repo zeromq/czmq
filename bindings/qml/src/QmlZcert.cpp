@@ -108,13 +108,6 @@ void QmlZcert::print () {
     zcert_print (self);
 };
 
-///
-//  Print certificate contents to open stream. This method is deprecated
-//  and you should use the print method.                                
-void QmlZcert::fprint (FILE *file) {
-    zcert_fprint (self, file);
-};
-
 
 QObject* QmlZcert::qmlAttachedProperties(QObject* object) {
     return new QmlZcertAttached(object);

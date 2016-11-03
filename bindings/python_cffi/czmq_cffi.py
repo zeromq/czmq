@@ -98,10 +98,6 @@ typedef int (zconfig_fct) (
 typedef void (zhash_free_fn) (
     void *data);
 
-// Callback function for zhash_foreach method. Deprecated.
-typedef int (zhash_foreach_fn) (
-    const char *key, void *item, void *argument);
-
 // Destroy an item
 typedef void (zhashx_destructor_fn) (
     void **item);
@@ -131,11 +127,6 @@ typedef char * (zhashx_serializer_fn) (
 // The caller takes ownership of the newly created object.
 typedef void * (zhashx_deserializer_fn) (
     const char *item_str);
-
-// Callback function for zhashx_foreach method.                              
-// This callback is deprecated and you should use zhashx_first/_next instead.
-typedef int (zhashx_foreach_fn) (
-    const char *key, void *item, void *argument);
 
 // Comparison function e.g. for sorting and removing.
 typedef int (zlist_compare_fn) (
@@ -372,11 +363,6 @@ bool
 void
     zcert_print (zcert_t *self);
 
-// Print certificate contents to open stream. This method is deprecated
-// and you should use the print method.                                
-void
-    zcert_fprint (zcert_t *self, FILE *file);
-
 // Self test of this class
 void
     zcert_test (bool verbose);
@@ -419,11 +405,6 @@ void
 // Print list of certificates in store to logging facility
 void
     zcertstore_print (zcertstore_t *self);
-
-// Print list of certificates in store to open stream. This method is
-// deprecated, and you should use the print method.                  
-void
-    zcertstore_fprint (zcertstore_t *self, FILE *file);
 
 // Self test of this class
 void
@@ -1265,12 +1246,6 @@ int
 void
     zhash_autofree (zhash_t *self);
 
-// Apply function to each item in the hash table. Items are iterated in no
-// defined order. Stops if callback function returns non-zero and returns 
-// final return code from callback function (zero = success). Deprecated. 
-int
-    zhash_foreach (zhash_t *self, zhash_foreach_fn callback, void *argument);
-
 // Self test of this class.
 void
     zhash_test (bool verbose);
@@ -1473,18 +1448,6 @@ void
 // since there's no other way to know how to duplicate the item value.  
 zhashx_t *
     zhashx_dup_v2 (zhashx_t *self);
-
-// Set hash for automatic value destruction. This method is deprecated
-// and you should use set_destructor instead.                         
-void
-    zhashx_autofree (zhashx_t *self);
-
-// Apply function to each item in the hash table. Items are iterated in no
-// defined order. Stops if callback function returns non-zero and returns 
-// final return code from callback function (zero = success). This method 
-// is deprecated and you should use zhashx_first/_next instead.           
-int
-    zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
 // Self test of this class.
 void
@@ -2632,6 +2595,90 @@ int
 void
     zsock_set_use_fd (void *self, int use_fd);
 
+// Set socket option `xpub_manual`.
+void
+    zsock_set_xpub_manual (void *self, int xpub_manual);
+
+// Set socket option `xpub_welcome_msg`.
+void
+    zsock_set_xpub_welcome_msg (void *self, const char *xpub_welcome_msg);
+
+// Set socket option `stream_notify`.
+void
+    zsock_set_stream_notify (void *self, int stream_notify);
+
+// Get socket option `invert_matching`.
+int
+    zsock_invert_matching (void *self);
+
+// Set socket option `invert_matching`.
+void
+    zsock_set_invert_matching (void *self, int invert_matching);
+
+// Set socket option `xpub_verboser`.
+void
+    zsock_set_xpub_verboser (void *self, int xpub_verboser);
+
+// Get socket option `connect_timeout`.
+int
+    zsock_connect_timeout (void *self);
+
+// Set socket option `connect_timeout`.
+void
+    zsock_set_connect_timeout (void *self, int connect_timeout);
+
+// Get socket option `tcp_maxrt`.
+int
+    zsock_tcp_maxrt (void *self);
+
+// Set socket option `tcp_maxrt`.
+void
+    zsock_set_tcp_maxrt (void *self, int tcp_maxrt);
+
+// Get socket option `thread_safe`.
+int
+    zsock_thread_safe (void *self);
+
+// Get socket option `multicast_maxtpdu`.
+int
+    zsock_multicast_maxtpdu (void *self);
+
+// Set socket option `multicast_maxtpdu`.
+void
+    zsock_set_multicast_maxtpdu (void *self, int multicast_maxtpdu);
+
+// Get socket option `vmci_buffer_size`.
+int
+    zsock_vmci_buffer_size (void *self);
+
+// Set socket option `vmci_buffer_size`.
+void
+    zsock_set_vmci_buffer_size (void *self, int vmci_buffer_size);
+
+// Get socket option `vmci_buffer_min_size`.
+int
+    zsock_vmci_buffer_min_size (void *self);
+
+// Set socket option `vmci_buffer_min_size`.
+void
+    zsock_set_vmci_buffer_min_size (void *self, int vmci_buffer_min_size);
+
+// Get socket option `vmci_buffer_max_size`.
+int
+    zsock_vmci_buffer_max_size (void *self);
+
+// Set socket option `vmci_buffer_max_size`.
+void
+    zsock_set_vmci_buffer_max_size (void *self, int vmci_buffer_max_size);
+
+// Get socket option `vmci_connect_timeout`.
+int
+    zsock_vmci_connect_timeout (void *self);
+
+// Set socket option `vmci_connect_timeout`.
+void
+    zsock_set_vmci_connect_timeout (void *self, int vmci_connect_timeout);
+
 // Get socket option `tos`.
 int
     zsock_tos (void *self);
@@ -2643,6 +2690,34 @@ void
 // Set socket option `router_handover`.
 void
     zsock_set_router_handover (void *self, int router_handover);
+
+// Set socket option `connect_rid`.
+void
+    zsock_set_connect_rid (void *self, const char *connect_rid);
+
+// Set socket option `connect_rid` from 32-octet binary
+void
+    zsock_set_connect_rid_bin (void *self, const byte *connect_rid);
+
+// Get socket option `handshake_ivl`.
+int
+    zsock_handshake_ivl (void *self);
+
+// Set socket option `handshake_ivl`.
+void
+    zsock_set_handshake_ivl (void *self, int handshake_ivl);
+
+// Get socket option `socks_proxy`.
+char *
+    zsock_socks_proxy (void *self);
+
+// Set socket option `socks_proxy`.
+void
+    zsock_set_socks_proxy (void *self, const char *socks_proxy);
+
+// Set socket option `xpub_nodrop`.
+void
+    zsock_set_xpub_nodrop (void *self, int xpub_nodrop);
 
 // Set socket option `router_mandatory`.
 void

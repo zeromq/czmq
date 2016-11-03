@@ -23,15 +23,9 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-//  This class has legacy methods, which will be removed over time. You
-//  should not use them, and migrate any code that is still using them.
 // Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (
     void *data);
-
-// Callback function for zhash_foreach method. Deprecated.
-typedef int (zhash_foreach_fn) (
-    const char *key, void *item, void *argument);
 
 //  Create a new, empty hash container
 CZMQ_EXPORT zhash_t *
@@ -173,13 +167,6 @@ CZMQ_EXPORT int
 //  Set hash for automatic value destruction
 CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
-
-//  *** Deprecated method, slated for removal: avoid using it ***
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order. Stops if callback function returns non-zero and returns 
-//  final return code from callback function (zero = success). Deprecated. 
-CZMQ_EXPORT int
-    zhash_foreach (zhash_t *self, zhash_foreach_fn callback, void *argument);
 
 //  Self test of this class.
 CZMQ_EXPORT void

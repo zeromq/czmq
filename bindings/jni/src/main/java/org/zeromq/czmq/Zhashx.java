@@ -239,14 +239,6 @@ public class Zhashx implements AutoCloseable{
         return new Zhashx (__dupV2 (self));
     }
     /*
-    Set hash for automatic value destruction. This method is deprecated
-    and you should use set_destructor instead.                         
-    */
-    native static void __autofree (long self);
-    public void autofree () {
-        __autofree (self);
-    }
-    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

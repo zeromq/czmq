@@ -174,14 +174,6 @@ void QmlZhash::autofree () {
     zhash_autofree (self);
 };
 
-///
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order. Stops if callback function returns non-zero and returns 
-//  final return code from callback function (zero = success). Deprecated. 
-int QmlZhash::foreach (zhash_foreach_fn callback, void *argument) {
-    return zhash_foreach (self, callback, argument);
-};
-
 
 QObject* QmlZhash::qmlAttachedProperties(QObject* object) {
     return new QmlZhashAttached(object);

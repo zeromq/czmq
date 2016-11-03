@@ -80,15 +80,6 @@ void QZcertstore::print ()
 }
 
 ///
-//  Print list of certificates in store to open stream. This method is
-//  deprecated, and you should use the print method.                  
-void QZcertstore::fprint (FILE *file)
-{
-    zcertstore_fprint (self, file);
-    
-}
-
-///
 //  Self test of this class
 void QZcertstore::test (bool verbose)
 {

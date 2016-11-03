@@ -25,8 +25,6 @@ extern "C" {
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
 //  in stable releases, by default. Use --enable-drafts to enable.
-//  This class has legacy methods, which will be removed over time. You
-//  should not use them, and migrate any code that is still using them.
 //  Create and initialize a new certificate in memory
 CZMQ_EXPORT zcert_t *
     zcert_new (void);
@@ -105,12 +103,6 @@ CZMQ_EXPORT bool
 //  Print certificate contents to stdout
 CZMQ_EXPORT void
     zcert_print (zcert_t *self);
-
-//  *** Deprecated method, slated for removal: avoid using it ***
-//  Print certificate contents to open stream. This method is deprecated
-//  and you should use the print method.                                
-CZMQ_EXPORT void
-    zcert_fprint (zcert_t *self, FILE *file);
 
 //  Self test of this class
 CZMQ_EXPORT void
