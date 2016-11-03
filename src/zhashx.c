@@ -690,7 +690,8 @@ int
 zhashx_load (zhashx_t *self, const char *filename)
 {
     assert (self);
-    zhashx_autofree (self);
+    zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
 
     //  Whether or not file exists, we'll track the filename and last
     //  modification date (0 for unknown files), so that zhashx_refresh ()
@@ -923,8 +924,11 @@ zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
         }
     }
     //  Hash will free values in destructor
-    if (self)
-        zhashx_autofree (self);
+    if (self) {
+        zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
+        zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
+    }
+
     return self;
 }
 
@@ -1063,7 +1067,8 @@ zhashx_dup_v2 (zhashx_t *self)
 
     zhashx_t *copy = zhashx_new ();
     if (copy) {
-        zhashx_autofree (copy);
+        zhashx_set_destructor (copy, (zhashx_destructor_fn *) zstr_free);
+        zhashx_set_duplicator (copy, (zhashx_duplicator_fn *) strdup);
         uint index;
         size_t limit = primes [self->prime_index];
         for (index = 0; index < limit; index++) {
@@ -1325,10 +1330,11 @@ zhashx_test (bool verbose)
     zhashx_destroy (&hash);
     assert (hash == NULL);
 
-    //  Test autofree; automatically copies and frees string values
+    //  Test destructor; automatically copies and frees string values
     hash = zhashx_new ();
     assert (hash);
-    zhashx_autofree (hash);
+    zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
     char value [255];
     strcpy (value, "This is a string");
     rc = zhashx_insert (hash, "key1", value);
