@@ -64,6 +64,7 @@ static bool s_initialized = false;
 //  from the environment, or via the zsys_set_xxx API.
 static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
+static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
@@ -131,6 +132,9 @@ zsys_init (void)
 
     if (getenv ("ZSYS_MAX_SOCKETS"))
         s_max_sockets = atoi (getenv ("ZSYS_MAX_SOCKETS"));
+
+    if (getenv ("ZSYS_MAX_MSGSZ"))
+        s_max_msgsz = atoi (getenv ("ZSYS_MAX_MSGSZ"));
 
     if (getenv ("ZSYS_LINGER"))
         s_linger = atoi (getenv ("ZSYS_LINGER"));
@@ -203,6 +207,8 @@ zsys_init (void)
 
     if (getenv ("ZSYS_LOGSENDER"))
         zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
+
+    zsys_set_max_msgsz (s_max_msgsz);
 
     return s_process_ctx;
 }
@@ -1219,6 +1225,7 @@ zsys_set_io_threads (size_t io_threads)
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     ZMUTEX_UNLOCK (s_mutex);
+    zsys_set_max_msgsz (s_max_msgsz);
 }
 
 
@@ -1269,6 +1276,42 @@ zsys_socket_limit (void)
     socket_limit = 1024;
 #endif
     return socket_limit;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the maximum allowed size of a message sent.
+//  The default is INT_MAX.
+
+void
+zsys_set_max_msgsz (int max_msgsz)
+{
+    if (max_msgsz < 0)
+        return;
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_max_msgsz = max_msgsz;
+#if defined (ZMQ_MAX_MSGSZ)
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_MSGSZ, (int) s_max_msgsz);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return maximum message size.
+
+int
+zsys_max_msgsz (void)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+#if defined (ZMQ_MAX_MSGSZ)
+    s_max_msgsz = zmq_ctx_get (s_process_ctx, ZMQ_MAX_MSGSZ);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+    return s_max_msgsz;
 }
 
 
@@ -1827,6 +1870,12 @@ zsys_test (bool verbose)
 
     zsys_set_auto_use_fd (1);
     assert (zsys_auto_use_fd () == 1);
+
+    assert (zsys_max_msgsz () == INT_MAX);
+    zsys_set_max_msgsz (2000);
+    assert (zsys_max_msgsz () == 2000);
+    zsys_set_max_msgsz (-1);
+    assert (zsys_max_msgsz () == 2000);
 
     printf ("OK\n");
 }
