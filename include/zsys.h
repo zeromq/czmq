@@ -223,6 +223,15 @@ CZMQ_EXPORT void
 CZMQ_EXPORT size_t
     zsys_socket_limit (void);
 
+//  Configure the maximum allowed size of a message sent.
+//  The default is INT_MAX.
+CZMQ_EXPORT void
+    zsys_set_max_msgsz (int max_msgsz);
+
+//  Return maximum message size.
+CZMQ_EXPORT int
+    zsys_max_msgsz (void);
+
 //  Configure the default linger timeout in msecs for new zsock instances.
 //  You can also set this separately on each zsock_t instance. The default
 //  linger time is zero, i.e. any pending messages will be dropped. If the
