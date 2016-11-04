@@ -480,14 +480,7 @@ module CZMQ
       attach_function :zloop_set_ticket_delay, [:pointer, :size_t], :void, **opts
       attach_function :zloop_set_max_timers, [:pointer, :size_t], :void, **opts
       attach_function :zloop_set_verbose, [:pointer, :bool], :void, **opts
-      begin # DRAFT method
-        attach_function :zloop_set_nonstop, [:pointer, :bool], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zloop_set_nonstop() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
+      attach_function :zloop_set_nonstop, [:pointer, :bool], :void, **opts
       attach_function :zloop_start, [:pointer], :int, **opts
       attach_function :zloop_test, [:bool], :void, **opts
 
@@ -550,14 +543,7 @@ module CZMQ
       attach_function :zpoller_destroy, [:pointer], :void, **opts
       attach_function :zpoller_add, [:pointer, :pointer], :int, **opts
       attach_function :zpoller_remove, [:pointer, :pointer], :int, **opts
-      begin # DRAFT method
-        attach_function :zpoller_set_nonstop, [:pointer, :bool], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function zpoller_set_nonstop() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
+      attach_function :zpoller_set_nonstop, [:pointer, :bool], :void, **opts
       attach_function :zpoller_wait, [:pointer, :int], :pointer, **opts
       attach_function :zpoller_expired, [:pointer], :bool, **opts
       attach_function :zpoller_terminated, [:pointer], :bool, **opts

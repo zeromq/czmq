@@ -93,14 +93,6 @@ CZMQ_EXPORT zhashx_t *
     zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer);
 
 //  *** Draft method, defined for internal use only ***
-//  By default the reactor stops if the process receives a SIGINT or SIGTERM 
-//  signal. This makes it impossible to shut-down message based architectures
-//  like zactors. This method lets you switch off break handling. The default
-//  nonstop setting is off (false).                                          
-CZMQ_EXPORT void
-    zloop_set_nonstop (zloop_t *self, bool nonstop);
-
-//  *** Draft method, defined for internal use only ***
 //  Return message routing ID, if the message came from a ZMQ_SERVER socket.
 //  Else returns zero.                                                      
 CZMQ_EXPORT uint32_t
@@ -111,14 +103,6 @@ CZMQ_EXPORT uint32_t
 //  ZMQ_SERVER socket.                                                      
 CZMQ_EXPORT void
     zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
-
-//  *** Draft method, defined for internal use only ***
-//  By default the poller stops if the process receives a SIGINT or SIGTERM  
-//  signal. This makes it impossible to shut-down message based architectures
-//  like zactors. This method lets you switch off break handling. The default
-//  nonstop setting is off (false).                                          
-CZMQ_EXPORT void
-    zpoller_set_nonstop (zpoller_t *self, bool nonstop);
 
 //  *** Draft method, defined for internal use only ***
 //  Create a SERVER socket. Default action is bind.
