@@ -1,3 +1,139 @@
+CZMQ version 4.0.0 stable, released on 2016/11/xx
+=================================================
+
+* v4.0.0 breaks API and ABI compatibility with v3.0.2.
+  The ABI version has been bumped to 4.
+
+* The v2 API, which have been declared DEPRECATED in v3.0.0
+  released on 2014/10/15, have now been declared RETIRED
+  and removed from this release. The following classes are gone:
+
+  - zauth_v2, use zauth
+  - zbeacon_v2, use zbeacon
+  - zctx, use zsock
+  - zmonitor_v2, use zmonitor
+  - zmutex
+  - zproxy_v2, use zproxy
+  - zsocket, use zsock
+  - zsockopt, use zsock
+  - zthread, use zactor
+
+  The following DEPRECATED methods have also been declared
+  RETIRED and removed from their STABLE classes:
+
+  - zcert_fprint, use zcert_print
+  - zcertstore_fprint, use zcertstore_print
+  - zhash_foreach (and callback), use zhash_first/next
+  - zhashx_foreach (and callback), use zhashx_first/next
+  - zhashx_autofree, use zhashx_set_destructor
+  - zloop_ignore_interrupts, use zloop_set_nonstop
+  - zpoller_ignore_interrupts, use zpoller_set_nonstop
+
+* Some STABLE APIs unfortunately had to be slightly changed to
+  fix critical issues. From v4.0.0 we commit to avoid incompatible changes
+  to STABLE APIs.
+  The following signatures have changed:
+
+  - v3.0.2: byte * zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
+    v4.0.0: zchunk_t * zarmour_decode (zarmour_t *self, const char *data)
+  - v3.0.2: zarmour_mode_t zarmour_mode (zarmour_t *self)
+    v4.0.0: int zarmour_mode (zarmour_t *self)
+  - v3.0.2: int zarmour_test (bool verbose)
+    v4.0.0: void zarmour_test (bool verbose)
+  - v3.0.2: zcert_t * zcert_new_from (byte *public_key, byte *secret_key)
+    v4.0.0: zcert_t * zcert_new_from (const byte *public_key, const byte *secret_key)
+  - v3.0.2: byte * zcert_public_key (zcert_t *self)
+    v4.0.0: const byte * zcert_public_key (zcert_t *self)
+  - v3.0.2: byte * zcert_secret_key (zcert_t *self)
+    v4.0.0: const byte * zcert_secret_key (zcert_t *self)
+  - v3.0.2: char * zcert_public_txt (zcert_t *self)
+    v4.0.0: const * zcert_public_txt (zcert_t *self)
+  - v3.0.2: char * zcert_secret_txt (zcert_t *self)
+    v4.0.0: const * zcert_secret_txt (zcert_t *self)
+  - v3.0.2: char * zcert_meta (zcert_t *self, const char *name)
+    v4.0.0: const * zcert_meta (zcert_t *self, const char *name)
+  - v3.0.2: void zdigest_update (zdigest_t *self, byte *buffer, size_t length)
+    v4.0.0: void zdigest_update (zdigest_t *self, const byte *buffer, size_t length)
+  - v3.0.2: byte * zdigest_data (zdigest_t *self)
+    v4.0.0: const byte * zdigest_data (zdigest_t *self)
+  - v3.0.2: enum zdir_patch_op_t {ZDIR_PATCH_CREATE, ZDIR_PATCH_DELETE}
+    v4.0.0: define ZDIR_PATCH_CREATE ZDIR_PATCH_DELETE
+  - v3.0.2: zdir_patch_t * zdir_patch_new (const char *path, zfile_t *file,
+                zdir_patch_op_t op, const char *alias)
+    v4.0.0: zdir_patch_t * zdir_patch_new (const char *path, zfile_t *file, int op,
+                const char *alias)
+  - v3.0.2: zdir_patch_op_t zdir_patch_op (zdir_patch_t *self)
+    v4.0.0: int zdir_patch_op (zdir_patch_t *self)
+  - v3.0.2: void zhash_test (int verbose)
+    v4.0.0: void zhash_test (bool verbose)
+  - v3.0.2: void zlist_test (int verbose)
+    v4.0.0: void zlist_test (bool verbose)
+  - v3.0.2: void zlistx_set_destructor (zlistx_t *self, czmq_destructor destructor)
+    v4.0.0: void zlistx_set_destructor (zlistx_t *self, zlistx_destructor_fn destructor)
+  - v3.0.2: void zlistx_set_duplicator (zlistx_t *self, czmq_duplicator duplicator)
+    v4.0.0: void zlistx_set_duplicator (zlistx_t *self, zlistx_duplicator_fn duplicator)
+  - v3.0.2: void zlistx_set_comparator (zlistx_t *self, czmq_comparator comparator)
+    v4.0.0: void zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator)
+  - v3.0.2: void zlistx_test (int verbose)
+    v4.0.0: void zlistx_test (bool verbose)
+  - v3.0.2: zmsg_t * zmsg_load (zmsg_t *self, FILE *file)
+    v4.0.0: zmsg_t * zmsg_load (FILE *file)
+  - v3.0.2: zmsg_t * zmsg_decode (const byte *buffer, size_t buffer_size)
+    v4.0.0: zmsg_t * zmsg_decode (zframe_t *frame)
+  - v3.0.2: size_t zmsg_encode (zmsg_t *self, byte **buffer)
+    v4.0.0: zframe_t * zmsg_encode (zmsg_t *self)
+  - v3.0.2: int zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
+    v4.0.0: int zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address, int addrlen)
+  - v3.0.2: zframe_t * zsys_udp_recv (SOCKET udpsock, char *peername)
+    v4.0.0: zframe_t * zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
+
+* The following new STABLE methods were added to STABLE classes:
+
+  - zarmour_mode_str, zarmour_print (see doc/zarmour.txt for details)
+  - zconfig_test (see doc/zconfig.txt for details)
+  - zframe_meta  (see doc/zframe.txt for details)
+  - zlistx_head zlistx_tail, zlistx_destructor_fn, zlistx_destructor_fn,
+    zlistx_comparator_fn (see doc/zlistx.txt for details)
+  - zloop_set_nonstop (see doc/zloop.txt for details)
+  - zpoller_set_nonstop (see doc/zpoller.txt for details)
+  - zsys_set_max_msgsz, zsys_max_msgsz, zsys_set_ipv6_address, zsys_ipv6_address,
+    zsys_set_ipv6_mcast_address, zsys_ipv6_mcast_address, zsys_set_auto_use_fd,
+    zsys_auto_use_fd (see doc/zsys.txt for details)
+
+* New DRAFT APIs early-release mechanism. New APIs will be introduced early
+  in public releases, and until they are stabilized and guaranteed not to
+  change anymore they will be unavailable unless the new build flag
+  --enable-drafts is used. This will allow developers and early adopters to
+  test new APIs before they are finalized.
+  NOTE: as the name implies, NO GUARANTEE is made on the stability of these APIs.
+  They might change or disappear entirely. Distributions are recommended NOT to
+  build with them.
+
+  The following DRAFT classes were added:
+
+  - zproc
+  - ztimerset
+  - ztrie
+
+  The following DRAFT methods were added to their respective STABLE class:
+
+  - zcert_unset_meta
+  - zcertstore_set_loader, zcertstore_empty
+  - zframe_routing_id, zframe_set_routing_id, zframe_group, zframe_set_group
+  - zhashx_unpack_own, zhashx_pack_own, zhashx_serializer_fn, zhashx_deserializer_fn
+  - zmsg_routing_id, zmsg_set_routing_id
+  - zstr_str
+
+* Support for new libzmq DRAFT socket types was added to zsock. See libzmq 4.2.0
+  release notes and doc/zsock.txt for more details. NOTE: until libzmq declares
+  these as STABLE, the CZMQ support will be in DRAFT state as well.
+
+* Support for all new libzmq socket and context options was added to zsock. See
+  libzmq 4.2.0 release notes and doc/zsock.txt for more details.
+
+* Many, many bug fixes. Check git log for the complete set of changes.
+
+
 CZMQ version 4.0.0 (rc1), released on 2016/11/01
 =================================================
 
