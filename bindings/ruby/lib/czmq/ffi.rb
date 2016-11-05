@@ -84,8 +84,11 @@ module CZMQ
         attach_function :zcert_unset_meta, [:pointer, :string], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zcert_unset_meta() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zcert_unset_meta()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zcert_unset_meta(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zcert_meta, [:pointer, :string], :string, **opts
@@ -107,8 +110,11 @@ module CZMQ
         attach_function :zcertstore_set_loader, [:pointer, :pointer, :pointer, :pointer], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zcertstore_set_loader() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zcertstore_set_loader()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zcertstore_set_loader(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zcertstore_lookup, [:pointer, :string], :pointer, **opts
@@ -117,8 +123,11 @@ module CZMQ
         attach_function :zcertstore_empty, [:pointer], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zcertstore_empty() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zcertstore_empty()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zcertstore_empty(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zcertstore_print, [:pointer], :void, **opts
@@ -284,32 +293,44 @@ module CZMQ
         attach_function :zframe_routing_id, [:pointer], :uint32, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zframe_routing_id() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zframe_routing_id()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zframe_routing_id(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zframe_set_routing_id, [:pointer, :uint32], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zframe_set_routing_id() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zframe_set_routing_id()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zframe_set_routing_id(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zframe_group, [:pointer], :string, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zframe_group() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zframe_group()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zframe_group(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zframe_set_group, [:pointer, :string], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zframe_set_group() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zframe_set_group()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zframe_set_group(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
@@ -351,8 +372,11 @@ module CZMQ
         attach_function :zhashx_unpack_own, [:pointer, :pointer], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zhashx_unpack_own() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zhashx_unpack_own()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zhashx_unpack_own(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zhashx_destroy, [:pointer], :void, **opts
@@ -378,8 +402,11 @@ module CZMQ
         attach_function :zhashx_pack_own, [:pointer, :pointer], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zhashx_pack_own() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zhashx_pack_own()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zhashx_pack_own(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zhashx_dup, [:pointer], :pointer, **opts
@@ -500,16 +527,22 @@ module CZMQ
         attach_function :zmsg_routing_id, [:pointer], :uint32, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zmsg_routing_id() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zmsg_routing_id()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zmsg_routing_id(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zmsg_set_routing_id, [:pointer, :uint32], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zmsg_set_routing_id() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zmsg_set_routing_id()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zmsg_set_routing_id(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zmsg_prepend, [:pointer, :pointer], :int, **opts
@@ -555,152 +588,209 @@ module CZMQ
         attach_function :zproc_czmq_version, [], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_czmq_version() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_czmq_version()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_czmq_version(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_interrupted, [], :bool, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_interrupted() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_interrupted()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_interrupted(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_has_curve, [], :bool, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_has_curve() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_has_curve()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_has_curve(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_hostname, [], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_hostname() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_hostname()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_hostname(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_daemonize, [:string], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_daemonize() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_daemonize()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_daemonize(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_run_as, [:string, :string, :string], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_run_as() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_run_as()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_run_as(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_set_io_threads, [:size_t], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_set_io_threads() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_set_io_threads()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_io_threads(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_set_max_sockets, [:size_t], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_set_max_sockets() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_set_max_sockets()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_max_sockets(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_set_biface, [:string], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_set_biface() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_set_biface()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_biface(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_biface, [], :string, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_biface() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_biface()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_biface(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_set_log_ident, [:string], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_set_log_ident() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_set_log_ident()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_log_ident(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_set_log_sender, [:string], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_set_log_sender() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_set_log_sender()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_log_sender(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_set_log_system, [:bool], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_set_log_system() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_set_log_system()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_log_system(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_log_error, [:string, :varargs], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_log_error() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_log_error()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_log_error(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_log_warning, [:string, :varargs], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_log_warning() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_log_warning()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_log_warning(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_log_notice, [:string, :varargs], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_log_notice() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_log_notice()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_log_notice(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_log_info, [:string, :varargs], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_log_info() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_log_info()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_log_info(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_log_debug, [:string, :varargs], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_log_debug() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_log_debug()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_log_debug(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zproc_test, [:bool], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zproc_test() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zproc_test()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_test(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
 
@@ -723,48 +813,66 @@ module CZMQ
         attach_function :zsock_new_server, [:string], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_new_server() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_new_server()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_new_server(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zsock_new_client, [:string], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_new_client() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_new_client()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_new_client(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zsock_new_radio, [:string], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_new_radio() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_new_radio()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_new_radio(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zsock_new_dish, [:string], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_new_dish() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_new_dish()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_new_dish(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zsock_new_gather, [:string], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_new_gather() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_new_gather()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_new_gather(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zsock_new_scatter, [:string], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_new_scatter() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_new_scatter()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_new_scatter(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zsock_destroy, [:pointer], :void, **opts
@@ -785,16 +893,22 @@ module CZMQ
         attach_function :zsock_routing_id, [:pointer], :uint32, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_routing_id() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_routing_id()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_routing_id(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zsock_set_routing_id, [:pointer, :uint32], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_set_routing_id() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_set_routing_id()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_set_routing_id(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zsock_set_unbounded, [:pointer], :void, **opts
@@ -805,16 +919,22 @@ module CZMQ
         attach_function :zsock_join, [:pointer, :string], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_join() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_join()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_join(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :zsock_leave, [:pointer, :string], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zsock_leave() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zsock_leave()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_leave(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zsock_is, [:pointer], :bool, **opts
@@ -964,8 +1084,11 @@ module CZMQ
         attach_function :zstr_str, [:pointer], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function zstr_str() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function zstr_str()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zstr_str(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       attach_function :zstr_free, [:pointer], :void, **opts
@@ -977,72 +1100,99 @@ module CZMQ
         attach_function :ztimerset_new, [], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_new() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_new()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_new(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_destroy, [:pointer], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_destroy() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_destroy()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_destroy(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_add, [:pointer, :size_t, :pointer, :pointer], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_add() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_add()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_add(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_cancel, [:pointer, :int], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_cancel() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_cancel()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_cancel(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_set_interval, [:pointer, :int, :size_t], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_set_interval() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_set_interval()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_set_interval(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_reset, [:pointer, :int], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_reset() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_reset()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_reset(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_timeout, [:pointer], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_timeout() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_timeout()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_timeout(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_execute, [:pointer], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_execute() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_execute()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_execute(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztimerset_test, [:bool], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztimerset_test() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztimerset_test()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztimerset_test(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
 
@@ -1052,88 +1202,121 @@ module CZMQ
         attach_function :ztrie_new, [:pointer], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_new() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_new()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_new(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_destroy, [:pointer], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_destroy() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_destroy()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_destroy(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_insert_route, [:pointer, :string, :pointer, :pointer], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_insert_route() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_insert_route()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_insert_route(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_remove_route, [:pointer, :string], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_remove_route() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_remove_route()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_remove_route(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_matches, [:pointer, :string], :bool, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_matches() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_matches()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_matches(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_hit_data, [:pointer], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_hit_data() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_hit_data()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_hit_data(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_hit_parameter_count, [:pointer], :size_t, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_hit_parameter_count() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_hit_parameter_count()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_hit_parameter_count(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_hit_parameters, [:pointer], :pointer, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_hit_parameters() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_hit_parameters()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_hit_parameters(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_hit_asterisk_match, [:pointer], :string, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_hit_asterisk_match() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_hit_asterisk_match()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_hit_asterisk_match(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_print, [:pointer], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_print() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_print()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_print(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
         attach_function :ztrie_test, [:bool], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The function ztrie_test() can't be used through " +
-               "this Ruby binding because it's not available."
+          warn "The DRAFT function ztrie_test()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ztrie_test(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
 
