@@ -353,7 +353,6 @@ set(TEST_CLASSES
     zproxy
     zrex
     zsys
-    zgossip_msg
 )
 
 IF (ENABLE_DRAFTS)

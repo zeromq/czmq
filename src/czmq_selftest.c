@@ -58,7 +58,6 @@ all_tests [] = {
     { "zproxy", zproxy_test },
     { "zrex", zrex_test },
     { "zsys", zsys_test },
-    { "zgossip_msg", zgossip_msg_test },
 #ifdef CZMQ_BUILD_DRAFT_API
     { "zproc", zproc_test },
     { "ztimerset", ztimerset_test },
