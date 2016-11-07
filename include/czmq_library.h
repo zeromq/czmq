@@ -49,8 +49,14 @@
 #   else
 #       define CZMQ_EXPORT __declspec(dllimport)
 #   endif
+#   define CZMQ_PRIVATE
 #else
 #   define CZMQ_EXPORT
+#   if (defined __GNUC__ && __GNUC__ >= 4) || defined __INTEL_COMPILER
+#       define CZMQ_PRIVATE __attribute__ ((visibility ("hidden")))
+#   else
+#       define CZMQ_PRIVATE
+#   endif
 #endif
 
 //  Opaque class structures to allow forward references

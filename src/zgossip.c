@@ -482,4 +482,7 @@ zgossip_test (bool verbose)
 
     //  @end
     printf ("OK\n");
+
+    // zgossip_msg is a private class used by zgossip, so we run the test here
+    zgossip_msg_test (verbose);
 }
