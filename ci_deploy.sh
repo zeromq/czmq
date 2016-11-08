@@ -22,8 +22,8 @@ if [ "$BUILD_TYPE" == "default" ]; then
     cd -
 elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ]; then
     ( cd bindings/jni && TERM=dumb PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./gradlew clean bintrayUpload )
-    cp bindings/jni/android/czmq-android.jar czmq-android-4.0.0.jar
-    export CZMQ_DEPLOYMENT=czmq-android-4.0.0.jar
+    cp bindings/jni/android/czmq-android.jar czmq-android-4.0.1.jar
+    export CZMQ_DEPLOYMENT=czmq-android-4.0.1.jar
 else
     export CZMQ_DEPLOYMENT=""
 fi

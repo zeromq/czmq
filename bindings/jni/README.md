@@ -49,7 +49,7 @@ Then in the android directory, run:
 This does the following:
 
 * It compiles the CZMQ C sources for Android, into a native library libczmq.so in builds/android/
-* It compiles the JNI Java classes into a jar file czmq-jni-4.0.0.jar in bindings/jni/build/libs
+* It compiles the JNI Java classes into a jar file czmq-jni-4.0.1.jar in bindings/jni/build/libs
 * It compiles the JNI C sources for Android, into a native library libczmqjni.so.
 * It combines all these into czmq-android.jar, which you can use in your Android projects.
 
