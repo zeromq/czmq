@@ -8,7 +8,7 @@
     repository = "https://github.com/zeromq/czmq"
     >
     <include filename = "license.xml" />
-    <version major = "4" minor = "0" patch = "0" />
+    <version major = "4" minor = "0" patch = "1" />
     <use project = "libzmq" />
     <use project = "uuid" optional = "1" implied = "1" />
     <use project = "systemd" optional = "1" implied = "1" min_major = "200" />
