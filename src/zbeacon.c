@@ -158,6 +158,12 @@ s_self_prepare_udp (self_t *self)
                 zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
         }
     }
+    else
+    {
+        //  No valid interface. Close the socket so that we can try again later
+        zsys_udp_close(self->udpsock);
+        self->udpsock = INVALID_SOCKET;
+    }
 }
 
 
