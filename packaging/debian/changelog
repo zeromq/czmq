@@ -1,4 +1,4 @@
-czmq (4.0.0) UNRELEASED; urgency=low
+czmq (4.0.1) UNRELEASED; urgency=low
 
   * Initial packaging.
 

@@ -3,7 +3,7 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 TEMPLATE = lib
-VERSION = 4.0.0
+VERSION = 4.0.1
 CONFIG += qt dll qczmq-buildlib
 mac:CONFIG += absolute_library_soname
 win32|mac:!wince*:!win32-msvc:!macx-xcode:CONFIG += debug_and_release build_all

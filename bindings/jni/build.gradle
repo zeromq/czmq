@@ -8,11 +8,11 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id "com.jfrog.bintray" version "1.6"
+    id "com.jfrog.bintray" version "1.7.2"
 }
 
 group = "org.zeromq"
-version = "4.0.0"
+version = "4.0.1"
 
 repositories {
     mavenLocal()
@@ -135,8 +135,8 @@ bintray {
         vcsUrl = 'https://github.com/zeromq/czmq.git'
         githubRepo = System.getenv('BINTRAY_USER_ORG') + '/czmq'
         version {
-            name = '4.0.0'
-            vcsTag= '4.0.0'
+            name = '4.0.1'
+            vcsTag= '4.0.1'
         }
     }
 }

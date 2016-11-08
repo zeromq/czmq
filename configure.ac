@@ -7,7 +7,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 #
-AC_INIT([czmq],[4.0.0],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[4.0.1],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
