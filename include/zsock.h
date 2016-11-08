@@ -1002,6 +1002,7 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT zsock_t *
     zsock_new_stream_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
+#ifdef CZMQ_BUILD_DRAFT_API
 CZMQ_EXPORT zsock_t *
     zsock_new_server_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
@@ -1019,6 +1020,7 @@ CZMQ_EXPORT zsock_t *
 
 CZMQ_EXPORT zsock_t *
     zsock_new_scatter_checked (const char *endpoint, const char *filename, size_t line_nbr);
+#endif // CZMQ_BUILD_DRAFT_API
 
 #ifdef __cplusplus
 }
