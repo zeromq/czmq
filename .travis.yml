@@ -84,4 +84,4 @@ deploy:
   on:
     branch: master
     tags: true
-    condition: $TRAVIS_OS_NAME =~ (linux) && $BUILD_TYPE =~ (default|bindings)
+    condition: $TRAVIS_OS_NAME =~ (linux) && ($BUILD_TYPE =~ (default) || ($BUILD_TYPE =~ (bindings) && $BINDING =~ (jni)))
