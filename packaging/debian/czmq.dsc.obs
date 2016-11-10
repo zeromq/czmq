@@ -1,7 +1,7 @@
 Format: 3.0 (quilt)
 Binary: czmq
 Source: czmq
-Version: 4.0.1
+Version: 4.0.2
 Maintainer: czmq Developers <zeromq-dev@lists.zeromq.org>
 Architecture: any
 Build-Depends: debhelper (>= 9),
