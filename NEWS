@@ -1,5 +1,12 @@
-CZMQ version 4.0.1 stable, released on 201x/xx/xx
+CZMQ version 4.0.1 stable, released on 2016/11/10
 =================================================
+
+* Version 4.0.0 introduced the DRAFT mechanism, but it had a flaw:
+  the internally defined DRAFT symbols were leaking as global in the
+  shared library. This meant that although the API was stable, the
+  ABI could in some cases not be.
+  This has now been fixed using compiler's visibility attribute to
+  avoid this problem.
 
 
 CZMQ version 4.0.0 stable, released on 2016/11/04
