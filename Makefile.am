@@ -31,6 +31,7 @@ EXTRA_DIST = \
     Findlibzmq.cmake \
     Finduuid.cmake \
     Findsystemd.cmake \
+    src/CMakeLists-local.txt \
     src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
