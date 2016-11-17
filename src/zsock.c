@@ -49,6 +49,26 @@ struct _zsock_t {
     uint32_t routing_id;        //  Routing ID for server sockets
 };
 
+#ifndef CZMQ_BUILD_DRAFT_API
+CZMQ_PRIVATE zsock_t *
+    zsock_new_server_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_PRIVATE zsock_t *
+    zsock_new_client_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_PRIVATE zsock_t *
+    zsock_new_radio_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_PRIVATE zsock_t *
+    zsock_new_dish_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_PRIVATE zsock_t *
+    zsock_new_gather_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_PRIVATE zsock_t *
+    zsock_new_scatter_checked (const char *endpoint, const char *filename, size_t line_nbr);
+#endif // CZMQ_BUILD_DRAFT_API
+
 
 //  --------------------------------------------------------------------------
 //  Create a new socket. This macro passes the caller source and line
