@@ -71,10 +71,19 @@ to $(major_removed).0.0 \
 .   endif
 -->
 .   for option
+.       if ! defined (.minor)
+.           .minor = 0
+.       endif
+.       if defined (.major_removed)
+.           removed_string = " to $(major_removed).0.0"
+.       else
+.           removed_string = ""
+.       endif
 .       if mode = "rw" | mode = "r"
 
 <method name = "$(option.api_name:)" polymorphic = "1"$(state(option))>
     Get socket option `$(option.name:)`.
+    Available from libzmq $(major).$(minor).0$(removed_string).
     <return type = "$(option.api_type:)" fresh = "1" />
 </method>
 .       endif
@@ -82,6 +91,7 @@ to $(major_removed).0.0 \
 
 <method name = "set $(option.api_name:)" polymorphic = "1"$(state(option))>
     Set socket option `$(option.name:)`.
+    Available from libzmq $(major).$(minor).0$(removed_string).
     <argument name = "$(option.api_name:)" type = "$(option.api_type:)" />
 </method>
 .       endif
@@ -89,6 +99,7 @@ to $(major_removed).0.0 \
 
 <method name = "set $(option.api_name:) bin" polymorphic = "1">
     Set socket option `$(option.name:)` from 32-octet binary
+    Available from libzmq $(major).$(minor).0$(removed_string).
     <argument name = "$(option.api_name:)" type = "buffer" />
 </method>
 .       endif
