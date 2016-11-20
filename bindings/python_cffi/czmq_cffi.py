@@ -2867,22 +2867,6 @@ int
 void
     zsock_set_immediate (void *self, int immediate);
 
-// Set socket option `router_raw`.
-void
-    zsock_set_router_raw (void *self, int router_raw);
-
-// Get socket option `ipv4only`.
-int
-    zsock_ipv4only (void *self);
-
-// Set socket option `ipv4only`.
-void
-    zsock_set_ipv4only (void *self, int ipv4only);
-
-// Set socket option `delay_attach_on_connect`.
-void
-    zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
-
 // Get socket option `type`.
 int
     zsock_type (void *self);
@@ -3082,6 +3066,22 @@ int
 // Get socket option `last_endpoint`.
 char *
     zsock_last_endpoint (void *self);
+
+// Set socket option `router_raw`.
+void
+    zsock_set_router_raw (void *self, int router_raw);
+
+// Get socket option `ipv4only`.
+int
+    zsock_ipv4only (void *self);
+
+// Set socket option `ipv4only`.
+void
+    zsock_set_ipv4only (void *self, int ipv4only);
+
+// Set socket option `delay_attach_on_connect`.
+void
+    zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
 
 // Self test of this class.
 void

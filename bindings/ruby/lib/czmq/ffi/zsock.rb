@@ -2818,110 +2818,6 @@ module CZMQ
         result
       end
 
-      # Set socket option `router_raw`.
-      #
-      # @param router_raw [Integer, #to_int, #to_i]
-      # @return [void]
-      def set_router_raw(router_raw)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        router_raw = Integer(router_raw)
-        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
-        result
-      end
-
-      # Set socket option `router_raw`.
-      #
-      # This is the polymorphic version of #set_router_raw.
-      #
-      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
-      #   object reference to use this method on
-      # @param router_raw [Integer, #to_int, #to_i]
-      # @return [void]
-      def self.set_router_raw(self_p, router_raw)
-        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        router_raw = Integer(router_raw)
-        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
-        result
-      end
-
-      # Get socket option `ipv4only`.
-      #
-      # @return [Integer]
-      def ipv4only()
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
-        result
-      end
-
-      # Get socket option `ipv4only`.
-      #
-      # This is the polymorphic version of #ipv4only.
-      #
-      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
-      #   object reference to use this method on
-      # @return [Integer]
-      def self.ipv4only(self_p)
-        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
-        result
-      end
-
-      # Set socket option `ipv4only`.
-      #
-      # @param ipv4only [Integer, #to_int, #to_i]
-      # @return [void]
-      def set_ipv4only(ipv4only)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        ipv4only = Integer(ipv4only)
-        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
-        result
-      end
-
-      # Set socket option `ipv4only`.
-      #
-      # This is the polymorphic version of #set_ipv4only.
-      #
-      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
-      #   object reference to use this method on
-      # @param ipv4only [Integer, #to_int, #to_i]
-      # @return [void]
-      def self.set_ipv4only(self_p, ipv4only)
-        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        ipv4only = Integer(ipv4only)
-        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
-        result
-      end
-
-      # Set socket option `delay_attach_on_connect`.
-      #
-      # @param delay_attach_on_connect [Integer, #to_int, #to_i]
-      # @return [void]
-      def set_delay_attach_on_connect(delay_attach_on_connect)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        delay_attach_on_connect = Integer(delay_attach_on_connect)
-        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
-        result
-      end
-
-      # Set socket option `delay_attach_on_connect`.
-      #
-      # This is the polymorphic version of #set_delay_attach_on_connect.
-      #
-      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
-      #   object reference to use this method on
-      # @param delay_attach_on_connect [Integer, #to_int, #to_i]
-      # @return [void]
-      def self.set_delay_attach_on_connect(self_p, delay_attach_on_connect)
-        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        delay_attach_on_connect = Integer(delay_attach_on_connect)
-        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
-        result
-      end
-
       # Get socket option `type`.
       #
       # @return [Integer]
@@ -4163,6 +4059,110 @@ module CZMQ
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
         result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Set socket option `router_raw`.
+      #
+      # @param router_raw [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_router_raw(router_raw)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_raw = Integer(router_raw)
+        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
+        result
+      end
+
+      # Set socket option `router_raw`.
+      #
+      # This is the polymorphic version of #set_router_raw.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param router_raw [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_router_raw(self_p, router_raw)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        router_raw = Integer(router_raw)
+        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
+        result
+      end
+
+      # Get socket option `ipv4only`.
+      #
+      # @return [Integer]
+      def ipv4only()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
+        result
+      end
+
+      # Get socket option `ipv4only`.
+      #
+      # This is the polymorphic version of #ipv4only.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.ipv4only(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
+        result
+      end
+
+      # Set socket option `ipv4only`.
+      #
+      # @param ipv4only [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_ipv4only(ipv4only)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        ipv4only = Integer(ipv4only)
+        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
+        result
+      end
+
+      # Set socket option `ipv4only`.
+      #
+      # This is the polymorphic version of #set_ipv4only.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param ipv4only [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_ipv4only(self_p, ipv4only)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        ipv4only = Integer(ipv4only)
+        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
+        result
+      end
+
+      # Set socket option `delay_attach_on_connect`.
+      #
+      # @param delay_attach_on_connect [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_delay_attach_on_connect(delay_attach_on_connect)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        delay_attach_on_connect = Integer(delay_attach_on_connect)
+        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        result
+      end
+
+      # Set socket option `delay_attach_on_connect`.
+      #
+      # This is the polymorphic version of #set_delay_attach_on_connect.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param delay_attach_on_connect [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        delay_attach_on_connect = Integer(delay_attach_on_connect)
+        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
         result
       end
 

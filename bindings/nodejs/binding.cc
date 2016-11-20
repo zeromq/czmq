@@ -4145,10 +4145,6 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "setIpv6", _set_ipv6);
     Nan::SetPrototypeMethod (tpl, "immediate", _immediate);
     Nan::SetPrototypeMethod (tpl, "setImmediate", _set_immediate);
-    Nan::SetPrototypeMethod (tpl, "setRouterRaw", _set_router_raw);
-    Nan::SetPrototypeMethod (tpl, "ipv4only", _ipv4only);
-    Nan::SetPrototypeMethod (tpl, "setIpv4only", _set_ipv4only);
-    Nan::SetPrototypeMethod (tpl, "setDelayAttachOnConnect", _set_delay_attach_on_connect);
     Nan::SetPrototypeMethod (tpl, "type", _type);
     Nan::SetPrototypeMethod (tpl, "sndhwm", _sndhwm);
     Nan::SetPrototypeMethod (tpl, "setSndhwm", _set_sndhwm);
@@ -4198,6 +4194,10 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "rcvmore", _rcvmore);
     Nan::SetPrototypeMethod (tpl, "events", _events);
     Nan::SetPrototypeMethod (tpl, "lastEndpoint", _last_endpoint);
+    Nan::SetPrototypeMethod (tpl, "setRouterRaw", _set_router_raw);
+    Nan::SetPrototypeMethod (tpl, "ipv4only", _ipv4only);
+    Nan::SetPrototypeMethod (tpl, "setIpv4only", _set_ipv4only);
+    Nan::SetPrototypeMethod (tpl, "setDelayAttachOnConnect", _set_delay_attach_on_connect);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -5314,51 +5314,6 @@ NAN_METHOD (Zsock::_set_immediate) {
     zsock_set_immediate (zsock->self, (int) immediate);
 }
 
-NAN_METHOD (Zsock::_set_router_raw) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `router raw`");
-
-    int router_raw;
-    if (info [0]->IsNumber ())
-        router_raw = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`router raw` must be a number");
-    zsock_set_router_raw (zsock->self, (int) router_raw);
-}
-
-NAN_METHOD (Zsock::_ipv4only) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_ipv4only (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_ipv4only) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `ipv4only`");
-
-    int ipv4only;
-    if (info [0]->IsNumber ())
-        ipv4only = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`ipv4only` must be a number");
-    zsock_set_ipv4only (zsock->self, (int) ipv4only);
-}
-
-NAN_METHOD (Zsock::_set_delay_attach_on_connect) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `delay attach on connect`");
-
-    int delay_attach_on_connect;
-    if (info [0]->IsNumber ())
-        delay_attach_on_connect = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`delay attach on connect` must be a number");
-    zsock_set_delay_attach_on_connect (zsock->self, (int) delay_attach_on_connect);
-}
-
 NAN_METHOD (Zsock::_type) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_type (zsock->self);
@@ -5827,6 +5782,51 @@ NAN_METHOD (Zsock::_last_endpoint) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     char *result = (char *) zsock_last_endpoint (zsock->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_router_raw) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `router raw`");
+
+    int router_raw;
+    if (info [0]->IsNumber ())
+        router_raw = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`router raw` must be a number");
+    zsock_set_router_raw (zsock->self, (int) router_raw);
+}
+
+NAN_METHOD (Zsock::_ipv4only) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_ipv4only (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_ipv4only) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `ipv4only`");
+
+    int ipv4only;
+    if (info [0]->IsNumber ())
+        ipv4only = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`ipv4only` must be a number");
+    zsock_set_ipv4only (zsock->self, (int) ipv4only);
+}
+
+NAN_METHOD (Zsock::_set_delay_attach_on_connect) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `delay attach on connect`");
+
+    int delay_attach_on_connect;
+    if (info [0]->IsNumber ())
+        delay_attach_on_connect = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`delay attach on connect` must be a number");
+    zsock_set_delay_attach_on_connect (zsock->self, (int) delay_attach_on_connect);
 }
 
 NAN_METHOD (Zsock::_test) {

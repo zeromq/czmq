@@ -5004,14 +5004,6 @@ lib.zsock_immediate.restype = c_int
 lib.zsock_immediate.argtypes = [zsock_p]
 lib.zsock_set_immediate.restype = None
 lib.zsock_set_immediate.argtypes = [zsock_p, c_int]
-lib.zsock_set_router_raw.restype = None
-lib.zsock_set_router_raw.argtypes = [zsock_p, c_int]
-lib.zsock_ipv4only.restype = c_int
-lib.zsock_ipv4only.argtypes = [zsock_p]
-lib.zsock_set_ipv4only.restype = None
-lib.zsock_set_ipv4only.argtypes = [zsock_p, c_int]
-lib.zsock_set_delay_attach_on_connect.restype = None
-lib.zsock_set_delay_attach_on_connect.argtypes = [zsock_p, c_int]
 lib.zsock_type.restype = c_int
 lib.zsock_type.argtypes = [zsock_p]
 lib.zsock_sndhwm.restype = c_int
@@ -5112,6 +5104,14 @@ lib.zsock_events.restype = c_int
 lib.zsock_events.argtypes = [zsock_p]
 lib.zsock_last_endpoint.restype = POINTER(c_char)
 lib.zsock_last_endpoint.argtypes = [zsock_p]
+lib.zsock_set_router_raw.restype = None
+lib.zsock_set_router_raw.argtypes = [zsock_p, c_int]
+lib.zsock_ipv4only.restype = c_int
+lib.zsock_ipv4only.argtypes = [zsock_p]
+lib.zsock_set_ipv4only.restype = None
+lib.zsock_set_ipv4only.argtypes = [zsock_p, c_int]
+lib.zsock_set_delay_attach_on_connect.restype = None
+lib.zsock_set_delay_attach_on_connect.argtypes = [zsock_p, c_int]
 lib.zsock_test.restype = None
 lib.zsock_test.argtypes = [c_bool]
 
@@ -6024,30 +6024,6 @@ return the supplied value. Takes a polymorphic socket reference.
         """
         return lib.zsock_set_immediate(self._as_parameter_, immediate)
 
-    def set_router_raw(self, router_raw):
-        """
-        Set socket option `router_raw`.
-        """
-        return lib.zsock_set_router_raw(self._as_parameter_, router_raw)
-
-    def ipv4only(self):
-        """
-        Get socket option `ipv4only`.
-        """
-        return lib.zsock_ipv4only(self._as_parameter_)
-
-    def set_ipv4only(self, ipv4only):
-        """
-        Set socket option `ipv4only`.
-        """
-        return lib.zsock_set_ipv4only(self._as_parameter_, ipv4only)
-
-    def set_delay_attach_on_connect(self, delay_attach_on_connect):
-        """
-        Set socket option `delay_attach_on_connect`.
-        """
-        return lib.zsock_set_delay_attach_on_connect(self._as_parameter_, delay_attach_on_connect)
-
     def type(self):
         """
         Get socket option `type`.
@@ -6347,6 +6323,30 @@ return the supplied value. Takes a polymorphic socket reference.
         Get socket option `last_endpoint`.
         """
         return return_fresh_string(lib.zsock_last_endpoint(self._as_parameter_))
+
+    def set_router_raw(self, router_raw):
+        """
+        Set socket option `router_raw`.
+        """
+        return lib.zsock_set_router_raw(self._as_parameter_, router_raw)
+
+    def ipv4only(self):
+        """
+        Get socket option `ipv4only`.
+        """
+        return lib.zsock_ipv4only(self._as_parameter_)
+
+    def set_ipv4only(self, ipv4only):
+        """
+        Set socket option `ipv4only`.
+        """
+        return lib.zsock_set_ipv4only(self._as_parameter_, ipv4only)
+
+    def set_delay_attach_on_connect(self, delay_attach_on_connect):
+        """
+        Set socket option `delay_attach_on_connect`.
+        """
+        return lib.zsock_set_delay_attach_on_connect(self._as_parameter_, delay_attach_on_connect)
 
     @staticmethod
     def test(verbose):

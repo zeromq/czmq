@@ -1015,10 +1015,6 @@ module CZMQ
       attach_function :zsock_set_ipv6, [:pointer, :int], :void, **opts
       attach_function :zsock_immediate, [:pointer], :int, **opts
       attach_function :zsock_set_immediate, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_router_raw, [:pointer, :int], :void, **opts
-      attach_function :zsock_ipv4only, [:pointer], :int, **opts
-      attach_function :zsock_set_ipv4only, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_delay_attach_on_connect, [:pointer, :int], :void, **opts
       attach_function :zsock_type, [:pointer], :int, **opts
       attach_function :zsock_sndhwm, [:pointer], :int, **opts
       attach_function :zsock_set_sndhwm, [:pointer, :int], :void, **opts
@@ -1069,6 +1065,10 @@ module CZMQ
       attach_function :zsock_fd, [:pointer], (::FFI::Platform.unix? ? :int : :uint64_t), **opts
       attach_function :zsock_events, [:pointer], :int, **opts
       attach_function :zsock_last_endpoint, [:pointer], :pointer, **opts
+      attach_function :zsock_set_router_raw, [:pointer, :int], :void, **opts
+      attach_function :zsock_ipv4only, [:pointer], :int, **opts
+      attach_function :zsock_set_ipv4only, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_delay_attach_on_connect, [:pointer, :int], :void, **opts
       attach_function :zsock_test, [:bool], :void, **opts
 
       require_relative 'ffi/zsock'

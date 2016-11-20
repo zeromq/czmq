@@ -8,6 +8,8 @@
 ******************************************************************
 -->
 
+<!-- The following socket options are available in libzmq from version 4.2.0 -->
+
 <method name = "heartbeat ivl" polymorphic = "1">
     Get socket option `heartbeat_ivl`.
     <return type = "integer" fresh = "1" />
@@ -153,6 +155,8 @@
     <argument name = "vmci connect timeout" type = "integer" />
 </method>
 
+<!-- The following socket options are available in libzmq from version 4.1.0 -->
+
 <method name = "tos" polymorphic = "1">
     Get socket option `tos`.
     <return type = "integer" fresh = "1" />
@@ -202,6 +206,8 @@
     Set socket option `xpub_nodrop`.
     <argument name = "xpub nodrop" type = "integer" />
 </method>
+
+<!-- The following socket options are available in libzmq from version 4.0.0 -->
 
 <method name = "set router mandatory" polymorphic = "1">
     Set socket option `router_mandatory`.
@@ -388,25 +394,7 @@
     <argument name = "immediate" type = "integer" />
 </method>
 
-<method name = "set router raw" polymorphic = "1">
-    Set socket option `router_raw`.
-    <argument name = "router raw" type = "integer" />
-</method>
-
-<method name = "ipv4only" polymorphic = "1">
-    Get socket option `ipv4only`.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set ipv4only" polymorphic = "1">
-    Set socket option `ipv4only`.
-    <argument name = "ipv4only" type = "integer" />
-</method>
-
-<method name = "set delay attach on connect" polymorphic = "1">
-    Set socket option `delay_attach_on_connect`.
-    <argument name = "delay attach on connect" type = "integer" />
-</method>
+<!-- The following socket options are available in libzmq from version 3.0.0 -->
 
 <method name = "type" polymorphic = "1">
     Get socket option `type`.
@@ -656,4 +644,24 @@
 <method name = "last endpoint" polymorphic = "1">
     Get socket option `last_endpoint`.
     <return type = "string" fresh = "1" />
+</method>
+
+<method name = "set router raw" polymorphic = "1">
+    Set socket option `router_raw`.
+    <argument name = "router raw" type = "integer" />
+</method>
+
+<method name = "ipv4only" polymorphic = "1">
+    Get socket option `ipv4only`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set ipv4only" polymorphic = "1">
+    Set socket option `ipv4only`.
+    <argument name = "ipv4only" type = "integer" />
+</method>
+
+<method name = "set delay attach on connect" polymorphic = "1">
+    Set socket option `delay_attach_on_connect`.
+    <argument name = "delay attach on connect" type = "integer" />
 </method>

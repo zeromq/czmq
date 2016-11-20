@@ -8,7 +8,7 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
-    <version major = "4" style = "macro">
+    <version major = "4" minor = "2" style = "macro">
         <!-- Options that are new in 4.2 -->
         <option name = "heartbeat_ivl"     type = "int"    mode = "rw" test = "DEALER"
             test_value = "2000" />
@@ -54,7 +54,9 @@
         <option name = "vmci_buffer_min_size" type = "uint64" mode = "rw" />
         <option name = "vmci_buffer_max_size" type = "uint64" mode = "rw" />
         <option name = "vmci_connect_timeout" type = "int" mode = "rw" />
+    </version>
 
+    <version major = "4" minor = "1" style = "macro">
         <!-- Options that are new in 4.1 -->
         <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />
         <option name = "router_handover"   type = "int"    mode = "w"  test = "ROUTER">
@@ -74,7 +76,9 @@
             <restrict type = "XPUB" />
             <restrict type = "PUB" />
         </option>
-        
+    </version>
+
+    <version major = "4" style = "macro">
         <!-- Options that are new in 4.0 -->
         <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
             <restrict type = "ROUTER" />
@@ -122,63 +126,10 @@
         <!-- New names for deprecated 3.x options -->
         <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
         <option name = "immediate"         type = "int"    mode = "rw" test = "DEALER" />
-
-        <!-- Deprecated 3.x options -->
-        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
-            <restrict type = "ROUTER" />
-        </option>
-        <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "delay_attach_on_connect"
-                                           type = "int"    mode = "w"  test = "PUB" />
-
-        <!-- Options that are the same in 3.x -->
-        <include name = "3-x options" />
     </version>
     
     <version major = "3" style = "macro">
         <!-- Options that are carried forward to 4.0 -->
-        <include name = "3-x options" />
-        
-        <!-- Options that are deprecated in 4.0 -->
-        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
-            <restrict type = "ROUTER" />
-        </option>
-        <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "delay_attach_on_connect"
-                                           type = "int"    mode = "w"  test = "PUB" />
-    </version>
-
-    <!-- Legacy version 2 -->
-    <version major = "2" style = "macro">
-        <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "identity"          type = "string" mode = "rw" test = "SUB" />
-        <option name = "rate"              type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "recovery_ivl"      type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "mcast_loop"        type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
-        <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
-        <option name = "sndbuf"            type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "rcvbuf"            type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
-        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
-        <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
-        <option name = "subscribe"         type = "string" mode = "w"  test = "SUB">
-            <restrict type = "SUB" />
-        </option>
-        <option name = "unsubscribe"       type = "string" mode = "w"  test = "SUB">
-            <restrict type = "SUB" />
-        </option>
-        <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
-        <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" />
-        <option name = "fd"                type = "socket" mode = "r"  test = "SUB" />
-        <option name = "events"            type = "uint32" mode = "r"  test = "SUB" />
-    </version>
-    
-    <macro name = "3-x options">
         <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
         <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
         <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
@@ -222,5 +173,43 @@
         <option name = "fd"                type = "socket" mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
         <option name = "last_endpoint"     type = "string" mode = "r"  test = "SUB" />
-    </macro>
+
+        <!-- Options that are deprecated in 4.0 -->
+        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER" >
+            <restrict type = "ROUTER" />
+        </option>
+        <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
+        <option name = "delay_attach_on_connect"
+                                           type = "int"    mode = "w"  test = "PUB" />
+    </version>
+
+    <!-- Legacy version 2 -->
+    <version major = "2" major_removed = "3" style = "macro">
+        <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "identity"          type = "string" mode = "rw" test = "SUB" />
+        <option name = "rate"              type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "recovery_ivl"      type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "mcast_loop"        type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
+        <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
+        <option name = "sndbuf"            type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "rcvbuf"            type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
+        <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
+        <option name = "subscribe"         type = "string" mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
+        <option name = "unsubscribe"       type = "string" mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
+        <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
+        <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" />
+        <option name = "fd"                type = "socket" mode = "r"  test = "SUB" />
+        <option name = "events"            type = "uint32" mode = "r"  test = "SUB" />
+    </version>
 </options>

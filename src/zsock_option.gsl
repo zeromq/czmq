@@ -18,7 +18,58 @@
 .  endif
 .  return ''
 .endfunction
-.for version where major = "4"
+.macro runtime_check(version, option, return)
+.   if defined (my.option.major)
+.      my.major = my.option.major
+.   else
+.      my.major = my.version.major
+.   endif
+.   if defined (my.option.minor)
+.      my.minor = my.option.minor
+.   elsif defined (my.version.minor)
+.      my.minor = my.version.minor
+.   else
+.      my.minor = 0
+.   endif
+.   if defined (my.option.major_removed)
+.      my.major_removed = my.option.major_removed
+.   elsif defined (my.version.major_removed)
+.      my.major_removed = my.version.major_removed
+.   endif
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION ($(my.major), $(my.minor), 0)\
+.   if defined (my.major_removed)
+
+            || ZMQ_MAKE_VERSION (major, minor, patch) >= ZMQ_MAKE_VERSION ($(my.major_removed), 0, 0)\
+.   endif
+) {
+        zsys_error ("zsock $(my.option.name) option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= $(my.major).$(my.minor).0\
+.   if defined (my.major_removed)
+ and < $(my.major_removed).0.0\
+.   endif
+\\n", major, minor, patch, NULL);
+.   if defined (my.return)
+        return $(my.return);
+.   else
+        return;
+.   endif
+    }
+.endmacro
+.# The bindings break against the latest version if a symbol cannot be found
+.for version where ! defined (major_removed)
+
+<!-- The following socket options are available in libzmq from version $(major).\
+.   if defined (.minor)
+$(minor).0 \
+.   else
+0.0 \
+.   endif
+.   if defined (.major_removed)
+to $(major_removed).0.0 \
+.   endif
+-->
 .   for option
 .       if mode = "rw" | mode = "r"
 
@@ -66,11 +117,18 @@
 */
 
 .for version
-#if (ZMQ_VERSION_MAJOR == $(major))
-.   for option
-.       if defined (.minor)
-#   if (ZMQ_VERSION_MINOR == $(minor))
-.       endif
+.   if defined (.major_removed)
+#if (ZMQ_VERSION_MAJOR >= $(major)) && (ZMQ_VERSION_MAJOR < $(major_removed))
+.   else
+#if (ZMQ_VERSION_MAJOR >= $(major))
+.   endif
+.   if defined (.minor)
+#   if (ZMQ_VERSION_MINOR >= $(minor))
+.   endif
+.       for option
+.           if defined (option.major_removed)
+#   if (ZMQ_VERSION_MAJOR < $(option.major_removed))
+.           endif
 .       if mode = "rw" | mode = "w"
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_$(NAME) value
@@ -83,6 +141,7 @@ zsock_set_$(name) (void *self, $(ctype_const:) $(name))
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
+.       runtime_check (version, option)
 .           if count (restrict)
 .               for restrict
 .                   if first()
@@ -134,6 +193,7 @@ zsock_set_$(name)_bin (void *self, const byte *$(name))
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
+.       runtime_check (version, option)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), 32);
     assert (rc == 0 || zmq_errno () == ETERM);
 .       if style = "macro"
@@ -156,6 +216,7 @@ zsock_$(name) (void *self)
 .           if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .           endif
+.       runtime_check (version, option, 0)
 .           if type = "uint64"
     uint64_t $(name);
     size_t option_len = sizeof (uint64_t);
@@ -202,10 +263,13 @@ zsock_$(name) (void *self)
 }
 
 .       endif
-.       if defined (.minor)
+.           if defined (option.major_removed)
 #   endif
-.       endif
-.   endfor
+.           endif
+.       endfor
+.   if defined (.minor)
+#   endif
+.   endif
 .   for source
 $(string.trim(.):)
 
@@ -225,10 +289,17 @@ zsock_option_test (bool verbose)
     //  @selftest
     zsock_t *self;
 .for version
-#if (ZMQ_VERSION_MAJOR == $(major))
+.   if defined (.major_removed)
+#if (ZMQ_VERSION_MAJOR >= $(major)) && (ZMQ_VERSION_MAJOR < $(major_removed))
+.   else
+#if (ZMQ_VERSION_MAJOR >= $(major))
+.   endif
+.   if defined (.minor)
+#   if (ZMQ_VERSION_MINOR >= $(minor))
+.   endif
 .   for option where defined (test)
-.       if defined (.minor)
-#   if (ZMQ_VERSION_MINOR == $(minor))
+.       if defined (option.major_removed)
+#   if (ZMQ_VERSION_MAJOR < $(option.major_removed))
 .       endif
 .       if style = "macro"
 #     if defined (ZMQ_$(NAME))
@@ -258,15 +329,18 @@ zsock_option_test (bool verbose)
 .       if style = "macro"
 #     endif
 .       endif
-.       if defined (.minor)
+.       if defined (option.major_removed)
 #   endif
 .       endif
 .   endfor
+.   if defined (.minor)
+#   endif
+.   endif
+#endif
 .   for selftest
 
 $(string.trim(.):)
 .   endfor
-#endif
 
 .endfor
     //  @end
