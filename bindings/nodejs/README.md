@@ -2416,774 +2416,903 @@ integer my_zsock.heartbeatIvl ()
 ```
 
 Get socket option `heartbeat_ivl`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setHeartbeatIvl (Number)
 ```
 
 Set socket option `heartbeat_ivl`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.heartbeatTtl ()
 ```
 
 Get socket option `heartbeat_ttl`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setHeartbeatTtl (Number)
 ```
 
 Set socket option `heartbeat_ttl`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.heartbeatTimeout ()
 ```
 
 Get socket option `heartbeat_timeout`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setHeartbeatTimeout (Number)
 ```
 
 Set socket option `heartbeat_timeout`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.useFd ()
 ```
 
 Get socket option `use_fd`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setUseFd (Number)
 ```
 
 Set socket option `use_fd`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setXpubManual (Number)
 ```
 
 Set socket option `xpub_manual`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setXpubWelcomeMsg (String)
 ```
 
 Set socket option `xpub_welcome_msg`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setStreamNotify (Number)
 ```
 
 Set socket option `stream_notify`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.invertMatching ()
 ```
 
 Get socket option `invert_matching`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setInvertMatching (Number)
 ```
 
 Set socket option `invert_matching`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setXpubVerboser (Number)
 ```
 
 Set socket option `xpub_verboser`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.connectTimeout ()
 ```
 
 Get socket option `connect_timeout`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setConnectTimeout (Number)
 ```
 
 Set socket option `connect_timeout`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.tcpMaxrt ()
 ```
 
 Get socket option `tcp_maxrt`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setTcpMaxrt (Number)
 ```
 
 Set socket option `tcp_maxrt`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.threadSafe ()
 ```
 
 Get socket option `thread_safe`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.multicastMaxtpdu ()
 ```
 
 Get socket option `multicast_maxtpdu`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setMulticastMaxtpdu (Number)
 ```
 
 Set socket option `multicast_maxtpdu`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.vmciBufferSize ()
 ```
 
 Get socket option `vmci_buffer_size`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setVmciBufferSize (Number)
 ```
 
 Set socket option `vmci_buffer_size`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.vmciBufferMinSize ()
 ```
 
 Get socket option `vmci_buffer_min_size`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setVmciBufferMinSize (Number)
 ```
 
 Set socket option `vmci_buffer_min_size`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.vmciBufferMaxSize ()
 ```
 
 Get socket option `vmci_buffer_max_size`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setVmciBufferMaxSize (Number)
 ```
 
 Set socket option `vmci_buffer_max_size`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.vmciConnectTimeout ()
 ```
 
 Get socket option `vmci_connect_timeout`.
+Available from libzmq 4.2.0.
 
 ```
 nothing my_zsock.setVmciConnectTimeout (Number)
 ```
 
 Set socket option `vmci_connect_timeout`.
+Available from libzmq 4.2.0.
 
 ```
 integer my_zsock.tos ()
 ```
 
 Get socket option `tos`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setTos (Number)
 ```
 
 Set socket option `tos`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setRouterHandover (Number)
 ```
 
 Set socket option `router_handover`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setConnectRid (String)
 ```
 
 Set socket option `connect_rid`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setConnectRidBin (String)
 ```
 
 Set socket option `connect_rid` from 32-octet binary
+Available from libzmq 4.1.0.
 
 ```
 integer my_zsock.handshakeIvl ()
 ```
 
 Get socket option `handshake_ivl`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setHandshakeIvl (Number)
 ```
 
 Set socket option `handshake_ivl`.
+Available from libzmq 4.1.0.
 
 ```
 string my_zsock.socksProxy ()
 ```
 
 Get socket option `socks_proxy`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setSocksProxy (String)
 ```
 
 Set socket option `socks_proxy`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setXpubNodrop (Number)
 ```
 
 Set socket option `xpub_nodrop`.
+Available from libzmq 4.1.0.
 
 ```
 nothing my_zsock.setRouterMandatory (Number)
 ```
 
 Set socket option `router_mandatory`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setProbeRouter (Number)
 ```
 
 Set socket option `probe_router`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setReqRelaxed (Number)
 ```
 
 Set socket option `req_relaxed`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setReqCorrelate (Number)
 ```
 
 Set socket option `req_correlate`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setConflate (Number)
 ```
 
 Set socket option `conflate`.
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.zapDomain ()
 ```
 
 Get socket option `zap_domain`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setZapDomain (String)
 ```
 
 Set socket option `zap_domain`.
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.mechanism ()
 ```
 
 Get socket option `mechanism`.
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.plainServer ()
 ```
 
 Get socket option `plain_server`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setPlainServer (Number)
 ```
 
 Set socket option `plain_server`.
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.plainUsername ()
 ```
 
 Get socket option `plain_username`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setPlainUsername (String)
 ```
 
 Set socket option `plain_username`.
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.plainPassword ()
 ```
 
 Get socket option `plain_password`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setPlainPassword (String)
 ```
 
 Set socket option `plain_password`.
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.curveServer ()
 ```
 
 Get socket option `curve_server`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setCurveServer (Number)
 ```
 
 Set socket option `curve_server`.
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.curvePublickey ()
 ```
 
 Get socket option `curve_publickey`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setCurvePublickey (String)
 ```
 
 Set socket option `curve_publickey`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setCurvePublickeyBin (String)
 ```
 
 Set socket option `curve_publickey` from 32-octet binary
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.curveSecretkey ()
 ```
 
 Get socket option `curve_secretkey`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setCurveSecretkey (String)
 ```
 
 Set socket option `curve_secretkey`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setCurveSecretkeyBin (String)
 ```
 
 Set socket option `curve_secretkey` from 32-octet binary
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.curveServerkey ()
 ```
 
 Get socket option `curve_serverkey`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setCurveServerkey (String)
 ```
 
 Set socket option `curve_serverkey`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setCurveServerkeyBin (String)
 ```
 
 Set socket option `curve_serverkey` from 32-octet binary
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.gssapiServer ()
 ```
 
 Get socket option `gssapi_server`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setGssapiServer (Number)
 ```
 
 Set socket option `gssapi_server`.
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.gssapiPlaintext ()
 ```
 
 Get socket option `gssapi_plaintext`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setGssapiPlaintext (Number)
 ```
 
 Set socket option `gssapi_plaintext`.
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.gssapiPrincipal ()
 ```
 
 Get socket option `gssapi_principal`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setGssapiPrincipal (String)
 ```
 
 Set socket option `gssapi_principal`.
+Available from libzmq 4.0.0.
 
 ```
 string my_zsock.gssapiServicePrincipal ()
 ```
 
 Get socket option `gssapi_service_principal`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setGssapiServicePrincipal (String)
 ```
 
 Set socket option `gssapi_service_principal`.
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.ipv6 ()
 ```
 
 Get socket option `ipv6`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setIpv6 (Number)
 ```
 
 Set socket option `ipv6`.
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.immediate ()
 ```
 
 Get socket option `immediate`.
+Available from libzmq 4.0.0.
 
 ```
 nothing my_zsock.setImmediate (Number)
 ```
 
 Set socket option `immediate`.
+Available from libzmq 4.0.0.
 
 ```
 integer my_zsock.type ()
 ```
 
 Get socket option `type`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.sndhwm ()
 ```
 
 Get socket option `sndhwm`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setSndhwm (Number)
 ```
 
 Set socket option `sndhwm`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.rcvhwm ()
 ```
 
 Get socket option `rcvhwm`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setRcvhwm (Number)
 ```
 
 Set socket option `rcvhwm`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.affinity ()
 ```
 
 Get socket option `affinity`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setAffinity (Number)
 ```
 
 Set socket option `affinity`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setSubscribe (String)
 ```
 
 Set socket option `subscribe`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setUnsubscribe (String)
 ```
 
 Set socket option `unsubscribe`.
+Available from libzmq 3.0.0.
 
 ```
 string my_zsock.identity ()
 ```
 
 Get socket option `identity`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setIdentity (String)
 ```
 
 Set socket option `identity`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.rate ()
 ```
 
 Get socket option `rate`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setRate (Number)
 ```
 
 Set socket option `rate`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.recoveryIvl ()
 ```
 
 Get socket option `recovery_ivl`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setRecoveryIvl (Number)
 ```
 
 Set socket option `recovery_ivl`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.sndbuf ()
 ```
 
 Get socket option `sndbuf`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setSndbuf (Number)
 ```
 
 Set socket option `sndbuf`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.rcvbuf ()
 ```
 
 Get socket option `rcvbuf`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setRcvbuf (Number)
 ```
 
 Set socket option `rcvbuf`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.linger ()
 ```
 
 Get socket option `linger`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setLinger (Number)
 ```
 
 Set socket option `linger`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.reconnectIvl ()
 ```
 
 Get socket option `reconnect_ivl`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setReconnectIvl (Number)
 ```
 
 Set socket option `reconnect_ivl`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.reconnectIvlMax ()
 ```
 
 Get socket option `reconnect_ivl_max`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setReconnectIvlMax (Number)
 ```
 
 Set socket option `reconnect_ivl_max`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.backlog ()
 ```
 
 Get socket option `backlog`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setBacklog (Number)
 ```
 
 Set socket option `backlog`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.maxmsgsize ()
 ```
 
 Get socket option `maxmsgsize`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setMaxmsgsize (Number)
 ```
 
 Set socket option `maxmsgsize`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.multicastHops ()
 ```
 
 Get socket option `multicast_hops`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setMulticastHops (Number)
 ```
 
 Set socket option `multicast_hops`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.rcvtimeo ()
 ```
 
 Get socket option `rcvtimeo`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setRcvtimeo (Number)
 ```
 
 Set socket option `rcvtimeo`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.sndtimeo ()
 ```
 
 Get socket option `sndtimeo`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setSndtimeo (Number)
 ```
 
 Set socket option `sndtimeo`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setXpubVerbose (Number)
 ```
 
 Set socket option `xpub_verbose`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.tcpKeepalive ()
 ```
 
 Get socket option `tcp_keepalive`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setTcpKeepalive (Number)
 ```
 
 Set socket option `tcp_keepalive`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.tcpKeepaliveIdle ()
 ```
 
 Get socket option `tcp_keepalive_idle`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setTcpKeepaliveIdle (Number)
 ```
 
 Set socket option `tcp_keepalive_idle`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.tcpKeepaliveCnt ()
 ```
 
 Get socket option `tcp_keepalive_cnt`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setTcpKeepaliveCnt (Number)
 ```
 
 Set socket option `tcp_keepalive_cnt`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.tcpKeepaliveIntvl ()
 ```
 
 Get socket option `tcp_keepalive_intvl`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setTcpKeepaliveIntvl (Number)
 ```
 
 Set socket option `tcp_keepalive_intvl`.
+Available from libzmq 3.0.0.
 
 ```
 string my_zsock.tcpAcceptFilter ()
 ```
 
 Get socket option `tcp_accept_filter`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setTcpAcceptFilter (String)
 ```
 
 Set socket option `tcp_accept_filter`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.rcvmore ()
 ```
 
 Get socket option `rcvmore`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.events ()
 ```
 
 Get socket option `events`.
+Available from libzmq 3.0.0.
 
 ```
 string my_zsock.lastEndpoint ()
 ```
 
 Get socket option `last_endpoint`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setRouterRaw (Number)
 ```
 
 Set socket option `router_raw`.
+Available from libzmq 3.0.0.
 
 ```
 integer my_zsock.ipv4only ()
 ```
 
 Get socket option `ipv4only`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setIpv4only (Number)
 ```
 
 Set socket option `ipv4only`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.setDelayAttachOnConnect (Number)
 ```
 
 Set socket option `delay_attach_on_connect`.
+Available from libzmq 3.0.0.
 
 ```
 nothing my_zsock.test (Boolean)

@@ -446,6 +446,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `heartbeat_ivl`.
+    Available from libzmq 4.2.0.      
     */
     native static int __heartbeatIvl (long self);
     public int heartbeatIvl () {
@@ -453,6 +454,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `heartbeat_ivl`.
+    Available from libzmq 4.2.0.      
     */
     native static void __setHeartbeatIvl (long self, int heartbeatIvl);
     public void setHeartbeatIvl (int heartbeatIvl) {
@@ -460,6 +462,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `heartbeat_ttl`.
+    Available from libzmq 4.2.0.      
     */
     native static int __heartbeatTtl (long self);
     public int heartbeatTtl () {
@@ -467,6 +470,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `heartbeat_ttl`.
+    Available from libzmq 4.2.0.      
     */
     native static void __setHeartbeatTtl (long self, int heartbeatTtl);
     public void setHeartbeatTtl (int heartbeatTtl) {
@@ -474,6 +478,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `heartbeat_timeout`.
+    Available from libzmq 4.2.0.          
     */
     native static int __heartbeatTimeout (long self);
     public int heartbeatTimeout () {
@@ -481,20 +486,23 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `heartbeat_timeout`.
+    Available from libzmq 4.2.0.          
     */
     native static void __setHeartbeatTimeout (long self, int heartbeatTimeout);
     public void setHeartbeatTimeout (int heartbeatTimeout) {
         __setHeartbeatTimeout (self, heartbeatTimeout);
     }
     /*
-    Get socket option `use_fd`.
+    Get socket option `use_fd`. 
+    Available from libzmq 4.2.0.
     */
     native static int __useFd (long self);
     public int useFd () {
         return __useFd (self);
     }
     /*
-    Set socket option `use_fd`.
+    Set socket option `use_fd`. 
+    Available from libzmq 4.2.0.
     */
     native static void __setUseFd (long self, int useFd);
     public void setUseFd (int useFd) {
@@ -502,6 +510,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `xpub_manual`.
+    Available from libzmq 4.2.0.    
     */
     native static void __setXpubManual (long self, int xpubManual);
     public void setXpubManual (int xpubManual) {
@@ -509,6 +518,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `xpub_welcome_msg`.
+    Available from libzmq 4.2.0.         
     */
     native static void __setXpubWelcomeMsg (long self, String xpubWelcomeMsg);
     public void setXpubWelcomeMsg (String xpubWelcomeMsg) {
@@ -516,6 +526,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `stream_notify`.
+    Available from libzmq 4.2.0.      
     */
     native static void __setStreamNotify (long self, int streamNotify);
     public void setStreamNotify (int streamNotify) {
@@ -523,6 +534,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `invert_matching`.
+    Available from libzmq 4.2.0.        
     */
     native static int __invertMatching (long self);
     public int invertMatching () {
@@ -530,6 +542,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `invert_matching`.
+    Available from libzmq 4.2.0.        
     */
     native static void __setInvertMatching (long self, int invertMatching);
     public void setInvertMatching (int invertMatching) {
@@ -537,6 +550,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `xpub_verboser`.
+    Available from libzmq 4.2.0.      
     */
     native static void __setXpubVerboser (long self, int xpubVerboser);
     public void setXpubVerboser (int xpubVerboser) {
@@ -544,6 +558,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `connect_timeout`.
+    Available from libzmq 4.2.0.        
     */
     native static int __connectTimeout (long self);
     public int connectTimeout () {
@@ -551,6 +566,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `connect_timeout`.
+    Available from libzmq 4.2.0.        
     */
     native static void __setConnectTimeout (long self, int connectTimeout);
     public void setConnectTimeout (int connectTimeout) {
@@ -558,6 +574,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `tcp_maxrt`.
+    Available from libzmq 4.2.0.  
     */
     native static int __tcpMaxrt (long self);
     public int tcpMaxrt () {
@@ -565,6 +582,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `tcp_maxrt`.
+    Available from libzmq 4.2.0.  
     */
     native static void __setTcpMaxrt (long self, int tcpMaxrt);
     public void setTcpMaxrt (int tcpMaxrt) {
@@ -572,6 +590,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `thread_safe`.
+    Available from libzmq 4.2.0.    
     */
     native static int __threadSafe (long self);
     public int threadSafe () {
@@ -579,6 +598,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `multicast_maxtpdu`.
+    Available from libzmq 4.2.0.          
     */
     native static int __multicastMaxtpdu (long self);
     public int multicastMaxtpdu () {
@@ -586,6 +606,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `multicast_maxtpdu`.
+    Available from libzmq 4.2.0.          
     */
     native static void __setMulticastMaxtpdu (long self, int multicastMaxtpdu);
     public void setMulticastMaxtpdu (int multicastMaxtpdu) {
@@ -593,6 +614,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `vmci_buffer_size`.
+    Available from libzmq 4.2.0.         
     */
     native static int __vmciBufferSize (long self);
     public int vmciBufferSize () {
@@ -600,6 +622,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `vmci_buffer_size`.
+    Available from libzmq 4.2.0.         
     */
     native static void __setVmciBufferSize (long self, int vmciBufferSize);
     public void setVmciBufferSize (int vmciBufferSize) {
@@ -607,6 +630,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `vmci_buffer_min_size`.
+    Available from libzmq 4.2.0.             
     */
     native static int __vmciBufferMinSize (long self);
     public int vmciBufferMinSize () {
@@ -614,6 +638,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `vmci_buffer_min_size`.
+    Available from libzmq 4.2.0.             
     */
     native static void __setVmciBufferMinSize (long self, int vmciBufferMinSize);
     public void setVmciBufferMinSize (int vmciBufferMinSize) {
@@ -621,6 +646,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `vmci_buffer_max_size`.
+    Available from libzmq 4.2.0.             
     */
     native static int __vmciBufferMaxSize (long self);
     public int vmciBufferMaxSize () {
@@ -628,6 +654,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `vmci_buffer_max_size`.
+    Available from libzmq 4.2.0.             
     */
     native static void __setVmciBufferMaxSize (long self, int vmciBufferMaxSize);
     public void setVmciBufferMaxSize (int vmciBufferMaxSize) {
@@ -635,6 +662,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `vmci_connect_timeout`.
+    Available from libzmq 4.2.0.             
     */
     native static int __vmciConnectTimeout (long self);
     public int vmciConnectTimeout () {
@@ -642,20 +670,23 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `vmci_connect_timeout`.
+    Available from libzmq 4.2.0.             
     */
     native static void __setVmciConnectTimeout (long self, int vmciConnectTimeout);
     public void setVmciConnectTimeout (int vmciConnectTimeout) {
         __setVmciConnectTimeout (self, vmciConnectTimeout);
     }
     /*
-    Get socket option `tos`.
+    Get socket option `tos`.    
+    Available from libzmq 4.1.0.
     */
     native static int __tos (long self);
     public int tos () {
         return __tos (self);
     }
     /*
-    Set socket option `tos`.
+    Set socket option `tos`.    
+    Available from libzmq 4.1.0.
     */
     native static void __setTos (long self, int tos);
     public void setTos (int tos) {
@@ -663,6 +694,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `router_handover`.
+    Available from libzmq 4.1.0.        
     */
     native static void __setRouterHandover (long self, int routerHandover);
     public void setRouterHandover (int routerHandover) {
@@ -670,6 +702,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `connect_rid`.
+    Available from libzmq 4.1.0.    
     */
     native static void __setConnectRid (long self, String connectRid);
     public void setConnectRid (String connectRid) {
@@ -677,6 +710,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `connect_rid` from 32-octet binary
+    Available from libzmq 4.1.0.                        
     */
     native static void __setConnectRidBin (long self, byte [] connectRid);
     public void setConnectRidBin (byte [] connectRid) {
@@ -684,6 +718,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `handshake_ivl`.
+    Available from libzmq 4.1.0.      
     */
     native static int __handshakeIvl (long self);
     public int handshakeIvl () {
@@ -691,6 +726,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `handshake_ivl`.
+    Available from libzmq 4.1.0.      
     */
     native static void __setHandshakeIvl (long self, int handshakeIvl);
     public void setHandshakeIvl (int handshakeIvl) {
@@ -698,6 +734,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `socks_proxy`.
+    Available from libzmq 4.1.0.    
     */
     native static String __socksProxy (long self);
     public String socksProxy () {
@@ -705,6 +742,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `socks_proxy`.
+    Available from libzmq 4.1.0.    
     */
     native static void __setSocksProxy (long self, String socksProxy);
     public void setSocksProxy (String socksProxy) {
@@ -712,6 +750,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `xpub_nodrop`.
+    Available from libzmq 4.1.0.    
     */
     native static void __setXpubNodrop (long self, int xpubNodrop);
     public void setXpubNodrop (int xpubNodrop) {
@@ -719,6 +758,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `router_mandatory`.
+    Available from libzmq 4.0.0.         
     */
     native static void __setRouterMandatory (long self, int routerMandatory);
     public void setRouterMandatory (int routerMandatory) {
@@ -726,6 +766,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `probe_router`.
+    Available from libzmq 4.0.0.     
     */
     native static void __setProbeRouter (long self, int probeRouter);
     public void setProbeRouter (int probeRouter) {
@@ -733,6 +774,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `req_relaxed`.
+    Available from libzmq 4.0.0.    
     */
     native static void __setReqRelaxed (long self, int reqRelaxed);
     public void setReqRelaxed (int reqRelaxed) {
@@ -740,6 +782,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `req_correlate`.
+    Available from libzmq 4.0.0.      
     */
     native static void __setReqCorrelate (long self, int reqCorrelate);
     public void setReqCorrelate (int reqCorrelate) {
@@ -747,6 +790,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `conflate`.
+    Available from libzmq 4.0.0. 
     */
     native static void __setConflate (long self, int conflate);
     public void setConflate (int conflate) {
@@ -754,6 +798,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `zap_domain`.
+    Available from libzmq 4.0.0.   
     */
     native static String __zapDomain (long self);
     public String zapDomain () {
@@ -761,6 +806,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `zap_domain`.
+    Available from libzmq 4.0.0.   
     */
     native static void __setZapDomain (long self, String zapDomain);
     public void setZapDomain (String zapDomain) {
@@ -768,6 +814,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `mechanism`.
+    Available from libzmq 4.0.0.  
     */
     native static int __mechanism (long self);
     public int mechanism () {
@@ -775,6 +822,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `plain_server`.
+    Available from libzmq 4.0.0.     
     */
     native static int __plainServer (long self);
     public int plainServer () {
@@ -782,6 +830,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `plain_server`.
+    Available from libzmq 4.0.0.     
     */
     native static void __setPlainServer (long self, int plainServer);
     public void setPlainServer (int plainServer) {
@@ -789,6 +838,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `plain_username`.
+    Available from libzmq 4.0.0.       
     */
     native static String __plainUsername (long self);
     public String plainUsername () {
@@ -796,6 +846,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `plain_username`.
+    Available from libzmq 4.0.0.       
     */
     native static void __setPlainUsername (long self, String plainUsername);
     public void setPlainUsername (String plainUsername) {
@@ -803,6 +854,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `plain_password`.
+    Available from libzmq 4.0.0.       
     */
     native static String __plainPassword (long self);
     public String plainPassword () {
@@ -810,6 +862,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `plain_password`.
+    Available from libzmq 4.0.0.       
     */
     native static void __setPlainPassword (long self, String plainPassword);
     public void setPlainPassword (String plainPassword) {
@@ -817,6 +870,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `curve_server`.
+    Available from libzmq 4.0.0.     
     */
     native static int __curveServer (long self);
     public int curveServer () {
@@ -824,6 +878,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `curve_server`.
+    Available from libzmq 4.0.0.     
     */
     native static void __setCurveServer (long self, int curveServer);
     public void setCurveServer (int curveServer) {
@@ -831,6 +886,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `curve_publickey`.
+    Available from libzmq 4.0.0.        
     */
     native static String __curvePublickey (long self);
     public String curvePublickey () {
@@ -838,6 +894,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `curve_publickey`.
+    Available from libzmq 4.0.0.        
     */
     native static void __setCurvePublickey (long self, String curvePublickey);
     public void setCurvePublickey (String curvePublickey) {
@@ -845,6 +902,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `curve_publickey` from 32-octet binary
+    Available from libzmq 4.0.0.                            
     */
     native static void __setCurvePublickeyBin (long self, byte [] curvePublickey);
     public void setCurvePublickeyBin (byte [] curvePublickey) {
@@ -852,6 +910,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `curve_secretkey`.
+    Available from libzmq 4.0.0.        
     */
     native static String __curveSecretkey (long self);
     public String curveSecretkey () {
@@ -859,6 +918,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `curve_secretkey`.
+    Available from libzmq 4.0.0.        
     */
     native static void __setCurveSecretkey (long self, String curveSecretkey);
     public void setCurveSecretkey (String curveSecretkey) {
@@ -866,6 +926,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `curve_secretkey` from 32-octet binary
+    Available from libzmq 4.0.0.                            
     */
     native static void __setCurveSecretkeyBin (long self, byte [] curveSecretkey);
     public void setCurveSecretkeyBin (byte [] curveSecretkey) {
@@ -873,6 +934,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `curve_serverkey`.
+    Available from libzmq 4.0.0.        
     */
     native static String __curveServerkey (long self);
     public String curveServerkey () {
@@ -880,6 +942,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `curve_serverkey`.
+    Available from libzmq 4.0.0.        
     */
     native static void __setCurveServerkey (long self, String curveServerkey);
     public void setCurveServerkey (String curveServerkey) {
@@ -887,6 +950,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `curve_serverkey` from 32-octet binary
+    Available from libzmq 4.0.0.                            
     */
     native static void __setCurveServerkeyBin (long self, byte [] curveServerkey);
     public void setCurveServerkeyBin (byte [] curveServerkey) {
@@ -894,6 +958,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `gssapi_server`.
+    Available from libzmq 4.0.0.      
     */
     native static int __gssapiServer (long self);
     public int gssapiServer () {
@@ -901,6 +966,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `gssapi_server`.
+    Available from libzmq 4.0.0.      
     */
     native static void __setGssapiServer (long self, int gssapiServer);
     public void setGssapiServer (int gssapiServer) {
@@ -908,6 +974,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `gssapi_plaintext`.
+    Available from libzmq 4.0.0.         
     */
     native static int __gssapiPlaintext (long self);
     public int gssapiPlaintext () {
@@ -915,6 +982,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `gssapi_plaintext`.
+    Available from libzmq 4.0.0.         
     */
     native static void __setGssapiPlaintext (long self, int gssapiPlaintext);
     public void setGssapiPlaintext (int gssapiPlaintext) {
@@ -922,6 +990,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `gssapi_principal`.
+    Available from libzmq 4.0.0.         
     */
     native static String __gssapiPrincipal (long self);
     public String gssapiPrincipal () {
@@ -929,6 +998,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `gssapi_principal`.
+    Available from libzmq 4.0.0.         
     */
     native static void __setGssapiPrincipal (long self, String gssapiPrincipal);
     public void setGssapiPrincipal (String gssapiPrincipal) {
@@ -936,6 +1006,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `gssapi_service_principal`.
+    Available from libzmq 4.0.0.                 
     */
     native static String __gssapiServicePrincipal (long self);
     public String gssapiServicePrincipal () {
@@ -943,20 +1014,23 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `gssapi_service_principal`.
+    Available from libzmq 4.0.0.                 
     */
     native static void __setGssapiServicePrincipal (long self, String gssapiServicePrincipal);
     public void setGssapiServicePrincipal (String gssapiServicePrincipal) {
         __setGssapiServicePrincipal (self, gssapiServicePrincipal);
     }
     /*
-    Get socket option `ipv6`.
+    Get socket option `ipv6`.   
+    Available from libzmq 4.0.0.
     */
     native static int __ipv6 (long self);
     public int ipv6 () {
         return __ipv6 (self);
     }
     /*
-    Set socket option `ipv6`.
+    Set socket option `ipv6`.   
+    Available from libzmq 4.0.0.
     */
     native static void __setIpv6 (long self, int ipv6);
     public void setIpv6 (int ipv6) {
@@ -964,6 +1038,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `immediate`.
+    Available from libzmq 4.0.0.  
     */
     native static int __immediate (long self);
     public int immediate () {
@@ -971,41 +1046,47 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `immediate`.
+    Available from libzmq 4.0.0.  
     */
     native static void __setImmediate (long self, int immediate);
     public void setImmediate (int immediate) {
         __setImmediate (self, immediate);
     }
     /*
-    Get socket option `type`.
+    Get socket option `type`.   
+    Available from libzmq 3.0.0.
     */
     native static int __type (long self);
     public int type () {
         return __type (self);
     }
     /*
-    Get socket option `sndhwm`.
+    Get socket option `sndhwm`. 
+    Available from libzmq 3.0.0.
     */
     native static int __sndhwm (long self);
     public int sndhwm () {
         return __sndhwm (self);
     }
     /*
-    Set socket option `sndhwm`.
+    Set socket option `sndhwm`. 
+    Available from libzmq 3.0.0.
     */
     native static void __setSndhwm (long self, int sndhwm);
     public void setSndhwm (int sndhwm) {
         __setSndhwm (self, sndhwm);
     }
     /*
-    Get socket option `rcvhwm`.
+    Get socket option `rcvhwm`. 
+    Available from libzmq 3.0.0.
     */
     native static int __rcvhwm (long self);
     public int rcvhwm () {
         return __rcvhwm (self);
     }
     /*
-    Set socket option `rcvhwm`.
+    Set socket option `rcvhwm`. 
+    Available from libzmq 3.0.0.
     */
     native static void __setRcvhwm (long self, int rcvhwm);
     public void setRcvhwm (int rcvhwm) {
@@ -1013,6 +1094,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `affinity`.
+    Available from libzmq 3.0.0. 
     */
     native static int __affinity (long self);
     public int affinity () {
@@ -1020,6 +1102,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `affinity`.
+    Available from libzmq 3.0.0. 
     */
     native static void __setAffinity (long self, int affinity);
     public void setAffinity (int affinity) {
@@ -1027,6 +1110,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `subscribe`.
+    Available from libzmq 3.0.0.  
     */
     native static void __setSubscribe (long self, String subscribe);
     public void setSubscribe (String subscribe) {
@@ -1034,6 +1118,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `unsubscribe`.
+    Available from libzmq 3.0.0.    
     */
     native static void __setUnsubscribe (long self, String unsubscribe);
     public void setUnsubscribe (String unsubscribe) {
@@ -1041,6 +1126,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `identity`.
+    Available from libzmq 3.0.0. 
     */
     native static String __identity (long self);
     public String identity () {
@@ -1048,20 +1134,23 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `identity`.
+    Available from libzmq 3.0.0. 
     */
     native static void __setIdentity (long self, String identity);
     public void setIdentity (String identity) {
         __setIdentity (self, identity);
     }
     /*
-    Get socket option `rate`.
+    Get socket option `rate`.   
+    Available from libzmq 3.0.0.
     */
     native static int __rate (long self);
     public int rate () {
         return __rate (self);
     }
     /*
-    Set socket option `rate`.
+    Set socket option `rate`.   
+    Available from libzmq 3.0.0.
     */
     native static void __setRate (long self, int rate);
     public void setRate (int rate) {
@@ -1069,6 +1158,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `recovery_ivl`.
+    Available from libzmq 3.0.0.     
     */
     native static int __recoveryIvl (long self);
     public int recoveryIvl () {
@@ -1076,48 +1166,55 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `recovery_ivl`.
+    Available from libzmq 3.0.0.     
     */
     native static void __setRecoveryIvl (long self, int recoveryIvl);
     public void setRecoveryIvl (int recoveryIvl) {
         __setRecoveryIvl (self, recoveryIvl);
     }
     /*
-    Get socket option `sndbuf`.
+    Get socket option `sndbuf`. 
+    Available from libzmq 3.0.0.
     */
     native static int __sndbuf (long self);
     public int sndbuf () {
         return __sndbuf (self);
     }
     /*
-    Set socket option `sndbuf`.
+    Set socket option `sndbuf`. 
+    Available from libzmq 3.0.0.
     */
     native static void __setSndbuf (long self, int sndbuf);
     public void setSndbuf (int sndbuf) {
         __setSndbuf (self, sndbuf);
     }
     /*
-    Get socket option `rcvbuf`.
+    Get socket option `rcvbuf`. 
+    Available from libzmq 3.0.0.
     */
     native static int __rcvbuf (long self);
     public int rcvbuf () {
         return __rcvbuf (self);
     }
     /*
-    Set socket option `rcvbuf`.
+    Set socket option `rcvbuf`. 
+    Available from libzmq 3.0.0.
     */
     native static void __setRcvbuf (long self, int rcvbuf);
     public void setRcvbuf (int rcvbuf) {
         __setRcvbuf (self, rcvbuf);
     }
     /*
-    Get socket option `linger`.
+    Get socket option `linger`. 
+    Available from libzmq 3.0.0.
     */
     native static int __linger (long self);
     public int linger () {
         return __linger (self);
     }
     /*
-    Set socket option `linger`.
+    Set socket option `linger`. 
+    Available from libzmq 3.0.0.
     */
     native static void __setLinger (long self, int linger);
     public void setLinger (int linger) {
@@ -1125,6 +1222,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `reconnect_ivl`.
+    Available from libzmq 3.0.0.      
     */
     native static int __reconnectIvl (long self);
     public int reconnectIvl () {
@@ -1132,6 +1230,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `reconnect_ivl`.
+    Available from libzmq 3.0.0.      
     */
     native static void __setReconnectIvl (long self, int reconnectIvl);
     public void setReconnectIvl (int reconnectIvl) {
@@ -1139,6 +1238,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `reconnect_ivl_max`.
+    Available from libzmq 3.0.0.          
     */
     native static int __reconnectIvlMax (long self);
     public int reconnectIvlMax () {
@@ -1146,6 +1246,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `reconnect_ivl_max`.
+    Available from libzmq 3.0.0.          
     */
     native static void __setReconnectIvlMax (long self, int reconnectIvlMax);
     public void setReconnectIvlMax (int reconnectIvlMax) {
@@ -1153,6 +1254,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `backlog`.
+    Available from libzmq 3.0.0.
     */
     native static int __backlog (long self);
     public int backlog () {
@@ -1160,6 +1262,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `backlog`.
+    Available from libzmq 3.0.0.
     */
     native static void __setBacklog (long self, int backlog);
     public void setBacklog (int backlog) {
@@ -1167,6 +1270,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `maxmsgsize`.
+    Available from libzmq 3.0.0.   
     */
     native static int __maxmsgsize (long self);
     public int maxmsgsize () {
@@ -1174,6 +1278,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `maxmsgsize`.
+    Available from libzmq 3.0.0.   
     */
     native static void __setMaxmsgsize (long self, int maxmsgsize);
     public void setMaxmsgsize (int maxmsgsize) {
@@ -1181,6 +1286,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `multicast_hops`.
+    Available from libzmq 3.0.0.       
     */
     native static int __multicastHops (long self);
     public int multicastHops () {
@@ -1188,6 +1294,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `multicast_hops`.
+    Available from libzmq 3.0.0.       
     */
     native static void __setMulticastHops (long self, int multicastHops);
     public void setMulticastHops (int multicastHops) {
@@ -1195,6 +1302,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `rcvtimeo`.
+    Available from libzmq 3.0.0. 
     */
     native static int __rcvtimeo (long self);
     public int rcvtimeo () {
@@ -1202,6 +1310,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `rcvtimeo`.
+    Available from libzmq 3.0.0. 
     */
     native static void __setRcvtimeo (long self, int rcvtimeo);
     public void setRcvtimeo (int rcvtimeo) {
@@ -1209,6 +1318,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `sndtimeo`.
+    Available from libzmq 3.0.0. 
     */
     native static int __sndtimeo (long self);
     public int sndtimeo () {
@@ -1216,6 +1326,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `sndtimeo`.
+    Available from libzmq 3.0.0. 
     */
     native static void __setSndtimeo (long self, int sndtimeo);
     public void setSndtimeo (int sndtimeo) {
@@ -1223,6 +1334,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `xpub_verbose`.
+    Available from libzmq 3.0.0.     
     */
     native static void __setXpubVerbose (long self, int xpubVerbose);
     public void setXpubVerbose (int xpubVerbose) {
@@ -1230,6 +1342,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `tcp_keepalive`.
+    Available from libzmq 3.0.0.      
     */
     native static int __tcpKeepalive (long self);
     public int tcpKeepalive () {
@@ -1237,6 +1350,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `tcp_keepalive`.
+    Available from libzmq 3.0.0.      
     */
     native static void __setTcpKeepalive (long self, int tcpKeepalive);
     public void setTcpKeepalive (int tcpKeepalive) {
@@ -1244,6 +1358,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `tcp_keepalive_idle`.
+    Available from libzmq 3.0.0.           
     */
     native static int __tcpKeepaliveIdle (long self);
     public int tcpKeepaliveIdle () {
@@ -1251,6 +1366,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `tcp_keepalive_idle`.
+    Available from libzmq 3.0.0.           
     */
     native static void __setTcpKeepaliveIdle (long self, int tcpKeepaliveIdle);
     public void setTcpKeepaliveIdle (int tcpKeepaliveIdle) {
@@ -1258,6 +1374,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `tcp_keepalive_cnt`.
+    Available from libzmq 3.0.0.          
     */
     native static int __tcpKeepaliveCnt (long self);
     public int tcpKeepaliveCnt () {
@@ -1265,6 +1382,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `tcp_keepalive_cnt`.
+    Available from libzmq 3.0.0.          
     */
     native static void __setTcpKeepaliveCnt (long self, int tcpKeepaliveCnt);
     public void setTcpKeepaliveCnt (int tcpKeepaliveCnt) {
@@ -1272,6 +1390,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `tcp_keepalive_intvl`.
+    Available from libzmq 3.0.0.            
     */
     native static int __tcpKeepaliveIntvl (long self);
     public int tcpKeepaliveIntvl () {
@@ -1279,6 +1398,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `tcp_keepalive_intvl`.
+    Available from libzmq 3.0.0.            
     */
     native static void __setTcpKeepaliveIntvl (long self, int tcpKeepaliveIntvl);
     public void setTcpKeepaliveIntvl (int tcpKeepaliveIntvl) {
@@ -1286,6 +1406,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `tcp_accept_filter`.
+    Available from libzmq 3.0.0.          
     */
     native static String __tcpAcceptFilter (long self);
     public String tcpAcceptFilter () {
@@ -1293,6 +1414,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `tcp_accept_filter`.
+    Available from libzmq 3.0.0.          
     */
     native static void __setTcpAcceptFilter (long self, String tcpAcceptFilter);
     public void setTcpAcceptFilter (String tcpAcceptFilter) {
@@ -1300,13 +1422,15 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `rcvmore`.
+    Available from libzmq 3.0.0.
     */
     native static int __rcvmore (long self);
     public int rcvmore () {
         return __rcvmore (self);
     }
     /*
-    Get socket option `events`.
+    Get socket option `events`. 
+    Available from libzmq 3.0.0.
     */
     native static int __events (long self);
     public int events () {
@@ -1314,6 +1438,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `last_endpoint`.
+    Available from libzmq 3.0.0.      
     */
     native static String __lastEndpoint (long self);
     public String lastEndpoint () {
@@ -1321,6 +1446,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `router_raw`.
+    Available from libzmq 3.0.0.   
     */
     native static void __setRouterRaw (long self, int routerRaw);
     public void setRouterRaw (int routerRaw) {
@@ -1328,6 +1454,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Get socket option `ipv4only`.
+    Available from libzmq 3.0.0. 
     */
     native static int __ipv4only (long self);
     public int ipv4only () {
@@ -1335,6 +1462,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `ipv4only`.
+    Available from libzmq 3.0.0. 
     */
     native static void __setIpv4only (long self, int ipv4only);
     public void setIpv4only (int ipv4only) {
@@ -1342,6 +1470,7 @@ public class Zsock implements AutoCloseable{
     }
     /*
     Set socket option `delay_attach_on_connect`.
+    Available from libzmq 3.0.0.                
     */
     native static void __setDelayAttachOnConnect (long self, int delayAttachOnConnect);
     public void setDelayAttachOnConnect (int delayAttachOnConnect) {

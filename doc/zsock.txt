@@ -280,582 +280,712 @@ CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
 //  Get socket option `heartbeat_ivl`.
+//  Available from libzmq 4.2.0.      
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_heartbeat_ivl (void *self);
 
 //  Set socket option `heartbeat_ivl`.
+//  Available from libzmq 4.2.0.      
 CZMQ_EXPORT void
     zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
 
 //  Get socket option `heartbeat_ttl`.
+//  Available from libzmq 4.2.0.      
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_heartbeat_ttl (void *self);
 
 //  Set socket option `heartbeat_ttl`.
+//  Available from libzmq 4.2.0.      
 CZMQ_EXPORT void
     zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
 
 //  Get socket option `heartbeat_timeout`.
+//  Available from libzmq 4.2.0.          
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_heartbeat_timeout (void *self);
 
 //  Set socket option `heartbeat_timeout`.
+//  Available from libzmq 4.2.0.          
 CZMQ_EXPORT void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
 
-//  Get socket option `use_fd`.
+//  Get socket option `use_fd`. 
+//  Available from libzmq 4.2.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_use_fd (void *self);
 
-//  Set socket option `use_fd`.
+//  Set socket option `use_fd`. 
+//  Available from libzmq 4.2.0.
 CZMQ_EXPORT void
     zsock_set_use_fd (void *self, int use_fd);
 
 //  Set socket option `xpub_manual`.
+//  Available from libzmq 4.2.0.    
 CZMQ_EXPORT void
     zsock_set_xpub_manual (void *self, int xpub_manual);
 
 //  Set socket option `xpub_welcome_msg`.
+//  Available from libzmq 4.2.0.         
 CZMQ_EXPORT void
     zsock_set_xpub_welcome_msg (void *self, const char *xpub_welcome_msg);
 
 //  Set socket option `stream_notify`.
+//  Available from libzmq 4.2.0.      
 CZMQ_EXPORT void
     zsock_set_stream_notify (void *self, int stream_notify);
 
 //  Get socket option `invert_matching`.
+//  Available from libzmq 4.2.0.        
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_invert_matching (void *self);
 
 //  Set socket option `invert_matching`.
+//  Available from libzmq 4.2.0.        
 CZMQ_EXPORT void
     zsock_set_invert_matching (void *self, int invert_matching);
 
 //  Set socket option `xpub_verboser`.
+//  Available from libzmq 4.2.0.      
 CZMQ_EXPORT void
     zsock_set_xpub_verboser (void *self, int xpub_verboser);
 
 //  Get socket option `connect_timeout`.
+//  Available from libzmq 4.2.0.        
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_connect_timeout (void *self);
 
 //  Set socket option `connect_timeout`.
+//  Available from libzmq 4.2.0.        
 CZMQ_EXPORT void
     zsock_set_connect_timeout (void *self, int connect_timeout);
 
 //  Get socket option `tcp_maxrt`.
+//  Available from libzmq 4.2.0.  
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_tcp_maxrt (void *self);
 
 //  Set socket option `tcp_maxrt`.
+//  Available from libzmq 4.2.0.  
 CZMQ_EXPORT void
     zsock_set_tcp_maxrt (void *self, int tcp_maxrt);
 
 //  Get socket option `thread_safe`.
+//  Available from libzmq 4.2.0.    
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_thread_safe (void *self);
 
 //  Get socket option `multicast_maxtpdu`.
+//  Available from libzmq 4.2.0.          
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_multicast_maxtpdu (void *self);
 
 //  Set socket option `multicast_maxtpdu`.
+//  Available from libzmq 4.2.0.          
 CZMQ_EXPORT void
     zsock_set_multicast_maxtpdu (void *self, int multicast_maxtpdu);
 
 //  Get socket option `vmci_buffer_size`.
+//  Available from libzmq 4.2.0.         
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_vmci_buffer_size (void *self);
 
 //  Set socket option `vmci_buffer_size`.
+//  Available from libzmq 4.2.0.         
 CZMQ_EXPORT void
     zsock_set_vmci_buffer_size (void *self, int vmci_buffer_size);
 
 //  Get socket option `vmci_buffer_min_size`.
+//  Available from libzmq 4.2.0.             
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_vmci_buffer_min_size (void *self);
 
 //  Set socket option `vmci_buffer_min_size`.
+//  Available from libzmq 4.2.0.             
 CZMQ_EXPORT void
     zsock_set_vmci_buffer_min_size (void *self, int vmci_buffer_min_size);
 
 //  Get socket option `vmci_buffer_max_size`.
+//  Available from libzmq 4.2.0.             
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_vmci_buffer_max_size (void *self);
 
 //  Set socket option `vmci_buffer_max_size`.
+//  Available from libzmq 4.2.0.             
 CZMQ_EXPORT void
     zsock_set_vmci_buffer_max_size (void *self, int vmci_buffer_max_size);
 
 //  Get socket option `vmci_connect_timeout`.
+//  Available from libzmq 4.2.0.             
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_vmci_connect_timeout (void *self);
 
 //  Set socket option `vmci_connect_timeout`.
+//  Available from libzmq 4.2.0.             
 CZMQ_EXPORT void
     zsock_set_vmci_connect_timeout (void *self, int vmci_connect_timeout);
 
-//  Get socket option `tos`.
+//  Get socket option `tos`.    
+//  Available from libzmq 4.1.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_tos (void *self);
 
-//  Set socket option `tos`.
+//  Set socket option `tos`.    
+//  Available from libzmq 4.1.0.
 CZMQ_EXPORT void
     zsock_set_tos (void *self, int tos);
 
 //  Set socket option `router_handover`.
+//  Available from libzmq 4.1.0.        
 CZMQ_EXPORT void
     zsock_set_router_handover (void *self, int router_handover);
 
 //  Set socket option `connect_rid`.
+//  Available from libzmq 4.1.0.    
 CZMQ_EXPORT void
     zsock_set_connect_rid (void *self, const char *connect_rid);
 
 //  Set socket option `connect_rid` from 32-octet binary
+//  Available from libzmq 4.1.0.                        
 CZMQ_EXPORT void
     zsock_set_connect_rid_bin (void *self, const byte *connect_rid);
 
 //  Get socket option `handshake_ivl`.
+//  Available from libzmq 4.1.0.      
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_handshake_ivl (void *self);
 
 //  Set socket option `handshake_ivl`.
+//  Available from libzmq 4.1.0.      
 CZMQ_EXPORT void
     zsock_set_handshake_ivl (void *self, int handshake_ivl);
 
 //  Get socket option `socks_proxy`.
+//  Available from libzmq 4.1.0.    
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_socks_proxy (void *self);
 
 //  Set socket option `socks_proxy`.
+//  Available from libzmq 4.1.0.    
 CZMQ_EXPORT void
     zsock_set_socks_proxy (void *self, const char *socks_proxy);
 
 //  Set socket option `xpub_nodrop`.
+//  Available from libzmq 4.1.0.    
 CZMQ_EXPORT void
     zsock_set_xpub_nodrop (void *self, int xpub_nodrop);
 
 //  Set socket option `router_mandatory`.
+//  Available from libzmq 4.0.0.         
 CZMQ_EXPORT void
     zsock_set_router_mandatory (void *self, int router_mandatory);
 
 //  Set socket option `probe_router`.
+//  Available from libzmq 4.0.0.     
 CZMQ_EXPORT void
     zsock_set_probe_router (void *self, int probe_router);
 
 //  Set socket option `req_relaxed`.
+//  Available from libzmq 4.0.0.    
 CZMQ_EXPORT void
     zsock_set_req_relaxed (void *self, int req_relaxed);
 
 //  Set socket option `req_correlate`.
+//  Available from libzmq 4.0.0.      
 CZMQ_EXPORT void
     zsock_set_req_correlate (void *self, int req_correlate);
 
 //  Set socket option `conflate`.
+//  Available from libzmq 4.0.0. 
 CZMQ_EXPORT void
     zsock_set_conflate (void *self, int conflate);
 
 //  Get socket option `zap_domain`.
+//  Available from libzmq 4.0.0.   
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_zap_domain (void *self);
 
 //  Set socket option `zap_domain`.
+//  Available from libzmq 4.0.0.   
 CZMQ_EXPORT void
     zsock_set_zap_domain (void *self, const char *zap_domain);
 
 //  Get socket option `mechanism`.
+//  Available from libzmq 4.0.0.  
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_mechanism (void *self);
 
 //  Get socket option `plain_server`.
+//  Available from libzmq 4.0.0.     
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_plain_server (void *self);
 
 //  Set socket option `plain_server`.
+//  Available from libzmq 4.0.0.     
 CZMQ_EXPORT void
     zsock_set_plain_server (void *self, int plain_server);
 
 //  Get socket option `plain_username`.
+//  Available from libzmq 4.0.0.       
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_plain_username (void *self);
 
 //  Set socket option `plain_username`.
+//  Available from libzmq 4.0.0.       
 CZMQ_EXPORT void
     zsock_set_plain_username (void *self, const char *plain_username);
 
 //  Get socket option `plain_password`.
+//  Available from libzmq 4.0.0.       
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_plain_password (void *self);
 
 //  Set socket option `plain_password`.
+//  Available from libzmq 4.0.0.       
 CZMQ_EXPORT void
     zsock_set_plain_password (void *self, const char *plain_password);
 
 //  Get socket option `curve_server`.
+//  Available from libzmq 4.0.0.     
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_curve_server (void *self);
 
 //  Set socket option `curve_server`.
+//  Available from libzmq 4.0.0.     
 CZMQ_EXPORT void
     zsock_set_curve_server (void *self, int curve_server);
 
 //  Get socket option `curve_publickey`.
+//  Available from libzmq 4.0.0.        
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_curve_publickey (void *self);
 
 //  Set socket option `curve_publickey`.
+//  Available from libzmq 4.0.0.        
 CZMQ_EXPORT void
     zsock_set_curve_publickey (void *self, const char *curve_publickey);
 
 //  Set socket option `curve_publickey` from 32-octet binary
+//  Available from libzmq 4.0.0.                            
 CZMQ_EXPORT void
     zsock_set_curve_publickey_bin (void *self, const byte *curve_publickey);
 
 //  Get socket option `curve_secretkey`.
+//  Available from libzmq 4.0.0.        
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_curve_secretkey (void *self);
 
 //  Set socket option `curve_secretkey`.
+//  Available from libzmq 4.0.0.        
 CZMQ_EXPORT void
     zsock_set_curve_secretkey (void *self, const char *curve_secretkey);
 
 //  Set socket option `curve_secretkey` from 32-octet binary
+//  Available from libzmq 4.0.0.                            
 CZMQ_EXPORT void
     zsock_set_curve_secretkey_bin (void *self, const byte *curve_secretkey);
 
 //  Get socket option `curve_serverkey`.
+//  Available from libzmq 4.0.0.        
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_curve_serverkey (void *self);
 
 //  Set socket option `curve_serverkey`.
+//  Available from libzmq 4.0.0.        
 CZMQ_EXPORT void
     zsock_set_curve_serverkey (void *self, const char *curve_serverkey);
 
 //  Set socket option `curve_serverkey` from 32-octet binary
+//  Available from libzmq 4.0.0.                            
 CZMQ_EXPORT void
     zsock_set_curve_serverkey_bin (void *self, const byte *curve_serverkey);
 
 //  Get socket option `gssapi_server`.
+//  Available from libzmq 4.0.0.      
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_gssapi_server (void *self);
 
 //  Set socket option `gssapi_server`.
+//  Available from libzmq 4.0.0.      
 CZMQ_EXPORT void
     zsock_set_gssapi_server (void *self, int gssapi_server);
 
 //  Get socket option `gssapi_plaintext`.
+//  Available from libzmq 4.0.0.         
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_gssapi_plaintext (void *self);
 
 //  Set socket option `gssapi_plaintext`.
+//  Available from libzmq 4.0.0.         
 CZMQ_EXPORT void
     zsock_set_gssapi_plaintext (void *self, int gssapi_plaintext);
 
 //  Get socket option `gssapi_principal`.
+//  Available from libzmq 4.0.0.         
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_gssapi_principal (void *self);
 
 //  Set socket option `gssapi_principal`.
+//  Available from libzmq 4.0.0.         
 CZMQ_EXPORT void
     zsock_set_gssapi_principal (void *self, const char *gssapi_principal);
 
 //  Get socket option `gssapi_service_principal`.
+//  Available from libzmq 4.0.0.                 
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_gssapi_service_principal (void *self);
 
 //  Set socket option `gssapi_service_principal`.
+//  Available from libzmq 4.0.0.                 
 CZMQ_EXPORT void
     zsock_set_gssapi_service_principal (void *self, const char *gssapi_service_principal);
 
-//  Get socket option `ipv6`.
+//  Get socket option `ipv6`.   
+//  Available from libzmq 4.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_ipv6 (void *self);
 
-//  Set socket option `ipv6`.
+//  Set socket option `ipv6`.   
+//  Available from libzmq 4.0.0.
 CZMQ_EXPORT void
     zsock_set_ipv6 (void *self, int ipv6);
 
 //  Get socket option `immediate`.
+//  Available from libzmq 4.0.0.  
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_immediate (void *self);
 
 //  Set socket option `immediate`.
+//  Available from libzmq 4.0.0.  
 CZMQ_EXPORT void
     zsock_set_immediate (void *self, int immediate);
 
-//  Set socket option `router_raw`.
-CZMQ_EXPORT void
-    zsock_set_router_raw (void *self, int router_raw);
-
-//  Get socket option `ipv4only`.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT int
-    zsock_ipv4only (void *self);
-
-//  Set socket option `ipv4only`.
-CZMQ_EXPORT void
-    zsock_set_ipv4only (void *self, int ipv4only);
-
-//  Set socket option `delay_attach_on_connect`.
-CZMQ_EXPORT void
-    zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
-
-//  Get socket option `type`.
+//  Get socket option `type`.   
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_type (void *self);
 
-//  Get socket option `sndhwm`.
+//  Get socket option `sndhwm`. 
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_sndhwm (void *self);
 
-//  Set socket option `sndhwm`.
+//  Set socket option `sndhwm`. 
+//  Available from libzmq 3.0.0.
 CZMQ_EXPORT void
     zsock_set_sndhwm (void *self, int sndhwm);
 
-//  Get socket option `rcvhwm`.
+//  Get socket option `rcvhwm`. 
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_rcvhwm (void *self);
 
-//  Set socket option `rcvhwm`.
+//  Set socket option `rcvhwm`. 
+//  Available from libzmq 3.0.0.
 CZMQ_EXPORT void
     zsock_set_rcvhwm (void *self, int rcvhwm);
 
 //  Get socket option `affinity`.
+//  Available from libzmq 3.0.0. 
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_affinity (void *self);
 
 //  Set socket option `affinity`.
+//  Available from libzmq 3.0.0. 
 CZMQ_EXPORT void
     zsock_set_affinity (void *self, int affinity);
 
 //  Set socket option `subscribe`.
+//  Available from libzmq 3.0.0.  
 CZMQ_EXPORT void
     zsock_set_subscribe (void *self, const char *subscribe);
 
 //  Set socket option `unsubscribe`.
+//  Available from libzmq 3.0.0.    
 CZMQ_EXPORT void
     zsock_set_unsubscribe (void *self, const char *unsubscribe);
 
 //  Get socket option `identity`.
+//  Available from libzmq 3.0.0. 
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_identity (void *self);
 
 //  Set socket option `identity`.
+//  Available from libzmq 3.0.0. 
 CZMQ_EXPORT void
     zsock_set_identity (void *self, const char *identity);
 
-//  Get socket option `rate`.
+//  Get socket option `rate`.   
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_rate (void *self);
 
-//  Set socket option `rate`.
+//  Set socket option `rate`.   
+//  Available from libzmq 3.0.0.
 CZMQ_EXPORT void
     zsock_set_rate (void *self, int rate);
 
 //  Get socket option `recovery_ivl`.
+//  Available from libzmq 3.0.0.     
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_recovery_ivl (void *self);
 
 //  Set socket option `recovery_ivl`.
+//  Available from libzmq 3.0.0.     
 CZMQ_EXPORT void
     zsock_set_recovery_ivl (void *self, int recovery_ivl);
 
-//  Get socket option `sndbuf`.
+//  Get socket option `sndbuf`. 
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_sndbuf (void *self);
 
-//  Set socket option `sndbuf`.
+//  Set socket option `sndbuf`. 
+//  Available from libzmq 3.0.0.
 CZMQ_EXPORT void
     zsock_set_sndbuf (void *self, int sndbuf);
 
-//  Get socket option `rcvbuf`.
+//  Get socket option `rcvbuf`. 
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_rcvbuf (void *self);
 
-//  Set socket option `rcvbuf`.
+//  Set socket option `rcvbuf`. 
+//  Available from libzmq 3.0.0.
 CZMQ_EXPORT void
     zsock_set_rcvbuf (void *self, int rcvbuf);
 
-//  Get socket option `linger`.
+//  Get socket option `linger`. 
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_linger (void *self);
 
-//  Set socket option `linger`.
+//  Set socket option `linger`. 
+//  Available from libzmq 3.0.0.
 CZMQ_EXPORT void
     zsock_set_linger (void *self, int linger);
 
 //  Get socket option `reconnect_ivl`.
+//  Available from libzmq 3.0.0.      
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_reconnect_ivl (void *self);
 
 //  Set socket option `reconnect_ivl`.
+//  Available from libzmq 3.0.0.      
 CZMQ_EXPORT void
     zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
 
 //  Get socket option `reconnect_ivl_max`.
+//  Available from libzmq 3.0.0.          
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_reconnect_ivl_max (void *self);
 
 //  Set socket option `reconnect_ivl_max`.
+//  Available from libzmq 3.0.0.          
 CZMQ_EXPORT void
     zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
 
 //  Get socket option `backlog`.
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_backlog (void *self);
 
 //  Set socket option `backlog`.
+//  Available from libzmq 3.0.0.
 CZMQ_EXPORT void
     zsock_set_backlog (void *self, int backlog);
 
 //  Get socket option `maxmsgsize`.
+//  Available from libzmq 3.0.0.   
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_maxmsgsize (void *self);
 
 //  Set socket option `maxmsgsize`.
+//  Available from libzmq 3.0.0.   
 CZMQ_EXPORT void
     zsock_set_maxmsgsize (void *self, int maxmsgsize);
 
 //  Get socket option `multicast_hops`.
+//  Available from libzmq 3.0.0.       
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_multicast_hops (void *self);
 
 //  Set socket option `multicast_hops`.
+//  Available from libzmq 3.0.0.       
 CZMQ_EXPORT void
     zsock_set_multicast_hops (void *self, int multicast_hops);
 
 //  Get socket option `rcvtimeo`.
+//  Available from libzmq 3.0.0. 
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_rcvtimeo (void *self);
 
 //  Set socket option `rcvtimeo`.
+//  Available from libzmq 3.0.0. 
 CZMQ_EXPORT void
     zsock_set_rcvtimeo (void *self, int rcvtimeo);
 
 //  Get socket option `sndtimeo`.
+//  Available from libzmq 3.0.0. 
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_sndtimeo (void *self);
 
 //  Set socket option `sndtimeo`.
+//  Available from libzmq 3.0.0. 
 CZMQ_EXPORT void
     zsock_set_sndtimeo (void *self, int sndtimeo);
 
 //  Set socket option `xpub_verbose`.
+//  Available from libzmq 3.0.0.     
 CZMQ_EXPORT void
     zsock_set_xpub_verbose (void *self, int xpub_verbose);
 
 //  Get socket option `tcp_keepalive`.
+//  Available from libzmq 3.0.0.      
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_tcp_keepalive (void *self);
 
 //  Set socket option `tcp_keepalive`.
+//  Available from libzmq 3.0.0.      
 CZMQ_EXPORT void
     zsock_set_tcp_keepalive (void *self, int tcp_keepalive);
 
 //  Get socket option `tcp_keepalive_idle`.
+//  Available from libzmq 3.0.0.           
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_tcp_keepalive_idle (void *self);
 
 //  Set socket option `tcp_keepalive_idle`.
+//  Available from libzmq 3.0.0.           
 CZMQ_EXPORT void
     zsock_set_tcp_keepalive_idle (void *self, int tcp_keepalive_idle);
 
 //  Get socket option `tcp_keepalive_cnt`.
+//  Available from libzmq 3.0.0.          
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_tcp_keepalive_cnt (void *self);
 
 //  Set socket option `tcp_keepalive_cnt`.
+//  Available from libzmq 3.0.0.          
 CZMQ_EXPORT void
     zsock_set_tcp_keepalive_cnt (void *self, int tcp_keepalive_cnt);
 
 //  Get socket option `tcp_keepalive_intvl`.
+//  Available from libzmq 3.0.0.            
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_tcp_keepalive_intvl (void *self);
 
 //  Set socket option `tcp_keepalive_intvl`.
+//  Available from libzmq 3.0.0.            
 CZMQ_EXPORT void
     zsock_set_tcp_keepalive_intvl (void *self, int tcp_keepalive_intvl);
 
 //  Get socket option `tcp_accept_filter`.
+//  Available from libzmq 3.0.0.          
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_tcp_accept_filter (void *self);
 
 //  Set socket option `tcp_accept_filter`.
+//  Available from libzmq 3.0.0.          
 CZMQ_EXPORT void
     zsock_set_tcp_accept_filter (void *self, const char *tcp_accept_filter);
 
 //  Get socket option `rcvmore`.
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_rcvmore (void *self);
 
-//  Get socket option `fd`.
+//  Get socket option `fd`.     
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT SOCKET
     zsock_fd (void *self);
 
-//  Get socket option `events`.
+//  Get socket option `events`. 
+//  Available from libzmq 3.0.0.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
     zsock_events (void *self);
 
 //  Get socket option `last_endpoint`.
+//  Available from libzmq 3.0.0.      
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_last_endpoint (void *self);
+
+//  Set socket option `router_raw`.
+//  Available from libzmq 3.0.0.   
+CZMQ_EXPORT void
+    zsock_set_router_raw (void *self, int router_raw);
+
+//  Get socket option `ipv4only`.
+//  Available from libzmq 3.0.0. 
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_ipv4only (void *self);
+
+//  Set socket option `ipv4only`.
+//  Available from libzmq 3.0.0. 
+CZMQ_EXPORT void
+    zsock_set_ipv4only (void *self, int ipv4only);
+
+//  Set socket option `delay_attach_on_connect`.
+//  Available from libzmq 3.0.0.                
+CZMQ_EXPORT void
+    zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
 
 //  Self test of this class.
 CZMQ_EXPORT void
