@@ -16,7 +16,7 @@
   <!-- Configuration -->
   <ItemDefinitionGroup>
     <PreBuildEvent>
-      <Command>copy $(BuildRoot)platform.h $(RepoRoot)include\</Command>
+      <Command>copy "$(BuildRoot)platform.h" "$(RepoRoot)include\"</Command>
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>$(RepoRoot)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

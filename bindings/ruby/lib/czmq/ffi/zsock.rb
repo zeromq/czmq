@@ -903,6 +903,7 @@ module CZMQ
       end
 
       # Get socket option `heartbeat_ivl`.
+      # Available from libzmq 4.2.0.      
       #
       # @return [Integer]
       def heartbeat_ivl()
@@ -913,6 +914,7 @@ module CZMQ
       end
 
       # Get socket option `heartbeat_ivl`.
+      # Available from libzmq 4.2.0.      
       #
       # This is the polymorphic version of #heartbeat_ivl.
       #
@@ -926,6 +928,7 @@ module CZMQ
       end
 
       # Set socket option `heartbeat_ivl`.
+      # Available from libzmq 4.2.0.      
       #
       # @param heartbeat_ivl [Integer, #to_int, #to_i]
       # @return [void]
@@ -938,6 +941,7 @@ module CZMQ
       end
 
       # Set socket option `heartbeat_ivl`.
+      # Available from libzmq 4.2.0.      
       #
       # This is the polymorphic version of #set_heartbeat_ivl.
       #
@@ -953,6 +957,7 @@ module CZMQ
       end
 
       # Get socket option `heartbeat_ttl`.
+      # Available from libzmq 4.2.0.      
       #
       # @return [Integer]
       def heartbeat_ttl()
@@ -963,6 +968,7 @@ module CZMQ
       end
 
       # Get socket option `heartbeat_ttl`.
+      # Available from libzmq 4.2.0.      
       #
       # This is the polymorphic version of #heartbeat_ttl.
       #
@@ -976,6 +982,7 @@ module CZMQ
       end
 
       # Set socket option `heartbeat_ttl`.
+      # Available from libzmq 4.2.0.      
       #
       # @param heartbeat_ttl [Integer, #to_int, #to_i]
       # @return [void]
@@ -988,6 +995,7 @@ module CZMQ
       end
 
       # Set socket option `heartbeat_ttl`.
+      # Available from libzmq 4.2.0.      
       #
       # This is the polymorphic version of #set_heartbeat_ttl.
       #
@@ -1003,6 +1011,7 @@ module CZMQ
       end
 
       # Get socket option `heartbeat_timeout`.
+      # Available from libzmq 4.2.0.          
       #
       # @return [Integer]
       def heartbeat_timeout()
@@ -1013,6 +1022,7 @@ module CZMQ
       end
 
       # Get socket option `heartbeat_timeout`.
+      # Available from libzmq 4.2.0.          
       #
       # This is the polymorphic version of #heartbeat_timeout.
       #
@@ -1026,6 +1036,7 @@ module CZMQ
       end
 
       # Set socket option `heartbeat_timeout`.
+      # Available from libzmq 4.2.0.          
       #
       # @param heartbeat_timeout [Integer, #to_int, #to_i]
       # @return [void]
@@ -1038,6 +1049,7 @@ module CZMQ
       end
 
       # Set socket option `heartbeat_timeout`.
+      # Available from libzmq 4.2.0.          
       #
       # This is the polymorphic version of #set_heartbeat_timeout.
       #
@@ -1052,7 +1064,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `use_fd`.
+      # Get socket option `use_fd`. 
+      # Available from libzmq 4.2.0.
       #
       # @return [Integer]
       def use_fd()
@@ -1062,7 +1075,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `use_fd`.
+      # Get socket option `use_fd`. 
+      # Available from libzmq 4.2.0.
       #
       # This is the polymorphic version of #use_fd.
       #
@@ -1075,7 +1089,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `use_fd`.
+      # Set socket option `use_fd`. 
+      # Available from libzmq 4.2.0.
       #
       # @param use_fd [Integer, #to_int, #to_i]
       # @return [void]
@@ -1087,7 +1102,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `use_fd`.
+      # Set socket option `use_fd`. 
+      # Available from libzmq 4.2.0.
       #
       # This is the polymorphic version of #set_use_fd.
       #
@@ -1103,6 +1119,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_manual`.
+      # Available from libzmq 4.2.0.    
       #
       # @param xpub_manual [Integer, #to_int, #to_i]
       # @return [void]
@@ -1115,6 +1132,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_manual`.
+      # Available from libzmq 4.2.0.    
       #
       # This is the polymorphic version of #set_xpub_manual.
       #
@@ -1130,6 +1148,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_welcome_msg`.
+      # Available from libzmq 4.2.0.         
       #
       # @param xpub_welcome_msg [String, #to_s, nil]
       # @return [void]
@@ -1141,6 +1160,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_welcome_msg`.
+      # Available from libzmq 4.2.0.         
       #
       # This is the polymorphic version of #set_xpub_welcome_msg.
       #
@@ -1155,6 +1175,7 @@ module CZMQ
       end
 
       # Set socket option `stream_notify`.
+      # Available from libzmq 4.2.0.      
       #
       # @param stream_notify [Integer, #to_int, #to_i]
       # @return [void]
@@ -1167,6 +1188,7 @@ module CZMQ
       end
 
       # Set socket option `stream_notify`.
+      # Available from libzmq 4.2.0.      
       #
       # This is the polymorphic version of #set_stream_notify.
       #
@@ -1182,6 +1204,7 @@ module CZMQ
       end
 
       # Get socket option `invert_matching`.
+      # Available from libzmq 4.2.0.        
       #
       # @return [Integer]
       def invert_matching()
@@ -1192,6 +1215,7 @@ module CZMQ
       end
 
       # Get socket option `invert_matching`.
+      # Available from libzmq 4.2.0.        
       #
       # This is the polymorphic version of #invert_matching.
       #
@@ -1205,6 +1229,7 @@ module CZMQ
       end
 
       # Set socket option `invert_matching`.
+      # Available from libzmq 4.2.0.        
       #
       # @param invert_matching [Integer, #to_int, #to_i]
       # @return [void]
@@ -1217,6 +1242,7 @@ module CZMQ
       end
 
       # Set socket option `invert_matching`.
+      # Available from libzmq 4.2.0.        
       #
       # This is the polymorphic version of #set_invert_matching.
       #
@@ -1232,6 +1258,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_verboser`.
+      # Available from libzmq 4.2.0.      
       #
       # @param xpub_verboser [Integer, #to_int, #to_i]
       # @return [void]
@@ -1244,6 +1271,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_verboser`.
+      # Available from libzmq 4.2.0.      
       #
       # This is the polymorphic version of #set_xpub_verboser.
       #
@@ -1259,6 +1287,7 @@ module CZMQ
       end
 
       # Get socket option `connect_timeout`.
+      # Available from libzmq 4.2.0.        
       #
       # @return [Integer]
       def connect_timeout()
@@ -1269,6 +1298,7 @@ module CZMQ
       end
 
       # Get socket option `connect_timeout`.
+      # Available from libzmq 4.2.0.        
       #
       # This is the polymorphic version of #connect_timeout.
       #
@@ -1282,6 +1312,7 @@ module CZMQ
       end
 
       # Set socket option `connect_timeout`.
+      # Available from libzmq 4.2.0.        
       #
       # @param connect_timeout [Integer, #to_int, #to_i]
       # @return [void]
@@ -1294,6 +1325,7 @@ module CZMQ
       end
 
       # Set socket option `connect_timeout`.
+      # Available from libzmq 4.2.0.        
       #
       # This is the polymorphic version of #set_connect_timeout.
       #
@@ -1309,6 +1341,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_maxrt`.
+      # Available from libzmq 4.2.0.  
       #
       # @return [Integer]
       def tcp_maxrt()
@@ -1319,6 +1352,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_maxrt`.
+      # Available from libzmq 4.2.0.  
       #
       # This is the polymorphic version of #tcp_maxrt.
       #
@@ -1332,6 +1366,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_maxrt`.
+      # Available from libzmq 4.2.0.  
       #
       # @param tcp_maxrt [Integer, #to_int, #to_i]
       # @return [void]
@@ -1344,6 +1379,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_maxrt`.
+      # Available from libzmq 4.2.0.  
       #
       # This is the polymorphic version of #set_tcp_maxrt.
       #
@@ -1359,6 +1395,7 @@ module CZMQ
       end
 
       # Get socket option `thread_safe`.
+      # Available from libzmq 4.2.0.    
       #
       # @return [Integer]
       def thread_safe()
@@ -1369,6 +1406,7 @@ module CZMQ
       end
 
       # Get socket option `thread_safe`.
+      # Available from libzmq 4.2.0.    
       #
       # This is the polymorphic version of #thread_safe.
       #
@@ -1382,6 +1420,7 @@ module CZMQ
       end
 
       # Get socket option `multicast_maxtpdu`.
+      # Available from libzmq 4.2.0.          
       #
       # @return [Integer]
       def multicast_maxtpdu()
@@ -1392,6 +1431,7 @@ module CZMQ
       end
 
       # Get socket option `multicast_maxtpdu`.
+      # Available from libzmq 4.2.0.          
       #
       # This is the polymorphic version of #multicast_maxtpdu.
       #
@@ -1405,6 +1445,7 @@ module CZMQ
       end
 
       # Set socket option `multicast_maxtpdu`.
+      # Available from libzmq 4.2.0.          
       #
       # @param multicast_maxtpdu [Integer, #to_int, #to_i]
       # @return [void]
@@ -1417,6 +1458,7 @@ module CZMQ
       end
 
       # Set socket option `multicast_maxtpdu`.
+      # Available from libzmq 4.2.0.          
       #
       # This is the polymorphic version of #set_multicast_maxtpdu.
       #
@@ -1432,6 +1474,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_buffer_size`.
+      # Available from libzmq 4.2.0.         
       #
       # @return [Integer]
       def vmci_buffer_size()
@@ -1442,6 +1485,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_buffer_size`.
+      # Available from libzmq 4.2.0.         
       #
       # This is the polymorphic version of #vmci_buffer_size.
       #
@@ -1455,6 +1499,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_buffer_size`.
+      # Available from libzmq 4.2.0.         
       #
       # @param vmci_buffer_size [Integer, #to_int, #to_i]
       # @return [void]
@@ -1467,6 +1512,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_buffer_size`.
+      # Available from libzmq 4.2.0.         
       #
       # This is the polymorphic version of #set_vmci_buffer_size.
       #
@@ -1482,6 +1528,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_buffer_min_size`.
+      # Available from libzmq 4.2.0.             
       #
       # @return [Integer]
       def vmci_buffer_min_size()
@@ -1492,6 +1539,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_buffer_min_size`.
+      # Available from libzmq 4.2.0.             
       #
       # This is the polymorphic version of #vmci_buffer_min_size.
       #
@@ -1505,6 +1553,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_buffer_min_size`.
+      # Available from libzmq 4.2.0.             
       #
       # @param vmci_buffer_min_size [Integer, #to_int, #to_i]
       # @return [void]
@@ -1517,6 +1566,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_buffer_min_size`.
+      # Available from libzmq 4.2.0.             
       #
       # This is the polymorphic version of #set_vmci_buffer_min_size.
       #
@@ -1532,6 +1582,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_buffer_max_size`.
+      # Available from libzmq 4.2.0.             
       #
       # @return [Integer]
       def vmci_buffer_max_size()
@@ -1542,6 +1593,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_buffer_max_size`.
+      # Available from libzmq 4.2.0.             
       #
       # This is the polymorphic version of #vmci_buffer_max_size.
       #
@@ -1555,6 +1607,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_buffer_max_size`.
+      # Available from libzmq 4.2.0.             
       #
       # @param vmci_buffer_max_size [Integer, #to_int, #to_i]
       # @return [void]
@@ -1567,6 +1620,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_buffer_max_size`.
+      # Available from libzmq 4.2.0.             
       #
       # This is the polymorphic version of #set_vmci_buffer_max_size.
       #
@@ -1582,6 +1636,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_connect_timeout`.
+      # Available from libzmq 4.2.0.             
       #
       # @return [Integer]
       def vmci_connect_timeout()
@@ -1592,6 +1647,7 @@ module CZMQ
       end
 
       # Get socket option `vmci_connect_timeout`.
+      # Available from libzmq 4.2.0.             
       #
       # This is the polymorphic version of #vmci_connect_timeout.
       #
@@ -1605,6 +1661,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_connect_timeout`.
+      # Available from libzmq 4.2.0.             
       #
       # @param vmci_connect_timeout [Integer, #to_int, #to_i]
       # @return [void]
@@ -1617,6 +1674,7 @@ module CZMQ
       end
 
       # Set socket option `vmci_connect_timeout`.
+      # Available from libzmq 4.2.0.             
       #
       # This is the polymorphic version of #set_vmci_connect_timeout.
       #
@@ -1631,7 +1689,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `tos`.
+      # Get socket option `tos`.    
+      # Available from libzmq 4.1.0.
       #
       # @return [Integer]
       def tos()
@@ -1641,7 +1700,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `tos`.
+      # Get socket option `tos`.    
+      # Available from libzmq 4.1.0.
       #
       # This is the polymorphic version of #tos.
       #
@@ -1654,7 +1714,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `tos`.
+      # Set socket option `tos`.    
+      # Available from libzmq 4.1.0.
       #
       # @param tos [Integer, #to_int, #to_i]
       # @return [void]
@@ -1666,7 +1727,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `tos`.
+      # Set socket option `tos`.    
+      # Available from libzmq 4.1.0.
       #
       # This is the polymorphic version of #set_tos.
       #
@@ -1682,6 +1744,7 @@ module CZMQ
       end
 
       # Set socket option `router_handover`.
+      # Available from libzmq 4.1.0.        
       #
       # @param router_handover [Integer, #to_int, #to_i]
       # @return [void]
@@ -1694,6 +1757,7 @@ module CZMQ
       end
 
       # Set socket option `router_handover`.
+      # Available from libzmq 4.1.0.        
       #
       # This is the polymorphic version of #set_router_handover.
       #
@@ -1709,6 +1773,7 @@ module CZMQ
       end
 
       # Set socket option `connect_rid`.
+      # Available from libzmq 4.1.0.    
       #
       # @param connect_rid [String, #to_s, nil]
       # @return [void]
@@ -1720,6 +1785,7 @@ module CZMQ
       end
 
       # Set socket option `connect_rid`.
+      # Available from libzmq 4.1.0.    
       #
       # This is the polymorphic version of #set_connect_rid.
       #
@@ -1734,6 +1800,7 @@ module CZMQ
       end
 
       # Set socket option `connect_rid` from 32-octet binary
+      # Available from libzmq 4.1.0.                        
       #
       # @param connect_rid [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -1745,6 +1812,7 @@ module CZMQ
       end
 
       # Set socket option `connect_rid` from 32-octet binary
+      # Available from libzmq 4.1.0.                        
       #
       # This is the polymorphic version of #set_connect_rid_bin.
       #
@@ -1759,6 +1827,7 @@ module CZMQ
       end
 
       # Get socket option `handshake_ivl`.
+      # Available from libzmq 4.1.0.      
       #
       # @return [Integer]
       def handshake_ivl()
@@ -1769,6 +1838,7 @@ module CZMQ
       end
 
       # Get socket option `handshake_ivl`.
+      # Available from libzmq 4.1.0.      
       #
       # This is the polymorphic version of #handshake_ivl.
       #
@@ -1782,6 +1852,7 @@ module CZMQ
       end
 
       # Set socket option `handshake_ivl`.
+      # Available from libzmq 4.1.0.      
       #
       # @param handshake_ivl [Integer, #to_int, #to_i]
       # @return [void]
@@ -1794,6 +1865,7 @@ module CZMQ
       end
 
       # Set socket option `handshake_ivl`.
+      # Available from libzmq 4.1.0.      
       #
       # This is the polymorphic version of #set_handshake_ivl.
       #
@@ -1809,6 +1881,7 @@ module CZMQ
       end
 
       # Get socket option `socks_proxy`.
+      # Available from libzmq 4.1.0.    
       #
       # @return [::FFI::AutoPointer]
       def socks_proxy()
@@ -1820,6 +1893,7 @@ module CZMQ
       end
 
       # Get socket option `socks_proxy`.
+      # Available from libzmq 4.1.0.    
       #
       # This is the polymorphic version of #socks_proxy.
       #
@@ -1834,6 +1908,7 @@ module CZMQ
       end
 
       # Set socket option `socks_proxy`.
+      # Available from libzmq 4.1.0.    
       #
       # @param socks_proxy [String, #to_s, nil]
       # @return [void]
@@ -1845,6 +1920,7 @@ module CZMQ
       end
 
       # Set socket option `socks_proxy`.
+      # Available from libzmq 4.1.0.    
       #
       # This is the polymorphic version of #set_socks_proxy.
       #
@@ -1859,6 +1935,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_nodrop`.
+      # Available from libzmq 4.1.0.    
       #
       # @param xpub_nodrop [Integer, #to_int, #to_i]
       # @return [void]
@@ -1871,6 +1948,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_nodrop`.
+      # Available from libzmq 4.1.0.    
       #
       # This is the polymorphic version of #set_xpub_nodrop.
       #
@@ -1886,6 +1964,7 @@ module CZMQ
       end
 
       # Set socket option `router_mandatory`.
+      # Available from libzmq 4.0.0.         
       #
       # @param router_mandatory [Integer, #to_int, #to_i]
       # @return [void]
@@ -1898,6 +1977,7 @@ module CZMQ
       end
 
       # Set socket option `router_mandatory`.
+      # Available from libzmq 4.0.0.         
       #
       # This is the polymorphic version of #set_router_mandatory.
       #
@@ -1913,6 +1993,7 @@ module CZMQ
       end
 
       # Set socket option `probe_router`.
+      # Available from libzmq 4.0.0.     
       #
       # @param probe_router [Integer, #to_int, #to_i]
       # @return [void]
@@ -1925,6 +2006,7 @@ module CZMQ
       end
 
       # Set socket option `probe_router`.
+      # Available from libzmq 4.0.0.     
       #
       # This is the polymorphic version of #set_probe_router.
       #
@@ -1940,6 +2022,7 @@ module CZMQ
       end
 
       # Set socket option `req_relaxed`.
+      # Available from libzmq 4.0.0.    
       #
       # @param req_relaxed [Integer, #to_int, #to_i]
       # @return [void]
@@ -1952,6 +2035,7 @@ module CZMQ
       end
 
       # Set socket option `req_relaxed`.
+      # Available from libzmq 4.0.0.    
       #
       # This is the polymorphic version of #set_req_relaxed.
       #
@@ -1967,6 +2051,7 @@ module CZMQ
       end
 
       # Set socket option `req_correlate`.
+      # Available from libzmq 4.0.0.      
       #
       # @param req_correlate [Integer, #to_int, #to_i]
       # @return [void]
@@ -1979,6 +2064,7 @@ module CZMQ
       end
 
       # Set socket option `req_correlate`.
+      # Available from libzmq 4.0.0.      
       #
       # This is the polymorphic version of #set_req_correlate.
       #
@@ -1994,6 +2080,7 @@ module CZMQ
       end
 
       # Set socket option `conflate`.
+      # Available from libzmq 4.0.0. 
       #
       # @param conflate [Integer, #to_int, #to_i]
       # @return [void]
@@ -2006,6 +2093,7 @@ module CZMQ
       end
 
       # Set socket option `conflate`.
+      # Available from libzmq 4.0.0. 
       #
       # This is the polymorphic version of #set_conflate.
       #
@@ -2021,6 +2109,7 @@ module CZMQ
       end
 
       # Get socket option `zap_domain`.
+      # Available from libzmq 4.0.0.   
       #
       # @return [::FFI::AutoPointer]
       def zap_domain()
@@ -2032,6 +2121,7 @@ module CZMQ
       end
 
       # Get socket option `zap_domain`.
+      # Available from libzmq 4.0.0.   
       #
       # This is the polymorphic version of #zap_domain.
       #
@@ -2046,6 +2136,7 @@ module CZMQ
       end
 
       # Set socket option `zap_domain`.
+      # Available from libzmq 4.0.0.   
       #
       # @param zap_domain [String, #to_s, nil]
       # @return [void]
@@ -2057,6 +2148,7 @@ module CZMQ
       end
 
       # Set socket option `zap_domain`.
+      # Available from libzmq 4.0.0.   
       #
       # This is the polymorphic version of #set_zap_domain.
       #
@@ -2071,6 +2163,7 @@ module CZMQ
       end
 
       # Get socket option `mechanism`.
+      # Available from libzmq 4.0.0.  
       #
       # @return [Integer]
       def mechanism()
@@ -2081,6 +2174,7 @@ module CZMQ
       end
 
       # Get socket option `mechanism`.
+      # Available from libzmq 4.0.0.  
       #
       # This is the polymorphic version of #mechanism.
       #
@@ -2094,6 +2188,7 @@ module CZMQ
       end
 
       # Get socket option `plain_server`.
+      # Available from libzmq 4.0.0.     
       #
       # @return [Integer]
       def plain_server()
@@ -2104,6 +2199,7 @@ module CZMQ
       end
 
       # Get socket option `plain_server`.
+      # Available from libzmq 4.0.0.     
       #
       # This is the polymorphic version of #plain_server.
       #
@@ -2117,6 +2213,7 @@ module CZMQ
       end
 
       # Set socket option `plain_server`.
+      # Available from libzmq 4.0.0.     
       #
       # @param plain_server [Integer, #to_int, #to_i]
       # @return [void]
@@ -2129,6 +2226,7 @@ module CZMQ
       end
 
       # Set socket option `plain_server`.
+      # Available from libzmq 4.0.0.     
       #
       # This is the polymorphic version of #set_plain_server.
       #
@@ -2144,6 +2242,7 @@ module CZMQ
       end
 
       # Get socket option `plain_username`.
+      # Available from libzmq 4.0.0.       
       #
       # @return [::FFI::AutoPointer]
       def plain_username()
@@ -2155,6 +2254,7 @@ module CZMQ
       end
 
       # Get socket option `plain_username`.
+      # Available from libzmq 4.0.0.       
       #
       # This is the polymorphic version of #plain_username.
       #
@@ -2169,6 +2269,7 @@ module CZMQ
       end
 
       # Set socket option `plain_username`.
+      # Available from libzmq 4.0.0.       
       #
       # @param plain_username [String, #to_s, nil]
       # @return [void]
@@ -2180,6 +2281,7 @@ module CZMQ
       end
 
       # Set socket option `plain_username`.
+      # Available from libzmq 4.0.0.       
       #
       # This is the polymorphic version of #set_plain_username.
       #
@@ -2194,6 +2296,7 @@ module CZMQ
       end
 
       # Get socket option `plain_password`.
+      # Available from libzmq 4.0.0.       
       #
       # @return [::FFI::AutoPointer]
       def plain_password()
@@ -2205,6 +2308,7 @@ module CZMQ
       end
 
       # Get socket option `plain_password`.
+      # Available from libzmq 4.0.0.       
       #
       # This is the polymorphic version of #plain_password.
       #
@@ -2219,6 +2323,7 @@ module CZMQ
       end
 
       # Set socket option `plain_password`.
+      # Available from libzmq 4.0.0.       
       #
       # @param plain_password [String, #to_s, nil]
       # @return [void]
@@ -2230,6 +2335,7 @@ module CZMQ
       end
 
       # Set socket option `plain_password`.
+      # Available from libzmq 4.0.0.       
       #
       # This is the polymorphic version of #set_plain_password.
       #
@@ -2244,6 +2350,7 @@ module CZMQ
       end
 
       # Get socket option `curve_server`.
+      # Available from libzmq 4.0.0.     
       #
       # @return [Integer]
       def curve_server()
@@ -2254,6 +2361,7 @@ module CZMQ
       end
 
       # Get socket option `curve_server`.
+      # Available from libzmq 4.0.0.     
       #
       # This is the polymorphic version of #curve_server.
       #
@@ -2267,6 +2375,7 @@ module CZMQ
       end
 
       # Set socket option `curve_server`.
+      # Available from libzmq 4.0.0.     
       #
       # @param curve_server [Integer, #to_int, #to_i]
       # @return [void]
@@ -2279,6 +2388,7 @@ module CZMQ
       end
 
       # Set socket option `curve_server`.
+      # Available from libzmq 4.0.0.     
       #
       # This is the polymorphic version of #set_curve_server.
       #
@@ -2294,6 +2404,7 @@ module CZMQ
       end
 
       # Get socket option `curve_publickey`.
+      # Available from libzmq 4.0.0.        
       #
       # @return [::FFI::AutoPointer]
       def curve_publickey()
@@ -2305,6 +2416,7 @@ module CZMQ
       end
 
       # Get socket option `curve_publickey`.
+      # Available from libzmq 4.0.0.        
       #
       # This is the polymorphic version of #curve_publickey.
       #
@@ -2319,6 +2431,7 @@ module CZMQ
       end
 
       # Set socket option `curve_publickey`.
+      # Available from libzmq 4.0.0.        
       #
       # @param curve_publickey [String, #to_s, nil]
       # @return [void]
@@ -2330,6 +2443,7 @@ module CZMQ
       end
 
       # Set socket option `curve_publickey`.
+      # Available from libzmq 4.0.0.        
       #
       # This is the polymorphic version of #set_curve_publickey.
       #
@@ -2344,6 +2458,7 @@ module CZMQ
       end
 
       # Set socket option `curve_publickey` from 32-octet binary
+      # Available from libzmq 4.0.0.                            
       #
       # @param curve_publickey [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -2355,6 +2470,7 @@ module CZMQ
       end
 
       # Set socket option `curve_publickey` from 32-octet binary
+      # Available from libzmq 4.0.0.                            
       #
       # This is the polymorphic version of #set_curve_publickey_bin.
       #
@@ -2369,6 +2485,7 @@ module CZMQ
       end
 
       # Get socket option `curve_secretkey`.
+      # Available from libzmq 4.0.0.        
       #
       # @return [::FFI::AutoPointer]
       def curve_secretkey()
@@ -2380,6 +2497,7 @@ module CZMQ
       end
 
       # Get socket option `curve_secretkey`.
+      # Available from libzmq 4.0.0.        
       #
       # This is the polymorphic version of #curve_secretkey.
       #
@@ -2394,6 +2512,7 @@ module CZMQ
       end
 
       # Set socket option `curve_secretkey`.
+      # Available from libzmq 4.0.0.        
       #
       # @param curve_secretkey [String, #to_s, nil]
       # @return [void]
@@ -2405,6 +2524,7 @@ module CZMQ
       end
 
       # Set socket option `curve_secretkey`.
+      # Available from libzmq 4.0.0.        
       #
       # This is the polymorphic version of #set_curve_secretkey.
       #
@@ -2419,6 +2539,7 @@ module CZMQ
       end
 
       # Set socket option `curve_secretkey` from 32-octet binary
+      # Available from libzmq 4.0.0.                            
       #
       # @param curve_secretkey [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -2430,6 +2551,7 @@ module CZMQ
       end
 
       # Set socket option `curve_secretkey` from 32-octet binary
+      # Available from libzmq 4.0.0.                            
       #
       # This is the polymorphic version of #set_curve_secretkey_bin.
       #
@@ -2444,6 +2566,7 @@ module CZMQ
       end
 
       # Get socket option `curve_serverkey`.
+      # Available from libzmq 4.0.0.        
       #
       # @return [::FFI::AutoPointer]
       def curve_serverkey()
@@ -2455,6 +2578,7 @@ module CZMQ
       end
 
       # Get socket option `curve_serverkey`.
+      # Available from libzmq 4.0.0.        
       #
       # This is the polymorphic version of #curve_serverkey.
       #
@@ -2469,6 +2593,7 @@ module CZMQ
       end
 
       # Set socket option `curve_serverkey`.
+      # Available from libzmq 4.0.0.        
       #
       # @param curve_serverkey [String, #to_s, nil]
       # @return [void]
@@ -2480,6 +2605,7 @@ module CZMQ
       end
 
       # Set socket option `curve_serverkey`.
+      # Available from libzmq 4.0.0.        
       #
       # This is the polymorphic version of #set_curve_serverkey.
       #
@@ -2494,6 +2620,7 @@ module CZMQ
       end
 
       # Set socket option `curve_serverkey` from 32-octet binary
+      # Available from libzmq 4.0.0.                            
       #
       # @param curve_serverkey [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -2505,6 +2632,7 @@ module CZMQ
       end
 
       # Set socket option `curve_serverkey` from 32-octet binary
+      # Available from libzmq 4.0.0.                            
       #
       # This is the polymorphic version of #set_curve_serverkey_bin.
       #
@@ -2519,6 +2647,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_server`.
+      # Available from libzmq 4.0.0.      
       #
       # @return [Integer]
       def gssapi_server()
@@ -2529,6 +2658,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_server`.
+      # Available from libzmq 4.0.0.      
       #
       # This is the polymorphic version of #gssapi_server.
       #
@@ -2542,6 +2672,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_server`.
+      # Available from libzmq 4.0.0.      
       #
       # @param gssapi_server [Integer, #to_int, #to_i]
       # @return [void]
@@ -2554,6 +2685,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_server`.
+      # Available from libzmq 4.0.0.      
       #
       # This is the polymorphic version of #set_gssapi_server.
       #
@@ -2569,6 +2701,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_plaintext`.
+      # Available from libzmq 4.0.0.         
       #
       # @return [Integer]
       def gssapi_plaintext()
@@ -2579,6 +2712,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_plaintext`.
+      # Available from libzmq 4.0.0.         
       #
       # This is the polymorphic version of #gssapi_plaintext.
       #
@@ -2592,6 +2726,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_plaintext`.
+      # Available from libzmq 4.0.0.         
       #
       # @param gssapi_plaintext [Integer, #to_int, #to_i]
       # @return [void]
@@ -2604,6 +2739,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_plaintext`.
+      # Available from libzmq 4.0.0.         
       #
       # This is the polymorphic version of #set_gssapi_plaintext.
       #
@@ -2619,6 +2755,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_principal`.
+      # Available from libzmq 4.0.0.         
       #
       # @return [::FFI::AutoPointer]
       def gssapi_principal()
@@ -2630,6 +2767,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_principal`.
+      # Available from libzmq 4.0.0.         
       #
       # This is the polymorphic version of #gssapi_principal.
       #
@@ -2644,6 +2782,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_principal`.
+      # Available from libzmq 4.0.0.         
       #
       # @param gssapi_principal [String, #to_s, nil]
       # @return [void]
@@ -2655,6 +2794,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_principal`.
+      # Available from libzmq 4.0.0.         
       #
       # This is the polymorphic version of #set_gssapi_principal.
       #
@@ -2669,6 +2809,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_service_principal`.
+      # Available from libzmq 4.0.0.                 
       #
       # @return [::FFI::AutoPointer]
       def gssapi_service_principal()
@@ -2680,6 +2821,7 @@ module CZMQ
       end
 
       # Get socket option `gssapi_service_principal`.
+      # Available from libzmq 4.0.0.                 
       #
       # This is the polymorphic version of #gssapi_service_principal.
       #
@@ -2694,6 +2836,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_service_principal`.
+      # Available from libzmq 4.0.0.                 
       #
       # @param gssapi_service_principal [String, #to_s, nil]
       # @return [void]
@@ -2705,6 +2848,7 @@ module CZMQ
       end
 
       # Set socket option `gssapi_service_principal`.
+      # Available from libzmq 4.0.0.                 
       #
       # This is the polymorphic version of #set_gssapi_service_principal.
       #
@@ -2718,7 +2862,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `ipv6`.
+      # Get socket option `ipv6`.   
+      # Available from libzmq 4.0.0.
       #
       # @return [Integer]
       def ipv6()
@@ -2728,7 +2873,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `ipv6`.
+      # Get socket option `ipv6`.   
+      # Available from libzmq 4.0.0.
       #
       # This is the polymorphic version of #ipv6.
       #
@@ -2741,7 +2887,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `ipv6`.
+      # Set socket option `ipv6`.   
+      # Available from libzmq 4.0.0.
       #
       # @param ipv6 [Integer, #to_int, #to_i]
       # @return [void]
@@ -2753,7 +2900,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `ipv6`.
+      # Set socket option `ipv6`.   
+      # Available from libzmq 4.0.0.
       #
       # This is the polymorphic version of #set_ipv6.
       #
@@ -2769,6 +2917,7 @@ module CZMQ
       end
 
       # Get socket option `immediate`.
+      # Available from libzmq 4.0.0.  
       #
       # @return [Integer]
       def immediate()
@@ -2779,6 +2928,7 @@ module CZMQ
       end
 
       # Get socket option `immediate`.
+      # Available from libzmq 4.0.0.  
       #
       # This is the polymorphic version of #immediate.
       #
@@ -2792,6 +2942,7 @@ module CZMQ
       end
 
       # Set socket option `immediate`.
+      # Available from libzmq 4.0.0.  
       #
       # @param immediate [Integer, #to_int, #to_i]
       # @return [void]
@@ -2804,6 +2955,7 @@ module CZMQ
       end
 
       # Set socket option `immediate`.
+      # Available from libzmq 4.0.0.  
       #
       # This is the polymorphic version of #set_immediate.
       #
@@ -2818,7 +2970,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `type`.
+      # Get socket option `type`.   
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def type()
@@ -2828,7 +2981,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `type`.
+      # Get socket option `type`.   
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #type.
       #
@@ -2841,7 +2995,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `sndhwm`.
+      # Get socket option `sndhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def sndhwm()
@@ -2851,7 +3006,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `sndhwm`.
+      # Get socket option `sndhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #sndhwm.
       #
@@ -2864,7 +3020,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `sndhwm`.
+      # Set socket option `sndhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # @param sndhwm [Integer, #to_int, #to_i]
       # @return [void]
@@ -2876,7 +3033,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `sndhwm`.
+      # Set socket option `sndhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #set_sndhwm.
       #
@@ -2891,7 +3049,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `rcvhwm`.
+      # Get socket option `rcvhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def rcvhwm()
@@ -2901,7 +3060,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `rcvhwm`.
+      # Get socket option `rcvhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #rcvhwm.
       #
@@ -2914,7 +3074,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `rcvhwm`.
+      # Set socket option `rcvhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # @param rcvhwm [Integer, #to_int, #to_i]
       # @return [void]
@@ -2926,7 +3087,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `rcvhwm`.
+      # Set socket option `rcvhwm`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #set_rcvhwm.
       #
@@ -2942,6 +3104,7 @@ module CZMQ
       end
 
       # Get socket option `affinity`.
+      # Available from libzmq 3.0.0. 
       #
       # @return [Integer]
       def affinity()
@@ -2952,6 +3115,7 @@ module CZMQ
       end
 
       # Get socket option `affinity`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #affinity.
       #
@@ -2965,6 +3129,7 @@ module CZMQ
       end
 
       # Set socket option `affinity`.
+      # Available from libzmq 3.0.0. 
       #
       # @param affinity [Integer, #to_int, #to_i]
       # @return [void]
@@ -2977,6 +3142,7 @@ module CZMQ
       end
 
       # Set socket option `affinity`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #set_affinity.
       #
@@ -2992,6 +3158,7 @@ module CZMQ
       end
 
       # Set socket option `subscribe`.
+      # Available from libzmq 3.0.0.  
       #
       # @param subscribe [String, #to_s, nil]
       # @return [void]
@@ -3003,6 +3170,7 @@ module CZMQ
       end
 
       # Set socket option `subscribe`.
+      # Available from libzmq 3.0.0.  
       #
       # This is the polymorphic version of #set_subscribe.
       #
@@ -3017,6 +3185,7 @@ module CZMQ
       end
 
       # Set socket option `unsubscribe`.
+      # Available from libzmq 3.0.0.    
       #
       # @param unsubscribe [String, #to_s, nil]
       # @return [void]
@@ -3028,6 +3197,7 @@ module CZMQ
       end
 
       # Set socket option `unsubscribe`.
+      # Available from libzmq 3.0.0.    
       #
       # This is the polymorphic version of #set_unsubscribe.
       #
@@ -3042,6 +3212,7 @@ module CZMQ
       end
 
       # Get socket option `identity`.
+      # Available from libzmq 3.0.0. 
       #
       # @return [::FFI::AutoPointer]
       def identity()
@@ -3053,6 +3224,7 @@ module CZMQ
       end
 
       # Get socket option `identity`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #identity.
       #
@@ -3067,6 +3239,7 @@ module CZMQ
       end
 
       # Set socket option `identity`.
+      # Available from libzmq 3.0.0. 
       #
       # @param identity [String, #to_s, nil]
       # @return [void]
@@ -3078,6 +3251,7 @@ module CZMQ
       end
 
       # Set socket option `identity`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #set_identity.
       #
@@ -3091,7 +3265,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `rate`.
+      # Get socket option `rate`.   
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def rate()
@@ -3101,7 +3276,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `rate`.
+      # Get socket option `rate`.   
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #rate.
       #
@@ -3114,7 +3290,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `rate`.
+      # Set socket option `rate`.   
+      # Available from libzmq 3.0.0.
       #
       # @param rate [Integer, #to_int, #to_i]
       # @return [void]
@@ -3126,7 +3303,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `rate`.
+      # Set socket option `rate`.   
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #set_rate.
       #
@@ -3142,6 +3320,7 @@ module CZMQ
       end
 
       # Get socket option `recovery_ivl`.
+      # Available from libzmq 3.0.0.     
       #
       # @return [Integer]
       def recovery_ivl()
@@ -3152,6 +3331,7 @@ module CZMQ
       end
 
       # Get socket option `recovery_ivl`.
+      # Available from libzmq 3.0.0.     
       #
       # This is the polymorphic version of #recovery_ivl.
       #
@@ -3165,6 +3345,7 @@ module CZMQ
       end
 
       # Set socket option `recovery_ivl`.
+      # Available from libzmq 3.0.0.     
       #
       # @param recovery_ivl [Integer, #to_int, #to_i]
       # @return [void]
@@ -3177,6 +3358,7 @@ module CZMQ
       end
 
       # Set socket option `recovery_ivl`.
+      # Available from libzmq 3.0.0.     
       #
       # This is the polymorphic version of #set_recovery_ivl.
       #
@@ -3191,7 +3373,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `sndbuf`.
+      # Get socket option `sndbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def sndbuf()
@@ -3201,7 +3384,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `sndbuf`.
+      # Get socket option `sndbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #sndbuf.
       #
@@ -3214,7 +3398,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `sndbuf`.
+      # Set socket option `sndbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # @param sndbuf [Integer, #to_int, #to_i]
       # @return [void]
@@ -3226,7 +3411,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `sndbuf`.
+      # Set socket option `sndbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #set_sndbuf.
       #
@@ -3241,7 +3427,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `rcvbuf`.
+      # Get socket option `rcvbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def rcvbuf()
@@ -3251,7 +3438,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `rcvbuf`.
+      # Get socket option `rcvbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #rcvbuf.
       #
@@ -3264,7 +3452,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `rcvbuf`.
+      # Set socket option `rcvbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # @param rcvbuf [Integer, #to_int, #to_i]
       # @return [void]
@@ -3276,7 +3465,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `rcvbuf`.
+      # Set socket option `rcvbuf`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #set_rcvbuf.
       #
@@ -3291,7 +3481,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `linger`.
+      # Get socket option `linger`. 
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def linger()
@@ -3301,7 +3492,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `linger`.
+      # Get socket option `linger`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #linger.
       #
@@ -3314,7 +3506,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `linger`.
+      # Set socket option `linger`. 
+      # Available from libzmq 3.0.0.
       #
       # @param linger [Integer, #to_int, #to_i]
       # @return [void]
@@ -3326,7 +3519,8 @@ module CZMQ
         result
       end
 
-      # Set socket option `linger`.
+      # Set socket option `linger`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #set_linger.
       #
@@ -3342,6 +3536,7 @@ module CZMQ
       end
 
       # Get socket option `reconnect_ivl`.
+      # Available from libzmq 3.0.0.      
       #
       # @return [Integer]
       def reconnect_ivl()
@@ -3352,6 +3547,7 @@ module CZMQ
       end
 
       # Get socket option `reconnect_ivl`.
+      # Available from libzmq 3.0.0.      
       #
       # This is the polymorphic version of #reconnect_ivl.
       #
@@ -3365,6 +3561,7 @@ module CZMQ
       end
 
       # Set socket option `reconnect_ivl`.
+      # Available from libzmq 3.0.0.      
       #
       # @param reconnect_ivl [Integer, #to_int, #to_i]
       # @return [void]
@@ -3377,6 +3574,7 @@ module CZMQ
       end
 
       # Set socket option `reconnect_ivl`.
+      # Available from libzmq 3.0.0.      
       #
       # This is the polymorphic version of #set_reconnect_ivl.
       #
@@ -3392,6 +3590,7 @@ module CZMQ
       end
 
       # Get socket option `reconnect_ivl_max`.
+      # Available from libzmq 3.0.0.          
       #
       # @return [Integer]
       def reconnect_ivl_max()
@@ -3402,6 +3601,7 @@ module CZMQ
       end
 
       # Get socket option `reconnect_ivl_max`.
+      # Available from libzmq 3.0.0.          
       #
       # This is the polymorphic version of #reconnect_ivl_max.
       #
@@ -3415,6 +3615,7 @@ module CZMQ
       end
 
       # Set socket option `reconnect_ivl_max`.
+      # Available from libzmq 3.0.0.          
       #
       # @param reconnect_ivl_max [Integer, #to_int, #to_i]
       # @return [void]
@@ -3427,6 +3628,7 @@ module CZMQ
       end
 
       # Set socket option `reconnect_ivl_max`.
+      # Available from libzmq 3.0.0.          
       #
       # This is the polymorphic version of #set_reconnect_ivl_max.
       #
@@ -3442,6 +3644,7 @@ module CZMQ
       end
 
       # Get socket option `backlog`.
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def backlog()
@@ -3452,6 +3655,7 @@ module CZMQ
       end
 
       # Get socket option `backlog`.
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #backlog.
       #
@@ -3465,6 +3669,7 @@ module CZMQ
       end
 
       # Set socket option `backlog`.
+      # Available from libzmq 3.0.0.
       #
       # @param backlog [Integer, #to_int, #to_i]
       # @return [void]
@@ -3477,6 +3682,7 @@ module CZMQ
       end
 
       # Set socket option `backlog`.
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #set_backlog.
       #
@@ -3492,6 +3698,7 @@ module CZMQ
       end
 
       # Get socket option `maxmsgsize`.
+      # Available from libzmq 3.0.0.   
       #
       # @return [Integer]
       def maxmsgsize()
@@ -3502,6 +3709,7 @@ module CZMQ
       end
 
       # Get socket option `maxmsgsize`.
+      # Available from libzmq 3.0.0.   
       #
       # This is the polymorphic version of #maxmsgsize.
       #
@@ -3515,6 +3723,7 @@ module CZMQ
       end
 
       # Set socket option `maxmsgsize`.
+      # Available from libzmq 3.0.0.   
       #
       # @param maxmsgsize [Integer, #to_int, #to_i]
       # @return [void]
@@ -3527,6 +3736,7 @@ module CZMQ
       end
 
       # Set socket option `maxmsgsize`.
+      # Available from libzmq 3.0.0.   
       #
       # This is the polymorphic version of #set_maxmsgsize.
       #
@@ -3542,6 +3752,7 @@ module CZMQ
       end
 
       # Get socket option `multicast_hops`.
+      # Available from libzmq 3.0.0.       
       #
       # @return [Integer]
       def multicast_hops()
@@ -3552,6 +3763,7 @@ module CZMQ
       end
 
       # Get socket option `multicast_hops`.
+      # Available from libzmq 3.0.0.       
       #
       # This is the polymorphic version of #multicast_hops.
       #
@@ -3565,6 +3777,7 @@ module CZMQ
       end
 
       # Set socket option `multicast_hops`.
+      # Available from libzmq 3.0.0.       
       #
       # @param multicast_hops [Integer, #to_int, #to_i]
       # @return [void]
@@ -3577,6 +3790,7 @@ module CZMQ
       end
 
       # Set socket option `multicast_hops`.
+      # Available from libzmq 3.0.0.       
       #
       # This is the polymorphic version of #set_multicast_hops.
       #
@@ -3592,6 +3806,7 @@ module CZMQ
       end
 
       # Get socket option `rcvtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # @return [Integer]
       def rcvtimeo()
@@ -3602,6 +3817,7 @@ module CZMQ
       end
 
       # Get socket option `rcvtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #rcvtimeo.
       #
@@ -3615,6 +3831,7 @@ module CZMQ
       end
 
       # Set socket option `rcvtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # @param rcvtimeo [Integer, #to_int, #to_i]
       # @return [void]
@@ -3627,6 +3844,7 @@ module CZMQ
       end
 
       # Set socket option `rcvtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #set_rcvtimeo.
       #
@@ -3642,6 +3860,7 @@ module CZMQ
       end
 
       # Get socket option `sndtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # @return [Integer]
       def sndtimeo()
@@ -3652,6 +3871,7 @@ module CZMQ
       end
 
       # Get socket option `sndtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #sndtimeo.
       #
@@ -3665,6 +3885,7 @@ module CZMQ
       end
 
       # Set socket option `sndtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # @param sndtimeo [Integer, #to_int, #to_i]
       # @return [void]
@@ -3677,6 +3898,7 @@ module CZMQ
       end
 
       # Set socket option `sndtimeo`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #set_sndtimeo.
       #
@@ -3692,6 +3914,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_verbose`.
+      # Available from libzmq 3.0.0.     
       #
       # @param xpub_verbose [Integer, #to_int, #to_i]
       # @return [void]
@@ -3704,6 +3927,7 @@ module CZMQ
       end
 
       # Set socket option `xpub_verbose`.
+      # Available from libzmq 3.0.0.     
       #
       # This is the polymorphic version of #set_xpub_verbose.
       #
@@ -3719,6 +3943,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive`.
+      # Available from libzmq 3.0.0.      
       #
       # @return [Integer]
       def tcp_keepalive()
@@ -3729,6 +3954,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive`.
+      # Available from libzmq 3.0.0.      
       #
       # This is the polymorphic version of #tcp_keepalive.
       #
@@ -3742,6 +3968,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive`.
+      # Available from libzmq 3.0.0.      
       #
       # @param tcp_keepalive [Integer, #to_int, #to_i]
       # @return [void]
@@ -3754,6 +3981,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive`.
+      # Available from libzmq 3.0.0.      
       #
       # This is the polymorphic version of #set_tcp_keepalive.
       #
@@ -3769,6 +3997,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive_idle`.
+      # Available from libzmq 3.0.0.           
       #
       # @return [Integer]
       def tcp_keepalive_idle()
@@ -3779,6 +4008,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive_idle`.
+      # Available from libzmq 3.0.0.           
       #
       # This is the polymorphic version of #tcp_keepalive_idle.
       #
@@ -3792,6 +4022,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive_idle`.
+      # Available from libzmq 3.0.0.           
       #
       # @param tcp_keepalive_idle [Integer, #to_int, #to_i]
       # @return [void]
@@ -3804,6 +4035,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive_idle`.
+      # Available from libzmq 3.0.0.           
       #
       # This is the polymorphic version of #set_tcp_keepalive_idle.
       #
@@ -3819,6 +4051,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive_cnt`.
+      # Available from libzmq 3.0.0.          
       #
       # @return [Integer]
       def tcp_keepalive_cnt()
@@ -3829,6 +4062,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive_cnt`.
+      # Available from libzmq 3.0.0.          
       #
       # This is the polymorphic version of #tcp_keepalive_cnt.
       #
@@ -3842,6 +4076,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive_cnt`.
+      # Available from libzmq 3.0.0.          
       #
       # @param tcp_keepalive_cnt [Integer, #to_int, #to_i]
       # @return [void]
@@ -3854,6 +4089,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive_cnt`.
+      # Available from libzmq 3.0.0.          
       #
       # This is the polymorphic version of #set_tcp_keepalive_cnt.
       #
@@ -3869,6 +4105,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive_intvl`.
+      # Available from libzmq 3.0.0.            
       #
       # @return [Integer]
       def tcp_keepalive_intvl()
@@ -3879,6 +4116,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_keepalive_intvl`.
+      # Available from libzmq 3.0.0.            
       #
       # This is the polymorphic version of #tcp_keepalive_intvl.
       #
@@ -3892,6 +4130,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive_intvl`.
+      # Available from libzmq 3.0.0.            
       #
       # @param tcp_keepalive_intvl [Integer, #to_int, #to_i]
       # @return [void]
@@ -3904,6 +4143,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_keepalive_intvl`.
+      # Available from libzmq 3.0.0.            
       #
       # This is the polymorphic version of #set_tcp_keepalive_intvl.
       #
@@ -3919,6 +4159,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_accept_filter`.
+      # Available from libzmq 3.0.0.          
       #
       # @return [::FFI::AutoPointer]
       def tcp_accept_filter()
@@ -3930,6 +4171,7 @@ module CZMQ
       end
 
       # Get socket option `tcp_accept_filter`.
+      # Available from libzmq 3.0.0.          
       #
       # This is the polymorphic version of #tcp_accept_filter.
       #
@@ -3944,6 +4186,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_accept_filter`.
+      # Available from libzmq 3.0.0.          
       #
       # @param tcp_accept_filter [String, #to_s, nil]
       # @return [void]
@@ -3955,6 +4198,7 @@ module CZMQ
       end
 
       # Set socket option `tcp_accept_filter`.
+      # Available from libzmq 3.0.0.          
       #
       # This is the polymorphic version of #set_tcp_accept_filter.
       #
@@ -3969,6 +4213,7 @@ module CZMQ
       end
 
       # Get socket option `rcvmore`.
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def rcvmore()
@@ -3979,6 +4224,7 @@ module CZMQ
       end
 
       # Get socket option `rcvmore`.
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #rcvmore.
       #
@@ -3991,7 +4237,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `fd`.
+      # Get socket option `fd`.     
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer or FFI::Pointer]
       def fd()
@@ -4001,7 +4248,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `fd`.
+      # Get socket option `fd`.     
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #fd.
       #
@@ -4014,7 +4262,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `events`.
+      # Get socket option `events`. 
+      # Available from libzmq 3.0.0.
       #
       # @return [Integer]
       def events()
@@ -4024,7 +4273,8 @@ module CZMQ
         result
       end
 
-      # Get socket option `events`.
+      # Get socket option `events`. 
+      # Available from libzmq 3.0.0.
       #
       # This is the polymorphic version of #events.
       #
@@ -4038,6 +4288,7 @@ module CZMQ
       end
 
       # Get socket option `last_endpoint`.
+      # Available from libzmq 3.0.0.      
       #
       # @return [::FFI::AutoPointer]
       def last_endpoint()
@@ -4049,6 +4300,7 @@ module CZMQ
       end
 
       # Get socket option `last_endpoint`.
+      # Available from libzmq 3.0.0.      
       #
       # This is the polymorphic version of #last_endpoint.
       #
@@ -4063,6 +4315,7 @@ module CZMQ
       end
 
       # Set socket option `router_raw`.
+      # Available from libzmq 3.0.0.   
       #
       # @param router_raw [Integer, #to_int, #to_i]
       # @return [void]
@@ -4075,6 +4328,7 @@ module CZMQ
       end
 
       # Set socket option `router_raw`.
+      # Available from libzmq 3.0.0.   
       #
       # This is the polymorphic version of #set_router_raw.
       #
@@ -4090,6 +4344,7 @@ module CZMQ
       end
 
       # Get socket option `ipv4only`.
+      # Available from libzmq 3.0.0. 
       #
       # @return [Integer]
       def ipv4only()
@@ -4100,6 +4355,7 @@ module CZMQ
       end
 
       # Get socket option `ipv4only`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #ipv4only.
       #
@@ -4113,6 +4369,7 @@ module CZMQ
       end
 
       # Set socket option `ipv4only`.
+      # Available from libzmq 3.0.0. 
       #
       # @param ipv4only [Integer, #to_int, #to_i]
       # @return [void]
@@ -4125,6 +4382,7 @@ module CZMQ
       end
 
       # Set socket option `ipv4only`.
+      # Available from libzmq 3.0.0. 
       #
       # This is the polymorphic version of #set_ipv4only.
       #
@@ -4140,6 +4398,7 @@ module CZMQ
       end
 
       # Set socket option `delay_attach_on_connect`.
+      # Available from libzmq 3.0.0.                
       #
       # @param delay_attach_on_connect [Integer, #to_int, #to_i]
       # @return [void]
@@ -4152,6 +4411,7 @@ module CZMQ
       end
 
       # Set socket option `delay_attach_on_connect`.
+      # Available from libzmq 3.0.0.                
       #
       # This is the polymorphic version of #set_delay_attach_on_connect.
       #

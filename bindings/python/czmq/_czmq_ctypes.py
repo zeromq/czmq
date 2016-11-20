@@ -5571,780 +5571,910 @@ return the supplied value. Takes a polymorphic socket reference.
     def heartbeat_ivl(self):
         """
         Get socket option `heartbeat_ivl`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_heartbeat_ivl(self._as_parameter_)
 
     def set_heartbeat_ivl(self, heartbeat_ivl):
         """
         Set socket option `heartbeat_ivl`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_heartbeat_ivl(self._as_parameter_, heartbeat_ivl)
 
     def heartbeat_ttl(self):
         """
         Get socket option `heartbeat_ttl`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_heartbeat_ttl(self._as_parameter_)
 
     def set_heartbeat_ttl(self, heartbeat_ttl):
         """
         Set socket option `heartbeat_ttl`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_heartbeat_ttl(self._as_parameter_, heartbeat_ttl)
 
     def heartbeat_timeout(self):
         """
         Get socket option `heartbeat_timeout`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_heartbeat_timeout(self._as_parameter_)
 
     def set_heartbeat_timeout(self, heartbeat_timeout):
         """
         Set socket option `heartbeat_timeout`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_heartbeat_timeout(self._as_parameter_, heartbeat_timeout)
 
     def use_fd(self):
         """
         Get socket option `use_fd`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_use_fd(self._as_parameter_)
 
     def set_use_fd(self, use_fd):
         """
         Set socket option `use_fd`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_use_fd(self._as_parameter_, use_fd)
 
     def set_xpub_manual(self, xpub_manual):
         """
         Set socket option `xpub_manual`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_xpub_manual(self._as_parameter_, xpub_manual)
 
     def set_xpub_welcome_msg(self, xpub_welcome_msg):
         """
         Set socket option `xpub_welcome_msg`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_xpub_welcome_msg(self._as_parameter_, xpub_welcome_msg)
 
     def set_stream_notify(self, stream_notify):
         """
         Set socket option `stream_notify`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_stream_notify(self._as_parameter_, stream_notify)
 
     def invert_matching(self):
         """
         Get socket option `invert_matching`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_invert_matching(self._as_parameter_)
 
     def set_invert_matching(self, invert_matching):
         """
         Set socket option `invert_matching`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_invert_matching(self._as_parameter_, invert_matching)
 
     def set_xpub_verboser(self, xpub_verboser):
         """
         Set socket option `xpub_verboser`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_xpub_verboser(self._as_parameter_, xpub_verboser)
 
     def connect_timeout(self):
         """
         Get socket option `connect_timeout`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_connect_timeout(self._as_parameter_)
 
     def set_connect_timeout(self, connect_timeout):
         """
         Set socket option `connect_timeout`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_connect_timeout(self._as_parameter_, connect_timeout)
 
     def tcp_maxrt(self):
         """
         Get socket option `tcp_maxrt`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_tcp_maxrt(self._as_parameter_)
 
     def set_tcp_maxrt(self, tcp_maxrt):
         """
         Set socket option `tcp_maxrt`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_tcp_maxrt(self._as_parameter_, tcp_maxrt)
 
     def thread_safe(self):
         """
         Get socket option `thread_safe`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_thread_safe(self._as_parameter_)
 
     def multicast_maxtpdu(self):
         """
         Get socket option `multicast_maxtpdu`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_multicast_maxtpdu(self._as_parameter_)
 
     def set_multicast_maxtpdu(self, multicast_maxtpdu):
         """
         Set socket option `multicast_maxtpdu`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_multicast_maxtpdu(self._as_parameter_, multicast_maxtpdu)
 
     def vmci_buffer_size(self):
         """
         Get socket option `vmci_buffer_size`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_vmci_buffer_size(self._as_parameter_)
 
     def set_vmci_buffer_size(self, vmci_buffer_size):
         """
         Set socket option `vmci_buffer_size`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_vmci_buffer_size(self._as_parameter_, vmci_buffer_size)
 
     def vmci_buffer_min_size(self):
         """
         Get socket option `vmci_buffer_min_size`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_vmci_buffer_min_size(self._as_parameter_)
 
     def set_vmci_buffer_min_size(self, vmci_buffer_min_size):
         """
         Set socket option `vmci_buffer_min_size`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_vmci_buffer_min_size(self._as_parameter_, vmci_buffer_min_size)
 
     def vmci_buffer_max_size(self):
         """
         Get socket option `vmci_buffer_max_size`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_vmci_buffer_max_size(self._as_parameter_)
 
     def set_vmci_buffer_max_size(self, vmci_buffer_max_size):
         """
         Set socket option `vmci_buffer_max_size`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_vmci_buffer_max_size(self._as_parameter_, vmci_buffer_max_size)
 
     def vmci_connect_timeout(self):
         """
         Get socket option `vmci_connect_timeout`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_vmci_connect_timeout(self._as_parameter_)
 
     def set_vmci_connect_timeout(self, vmci_connect_timeout):
         """
         Set socket option `vmci_connect_timeout`.
+Available from libzmq 4.2.0.
         """
         return lib.zsock_set_vmci_connect_timeout(self._as_parameter_, vmci_connect_timeout)
 
     def tos(self):
         """
         Get socket option `tos`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_tos(self._as_parameter_)
 
     def set_tos(self, tos):
         """
         Set socket option `tos`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_set_tos(self._as_parameter_, tos)
 
     def set_router_handover(self, router_handover):
         """
         Set socket option `router_handover`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_set_router_handover(self._as_parameter_, router_handover)
 
     def set_connect_rid(self, connect_rid):
         """
         Set socket option `connect_rid`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_set_connect_rid(self._as_parameter_, connect_rid)
 
     def set_connect_rid_bin(self, connect_rid):
         """
         Set socket option `connect_rid` from 32-octet binary
+Available from libzmq 4.1.0.
         """
         return lib.zsock_set_connect_rid_bin(self._as_parameter_, connect_rid)
 
     def handshake_ivl(self):
         """
         Get socket option `handshake_ivl`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_handshake_ivl(self._as_parameter_)
 
     def set_handshake_ivl(self, handshake_ivl):
         """
         Set socket option `handshake_ivl`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_set_handshake_ivl(self._as_parameter_, handshake_ivl)
 
     def socks_proxy(self):
         """
         Get socket option `socks_proxy`.
+Available from libzmq 4.1.0.
         """
         return return_fresh_string(lib.zsock_socks_proxy(self._as_parameter_))
 
     def set_socks_proxy(self, socks_proxy):
         """
         Set socket option `socks_proxy`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_set_socks_proxy(self._as_parameter_, socks_proxy)
 
     def set_xpub_nodrop(self, xpub_nodrop):
         """
         Set socket option `xpub_nodrop`.
+Available from libzmq 4.1.0.
         """
         return lib.zsock_set_xpub_nodrop(self._as_parameter_, xpub_nodrop)
 
     def set_router_mandatory(self, router_mandatory):
         """
         Set socket option `router_mandatory`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_router_mandatory(self._as_parameter_, router_mandatory)
 
     def set_probe_router(self, probe_router):
         """
         Set socket option `probe_router`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_probe_router(self._as_parameter_, probe_router)
 
     def set_req_relaxed(self, req_relaxed):
         """
         Set socket option `req_relaxed`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_req_relaxed(self._as_parameter_, req_relaxed)
 
     def set_req_correlate(self, req_correlate):
         """
         Set socket option `req_correlate`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_req_correlate(self._as_parameter_, req_correlate)
 
     def set_conflate(self, conflate):
         """
         Set socket option `conflate`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_conflate(self._as_parameter_, conflate)
 
     def zap_domain(self):
         """
         Get socket option `zap_domain`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_zap_domain(self._as_parameter_))
 
     def set_zap_domain(self, zap_domain):
         """
         Set socket option `zap_domain`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_zap_domain(self._as_parameter_, zap_domain)
 
     def mechanism(self):
         """
         Get socket option `mechanism`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_mechanism(self._as_parameter_)
 
     def plain_server(self):
         """
         Get socket option `plain_server`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_plain_server(self._as_parameter_)
 
     def set_plain_server(self, plain_server):
         """
         Set socket option `plain_server`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_plain_server(self._as_parameter_, plain_server)
 
     def plain_username(self):
         """
         Get socket option `plain_username`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_plain_username(self._as_parameter_))
 
     def set_plain_username(self, plain_username):
         """
         Set socket option `plain_username`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_plain_username(self._as_parameter_, plain_username)
 
     def plain_password(self):
         """
         Get socket option `plain_password`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_plain_password(self._as_parameter_))
 
     def set_plain_password(self, plain_password):
         """
         Set socket option `plain_password`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_plain_password(self._as_parameter_, plain_password)
 
     def curve_server(self):
         """
         Get socket option `curve_server`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_curve_server(self._as_parameter_)
 
     def set_curve_server(self, curve_server):
         """
         Set socket option `curve_server`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_curve_server(self._as_parameter_, curve_server)
 
     def curve_publickey(self):
         """
         Get socket option `curve_publickey`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_curve_publickey(self._as_parameter_))
 
     def set_curve_publickey(self, curve_publickey):
         """
         Set socket option `curve_publickey`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_curve_publickey(self._as_parameter_, curve_publickey)
 
     def set_curve_publickey_bin(self, curve_publickey):
         """
         Set socket option `curve_publickey` from 32-octet binary
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_curve_publickey_bin(self._as_parameter_, curve_publickey)
 
     def curve_secretkey(self):
         """
         Get socket option `curve_secretkey`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_curve_secretkey(self._as_parameter_))
 
     def set_curve_secretkey(self, curve_secretkey):
         """
         Set socket option `curve_secretkey`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_curve_secretkey(self._as_parameter_, curve_secretkey)
 
     def set_curve_secretkey_bin(self, curve_secretkey):
         """
         Set socket option `curve_secretkey` from 32-octet binary
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_curve_secretkey_bin(self._as_parameter_, curve_secretkey)
 
     def curve_serverkey(self):
         """
         Get socket option `curve_serverkey`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_curve_serverkey(self._as_parameter_))
 
     def set_curve_serverkey(self, curve_serverkey):
         """
         Set socket option `curve_serverkey`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_curve_serverkey(self._as_parameter_, curve_serverkey)
 
     def set_curve_serverkey_bin(self, curve_serverkey):
         """
         Set socket option `curve_serverkey` from 32-octet binary
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_curve_serverkey_bin(self._as_parameter_, curve_serverkey)
 
     def gssapi_server(self):
         """
         Get socket option `gssapi_server`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_gssapi_server(self._as_parameter_)
 
     def set_gssapi_server(self, gssapi_server):
         """
         Set socket option `gssapi_server`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_gssapi_server(self._as_parameter_, gssapi_server)
 
     def gssapi_plaintext(self):
         """
         Get socket option `gssapi_plaintext`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_gssapi_plaintext(self._as_parameter_)
 
     def set_gssapi_plaintext(self, gssapi_plaintext):
         """
         Set socket option `gssapi_plaintext`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_gssapi_plaintext(self._as_parameter_, gssapi_plaintext)
 
     def gssapi_principal(self):
         """
         Get socket option `gssapi_principal`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_gssapi_principal(self._as_parameter_))
 
     def set_gssapi_principal(self, gssapi_principal):
         """
         Set socket option `gssapi_principal`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_gssapi_principal(self._as_parameter_, gssapi_principal)
 
     def gssapi_service_principal(self):
         """
         Get socket option `gssapi_service_principal`.
+Available from libzmq 4.0.0.
         """
         return return_fresh_string(lib.zsock_gssapi_service_principal(self._as_parameter_))
 
     def set_gssapi_service_principal(self, gssapi_service_principal):
         """
         Set socket option `gssapi_service_principal`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_gssapi_service_principal(self._as_parameter_, gssapi_service_principal)
 
     def ipv6(self):
         """
         Get socket option `ipv6`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_ipv6(self._as_parameter_)
 
     def set_ipv6(self, ipv6):
         """
         Set socket option `ipv6`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_ipv6(self._as_parameter_, ipv6)
 
     def immediate(self):
         """
         Get socket option `immediate`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_immediate(self._as_parameter_)
 
     def set_immediate(self, immediate):
         """
         Set socket option `immediate`.
+Available from libzmq 4.0.0.
         """
         return lib.zsock_set_immediate(self._as_parameter_, immediate)
 
     def type(self):
         """
         Get socket option `type`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_type(self._as_parameter_)
 
     def sndhwm(self):
         """
         Get socket option `sndhwm`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_sndhwm(self._as_parameter_)
 
     def set_sndhwm(self, sndhwm):
         """
         Set socket option `sndhwm`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_sndhwm(self._as_parameter_, sndhwm)
 
     def rcvhwm(self):
         """
         Get socket option `rcvhwm`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_rcvhwm(self._as_parameter_)
 
     def set_rcvhwm(self, rcvhwm):
         """
         Set socket option `rcvhwm`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_rcvhwm(self._as_parameter_, rcvhwm)
 
     def affinity(self):
         """
         Get socket option `affinity`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_affinity(self._as_parameter_)
 
     def set_affinity(self, affinity):
         """
         Set socket option `affinity`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_affinity(self._as_parameter_, affinity)
 
     def set_subscribe(self, subscribe):
         """
         Set socket option `subscribe`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_subscribe(self._as_parameter_, subscribe)
 
     def set_unsubscribe(self, unsubscribe):
         """
         Set socket option `unsubscribe`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_unsubscribe(self._as_parameter_, unsubscribe)
 
     def identity(self):
         """
         Get socket option `identity`.
+Available from libzmq 3.0.0.
         """
         return return_fresh_string(lib.zsock_identity(self._as_parameter_))
 
     def set_identity(self, identity):
         """
         Set socket option `identity`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_identity(self._as_parameter_, identity)
 
     def rate(self):
         """
         Get socket option `rate`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_rate(self._as_parameter_)
 
     def set_rate(self, rate):
         """
         Set socket option `rate`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_rate(self._as_parameter_, rate)
 
     def recovery_ivl(self):
         """
         Get socket option `recovery_ivl`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_recovery_ivl(self._as_parameter_)
 
     def set_recovery_ivl(self, recovery_ivl):
         """
         Set socket option `recovery_ivl`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_recovery_ivl(self._as_parameter_, recovery_ivl)
 
     def sndbuf(self):
         """
         Get socket option `sndbuf`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_sndbuf(self._as_parameter_)
 
     def set_sndbuf(self, sndbuf):
         """
         Set socket option `sndbuf`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_sndbuf(self._as_parameter_, sndbuf)
 
     def rcvbuf(self):
         """
         Get socket option `rcvbuf`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_rcvbuf(self._as_parameter_)
 
     def set_rcvbuf(self, rcvbuf):
         """
         Set socket option `rcvbuf`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_rcvbuf(self._as_parameter_, rcvbuf)
 
     def linger(self):
         """
         Get socket option `linger`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_linger(self._as_parameter_)
 
     def set_linger(self, linger):
         """
         Set socket option `linger`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_linger(self._as_parameter_, linger)
 
     def reconnect_ivl(self):
         """
         Get socket option `reconnect_ivl`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_reconnect_ivl(self._as_parameter_)
 
     def set_reconnect_ivl(self, reconnect_ivl):
         """
         Set socket option `reconnect_ivl`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_reconnect_ivl(self._as_parameter_, reconnect_ivl)
 
     def reconnect_ivl_max(self):
         """
         Get socket option `reconnect_ivl_max`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_reconnect_ivl_max(self._as_parameter_)
 
     def set_reconnect_ivl_max(self, reconnect_ivl_max):
         """
         Set socket option `reconnect_ivl_max`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_reconnect_ivl_max(self._as_parameter_, reconnect_ivl_max)
 
     def backlog(self):
         """
         Get socket option `backlog`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_backlog(self._as_parameter_)
 
     def set_backlog(self, backlog):
         """
         Set socket option `backlog`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_backlog(self._as_parameter_, backlog)
 
     def maxmsgsize(self):
         """
         Get socket option `maxmsgsize`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_maxmsgsize(self._as_parameter_)
 
     def set_maxmsgsize(self, maxmsgsize):
         """
         Set socket option `maxmsgsize`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_maxmsgsize(self._as_parameter_, maxmsgsize)
 
     def multicast_hops(self):
         """
         Get socket option `multicast_hops`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_multicast_hops(self._as_parameter_)
 
     def set_multicast_hops(self, multicast_hops):
         """
         Set socket option `multicast_hops`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_multicast_hops(self._as_parameter_, multicast_hops)
 
     def rcvtimeo(self):
         """
         Get socket option `rcvtimeo`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_rcvtimeo(self._as_parameter_)
 
     def set_rcvtimeo(self, rcvtimeo):
         """
         Set socket option `rcvtimeo`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_rcvtimeo(self._as_parameter_, rcvtimeo)
 
     def sndtimeo(self):
         """
         Get socket option `sndtimeo`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_sndtimeo(self._as_parameter_)
 
     def set_sndtimeo(self, sndtimeo):
         """
         Set socket option `sndtimeo`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_sndtimeo(self._as_parameter_, sndtimeo)
 
     def set_xpub_verbose(self, xpub_verbose):
         """
         Set socket option `xpub_verbose`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_xpub_verbose(self._as_parameter_, xpub_verbose)
 
     def tcp_keepalive(self):
         """
         Get socket option `tcp_keepalive`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_tcp_keepalive(self._as_parameter_)
 
     def set_tcp_keepalive(self, tcp_keepalive):
         """
         Set socket option `tcp_keepalive`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_tcp_keepalive(self._as_parameter_, tcp_keepalive)
 
     def tcp_keepalive_idle(self):
         """
         Get socket option `tcp_keepalive_idle`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_tcp_keepalive_idle(self._as_parameter_)
 
     def set_tcp_keepalive_idle(self, tcp_keepalive_idle):
         """
         Set socket option `tcp_keepalive_idle`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_tcp_keepalive_idle(self._as_parameter_, tcp_keepalive_idle)
 
     def tcp_keepalive_cnt(self):
         """
         Get socket option `tcp_keepalive_cnt`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_tcp_keepalive_cnt(self._as_parameter_)
 
     def set_tcp_keepalive_cnt(self, tcp_keepalive_cnt):
         """
         Set socket option `tcp_keepalive_cnt`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_tcp_keepalive_cnt(self._as_parameter_, tcp_keepalive_cnt)
 
     def tcp_keepalive_intvl(self):
         """
         Get socket option `tcp_keepalive_intvl`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_tcp_keepalive_intvl(self._as_parameter_)
 
     def set_tcp_keepalive_intvl(self, tcp_keepalive_intvl):
         """
         Set socket option `tcp_keepalive_intvl`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_tcp_keepalive_intvl(self._as_parameter_, tcp_keepalive_intvl)
 
     def tcp_accept_filter(self):
         """
         Get socket option `tcp_accept_filter`.
+Available from libzmq 3.0.0.
         """
         return return_fresh_string(lib.zsock_tcp_accept_filter(self._as_parameter_))
 
     def set_tcp_accept_filter(self, tcp_accept_filter):
         """
         Set socket option `tcp_accept_filter`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_tcp_accept_filter(self._as_parameter_, tcp_accept_filter)
 
     def rcvmore(self):
         """
         Get socket option `rcvmore`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_rcvmore(self._as_parameter_)
 
     def fd(self):
         """
         Get socket option `fd`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_fd(self._as_parameter_)
 
     def events(self):
         """
         Get socket option `events`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_events(self._as_parameter_)
 
     def last_endpoint(self):
         """
         Get socket option `last_endpoint`.
+Available from libzmq 3.0.0.
         """
         return return_fresh_string(lib.zsock_last_endpoint(self._as_parameter_))
 
     def set_router_raw(self, router_raw):
         """
         Set socket option `router_raw`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_router_raw(self._as_parameter_, router_raw)
 
     def ipv4only(self):
         """
         Get socket option `ipv4only`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_ipv4only(self._as_parameter_)
 
     def set_ipv4only(self, ipv4only):
         """
         Set socket option `ipv4only`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_ipv4only(self._as_parameter_, ipv4only)
 
     def set_delay_attach_on_connect(self, delay_attach_on_connect):
         """
         Set socket option `delay_attach_on_connect`.
+Available from libzmq 3.0.0.
         """
         return lib.zsock_set_delay_attach_on_connect(self._as_parameter_, delay_attach_on_connect)
 

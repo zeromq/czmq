@@ -104,6 +104,7 @@ zmakecert.txt:
 	./mkman zmakecert $@
 clean:
 	rm -f *.1 *.3 *.7
+doc:
 	./mkman zactor
 	./mkman zarmour
 	./mkman zcert
