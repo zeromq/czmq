@@ -633,23 +633,6 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zsock_set_immediate (void *self, int immediate);
 
-//  Set socket option `router_raw`.
-CZMQ_EXPORT void
-    zsock_set_router_raw (void *self, int router_raw);
-
-//  Get socket option `ipv4only`.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT int
-    zsock_ipv4only (void *self);
-
-//  Set socket option `ipv4only`.
-CZMQ_EXPORT void
-    zsock_set_ipv4only (void *self, int ipv4only);
-
-//  Set socket option `delay_attach_on_connect`.
-CZMQ_EXPORT void
-    zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
-
 //  Get socket option `type`.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT int
@@ -875,6 +858,23 @@ CZMQ_EXPORT int
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zsock_last_endpoint (void *self);
+
+//  Set socket option `router_raw`.
+CZMQ_EXPORT void
+    zsock_set_router_raw (void *self, int router_raw);
+
+//  Get socket option `ipv4only`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_ipv4only (void *self);
+
+//  Set socket option `ipv4only`.
+CZMQ_EXPORT void
+    zsock_set_ipv4only (void *self, int ipv4only);
+
+//  Set socket option `delay_attach_on_connect`.
+CZMQ_EXPORT void
+    zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
 
 //  Self test of this class.
 CZMQ_EXPORT void
