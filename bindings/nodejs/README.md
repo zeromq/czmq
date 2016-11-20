@@ -2868,30 +2868,6 @@ nothing my_zsock.setImmediate (Number)
 Set socket option `immediate`.
 
 ```
-nothing my_zsock.setRouterRaw (Number)
-```
-
-Set socket option `router_raw`.
-
-```
-integer my_zsock.ipv4only ()
-```
-
-Get socket option `ipv4only`.
-
-```
-nothing my_zsock.setIpv4only (Number)
-```
-
-Set socket option `ipv4only`.
-
-```
-nothing my_zsock.setDelayAttachOnConnect (Number)
-```
-
-Set socket option `delay_attach_on_connect`.
-
-```
 integer my_zsock.type ()
 ```
 
@@ -3184,6 +3160,30 @@ string my_zsock.lastEndpoint ()
 ```
 
 Get socket option `last_endpoint`.
+
+```
+nothing my_zsock.setRouterRaw (Number)
+```
+
+Set socket option `router_raw`.
+
+```
+integer my_zsock.ipv4only ()
+```
+
+Get socket option `ipv4only`.
+
+```
+nothing my_zsock.setIpv4only (Number)
+```
+
+Set socket option `ipv4only`.
+
+```
+nothing my_zsock.setDelayAttachOnConnect (Number)
+```
+
+Set socket option `delay_attach_on_connect`.
 
 ```
 nothing my_zsock.test (Boolean)

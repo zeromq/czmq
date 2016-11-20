@@ -977,34 +977,6 @@ public class Zsock implements AutoCloseable{
         __setImmediate (self, immediate);
     }
     /*
-    Set socket option `router_raw`.
-    */
-    native static void __setRouterRaw (long self, int routerRaw);
-    public void setRouterRaw (int routerRaw) {
-        __setRouterRaw (self, routerRaw);
-    }
-    /*
-    Get socket option `ipv4only`.
-    */
-    native static int __ipv4only (long self);
-    public int ipv4only () {
-        return __ipv4only (self);
-    }
-    /*
-    Set socket option `ipv4only`.
-    */
-    native static void __setIpv4only (long self, int ipv4only);
-    public void setIpv4only (int ipv4only) {
-        __setIpv4only (self, ipv4only);
-    }
-    /*
-    Set socket option `delay_attach_on_connect`.
-    */
-    native static void __setDelayAttachOnConnect (long self, int delayAttachOnConnect);
-    public void setDelayAttachOnConnect (int delayAttachOnConnect) {
-        __setDelayAttachOnConnect (self, delayAttachOnConnect);
-    }
-    /*
     Get socket option `type`.
     */
     native static int __type (long self);
@@ -1346,6 +1318,34 @@ public class Zsock implements AutoCloseable{
     native static String __lastEndpoint (long self);
     public String lastEndpoint () {
         return __lastEndpoint (self);
+    }
+    /*
+    Set socket option `router_raw`.
+    */
+    native static void __setRouterRaw (long self, int routerRaw);
+    public void setRouterRaw (int routerRaw) {
+        __setRouterRaw (self, routerRaw);
+    }
+    /*
+    Get socket option `ipv4only`.
+    */
+    native static int __ipv4only (long self);
+    public int ipv4only () {
+        return __ipv4only (self);
+    }
+    /*
+    Set socket option `ipv4only`.
+    */
+    native static void __setIpv4only (long self, int ipv4only);
+    public void setIpv4only (int ipv4only) {
+        __setIpv4only (self, ipv4only);
+    }
+    /*
+    Set socket option `delay_attach_on_connect`.
+    */
+    native static void __setDelayAttachOnConnect (long self, int delayAttachOnConnect);
+    public void setDelayAttachOnConnect (int delayAttachOnConnect) {
+        __setDelayAttachOnConnect (self, delayAttachOnConnect);
     }
     /*
     Self test of this class.

@@ -892,31 +892,6 @@ Java_org_zeromq_czmq_Zsock__1_1setImmediate (JNIEnv *env, jclass c, jlong self, 
     zsock_set_immediate ((zsock_t *) (intptr_t) self, (int) immediate);
 }
 
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zsock__1_1setRouterRaw (JNIEnv *env, jclass c, jlong self, jint router_raw)
-{
-    zsock_set_router_raw ((zsock_t *) (intptr_t) self, (int) router_raw);
-}
-
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zsock__1_1ipv4only (JNIEnv *env, jclass c, jlong self)
-{
-    jint ipv4only_ = (jint) zsock_ipv4only ((zsock_t *) (intptr_t) self);
-    return ipv4only_;
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zsock__1_1setIpv4only (JNIEnv *env, jclass c, jlong self, jint ipv4only)
-{
-    zsock_set_ipv4only ((zsock_t *) (intptr_t) self, (int) ipv4only);
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zsock__1_1setDelayAttachOnConnect (JNIEnv *env, jclass c, jlong self, jint delay_attach_on_connect)
-{
-    zsock_set_delay_attach_on_connect ((zsock_t *) (intptr_t) self, (int) delay_attach_on_connect);
-}
-
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1type (JNIEnv *env, jclass c, jlong self)
 {
@@ -1248,6 +1223,31 @@ Java_org_zeromq_czmq_Zsock__1_1lastEndpoint (JNIEnv *env, jclass c, jlong self)
     jstring return_string_ = (*env)->NewStringUTF (env, last_endpoint_);
     zstr_free (&last_endpoint_);
     return return_string_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setRouterRaw (JNIEnv *env, jclass c, jlong self, jint router_raw)
+{
+    zsock_set_router_raw ((zsock_t *) (intptr_t) self, (int) router_raw);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1ipv4only (JNIEnv *env, jclass c, jlong self)
+{
+    jint ipv4only_ = (jint) zsock_ipv4only ((zsock_t *) (intptr_t) self);
+    return ipv4only_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setIpv4only (JNIEnv *env, jclass c, jlong self, jint ipv4only)
+{
+    zsock_set_ipv4only ((zsock_t *) (intptr_t) self, (int) ipv4only);
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setDelayAttachOnConnect (JNIEnv *env, jclass c, jlong self, jint delay_attach_on_connect)
+{
+    zsock_set_delay_attach_on_connect ((zsock_t *) (intptr_t) self, (int) delay_attach_on_connect);
 }
 
 JNIEXPORT void JNICALL

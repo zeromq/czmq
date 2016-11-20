@@ -1065,38 +1065,6 @@ void QZsock::setImmediate (int immediate)
 }
 
 ///
-//  Set socket option `router_raw`.
-void QZsock::setRouterRaw (int routerRaw)
-{
-    zsock_set_router_raw (self, routerRaw);
-    
-}
-
-///
-//  Get socket option `ipv4only`.
-int QZsock::ipv4only ()
-{
-    int rv = zsock_ipv4only (self);
-    return rv;
-}
-
-///
-//  Set socket option `ipv4only`.
-void QZsock::setIpv4only (int ipv4only)
-{
-    zsock_set_ipv4only (self, ipv4only);
-    
-}
-
-///
-//  Set socket option `delay_attach_on_connect`.
-void QZsock::setDelayAttachOnConnect (int delayAttachOnConnect)
-{
-    zsock_set_delay_attach_on_connect (self, delayAttachOnConnect);
-    
-}
-
-///
 //  Get socket option `type`.
 int QZsock::type ()
 {
@@ -1500,6 +1468,38 @@ QString QZsock::lastEndpoint ()
     QString rv = QString (retStr_);
     zstr_free (&retStr_);
     return rv;
+}
+
+///
+//  Set socket option `router_raw`.
+void QZsock::setRouterRaw (int routerRaw)
+{
+    zsock_set_router_raw (self, routerRaw);
+    
+}
+
+///
+//  Get socket option `ipv4only`.
+int QZsock::ipv4only ()
+{
+    int rv = zsock_ipv4only (self);
+    return rv;
+}
+
+///
+//  Set socket option `ipv4only`.
+void QZsock::setIpv4only (int ipv4only)
+{
+    zsock_set_ipv4only (self, ipv4only);
+    
+}
+
+///
+//  Set socket option `delay_attach_on_connect`.
+void QZsock::setDelayAttachOnConnect (int delayAttachOnConnect)
+{
+    zsock_set_delay_attach_on_connect (self, delayAttachOnConnect);
+    
 }
 
 ///

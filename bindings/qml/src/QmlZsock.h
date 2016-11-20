@@ -447,18 +447,6 @@ public slots:
     //  Set socket option `immediate`.
     void setImmediate (int immediate);
 
-    //  Set socket option `router_raw`.
-    void setRouterRaw (int routerRaw);
-
-    //  Get socket option `ipv4only`.
-    int ipv4only ();
-
-    //  Set socket option `ipv4only`.
-    void setIpv4only (int ipv4only);
-
-    //  Set socket option `delay_attach_on_connect`.
-    void setDelayAttachOnConnect (int delayAttachOnConnect);
-
     //  Get socket option `type`.
     int type ();
 
@@ -608,6 +596,18 @@ public slots:
 
     //  Get socket option `last_endpoint`.
     QString lastEndpoint ();
+
+    //  Set socket option `router_raw`.
+    void setRouterRaw (int routerRaw);
+
+    //  Get socket option `ipv4only`.
+    int ipv4only ();
+
+    //  Set socket option `ipv4only`.
+    void setIpv4only (int ipv4only);
+
+    //  Set socket option `delay_attach_on_connect`.
+    void setDelayAttachOnConnect (int delayAttachOnConnect);
 };
 
 class QmlZsockAttached : public QObject

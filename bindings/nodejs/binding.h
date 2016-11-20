@@ -679,10 +679,6 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_set_ipv6);
     static NAN_METHOD (_immediate);
     static NAN_METHOD (_set_immediate);
-    static NAN_METHOD (_set_router_raw);
-    static NAN_METHOD (_ipv4only);
-    static NAN_METHOD (_set_ipv4only);
-    static NAN_METHOD (_set_delay_attach_on_connect);
     static NAN_METHOD (_type);
     static NAN_METHOD (_sndhwm);
     static NAN_METHOD (_set_sndhwm);
@@ -732,6 +728,10 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_rcvmore);
     static NAN_METHOD (_events);
     static NAN_METHOD (_last_endpoint);
+    static NAN_METHOD (_set_router_raw);
+    static NAN_METHOD (_ipv4only);
+    static NAN_METHOD (_set_ipv4only);
+    static NAN_METHOD (_set_delay_attach_on_connect);
     static NAN_METHOD (_test);
 };
 
