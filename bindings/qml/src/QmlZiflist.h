@@ -51,6 +51,9 @@ public slots:
 
     //  Return the list of interfaces.
     void print ();
+
+    //  Reload network interfaces from system, including IPv6
+    void reloadIpv6 ();
 };
 
 class QmlZiflistAttached : public QObject
@@ -64,6 +67,10 @@ public:
     };
     
 public slots:
+    //  Get a list of network interfaces currently defined on the system
+    //  Includes IPv6 interfaces                                        
+    QmlZiflist *newIpv6 ();
+
     //  Self test of this class.
     void test (bool verbose);
 

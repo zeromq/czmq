@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  Get a list of network interfaces currently defined on the system
 CZMQ_EXPORT ziflist_t *
     ziflist_new (void);
@@ -67,6 +69,20 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     ziflist_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Get a list of network interfaces currently defined on the system
+//  Includes IPv6 interfaces                                        
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT ziflist_t *
+    ziflist_new_ipv6 (void);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Reload network interfaces from system, including IPv6
+CZMQ_EXPORT void
+    ziflist_reload_ipv6 (ziflist_t *self);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 

@@ -101,6 +101,18 @@ CZMQ_PRIVATE zhashx_t *
     zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer);
 
 //  *** Draft method, defined for internal use only ***
+//  Get a list of network interfaces currently defined on the system
+//  Includes IPv6 interfaces                                        
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE ziflist_t *
+    ziflist_new_ipv6 (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Reload network interfaces from system, including IPv6
+CZMQ_PRIVATE void
+    ziflist_reload_ipv6 (ziflist_t *self);
+
+//  *** Draft method, defined for internal use only ***
 //  Return message routing ID, if the message came from a ZMQ_SERVER socket.
 //  Else returns zero.                                                      
 CZMQ_PRIVATE uint32_t

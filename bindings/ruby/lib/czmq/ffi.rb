@@ -431,6 +431,28 @@ module CZMQ
       attach_function :ziflist_broadcast, [:pointer], :string, **opts
       attach_function :ziflist_netmask, [:pointer], :string, **opts
       attach_function :ziflist_print, [:pointer], :void, **opts
+      begin # DRAFT method
+        attach_function :ziflist_new_ipv6, [], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function ziflist_new_ipv6()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ziflist_new_ipv6(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :ziflist_reload_ipv6, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function ziflist_reload_ipv6()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ziflist_reload_ipv6(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :ziflist_test, [:bool], :void, **opts
 
       require_relative 'ffi/ziflist'

@@ -56,18 +56,49 @@ s_interface_destroy (interface_t **self_p)
 //  interface constructor
 
 static interface_t *
-s_interface_new (char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
+s_interface_new (char *name, struct sockaddr *address, struct sockaddr *netmask,
+        struct sockaddr *broadcast)
 {
+    char hbuf[NI_MAXHOST];
+    int rc;
+
     interface_t *self = (interface_t *) zmalloc (sizeof (interface_t));
     assert (self);
     self->name = strdup (name);
     assert (self->name);
-    self->address = strdup (inet_ntoa (address.sin_addr));
+
+    rc = getnameinfo (address, address->sa_family == AF_INET ?
+            sizeof (struct sockaddr_in) : sizeof (struct sockaddr_in6),
+            hbuf, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+    assert (rc == 0);
+    self->address = strdup (hbuf);
     assert (self->address);
-    self->netmask = strdup (inet_ntoa (netmask.sin_addr));
+
+    rc = getnameinfo (netmask, netmask->sa_family == AF_INET ?
+            sizeof (struct sockaddr_in) : sizeof (struct sockaddr_in6),
+            hbuf, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+    assert (rc == 0);
+    self->netmask = strdup (hbuf);
     assert (self->netmask);
-    self->broadcast = strdup (inet_ntoa (broadcast.sin_addr));
-    assert (self->broadcast);
+
+    if (address->sa_family == AF_INET) {
+        //  If the returned broadcast address is the same as source
+        //  address, build the broadcast address from the source
+        //  address and netmask.
+        if (((inaddr_t *)address)->sin_addr.s_addr == ((inaddr_t *)broadcast)->sin_addr.s_addr)
+            ((inaddr_t *)broadcast)->sin_addr.s_addr |= ~(((inaddr_t *)netmask)->sin_addr.s_addr);
+
+        rc = getnameinfo (broadcast, sizeof (struct sockaddr_in), hbuf, NI_MAXHOST,
+                NULL, 0, NI_NUMERICHOST);
+        assert (rc == 0);
+        self->broadcast = strdup (hbuf);
+        assert (self->broadcast);
+    } else {
+        //  The default is link-local all-node multicast group fe02::1
+        self->broadcast = strdup (zsys_ipv6_mcast_address ());
+        assert (self->broadcast);
+    }
+
     return self;
 }
 
@@ -84,6 +115,20 @@ ziflist_new (void)
     assert (self);
     zlistx_set_destructor ((zlistx_t *) self, (czmq_destructor *) s_interface_destroy);
     ziflist_reload (self);
+    return self;
+}
+
+//  --------------------------------------------------------------------------
+//  Get a list of network interfaces currently defined on the system
+//  Includes IPv6 interfaces
+
+ziflist_t *
+ziflist_new_ipv6 (void)
+{
+    ziflist_t *self = (ziflist_t *) zlistx_new ();
+    assert (self);
+    zlistx_set_destructor ((zlistx_t *) self, (czmq_destructor *) s_interface_destroy);
+    ziflist_reload_ipv6 (self);
     return self;
 }
 
@@ -121,11 +166,12 @@ ziflist_destroy (ziflist_t **self_p)
 //  Helper function to verify if one interface's flags are what we want.
 
 static bool
-s_valid_flags (short flags)
+s_valid_flags (short flags, bool ipv6)
 {
     return (flags & IFF_UP)             //  Only use interfaces that are running
            && !(flags & IFF_LOOPBACK)   //  Ignore loopback interface
-           && (flags & IFF_BROADCAST)   //  Only use interfaces that have BROADCAST
+           && ((ipv6 || (flags & IFF_BROADCAST))  //  Only use interfaces that have BROADCAST
+                   && (!ipv6 || (flags & IFF_MULTICAST))) //  or IPv6 and MULTICAST
 #   if defined (IFF_SLAVE)
            && !(flags & IFF_SLAVE)      //  Ignore devices that are bonding slaves.
 #   endif
@@ -135,10 +181,10 @@ s_valid_flags (short flags)
 
 
 //  --------------------------------------------------------------------------
-//  Reload network interfaces from system
+//  Helper to reload network interfaces from system
 
-void
-ziflist_reload (ziflist_t *self)
+static void
+s_reload (ziflist_t *self, bool ipv6)
 {
     assert (self);
     zlistx_t *list = (zlistx_t *) self;
@@ -150,23 +196,16 @@ ziflist_reload (ziflist_t *self)
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if (interface->ifa_broadaddr
-            &&  interface->ifa_addr
-            &&  interface->ifa_addr->sa_family == AF_INET
-            &&  s_valid_flags (interface->ifa_flags)) {
-                inaddr_t address = *(inaddr_t *) interface->ifa_addr;
-                inaddr_t netmask = *(inaddr_t *) interface->ifa_netmask;
-                inaddr_t broadcast = *(inaddr_t *) interface->ifa_broadaddr;
-
-                //  If the returned broadcast address is the same as source
-                //  address, build the broadcast address from the source
-                //  address and netmask.
-                if (address.sin_addr.s_addr == broadcast.sin_addr.s_addr)
-                    broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
-
-                interface_t *item =
-                    s_interface_new (interface->ifa_name, address, netmask,
-                                     broadcast);
+            if (interface->ifa_addr
+            && (interface->ifa_broadaddr
+                    || (ipv6 && (interface->ifa_addr->sa_family == AF_INET6)))
+            &&(interface->ifa_addr->sa_family == AF_INET
+                    || (ipv6 && (interface->ifa_addr->sa_family == AF_INET6)))
+            &&  s_valid_flags (interface->ifa_flags,
+                    ipv6 && (interface->ifa_addr->sa_family == AF_INET6))) {
+                interface_t *item = s_interface_new (interface->ifa_name,
+                        interface->ifa_addr, interface->ifa_netmask,
+                        interface->ifa_broadaddr);
                 if (item)
                     zlistx_add_end (list, item);
             }
@@ -191,8 +230,6 @@ ziflist_reload (ziflist_t *self)
             struct ifreq *ifr = &ifconfig.ifc_req [index];
             //  Check interface flags
             bool is_valid = false;
-            if (!ioctl (sock, SIOCGIFFLAGS, (caddr_t) ifr, sizeof (struct ifreq)))
-                is_valid = s_valid_flags (ifr->ifr_flags);
 
             //  Get interface properties
             inaddr_t address = { 0 };
@@ -200,6 +237,10 @@ ziflist_reload (ziflist_t *self)
                 address = *((inaddr_t *) &ifr->ifr_addr);
             else
                 is_valid = false;
+
+            if (!ioctl (sock, SIOCGIFFLAGS, (caddr_t) ifr, sizeof (struct ifreq)))
+                is_valid = s_valid_flags (ifr->ifr_flags,
+                        ipv6 && (address.sin_family == AF_INET6));
 
             inaddr_t broadcast = { 0 };
             if (!ioctl (sock, SIOCGIFBRDADDR, (caddr_t) ifr, sizeof (struct ifreq)))
@@ -214,8 +255,9 @@ ziflist_reload (ziflist_t *self)
                 is_valid = false;
 
             if (is_valid) {
-                interface_t *item = s_interface_new (ifr->ifr_name, address,
-                                                     netmask, broadcast);
+                interface_t *item = s_interface_new (ifr->ifr_name,
+                        (struct sockaddr *)&address, (struct sockaddr *)&netmask,
+                        (struct sockaddr *)&broadcast);
                 if (item)
                     zlistx_add_end (list, item);
             }
@@ -225,6 +267,7 @@ ziflist_reload (ziflist_t *self)
     }
 
 #   elif defined (__WINDOWS__)
+    // TODO: IPv6 support
     ULONG addr_size = 0;
     DWORD rc = GetAdaptersAddresses (AF_INET, GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);
     assert (rc == ERROR_BUFFER_OVERFLOW);
@@ -250,13 +293,16 @@ ziflist_reload (ziflist_t *self)
                      && (pPrefix->PrefixLength <= 32);
 
         if (valid) {
-            inaddr_t address = *(inaddr_t *) pUnicast->Address.lpSockaddr;
-            inaddr_t netmask;
+            struct sockaddr_in address, netmask, broadcast;
+            address = *(sockaddr_in *)pUnicast->Address.lpSockaddr;
+            address.sin_family = AF_INET;
             netmask.sin_addr.s_addr = htonl ((0xffffffffU) << (32 - pPrefix->PrefixLength));
-            inaddr_t broadcast = address;
+            netmask.sin_family = AF_INET;
+            broadcast = address;
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
-            interface_t *item = s_interface_new (asciiFriendlyName, address,
-                                                 netmask, broadcast);
+            interface_t *item = s_interface_new (asciiFriendlyName,
+                    (struct sockaddr *)&address, (struct sockaddr *)&netmask,
+                    (struct sockaddr *)&broadcast);
             if (item)
                 zlistx_add_end (list, item);
         }
@@ -268,6 +314,26 @@ ziflist_reload (ziflist_t *self)
 #   else
 #       error "Interface detection TBD on this operating system"
 #   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reload network interfaces from system
+
+void
+ziflist_reload (ziflist_t *self)
+{
+    s_reload (self, false);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reload network interfaces from system, including IPv6
+
+void
+ziflist_reload_ipv6 (ziflist_t *self)
+{
+    s_reload (self, true);
 }
 
 
@@ -366,6 +432,16 @@ ziflist_test (bool verbose)
     printf (" * ziflist: ");
     if (verbose)
         printf ("\n");
+
+    // TODO: for any Windows dev, any alternative to this?
+#if defined (__WINDOWS__)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+        HIBYTE (wsa_data.wVersion) == 2);
+#endif
 
     //  @selftest
     ziflist_t *iflist = ziflist_new ();
