@@ -102,7 +102,7 @@ Which we install like this (using the Debian-style apt-get package manager):
     # only execute this next line if interested in updating the man pages as well (adds to build time):
     sudo apt-get install -y asciidoc
 
-Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libzmq (ZeroMQ core) library:
+Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libzmq (ZeroMQ core) library (NOTE: skip ldconfig on OSX):
 
     git clone git://github.com/zeromq/libzmq.git
     cd libzmq
