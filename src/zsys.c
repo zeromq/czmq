@@ -204,6 +204,9 @@ zsys_init (void)
 
     if (getenv ("ZSYS_IPV6_MCAST_ADDRESS"))
         zsys_set_ipv6_mcast_address (getenv ("ZSYS_IPV6_MCAST_ADDRESS"));
+    else
+        zsys_set_ipv6_mcast_address ("ff02:0:0:0:0:0:0:1");
+
 
     if (getenv ("ZSYS_LOGIDENT"))
         zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
@@ -1480,8 +1483,8 @@ zsys_ipv6_address (void)
 
 
 //  --------------------------------------------------------------------------
-//  Set IPv6 milticast address to use for sending zbeacon messages. This needs
-//  to be set if IPv6 is enabled. If the environment variable
+//  Set IPv6 multicast address to use for sending zbeacon messages. The default
+//  is fe02::1 (link-local all-node). If the environment variable
 //  ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
 //  address.
 
@@ -1496,13 +1499,13 @@ zsys_set_ipv6_mcast_address (const char *value)
 
 
 //  --------------------------------------------------------------------------
-//  Return IPv6 multicast address to use for sending zbeacon, or "" if none was
-//  set.
+//  Return IPv6 multicast address to use for sending zbeacon, or
+//  "ff02:0:0:0:0:0:0:1" if none was set.
 
 const char *
 zsys_ipv6_mcast_address (void)
 {
-    return s_ipv6_mcast_address? s_ipv6_mcast_address: "";
+    return s_ipv6_mcast_address ? s_ipv6_mcast_address : "ff02:0:0:0:0:0:0:1";
 }
 
 
