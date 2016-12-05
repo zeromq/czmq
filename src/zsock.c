@@ -1961,7 +1961,7 @@ zsock_test (bool verbose)
     byte *data;
     size_t size;
     char *pointer;
-    number8_MAX = number8 = number4 = number2 = number1 = 0;
+    number8_MAX = number8 = number4_MAX = number4 = number2 = number1 = 0ULL;
     rc = zsock_recv (reader, "i124488zsbcfUhp",
                      &integer, &number1, &number2, &number4, &number4_MAX,
                      &number8, &number8_MAX, &string, &data, &size, &chunk,
