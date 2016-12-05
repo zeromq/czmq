@@ -75,13 +75,13 @@ zuuid_new (void)
     byte buffer [ZUUID_LEN];
     uuid_enc_be (&buffer, &uuid);
     zuuid_set (self, buffer);
-#elif defined (__UTYPE_LINUX) || defined (__UTYPE_OSX) || defined (__UTYPE_GNU)
+#elif defined (__UTYPE_LINUX) || defined (__UTYPE_OSX) || defined (__UTYPE_SUNOS) || defined (__UTYPE_SUNSOLARIS) || defined (__UTYPE_GNU)
     uuid_t uuid;
     assert (sizeof (uuid) == ZUUID_LEN);
     uuid_generate (uuid);
     zuuid_set (self, (byte *) uuid);
 #else
-#   error "Unknow UNIX TYPE"
+#   error "Unknown UNIX TYPE"
 #endif
     return self;
 }
