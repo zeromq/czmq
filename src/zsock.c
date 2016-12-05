@@ -1927,7 +1927,7 @@ zsock_test (bool verbose)
     uint8_t  number1 = 123;
     uint16_t number2 = 123 * 123;
     uint32_t number4 = 123 * 123 * 123;
-    uint64_t number4_MAX = UINT32_MAX;
+    uint32_t number4_MAX = UINT32_MAX;
     uint64_t number8 = 123 * 123 * 123 * 123;
     uint64_t number8_MAX = UINT64_MAX;
 
@@ -1961,7 +1961,7 @@ zsock_test (bool verbose)
     byte *data;
     size_t size;
     char *pointer;
-    number8_MAX = number8 = number4 = number2 = number1 = 0;
+    number8_MAX = number8 = number4_MAX = number4 = number2 = number1 = 0ULL;
     rc = zsock_recv (reader, "i124488zsbcfUhp",
                      &integer, &number1, &number2, &number4, &number4_MAX,
                      &number8, &number8_MAX, &string, &data, &size, &chunk,
