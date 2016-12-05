@@ -424,7 +424,7 @@ typedef struct {
 //  Note that (at least in Solaris) while rand() returns an int limited by
 //  RAND_MAX, random() returns a 32-bit value all filled with random bits.
 #if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
- || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS))
+ || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
 #   define randof(num)  (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
 #else
 # if defined(RAND_MAX)
