@@ -1927,7 +1927,7 @@ zsock_test (bool verbose)
     uint8_t  number1 = 123;
     uint16_t number2 = 123 * 123;
     uint32_t number4 = 123 * 123 * 123;
-    uint64_t number4_MAX = UINT32_MAX;
+    uint32_t number4_MAX = UINT32_MAX;
     uint64_t number8 = 123 * 123 * 123 * 123;
     uint64_t number8_MAX = UINT64_MAX;
 
