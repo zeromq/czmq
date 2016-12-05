@@ -1926,9 +1926,12 @@ zsock_test (bool verbose)
     //  Test zsock_send/recv pictures
     uint8_t  number1 = 123;
     uint16_t number2 = 123 * 123;
-    uint32_t number4 = 123 * 123 * 123;
+    uint32_t number4 = 123 * 123;
+    number4 *= 123;
     uint32_t number4_MAX = UINT32_MAX;
-    uint64_t number8 = 123 * 123 * 123 * 123;
+    uint64_t number8 = 123 * 123;
+    number8 *= 123;
+    number8 *= 123;
     uint64_t number8_MAX = UINT64_MAX;
 
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
