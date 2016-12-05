@@ -421,11 +421,17 @@ typedef struct {
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
 
 //  Provide random number from 0..(num-1)
+//  Note that (at least in Solaris) while rand() returns an int limited by
+//  RAND_MAX, random() returns a 32-bit value all filled with random bits.
 #if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
  || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS))
 #   define randof(num)  (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
 #else
-#   define randof(num)  (int) ((float) (num) * random () / (RAND_MAX + 1.0))
+# if defined(RAND_MAX)
+#   define randof(num)  (int) ((float) (num) * (random () % RAND_MAX) / (RAND_MAX + 1.0))
+# else
+#   define randof(num)  (int) ((float) (num) * (uint32_t)random () / (UINT32_MAX + 1.0))
+# endif
 #endif
 
 // Windows MSVS doesn't have stdbool
