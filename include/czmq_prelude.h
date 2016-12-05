@@ -193,7 +193,7 @@
 #elif (defined (sinix))
 #   define __UTYPE_SINIX
 #   define __UNIX__
-#elif (defined (SOLARIS) || defined (__SRV4))
+#elif (defined (SOLARIS) || defined (__SVR4)) || defined (SVR4)
 #   define __UTYPE_SUNSOLARIS
 #   define __UNIX__
 #elif (defined (SUNOS) || defined (SUN) || defined (sun))
