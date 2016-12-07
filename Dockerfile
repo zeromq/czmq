@@ -11,8 +11,8 @@ RUN chmod 0440 /etc/sudoers.d/zmq
 USER zmq
 
 WORKDIR /home/zmq
-RUN git clone --quiet https://github.com/zeromq/libzmq.git
-WORKDIR /home/zmq/libzmq
+RUN git clone --quiet https://github.com/zeromq/libzmq.git libzmq.git
+WORKDIR /home/zmq/libzmq.git
 RUN ./autogen.sh 2> /dev/null
 RUN ./configure --quiet --without-docs
 RUN make
@@ -20,8 +20,8 @@ RUN sudo make install
 RUN sudo ldconfig
 
 WORKDIR /home/zmq
-RUN git clone --quiet git://github.com/zeromq/czmq.git
-WORKDIR /home/zmq/czmq
+RUN git clone --quiet git://github.com/zeromq/czmq.git czmq.git
+WORKDIR /home/zmq/czmq czmq.git
 RUN ./autogen.sh 2> /dev/null
 RUN ./configure --quiet --without-docs
 RUN make

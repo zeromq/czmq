@@ -81,6 +81,7 @@ src_libczmq_la_SOURCES = \
     src/zauth.c \
     src/zbeacon.c \
     src/zgossip.c \
+    src/zgossip_engine.inc \
     src/zmonitor.c \
     src/zproxy.c \
     src/zrex.c \
