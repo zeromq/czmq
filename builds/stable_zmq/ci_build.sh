@@ -14,6 +14,7 @@ CONFIG_OPTS+=("LDFLAGS=-L${BUILD_PREFIX}/lib")
 CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
 CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
 CONFIG_OPTS+=("--with-docs=no")
+CONFIG_OPTS+=("--without-documentation")
 CONFIG_OPTS+=("--quiet")
 
 git clone --quiet --depth 1 -b stable git://github.com/jedisct1/libsodium.git &&
