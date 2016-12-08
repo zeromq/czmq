@@ -14,8 +14,8 @@ libffi-dev
 # sudo apt-get install -y asciidoc
 
 cd /home/vagrant
-git clone --quiet https://github.com/zeromq/libzmq.git
-cd /home/vagrant/libzmq
+git clone --quiet https://github.com/zeromq/libzmq.git libzmq.git
+cd /home/vagrant/libzmq.git
 ./autogen.sh
 ./configure
 make

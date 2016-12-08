@@ -20,13 +20,17 @@ save.xml
 
 # Executables
 src/czmq_selftest
-src/makecert
-src/test_zgossip
 src/zmakecert
+src/czmq_selftest
 *.exe
 *.out
 *.app
 core
+
+ # Distcheck workspace and archives
+czmq-4.0.2/
+czmq-4.0.2.tar.gz
+czmq-4.0.2.zip
 
 # Man pages
 doc/*.1
@@ -56,13 +60,24 @@ src/test-suite.log
 src/.dirstamp
 
 # CMake cache
-compile_commands.json
 CMakeCache.txt
 CMakeFiles/
 CTestTestfile.cmake
 cmake_install.cmake
+compile_commands.json
+DartConfiguration.tcl
 install_manifest.txt
 Testing/
+
+# Repositories downloaded by CI integration scripts
+*.git/
+
+# Travis build area
+tmp/
+
+# Valgrind files
+callgrind*
+vgcore*
 
 # GYP files
 project.Makefile
@@ -84,12 +99,13 @@ src/app/jni/output
 # Python build directory
 build/
 
-# MSVC build directories
-obj/
-bin/
-*.tlog
+# Qt
+*pro.user
+moc_*
+build-*
+bindings/qt/selftest/selftest
 
 # Temporary files
 *.swp
+*.bak
 *~
-.test*

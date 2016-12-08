@@ -57,6 +57,8 @@ addons:
   apt:
     packages:
     - uuid-dev
+    - asciidoc
+    - xmlto
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "osx" ] ; then brew update; brew reinstall ossp-uuid binutils ; fi
