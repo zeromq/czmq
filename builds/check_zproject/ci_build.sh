@@ -35,4 +35,5 @@ export PATH=$PATH:`pwd`
         echo "zproject generated new files!"
         exit 1
     fi
+    exit 0
 }
