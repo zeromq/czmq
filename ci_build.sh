@@ -23,14 +23,20 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] ; the
     if [ "$BUILD_TYPE" == "default-Werror" ] ; then
         COMPILER_FAMILY=""
         if [ -n "$CC" -a -n "$CXX" ]; then
-            if "$CC" --version 2>&1 | grep GCC > /dev/null &&   "$CXX" --version 2>&1 | grep GCC > /dev/null   ; then
+            if "$CC" --version 2>&1 | grep GCC > /dev/null && \
+               "$CXX" --version 2>&1 | grep GCC > /dev/null \
+            ; then
                 COMPILER_FAMILY="GCC"
             fi
         else
-            if "gcc" --version 2>&1 | grep GCC > /dev/null &&   "g++" --version 2>&1 | grep GCC > /dev/null   ; then
+            if "gcc" --version 2>&1 | grep GCC > /dev/null && \
+               "g++" --version 2>&1 | grep GCC > /dev/null \
+            ; then
                 # Autoconf would pick this by default
                 COMPILER_FAMILY="GCC"
-            elif "cc" --version 2>&1 | grep GCC > /dev/null &&   "c++" --version 2>&1 | grep GCC > /dev/null   ; then
+            elif "cc" --version 2>&1 | grep GCC > /dev/null && \
+               "c++" --version 2>&1 | grep GCC > /dev/null \
+            ; then
                 COMPILER_FAMILY="GCC"
             fi
         fi
