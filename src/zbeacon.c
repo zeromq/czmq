@@ -274,7 +274,8 @@ s_self_handle_udp (self_t *self)
         assert (msg);
         zmsg_addstr (msg, peername);
         zmsg_append (msg, &frame);
-        zmsg_send (&msg, self->pipe);
+        if (zmsg_send (&msg, self->pipe) < 0)
+            zmsg_destroy (&msg);
     }
     else
         zframe_destroy (&frame);

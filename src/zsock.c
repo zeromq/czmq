@@ -1670,7 +1670,12 @@ zsock_signal (void *self, byte status)
 {
     assert (self);
     zmsg_t *msg = zmsg_new_signal (status);
-    return zmsg_send (&msg, self);
+    if (zmsg_send (&msg, self) < 0) {
+        zmsg_destroy (&msg);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 
