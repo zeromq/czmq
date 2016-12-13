@@ -233,7 +233,12 @@ zstr_sendx (void *dest, const char *string, ...)
     if (zsock_is (dest) && zsock_type (dest) == ZMQ_SERVER)
         zmsg_set_routing_id (msg, zsock_routing_id ((zsock_t *) dest));
 #endif
-    return zmsg_send (&msg, dest);
+    if (zmsg_send (&msg, dest) < 0) {
+        zmsg_destroy(&msg);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 
