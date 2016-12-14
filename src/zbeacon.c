@@ -36,12 +36,12 @@
 typedef struct {
     zsock_t *pipe;              //  Actor command pipe
     SOCKET udpsock;             //  UDP socket for send/recv
-    int port_nbr;               //  UDP port number we work on
+    char port_nbr [7];          //  UDP port number we work on
     int interval;               //  Beacon broadcast interval
     int64_t ping_at;            //  Next broadcast time
     zframe_t *transmit;         //  Beacon transmit data
     zframe_t *filter;           //  Beacon filter data
-    inaddr_t broadcast;         //  Our broadcast address
+    inaddr_storage_t broadcast; //  Our broadcast address
     bool terminated;            //  Did caller ask us to quit?
     bool verbose;               //  Verbose logging enabled?
     char hostname [NI_MAXHOST]; //  Saved host name
@@ -91,14 +91,38 @@ s_self_prepare_udp (self_t *self)
     //  broadcast interface defined on system. ZSYS_INTERFACE=* means
     //  use INADDR_ANY + INADDR_BROADCAST.
     const char *iface = zsys_interface ();
-    in_addr_t bind_to = 0;
-    in_addr_t send_to = 0;
+    struct addrinfo *bind_to = NULL;
+    struct addrinfo *send_to = NULL;
+    struct addrinfo hint;
+    memset (&hint, 0, sizeof(struct addrinfo));
+    hint.ai_flags = AI_NUMERICHOST | AI_V4MAPPED;
+    hint.ai_socktype = SOCK_DGRAM;
+    hint.ai_protocol = IPPROTO_UDP;
+    hint.ai_family = zsys_ipv6 () ? AF_INET6 : AF_INET;
+    int rc;
     int found_iface = 0;
+    unsigned int if_index = 0;
 
     if (streq (iface, "*")) {
         //  Wildcard means bind to INADDR_ANY and send to INADDR_BROADCAST
-        bind_to = INADDR_ANY;
-        send_to = INADDR_BROADCAST;
+        //  IE - getaddrinfo with NULL as first parameter or 255.255.255.255
+        //  (or IPv6 multicast link-local all-node group ff02::1
+        hint.ai_flags = hint.ai_flags | AI_PASSIVE;
+        rc = getaddrinfo (NULL, self->port_nbr, &hint, &bind_to);
+        assert (rc == 0);
+
+        if (zsys_ipv6()) {
+            //  Default is link-local all-node multicast group
+            rc = getaddrinfo (zsys_ipv6_mcast_address (), self->port_nbr, &hint,
+                    &send_to);
+            assert (rc == 0);
+        }
+        else {
+            rc = getaddrinfo ("255.255.255.255", self->port_nbr, &hint,
+                    &send_to);
+            assert (rc == 0);
+        }
+
         found_iface = 1;
     }
     // if ZSYS_INTERFACE is a single digit, use the corresponding interface in
@@ -106,17 +130,25 @@ s_self_prepare_udp (self_t *self)
     else if (strlen (iface) == 1 && iface[0] >= '0' && iface[0] <= '9')
     {
         int if_number = atoi (iface);
-        ziflist_t *iflist = ziflist_new ();
+        ziflist_t *iflist = ziflist_new_ipv6 ();
         assert (iflist);
         const char *name = ziflist_first (iflist);
         int idx = -1;
         while (name) {
             idx++;
-            if (idx == if_number) {
+            if (idx == if_number &&
+                    ((ziflist_is_ipv6 (iflist) && zsys_ipv6 ()) ||
+                            (!ziflist_is_ipv6 (iflist) && !zsys_ipv6 ()))) {
                 //  Using inet_addr instead of inet_aton or inet_atop
                 //  because these are not supported in Win XP
-                send_to = inet_addr (ziflist_broadcast (iflist));
-                bind_to = inet_addr (ziflist_address (iflist));
+                rc = getaddrinfo (ziflist_address (iflist), self->port_nbr,
+                        &hint, &bind_to);
+                assert (rc == 0);
+                rc = getaddrinfo (ziflist_broadcast (iflist), self->port_nbr,
+                        &hint, &send_to);
+                assert (rc == 0);
+                if_index = if_nametoindex (name);
+
                 if (self->verbose)
                     zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
                             name, ziflist_address (iflist), ziflist_broadcast (iflist));
@@ -127,17 +159,38 @@ s_self_prepare_udp (self_t *self)
         }
         ziflist_destroy (&iflist);
     }
+    else if (zsys_ipv6 () && strneq("", zsys_ipv6_address ()) && strneq (iface, "")) {
+        rc = getaddrinfo (zsys_ipv6_address (), self->port_nbr,
+                &hint, &bind_to);
+        assert (rc == 0);
+        rc = getaddrinfo (zsys_ipv6_mcast_address (), self->port_nbr,
+                &hint, &send_to);
+        assert (rc == 0);
+        if_index = if_nametoindex (iface);
+
+        if (self->verbose)
+            zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
+                    iface, zsys_ipv6_address (), zsys_ipv6_mcast_address ());
+        found_iface = 1;
+    }
     else {
         //  Look for matching interface, or first ziflist item
-        ziflist_t *iflist = ziflist_new ();
+        ziflist_t *iflist = ziflist_new_ipv6 ();
         assert (iflist);
         const char *name = ziflist_first (iflist);
         while (name) {
-            if (streq (iface, name) || streq (iface, "")) {
-                //  Using inet_addr instead of inet_aton or inet_atop
-                //  because these are not supported in Win XP
-                send_to = inet_addr (ziflist_broadcast (iflist));
-                bind_to = inet_addr (ziflist_address (iflist));
+            //  If IPv6 is not enabled ignore IPv6 interfaces.
+            if ((streq (iface, name) || streq (iface, "")) &&
+                    ((ziflist_is_ipv6 (iflist) && zsys_ipv6 ()) ||
+                            (!ziflist_is_ipv6 (iflist) && !zsys_ipv6 ()))) {
+                rc = getaddrinfo (ziflist_address (iflist), self->port_nbr,
+                        &hint, &bind_to);
+                assert (rc == 0);
+                rc = getaddrinfo (ziflist_broadcast (iflist), self->port_nbr,
+                        &hint, &send_to);
+                assert (rc == 0);
+                if_index = if_nametoindex (name);
+
                 if (self->verbose)
                     zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
                                name, ziflist_address (iflist), ziflist_broadcast (iflist));
@@ -149,37 +202,52 @@ s_self_prepare_udp (self_t *self)
         ziflist_destroy (&iflist);
     }
     if (found_iface) {
-        self->broadcast.sin_family = AF_INET;
-        self->broadcast.sin_port = htons (self->port_nbr);
-        self->broadcast.sin_addr.s_addr = send_to;
-        inaddr_t address = self->broadcast;
-        address.sin_addr.s_addr = bind_to;
-        //  Bind to the port on all interfaces
+        inaddr_storage_t bind_address;
+
+        //  On Windows we bind to the host address
+        //  On *NIX we bind to INADDR_ANY or in6addr_any, otherwise multicast
+        //  packets will be filtered out despite joining the group
 #if (defined (__WINDOWS__))
-        inaddr_t sockaddr = address;
-#elif (defined (__APPLE__))
-        inaddr_t sockaddr = self->broadcast;
-        sockaddr.sin_addr.s_addr = htons (INADDR_ANY);
+        memcpy (&bind_address, bind_to->ai_addr, bind_to->ai_addrlen);
 #else
-        inaddr_t sockaddr = self->broadcast;
+        memcpy (&bind_address, send_to->ai_addr, send_to->ai_addrlen);
+        if (zsys_ipv6 ())
+            bind_address.__inaddr_u.__addr6.sin6_addr = in6addr_any;
+        else
+            bind_address.__inaddr_u.__addr.sin_addr.s_addr = htonl (INADDR_ANY);
 #endif
+        memcpy (&self->broadcast, send_to->ai_addr, send_to->ai_addrlen);
+
+        if (zsys_ipv6()) {
+            struct ipv6_mreq mreq;
+            mreq.ipv6mr_interface = if_index;
+            memcpy (&mreq.ipv6mr_multiaddr,
+                    &(((in6addr_t *)(send_to->ai_addr))->sin6_addr),
+                    sizeof (struct in6_addr));
+
+            if (setsockopt (self->udpsock, IPPROTO_IPV6, IPV6_JOIN_GROUP,
+                    (char *)&mreq, sizeof (mreq)))
+                zsys_socket_error ("zbeacon: setsockopt IPV6_JOIN_GROUP failed");
+
+            if (setsockopt (self->udpsock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+                    (char *)&if_index, sizeof (if_index)))
+                zsys_socket_error ("zbeacon: setsockopt IPV6_MULTICAST_IF failed");
+        }
+
         //  If bind fails, we close the socket for opening again later (next poll interval)
-        if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (inaddr_t)))
-        {
+        if (bind (self->udpsock, (struct sockaddr *)&bind_address,
+                zsys_ipv6 () ? sizeof (in6addr_t) : sizeof (inaddr_t))) {
             zsys_debug ("zbeacon: Unable to bind to broadcast address, reason=%s", strerror (errno));
             zsys_udp_close (self->udpsock);
             self->udpsock = INVALID_SOCKET;
-            return;
         }
-
-        //  Get our hostname so we can send it back to the API
-        if (address.sin_addr.s_addr == INADDR_ANY) {
+        else if (streq (iface, "*")) {
             strcpy(self->hostname, "*");
             if (self->verbose)
                 zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
         }
-        else if (getnameinfo ((struct sockaddr *) &address, sizeof (inaddr_t),
-                              self->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {
+        else if (getnameinfo (bind_to->ai_addr, bind_to->ai_addrlen,
+                        self->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {
             if (self->verbose)
                 zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
         }
@@ -190,6 +258,9 @@ s_self_prepare_udp (self_t *self)
         zsys_udp_close(self->udpsock);
         self->udpsock = INVALID_SOCKET;
     }
+
+    freeaddrinfo (bind_to);
+    freeaddrinfo (send_to);
 }
 
 
@@ -201,7 +272,7 @@ static void
 s_self_configure (self_t *self, int port_nbr)
 {
     assert (port_nbr);
-    self->port_nbr = port_nbr;
+    snprintf (self->port_nbr, 7, "%d", port_nbr);
     s_self_prepare_udp (self);
     zstr_send (self->pipe, self->hostname);
     if (streq (self->hostname, ""))
@@ -346,7 +417,9 @@ zbeacon (zsock_t *pipe, void *args)
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
             if (!self->udpsock || self->udpsock == INVALID_SOCKET ||
-                zsys_udp_send (self->udpsock, self->transmit, &self->broadcast, sizeof(inaddr_t)))
+                    zsys_udp_send (self->udpsock, self->transmit,
+                            (inaddr_t *)&self->broadcast,
+                            zsys_ipv6 () ? sizeof (in6addr_t) : sizeof (inaddr_t)))
             {
                 const char *reason = (!self->udpsock || self->udpsock == INVALID_SOCKET) ? "invalid socket" : strerror (errno);
                 zsys_debug ("zbeacon: failed to transmit, attempting reconnection. reason=%s", reason);
