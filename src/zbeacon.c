@@ -274,8 +274,8 @@ s_self_handle_udp (self_t *self)
 {
     assert (self);
 
-    char peername [INET_ADDRSTRLEN];
-    zframe_t *frame = zsys_udp_recv (self->udpsock, peername, INET_ADDRSTRLEN);
+    char peername [NI_MAXHOST];
+    zframe_t *frame = zsys_udp_recv (self->udpsock, peername, NI_MAXHOST);
 
     //  If filter is set, check that beacon matches it
     bool is_valid = false;
