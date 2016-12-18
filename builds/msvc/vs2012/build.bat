@@ -28,7 +28,7 @@ IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2012\libzmq.import.props" (
     IF errorlevel 1 GOTO error
 ) ELSE (
     ECHO Did not find libzmq, aborting.
-    ECHO Please clone from https://github.com/zeromq/libzmq, and then build.
+    ECHO Please clone from https://github.com/zeromq/libzmq.git, and then build.
     GOTO error
 )
 IF EXIST "..\..\..\..\uuid\builds/msvc/vs2012\uuid.import.props" (

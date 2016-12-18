@@ -23,7 +23,7 @@ CONFIG_OPTS+=("--with-docs=no")
 CONFIG_OPTS+=("--quiet")
 
 # Clone and build dependencies
-git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq.git
+git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq.git
 cd libzmq.git
 git --no-pager log --oneline -n1
 if [ -e autogen.sh ]; then

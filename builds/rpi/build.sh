@@ -77,7 +77,7 @@ CONFIG_OPTS+=("RANLIB=${RANLIB}")
 if [ ! $INCREMENTAL ]; then
     # Clone and build dependencies
     if [ ! -e libzmq.git ]; then
-        git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq.git
+        git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq.git
     fi
     pushd libzmq.git
     (

@@ -2,7 +2,7 @@
 set -ex
 
 cd $REPO_DIR/..
-git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq.git
+git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq.git
 cd -
 
 cd $REPO_DIR/..

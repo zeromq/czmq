@@ -49,139 +49,139 @@ GENERATED_DOCS =
 # make a dependency that can not parallelize and break stuff
 
 GENERATED_DOCS += zactor.txt zactor.doc
-zactor.txt: $(srcdir)/../src/zactor.c
+zactor.txt: $(top_srcdir)/src/zactor.c
 	$(srcdir)/mkman zactor $(builddir)/zactor $(srcdir)/..
 
 GENERATED_DOCS += zarmour.txt zarmour.doc
-zarmour.txt: $(srcdir)/../src/zarmour.c
+zarmour.txt: $(top_srcdir)/src/zarmour.c
 	$(srcdir)/mkman zarmour $(builddir)/zarmour $(srcdir)/..
 
 GENERATED_DOCS += zcert.txt zcert.doc
-zcert.txt: $(srcdir)/../src/zcert.c
+zcert.txt: $(top_srcdir)/src/zcert.c
 	$(srcdir)/mkman zcert $(builddir)/zcert $(srcdir)/..
 
 GENERATED_DOCS += zcertstore.txt zcertstore.doc
-zcertstore.txt: $(srcdir)/../src/zcertstore.c
+zcertstore.txt: $(top_srcdir)/src/zcertstore.c
 	$(srcdir)/mkman zcertstore $(builddir)/zcertstore $(srcdir)/..
 
 GENERATED_DOCS += zchunk.txt zchunk.doc
-zchunk.txt: $(srcdir)/../src/zchunk.c
+zchunk.txt: $(top_srcdir)/src/zchunk.c
 	$(srcdir)/mkman zchunk $(builddir)/zchunk $(srcdir)/..
 
 GENERATED_DOCS += zclock.txt zclock.doc
-zclock.txt: $(srcdir)/../src/zclock.c
+zclock.txt: $(top_srcdir)/src/zclock.c
 	$(srcdir)/mkman zclock $(builddir)/zclock $(srcdir)/..
 
 GENERATED_DOCS += zconfig.txt zconfig.doc
-zconfig.txt: $(srcdir)/../src/zconfig.c
+zconfig.txt: $(top_srcdir)/src/zconfig.c
 	$(srcdir)/mkman zconfig $(builddir)/zconfig $(srcdir)/..
 
 GENERATED_DOCS += zdigest.txt zdigest.doc
-zdigest.txt: $(srcdir)/../src/zdigest.c
+zdigest.txt: $(top_srcdir)/src/zdigest.c
 	$(srcdir)/mkman zdigest $(builddir)/zdigest $(srcdir)/..
 
 GENERATED_DOCS += zdir.txt zdir.doc
-zdir.txt: $(srcdir)/../src/zdir.c
+zdir.txt: $(top_srcdir)/src/zdir.c
 	$(srcdir)/mkman zdir $(builddir)/zdir $(srcdir)/..
 
 GENERATED_DOCS += zdir_patch.txt zdir_patch.doc
-zdir_patch.txt: $(srcdir)/../src/zdir_patch.c
+zdir_patch.txt: $(top_srcdir)/src/zdir_patch.c
 	$(srcdir)/mkman zdir_patch $(builddir)/zdir_patch $(srcdir)/..
 
 GENERATED_DOCS += zfile.txt zfile.doc
-zfile.txt: $(srcdir)/../src/zfile.c
+zfile.txt: $(top_srcdir)/src/zfile.c
 	$(srcdir)/mkman zfile $(builddir)/zfile $(srcdir)/..
 
 GENERATED_DOCS += zframe.txt zframe.doc
-zframe.txt: $(srcdir)/../src/zframe.c
+zframe.txt: $(top_srcdir)/src/zframe.c
 	$(srcdir)/mkman zframe $(builddir)/zframe $(srcdir)/..
 
 GENERATED_DOCS += zhash.txt zhash.doc
-zhash.txt: $(srcdir)/../src/zhash.c
+zhash.txt: $(top_srcdir)/src/zhash.c
 	$(srcdir)/mkman zhash $(builddir)/zhash $(srcdir)/..
 
 GENERATED_DOCS += zhashx.txt zhashx.doc
-zhashx.txt: $(srcdir)/../src/zhashx.c
+zhashx.txt: $(top_srcdir)/src/zhashx.c
 	$(srcdir)/mkman zhashx $(builddir)/zhashx $(srcdir)/..
 
 GENERATED_DOCS += ziflist.txt ziflist.doc
-ziflist.txt: $(srcdir)/../src/ziflist.c
+ziflist.txt: $(top_srcdir)/src/ziflist.c
 	$(srcdir)/mkman ziflist $(builddir)/ziflist $(srcdir)/..
 
 GENERATED_DOCS += zlist.txt zlist.doc
-zlist.txt: $(srcdir)/../src/zlist.c
+zlist.txt: $(top_srcdir)/src/zlist.c
 	$(srcdir)/mkman zlist $(builddir)/zlist $(srcdir)/..
 
 GENERATED_DOCS += zlistx.txt zlistx.doc
-zlistx.txt: $(srcdir)/../src/zlistx.c
+zlistx.txt: $(top_srcdir)/src/zlistx.c
 	$(srcdir)/mkman zlistx $(builddir)/zlistx $(srcdir)/..
 
 GENERATED_DOCS += zloop.txt zloop.doc
-zloop.txt: $(srcdir)/../src/zloop.c
+zloop.txt: $(top_srcdir)/src/zloop.c
 	$(srcdir)/mkman zloop $(builddir)/zloop $(srcdir)/..
 
 GENERATED_DOCS += zmsg.txt zmsg.doc
-zmsg.txt: $(srcdir)/../src/zmsg.c
+zmsg.txt: $(top_srcdir)/src/zmsg.c
 	$(srcdir)/mkman zmsg $(builddir)/zmsg $(srcdir)/..
 
 GENERATED_DOCS += zpoller.txt zpoller.doc
-zpoller.txt: $(srcdir)/../src/zpoller.c
+zpoller.txt: $(top_srcdir)/src/zpoller.c
 	$(srcdir)/mkman zpoller $(builddir)/zpoller $(srcdir)/..
 
 GENERATED_DOCS += zproc.txt zproc.doc
-zproc.txt: $(srcdir)/../src/zproc.c
+zproc.txt: $(top_srcdir)/src/zproc.c
 	$(srcdir)/mkman zproc $(builddir)/zproc $(srcdir)/..
 
 GENERATED_DOCS += zsock.txt zsock.doc
-zsock.txt: $(srcdir)/../src/zsock.c
+zsock.txt: $(top_srcdir)/src/zsock.c
 	$(srcdir)/mkman zsock $(builddir)/zsock $(srcdir)/..
 
 GENERATED_DOCS += zstr.txt zstr.doc
-zstr.txt: $(srcdir)/../src/zstr.c
+zstr.txt: $(top_srcdir)/src/zstr.c
 	$(srcdir)/mkman zstr $(builddir)/zstr $(srcdir)/..
 
 GENERATED_DOCS += ztimerset.txt ztimerset.doc
-ztimerset.txt: $(srcdir)/../src/ztimerset.c
+ztimerset.txt: $(top_srcdir)/src/ztimerset.c
 	$(srcdir)/mkman ztimerset $(builddir)/ztimerset $(srcdir)/..
 
 GENERATED_DOCS += ztrie.txt ztrie.doc
-ztrie.txt: $(srcdir)/../src/ztrie.c
+ztrie.txt: $(top_srcdir)/src/ztrie.c
 	$(srcdir)/mkman ztrie $(builddir)/ztrie $(srcdir)/..
 
 GENERATED_DOCS += zuuid.txt zuuid.doc
-zuuid.txt: $(srcdir)/../src/zuuid.c
+zuuid.txt: $(top_srcdir)/src/zuuid.c
 	$(srcdir)/mkman zuuid $(builddir)/zuuid $(srcdir)/..
 
 GENERATED_DOCS += zauth.txt zauth.doc
-zauth.txt: $(srcdir)/../src/zauth.c
+zauth.txt: $(top_srcdir)/src/zauth.c
 	$(srcdir)/mkman zauth $(builddir)/zauth $(srcdir)/..
 
 GENERATED_DOCS += zbeacon.txt zbeacon.doc
-zbeacon.txt: $(srcdir)/../src/zbeacon.c
+zbeacon.txt: $(top_srcdir)/src/zbeacon.c
 	$(srcdir)/mkman zbeacon $(builddir)/zbeacon $(srcdir)/..
 
 GENERATED_DOCS += zgossip.txt zgossip.doc
-zgossip.txt: $(srcdir)/../src/zgossip.c
+zgossip.txt: $(top_srcdir)/src/zgossip.c
 	$(srcdir)/mkman zgossip $(builddir)/zgossip $(srcdir)/..
 
 GENERATED_DOCS += zmonitor.txt zmonitor.doc
-zmonitor.txt: $(srcdir)/../src/zmonitor.c
+zmonitor.txt: $(top_srcdir)/src/zmonitor.c
 	$(srcdir)/mkman zmonitor $(builddir)/zmonitor $(srcdir)/..
 
 GENERATED_DOCS += zproxy.txt zproxy.doc
-zproxy.txt: $(srcdir)/../src/zproxy.c
+zproxy.txt: $(top_srcdir)/src/zproxy.c
 	$(srcdir)/mkman zproxy $(builddir)/zproxy $(srcdir)/..
 
 GENERATED_DOCS += zrex.txt zrex.doc
-zrex.txt: $(srcdir)/../src/zrex.c
+zrex.txt: $(top_srcdir)/src/zrex.c
 	$(srcdir)/mkman zrex $(builddir)/zrex $(srcdir)/..
 
 GENERATED_DOCS += zsys.txt zsys.doc
-zsys.txt: $(srcdir)/../src/zsys.c
+zsys.txt: $(top_srcdir)/src/zsys.c
 	$(srcdir)/mkman zsys $(builddir)/zsys $(srcdir)/..
 
 GENERATED_DOCS += zmakecert.txt zmakecert.doc
-zmakecert.txt: $(srcdir)/../src/zmakecert.c
+zmakecert.txt: $(top_srcdir)/src/zmakecert.c
 	$(srcdir)/mkman zmakecert $(builddir)/zmakecert $(srcdir)/..
 
 
