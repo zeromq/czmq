@@ -64,7 +64,7 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] ; the
     CONFIG_OPTS+=("--quiet")
 
     # Clone and build dependencies
-    git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq.git
+    git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq.git
     cd libzmq.git
     git --no-pager log --oneline -n1
     if [ -e autogen.sh ]; then
@@ -100,6 +100,7 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] ; the
 
     # Build and check this project without DRAFT APIs
     make distclean
+
     git clean -f
     git reset --hard HEAD
     (
@@ -109,7 +110,8 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] ; the
         if [ "$BUILD_TYPE" == "default-Werror" ] ; then
             echo "NOTE: Skipping distcheck for BUILD_TYPE='$BUILD_TYPE'" >&2
         else
-            export DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=no ${CONFIG_OPTS[@]} --with-docs=yes" &&   make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck || exit $?
+            export DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=no ${CONFIG_OPTS[@]} --with-docs=yes" && \
+            make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck || exit $?
         fi
     ) || exit 1
 

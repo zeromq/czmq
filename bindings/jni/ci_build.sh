@@ -22,7 +22,7 @@ CONFIG_OPTS+=("--quiet")
 pushd ../../..
 
 # Clone and build dependencies
-git clone --quiet --depth 1 https://github.com/zeromq/libzmq libzmq
+git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
 cd libzmq
 git --no-pager log --oneline -n1
 if [ -e autogen.sh ]; then

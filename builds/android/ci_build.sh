@@ -31,7 +31,7 @@ export TOOLCHAIN_HOST="arm-linux-androideabi"
 export TOOLCHAIN_ARCH="arm"
 
 export LIBZMQ_ROOT="/tmp/libzmq"
-git clone --quiet --depth 1 https://github.com/zeromq/libzmq $LIBZMQ_ROOT
+git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
 
 source ./build.sh
 

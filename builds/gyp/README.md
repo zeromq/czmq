@@ -18,7 +18,7 @@ To install GYP on Windows, you need git and Python 2.7. Then:
 
 To build this project, first check out its dependencies, at the same level as this directory:
 
-    git clone https://github.com/zeromq/libzmq
+    git clone https://github.com/zeromq/libzmq.git
 
 On Linux, build just this project in builds/gyp and it will automatically build its dependencies:
 

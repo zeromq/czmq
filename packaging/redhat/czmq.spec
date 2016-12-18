@@ -48,11 +48,10 @@ czmq the high-level c binding for 0mq.
 
 %package -n libczmq4
 Group:          System/Libraries
-Summary:        the high-level c binding for 0mq
+Summary:        the high-level c binding for 0mq shared library
 
 %description -n libczmq4
-czmq the high-level c binding for 0mq.
-This package contains shared library.
+This package contains shared library for czmq: the high-level c binding for 0mq
 
 %post -n libczmq4 -p /sbin/ldconfig
 %postun -n libczmq4 -p /sbin/ldconfig
@@ -70,8 +69,8 @@ Requires:       uuid-devel
 Requires:       systemd-devel
 
 %description devel
-czmq the high-level c binding for 0mq.
-This package contains development files.
+the high-level c binding for 0mq development tools
+This package contains development files for czmq: the high-level c binding for 0mq
 
 %files devel
 %defattr(-,root,root)

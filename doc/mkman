@@ -61,12 +61,14 @@ sub generate_manpage {
     local ($name, $outp, $rootsrcdir) = @_;
     $name = $1 if $name =~ /(\w+)\.\w+/; # Chop off extensions
     $outp = $1 if $outp =~ /^(.+)\.[^\.\/]+$/;
-    $outp_basename = $outp;
+    $outp_basename = basename ($outp);
     $outp_basename = $2 if $outp =~ /^(.*\/)?(\w+)$/;
 
-    printf "D: generate_manpage() got name='$name' outp='$outp' outp_basename='$outp_basename' rootsrcdir='$rootsrcdir'\n";
-    #   Check if we're making the man page for a main program, or a class
+    if ($ENV{"V"} == "1") {
+        printf "D: generate_manpage() got name='$name' outp='$outp' outp_basename='$outp_basename' rootsrcdir='$rootsrcdir'\n";
+    }
 
+    #   Check if we're making the man page for a main program, or a class
     $cat = 0;           #   Unknown category
     die "Can't open '" . cwd() . "/Makefile'"
         unless open (MAKEFILE, "Makefile");

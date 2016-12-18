@@ -35,7 +35,7 @@ IF EXIST "..\..\..\libzmq" (
 ) ELSE (
     ECHO Building without libzmq
     ECHO CZMQ cannot build without libzmq
-    ECHO Please clone https://github.com/zeromq/libzmq, and then configure ^& build
+    ECHO Please clone https://github.com/zeromq/libzmq.git, and then configure ^& build
     ECHO TODO: resolve this problem automatically.
     GOTO error
 )

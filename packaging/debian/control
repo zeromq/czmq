@@ -26,7 +26,7 @@ Build-Depends-Indep: asciidoc,
 Package: libczmq4
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: czmq
+Description: the high-level c binding for 0mq shared library
  This package contains shared library for czmq: the high-level c binding for 0mq
 
 Package: libczmq-dev
@@ -37,7 +37,7 @@ Depends:
     uuid-dev,
     libsystemd-dev,
     libczmq4 (= ${binary:Version})
-Description: development files for czmq
+Description: the high-level c binding for 0mq development tools
  This package contains development files for czmq: the high-level c binding for 0mq
 
 Package: czmq
@@ -53,6 +53,6 @@ Priority: extra
 Depends:
     czmq (= ${binary:Version}),
     ${misc:Depends}
-Description: debugging symbols for czmq
+Description: the high-level c binding for 0mq debugging symbols
  This package contains the debugging symbols for czmq : the high-level c binding for 0mq.
 
