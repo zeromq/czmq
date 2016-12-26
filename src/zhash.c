@@ -906,8 +906,8 @@ zhash_test (bool verbose)
     srandom ((unsigned) time (NULL));
     for (iteration = 0; iteration < 25000; iteration++) {
         testnbr = randof (testmax);
-        assert(testnbr!=testmax);
-        assert(testnbr<testmax);
+        assert (testnbr != testmax);
+        assert (testnbr < testmax);
         if (testset [testnbr].exists) {
             item = (char *) zhash_lookup (hash, testset [testnbr].name);
             assert (item);
