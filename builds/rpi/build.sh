@@ -91,6 +91,14 @@ if [ ! $INCREMENTAL ]; then
         if [ -e buildconf ]; then
             ./buildconf 2> /dev/null
         fi
+        if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+            libtoolize --copy --force && \
+            aclocal -I . && \
+            autoheader && \
+            automake --add-missing --copy && \
+            autoconf || \
+            autoreconf -fiv
+        fi
         ./configure "${CONFIG_OPTS[@]}"
         make -j4
         make install

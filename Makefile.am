@@ -25,13 +25,18 @@ noinst_PROGRAMS =
 check_PROGRAMS =
 noinst_LTLIBRARIES =
 TESTS =
+EXTRA_DIST =
 
-EXTRA_DIST = \
-    CMakeLists.txt \
+if ENABLE_DIST_CMAKEFILES
+EXTRA_DIST += \
     Findlibzmq.cmake \
     Finduuid.cmake \
     Findsystemd.cmake \
     src/CMakeLists-local.txt \
+    CMakeLists.txt
+endif
+
+EXTRA_DIST += \
     src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
