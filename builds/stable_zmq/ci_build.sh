@@ -17,8 +17,11 @@ CONFIG_OPTS+=("--with-docs=no")
 CONFIG_OPTS+=("--without-documentation")
 CONFIG_OPTS+=("--quiet")
 
-git clone --quiet --depth 1 -b stable git://github.com/jedisct1/libsodium.git &&
-( cd libsodium; ./autogen.sh && ./configure --prefix=$BUILD_PREFIX && make -j4 install ) || exit 1
+if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsodium-dev >/dev/null 2>&1) || \
+       (command -v brew >/dev/null 2>&1 && brew ls --versions libsodium >/dev/null 2>&1)); then
+    git clone --quiet --depth 1 -b stable git://github.com/jedisct1/libsodium.git
+    ( cd libsodium; ./autogen.sh && ./configure --prefix=$BUILD_PREFIX && make -j4 install) || exit 1
+fi
 
 # Clone and build dependencies
 git clone --quiet --depth 1 https://github.com/zeromq/${ZMQ_REPO} libzmq
