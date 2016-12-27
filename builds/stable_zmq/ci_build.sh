@@ -25,7 +25,7 @@ git clone --quiet --depth 1 https://github.com/zeromq/${ZMQ_REPO} libzmq
 cd libzmq
 git --no-pager log --oneline -n1
 ./autogen.sh 2> /dev/null
-./configure "${CONFIG_OPTS[@]}"
+./configure "${CONFIG_OPTS[@]}" --with-libsodium
 make -j4
 make install
 cd ../../..
