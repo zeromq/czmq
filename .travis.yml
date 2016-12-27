@@ -55,15 +55,18 @@ matrix:
 
 addons:
   apt:
+    sources:
+    - sourceline: 'deb http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/ ./'
+      key_url: 'http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/Release.key'
     packages:
     - uuid-dev
     - asciidoc
     - xmlto
+    - libsodium-dev
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "osx" ] ; then brew update; brew reinstall ossp-uuid binutils ; fi
-# workaround for Travis OSX CI bug, hasn't been fixed in a month so time for a hack
-- if [ $TRAVIS_OS_NAME == "osx" ] ; then brew uninstall libtool && brew install libtool ; fi
+- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "stable_zmq" ] ; then brew install libsodium ; fi
 
 # ZMQ stress tests need more open socket (files) than the usual default
 # On OSX, it seems the way to set the max files limit is constantly changing, so
@@ -71,7 +74,6 @@ before_install:
 before_script:
 - if [ $TRAVIS_OS_NAME == "osx" ] ; then sudo sysctl -w kern.maxfiles=64000 ; sudo sysctl -w kern.maxfilesperproc=64000 ; sudo launchctl limit maxfiles 64000 64000 ; ulimit -n 64000 ; fi
 - if [ $BUILD_TYPE != "valgrind" ] ; then ulimit -n 64000; fi
-- ./autogen.sh
 
 # Build and check this project according to the BUILD_TYPE
 script: ./ci_build.sh
