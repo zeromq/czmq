@@ -149,30 +149,33 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ 
     fi
 
     # Clone and build dependencies
-    git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq.git
-    BASE_PWD=${PWD}
-    cd libzmq.git
-    CCACHE_BASEDIR=${PWD}
-    export CCACHE_BASEDIR
-    git --no-pager log --oneline -n1
-    if [ -e autogen.sh ]; then
-        ./autogen.sh 2> /dev/null
+    if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1) || \
+           (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1)); then
+        git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
+        BASE_PWD=${PWD}
+        cd libzmq
+        CCACHE_BASEDIR=${PWD}
+        export CCACHE_BASEDIR
+        git --no-pager log --oneline -n1
+        if [ -e autogen.sh ]; then
+            ./autogen.sh 2> /dev/null
+        fi
+        if [ -e buildconf ]; then
+            ./buildconf 2> /dev/null
+        fi
+        if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+            libtoolize --copy --force && \
+            aclocal -I . && \
+            autoheader && \
+            automake --add-missing --copy && \
+            autoconf || \
+            autoreconf -fiv
+        fi
+        ./configure "${CONFIG_OPTS[@]}"
+        make -j4
+        make install
+        cd "${BASE_PWD}"
     fi
-    if [ -e buildconf ]; then
-        ./buildconf 2> /dev/null
-    fi
-    if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-        libtoolize --copy --force && \
-        aclocal -I . && \
-        autoheader && \
-        automake --add-missing --copy && \
-        autoconf || \
-        autoreconf -fiv
-    fi
-    ./configure "${CONFIG_OPTS[@]}"
-    make -j4
-    make install
-    cd "${BASE_PWD}"
 
     # Build and check this project; note that zprojects always have an autogen.sh
     CCACHE_BASEDIR=${PWD}
