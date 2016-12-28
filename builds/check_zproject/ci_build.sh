@@ -2,17 +2,17 @@
 set -ex
 
 cd $REPO_DIR/..
-git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq.git
+git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
 cd -
 
 cd $REPO_DIR/..
-git clone --quiet --depth 1 https://github.com/zeromq/zproject zproject.git
-cd zproject.git
+git clone --quiet --depth 1 https://github.com/zeromq/zproject zproject
+cd zproject
 export PATH=$PATH:`pwd`
 
 cd $REPO_DIR/..
-git clone https://github.com/imatix/gsl.git gsl.git
-cd gsl.git/src
+git clone https://github.com/imatix/gsl.git gsl
+cd gsl/src
 make
 export PATH=$PATH:`pwd`
 
