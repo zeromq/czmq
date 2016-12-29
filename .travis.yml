@@ -37,8 +37,12 @@ matrix:
     compiler: gcc
     addons:
       apt:
+        sources:
+        - sourceline: 'deb http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/ ./'
+          key_url: 'http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/Release.key'
         packages:
         - valgrind
+        - libzmq3-dev
   - env: BUILD_TYPE=android
     os: osx
     compiler: clang
@@ -63,6 +67,7 @@ addons:
     - asciidoc
     - xmlto
     - libsodium-dev
+    - libzmq3-dev
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "osx" ] ; then brew update; brew reinstall ossp-uuid binutils ; fi
