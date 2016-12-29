@@ -42,7 +42,7 @@ Description: the high-level c binding for 0mq development tools
 
 Package: czmq
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends},
 Description: the high-level c binding for 0mq
  Main package for czmq: the high-level c binding for 0mq
 
