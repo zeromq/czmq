@@ -1,21 +1,23 @@
 //  The Grasslands Pattern
 //
 //  The Classic ZeroMQ model, plain text with no protection at all.
+//
+//  CZMQ APIv3
+//
+//  More info: http://hintjens.com/blog:49#toc2
+//
 
 #include <czmq.h>
 
 int main (void) 
 {
-    //  Create context
-    zctx_t *ctx = zctx_new ();
-    
     //  Create and bind server socket
-    void *server = zsocket_new (ctx, ZMQ_PUSH);
-    zsocket_bind (server, "tcp://*:9000");
+    zsock_t *server = zsock_new (ZMQ_PUSH);
+    zsock_bind (server, "tcp://*:9000");
 
     //  Create and connect client socket
-    void *client = zsocket_new (ctx, ZMQ_PULL);
-    zsocket_connect (client, "tcp://127.0.0.1:9000");
+    zsock_t *client = zsock_new (ZMQ_PULL);
+    zsock_connect (client, "tcp://127.0.0.1:9000");
     
     //  Send a single message from server to client
     zstr_send (server, "Hello");
@@ -24,6 +26,7 @@ int main (void)
     free (message);
     puts ("Grasslands test OK");
     
-    zctx_destroy (&ctx);
+    zsock_destroy (&client);
+    zsock_destroy (&server);
     return 0;
 }

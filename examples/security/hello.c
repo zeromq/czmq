@@ -1,10 +1,13 @@
+//
+//  CZMQ APIv3
+//
+
 #include <czmq.h>
 
 int main (void) {
-    zctx_t *ctx = zctx_new ();
-    void *publisher = zsocket_new (ctx, ZMQ_PUB);
-    zsocket_set_curve_server (publisher, true);
+    zsock_t *publisher = zsock_new (ZMQ_PUB);
+    zsock_set_curve_server (publisher, true);
     puts ("Hello, Curve!");
-    zctx_destroy (&ctx);
+    zsock_destroy(&publisher);
     return 0;
 }
