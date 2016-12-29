@@ -1,6 +1,17 @@
 CZMQ version 4.0.2 stable, released on 201x/xx/xx
 =================================================
 
+* Fixed #1559 - DRAFT zsock_new_*_checked symbols leak
+
+* Fixed #1560 - zsock options could be available at build time but
+                not at runtime. Added runtime check, an error will
+                be printed if the option is not available.
+
+* Fixed #1565 - improved compatibility with Solaris/Illumos
+
+* Fixed #1573 - memory leak when message send fails in internal usage
+
+
 CZMQ version 4.0.1 stable, released on 2016/11/10
 =================================================
 
