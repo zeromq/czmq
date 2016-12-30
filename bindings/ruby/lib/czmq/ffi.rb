@@ -1062,7 +1062,7 @@ module CZMQ
       attach_function :zsock_tcp_accept_filter, [:pointer], :pointer, **opts
       attach_function :zsock_set_tcp_accept_filter, [:pointer, :string], :void, **opts
       attach_function :zsock_rcvmore, [:pointer], :int, **opts
-      attach_function :zsock_fd, [:pointer], (::FFI::Platform.unix? ? :int : :uint64_t), **opts
+      attach_function :zsock_fd, [:pointer], (::FFI::Platform.unix? ? :int : :uint64), **opts
       attach_function :zsock_events, [:pointer], :int, **opts
       attach_function :zsock_last_endpoint, [:pointer], :pointer, **opts
       attach_function :zsock_set_router_raw, [:pointer, :int], :void, **opts
