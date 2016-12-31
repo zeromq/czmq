@@ -36,6 +36,7 @@
 typedef struct {
     zsock_t *pipe;              //  Actor command pipe
     SOCKET udpsock;             //  UDP socket for send/recv
+    SOCKET udpsock_send;        //  UDP socket for IPv6 send
     char port_nbr [7];          //  UDP port number we work on
     int interval;               //  Beacon broadcast interval
     int64_t ping_at;            //  Next broadcast time
@@ -81,11 +82,32 @@ s_self_prepare_udp (self_t *self)
     //  Create our UDP socket
     if (self->udpsock)
         zsys_udp_close (self->udpsock);
+    if (self->udpsock_send)
+        zsys_udp_close (self->udpsock_send);
 
     self->hostname [0] = 0;
+    //  For IPv6 we need two sockets. At least on Linux, IPv6 multicast packets
+    //  are NOT received despite joining the group and setting the interface
+    //  option UNLESS the socket is bound to in6_addrany, which means the kernel
+    //  will select an arbitrary IP address as the source when sending beacons
+    //  out. This breaks zbeacon as the protocol uses the source address of a
+    //  beacon to find the endpoint of a peer, which is then random and
+    //  useless (could even be associated with a different interface, eg: a
+    //  virtual bridge).
+    //  As a workaround, use a different socket to send packets. So the socket
+    //  that receives can be bound to in6_addrany, and the socket that sends
+    //  can be bound to the actual intended host address.
     self->udpsock = zsys_udp_new (false);
-    if (self->udpsock == INVALID_SOCKET)
+    if (self->udpsock == INVALID_SOCKET) {
+        self->udpsock_send = INVALID_SOCKET;
         return;
+    }
+    self->udpsock_send = zsys_udp_new (false);
+    if (self->udpsock_send == INVALID_SOCKET) {
+        zsys_udp_close (self->udpsock);
+        self->udpsock = INVALID_SOCKET;
+        return;
+    }
 
     //  Get the network interface fro ZSYS_INTERFACE or else use first
     //  broadcast interface defined on system. ZSYS_INTERFACE=* means
@@ -232,14 +254,25 @@ s_self_prepare_udp (self_t *self)
             if (setsockopt (self->udpsock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                     (char *)&if_index, sizeof (if_index)))
                 zsys_socket_error ("zbeacon: setsockopt IPV6_MULTICAST_IF failed");
+
+            if (setsockopt (self->udpsock_send, IPPROTO_IPV6, IPV6_JOIN_GROUP,
+                    (char *)&mreq, sizeof (mreq)))
+                zsys_socket_error ("zbeacon: setsockopt IPV6_JOIN_GROUP failed");
+
+            if (setsockopt (self->udpsock_send, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+                    (char *)&if_index, sizeof (if_index)))
+                zsys_socket_error ("zbeacon: setsockopt IPV6_MULTICAST_IF failed");
         }
 
         //  If bind fails, we close the socket for opening again later (next poll interval)
-        if (bind (self->udpsock, (struct sockaddr *)&bind_address,
+        if (bind (self->udpsock_send, bind_to->ai_addr, bind_to->ai_addrlen) ||
+                bind (self->udpsock, (struct sockaddr *)&bind_address,
                 zsys_ipv6 () ? sizeof (in6addr_t) : sizeof (inaddr_t))) {
             zsys_debug ("zbeacon: Unable to bind to broadcast address, reason=%s", strerror (errno));
             zsys_udp_close (self->udpsock);
             self->udpsock = INVALID_SOCKET;
+            zsys_udp_close (self->udpsock_send);
+            self->udpsock_send = INVALID_SOCKET;
         }
         else if (streq (iface, "*")) {
             strcpy(self->hostname, "*");
@@ -257,6 +290,8 @@ s_self_prepare_udp (self_t *self)
         //  No valid interface. Close the socket so that we can try again later
         zsys_udp_close(self->udpsock);
         self->udpsock = INVALID_SOCKET;
+        zsys_udp_close (self->udpsock_send);
+        self->udpsock_send = INVALID_SOCKET;
     }
 
     freeaddrinfo (bind_to);
@@ -417,7 +452,7 @@ zbeacon (zsock_t *pipe, void *args)
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
             if (!self->udpsock || self->udpsock == INVALID_SOCKET ||
-                    zsys_udp_send (self->udpsock, self->transmit,
+                    zsys_udp_send (self->udpsock_send, self->transmit,
                             (inaddr_t *)&self->broadcast,
                             zsys_ipv6 () ? sizeof (in6addr_t) : sizeof (inaddr_t)))
             {
