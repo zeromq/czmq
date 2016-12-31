@@ -1,4 +1,4 @@
-CZMQ version 4.0.2 stable, released on 201x/xx/xx
+CZMQ version 4.0.2 stable, released on 2016/12/31
 =================================================
 
 * Fixed #1559 - DRAFT zsock_new_*_checked symbols leak
