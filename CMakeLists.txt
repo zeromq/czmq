@@ -242,6 +242,9 @@ set_target_properties(czmq
 set_target_properties(czmq
     PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
 )
+set_target_properties (czmq
+    PROPERTIES SOVERSION "4.0.2"
+)
 target_link_libraries(czmq
     ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
 )
