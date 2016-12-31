@@ -21,7 +21,7 @@
 %define DRAFTS no
 %endif
 Name:           czmq
-Version:        4.0.2
+Version:        4.0.3
 Release:        1
 Summary:        the high-level c binding for 0mq
 License:        MPLv2

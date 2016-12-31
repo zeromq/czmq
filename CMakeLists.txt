@@ -243,7 +243,7 @@ set_target_properties(czmq
     PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
 )
 set_target_properties (czmq
-    PROPERTIES SOVERSION "4.0.2"
+    PROPERTIES SOVERSION "4.0.3"
 )
 target_link_libraries(czmq
     ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
@@ -260,7 +260,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project
 ########################################################################
 # pkgconfig
 ########################################################################
-set (VERSION "4.0.2")
+set (VERSION "4.0.3")
 set (prefix "${CMAKE_INSTALL_PREFIX}")
 set (exec_prefix "\${prefix}")
 set (libdir "\${prefix}/lib${LIB_SUFFIX}")

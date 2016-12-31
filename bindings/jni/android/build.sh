@@ -52,7 +52,7 @@ make $MAKE_OPTIONS
 
 echo "********  Building czmq.jar for Android"
 #   Copy class files into org/zeromq/etc.
-unzip -q ../../build/libs/czmq-jni-4.0.2.jar
+unzip -q ../../build/libs/czmq-jni-4.0.3.jar
 
 #   Copy native libraries into lib/armeabi
 mkdir -p lib/armeabi
