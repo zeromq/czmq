@@ -123,7 +123,7 @@ module CZMQ
       end
 
       # Create a new callback of the following type:
-      # compare two items, for sorting
+      # Destroy an item.
       #     typedef void (zhashx_free_fn) (
       #         void *data);               
       #
@@ -139,7 +139,7 @@ module CZMQ
       end
 
       # Create a new callback of the following type:
-      # compare two items, for sorting
+      # Hash function for keys.
       #     typedef size_t (zhashx_hash_fn) (
       #         const void *key);            
       #

@@ -110,11 +110,11 @@ typedef void * (zhashx_duplicator_fn) (
 typedef int (zhashx_comparator_fn) (
     const void *item1, const void *item2);
 
-// compare two items, for sorting
+// Destroy an item.
 typedef void (zhashx_free_fn) (
     void *data);
 
-// compare two items, for sorting
+// Hash function for keys.
 typedef size_t (zhashx_hash_fn) (
     const void *key);
 
@@ -1242,7 +1242,8 @@ int
 int
     zhash_refresh (zhash_t *self);
 
-// Set hash for automatic value destruction
+// Set hash for automatic value destruction. Note that this assumes that
+// values are NULL-terminated strings. Do not use with different types. 
 void
     zhash_autofree (zhash_t *self);
 

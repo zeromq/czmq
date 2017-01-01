@@ -2703,7 +2703,8 @@ file.
 
     def autofree(self):
         """
-        Set hash for automatic value destruction
+        Set hash for automatic value destruction. Note that this assumes that
+values are NULL-terminated strings. Do not use with different types.
         """
         return lib.zhash_autofree(self._as_parameter_)
 

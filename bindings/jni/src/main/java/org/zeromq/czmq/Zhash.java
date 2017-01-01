@@ -206,7 +206,8 @@ public class Zhash implements AutoCloseable{
         return __refresh (self);
     }
     /*
-    Set hash for automatic value destruction
+    Set hash for automatic value destruction. Note that this assumes that
+    values are NULL-terminated strings. Do not use with different types. 
     */
     native static void __autofree (long self);
     public void autofree () {
