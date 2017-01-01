@@ -3017,7 +3017,8 @@ This is the class interface:
     CZMQ_EXPORT int
         zhash_refresh (zhash_t *self);
     
-    //  Set hash for automatic value destruction
+    //  Set hash for automatic value destruction. Note that this assumes that
+    //  values are NULL-terminated strings. Do not use with different types. 
     CZMQ_EXPORT void
         zhash_autofree (zhash_t *self);
     
@@ -3150,6 +3151,8 @@ This is the class self test code:
     srandom ((unsigned) time (NULL));
     for (iteration = 0; iteration < 25000; iteration++) {
         testnbr = randof (testmax);
+        assert (testnbr != testmax);
+        assert (testnbr < testmax);
         if (testset [testnbr].exists) {
             item = (char *) zhash_lookup (hash, testset [testnbr].name);
             assert (item);
@@ -3221,11 +3224,11 @@ This is the class interface:
     typedef int (zhashx_comparator_fn) (
         const void *item1, const void *item2);
     
-    // compare two items, for sorting
+    // Destroy an item.
     typedef void (zhashx_free_fn) (
         void *data);
     
-    // compare two items, for sorting
+    // Hash function for keys.
     typedef size_t (zhashx_hash_fn) (
         const void *key);
     
@@ -7073,9 +7076,12 @@ This is the class self test code:
     //  Test zsock_send/recv pictures
     uint8_t  number1 = 123;
     uint16_t number2 = 123 * 123;
-    uint32_t number4 = 123 * 123 * 123;
-    uint64_t number4_MAX = UINT32_MAX;
-    uint64_t number8 = 123 * 123 * 123 * 123;
+    uint32_t number4 = 123 * 123;
+    number4 *= 123;
+    uint32_t number4_MAX = UINT32_MAX;
+    uint64_t number8 = 123 * 123;
+    number8 *= 123;
+    number8 *= 123;
     uint64_t number8_MAX = UINT64_MAX;
     
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
@@ -7108,7 +7114,7 @@ This is the class self test code:
     byte *data;
     size_t size;
     char *pointer;
-    number8_MAX = number8 = number4 = number2 = number1 = 0;
+    number8_MAX = number8 = number4_MAX = number4 = number2 = number1 = 0ULL;
     rc = zsock_recv (reader, "i124488zsbcfUhp",
                      &integer, &number1, &number2, &number4, &number4_MAX,
                      &number8, &number8_MAX, &string, &data, &size, &chunk,

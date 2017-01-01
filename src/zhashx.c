@@ -1002,7 +1002,7 @@ zhashx_set_duplicator (zhashx_t *self, zhashx_duplicator_fn duplicator)
 
 
 //  --------------------------------------------------------------------------
-//  Set a user-defined deallocator for keyss; by default keys are
+//  Set a user-defined deallocator for keys; by default keys are
 //  freed when the hash is destroyed by calling free().
 
 void

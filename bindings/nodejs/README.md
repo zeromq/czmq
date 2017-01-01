@@ -1328,7 +1328,8 @@ file.
 nothing my_zhash.autofree ()
 ```
 
-Set hash for automatic value destruction
+Set hash for automatic value destruction. Note that this assumes that
+values are NULL-terminated strings. Do not use with different types.
 
 ```
 nothing my_zhash.test (Boolean)

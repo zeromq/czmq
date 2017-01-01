@@ -131,7 +131,8 @@ public:
     //  file.                                                                   
     int refresh ();
 
-    //  Set hash for automatic value destruction
+    //  Set hash for automatic value destruction. Note that this assumes that
+    //  values are NULL-terminated strings. Do not use with different types. 
     void autofree ();
 
     //  Self test of this class.

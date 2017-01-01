@@ -227,7 +227,8 @@ int QZhash::refresh ()
 }
 
 ///
-//  Set hash for automatic value destruction
+//  Set hash for automatic value destruction. Note that this assumes that
+//  values are NULL-terminated strings. Do not use with different types. 
 void QZhash::autofree ()
 {
     zhash_autofree (self);

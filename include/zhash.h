@@ -164,7 +164,8 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zhash_refresh (zhash_t *self);
 
-//  Set hash for automatic value destruction
+//  Set hash for automatic value destruction. Note that this assumes that
+//  values are NULL-terminated strings. Do not use with different types. 
 CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
 

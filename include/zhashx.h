@@ -38,11 +38,11 @@ typedef void * (zhashx_duplicator_fn) (
 typedef int (zhashx_comparator_fn) (
     const void *item1, const void *item2);
 
-// compare two items, for sorting
+// Destroy an item.
 typedef void (zhashx_free_fn) (
     void *data);
 
-// compare two items, for sorting
+// Hash function for keys.
 typedef size_t (zhashx_hash_fn) (
     const void *key);
 
