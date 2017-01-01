@@ -501,8 +501,17 @@ zmsg_remove (zmsg_t *self, zframe_t *frame)
     assert (self);
     assert (zmsg_is (self));
 
-    self->content_size -= zframe_size (frame);
+    //  zlist_remove does not give feedback on whether an element was actually
+    //  removed or not. To avoid wrongly decreasing the size in case the frame
+    //  is not actually part of the zmsg, check the size before and after.
+    //  We could do a search but that's a full scan, while the size is saved
+    //  by zlist so checking it is much cheaper.
+    size_t num_frames_before = zlist_size (self->frames);
     zlist_remove (self->frames, frame);
+    size_t num_frames_after = zlist_size (self->frames);
+
+    if (num_frames_before > num_frames_after)
+        self->content_size -= zframe_size (frame);
 }
 
 
@@ -1217,6 +1226,20 @@ zmsg_test (bool verbose)
     zsock_destroy (&client);
     zsock_destroy (&server);
 #endif
+
+    //  Test message length calculation after removal
+    msg = zmsg_new ();
+    zmsg_addstr (msg, "One");
+    zmsg_addstr (msg, "Two");
+    size_t size_before = zmsg_content_size (msg);
+    frame = zframe_new ("Three", strlen ("Three"));
+    assert (frame);
+    zmsg_remove (msg, frame);
+    size_t size_after = zmsg_content_size (msg);
+    assert (size_before == size_after);
+    zframe_destroy (&frame);
+    zmsg_destroy (&msg);
+
     //  @end
     printf ("OK\n");
 }
