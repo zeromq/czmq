@@ -29,12 +29,12 @@
     </callback_type>
 
     <callback_type name = "free_fn">
-        compare two items, for sorting
+        Destroy an item.
         <argument name = "data" type = "anything" />
     </callback_type>
 
     <callback_type name = "hash_fn">
-        compare two items, for sorting
+        Hash function for keys.
         <argument name = "key" type = "anything" mutable = "0"/>
         <return type = "size"/>
     </callback_type>
