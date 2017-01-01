@@ -476,6 +476,47 @@ zgossip_test (bool verbose)
     //  got nothing
     zclock_sleep (200);
 
+    zstr_send (alpha, "STATUS");
+    char *command, *status, *key, *value;
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://alpha-1"));
+    assert (streq (value, "service1"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://alpha-2"));
+    assert (streq (value, "service2"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://beta-1"));
+    assert (streq (value, "service1"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://beta-2"));
+    assert (streq (value, "service2"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &status, NULL);
+    assert (streq (command, "STATUS"));
+    assert (atoi (status) == 4);
+    zstr_free (&command);
+    zstr_free (&status);
+
     zactor_destroy (&base);
     zactor_destroy (&alpha);
     zactor_destroy (&beta);
