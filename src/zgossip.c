@@ -76,9 +76,8 @@
     The basic logic of the gossip service is to accept PUBLISH messages
     from its owning application, and to forward these to every remote, and
     every client it talks to. When a node gets a duplicate tuple, it throws
-    it away. When a node gets a new tuple, it stores it, and fowards it as
-    just described. At any point the application can access the node's set
-    of tuples.
+    it away. When a node gets a new tuple, it stores it, and forwards it as
+    just described.
 
     At present there is no way to expire tuples from the network.
 
