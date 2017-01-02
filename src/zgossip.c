@@ -76,9 +76,8 @@
     The basic logic of the gossip service is to accept PUBLISH messages
     from its owning application, and to forward these to every remote, and
     every client it talks to. When a node gets a duplicate tuple, it throws
-    it away. When a node gets a new tuple, it stores it, and fowards it as
-    just described. At any point the application can access the node's set
-    of tuples.
+    it away. When a node gets a new tuple, it stores it, and forwards it as
+    just described.
 
     At present there is no way to expire tuples from the network.
 
@@ -475,6 +474,47 @@ zgossip_test (bool verbose)
 
     //  got nothing
     zclock_sleep (200);
+
+    zstr_send (alpha, "STATUS");
+    char *command, *status, *key, *value;
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://alpha-1"));
+    assert (streq (value, "service1"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://alpha-2"));
+    assert (streq (value, "service2"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://beta-1"));
+    assert (streq (value, "service1"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &key, &value, NULL);
+    assert (streq (command, "DELIVER"));
+    assert (streq (key, "inproc://beta-2"));
+    assert (streq (value, "service2"));
+    zstr_free (&command);
+    zstr_free (&key);
+    zstr_free (&value);
+
+    zstr_recvx (alpha, &command, &status, NULL);
+    assert (streq (command, "STATUS"));
+    assert (atoi (status) == 4);
+    zstr_free (&command);
+    zstr_free (&status);
 
     zactor_destroy (&base);
     zactor_destroy (&alpha);
