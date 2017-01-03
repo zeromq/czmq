@@ -110,6 +110,16 @@ s_self_listen (self_t *self, const char *event)
         self->events |= ZMQ_EVENT_MONITOR_STOPPED;
     else
 #endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED)
+    if (streq (event, "HANDSHAKE_FAILED"))
+        self->events |= ZMQ_EVENT_HANDSHAKE_FAILED;
+    else
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
+    if (streq (event, "HANDSHAKE_SUCCEED"))
+        self->events |= ZMQ_EVENT_HANDSHAKE_SUCCEED;
+    else
+#endif
     if (streq (event, "ALL"))
         self->events |= ZMQ_EVENT_ALL;
     else
@@ -259,6 +269,16 @@ s_self_handle_sink (self_t *self)
             name = "MONITOR_STOPPED";
             break;
 #endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED)
+        case ZMQ_EVENT_HANDSHAKE_FAILED:
+            name = "HANDSHAKE_FAILED";
+            break;
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
+        case ZMQ_EVENT_HANDSHAKE_SUCCEED:
+            name = "HANDSHAKE_SUCCEED";
+            break;
+#endif
         default:
             zsys_error ("illegal socket monitor event: %d", event);
             name = "UNKNOWN";
@@ -333,6 +353,9 @@ zmonitor_test (bool verbose)
     if (verbose)
         zstr_sendx (clientmon, "VERBOSE", NULL);
     zstr_sendx (clientmon, "LISTEN", "LISTENING", "ACCEPTED", NULL);
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
+    zstr_sendx (clientmon, "LISTEN", "HANDSHAKE_SUCCEED", NULL);
+#endif
     zstr_sendx (clientmon, "START", NULL);
     zsock_wait (clientmon);
 
@@ -360,6 +383,9 @@ zmonitor_test (bool verbose)
 
     //  Check client accepted connection
     s_assert_event (clientmon, "ACCEPTED");
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
+    s_assert_event (clientmon, "HANDSHAKE_SUCCEED");
+#endif
 
     zactor_destroy (&clientmon);
     zactor_destroy (&servermon);
