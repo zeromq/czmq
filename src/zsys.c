@@ -251,6 +251,7 @@ zsys_shutdown (void)
         zmq_close (sockref->handle);
         free (sockref);
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
+        --s_open_sockets;
     }
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
