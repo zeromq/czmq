@@ -16,12 +16,11 @@ Maintainer:     czmq Developers <zeromq-dev@lists.zeromq.org>
 Standards-Version: 3.9.7
 Build-Depends: debhelper (>= 9),
     pkg-config,
-    dh-autoreconf,
     libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
-Build-Depends-Indep: asciidoc,
-                     xmlto
+    asciidoc-base | asciidoc, xmlto,
+    dh-autoreconf
 
 Package: libczmq4
 Architecture: any

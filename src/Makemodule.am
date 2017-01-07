@@ -105,6 +105,11 @@ src_libczmq_la_SOURCES += \
 
 endif
 
+if ENABLE_DRAFTS
+src_libczmq_la_SOURCES += \
+    src/czmq_private_selftest.c
+endif
+
 src_libczmq_la_CPPFLAGS = ${AM_CPPFLAGS}
 
 src_libczmq_la_LDFLAGS = \

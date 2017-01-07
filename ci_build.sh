@@ -5,8 +5,25 @@
 #  READ THE ZPROJECT/README.MD FOR INFORMATION ABOUT MAKING PERMANENT CHANGES. #
 ################################################################################
 
-set -x
 set -e
+
+# Set this to enable verbose profiling
+[ -n "${CI_TIME-}" ] || CI_TIME=""
+case "$CI_TIME" in
+    [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
+        CI_TIME="time -p " ;;
+    [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
+        CI_TIME="" ;;
+esac
+
+# Set this to enable verbose tracing
+[ -n "${CI_TRACE-}" ] || CI_TRACE="no"
+case "$CI_TRACE" in
+    [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
+        set +x ;;
+    [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
+        set -x ;;
+esac
 
 if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ "$BUILD_TYPE" == "valgrind" ]; then
     LANG=C
@@ -95,7 +112,9 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ 
     CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
     CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
     CONFIG_OPTS+=("--with-docs=no")
-    CONFIG_OPTS+=("--quiet")
+    if [ -z "${CI_CONFIG_QUIET-}" ] || [ "${CI_CONFIG_QUIET-}" = yes ] || [ "${CI_CONFIG_QUIET-}" = true ]; then
+        CONFIG_OPTS+=("--quiet")
+    fi
 
     if [ "$HAVE_CCACHE" = yes ] && [ "${COMPILER_FAMILY}" = GCC ]; then
         PATH="/usr/lib/ccache:$PATH"
@@ -148,49 +167,75 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ 
         CONFIG_OPTS+=("CPP=${CPP}")
     fi
 
-    # Clone and build dependencies
+    # Clone and build dependencies, if not yet installed to Travis env as DEBs
+    # or MacOS packages; other OSes are not currently supported by Travis cloud
+    [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
+
+    # Start of recipe for dependency: libzmq
     if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1)); then
-        git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
+        echo ""
         BASE_PWD=${PWD}
+        echo "`date`: INFO: Building prerequisite 'libzmq' from Git repository..." >&2
+        $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
         cd libzmq
         CCACHE_BASEDIR=${PWD}
         export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
         if [ -e autogen.sh ]; then
-            ./autogen.sh 2> /dev/null
+            $CI_TIME ./autogen.sh 2> /dev/null
         fi
         if [ -e buildconf ]; then
-            ./buildconf 2> /dev/null
+            $CI_TIME ./buildconf 2> /dev/null
         fi
         if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-            libtoolize --copy --force && \
-            aclocal -I . && \
-            autoheader && \
-            automake --add-missing --copy && \
-            autoconf || \
-            autoreconf -fiv
+            $CI_TIME libtoolize --copy --force && \
+            $CI_TIME aclocal -I . && \
+            $CI_TIME autoheader && \
+            $CI_TIME automake --add-missing --copy && \
+            $CI_TIME autoconf || \
+            $CI_TIME autoreconf -fiv
         fi
-        ./configure "${CONFIG_OPTS[@]}"
-        make -j4
-        make install
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        $CI_TIME make -j4
+        $CI_TIME make install
         cd "${BASE_PWD}"
     fi
 
+    # Start of recipe for dependency: uuid
+    if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list uuid-dev >/dev/null 2>&1) || \
+           (command -v brew >/dev/null 2>&1 && brew ls --versions uuid >/dev/null 2>&1)); then
+        echo ""
+        echo "WARNING: Can not build prerequisite 'uuid'" >&2
+        echo "because neither tarball nor repository sources are known for it," >&2
+        echo "and it was not isntalled as a package; this may cause the test to fail!" >&2
+    fi
+
+    # Start of recipe for dependency: systemd
+    if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsystemd-dev >/dev/null 2>&1) || \
+           (command -v brew >/dev/null 2>&1 && brew ls --versions systemd >/dev/null 2>&1)); then
+        echo ""
+        echo "WARNING: Can not build prerequisite 'systemd'" >&2
+        echo "because neither tarball nor repository sources are known for it," >&2
+        echo "and it was not isntalled as a package; this may cause the test to fail!" >&2
+    fi
+
     # Build and check this project; note that zprojects always have an autogen.sh
+    echo ""
+    echo "`date`: INFO: Starting build of currently tested project with DRAFT APIs..."
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
     # Only use --enable-Werror on projects that are expected to have it
     # (and it is not our duty to check prerequisite projects anyway)
     CONFIG_OPTS+=("${CONFIG_OPT_WERROR}")
-    ./autogen.sh 2> /dev/null
-    ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
+    $CI_TIME ./autogen.sh 2> /dev/null
+    $CI_TIME ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
     if [ "$BUILD_TYPE" == "valgrind" ] ; then
         # Build and check this project
-        make VERBOSE=1 memcheck
+        $CI_TIME make VERBOSE=1 memcheck
         exit $?
     fi
-    make VERBOSE=1 all
+    $CI_TIME make VERBOSE=1 all
 
     echo "=== Are GitIgnores good after 'make all' with drafts? (should have no output below)"
     git status -s || true
@@ -198,7 +243,7 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ 
 
     (
         export DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=yes ${CONFIG_OPTS[@]}"
-        make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck
+        $CI_TIME make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck
 
         echo "=== Are GitIgnores good after 'make distcheck' with drafts? (should have no output below)"
         git status -s || true
@@ -206,19 +251,22 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ 
     )
 
     # Build and check this project without DRAFT APIs
+    echo ""
+    echo "`date`: INFO: Starting build of currently tested project without DRAFT APIs..."
     make distclean
 
     git clean -f
     git reset --hard HEAD
     (
-        ./autogen.sh 2> /dev/null
-        ./configure --enable-drafts=no "${CONFIG_OPTS[@]}" --with-docs=yes
-        make VERBOSE=1 all || exit $?
+        $CI_TIME ./autogen.sh 2> /dev/null
+        $CI_TIME ./configure --enable-drafts=no "${CONFIG_OPTS[@]}" --with-docs=yes
+        $CI_TIME make VERBOSE=1 all || exit $?
         (
             export DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=no ${CONFIG_OPTS[@]} --with-docs=yes" && \
-            make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck || exit $?
+            $CI_TIME make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck || exit $?
         )
     ) || exit 1
+    [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"
 
     echo "=== Are GitIgnores good after 'make distcheck' without drafts? (should have no output below)"
     git status -s || true

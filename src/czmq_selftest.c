@@ -28,6 +28,7 @@ typedef struct {
 
 static test_item_t
 all_tests [] = {
+// Tests for stable public classes:
     { "zactor", zactor_test },
     { "zarmour", zarmour_test },
     { "zcert", zcert_test },
@@ -59,9 +60,13 @@ all_tests [] = {
     { "zrex", zrex_test },
     { "zsys", zsys_test },
 #ifdef CZMQ_BUILD_DRAFT_API
+// Tests for draft public classes:
     { "zproc", zproc_test },
     { "ztimerset", ztimerset_test },
     { "ztrie", ztrie_test },
+#endif // CZMQ_BUILD_DRAFT_API
+#ifdef CZMQ_BUILD_DRAFT_API
+    { "private_classes", czmq_private_selftest },
 #endif // CZMQ_BUILD_DRAFT_API
     {0, 0}          //  Sentinel
 };
@@ -127,40 +132,40 @@ main (int argc, char **argv)
         if (streq (argv [argn], "--list")
         ||  streq (argv [argn], "-l")) {
             puts ("Available tests:");
-            puts ("    zactor");
-            puts ("    zarmour");
-            puts ("    zcert");
-            puts ("    zcertstore");
-            puts ("    zchunk");
-            puts ("    zclock");
-            puts ("    zconfig");
-            puts ("    zdigest");
-            puts ("    zdir");
-            puts ("    zdir_patch");
-            puts ("    zfile");
-            puts ("    zframe");
-            puts ("    zhash");
-            puts ("    zhashx");
-            puts ("    ziflist");
-            puts ("    zlist");
-            puts ("    zlistx");
-            puts ("    zloop");
-            puts ("    zmsg");
-            puts ("    zpoller");
-            puts ("    zproc");
-            puts ("    zsock");
-            puts ("    zstr");
-            puts ("    ztimerset");
-            puts ("    ztrie");
-            puts ("    zuuid");
-            puts ("    zauth");
-            puts ("    zbeacon");
-            puts ("    zgossip");
-            puts ("    zmonitor");
-            puts ("    zproxy");
-            puts ("    zrex");
-            puts ("    zsys");
-            puts ("    zgossip_msg");
+            puts ("    zactor\t\t- stable");
+            puts ("    zarmour\t\t- stable");
+            puts ("    zcert\t\t- stable");
+            puts ("    zcertstore\t\t- stable");
+            puts ("    zchunk\t\t- stable");
+            puts ("    zclock\t\t- stable");
+            puts ("    zconfig\t\t- stable");
+            puts ("    zdigest\t\t- stable");
+            puts ("    zdir\t\t- stable");
+            puts ("    zdir_patch\t\t- stable");
+            puts ("    zfile\t\t- stable");
+            puts ("    zframe\t\t- stable");
+            puts ("    zhash\t\t- stable");
+            puts ("    zhashx\t\t- stable");
+            puts ("    ziflist\t\t- stable");
+            puts ("    zlist\t\t- stable");
+            puts ("    zlistx\t\t- stable");
+            puts ("    zloop\t\t- stable");
+            puts ("    zmsg\t\t- stable");
+            puts ("    zpoller\t\t- stable");
+            puts ("    zproc\t\t- draft");
+            puts ("    zsock\t\t- stable");
+            puts ("    zstr\t\t- stable");
+            puts ("    ztimerset\t\t- draft");
+            puts ("    ztrie\t\t- draft");
+            puts ("    zuuid\t\t- stable");
+            puts ("    zauth\t\t- stable");
+            puts ("    zbeacon\t\t- stable");
+            puts ("    zgossip\t\t- stable");
+            puts ("    zmonitor\t\t- stable");
+            puts ("    zproxy\t\t- stable");
+            puts ("    zrex\t\t- stable");
+            puts ("    zsys\t\t- stable");
+            puts ("    private_classes\t- draft");
             return 0;
         }
         else
