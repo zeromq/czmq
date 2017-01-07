@@ -23,8 +23,8 @@ int main (void)
     
     //  Whitelist our address; any other address will be rejected
     //  Add as much address as argument as you like before the NULL-Argument
-    //  e.g. zstr_sendx (auth,"127.0.0.1","192.168.1.20",NULL);
-    zstr_sendx (auth,"PLAIN","127.0.0.1",NULL);    
+    //  e.g. zstr_sendx (auth,"ALLOW","127.0.0.1","192.168.1.20",NULL);
+    zstr_sendx (auth,"ALLOW","127.0.0.1",NULL);    
     zsock_wait (auth);
     
     //  Create and bind server socket
