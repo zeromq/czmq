@@ -265,6 +265,10 @@ CZMQ_PRIVATE void
 CZMQ_PRIVATE void
     zgossip_msg_test (bool verbose);
 
+//  Self test for private classes
+CZMQ_PRIVATE void
+    czmq_private_selftest (bool verbose);
+
 #endif // CZMQ_BUILD_DRAFT_API
 
 #endif

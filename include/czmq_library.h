@@ -169,6 +169,12 @@ typedef struct _ztrie_t ztrie_t;
 #include "ztrie.h"
 #endif // CZMQ_BUILD_DRAFT_API
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  Self test for private classes
+CZMQ_EXPORT void
+    czmq_private_selftest (bool verbose);
+#endif // CZMQ_BUILD_DRAFT_API
+
 #endif
 /*
 ################################################################################

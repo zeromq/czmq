@@ -231,6 +231,12 @@ IF (ENABLE_DRAFTS)
     )
 ENDIF (ENABLE_DRAFTS)
 
+IF (ENABLE_DRAFTS)
+    list (APPEND czmq_sources
+        src/czmq_private_selftest.c
+    )
+ENDIF (ENABLE_DRAFTS)
+
 source_group("Source Files" FILES ${czmq_sources})
 if (NOT DEFINED BUILD_SHARED_LIBS)
     SET(BUILD_SHARED_LIBS ON)
@@ -296,6 +302,9 @@ target_link_libraries(
 set_target_properties(
     zmakecert
     PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
+)
+install(TARGETS zmakecert
+    RUNTIME DESTINATION bin
 )
 add_executable(
     czmq_selftest
@@ -363,6 +372,12 @@ IF (ENABLE_DRAFTS)
     zproc
     ztimerset
     ztrie
+    )
+ENDIF (ENABLE_DRAFTS)
+
+IF (ENABLE_DRAFTS)
+    list (APPEND TEST_CLASSES
+    private_classes
     )
 ENDIF (ENABLE_DRAFTS)
 

@@ -35,88 +35,88 @@ typedef struct _zgossip_msg_t zgossip_msg_t;
 
 //  *** Draft method, for development use, may change without warning ***
 //  Create a new empty zgossip_msg
-CZMQ_EXPORT zgossip_msg_t *
+CZMQ_PRIVATE zgossip_msg_t *
     zgossip_msg_new (void);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Destroy a zgossip_msg instance
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_destroy (zgossip_msg_t **self_p);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
 //  there was an error. Blocks if there is no message waiting.   
-CZMQ_EXPORT int
+CZMQ_PRIVATE int
     zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Send the zgossip_msg to the output socket, does not destroy it
-CZMQ_EXPORT int
+CZMQ_PRIVATE int
     zgossip_msg_send (zgossip_msg_t *self, zsock_t *output);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Print contents of message to stdout
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_print (zgossip_msg_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get the message routing id, as a frame
-CZMQ_EXPORT zframe_t *
+CZMQ_PRIVATE zframe_t *
     zgossip_msg_routing_id (zgossip_msg_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Set the message routing id from a frame
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_set_routing_id (zgossip_msg_t *self, zframe_t *routing_id);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get the zgossip_msg message id
-CZMQ_EXPORT int
+CZMQ_PRIVATE int
     zgossip_msg_id (zgossip_msg_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Set the zgossip_msg message id
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_set_id (zgossip_msg_t *self, int id);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get the zgossip_msg message id as printable text
-CZMQ_EXPORT const char *
+CZMQ_PRIVATE const char *
     zgossip_msg_command (zgossip_msg_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get the key field
-CZMQ_EXPORT const char *
+CZMQ_PRIVATE const char *
     zgossip_msg_key (zgossip_msg_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Set the key field
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_set_key (zgossip_msg_t *self, const char *key);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get the value field
-CZMQ_EXPORT const char *
+CZMQ_PRIVATE const char *
     zgossip_msg_value (zgossip_msg_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Set the value field
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_set_value (zgossip_msg_t *self, const char *value);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Get the ttl field
-CZMQ_EXPORT uint32_t
+CZMQ_PRIVATE uint32_t
     zgossip_msg_ttl (zgossip_msg_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Set the ttl field
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_set_ttl (zgossip_msg_t *self, uint32_t ttl);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.
-CZMQ_EXPORT void
+CZMQ_PRIVATE void
     zgossip_msg_test (bool verbose);
 
 #endif // CZMQ_BUILD_DRAFT_API

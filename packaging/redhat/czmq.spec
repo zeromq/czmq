@@ -39,7 +39,7 @@ BuildRequires:  libtool
 BuildRequires:  pkgconfig
 BuildRequires:  xmlto
 BuildRequires:  zeromq-devel
-BuildRequires:  uuid-devel
+BuildRequires:  libuuid-devel
 BuildRequires:  systemd-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -65,7 +65,7 @@ Summary:        the high-level c binding for 0mq
 Group:          System/Libraries
 Requires:       libczmq4 = %{version}
 Requires:       zeromq-devel
-Requires:       uuid-devel
+Requires:       libuuid-devel
 Requires:       systemd-devel
 
 %description devel

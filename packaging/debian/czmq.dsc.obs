@@ -6,12 +6,11 @@ Maintainer: czmq Developers <zeromq-dev@lists.zeromq.org>
 Architecture: any
 Build-Depends: debhelper (>= 9),
     pkg-config,
-    dh-autoreconf,
     libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
-Build-Depends-Indep: asciidoc,
-                     xmlto
+    asciidoc-base | asciidoc, xmlto,
+    dh-autoreconf
 
 Files:
  7697688bf65a35bc33ae2db51ebb0e3b 818110 czmq.tar.gz

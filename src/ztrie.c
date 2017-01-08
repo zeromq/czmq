@@ -40,7 +40,7 @@
 
 
 // TODO: Move to a more appropriate location:
-char *
+static char *
 s_strndup (const char *s, size_t size) {
     char *dup;
     char *end = (char *) memchr (s, '\0', size);

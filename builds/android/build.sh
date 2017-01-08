@@ -23,6 +23,24 @@ cache="/tmp/android_build/${TOOLCHAIN_NAME}"
 rm -rf "${cache}"
 mkdir -p "${cache}"
 
+# Set this to enable verbose profiling
+[ -n "${CI_TIME-}" ] || CI_TIME=""
+case "$CI_TIME" in
+    [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
+        CI_TIME="time -p " ;;
+    [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
+        CI_TIME="" ;;
+esac
+
+# Set this to enable verbose tracing
+[ -n "${CI_TRACE-}" ] || CI_TRACE="no"
+case "$CI_TRACE" in
+    [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
+        set +x ;;
+    [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
+        set -x ;;
+esac
+
 # Check for environment variable to clear the prefix and do a clean build
 if [[ $ANDROID_BUILD_CLEAN ]]; then
     echo "Doing a clean build (removing previous build and depedencies)..."
@@ -49,7 +67,7 @@ fi
 }
 
 ##
-# Build czmq from local source
+[ -z "$CI_TIME" ] || echo "`date`: Build czmq from local source"
 
 (android_build_verify_so "libczmq.so" "libzmq.so" &> /dev/null) || {
     rm -rf "${cache}/czmq"
@@ -58,10 +76,10 @@ fi
 
     export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
 
-    (cd "${cache}/czmq" && ./autogen.sh 2> /dev/null \
-        && ./configure --quiet "${ANDROID_BUILD_OPTS[@]}" --without-docs \
-        && make -j 4 \
-        && make install) || exit 1
+    (cd "${cache}/czmq" && $CI_TIME ./autogen.sh 2> /dev/null \
+        && $CI_TIME ./configure --quiet "${ANDROID_BUILD_OPTS[@]}" --without-docs \
+        && $CI_TIME make -j 4 \
+        && $CI_TIME make install) || exit 1
 }
 
 ##

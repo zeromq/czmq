@@ -134,6 +134,7 @@
         '../../src/zsock_option.inc',
         '../../include/czmq_library.h',
         '../../src/czmq_selftest.c',
+        '../../src/czmq_private_selftest.c',
         '../../src/czmq_classes.h'
       ],
       'dependencies': [
