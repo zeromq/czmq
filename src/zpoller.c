@@ -174,7 +174,7 @@ zpoller_remove (zpoller_t *self, void *reader)
     else
         rc = zmq_poller_remove_fd (self->zmq_poller, *(SOCKET *) reader);
 #else
-    if (zlist_exists (self-reader_list, reader)) {
+    if (zlist_exists (self->reader_list, reader)) {
         zlist_remove (self->reader_list, reader);
         self->need_rebuild = true;
     }
