@@ -174,8 +174,14 @@ zpoller_remove (zpoller_t *self, void *reader)
     else
         rc = zmq_poller_remove_fd (self->zmq_poller, *(SOCKET *) reader);
 #else
-    zlist_remove (self->reader_list, reader);
-    self->need_rebuild = true;
+    if (zlist_exists (self-reader_list, reader)) {
+        zlist_remove (self->reader_list, reader);
+        self->need_rebuild = true;
+    }
+    else {
+        errno = EINVAL;
+        rc    = -1;
+    }
 #endif
     return rc;
 }
@@ -321,6 +327,11 @@ zpoller_test (bool verbose)
     //  Stop polling reader
     rc = zpoller_remove (poller, sink);
     assert (rc == 0);
+
+    // Removing a non-existent reader shall fail
+    rc = zpoller_remove (poller, sink);
+    assert (rc == -1);
+    assert (errno == EINVAL);
 
     //  Check we can poll an FD
     rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
