@@ -152,10 +152,14 @@ ztimerset_execute (ztimerset_t *self)
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
-void handler(int timer_id, void* arg)
+//  Avoid -Werror=unused-function
+#ifdef ZMQ_HAVE_TIMERS
+static void
+handler (int timer_id, void *arg)
 {
     *((bool*)arg) = true;
 }
+#endif
 
 void
 ztimerset_test (bool verbose)

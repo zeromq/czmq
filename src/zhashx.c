@@ -1089,7 +1089,7 @@ zhashx_dup_v2 (zhashx_t *self)
 //
 
 #ifdef CZMQ_BUILD_DRAFT_API
-char *
+static char *
 s_test_serialize_int (const void *item)
 {
     int *int_item = (int *) item;
@@ -1098,7 +1098,7 @@ s_test_serialize_int (const void *item)
     return str_item;
 }
 
-void *
+static void *
 s_test_deserialze_int (const char *str_item)
 {
     int *int_item = (int *) zmalloc (sizeof (int));
@@ -1106,7 +1106,7 @@ s_test_deserialze_int (const char *str_item)
     return int_item;
 }
 
-void
+static void
 s_test_destroy_int (void **item)
 {
     int *int_item = (int *) *item;
