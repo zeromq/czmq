@@ -174,10 +174,10 @@ zpoller_remove (zpoller_t *self, void *reader)
     else
         rc = zmq_poller_remove_fd (self->zmq_poller, *(SOCKET *) reader);
 #else
-    if (zlist_exists (self->reader_list, reader)) {
-        zlist_remove (self->reader_list, reader);
+    zlist_remove (self->reader_list, reader); // won't fail with non-existent reader
+    size_t num_readers_after = zlist_size (self->reader_list);
+    if (self->poll_size != num_readers_after)
         self->need_rebuild = true;
-    }
     else {
         errno = EINVAL;
         rc    = -1;
