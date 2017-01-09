@@ -48,8 +48,11 @@ s_handler_fn_shim (DWORD ctrltype)
         installed_handler_fn (ctrltype);
         return TRUE;
     }
-    else
-        return FALSE;
+    if (ctrltype == CTRL_CLOSE_EVENT && installed_handler_fn != NULL) {
+        installed_handler_fn (ctrltype);
+        return TRUE;
+    }
+    return FALSE;
 }
 #endif
 
@@ -235,7 +238,7 @@ zsys_shutdown (void)
         zclock_sleep (200);
 
     //  Close logsender socket if opened (don't do this in critical section)
-    if (s_logsender) 
+    if (s_logsender)
         zsock_destroy (&s_logsender);
 
     //  No matter, we are now going to shut down
