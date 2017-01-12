@@ -299,10 +299,10 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
-set_target_properties(
-    zmakecert
-    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
-)
+#set_target_properties(
+#    zmakecert
+#    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
+#)
 install(TARGETS zmakecert
     RUNTIME DESTINATION bin
 )
@@ -316,10 +316,10 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
-set_target_properties(
-    czmq_selftest
-    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
-)
+#set_target_properties(
+#    czmq_selftest
+#    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
+#)
 
 ########################################################################
 # tests
