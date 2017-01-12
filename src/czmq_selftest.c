@@ -202,8 +202,10 @@ main (int argc, char **argv)
     else
         test_runall (verbose);
 
-    // call on win32 only
+#if defined (__WINDOWS__)
     zsys_shutdown();
+#endif
+
     return 0;
 }
 /*
