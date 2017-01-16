@@ -547,10 +547,18 @@ zproxy_test (bool verbose)
     proxy = zactor_new (zproxy, NULL);
     assert (proxy);
 
-    sink = zsock_new_sub (">ipc://backend", "whatever");
-    assert (sink);
+#ifdef  WIN32
+	sink = zsock_new_sub(">inproc://backend", "whatever");
+#else
+	sink = zsock_new_sub (">ipc://backend", "whatever");
+#endif //  WIN32
+	assert (sink);
 
-    zstr_sendx (proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
+#ifdef WIN32
+	zstr_sendx (proxy, "BACKEND", "XPUB", "inproc://backend", NULL);
+#else
+	zstr_sendx(proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
+#endif
     zsock_wait (proxy);
 
     zsock_destroy(&sink);
