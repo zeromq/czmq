@@ -35,7 +35,8 @@ CZMQ_EXPORT void *
 //  Optionally shut down the CZMQ zsys layer; this normally happens automatically
 //  when the process exits; however this call lets you force a shutdown
 //  earlier, avoiding any potential problems with atexit() ordering, especially
-//  with Windows dlls.
+//  with Windows DLL builds, where atexit() does not work and zsys_shutdown has
+//  to be called manually.
 CZMQ_EXPORT void
     zsys_shutdown (void);
 
