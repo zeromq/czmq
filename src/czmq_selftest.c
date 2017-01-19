@@ -202,10 +202,6 @@ main (int argc, char **argv)
     else
         test_runall (verbose);
 
-#if defined (__WINDOWS__)
-    zsys_shutdown();
-#endif
-
     return 0;
 }
 /*

@@ -334,6 +334,10 @@ zuuid_test (bool verbose)
 
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

@@ -217,6 +217,10 @@ ztimerset_test (bool verbose)
     assert (timeout2 > timeout);
 
     ztimerset_destroy (&self);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
     printf ("OK\n");
 #endif

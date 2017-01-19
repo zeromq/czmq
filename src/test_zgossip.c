@@ -178,5 +178,9 @@ main (int argn, char *argv [])
 
     printf ("(100%%) OK\n");
 
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
+
     return 0;
 }

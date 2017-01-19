@@ -731,6 +731,10 @@ zproxy_test (bool verbose)
     zsys_file_delete (TESTDIR "/mycert.txt");
     zsys_dir_delete (TESTDIR);
 #endif
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
     printf ("OK\n");
 }

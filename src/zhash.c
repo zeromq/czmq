@@ -946,6 +946,10 @@ zhash_test (bool verbose)
     assert (streq ((char *) zhash_lookup (hash, "key1"), "This is a string"));
     assert (streq ((char *) zhash_lookup (hash, "key2"), "Ring a ding ding"));
     zhash_destroy (&hash);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

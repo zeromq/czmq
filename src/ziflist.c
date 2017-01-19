@@ -385,6 +385,10 @@ ziflist_test (bool verbose)
     ziflist_reload (iflist);
     assert (items == ziflist_size (iflist));
     ziflist_destroy (&iflist);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
     
     printf ("OK\n");

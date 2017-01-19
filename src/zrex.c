@@ -300,6 +300,10 @@ zrex_test (bool verbose)
     assert (streq (zrex_hit (rex, 1), "CURVE"));
     assert (streq (mechanism, "CURVE"));
     zrex_destroy (&rex);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     
     //  @end
     printf ("OK\n");

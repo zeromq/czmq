@@ -732,6 +732,10 @@ zframe_test (bool verbose)
     zsock_destroy (&radio);
 #endif
 
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
+
     //  @end
     printf ("OK\n");
 }

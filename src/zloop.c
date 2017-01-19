@@ -947,6 +947,10 @@ zloop_test (bool verbose)
 
     zsock_destroy (&input);
     zsock_destroy (&output);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
     printf ("OK\n");
 }

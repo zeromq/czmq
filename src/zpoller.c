@@ -387,6 +387,10 @@ zpoller_test (bool verbose)
     zsock_destroy (&client);
     zsock_destroy (&server);
 #endif
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

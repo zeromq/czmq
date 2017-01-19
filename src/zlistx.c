@@ -743,6 +743,10 @@ zlistx_test (bool verbose)
 
     zlistx_purge (list);
     zlistx_destroy (&list);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

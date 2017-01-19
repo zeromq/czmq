@@ -1881,5 +1881,9 @@ zsys_test (bool verbose)
     zsys_set_max_msgsz (-1);
     assert (zsys_max_msgsz () == 2000);
 
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
+
     printf ("OK\n");
 }

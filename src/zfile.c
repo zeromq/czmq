@@ -736,9 +736,14 @@ zfile_test (bool verbose)
     assert (zchunk_streq (chunk, "6789"));
     zchunk_destroy (&chunk);
     zfile_remove (file);
-    //  @end
     zfile_close (file);
     zfile_destroy (&file);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
+
+    //  @end
 
     printf ("OK\n");
 }

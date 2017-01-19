@@ -284,6 +284,10 @@ zactor_test (bool verbose)
     assert (streq (string, "This is a string"));
     free (string);
     zactor_destroy (&actor);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");
