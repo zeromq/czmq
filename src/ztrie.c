@@ -799,6 +799,10 @@ ztrie_test (bool verbose)
 
     zstr_free (&data);
     ztrie_destroy (&self);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

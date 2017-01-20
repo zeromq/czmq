@@ -678,6 +678,10 @@ zgossip_msg_test (bool verbose)
     zgossip_msg_destroy (&self);
     zsock_destroy (&input);
     zsock_destroy (&output);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

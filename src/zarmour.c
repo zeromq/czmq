@@ -931,6 +931,10 @@ zarmour_test (bool verbose)
 #endif
 
     zarmour_destroy (&self);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

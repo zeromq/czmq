@@ -1044,6 +1044,10 @@ zdir_test (bool verbose)
     zdir_t *testdir = zdir_new ("zdir-test-dir", NULL);
     zdir_remove (testdir, true);
     zdir_destroy (&testdir);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

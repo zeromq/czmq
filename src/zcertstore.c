@@ -348,6 +348,10 @@ zcertstore_test (bool verbose)
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
     printf ("OK\n");
 }

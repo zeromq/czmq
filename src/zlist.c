@@ -624,6 +624,10 @@ zlist_test (bool verbose)
 
     zlist_destroy (&list);
     assert (list == NULL);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

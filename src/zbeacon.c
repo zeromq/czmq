@@ -476,6 +476,10 @@ zbeacon_test (bool verbose)
     zactor_destroy (&node1);
     zactor_destroy (&node2);
     zactor_destroy (&node3);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
     printf ("OK\n");
 }

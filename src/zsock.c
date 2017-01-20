@@ -2184,4 +2184,8 @@ zsock_test (bool verbose)
     //  @end
     printf ("OK\n");
     zsock_option_test (verbose);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
 }

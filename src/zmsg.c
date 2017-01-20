@@ -1240,6 +1240,10 @@ zmsg_test (bool verbose)
     zframe_destroy (&frame);
     zmsg_destroy (&msg);
 
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
+
     //  @end
     printf ("OK\n");
 }

@@ -227,6 +227,10 @@ zclock_test (bool verbose)
     if (verbose)
         puts (timestr);
     free (timestr);
+
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     //  @end
 
     printf ("OK\n");

@@ -520,6 +520,10 @@ zgossip_test (bool verbose)
     zactor_destroy (&alpha);
     zactor_destroy (&beta);
 
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
+
     //  @end
     printf ("OK\n");
 }
