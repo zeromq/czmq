@@ -71,124 +71,285 @@ else
     AM_CONDITIONAL(WITH_GCOV, false)
 fi
 
+# Set pkgconfigdir
+AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
+    [Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
+    [pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
+AC_SUBST([pkgconfigdir])
+
+# Use the provided pkgconfigdir not only to write our pkg-config data,
+# but also as an additional location to look for other packages metadata.
+AS_IF([test -n "${pkgconfigdir}" -a -d "${pkgconfigdir}"],
+    [AS_IF([test -z "${PKG_CONFIG_PATH}"],
+        [PKG_CONFIG_PATH="${pkgconfigdir}"],
+        [PKG_CONFIG_PATH="${pkgconfigdir}:${PKG_CONFIG_PATH}"])
+     export PKG_CONFIG_PATH
+    ])
+
 # Will be used to add flags to pkg-config useful when apps want to statically link
 PKGCFG_LIBS_PRIVATE=""
 
+# Archive user supplied flags
 PREVIOUS_CFLAGS="${CFLAGS}"
 PREVIOUS_LIBS="${LIBS}"
 
 
 was_libzmq_check_lib_detected=no
 
-PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
+search_libzmq="yes"
+
+AC_ARG_WITH([libzmq],
     [
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libzmq_LIBS"
+        AS_HELP_STRING([--with-libzmq],
+        [yes or no. Optionally specify libzmq prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
     ],
     [
-        AC_ARG_WITH([libzmq],
-            [
-                AS_HELP_STRING([--with-libzmq],
-                [Specify libzmq prefix])
-            ],
-            [search_libzmq="yes"],
-            [])
+        search_libzmq="yes"
+    ],
+    [])
+AS_CASE([x"${with_libzmq}"],
+    [xyes], [search_libzmq="yes"],
+    [xno],  [search_libzmq="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_libzmq}" = xno],
+    [AC_MSG_WARN([Required dependency on libzmq was explicitly disabled during configuration by '--with-libzmq=no'; subsequent full build of czmq may fail])])
+
+AS_IF([test x"${search_libzmq}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    found_linkname=""
+    PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
+    [
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libzmq_LIBS"
+        was_libzmq_check_lib_detected=pkgcfg
+        found_pkgconfig="libzmq"
+    ],
+    [
+        AC_MSG_NOTICE([Package libzmq not found; falling back to defined compilability tests])
 
         libzmq_synthetic_cflags=""
         libzmq_synthetic_libs="-lzmq"
 
-        if test "x$search_libzmq" = "xyes"; then
+        if test -n "${with_libzmq}" && test x"${with_libzmq}" != xyes && test x"${with_libzmq}" != xno; then
             if test -r "${with_libzmq}/include/zmq.h"; then
                 libzmq_synthetic_cflags="-I${with_libzmq}/include"
                 libzmq_synthetic_libs="-L${with_libzmq}/lib -lzmq"
             else
-                AC_MSG_ERROR([${with_libzmq}/include/zmq.h not found. Please check libzmq prefix])
+            AC_MSG_ERROR([Header file ${with_libzmq}/include/zmq.h was not found. Please check libzmq prefix])
             fi
+        else
+            AC_CHECK_HEADER([zmq.h], [],
+            AC_MSG_ERROR([Header file zmq.h was not found in default search paths])
+                )
         fi
-
 
         AC_CHECK_LIB([zmq], [zmq_init],
             [
+                was_libzmq_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lzmq"
+                found_linkname="zmq"
+            ],
+            [AC_MSG_ERROR([cannot link with -lzmq, install libzmq])])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for libzmq
+    AS_CASE(["x${was_libzmq_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_libzmq],[${found_pkgconfig}])
+                CFLAGS="${libzmq_CFLAGS} ${CFLAGS}"
+                LIBS="${libzmq_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_libzmq],[${found_linkname}])
                 CFLAGS="${libzmq_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${libzmq_synthetic_libs} ${LDFLAGS}"
                 LIBS="${libzmq_synthetic_libs} ${LIBS}"
 
                 AC_SUBST([libzmq_CFLAGS],[${libzmq_synthetic_cflags}])
                 AC_SUBST([libzmq_LIBS],[${libzmq_synthetic_libs}])
-                was_libzmq_check_lib_detected=yes
-                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lzmq"
             ],
-            [AC_MSG_ERROR([cannot link with -lzmq, install libzmq])])
+        [xno], [
+                AC_SUBST([pkgconfig_name_libzmq],[libzmq])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for libzmq 0.0.0 or higher])
     ])
+])
+dnl END of enabled attempts to search for libzmq
 
-if test "x$was_libzmq_check_lib_detected" = "xno"; then
-    CFLAGS="${libzmq_CFLAGS} ${CFLAGS}"
-    LIBS="${libzmq_LIBS} ${LIBS}"
-fi
 
 was_uuid_check_lib_detected=no
 
-PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
+search_uuid="no"
+
+AC_ARG_WITH([uuid],
     [
-        AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $uuid_LIBS"
+        AS_HELP_STRING([--with-uuid],
+        [yes or no. Optionally specify uuid prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
     ],
     [
-        AC_ARG_WITH([uuid],
-            [
-                AS_HELP_STRING([--with-uuid],
-                [Specify uuid prefix])
-            ],
-            [search_uuid="yes"],
-            [])
+        search_uuid="yes"
+    ],
+    [])
+AS_CASE([x"${with_uuid}"],
+    [xyes], [search_uuid="yes"],
+    [xno],  [search_uuid="no"])
+
+
+AS_IF([test x"${search_uuid}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    found_linkname=""
+    PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
+    [
+        AC_DEFINE(HAVE_UUID, 1, [The optional uuid library is to be used])
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $uuid_LIBS"
+        was_uuid_check_lib_detected=pkgcfg
+        found_pkgconfig="uuid"
+    ],
+    [
+        AC_MSG_NOTICE([Package uuid not found; falling back to defined compilability tests])
 
         uuid_synthetic_cflags=""
         uuid_synthetic_libs="-luuid"
 
-        if test "x$search_uuid" = "xyes"; then
+        if test -n "${with_uuid}" && test x"${with_uuid}" != xyes && test x"${with_uuid}" != xno; then
             if test -r "${with_uuid}/include/uuid/uuid.h"; then
                 uuid_synthetic_cflags="-I${with_uuid}/include"
                 uuid_synthetic_libs="-L${with_uuid}/lib -luuid"
             else
-                AC_MSG_ERROR([${with_uuid}/include/uuid/uuid.h not found. Please check uuid prefix])
+            AC_MSG_WARN([Header file ${with_uuid}/include/uuid/uuid.h was not found. Please check uuid prefix])
             fi
+        else
+            AC_CHECK_HEADER([uuid/uuid.h], [],
+            AC_MSG_WARN([Header file uuid/uuid.h was not found in default search paths])
+                )
         fi
-
 
         AC_CHECK_LIB([uuid], [uuid_generate],
             [
+                was_uuid_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -luuid"
+                found_linkname="uuid"
+                AC_DEFINE(HAVE_UUID, 1, [The optional uuid library is to be used (as -luuid)])
+            ],
+            [])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for uuid
+    AS_CASE(["x${was_uuid_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_uuid],[${found_pkgconfig}])
+                CFLAGS="${uuid_CFLAGS} ${CFLAGS}"
+                LIBS="${uuid_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_uuid],[${found_linkname}])
                 CFLAGS="${uuid_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${uuid_synthetic_libs} ${LDFLAGS}"
                 LIBS="${uuid_synthetic_libs} ${LIBS}"
 
                 AC_SUBST([uuid_CFLAGS],[${uuid_synthetic_cflags}])
                 AC_SUBST([uuid_LIBS],[${uuid_synthetic_libs}])
-                was_uuid_check_lib_detected=yes
-                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -luuid"
-                AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used])
+            ],
+        [xno], [
+                AC_SUBST([pkgconfig_name_uuid],[uuid])
+            AC_MSG_WARN([Cannot find pkg-config metadata for uuid 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for uuid
+
+
+was_systemd_check_lib_detected=no
+
+search_libsystemd="no"
+
+AC_ARG_WITH([libsystemd],
+    [
+        AS_HELP_STRING([--with-libsystemd],
+        [yes or no. Optionally specify libsystemd prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_libsystemd="yes"
+    ],
+    [])
+AS_CASE([x"${with_libsystemd}"],
+    [xyes], [search_libsystemd="yes"],
+    [xno],  [search_libsystemd="no"])
+
+
+AS_IF([test x"${search_libsystemd}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    found_linkname=""
+    PKG_CHECK_MODULES([systemd], [libsystemd >= 200.0.0],
+    [
+        AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The optional libsystemd library is to be used])
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $systemd_LIBS"
+        was_systemd_check_lib_detected=pkgcfg
+        found_pkgconfig="libsystemd"
+    ],
+    [
+        AC_MSG_NOTICE([Package libsystemd not found with needed constraints; falling back to defined compilability tests])
+
+        systemd_synthetic_cflags=""
+        systemd_synthetic_libs="-lsystemd"
+
+        if test -n "${with_libsystemd}" && test x"${with_libsystemd}" != xyes && test x"${with_libsystemd}" != xno; then
+            if test -r "${with_libsystemd}/include/systemd/sd-daemon.h"; then
+                systemd_synthetic_cflags="-I${with_libsystemd}/include"
+                systemd_synthetic_libs="-L${with_libsystemd}/lib -lsystemd"
+            else
+            AC_MSG_WARN([Header file ${with_libsystemd}/include/systemd/sd-daemon.h was not found. Please check libsystemd prefix])
+            fi
+        else
+            AC_CHECK_HEADER([systemd/sd-daemon.h], [],
+            AC_MSG_WARN([Header file systemd/sd-daemon.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([libsystemd], [sd_listen_fds],
+            [
+                was_systemd_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lsystemd"
+                found_linkname="systemd"
+                AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The optional libsystemd library is to be used (as -lsystemd)])
             ],
             [])
     ])
 
-if test "x$was_uuid_check_lib_detected" = "xno"; then
-    CFLAGS="${uuid_CFLAGS} ${CFLAGS}"
-    LIBS="${uuid_LIBS} ${LIBS}"
-fi
+dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
+    AS_CASE(["x${was_systemd_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_libsystemd],[${found_pkgconfig}])
+                CFLAGS="${systemd_CFLAGS} ${CFLAGS}"
+                LIBS="${systemd_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_libsystemd],[${found_linkname}])
+                CFLAGS="${systemd_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${systemd_synthetic_libs} ${LDFLAGS}"
+                LIBS="${systemd_synthetic_libs} ${LIBS}"
 
-was_systemd_check_lib_detected=no
-
-PKG_CHECK_MODULES([systemd], [libsystemd >= 200.0.0],
-    [
-        AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The libsystemd library is to be used])
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $systemd_LIBS"
-    ],
-    [
-        AC_MSG_WARN([Cannot find libsystemd 200.0.0 or higher])
+                AC_SUBST([systemd_CFLAGS],[${systemd_synthetic_cflags}])
+                AC_SUBST([systemd_LIBS],[${systemd_synthetic_libs}])
+            ],
+        [xno], [
+                AC_SUBST([pkgconfig_name_libsystemd],[libsystemd])
+            AC_MSG_WARN([Cannot find pkg-config metadata for libsystemd 200.0.0 or higher])
     ])
+])
+dnl END of enabled attempts to search for libsystemd
 
-if test "x$was_systemd_check_lib_detected" = "xno"; then
-    CFLAGS="${systemd_CFLAGS} ${CFLAGS}"
-    LIBS="${systemd_LIBS} ${LIBS}"
-fi
 
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
@@ -406,12 +567,6 @@ AM_COND_IF([ENABLE_CZMQ_SELFTEST], [AC_MSG_NOTICE([ENABLE_CZMQ_SELFTEST defined]
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs)
 
-# Set pkgconfigdir
-AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
-    [Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
-    [pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
-AC_SUBST([pkgconfigdir])
-
 
 # enable specific system integration features
 if test "x$cross_compiling" = "xyes"; then
@@ -420,7 +575,13 @@ if test "x$cross_compiling" = "xyes"; then
 else
     # enable draft API by default if we're in a git repository
     # else disable it by default; then allow --enable-drafts=yes/no override
-    AC_CHECK_FILE($srcdir/.git, [defaultval=yes], [defaultval=no])
+    AC_CHECK_FILE($srcdir/.git, [defaultval=yes],
+        [AC_MSG_CHECKING([running under a git repository workspace])
+         AS_IF([git rev-parse --show-toplevel 2>/dev/null],
+            [defaultval=yes],
+            [defaultval=no])
+         AC_MSG_RESULT($defaultval)
+        ])
 fi
 
 AC_ARG_ENABLE([drafts],
@@ -472,7 +633,6 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  src/libczmq.pc
                  ])
-
 
 AC_OUTPUT
 

@@ -1,0 +1,51 @@
+Name(7)
+=======
+
+
+NAME
+----
+czmq - Overview of The high-level C binding for 0MQ
+
+
+SYNOPSIS
+--------
+
+Project czmq aims to ... (short marketing pitch)
+
+It delivers several programs with their respective man pages:
+ zmakecert.1
+and public classes in a shared library:
+ zactor.3 zarmour.3 zcert.3 zcertstore.3 zchunk.3 zclock.3 zconfig.3 zdigest.3 zdir.3 zdir_patch.3 zfile.3 zframe.3 zhash.3 zhashx.3 ziflist.3 zlist.3 zlistx.3 zloop.3 zmsg.3 zpoller.3 zproc.3 zsock.3 zstr.3 ztimerset.3 ztrie.3 zuuid.3 zauth.3 zbeacon.3 zgossip.3 zmonitor.3 zproxy.3 zrex.3 zsys.3
+
+Generally you can compile and link against it like this:
+----
+#include <czmq.h>
+
+cc ['flags'] 'files' -lczmq ['libraries']
+----
+
+
+DESCRIPTION
+-----------
+
+This is a skeleton document created by zproject, which will not be
+regenerated automatically (by Makefiles nor project.xml re-parsing).
+You should add hand-written text here to detail whatever applies to
+Linux standard manpage Section 7 (note that other OSes may follow
+a different standard with similar concepts, and extend the recipes
+to package this document into a different section number):
+
+----
+7 Overview, conventions, and miscellaneous :
+    Overviews or descriptions of various topics, conventions
+    and protocols, character set standards, the standard
+    filesystem layout, and miscellaneous other things.
+----
+
+Classes
+~~~~~~~
+
+Something for developers to consider. Note there are separate man
+pages generated for public classes during build with contents taken
+from source code comments.
+

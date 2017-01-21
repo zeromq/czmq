@@ -25,7 +25,11 @@ noinst_PROGRAMS =
 check_PROGRAMS =
 noinst_LTLIBRARIES =
 TESTS =
+# Prepare variables that can be populated (appended) in generated Makefiles or
+# manually maintained src/Makemodules-local.am
 EXTRA_DIST =
+CLEANFILES =
+DISTCLEANFILES =
 
 if ENABLE_DIST_CMAKEFILES
 EXTRA_DIST += \
