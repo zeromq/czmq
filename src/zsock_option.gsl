@@ -128,18 +128,7 @@ to $(major_removed).0.0 \
 */
 
 .for version
-.   if defined (.major_removed)
-#if (ZMQ_VERSION_MAJOR >= $(major)) && (ZMQ_VERSION_MAJOR < $(major_removed))
-.   else
-#if (ZMQ_VERSION_MAJOR >= $(major))
-.   endif
-.   if defined (.minor)
-#   if (ZMQ_VERSION_MINOR >= $(minor))
-.   endif
 .       for option
-.           if defined (option.major_removed)
-#   if (ZMQ_VERSION_MAJOR < $(option.major_removed))
-.           endif
 .       if mode = "rw" | mode = "w"
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_$(NAME) value
@@ -171,6 +160,9 @@ zsock_set_$(name) (void *self, $(ctype_const:) $(name))
         assert (false);
     }
 .           endif
+.           if defined (major_changed)
+#        if ZMQ_VERSION_MAJOR < $(major_changed)
+.           endif
 .           if type = "uint64"
     uint64_t value = $(name);
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &value, sizeof (uint64_t));
@@ -184,6 +176,24 @@ zsock_set_$(name) (void *self, $(ctype_const:) $(name))
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), sizeof (int));
 .           elsif type = "string" | type = "key"
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), strlen ($(name)));
+.           endif
+.           if defined (major_changed)
+#        else
+.           if type_new = "uint64"
+    uint64_t value = $(name);
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &value, sizeof (uint64_t));
+.           elsif type_new = "int64"
+    int64_t value = $(name);
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &value, sizeof (int64_t));
+.           elsif type_new = "uint32"
+    uint32_t value = $(name);
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &value, sizeof (uint32_t));
+.           elsif type_new = "int"
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), sizeof (int));
+.           elsif type_new = "string" | type = "key"
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), strlen ($(name)));
+.           endif
+#        endif
 .           endif
     assert (rc == 0 || zmq_errno () == ETERM);
 .       if style = "macro"
@@ -228,6 +238,9 @@ zsock_$(name) (void *self)
 #   if defined (ZMQ_$(NAME))
 .           endif
 .       runtime_check (version, option, 0)
+.           if defined (major_changed)
+#        if ZMQ_VERSION_MAJOR < $(major_changed)
+.           endif
 .           if type = "uint64"
     uint64_t $(name);
     size_t option_len = sizeof (uint64_t);
@@ -262,6 +275,44 @@ zsock_$(name) (void *self)
 .           else
     return ($(ctype:)) $(name);
 .           endif
+.           if defined (major_changed)
+#        else
+.           if type_new = "uint64"
+    uint64_t $(name);
+    size_t option_len = sizeof (uint64_t);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), &option_len);
+.           elsif type_new = "int64"
+    int64_t $(name);
+    size_t option_len = sizeof (int64_t);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), &option_len);
+.           elsif type_new = "uint32"
+    uint32_t $(name);
+    size_t option_len = sizeof (uint32_t);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), &option_len);
+.           elsif type_new = "int"
+    int $(name);
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), &option_len);
+.           elsif type_new = "string"
+    size_t option_len = 255;
+    char *$(name) = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), &option_len);
+.           elsif type_new = "key"
+    size_t option_len = 40 + 1;     //  Z85 key + terminator
+    char *$(name) = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), &option_len);
+.           elsif type_new = "socket"
+    SOCKET $(name);
+    size_t option_len = sizeof (SOCKET);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), &option_len);
+.           endif
+.           if type_new = "int" | type_new = "socket"
+    return $(name);
+.           else
+    return ($(ctype_new:)) $(name);
+.           endif
+#        endif
+.           endif
 .           if style = "macro"
 #   else
 .               if type = "string" | type = "key"
@@ -274,18 +325,11 @@ zsock_$(name) (void *self)
 }
 
 .       endif
-.           if defined (option.major_removed)
-#   endif
-.           endif
 .       endfor
-.   if defined (.minor)
-#   endif
-.   endif
 .   for source
 $(string.trim(.):)
 
 .   endfor
-#endif
 
 .endfor
 //  --------------------------------------------------------------------------
