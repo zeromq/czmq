@@ -26,7 +26,21 @@ if (NOT CMAKE_BUILD_TYPE)
     if (EXISTS "${SOURCE_DIR}/.git")
         set (CMAKE_BUILD_TYPE Debug)
     else ()
-        set (CMAKE_BUILD_TYPE Release)
+# http://xit0.org/2013/04/cmake-use-git-branch-and-commit-details-in-project/
+# http://stackoverflow.com/questions/6797395/cmake-execute-process-always-fails-with-no-such-file-or-directory-when-i-cal
+        execute_process(
+            COMMAND git rev-parse --show-toplevel
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            RESULT_VARIABLE git_result
+            OUTPUT_VARIABLE git_root
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        message(STATUS "git workspace root [${git_result}]: ${git_root}")
+        if ( "${git_result}" == "0" )
+            set (CMAKE_BUILD_TYPE Debug)
+        else ()
+            set (CMAKE_BUILD_TYPE Release)
+        endif ()
     endif ()
 endif ()
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -245,9 +259,6 @@ add_library(czmq ${czmq_sources})
 set_target_properties(czmq
     PROPERTIES DEFINE_SYMBOL "CZMQ_EXPORTS"
 )
-set_target_properties(czmq
-    PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
-)
 set_target_properties (czmq
     PROPERTIES SOVERSION "4.0.3"
 )
@@ -299,10 +310,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
-#set_target_properties(
-#    zmakecert
-#    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
-#)
 install(TARGETS zmakecert
     RUNTIME DESTINATION bin
 )
@@ -316,10 +323,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
-#set_target_properties(
-#    czmq_selftest
-#    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
-#)
 
 ########################################################################
 # tests
