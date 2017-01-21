@@ -964,24 +964,30 @@ zdir_test (bool verbose)
     zactor_t *watch = zactor_new (zdir_watch, NULL);
     assert (watch);
 
+    int synced;
     if (verbose) {
         zsock_send (watch, "s", "VERBOSE");
-        assert (zsock_wait (watch) == 0);
+        synced = zsock_wait(watch);
+        assert ( synced == 0);
     }
 
     zclock_sleep (1001); // wait for initial file to become 'stable'
 
     zsock_send (watch, "si", "TIMEOUT", 100);
-    assert (zsock_wait (watch) == 0);
+    synced = zsock_wait(watch);
+    assert (synced == 0);
 
     zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
-    assert (zsock_wait (watch) == 0);
+    synced = zsock_wait(watch);
+    assert(synced == 0);
 
     zsock_send (watch, "ss", "UNSUBSCRIBE", "zdir-test-dir");
-    assert (zsock_wait (watch) == 0);
+    synced = zsock_wait(watch);
+    assert(synced == 0);
 
     zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
-    assert (zsock_wait (watch) == 0);
+    synced = zsock_wait(watch);
+    assert(synced == 0);
 
     zfile_t *newfile = zfile_new ("zdir-test-dir", "test_abc");
     zfile_output (newfile);
@@ -991,7 +997,8 @@ zdir_test (bool verbose)
     zpoller_t *watch_poll = zpoller_new (watch, NULL);
 
     // poll for a certain timeout before giving up and failing the test.
-    assert (zpoller_wait (watch_poll, 1001) == watch);
+    void* polled = zpoller_wait(watch_poll, 1001);
+    assert (polled == watch);
 
     // wait for notification of the file being added
     char *path;
@@ -1017,7 +1024,8 @@ zdir_test (bool verbose)
     zfile_destroy (&newfile);
 
     // poll for a certain timeout before giving up and failing the test.
-    assert (zpoller_wait (watch_poll, 1001) == watch);
+    polled = zpoller_wait(watch_poll, 1001);
+    assert (polled == watch);
 
     // wait for notification of the file being removed
     rc = zsock_recv (watch, "sp", &path, &patches);
