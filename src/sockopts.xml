@@ -130,34 +130,10 @@
     
     <version major = "3" style = "macro">
         <!-- Options that are carried forward to 4.0 -->
-        <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
         <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
         <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "subscribe"         type = "string" mode = "w"  test = "SUB">
-            <restrict type = "SUB" />
-        </option>
-        <option name = "unsubscribe"       type = "string" mode = "w"  test = "SUB">
-            <restrict type = "SUB" />
-        </option>
-        <option name = "identity"          type = "string" mode = "rw" test = "DEALER">
-            <restrict type = "REQ" />
-            <restrict type = "REP" />
-            <restrict type = "DEALER" />
-            <restrict type = "ROUTER" />
-        </option>
-        <option name = "rate"              type = "int"    mode = "rw" test = "SUB" />
-        <option name = "recovery_ivl"      type = "int"    mode = "rw" test = "SUB" />
-        <option name = "sndbuf"            type = "int"    mode = "rw" test = "PUB" />
-        <option name = "rcvbuf"            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
-        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
-        <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
         <option name = "maxmsgsize"        type = "int64"  mode = "rw" test = "SUB" />
         <option name = "multicast_hops"    type = "int"    mode = "rw" test = "SUB" />
-        <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "xpub_verbose"      type = "int"    mode = "w"  test = "XPUB">
             <restrict type = "XPUB" />
         </option>
@@ -169,9 +145,6 @@
                                            type = "int"    mode = "rw" test = "SUB" />
         <option name = "tcp_accept_filter" type = "string" mode = "rw" test = "SUB"
                 test_value = "127.0.0.1" />
-        <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
-        <option name = "fd"                type = "socket" mode = "r"  test = "SUB" />
-        <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
         <option name = "last_endpoint"     type = "string" mode = "r"  test = "SUB" />
 
         <!-- Options that are deprecated in 4.0 -->
@@ -184,19 +157,24 @@
     </version>
 
     <!-- Legacy version 2 -->
-    <version major = "2" major_removed = "3" style = "macro">
-        <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" />
+    <version major = "2" style = "macro">
+        <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" major_removed = "3" />
+        <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" major_removed = "3" />
         <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "identity"          type = "string" mode = "rw" test = "SUB" />
-        <option name = "rate"              type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "recovery_ivl"      type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "mcast_loop"        type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "identity"          type = "string" mode = "rw" test = "DEALER">
+            <restrict type = "REQ" />
+            <restrict type = "REP" />
+            <restrict type = "DEALER" />
+            <restrict type = "ROUTER" />
+        </option>
+        <option name = "rate"              type = "int64"  mode = "rw" test = "SUB" major_changed = "3" type_new = "int" />
+        <option name = "recovery_ivl"      type = "int64"  mode = "rw" test = "SUB" major_changed = "3" type_new = "int" />
+        <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" test = "SUB" major_removed = "3" />
+        <option name = "mcast_loop"        type = "int64"  mode = "rw" test = "SUB" major_removed = "3" />
         <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
         <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
-        <option name = "sndbuf"            type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "rcvbuf"            type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "sndbuf"            type = "uint64" mode = "rw" test = "SUB" major_changed = "3" type_new = "int" />
+        <option name = "rcvbuf"            type = "uint64" mode = "rw" test = "SUB" major_changed = "3" type_new = "int" />
         <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
         <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
         <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
@@ -208,8 +186,8 @@
             <restrict type = "SUB" />
         </option>
         <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
-        <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" />
+        <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" major_changed = "3" type_new = "int" />
         <option name = "fd"                type = "socket" mode = "r"  test = "SUB" />
-        <option name = "events"            type = "uint32" mode = "r"  test = "SUB" />
+        <option name = "events"            type = "uint32" mode = "r"  test = "SUB" major_changed = "3" type_new = "int" />
     </version>
 </options>
