@@ -472,12 +472,6 @@
 
 <!-- The following socket options are available in libzmq from version 3.0.0 -->
 
-<method name = "type" polymorphic = "1">
-    Get socket option `type`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
 <method name = "sndhwm" polymorphic = "1">
     Get socket option `sndhwm`.
     Available from libzmq 3.0.0.
@@ -502,138 +496,6 @@
     <argument name = "rcvhwm" type = "integer" />
 </method>
 
-<method name = "affinity" polymorphic = "1">
-    Get socket option `affinity`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set affinity" polymorphic = "1">
-    Set socket option `affinity`.
-    Available from libzmq 3.0.0.
-    <argument name = "affinity" type = "integer" />
-</method>
-
-<method name = "set subscribe" polymorphic = "1">
-    Set socket option `subscribe`.
-    Available from libzmq 3.0.0.
-    <argument name = "subscribe" type = "string" />
-</method>
-
-<method name = "set unsubscribe" polymorphic = "1">
-    Set socket option `unsubscribe`.
-    Available from libzmq 3.0.0.
-    <argument name = "unsubscribe" type = "string" />
-</method>
-
-<method name = "identity" polymorphic = "1">
-    Get socket option `identity`.
-    Available from libzmq 3.0.0.
-    <return type = "string" fresh = "1" />
-</method>
-
-<method name = "set identity" polymorphic = "1">
-    Set socket option `identity`.
-    Available from libzmq 3.0.0.
-    <argument name = "identity" type = "string" />
-</method>
-
-<method name = "rate" polymorphic = "1">
-    Get socket option `rate`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set rate" polymorphic = "1">
-    Set socket option `rate`.
-    Available from libzmq 3.0.0.
-    <argument name = "rate" type = "integer" />
-</method>
-
-<method name = "recovery ivl" polymorphic = "1">
-    Get socket option `recovery_ivl`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set recovery ivl" polymorphic = "1">
-    Set socket option `recovery_ivl`.
-    Available from libzmq 3.0.0.
-    <argument name = "recovery ivl" type = "integer" />
-</method>
-
-<method name = "sndbuf" polymorphic = "1">
-    Get socket option `sndbuf`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set sndbuf" polymorphic = "1">
-    Set socket option `sndbuf`.
-    Available from libzmq 3.0.0.
-    <argument name = "sndbuf" type = "integer" />
-</method>
-
-<method name = "rcvbuf" polymorphic = "1">
-    Get socket option `rcvbuf`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set rcvbuf" polymorphic = "1">
-    Set socket option `rcvbuf`.
-    Available from libzmq 3.0.0.
-    <argument name = "rcvbuf" type = "integer" />
-</method>
-
-<method name = "linger" polymorphic = "1">
-    Get socket option `linger`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set linger" polymorphic = "1">
-    Set socket option `linger`.
-    Available from libzmq 3.0.0.
-    <argument name = "linger" type = "integer" />
-</method>
-
-<method name = "reconnect ivl" polymorphic = "1">
-    Get socket option `reconnect_ivl`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set reconnect ivl" polymorphic = "1">
-    Set socket option `reconnect_ivl`.
-    Available from libzmq 3.0.0.
-    <argument name = "reconnect ivl" type = "integer" />
-</method>
-
-<method name = "reconnect ivl max" polymorphic = "1">
-    Get socket option `reconnect_ivl_max`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set reconnect ivl max" polymorphic = "1">
-    Set socket option `reconnect_ivl_max`.
-    Available from libzmq 3.0.0.
-    <argument name = "reconnect ivl max" type = "integer" />
-</method>
-
-<method name = "backlog" polymorphic = "1">
-    Get socket option `backlog`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set backlog" polymorphic = "1">
-    Set socket option `backlog`.
-    Available from libzmq 3.0.0.
-    <argument name = "backlog" type = "integer" />
-</method>
-
 <method name = "maxmsgsize" polymorphic = "1">
     Get socket option `maxmsgsize`.
     Available from libzmq 3.0.0.
@@ -656,30 +518,6 @@
     Set socket option `multicast_hops`.
     Available from libzmq 3.0.0.
     <argument name = "multicast hops" type = "integer" />
-</method>
-
-<method name = "rcvtimeo" polymorphic = "1">
-    Get socket option `rcvtimeo`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set rcvtimeo" polymorphic = "1">
-    Set socket option `rcvtimeo`.
-    Available from libzmq 3.0.0.
-    <argument name = "rcvtimeo" type = "integer" />
-</method>
-
-<method name = "sndtimeo" polymorphic = "1">
-    Get socket option `sndtimeo`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "set sndtimeo" polymorphic = "1">
-    Set socket option `sndtimeo`.
-    Available from libzmq 3.0.0.
-    <argument name = "sndtimeo" type = "integer" />
 </method>
 
 <method name = "set xpub verbose" polymorphic = "1">
@@ -748,24 +586,6 @@
     <argument name = "tcp accept filter" type = "string" />
 </method>
 
-<method name = "rcvmore" polymorphic = "1">
-    Get socket option `rcvmore`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
-<method name = "fd" polymorphic = "1">
-    Get socket option `fd`.
-    Available from libzmq 3.0.0.
-    <return type = "socket" fresh = "1" />
-</method>
-
-<method name = "events" polymorphic = "1">
-    Get socket option `events`.
-    Available from libzmq 3.0.0.
-    <return type = "integer" fresh = "1" />
-</method>
-
 <method name = "last endpoint" polymorphic = "1">
     Get socket option `last_endpoint`.
     Available from libzmq 3.0.0.
@@ -794,4 +614,234 @@
     Set socket option `delay_attach_on_connect`.
     Available from libzmq 3.0.0.
     <argument name = "delay attach on connect" type = "integer" />
+</method>
+
+<!-- The following socket options are available in libzmq from version 2.0.0 -->
+
+<method name = "hwm" polymorphic = "1">
+    Get socket option `hwm`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set hwm" polymorphic = "1">
+    Set socket option `hwm`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <argument name = "hwm" type = "integer" />
+</method>
+
+<method name = "swap" polymorphic = "1">
+    Get socket option `swap`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set swap" polymorphic = "1">
+    Set socket option `swap`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <argument name = "swap" type = "integer" />
+</method>
+
+<method name = "affinity" polymorphic = "1">
+    Get socket option `affinity`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set affinity" polymorphic = "1">
+    Set socket option `affinity`.
+    Available from libzmq 2.0.0.
+    <argument name = "affinity" type = "integer" />
+</method>
+
+<method name = "identity" polymorphic = "1">
+    Get socket option `identity`.
+    Available from libzmq 2.0.0.
+    <return type = "string" fresh = "1" />
+</method>
+
+<method name = "set identity" polymorphic = "1">
+    Set socket option `identity`.
+    Available from libzmq 2.0.0.
+    <argument name = "identity" type = "string" />
+</method>
+
+<method name = "rate" polymorphic = "1">
+    Get socket option `rate`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set rate" polymorphic = "1">
+    Set socket option `rate`.
+    Available from libzmq 2.0.0.
+    <argument name = "rate" type = "integer" />
+</method>
+
+<method name = "recovery ivl" polymorphic = "1">
+    Get socket option `recovery_ivl`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set recovery ivl" polymorphic = "1">
+    Set socket option `recovery_ivl`.
+    Available from libzmq 2.0.0.
+    <argument name = "recovery ivl" type = "integer" />
+</method>
+
+<method name = "recovery ivl msec" polymorphic = "1">
+    Get socket option `recovery_ivl_msec`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set recovery ivl msec" polymorphic = "1">
+    Set socket option `recovery_ivl_msec`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <argument name = "recovery ivl msec" type = "integer" />
+</method>
+
+<method name = "mcast loop" polymorphic = "1">
+    Get socket option `mcast_loop`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set mcast loop" polymorphic = "1">
+    Set socket option `mcast_loop`.
+    Available from libzmq 2.0.0 to 3.0.0.
+    <argument name = "mcast loop" type = "integer" />
+</method>
+
+<method name = "rcvtimeo" polymorphic = "1">
+    Get socket option `rcvtimeo`.
+    Available from libzmq 2.2.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set rcvtimeo" polymorphic = "1">
+    Set socket option `rcvtimeo`.
+    Available from libzmq 2.2.0.
+    <argument name = "rcvtimeo" type = "integer" />
+</method>
+
+<method name = "sndtimeo" polymorphic = "1">
+    Get socket option `sndtimeo`.
+    Available from libzmq 2.2.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set sndtimeo" polymorphic = "1">
+    Set socket option `sndtimeo`.
+    Available from libzmq 2.2.0.
+    <argument name = "sndtimeo" type = "integer" />
+</method>
+
+<method name = "sndbuf" polymorphic = "1">
+    Get socket option `sndbuf`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set sndbuf" polymorphic = "1">
+    Set socket option `sndbuf`.
+    Available from libzmq 2.0.0.
+    <argument name = "sndbuf" type = "integer" />
+</method>
+
+<method name = "rcvbuf" polymorphic = "1">
+    Get socket option `rcvbuf`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set rcvbuf" polymorphic = "1">
+    Set socket option `rcvbuf`.
+    Available from libzmq 2.0.0.
+    <argument name = "rcvbuf" type = "integer" />
+</method>
+
+<method name = "linger" polymorphic = "1">
+    Get socket option `linger`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set linger" polymorphic = "1">
+    Set socket option `linger`.
+    Available from libzmq 2.0.0.
+    <argument name = "linger" type = "integer" />
+</method>
+
+<method name = "reconnect ivl" polymorphic = "1">
+    Get socket option `reconnect_ivl`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set reconnect ivl" polymorphic = "1">
+    Set socket option `reconnect_ivl`.
+    Available from libzmq 2.0.0.
+    <argument name = "reconnect ivl" type = "integer" />
+</method>
+
+<method name = "reconnect ivl max" polymorphic = "1">
+    Get socket option `reconnect_ivl_max`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set reconnect ivl max" polymorphic = "1">
+    Set socket option `reconnect_ivl_max`.
+    Available from libzmq 2.0.0.
+    <argument name = "reconnect ivl max" type = "integer" />
+</method>
+
+<method name = "backlog" polymorphic = "1">
+    Get socket option `backlog`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set backlog" polymorphic = "1">
+    Set socket option `backlog`.
+    Available from libzmq 2.0.0.
+    <argument name = "backlog" type = "integer" />
+</method>
+
+<method name = "set subscribe" polymorphic = "1">
+    Set socket option `subscribe`.
+    Available from libzmq 2.0.0.
+    <argument name = "subscribe" type = "string" />
+</method>
+
+<method name = "set unsubscribe" polymorphic = "1">
+    Set socket option `unsubscribe`.
+    Available from libzmq 2.0.0.
+    <argument name = "unsubscribe" type = "string" />
+</method>
+
+<method name = "type" polymorphic = "1">
+    Get socket option `type`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "rcvmore" polymorphic = "1">
+    Get socket option `rcvmore`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "fd" polymorphic = "1">
+    Get socket option `fd`.
+    Available from libzmq 2.0.0.
+    <return type = "socket" fresh = "1" />
+</method>
+
+<method name = "events" polymorphic = "1">
+    Get socket option `events`.
+    Available from libzmq 2.0.0.
+    <return type = "integer" fresh = "1" />
 </method>
