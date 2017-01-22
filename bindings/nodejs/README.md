@@ -2945,13 +2945,6 @@ Set socket option `immediate`.
 Available from libzmq 4.0.0.
 
 ```
-integer my_zsock.type ()
-```
-
-Get socket option `type`.
-Available from libzmq 3.0.0.
-
-```
 integer my_zsock.sndhwm ()
 ```
 
@@ -2980,160 +2973,6 @@ Set socket option `rcvhwm`.
 Available from libzmq 3.0.0.
 
 ```
-integer my_zsock.affinity ()
-```
-
-Get socket option `affinity`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setAffinity (Number)
-```
-
-Set socket option `affinity`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setSubscribe (String)
-```
-
-Set socket option `subscribe`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setUnsubscribe (String)
-```
-
-Set socket option `unsubscribe`.
-Available from libzmq 3.0.0.
-
-```
-string my_zsock.identity ()
-```
-
-Get socket option `identity`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setIdentity (String)
-```
-
-Set socket option `identity`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.rate ()
-```
-
-Get socket option `rate`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setRate (Number)
-```
-
-Set socket option `rate`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.recoveryIvl ()
-```
-
-Get socket option `recovery_ivl`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setRecoveryIvl (Number)
-```
-
-Set socket option `recovery_ivl`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.sndbuf ()
-```
-
-Get socket option `sndbuf`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setSndbuf (Number)
-```
-
-Set socket option `sndbuf`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.rcvbuf ()
-```
-
-Get socket option `rcvbuf`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setRcvbuf (Number)
-```
-
-Set socket option `rcvbuf`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.linger ()
-```
-
-Get socket option `linger`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setLinger (Number)
-```
-
-Set socket option `linger`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.reconnectIvl ()
-```
-
-Get socket option `reconnect_ivl`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setReconnectIvl (Number)
-```
-
-Set socket option `reconnect_ivl`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.reconnectIvlMax ()
-```
-
-Get socket option `reconnect_ivl_max`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setReconnectIvlMax (Number)
-```
-
-Set socket option `reconnect_ivl_max`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.backlog ()
-```
-
-Get socket option `backlog`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setBacklog (Number)
-```
-
-Set socket option `backlog`.
-Available from libzmq 3.0.0.
-
-```
 integer my_zsock.maxmsgsize ()
 ```
 
@@ -3159,34 +2998,6 @@ nothing my_zsock.setMulticastHops (Number)
 ```
 
 Set socket option `multicast_hops`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.rcvtimeo ()
-```
-
-Get socket option `rcvtimeo`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setRcvtimeo (Number)
-```
-
-Set socket option `rcvtimeo`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.sndtimeo ()
-```
-
-Get socket option `sndtimeo`.
-Available from libzmq 3.0.0.
-
-```
-nothing my_zsock.setSndtimeo (Number)
-```
-
-Set socket option `sndtimeo`.
 Available from libzmq 3.0.0.
 
 ```
@@ -3267,20 +3078,6 @@ Set socket option `tcp_accept_filter`.
 Available from libzmq 3.0.0.
 
 ```
-integer my_zsock.rcvmore ()
-```
-
-Get socket option `rcvmore`.
-Available from libzmq 3.0.0.
-
-```
-integer my_zsock.events ()
-```
-
-Get socket option `events`.
-Available from libzmq 3.0.0.
-
-```
 string my_zsock.lastEndpoint ()
 ```
 
@@ -3314,6 +3111,265 @@ nothing my_zsock.setDelayAttachOnConnect (Number)
 
 Set socket option `delay_attach_on_connect`.
 Available from libzmq 3.0.0.
+
+```
+integer my_zsock.hwm ()
+```
+
+Get socket option `hwm`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+nothing my_zsock.setHwm (Number)
+```
+
+Set socket option `hwm`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+integer my_zsock.swap ()
+```
+
+Get socket option `swap`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+nothing my_zsock.setSwap (Number)
+```
+
+Set socket option `swap`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+integer my_zsock.affinity ()
+```
+
+Get socket option `affinity`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setAffinity (Number)
+```
+
+Set socket option `affinity`.
+Available from libzmq 2.0.0.
+
+```
+string my_zsock.identity ()
+```
+
+Get socket option `identity`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setIdentity (String)
+```
+
+Set socket option `identity`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.rate ()
+```
+
+Get socket option `rate`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setRate (Number)
+```
+
+Set socket option `rate`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.recoveryIvl ()
+```
+
+Get socket option `recovery_ivl`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setRecoveryIvl (Number)
+```
+
+Set socket option `recovery_ivl`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.recoveryIvlMsec ()
+```
+
+Get socket option `recovery_ivl_msec`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+nothing my_zsock.setRecoveryIvlMsec (Number)
+```
+
+Set socket option `recovery_ivl_msec`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+integer my_zsock.mcastLoop ()
+```
+
+Get socket option `mcast_loop`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+nothing my_zsock.setMcastLoop (Number)
+```
+
+Set socket option `mcast_loop`.
+Available from libzmq 2.0.0 to 3.0.0.
+
+```
+integer my_zsock.rcvtimeo ()
+```
+
+Get socket option `rcvtimeo`.
+Available from libzmq 2.2.0.
+
+```
+nothing my_zsock.setRcvtimeo (Number)
+```
+
+Set socket option `rcvtimeo`.
+Available from libzmq 2.2.0.
+
+```
+integer my_zsock.sndtimeo ()
+```
+
+Get socket option `sndtimeo`.
+Available from libzmq 2.2.0.
+
+```
+nothing my_zsock.setSndtimeo (Number)
+```
+
+Set socket option `sndtimeo`.
+Available from libzmq 2.2.0.
+
+```
+integer my_zsock.sndbuf ()
+```
+
+Get socket option `sndbuf`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setSndbuf (Number)
+```
+
+Set socket option `sndbuf`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.rcvbuf ()
+```
+
+Get socket option `rcvbuf`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setRcvbuf (Number)
+```
+
+Set socket option `rcvbuf`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.linger ()
+```
+
+Get socket option `linger`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setLinger (Number)
+```
+
+Set socket option `linger`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.reconnectIvl ()
+```
+
+Get socket option `reconnect_ivl`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setReconnectIvl (Number)
+```
+
+Set socket option `reconnect_ivl`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.reconnectIvlMax ()
+```
+
+Get socket option `reconnect_ivl_max`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setReconnectIvlMax (Number)
+```
+
+Set socket option `reconnect_ivl_max`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.backlog ()
+```
+
+Get socket option `backlog`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setBacklog (Number)
+```
+
+Set socket option `backlog`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setSubscribe (String)
+```
+
+Set socket option `subscribe`.
+Available from libzmq 2.0.0.
+
+```
+nothing my_zsock.setUnsubscribe (String)
+```
+
+Set socket option `unsubscribe`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.type ()
+```
+
+Get socket option `type`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.rcvmore ()
+```
+
+Get socket option `rcvmore`.
+Available from libzmq 2.0.0.
+
+```
+integer my_zsock.events ()
+```
+
+Get socket option `events`.
+Available from libzmq 2.0.0.
 
 ```
 nothing my_zsock.test (Boolean)

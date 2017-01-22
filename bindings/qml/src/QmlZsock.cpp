@@ -822,13 +822,6 @@ void QmlZsock::setImmediate (int immediate) {
 };
 
 ///
-//  Get socket option `type`.   
-//  Available from libzmq 3.0.0.
-int QmlZsock::type () {
-    return zsock_type (self);
-};
-
-///
 //  Get socket option `sndhwm`. 
 //  Available from libzmq 3.0.0.
 int QmlZsock::sndhwm () {
@@ -857,163 +850,6 @@ void QmlZsock::setRcvhwm (int rcvhwm) {
 };
 
 ///
-//  Get socket option `affinity`.
-//  Available from libzmq 3.0.0. 
-int QmlZsock::affinity () {
-    return zsock_affinity (self);
-};
-
-///
-//  Set socket option `affinity`.
-//  Available from libzmq 3.0.0. 
-void QmlZsock::setAffinity (int affinity) {
-    zsock_set_affinity (self, affinity);
-};
-
-///
-//  Set socket option `subscribe`.
-//  Available from libzmq 3.0.0.  
-void QmlZsock::setSubscribe (const QString &subscribe) {
-    zsock_set_subscribe (self, subscribe.toUtf8().data());
-};
-
-///
-//  Set socket option `unsubscribe`.
-//  Available from libzmq 3.0.0.    
-void QmlZsock::setUnsubscribe (const QString &unsubscribe) {
-    zsock_set_unsubscribe (self, unsubscribe.toUtf8().data());
-};
-
-///
-//  Get socket option `identity`.
-//  Available from libzmq 3.0.0. 
-QString QmlZsock::identity () {
-    char *retStr_ = zsock_identity (self);
-    QString retQStr_ = QString (retStr_);
-    free (retStr_);
-    return retQStr_;
-};
-
-///
-//  Set socket option `identity`.
-//  Available from libzmq 3.0.0. 
-void QmlZsock::setIdentity (const QString &identity) {
-    zsock_set_identity (self, identity.toUtf8().data());
-};
-
-///
-//  Get socket option `rate`.   
-//  Available from libzmq 3.0.0.
-int QmlZsock::rate () {
-    return zsock_rate (self);
-};
-
-///
-//  Set socket option `rate`.   
-//  Available from libzmq 3.0.0.
-void QmlZsock::setRate (int rate) {
-    zsock_set_rate (self, rate);
-};
-
-///
-//  Get socket option `recovery_ivl`.
-//  Available from libzmq 3.0.0.     
-int QmlZsock::recoveryIvl () {
-    return zsock_recovery_ivl (self);
-};
-
-///
-//  Set socket option `recovery_ivl`.
-//  Available from libzmq 3.0.0.     
-void QmlZsock::setRecoveryIvl (int recoveryIvl) {
-    zsock_set_recovery_ivl (self, recoveryIvl);
-};
-
-///
-//  Get socket option `sndbuf`. 
-//  Available from libzmq 3.0.0.
-int QmlZsock::sndbuf () {
-    return zsock_sndbuf (self);
-};
-
-///
-//  Set socket option `sndbuf`. 
-//  Available from libzmq 3.0.0.
-void QmlZsock::setSndbuf (int sndbuf) {
-    zsock_set_sndbuf (self, sndbuf);
-};
-
-///
-//  Get socket option `rcvbuf`. 
-//  Available from libzmq 3.0.0.
-int QmlZsock::rcvbuf () {
-    return zsock_rcvbuf (self);
-};
-
-///
-//  Set socket option `rcvbuf`. 
-//  Available from libzmq 3.0.0.
-void QmlZsock::setRcvbuf (int rcvbuf) {
-    zsock_set_rcvbuf (self, rcvbuf);
-};
-
-///
-//  Get socket option `linger`. 
-//  Available from libzmq 3.0.0.
-int QmlZsock::linger () {
-    return zsock_linger (self);
-};
-
-///
-//  Set socket option `linger`. 
-//  Available from libzmq 3.0.0.
-void QmlZsock::setLinger (int linger) {
-    zsock_set_linger (self, linger);
-};
-
-///
-//  Get socket option `reconnect_ivl`.
-//  Available from libzmq 3.0.0.      
-int QmlZsock::reconnectIvl () {
-    return zsock_reconnect_ivl (self);
-};
-
-///
-//  Set socket option `reconnect_ivl`.
-//  Available from libzmq 3.0.0.      
-void QmlZsock::setReconnectIvl (int reconnectIvl) {
-    zsock_set_reconnect_ivl (self, reconnectIvl);
-};
-
-///
-//  Get socket option `reconnect_ivl_max`.
-//  Available from libzmq 3.0.0.          
-int QmlZsock::reconnectIvlMax () {
-    return zsock_reconnect_ivl_max (self);
-};
-
-///
-//  Set socket option `reconnect_ivl_max`.
-//  Available from libzmq 3.0.0.          
-void QmlZsock::setReconnectIvlMax (int reconnectIvlMax) {
-    zsock_set_reconnect_ivl_max (self, reconnectIvlMax);
-};
-
-///
-//  Get socket option `backlog`.
-//  Available from libzmq 3.0.0.
-int QmlZsock::backlog () {
-    return zsock_backlog (self);
-};
-
-///
-//  Set socket option `backlog`.
-//  Available from libzmq 3.0.0.
-void QmlZsock::setBacklog (int backlog) {
-    zsock_set_backlog (self, backlog);
-};
-
-///
 //  Get socket option `maxmsgsize`.
 //  Available from libzmq 3.0.0.   
 int QmlZsock::maxmsgsize () {
@@ -1039,34 +875,6 @@ int QmlZsock::multicastHops () {
 //  Available from libzmq 3.0.0.       
 void QmlZsock::setMulticastHops (int multicastHops) {
     zsock_set_multicast_hops (self, multicastHops);
-};
-
-///
-//  Get socket option `rcvtimeo`.
-//  Available from libzmq 3.0.0. 
-int QmlZsock::rcvtimeo () {
-    return zsock_rcvtimeo (self);
-};
-
-///
-//  Set socket option `rcvtimeo`.
-//  Available from libzmq 3.0.0. 
-void QmlZsock::setRcvtimeo (int rcvtimeo) {
-    zsock_set_rcvtimeo (self, rcvtimeo);
-};
-
-///
-//  Get socket option `sndtimeo`.
-//  Available from libzmq 3.0.0. 
-int QmlZsock::sndtimeo () {
-    return zsock_sndtimeo (self);
-};
-
-///
-//  Set socket option `sndtimeo`.
-//  Available from libzmq 3.0.0. 
-void QmlZsock::setSndtimeo (int sndtimeo) {
-    zsock_set_sndtimeo (self, sndtimeo);
 };
 
 ///
@@ -1150,27 +958,6 @@ void QmlZsock::setTcpAcceptFilter (const QString &tcpAcceptFilter) {
 };
 
 ///
-//  Get socket option `rcvmore`.
-//  Available from libzmq 3.0.0.
-int QmlZsock::rcvmore () {
-    return zsock_rcvmore (self);
-};
-
-///
-//  Get socket option `fd`.     
-//  Available from libzmq 3.0.0.
-SOCKET QmlZsock::fd () {
-    return zsock_fd (self);
-};
-
-///
-//  Get socket option `events`. 
-//  Available from libzmq 3.0.0.
-int QmlZsock::events () {
-    return zsock_events (self);
-};
-
-///
 //  Get socket option `last_endpoint`.
 //  Available from libzmq 3.0.0.      
 QString QmlZsock::lastEndpoint () {
@@ -1206,6 +993,275 @@ void QmlZsock::setIpv4only (int ipv4only) {
 //  Available from libzmq 3.0.0.                
 void QmlZsock::setDelayAttachOnConnect (int delayAttachOnConnect) {
     zsock_set_delay_attach_on_connect (self, delayAttachOnConnect);
+};
+
+///
+//  Get socket option `hwm`.             
+//  Available from libzmq 2.0.0 to 3.0.0.
+int QmlZsock::hwm () {
+    return zsock_hwm (self);
+};
+
+///
+//  Set socket option `hwm`.             
+//  Available from libzmq 2.0.0 to 3.0.0.
+void QmlZsock::setHwm (int hwm) {
+    zsock_set_hwm (self, hwm);
+};
+
+///
+//  Get socket option `swap`.            
+//  Available from libzmq 2.0.0 to 3.0.0.
+int QmlZsock::swap () {
+    return zsock_swap (self);
+};
+
+///
+//  Set socket option `swap`.            
+//  Available from libzmq 2.0.0 to 3.0.0.
+void QmlZsock::setSwap (int swap) {
+    zsock_set_swap (self, swap);
+};
+
+///
+//  Get socket option `affinity`.
+//  Available from libzmq 2.0.0. 
+int QmlZsock::affinity () {
+    return zsock_affinity (self);
+};
+
+///
+//  Set socket option `affinity`.
+//  Available from libzmq 2.0.0. 
+void QmlZsock::setAffinity (int affinity) {
+    zsock_set_affinity (self, affinity);
+};
+
+///
+//  Get socket option `identity`.
+//  Available from libzmq 2.0.0. 
+QString QmlZsock::identity () {
+    char *retStr_ = zsock_identity (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `identity`.
+//  Available from libzmq 2.0.0. 
+void QmlZsock::setIdentity (const QString &identity) {
+    zsock_set_identity (self, identity.toUtf8().data());
+};
+
+///
+//  Get socket option `rate`.   
+//  Available from libzmq 2.0.0.
+int QmlZsock::rate () {
+    return zsock_rate (self);
+};
+
+///
+//  Set socket option `rate`.   
+//  Available from libzmq 2.0.0.
+void QmlZsock::setRate (int rate) {
+    zsock_set_rate (self, rate);
+};
+
+///
+//  Get socket option `recovery_ivl`.
+//  Available from libzmq 2.0.0.     
+int QmlZsock::recoveryIvl () {
+    return zsock_recovery_ivl (self);
+};
+
+///
+//  Set socket option `recovery_ivl`.
+//  Available from libzmq 2.0.0.     
+void QmlZsock::setRecoveryIvl (int recoveryIvl) {
+    zsock_set_recovery_ivl (self, recoveryIvl);
+};
+
+///
+//  Get socket option `recovery_ivl_msec`.
+//  Available from libzmq 2.0.0 to 3.0.0. 
+int QmlZsock::recoveryIvlMsec () {
+    return zsock_recovery_ivl_msec (self);
+};
+
+///
+//  Set socket option `recovery_ivl_msec`.
+//  Available from libzmq 2.0.0 to 3.0.0. 
+void QmlZsock::setRecoveryIvlMsec (int recoveryIvlMsec) {
+    zsock_set_recovery_ivl_msec (self, recoveryIvlMsec);
+};
+
+///
+//  Get socket option `mcast_loop`.      
+//  Available from libzmq 2.0.0 to 3.0.0.
+int QmlZsock::mcastLoop () {
+    return zsock_mcast_loop (self);
+};
+
+///
+//  Set socket option `mcast_loop`.      
+//  Available from libzmq 2.0.0 to 3.0.0.
+void QmlZsock::setMcastLoop (int mcastLoop) {
+    zsock_set_mcast_loop (self, mcastLoop);
+};
+
+///
+//  Get socket option `rcvtimeo`.
+//  Available from libzmq 2.2.0. 
+int QmlZsock::rcvtimeo () {
+    return zsock_rcvtimeo (self);
+};
+
+///
+//  Set socket option `rcvtimeo`.
+//  Available from libzmq 2.2.0. 
+void QmlZsock::setRcvtimeo (int rcvtimeo) {
+    zsock_set_rcvtimeo (self, rcvtimeo);
+};
+
+///
+//  Get socket option `sndtimeo`.
+//  Available from libzmq 2.2.0. 
+int QmlZsock::sndtimeo () {
+    return zsock_sndtimeo (self);
+};
+
+///
+//  Set socket option `sndtimeo`.
+//  Available from libzmq 2.2.0. 
+void QmlZsock::setSndtimeo (int sndtimeo) {
+    zsock_set_sndtimeo (self, sndtimeo);
+};
+
+///
+//  Get socket option `sndbuf`. 
+//  Available from libzmq 2.0.0.
+int QmlZsock::sndbuf () {
+    return zsock_sndbuf (self);
+};
+
+///
+//  Set socket option `sndbuf`. 
+//  Available from libzmq 2.0.0.
+void QmlZsock::setSndbuf (int sndbuf) {
+    zsock_set_sndbuf (self, sndbuf);
+};
+
+///
+//  Get socket option `rcvbuf`. 
+//  Available from libzmq 2.0.0.
+int QmlZsock::rcvbuf () {
+    return zsock_rcvbuf (self);
+};
+
+///
+//  Set socket option `rcvbuf`. 
+//  Available from libzmq 2.0.0.
+void QmlZsock::setRcvbuf (int rcvbuf) {
+    zsock_set_rcvbuf (self, rcvbuf);
+};
+
+///
+//  Get socket option `linger`. 
+//  Available from libzmq 2.0.0.
+int QmlZsock::linger () {
+    return zsock_linger (self);
+};
+
+///
+//  Set socket option `linger`. 
+//  Available from libzmq 2.0.0.
+void QmlZsock::setLinger (int linger) {
+    zsock_set_linger (self, linger);
+};
+
+///
+//  Get socket option `reconnect_ivl`.
+//  Available from libzmq 2.0.0.      
+int QmlZsock::reconnectIvl () {
+    return zsock_reconnect_ivl (self);
+};
+
+///
+//  Set socket option `reconnect_ivl`.
+//  Available from libzmq 2.0.0.      
+void QmlZsock::setReconnectIvl (int reconnectIvl) {
+    zsock_set_reconnect_ivl (self, reconnectIvl);
+};
+
+///
+//  Get socket option `reconnect_ivl_max`.
+//  Available from libzmq 2.0.0.          
+int QmlZsock::reconnectIvlMax () {
+    return zsock_reconnect_ivl_max (self);
+};
+
+///
+//  Set socket option `reconnect_ivl_max`.
+//  Available from libzmq 2.0.0.          
+void QmlZsock::setReconnectIvlMax (int reconnectIvlMax) {
+    zsock_set_reconnect_ivl_max (self, reconnectIvlMax);
+};
+
+///
+//  Get socket option `backlog`.
+//  Available from libzmq 2.0.0.
+int QmlZsock::backlog () {
+    return zsock_backlog (self);
+};
+
+///
+//  Set socket option `backlog`.
+//  Available from libzmq 2.0.0.
+void QmlZsock::setBacklog (int backlog) {
+    zsock_set_backlog (self, backlog);
+};
+
+///
+//  Set socket option `subscribe`.
+//  Available from libzmq 2.0.0.  
+void QmlZsock::setSubscribe (const QString &subscribe) {
+    zsock_set_subscribe (self, subscribe.toUtf8().data());
+};
+
+///
+//  Set socket option `unsubscribe`.
+//  Available from libzmq 2.0.0.    
+void QmlZsock::setUnsubscribe (const QString &unsubscribe) {
+    zsock_set_unsubscribe (self, unsubscribe.toUtf8().data());
+};
+
+///
+//  Get socket option `type`.   
+//  Available from libzmq 2.0.0.
+int QmlZsock::type () {
+    return zsock_type (self);
+};
+
+///
+//  Get socket option `rcvmore`.
+//  Available from libzmq 2.0.0.
+int QmlZsock::rcvmore () {
+    return zsock_rcvmore (self);
+};
+
+///
+//  Get socket option `fd`.     
+//  Available from libzmq 2.0.0.
+SOCKET QmlZsock::fd () {
+    return zsock_fd (self);
+};
+
+///
+//  Get socket option `events`. 
+//  Available from libzmq 2.0.0.
+int QmlZsock::events () {
+    return zsock_events (self);
 };
 
 

@@ -4145,21 +4145,50 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "setIpv6", _set_ipv6);
     Nan::SetPrototypeMethod (tpl, "immediate", _immediate);
     Nan::SetPrototypeMethod (tpl, "setImmediate", _set_immediate);
-    Nan::SetPrototypeMethod (tpl, "type", _type);
     Nan::SetPrototypeMethod (tpl, "sndhwm", _sndhwm);
     Nan::SetPrototypeMethod (tpl, "setSndhwm", _set_sndhwm);
     Nan::SetPrototypeMethod (tpl, "rcvhwm", _rcvhwm);
     Nan::SetPrototypeMethod (tpl, "setRcvhwm", _set_rcvhwm);
+    Nan::SetPrototypeMethod (tpl, "maxmsgsize", _maxmsgsize);
+    Nan::SetPrototypeMethod (tpl, "setMaxmsgsize", _set_maxmsgsize);
+    Nan::SetPrototypeMethod (tpl, "multicastHops", _multicast_hops);
+    Nan::SetPrototypeMethod (tpl, "setMulticastHops", _set_multicast_hops);
+    Nan::SetPrototypeMethod (tpl, "setXpubVerbose", _set_xpub_verbose);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepalive", _tcp_keepalive);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepalive", _set_tcp_keepalive);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIdle", _tcp_keepalive_idle);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIdle", _set_tcp_keepalive_idle);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveCnt", _tcp_keepalive_cnt);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveCnt", _set_tcp_keepalive_cnt);
+    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIntvl", _tcp_keepalive_intvl);
+    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIntvl", _set_tcp_keepalive_intvl);
+    Nan::SetPrototypeMethod (tpl, "tcpAcceptFilter", _tcp_accept_filter);
+    Nan::SetPrototypeMethod (tpl, "setTcpAcceptFilter", _set_tcp_accept_filter);
+    Nan::SetPrototypeMethod (tpl, "lastEndpoint", _last_endpoint);
+    Nan::SetPrototypeMethod (tpl, "setRouterRaw", _set_router_raw);
+    Nan::SetPrototypeMethod (tpl, "ipv4only", _ipv4only);
+    Nan::SetPrototypeMethod (tpl, "setIpv4only", _set_ipv4only);
+    Nan::SetPrototypeMethod (tpl, "setDelayAttachOnConnect", _set_delay_attach_on_connect);
+    Nan::SetPrototypeMethod (tpl, "hwm", _hwm);
+    Nan::SetPrototypeMethod (tpl, "setHwm", _set_hwm);
+    Nan::SetPrototypeMethod (tpl, "swap", _swap);
+    Nan::SetPrototypeMethod (tpl, "setSwap", _set_swap);
     Nan::SetPrototypeMethod (tpl, "affinity", _affinity);
     Nan::SetPrototypeMethod (tpl, "setAffinity", _set_affinity);
-    Nan::SetPrototypeMethod (tpl, "setSubscribe", _set_subscribe);
-    Nan::SetPrototypeMethod (tpl, "setUnsubscribe", _set_unsubscribe);
     Nan::SetPrototypeMethod (tpl, "identity", _identity);
     Nan::SetPrototypeMethod (tpl, "setIdentity", _set_identity);
     Nan::SetPrototypeMethod (tpl, "rate", _rate);
     Nan::SetPrototypeMethod (tpl, "setRate", _set_rate);
     Nan::SetPrototypeMethod (tpl, "recoveryIvl", _recovery_ivl);
     Nan::SetPrototypeMethod (tpl, "setRecoveryIvl", _set_recovery_ivl);
+    Nan::SetPrototypeMethod (tpl, "recoveryIvlMsec", _recovery_ivl_msec);
+    Nan::SetPrototypeMethod (tpl, "setRecoveryIvlMsec", _set_recovery_ivl_msec);
+    Nan::SetPrototypeMethod (tpl, "mcastLoop", _mcast_loop);
+    Nan::SetPrototypeMethod (tpl, "setMcastLoop", _set_mcast_loop);
+    Nan::SetPrototypeMethod (tpl, "rcvtimeo", _rcvtimeo);
+    Nan::SetPrototypeMethod (tpl, "setRcvtimeo", _set_rcvtimeo);
+    Nan::SetPrototypeMethod (tpl, "sndtimeo", _sndtimeo);
+    Nan::SetPrototypeMethod (tpl, "setSndtimeo", _set_sndtimeo);
     Nan::SetPrototypeMethod (tpl, "sndbuf", _sndbuf);
     Nan::SetPrototypeMethod (tpl, "setSndbuf", _set_sndbuf);
     Nan::SetPrototypeMethod (tpl, "rcvbuf", _rcvbuf);
@@ -4172,32 +4201,11 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "setReconnectIvlMax", _set_reconnect_ivl_max);
     Nan::SetPrototypeMethod (tpl, "backlog", _backlog);
     Nan::SetPrototypeMethod (tpl, "setBacklog", _set_backlog);
-    Nan::SetPrototypeMethod (tpl, "maxmsgsize", _maxmsgsize);
-    Nan::SetPrototypeMethod (tpl, "setMaxmsgsize", _set_maxmsgsize);
-    Nan::SetPrototypeMethod (tpl, "multicastHops", _multicast_hops);
-    Nan::SetPrototypeMethod (tpl, "setMulticastHops", _set_multicast_hops);
-    Nan::SetPrototypeMethod (tpl, "rcvtimeo", _rcvtimeo);
-    Nan::SetPrototypeMethod (tpl, "setRcvtimeo", _set_rcvtimeo);
-    Nan::SetPrototypeMethod (tpl, "sndtimeo", _sndtimeo);
-    Nan::SetPrototypeMethod (tpl, "setSndtimeo", _set_sndtimeo);
-    Nan::SetPrototypeMethod (tpl, "setXpubVerbose", _set_xpub_verbose);
-    Nan::SetPrototypeMethod (tpl, "tcpKeepalive", _tcp_keepalive);
-    Nan::SetPrototypeMethod (tpl, "setTcpKeepalive", _set_tcp_keepalive);
-    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIdle", _tcp_keepalive_idle);
-    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIdle", _set_tcp_keepalive_idle);
-    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveCnt", _tcp_keepalive_cnt);
-    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveCnt", _set_tcp_keepalive_cnt);
-    Nan::SetPrototypeMethod (tpl, "tcpKeepaliveIntvl", _tcp_keepalive_intvl);
-    Nan::SetPrototypeMethod (tpl, "setTcpKeepaliveIntvl", _set_tcp_keepalive_intvl);
-    Nan::SetPrototypeMethod (tpl, "tcpAcceptFilter", _tcp_accept_filter);
-    Nan::SetPrototypeMethod (tpl, "setTcpAcceptFilter", _set_tcp_accept_filter);
+    Nan::SetPrototypeMethod (tpl, "setSubscribe", _set_subscribe);
+    Nan::SetPrototypeMethod (tpl, "setUnsubscribe", _set_unsubscribe);
+    Nan::SetPrototypeMethod (tpl, "type", _type);
     Nan::SetPrototypeMethod (tpl, "rcvmore", _rcvmore);
     Nan::SetPrototypeMethod (tpl, "events", _events);
-    Nan::SetPrototypeMethod (tpl, "lastEndpoint", _last_endpoint);
-    Nan::SetPrototypeMethod (tpl, "setRouterRaw", _set_router_raw);
-    Nan::SetPrototypeMethod (tpl, "ipv4only", _ipv4only);
-    Nan::SetPrototypeMethod (tpl, "setIpv4only", _set_ipv4only);
-    Nan::SetPrototypeMethod (tpl, "setDelayAttachOnConnect", _set_delay_attach_on_connect);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -5314,12 +5322,6 @@ NAN_METHOD (Zsock::_set_immediate) {
     zsock_set_immediate (zsock->self, (int) immediate);
 }
 
-NAN_METHOD (Zsock::_type) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_type (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
 NAN_METHOD (Zsock::_sndhwm) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_sndhwm (zsock->self);
@@ -5358,6 +5360,243 @@ NAN_METHOD (Zsock::_set_rcvhwm) {
     zsock_set_rcvhwm (zsock->self, (int) rcvhwm);
 }
 
+NAN_METHOD (Zsock::_maxmsgsize) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_maxmsgsize (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_maxmsgsize) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `maxmsgsize`");
+
+    int maxmsgsize;
+    if (info [0]->IsNumber ())
+        maxmsgsize = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`maxmsgsize` must be a number");
+    zsock_set_maxmsgsize (zsock->self, (int) maxmsgsize);
+}
+
+NAN_METHOD (Zsock::_multicast_hops) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_multicast_hops (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_multicast_hops) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `multicast hops`");
+
+    int multicast_hops;
+    if (info [0]->IsNumber ())
+        multicast_hops = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`multicast hops` must be a number");
+    zsock_set_multicast_hops (zsock->self, (int) multicast_hops);
+}
+
+NAN_METHOD (Zsock::_set_xpub_verbose) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `xpub verbose`");
+
+    int xpub_verbose;
+    if (info [0]->IsNumber ())
+        xpub_verbose = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`xpub verbose` must be a number");
+    zsock_set_xpub_verbose (zsock->self, (int) xpub_verbose);
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_tcp_keepalive) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive`");
+
+    int tcp_keepalive;
+    if (info [0]->IsNumber ())
+        tcp_keepalive = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive` must be a number");
+    zsock_set_tcp_keepalive (zsock->self, (int) tcp_keepalive);
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive_idle) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive_idle (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_tcp_keepalive_idle) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive idle`");
+
+    int tcp_keepalive_idle;
+    if (info [0]->IsNumber ())
+        tcp_keepalive_idle = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive idle` must be a number");
+    zsock_set_tcp_keepalive_idle (zsock->self, (int) tcp_keepalive_idle);
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive_cnt) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive_cnt (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_tcp_keepalive_cnt) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive cnt`");
+
+    int tcp_keepalive_cnt;
+    if (info [0]->IsNumber ())
+        tcp_keepalive_cnt = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive cnt` must be a number");
+    zsock_set_tcp_keepalive_cnt (zsock->self, (int) tcp_keepalive_cnt);
+}
+
+NAN_METHOD (Zsock::_tcp_keepalive_intvl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_tcp_keepalive_intvl (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_tcp_keepalive_intvl) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp keepalive intvl`");
+
+    int tcp_keepalive_intvl;
+    if (info [0]->IsNumber ())
+        tcp_keepalive_intvl = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`tcp keepalive intvl` must be a number");
+    zsock_set_tcp_keepalive_intvl (zsock->self, (int) tcp_keepalive_intvl);
+}
+
+NAN_METHOD (Zsock::_tcp_accept_filter) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_tcp_accept_filter (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_tcp_accept_filter) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *tcp_accept_filter;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `tcp accept filter`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`tcp accept filter` must be a string");
+    else {
+        Nan::Utf8String tcp_accept_filter_utf8 (info [0].As<String>());
+        tcp_accept_filter = *tcp_accept_filter_utf8;
+    }
+    zsock_set_tcp_accept_filter (zsock->self, (const char *)tcp_accept_filter);
+}
+
+NAN_METHOD (Zsock::_last_endpoint) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_last_endpoint (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_router_raw) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `router raw`");
+
+    int router_raw;
+    if (info [0]->IsNumber ())
+        router_raw = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`router raw` must be a number");
+    zsock_set_router_raw (zsock->self, (int) router_raw);
+}
+
+NAN_METHOD (Zsock::_ipv4only) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_ipv4only (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_ipv4only) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `ipv4only`");
+
+    int ipv4only;
+    if (info [0]->IsNumber ())
+        ipv4only = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`ipv4only` must be a number");
+    zsock_set_ipv4only (zsock->self, (int) ipv4only);
+}
+
+NAN_METHOD (Zsock::_set_delay_attach_on_connect) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `delay attach on connect`");
+
+    int delay_attach_on_connect;
+    if (info [0]->IsNumber ())
+        delay_attach_on_connect = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`delay attach on connect` must be a number");
+    zsock_set_delay_attach_on_connect (zsock->self, (int) delay_attach_on_connect);
+}
+
+NAN_METHOD (Zsock::_hwm) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_hwm (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_hwm) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `hwm`");
+
+    int hwm;
+    if (info [0]->IsNumber ())
+        hwm = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`hwm` must be a number");
+    zsock_set_hwm (zsock->self, (int) hwm);
+}
+
+NAN_METHOD (Zsock::_swap) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_swap (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_swap) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `swap`");
+
+    int swap;
+    if (info [0]->IsNumber ())
+        swap = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`swap` must be a number");
+    zsock_set_swap (zsock->self, (int) swap);
+}
+
 NAN_METHOD (Zsock::_affinity) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_affinity (zsock->self);
@@ -5375,36 +5614,6 @@ NAN_METHOD (Zsock::_set_affinity) {
     else
         return Nan::ThrowTypeError ("`affinity` must be a number");
     zsock_set_affinity (zsock->self, (int) affinity);
-}
-
-NAN_METHOD (Zsock::_set_subscribe) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    char *subscribe;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `subscribe`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`subscribe` must be a string");
-    else {
-        Nan::Utf8String subscribe_utf8 (info [0].As<String>());
-        subscribe = *subscribe_utf8;
-    }
-    zsock_set_subscribe (zsock->self, (const char *)subscribe);
-}
-
-NAN_METHOD (Zsock::_set_unsubscribe) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    char *unsubscribe;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `unsubscribe`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`unsubscribe` must be a string");
-    else {
-        Nan::Utf8String unsubscribe_utf8 (info [0].As<String>());
-        unsubscribe = *unsubscribe_utf8;
-    }
-    zsock_set_unsubscribe (zsock->self, (const char *)unsubscribe);
 }
 
 NAN_METHOD (Zsock::_identity) {
@@ -5464,6 +5673,82 @@ NAN_METHOD (Zsock::_set_recovery_ivl) {
     else
         return Nan::ThrowTypeError ("`recovery ivl` must be a number");
     zsock_set_recovery_ivl (zsock->self, (int) recovery_ivl);
+}
+
+NAN_METHOD (Zsock::_recovery_ivl_msec) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_recovery_ivl_msec (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_recovery_ivl_msec) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `recovery ivl msec`");
+
+    int recovery_ivl_msec;
+    if (info [0]->IsNumber ())
+        recovery_ivl_msec = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`recovery ivl msec` must be a number");
+    zsock_set_recovery_ivl_msec (zsock->self, (int) recovery_ivl_msec);
+}
+
+NAN_METHOD (Zsock::_mcast_loop) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_mcast_loop (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_mcast_loop) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `mcast loop`");
+
+    int mcast_loop;
+    if (info [0]->IsNumber ())
+        mcast_loop = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`mcast loop` must be a number");
+    zsock_set_mcast_loop (zsock->self, (int) mcast_loop);
+}
+
+NAN_METHOD (Zsock::_rcvtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_rcvtimeo (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_rcvtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `rcvtimeo`");
+
+    int rcvtimeo;
+    if (info [0]->IsNumber ())
+        rcvtimeo = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`rcvtimeo` must be a number");
+    zsock_set_rcvtimeo (zsock->self, (int) rcvtimeo);
+}
+
+NAN_METHOD (Zsock::_sndtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_sndtimeo (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_sndtimeo) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `sndtimeo`");
+
+    int sndtimeo;
+    if (info [0]->IsNumber ())
+        sndtimeo = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`sndtimeo` must be a number");
+    zsock_set_sndtimeo (zsock->self, (int) sndtimeo);
 }
 
 NAN_METHOD (Zsock::_sndbuf) {
@@ -5580,190 +5865,40 @@ NAN_METHOD (Zsock::_set_backlog) {
     zsock_set_backlog (zsock->self, (int) backlog);
 }
 
-NAN_METHOD (Zsock::_maxmsgsize) {
+NAN_METHOD (Zsock::_set_subscribe) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_maxmsgsize (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_maxmsgsize) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *subscribe;
     if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `maxmsgsize`");
-
-    int maxmsgsize;
-    if (info [0]->IsNumber ())
-        maxmsgsize = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`maxmsgsize` must be a number");
-    zsock_set_maxmsgsize (zsock->self, (int) maxmsgsize);
-}
-
-NAN_METHOD (Zsock::_multicast_hops) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_multicast_hops (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_multicast_hops) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `multicast hops`");
-
-    int multicast_hops;
-    if (info [0]->IsNumber ())
-        multicast_hops = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`multicast hops` must be a number");
-    zsock_set_multicast_hops (zsock->self, (int) multicast_hops);
-}
-
-NAN_METHOD (Zsock::_rcvtimeo) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_rcvtimeo (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_rcvtimeo) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `rcvtimeo`");
-
-    int rcvtimeo;
-    if (info [0]->IsNumber ())
-        rcvtimeo = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`rcvtimeo` must be a number");
-    zsock_set_rcvtimeo (zsock->self, (int) rcvtimeo);
-}
-
-NAN_METHOD (Zsock::_sndtimeo) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_sndtimeo (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_sndtimeo) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `sndtimeo`");
-
-    int sndtimeo;
-    if (info [0]->IsNumber ())
-        sndtimeo = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`sndtimeo` must be a number");
-    zsock_set_sndtimeo (zsock->self, (int) sndtimeo);
-}
-
-NAN_METHOD (Zsock::_set_xpub_verbose) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `xpub verbose`");
-
-    int xpub_verbose;
-    if (info [0]->IsNumber ())
-        xpub_verbose = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`xpub verbose` must be a number");
-    zsock_set_xpub_verbose (zsock->self, (int) xpub_verbose);
-}
-
-NAN_METHOD (Zsock::_tcp_keepalive) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_tcp_keepalive (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_tcp_keepalive) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `tcp keepalive`");
-
-    int tcp_keepalive;
-    if (info [0]->IsNumber ())
-        tcp_keepalive = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`tcp keepalive` must be a number");
-    zsock_set_tcp_keepalive (zsock->self, (int) tcp_keepalive);
-}
-
-NAN_METHOD (Zsock::_tcp_keepalive_idle) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_tcp_keepalive_idle (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_tcp_keepalive_idle) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `tcp keepalive idle`");
-
-    int tcp_keepalive_idle;
-    if (info [0]->IsNumber ())
-        tcp_keepalive_idle = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`tcp keepalive idle` must be a number");
-    zsock_set_tcp_keepalive_idle (zsock->self, (int) tcp_keepalive_idle);
-}
-
-NAN_METHOD (Zsock::_tcp_keepalive_cnt) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_tcp_keepalive_cnt (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_tcp_keepalive_cnt) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `tcp keepalive cnt`");
-
-    int tcp_keepalive_cnt;
-    if (info [0]->IsNumber ())
-        tcp_keepalive_cnt = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`tcp keepalive cnt` must be a number");
-    zsock_set_tcp_keepalive_cnt (zsock->self, (int) tcp_keepalive_cnt);
-}
-
-NAN_METHOD (Zsock::_tcp_keepalive_intvl) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_tcp_keepalive_intvl (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_tcp_keepalive_intvl) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `tcp keepalive intvl`");
-
-    int tcp_keepalive_intvl;
-    if (info [0]->IsNumber ())
-        tcp_keepalive_intvl = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`tcp keepalive intvl` must be a number");
-    zsock_set_tcp_keepalive_intvl (zsock->self, (int) tcp_keepalive_intvl);
-}
-
-NAN_METHOD (Zsock::_tcp_accept_filter) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    char *result = (char *) zsock_tcp_accept_filter (zsock->self);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
-}
-
-NAN_METHOD (Zsock::_set_tcp_accept_filter) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    char *tcp_accept_filter;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `tcp accept filter`");
+        return Nan::ThrowTypeError ("method requires a `subscribe`");
     else
     if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`tcp accept filter` must be a string");
+        return Nan::ThrowTypeError ("`subscribe` must be a string");
     else {
-        Nan::Utf8String tcp_accept_filter_utf8 (info [0].As<String>());
-        tcp_accept_filter = *tcp_accept_filter_utf8;
+        Nan::Utf8String subscribe_utf8 (info [0].As<String>());
+        subscribe = *subscribe_utf8;
     }
-    zsock_set_tcp_accept_filter (zsock->self, (const char *)tcp_accept_filter);
+    zsock_set_subscribe (zsock->self, (const char *)subscribe);
+}
+
+NAN_METHOD (Zsock::_set_unsubscribe) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *unsubscribe;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `unsubscribe`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`unsubscribe` must be a string");
+    else {
+        Nan::Utf8String unsubscribe_utf8 (info [0].As<String>());
+        unsubscribe = *unsubscribe_utf8;
+    }
+    zsock_set_unsubscribe (zsock->self, (const char *)unsubscribe);
+}
+
+NAN_METHOD (Zsock::_type) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_type (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_rcvmore) {
@@ -5776,57 +5911,6 @@ NAN_METHOD (Zsock::_events) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     int result = zsock_events (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_last_endpoint) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    char *result = (char *) zsock_last_endpoint (zsock->self);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
-}
-
-NAN_METHOD (Zsock::_set_router_raw) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `router raw`");
-
-    int router_raw;
-    if (info [0]->IsNumber ())
-        router_raw = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`router raw` must be a number");
-    zsock_set_router_raw (zsock->self, (int) router_raw);
-}
-
-NAN_METHOD (Zsock::_ipv4only) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    int result = zsock_ipv4only (zsock->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (Zsock::_set_ipv4only) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `ipv4only`");
-
-    int ipv4only;
-    if (info [0]->IsNumber ())
-        ipv4only = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`ipv4only` must be a number");
-    zsock_set_ipv4only (zsock->self, (int) ipv4only);
-}
-
-NAN_METHOD (Zsock::_set_delay_attach_on_connect) {
-    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `delay attach on connect`");
-
-    int delay_attach_on_connect;
-    if (info [0]->IsNumber ())
-        delay_attach_on_connect = Nan::To<int>(info [0]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`delay attach on connect` must be a number");
-    zsock_set_delay_attach_on_connect (zsock->self, (int) delay_attach_on_connect);
 }
 
 NAN_METHOD (Zsock::_test) {

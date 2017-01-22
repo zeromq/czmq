@@ -5005,8 +5005,6 @@ lib.zsock_immediate.restype = c_int
 lib.zsock_immediate.argtypes = [zsock_p]
 lib.zsock_set_immediate.restype = None
 lib.zsock_set_immediate.argtypes = [zsock_p, c_int]
-lib.zsock_type.restype = c_int
-lib.zsock_type.argtypes = [zsock_p]
 lib.zsock_sndhwm.restype = c_int
 lib.zsock_sndhwm.argtypes = [zsock_p]
 lib.zsock_set_sndhwm.restype = None
@@ -5015,14 +5013,58 @@ lib.zsock_rcvhwm.restype = c_int
 lib.zsock_rcvhwm.argtypes = [zsock_p]
 lib.zsock_set_rcvhwm.restype = None
 lib.zsock_set_rcvhwm.argtypes = [zsock_p, c_int]
+lib.zsock_maxmsgsize.restype = c_int
+lib.zsock_maxmsgsize.argtypes = [zsock_p]
+lib.zsock_set_maxmsgsize.restype = None
+lib.zsock_set_maxmsgsize.argtypes = [zsock_p, c_int]
+lib.zsock_multicast_hops.restype = c_int
+lib.zsock_multicast_hops.argtypes = [zsock_p]
+lib.zsock_set_multicast_hops.restype = None
+lib.zsock_set_multicast_hops.argtypes = [zsock_p, c_int]
+lib.zsock_set_xpub_verbose.restype = None
+lib.zsock_set_xpub_verbose.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive.restype = c_int
+lib.zsock_tcp_keepalive.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive.restype = None
+lib.zsock_set_tcp_keepalive.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive_idle.restype = c_int
+lib.zsock_tcp_keepalive_idle.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive_idle.restype = None
+lib.zsock_set_tcp_keepalive_idle.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive_cnt.restype = c_int
+lib.zsock_tcp_keepalive_cnt.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive_cnt.restype = None
+lib.zsock_set_tcp_keepalive_cnt.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive_intvl.restype = c_int
+lib.zsock_tcp_keepalive_intvl.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive_intvl.restype = None
+lib.zsock_set_tcp_keepalive_intvl.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_accept_filter.restype = POINTER(c_char)
+lib.zsock_tcp_accept_filter.argtypes = [zsock_p]
+lib.zsock_set_tcp_accept_filter.restype = None
+lib.zsock_set_tcp_accept_filter.argtypes = [zsock_p, c_char_p]
+lib.zsock_last_endpoint.restype = POINTER(c_char)
+lib.zsock_last_endpoint.argtypes = [zsock_p]
+lib.zsock_set_router_raw.restype = None
+lib.zsock_set_router_raw.argtypes = [zsock_p, c_int]
+lib.zsock_ipv4only.restype = c_int
+lib.zsock_ipv4only.argtypes = [zsock_p]
+lib.zsock_set_ipv4only.restype = None
+lib.zsock_set_ipv4only.argtypes = [zsock_p, c_int]
+lib.zsock_set_delay_attach_on_connect.restype = None
+lib.zsock_set_delay_attach_on_connect.argtypes = [zsock_p, c_int]
+lib.zsock_hwm.restype = c_int
+lib.zsock_hwm.argtypes = [zsock_p]
+lib.zsock_set_hwm.restype = None
+lib.zsock_set_hwm.argtypes = [zsock_p, c_int]
+lib.zsock_swap.restype = c_int
+lib.zsock_swap.argtypes = [zsock_p]
+lib.zsock_set_swap.restype = None
+lib.zsock_set_swap.argtypes = [zsock_p, c_int]
 lib.zsock_affinity.restype = c_int
 lib.zsock_affinity.argtypes = [zsock_p]
 lib.zsock_set_affinity.restype = None
 lib.zsock_set_affinity.argtypes = [zsock_p, c_int]
-lib.zsock_set_subscribe.restype = None
-lib.zsock_set_subscribe.argtypes = [zsock_p, c_char_p]
-lib.zsock_set_unsubscribe.restype = None
-lib.zsock_set_unsubscribe.argtypes = [zsock_p, c_char_p]
 lib.zsock_identity.restype = POINTER(c_char)
 lib.zsock_identity.argtypes = [zsock_p]
 lib.zsock_set_identity.restype = None
@@ -5035,6 +5077,22 @@ lib.zsock_recovery_ivl.restype = c_int
 lib.zsock_recovery_ivl.argtypes = [zsock_p]
 lib.zsock_set_recovery_ivl.restype = None
 lib.zsock_set_recovery_ivl.argtypes = [zsock_p, c_int]
+lib.zsock_recovery_ivl_msec.restype = c_int
+lib.zsock_recovery_ivl_msec.argtypes = [zsock_p]
+lib.zsock_set_recovery_ivl_msec.restype = None
+lib.zsock_set_recovery_ivl_msec.argtypes = [zsock_p, c_int]
+lib.zsock_mcast_loop.restype = c_int
+lib.zsock_mcast_loop.argtypes = [zsock_p]
+lib.zsock_set_mcast_loop.restype = None
+lib.zsock_set_mcast_loop.argtypes = [zsock_p, c_int]
+lib.zsock_rcvtimeo.restype = c_int
+lib.zsock_rcvtimeo.argtypes = [zsock_p]
+lib.zsock_set_rcvtimeo.restype = None
+lib.zsock_set_rcvtimeo.argtypes = [zsock_p, c_int]
+lib.zsock_sndtimeo.restype = c_int
+lib.zsock_sndtimeo.argtypes = [zsock_p]
+lib.zsock_set_sndtimeo.restype = None
+lib.zsock_set_sndtimeo.argtypes = [zsock_p, c_int]
 lib.zsock_sndbuf.restype = c_int
 lib.zsock_sndbuf.argtypes = [zsock_p]
 lib.zsock_set_sndbuf.restype = None
@@ -5059,60 +5117,18 @@ lib.zsock_backlog.restype = c_int
 lib.zsock_backlog.argtypes = [zsock_p]
 lib.zsock_set_backlog.restype = None
 lib.zsock_set_backlog.argtypes = [zsock_p, c_int]
-lib.zsock_maxmsgsize.restype = c_int
-lib.zsock_maxmsgsize.argtypes = [zsock_p]
-lib.zsock_set_maxmsgsize.restype = None
-lib.zsock_set_maxmsgsize.argtypes = [zsock_p, c_int]
-lib.zsock_multicast_hops.restype = c_int
-lib.zsock_multicast_hops.argtypes = [zsock_p]
-lib.zsock_set_multicast_hops.restype = None
-lib.zsock_set_multicast_hops.argtypes = [zsock_p, c_int]
-lib.zsock_rcvtimeo.restype = c_int
-lib.zsock_rcvtimeo.argtypes = [zsock_p]
-lib.zsock_set_rcvtimeo.restype = None
-lib.zsock_set_rcvtimeo.argtypes = [zsock_p, c_int]
-lib.zsock_sndtimeo.restype = c_int
-lib.zsock_sndtimeo.argtypes = [zsock_p]
-lib.zsock_set_sndtimeo.restype = None
-lib.zsock_set_sndtimeo.argtypes = [zsock_p, c_int]
-lib.zsock_set_xpub_verbose.restype = None
-lib.zsock_set_xpub_verbose.argtypes = [zsock_p, c_int]
-lib.zsock_tcp_keepalive.restype = c_int
-lib.zsock_tcp_keepalive.argtypes = [zsock_p]
-lib.zsock_set_tcp_keepalive.restype = None
-lib.zsock_set_tcp_keepalive.argtypes = [zsock_p, c_int]
-lib.zsock_tcp_keepalive_idle.restype = c_int
-lib.zsock_tcp_keepalive_idle.argtypes = [zsock_p]
-lib.zsock_set_tcp_keepalive_idle.restype = None
-lib.zsock_set_tcp_keepalive_idle.argtypes = [zsock_p, c_int]
-lib.zsock_tcp_keepalive_cnt.restype = c_int
-lib.zsock_tcp_keepalive_cnt.argtypes = [zsock_p]
-lib.zsock_set_tcp_keepalive_cnt.restype = None
-lib.zsock_set_tcp_keepalive_cnt.argtypes = [zsock_p, c_int]
-lib.zsock_tcp_keepalive_intvl.restype = c_int
-lib.zsock_tcp_keepalive_intvl.argtypes = [zsock_p]
-lib.zsock_set_tcp_keepalive_intvl.restype = None
-lib.zsock_set_tcp_keepalive_intvl.argtypes = [zsock_p, c_int]
-lib.zsock_tcp_accept_filter.restype = POINTER(c_char)
-lib.zsock_tcp_accept_filter.argtypes = [zsock_p]
-lib.zsock_set_tcp_accept_filter.restype = None
-lib.zsock_set_tcp_accept_filter.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_subscribe.restype = None
+lib.zsock_set_subscribe.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_unsubscribe.restype = None
+lib.zsock_set_unsubscribe.argtypes = [zsock_p, c_char_p]
+lib.zsock_type.restype = c_int
+lib.zsock_type.argtypes = [zsock_p]
 lib.zsock_rcvmore.restype = c_int
 lib.zsock_rcvmore.argtypes = [zsock_p]
 lib.zsock_fd.restype = socket_p
 lib.zsock_fd.argtypes = [zsock_p]
 lib.zsock_events.restype = c_int
 lib.zsock_events.argtypes = [zsock_p]
-lib.zsock_last_endpoint.restype = POINTER(c_char)
-lib.zsock_last_endpoint.argtypes = [zsock_p]
-lib.zsock_set_router_raw.restype = None
-lib.zsock_set_router_raw.argtypes = [zsock_p, c_int]
-lib.zsock_ipv4only.restype = c_int
-lib.zsock_ipv4only.argtypes = [zsock_p]
-lib.zsock_set_ipv4only.restype = None
-lib.zsock_set_ipv4only.argtypes = [zsock_p, c_int]
-lib.zsock_set_delay_attach_on_connect.restype = None
-lib.zsock_set_delay_attach_on_connect.argtypes = [zsock_p, c_int]
 lib.zsock_test.restype = None
 lib.zsock_test.argtypes = [c_bool]
 
@@ -6101,13 +6117,6 @@ Available from libzmq 4.0.0.
         """
         return lib.zsock_set_immediate(self._as_parameter_, immediate)
 
-    def type(self):
-        """
-        Get socket option `type`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_type(self._as_parameter_)
-
     def sndhwm(self):
         """
         Get socket option `sndhwm`.
@@ -6136,160 +6145,6 @@ Available from libzmq 3.0.0.
         """
         return lib.zsock_set_rcvhwm(self._as_parameter_, rcvhwm)
 
-    def affinity(self):
-        """
-        Get socket option `affinity`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_affinity(self._as_parameter_)
-
-    def set_affinity(self, affinity):
-        """
-        Set socket option `affinity`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_affinity(self._as_parameter_, affinity)
-
-    def set_subscribe(self, subscribe):
-        """
-        Set socket option `subscribe`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_subscribe(self._as_parameter_, subscribe)
-
-    def set_unsubscribe(self, unsubscribe):
-        """
-        Set socket option `unsubscribe`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_unsubscribe(self._as_parameter_, unsubscribe)
-
-    def identity(self):
-        """
-        Get socket option `identity`.
-Available from libzmq 3.0.0.
-        """
-        return return_fresh_string(lib.zsock_identity(self._as_parameter_))
-
-    def set_identity(self, identity):
-        """
-        Set socket option `identity`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_identity(self._as_parameter_, identity)
-
-    def rate(self):
-        """
-        Get socket option `rate`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_rate(self._as_parameter_)
-
-    def set_rate(self, rate):
-        """
-        Set socket option `rate`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_rate(self._as_parameter_, rate)
-
-    def recovery_ivl(self):
-        """
-        Get socket option `recovery_ivl`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_recovery_ivl(self._as_parameter_)
-
-    def set_recovery_ivl(self, recovery_ivl):
-        """
-        Set socket option `recovery_ivl`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_recovery_ivl(self._as_parameter_, recovery_ivl)
-
-    def sndbuf(self):
-        """
-        Get socket option `sndbuf`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_sndbuf(self._as_parameter_)
-
-    def set_sndbuf(self, sndbuf):
-        """
-        Set socket option `sndbuf`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_sndbuf(self._as_parameter_, sndbuf)
-
-    def rcvbuf(self):
-        """
-        Get socket option `rcvbuf`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_rcvbuf(self._as_parameter_)
-
-    def set_rcvbuf(self, rcvbuf):
-        """
-        Set socket option `rcvbuf`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_rcvbuf(self._as_parameter_, rcvbuf)
-
-    def linger(self):
-        """
-        Get socket option `linger`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_linger(self._as_parameter_)
-
-    def set_linger(self, linger):
-        """
-        Set socket option `linger`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_linger(self._as_parameter_, linger)
-
-    def reconnect_ivl(self):
-        """
-        Get socket option `reconnect_ivl`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_reconnect_ivl(self._as_parameter_)
-
-    def set_reconnect_ivl(self, reconnect_ivl):
-        """
-        Set socket option `reconnect_ivl`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_reconnect_ivl(self._as_parameter_, reconnect_ivl)
-
-    def reconnect_ivl_max(self):
-        """
-        Get socket option `reconnect_ivl_max`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_reconnect_ivl_max(self._as_parameter_)
-
-    def set_reconnect_ivl_max(self, reconnect_ivl_max):
-        """
-        Set socket option `reconnect_ivl_max`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_reconnect_ivl_max(self._as_parameter_, reconnect_ivl_max)
-
-    def backlog(self):
-        """
-        Get socket option `backlog`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_backlog(self._as_parameter_)
-
-    def set_backlog(self, backlog):
-        """
-        Set socket option `backlog`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_backlog(self._as_parameter_, backlog)
-
     def maxmsgsize(self):
         """
         Get socket option `maxmsgsize`.
@@ -6317,34 +6172,6 @@ Available from libzmq 3.0.0.
 Available from libzmq 3.0.0.
         """
         return lib.zsock_set_multicast_hops(self._as_parameter_, multicast_hops)
-
-    def rcvtimeo(self):
-        """
-        Get socket option `rcvtimeo`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_rcvtimeo(self._as_parameter_)
-
-    def set_rcvtimeo(self, rcvtimeo):
-        """
-        Set socket option `rcvtimeo`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_rcvtimeo(self._as_parameter_, rcvtimeo)
-
-    def sndtimeo(self):
-        """
-        Get socket option `sndtimeo`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_sndtimeo(self._as_parameter_)
-
-    def set_sndtimeo(self, sndtimeo):
-        """
-        Set socket option `sndtimeo`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_set_sndtimeo(self._as_parameter_, sndtimeo)
 
     def set_xpub_verbose(self, xpub_verbose):
         """
@@ -6423,27 +6250,6 @@ Available from libzmq 3.0.0.
         """
         return lib.zsock_set_tcp_accept_filter(self._as_parameter_, tcp_accept_filter)
 
-    def rcvmore(self):
-        """
-        Get socket option `rcvmore`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_rcvmore(self._as_parameter_)
-
-    def fd(self):
-        """
-        Get socket option `fd`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_fd(self._as_parameter_)
-
-    def events(self):
-        """
-        Get socket option `events`.
-Available from libzmq 3.0.0.
-        """
-        return lib.zsock_events(self._as_parameter_)
-
     def last_endpoint(self):
         """
         Get socket option `last_endpoint`.
@@ -6478,6 +6284,272 @@ Available from libzmq 3.0.0.
 Available from libzmq 3.0.0.
         """
         return lib.zsock_set_delay_attach_on_connect(self._as_parameter_, delay_attach_on_connect)
+
+    def hwm(self):
+        """
+        Get socket option `hwm`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_hwm(self._as_parameter_)
+
+    def set_hwm(self, hwm):
+        """
+        Set socket option `hwm`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_set_hwm(self._as_parameter_, hwm)
+
+    def swap(self):
+        """
+        Get socket option `swap`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_swap(self._as_parameter_)
+
+    def set_swap(self, swap):
+        """
+        Set socket option `swap`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_set_swap(self._as_parameter_, swap)
+
+    def affinity(self):
+        """
+        Get socket option `affinity`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_affinity(self._as_parameter_)
+
+    def set_affinity(self, affinity):
+        """
+        Set socket option `affinity`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_affinity(self._as_parameter_, affinity)
+
+    def identity(self):
+        """
+        Get socket option `identity`.
+Available from libzmq 2.0.0.
+        """
+        return return_fresh_string(lib.zsock_identity(self._as_parameter_))
+
+    def set_identity(self, identity):
+        """
+        Set socket option `identity`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_identity(self._as_parameter_, identity)
+
+    def rate(self):
+        """
+        Get socket option `rate`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_rate(self._as_parameter_)
+
+    def set_rate(self, rate):
+        """
+        Set socket option `rate`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_rate(self._as_parameter_, rate)
+
+    def recovery_ivl(self):
+        """
+        Get socket option `recovery_ivl`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_recovery_ivl(self._as_parameter_)
+
+    def set_recovery_ivl(self, recovery_ivl):
+        """
+        Set socket option `recovery_ivl`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_recovery_ivl(self._as_parameter_, recovery_ivl)
+
+    def recovery_ivl_msec(self):
+        """
+        Get socket option `recovery_ivl_msec`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_recovery_ivl_msec(self._as_parameter_)
+
+    def set_recovery_ivl_msec(self, recovery_ivl_msec):
+        """
+        Set socket option `recovery_ivl_msec`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_set_recovery_ivl_msec(self._as_parameter_, recovery_ivl_msec)
+
+    def mcast_loop(self):
+        """
+        Get socket option `mcast_loop`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_mcast_loop(self._as_parameter_)
+
+    def set_mcast_loop(self, mcast_loop):
+        """
+        Set socket option `mcast_loop`.
+Available from libzmq 2.0.0 to 3.0.0.
+        """
+        return lib.zsock_set_mcast_loop(self._as_parameter_, mcast_loop)
+
+    def rcvtimeo(self):
+        """
+        Get socket option `rcvtimeo`.
+Available from libzmq 2.2.0.
+        """
+        return lib.zsock_rcvtimeo(self._as_parameter_)
+
+    def set_rcvtimeo(self, rcvtimeo):
+        """
+        Set socket option `rcvtimeo`.
+Available from libzmq 2.2.0.
+        """
+        return lib.zsock_set_rcvtimeo(self._as_parameter_, rcvtimeo)
+
+    def sndtimeo(self):
+        """
+        Get socket option `sndtimeo`.
+Available from libzmq 2.2.0.
+        """
+        return lib.zsock_sndtimeo(self._as_parameter_)
+
+    def set_sndtimeo(self, sndtimeo):
+        """
+        Set socket option `sndtimeo`.
+Available from libzmq 2.2.0.
+        """
+        return lib.zsock_set_sndtimeo(self._as_parameter_, sndtimeo)
+
+    def sndbuf(self):
+        """
+        Get socket option `sndbuf`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_sndbuf(self._as_parameter_)
+
+    def set_sndbuf(self, sndbuf):
+        """
+        Set socket option `sndbuf`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_sndbuf(self._as_parameter_, sndbuf)
+
+    def rcvbuf(self):
+        """
+        Get socket option `rcvbuf`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_rcvbuf(self._as_parameter_)
+
+    def set_rcvbuf(self, rcvbuf):
+        """
+        Set socket option `rcvbuf`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_rcvbuf(self._as_parameter_, rcvbuf)
+
+    def linger(self):
+        """
+        Get socket option `linger`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_linger(self._as_parameter_)
+
+    def set_linger(self, linger):
+        """
+        Set socket option `linger`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_linger(self._as_parameter_, linger)
+
+    def reconnect_ivl(self):
+        """
+        Get socket option `reconnect_ivl`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_reconnect_ivl(self._as_parameter_)
+
+    def set_reconnect_ivl(self, reconnect_ivl):
+        """
+        Set socket option `reconnect_ivl`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_reconnect_ivl(self._as_parameter_, reconnect_ivl)
+
+    def reconnect_ivl_max(self):
+        """
+        Get socket option `reconnect_ivl_max`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_reconnect_ivl_max(self._as_parameter_)
+
+    def set_reconnect_ivl_max(self, reconnect_ivl_max):
+        """
+        Set socket option `reconnect_ivl_max`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_reconnect_ivl_max(self._as_parameter_, reconnect_ivl_max)
+
+    def backlog(self):
+        """
+        Get socket option `backlog`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_backlog(self._as_parameter_)
+
+    def set_backlog(self, backlog):
+        """
+        Set socket option `backlog`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_backlog(self._as_parameter_, backlog)
+
+    def set_subscribe(self, subscribe):
+        """
+        Set socket option `subscribe`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_subscribe(self._as_parameter_, subscribe)
+
+    def set_unsubscribe(self, unsubscribe):
+        """
+        Set socket option `unsubscribe`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_set_unsubscribe(self._as_parameter_, unsubscribe)
+
+    def type(self):
+        """
+        Get socket option `type`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_type(self._as_parameter_)
+
+    def rcvmore(self):
+        """
+        Get socket option `rcvmore`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_rcvmore(self._as_parameter_)
+
+    def fd(self):
+        """
+        Get socket option `fd`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_fd(self._as_parameter_)
+
+    def events(self):
+        """
+        Get socket option `events`.
+Available from libzmq 2.0.0.
+        """
+        return lib.zsock_events(self._as_parameter_)
 
     @staticmethod
     def test(verbose):

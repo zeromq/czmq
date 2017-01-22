@@ -523,10 +523,6 @@ public slots:
     //  Available from libzmq 4.0.0.  
     void setImmediate (int immediate);
 
-    //  Get socket option `type`.   
-    //  Available from libzmq 3.0.0.
-    int type ();
-
     //  Get socket option `sndhwm`. 
     //  Available from libzmq 3.0.0.
     int sndhwm ();
@@ -543,94 +539,6 @@ public slots:
     //  Available from libzmq 3.0.0.
     void setRcvhwm (int rcvhwm);
 
-    //  Get socket option `affinity`.
-    //  Available from libzmq 3.0.0. 
-    int affinity ();
-
-    //  Set socket option `affinity`.
-    //  Available from libzmq 3.0.0. 
-    void setAffinity (int affinity);
-
-    //  Set socket option `subscribe`.
-    //  Available from libzmq 3.0.0.  
-    void setSubscribe (const QString &subscribe);
-
-    //  Set socket option `unsubscribe`.
-    //  Available from libzmq 3.0.0.    
-    void setUnsubscribe (const QString &unsubscribe);
-
-    //  Get socket option `identity`.
-    //  Available from libzmq 3.0.0. 
-    QString identity ();
-
-    //  Set socket option `identity`.
-    //  Available from libzmq 3.0.0. 
-    void setIdentity (const QString &identity);
-
-    //  Get socket option `rate`.   
-    //  Available from libzmq 3.0.0.
-    int rate ();
-
-    //  Set socket option `rate`.   
-    //  Available from libzmq 3.0.0.
-    void setRate (int rate);
-
-    //  Get socket option `recovery_ivl`.
-    //  Available from libzmq 3.0.0.     
-    int recoveryIvl ();
-
-    //  Set socket option `recovery_ivl`.
-    //  Available from libzmq 3.0.0.     
-    void setRecoveryIvl (int recoveryIvl);
-
-    //  Get socket option `sndbuf`. 
-    //  Available from libzmq 3.0.0.
-    int sndbuf ();
-
-    //  Set socket option `sndbuf`. 
-    //  Available from libzmq 3.0.0.
-    void setSndbuf (int sndbuf);
-
-    //  Get socket option `rcvbuf`. 
-    //  Available from libzmq 3.0.0.
-    int rcvbuf ();
-
-    //  Set socket option `rcvbuf`. 
-    //  Available from libzmq 3.0.0.
-    void setRcvbuf (int rcvbuf);
-
-    //  Get socket option `linger`. 
-    //  Available from libzmq 3.0.0.
-    int linger ();
-
-    //  Set socket option `linger`. 
-    //  Available from libzmq 3.0.0.
-    void setLinger (int linger);
-
-    //  Get socket option `reconnect_ivl`.
-    //  Available from libzmq 3.0.0.      
-    int reconnectIvl ();
-
-    //  Set socket option `reconnect_ivl`.
-    //  Available from libzmq 3.0.0.      
-    void setReconnectIvl (int reconnectIvl);
-
-    //  Get socket option `reconnect_ivl_max`.
-    //  Available from libzmq 3.0.0.          
-    int reconnectIvlMax ();
-
-    //  Set socket option `reconnect_ivl_max`.
-    //  Available from libzmq 3.0.0.          
-    void setReconnectIvlMax (int reconnectIvlMax);
-
-    //  Get socket option `backlog`.
-    //  Available from libzmq 3.0.0.
-    int backlog ();
-
-    //  Set socket option `backlog`.
-    //  Available from libzmq 3.0.0.
-    void setBacklog (int backlog);
-
     //  Get socket option `maxmsgsize`.
     //  Available from libzmq 3.0.0.   
     int maxmsgsize ();
@@ -646,22 +554,6 @@ public slots:
     //  Set socket option `multicast_hops`.
     //  Available from libzmq 3.0.0.       
     void setMulticastHops (int multicastHops);
-
-    //  Get socket option `rcvtimeo`.
-    //  Available from libzmq 3.0.0. 
-    int rcvtimeo ();
-
-    //  Set socket option `rcvtimeo`.
-    //  Available from libzmq 3.0.0. 
-    void setRcvtimeo (int rcvtimeo);
-
-    //  Get socket option `sndtimeo`.
-    //  Available from libzmq 3.0.0. 
-    int sndtimeo ();
-
-    //  Set socket option `sndtimeo`.
-    //  Available from libzmq 3.0.0. 
-    void setSndtimeo (int sndtimeo);
 
     //  Set socket option `xpub_verbose`.
     //  Available from libzmq 3.0.0.     
@@ -707,18 +599,6 @@ public slots:
     //  Available from libzmq 3.0.0.          
     void setTcpAcceptFilter (const QString &tcpAcceptFilter);
 
-    //  Get socket option `rcvmore`.
-    //  Available from libzmq 3.0.0.
-    int rcvmore ();
-
-    //  Get socket option `fd`.     
-    //  Available from libzmq 3.0.0.
-    SOCKET fd ();
-
-    //  Get socket option `events`. 
-    //  Available from libzmq 3.0.0.
-    int events ();
-
     //  Get socket option `last_endpoint`.
     //  Available from libzmq 3.0.0.      
     QString lastEndpoint ();
@@ -738,6 +618,158 @@ public slots:
     //  Set socket option `delay_attach_on_connect`.
     //  Available from libzmq 3.0.0.                
     void setDelayAttachOnConnect (int delayAttachOnConnect);
+
+    //  Get socket option `hwm`.             
+    //  Available from libzmq 2.0.0 to 3.0.0.
+    int hwm ();
+
+    //  Set socket option `hwm`.             
+    //  Available from libzmq 2.0.0 to 3.0.0.
+    void setHwm (int hwm);
+
+    //  Get socket option `swap`.            
+    //  Available from libzmq 2.0.0 to 3.0.0.
+    int swap ();
+
+    //  Set socket option `swap`.            
+    //  Available from libzmq 2.0.0 to 3.0.0.
+    void setSwap (int swap);
+
+    //  Get socket option `affinity`.
+    //  Available from libzmq 2.0.0. 
+    int affinity ();
+
+    //  Set socket option `affinity`.
+    //  Available from libzmq 2.0.0. 
+    void setAffinity (int affinity);
+
+    //  Get socket option `identity`.
+    //  Available from libzmq 2.0.0. 
+    QString identity ();
+
+    //  Set socket option `identity`.
+    //  Available from libzmq 2.0.0. 
+    void setIdentity (const QString &identity);
+
+    //  Get socket option `rate`.   
+    //  Available from libzmq 2.0.0.
+    int rate ();
+
+    //  Set socket option `rate`.   
+    //  Available from libzmq 2.0.0.
+    void setRate (int rate);
+
+    //  Get socket option `recovery_ivl`.
+    //  Available from libzmq 2.0.0.     
+    int recoveryIvl ();
+
+    //  Set socket option `recovery_ivl`.
+    //  Available from libzmq 2.0.0.     
+    void setRecoveryIvl (int recoveryIvl);
+
+    //  Get socket option `recovery_ivl_msec`.
+    //  Available from libzmq 2.0.0 to 3.0.0. 
+    int recoveryIvlMsec ();
+
+    //  Set socket option `recovery_ivl_msec`.
+    //  Available from libzmq 2.0.0 to 3.0.0. 
+    void setRecoveryIvlMsec (int recoveryIvlMsec);
+
+    //  Get socket option `mcast_loop`.      
+    //  Available from libzmq 2.0.0 to 3.0.0.
+    int mcastLoop ();
+
+    //  Set socket option `mcast_loop`.      
+    //  Available from libzmq 2.0.0 to 3.0.0.
+    void setMcastLoop (int mcastLoop);
+
+    //  Get socket option `rcvtimeo`.
+    //  Available from libzmq 2.2.0. 
+    int rcvtimeo ();
+
+    //  Set socket option `rcvtimeo`.
+    //  Available from libzmq 2.2.0. 
+    void setRcvtimeo (int rcvtimeo);
+
+    //  Get socket option `sndtimeo`.
+    //  Available from libzmq 2.2.0. 
+    int sndtimeo ();
+
+    //  Set socket option `sndtimeo`.
+    //  Available from libzmq 2.2.0. 
+    void setSndtimeo (int sndtimeo);
+
+    //  Get socket option `sndbuf`. 
+    //  Available from libzmq 2.0.0.
+    int sndbuf ();
+
+    //  Set socket option `sndbuf`. 
+    //  Available from libzmq 2.0.0.
+    void setSndbuf (int sndbuf);
+
+    //  Get socket option `rcvbuf`. 
+    //  Available from libzmq 2.0.0.
+    int rcvbuf ();
+
+    //  Set socket option `rcvbuf`. 
+    //  Available from libzmq 2.0.0.
+    void setRcvbuf (int rcvbuf);
+
+    //  Get socket option `linger`. 
+    //  Available from libzmq 2.0.0.
+    int linger ();
+
+    //  Set socket option `linger`. 
+    //  Available from libzmq 2.0.0.
+    void setLinger (int linger);
+
+    //  Get socket option `reconnect_ivl`.
+    //  Available from libzmq 2.0.0.      
+    int reconnectIvl ();
+
+    //  Set socket option `reconnect_ivl`.
+    //  Available from libzmq 2.0.0.      
+    void setReconnectIvl (int reconnectIvl);
+
+    //  Get socket option `reconnect_ivl_max`.
+    //  Available from libzmq 2.0.0.          
+    int reconnectIvlMax ();
+
+    //  Set socket option `reconnect_ivl_max`.
+    //  Available from libzmq 2.0.0.          
+    void setReconnectIvlMax (int reconnectIvlMax);
+
+    //  Get socket option `backlog`.
+    //  Available from libzmq 2.0.0.
+    int backlog ();
+
+    //  Set socket option `backlog`.
+    //  Available from libzmq 2.0.0.
+    void setBacklog (int backlog);
+
+    //  Set socket option `subscribe`.
+    //  Available from libzmq 2.0.0.  
+    void setSubscribe (const QString &subscribe);
+
+    //  Set socket option `unsubscribe`.
+    //  Available from libzmq 2.0.0.    
+    void setUnsubscribe (const QString &unsubscribe);
+
+    //  Get socket option `type`.   
+    //  Available from libzmq 2.0.0.
+    int type ();
+
+    //  Get socket option `rcvmore`.
+    //  Available from libzmq 2.0.0.
+    int rcvmore ();
+
+    //  Get socket option `fd`.     
+    //  Available from libzmq 2.0.0.
+    SOCKET fd ();
+
+    //  Get socket option `events`. 
+    //  Available from libzmq 2.0.0.
+    int events ();
 };
 
 class QmlZsockAttached : public QObject
