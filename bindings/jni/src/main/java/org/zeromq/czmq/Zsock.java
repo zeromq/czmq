@@ -1053,14 +1053,6 @@ public class Zsock implements AutoCloseable{
         __setImmediate (self, immediate);
     }
     /*
-    Get socket option `type`.   
-    Available from libzmq 3.0.0.
-    */
-    native static int __type (long self);
-    public int type () {
-        return __type (self);
-    }
-    /*
     Get socket option `sndhwm`. 
     Available from libzmq 3.0.0.
     */
@@ -1093,182 +1085,6 @@ public class Zsock implements AutoCloseable{
         __setRcvhwm (self, rcvhwm);
     }
     /*
-    Get socket option `affinity`.
-    Available from libzmq 3.0.0. 
-    */
-    native static int __affinity (long self);
-    public int affinity () {
-        return __affinity (self);
-    }
-    /*
-    Set socket option `affinity`.
-    Available from libzmq 3.0.0. 
-    */
-    native static void __setAffinity (long self, int affinity);
-    public void setAffinity (int affinity) {
-        __setAffinity (self, affinity);
-    }
-    /*
-    Set socket option `subscribe`.
-    Available from libzmq 3.0.0.  
-    */
-    native static void __setSubscribe (long self, String subscribe);
-    public void setSubscribe (String subscribe) {
-        __setSubscribe (self, subscribe);
-    }
-    /*
-    Set socket option `unsubscribe`.
-    Available from libzmq 3.0.0.    
-    */
-    native static void __setUnsubscribe (long self, String unsubscribe);
-    public void setUnsubscribe (String unsubscribe) {
-        __setUnsubscribe (self, unsubscribe);
-    }
-    /*
-    Get socket option `identity`.
-    Available from libzmq 3.0.0. 
-    */
-    native static String __identity (long self);
-    public String identity () {
-        return __identity (self);
-    }
-    /*
-    Set socket option `identity`.
-    Available from libzmq 3.0.0. 
-    */
-    native static void __setIdentity (long self, String identity);
-    public void setIdentity (String identity) {
-        __setIdentity (self, identity);
-    }
-    /*
-    Get socket option `rate`.   
-    Available from libzmq 3.0.0.
-    */
-    native static int __rate (long self);
-    public int rate () {
-        return __rate (self);
-    }
-    /*
-    Set socket option `rate`.   
-    Available from libzmq 3.0.0.
-    */
-    native static void __setRate (long self, int rate);
-    public void setRate (int rate) {
-        __setRate (self, rate);
-    }
-    /*
-    Get socket option `recovery_ivl`.
-    Available from libzmq 3.0.0.     
-    */
-    native static int __recoveryIvl (long self);
-    public int recoveryIvl () {
-        return __recoveryIvl (self);
-    }
-    /*
-    Set socket option `recovery_ivl`.
-    Available from libzmq 3.0.0.     
-    */
-    native static void __setRecoveryIvl (long self, int recoveryIvl);
-    public void setRecoveryIvl (int recoveryIvl) {
-        __setRecoveryIvl (self, recoveryIvl);
-    }
-    /*
-    Get socket option `sndbuf`. 
-    Available from libzmq 3.0.0.
-    */
-    native static int __sndbuf (long self);
-    public int sndbuf () {
-        return __sndbuf (self);
-    }
-    /*
-    Set socket option `sndbuf`. 
-    Available from libzmq 3.0.0.
-    */
-    native static void __setSndbuf (long self, int sndbuf);
-    public void setSndbuf (int sndbuf) {
-        __setSndbuf (self, sndbuf);
-    }
-    /*
-    Get socket option `rcvbuf`. 
-    Available from libzmq 3.0.0.
-    */
-    native static int __rcvbuf (long self);
-    public int rcvbuf () {
-        return __rcvbuf (self);
-    }
-    /*
-    Set socket option `rcvbuf`. 
-    Available from libzmq 3.0.0.
-    */
-    native static void __setRcvbuf (long self, int rcvbuf);
-    public void setRcvbuf (int rcvbuf) {
-        __setRcvbuf (self, rcvbuf);
-    }
-    /*
-    Get socket option `linger`. 
-    Available from libzmq 3.0.0.
-    */
-    native static int __linger (long self);
-    public int linger () {
-        return __linger (self);
-    }
-    /*
-    Set socket option `linger`. 
-    Available from libzmq 3.0.0.
-    */
-    native static void __setLinger (long self, int linger);
-    public void setLinger (int linger) {
-        __setLinger (self, linger);
-    }
-    /*
-    Get socket option `reconnect_ivl`.
-    Available from libzmq 3.0.0.      
-    */
-    native static int __reconnectIvl (long self);
-    public int reconnectIvl () {
-        return __reconnectIvl (self);
-    }
-    /*
-    Set socket option `reconnect_ivl`.
-    Available from libzmq 3.0.0.      
-    */
-    native static void __setReconnectIvl (long self, int reconnectIvl);
-    public void setReconnectIvl (int reconnectIvl) {
-        __setReconnectIvl (self, reconnectIvl);
-    }
-    /*
-    Get socket option `reconnect_ivl_max`.
-    Available from libzmq 3.0.0.          
-    */
-    native static int __reconnectIvlMax (long self);
-    public int reconnectIvlMax () {
-        return __reconnectIvlMax (self);
-    }
-    /*
-    Set socket option `reconnect_ivl_max`.
-    Available from libzmq 3.0.0.          
-    */
-    native static void __setReconnectIvlMax (long self, int reconnectIvlMax);
-    public void setReconnectIvlMax (int reconnectIvlMax) {
-        __setReconnectIvlMax (self, reconnectIvlMax);
-    }
-    /*
-    Get socket option `backlog`.
-    Available from libzmq 3.0.0.
-    */
-    native static int __backlog (long self);
-    public int backlog () {
-        return __backlog (self);
-    }
-    /*
-    Set socket option `backlog`.
-    Available from libzmq 3.0.0.
-    */
-    native static void __setBacklog (long self, int backlog);
-    public void setBacklog (int backlog) {
-        __setBacklog (self, backlog);
-    }
-    /*
     Get socket option `maxmsgsize`.
     Available from libzmq 3.0.0.   
     */
@@ -1299,38 +1115,6 @@ public class Zsock implements AutoCloseable{
     native static void __setMulticastHops (long self, int multicastHops);
     public void setMulticastHops (int multicastHops) {
         __setMulticastHops (self, multicastHops);
-    }
-    /*
-    Get socket option `rcvtimeo`.
-    Available from libzmq 3.0.0. 
-    */
-    native static int __rcvtimeo (long self);
-    public int rcvtimeo () {
-        return __rcvtimeo (self);
-    }
-    /*
-    Set socket option `rcvtimeo`.
-    Available from libzmq 3.0.0. 
-    */
-    native static void __setRcvtimeo (long self, int rcvtimeo);
-    public void setRcvtimeo (int rcvtimeo) {
-        __setRcvtimeo (self, rcvtimeo);
-    }
-    /*
-    Get socket option `sndtimeo`.
-    Available from libzmq 3.0.0. 
-    */
-    native static int __sndtimeo (long self);
-    public int sndtimeo () {
-        return __sndtimeo (self);
-    }
-    /*
-    Set socket option `sndtimeo`.
-    Available from libzmq 3.0.0. 
-    */
-    native static void __setSndtimeo (long self, int sndtimeo);
-    public void setSndtimeo (int sndtimeo) {
-        __setSndtimeo (self, sndtimeo);
     }
     /*
     Set socket option `xpub_verbose`.
@@ -1421,22 +1205,6 @@ public class Zsock implements AutoCloseable{
         __setTcpAcceptFilter (self, tcpAcceptFilter);
     }
     /*
-    Get socket option `rcvmore`.
-    Available from libzmq 3.0.0.
-    */
-    native static int __rcvmore (long self);
-    public int rcvmore () {
-        return __rcvmore (self);
-    }
-    /*
-    Get socket option `events`. 
-    Available from libzmq 3.0.0.
-    */
-    native static int __events (long self);
-    public int events () {
-        return __events (self);
-    }
-    /*
     Get socket option `last_endpoint`.
     Available from libzmq 3.0.0.      
     */
@@ -1475,6 +1243,302 @@ public class Zsock implements AutoCloseable{
     native static void __setDelayAttachOnConnect (long self, int delayAttachOnConnect);
     public void setDelayAttachOnConnect (int delayAttachOnConnect) {
         __setDelayAttachOnConnect (self, delayAttachOnConnect);
+    }
+    /*
+    Get socket option `hwm`.             
+    Available from libzmq 2.0.0 to 3.0.0.
+    */
+    native static int __hwm (long self);
+    public int hwm () {
+        return __hwm (self);
+    }
+    /*
+    Set socket option `hwm`.             
+    Available from libzmq 2.0.0 to 3.0.0.
+    */
+    native static void __setHwm (long self, int hwm);
+    public void setHwm (int hwm) {
+        __setHwm (self, hwm);
+    }
+    /*
+    Get socket option `swap`.            
+    Available from libzmq 2.0.0 to 3.0.0.
+    */
+    native static int __swap (long self);
+    public int swap () {
+        return __swap (self);
+    }
+    /*
+    Set socket option `swap`.            
+    Available from libzmq 2.0.0 to 3.0.0.
+    */
+    native static void __setSwap (long self, int swap);
+    public void setSwap (int swap) {
+        __setSwap (self, swap);
+    }
+    /*
+    Get socket option `affinity`.
+    Available from libzmq 2.0.0. 
+    */
+    native static int __affinity (long self);
+    public int affinity () {
+        return __affinity (self);
+    }
+    /*
+    Set socket option `affinity`.
+    Available from libzmq 2.0.0. 
+    */
+    native static void __setAffinity (long self, int affinity);
+    public void setAffinity (int affinity) {
+        __setAffinity (self, affinity);
+    }
+    /*
+    Get socket option `identity`.
+    Available from libzmq 2.0.0. 
+    */
+    native static String __identity (long self);
+    public String identity () {
+        return __identity (self);
+    }
+    /*
+    Set socket option `identity`.
+    Available from libzmq 2.0.0. 
+    */
+    native static void __setIdentity (long self, String identity);
+    public void setIdentity (String identity) {
+        __setIdentity (self, identity);
+    }
+    /*
+    Get socket option `rate`.   
+    Available from libzmq 2.0.0.
+    */
+    native static int __rate (long self);
+    public int rate () {
+        return __rate (self);
+    }
+    /*
+    Set socket option `rate`.   
+    Available from libzmq 2.0.0.
+    */
+    native static void __setRate (long self, int rate);
+    public void setRate (int rate) {
+        __setRate (self, rate);
+    }
+    /*
+    Get socket option `recovery_ivl`.
+    Available from libzmq 2.0.0.     
+    */
+    native static int __recoveryIvl (long self);
+    public int recoveryIvl () {
+        return __recoveryIvl (self);
+    }
+    /*
+    Set socket option `recovery_ivl`.
+    Available from libzmq 2.0.0.     
+    */
+    native static void __setRecoveryIvl (long self, int recoveryIvl);
+    public void setRecoveryIvl (int recoveryIvl) {
+        __setRecoveryIvl (self, recoveryIvl);
+    }
+    /*
+    Get socket option `recovery_ivl_msec`.
+    Available from libzmq 2.0.0 to 3.0.0. 
+    */
+    native static int __recoveryIvlMsec (long self);
+    public int recoveryIvlMsec () {
+        return __recoveryIvlMsec (self);
+    }
+    /*
+    Set socket option `recovery_ivl_msec`.
+    Available from libzmq 2.0.0 to 3.0.0. 
+    */
+    native static void __setRecoveryIvlMsec (long self, int recoveryIvlMsec);
+    public void setRecoveryIvlMsec (int recoveryIvlMsec) {
+        __setRecoveryIvlMsec (self, recoveryIvlMsec);
+    }
+    /*
+    Get socket option `mcast_loop`.      
+    Available from libzmq 2.0.0 to 3.0.0.
+    */
+    native static int __mcastLoop (long self);
+    public int mcastLoop () {
+        return __mcastLoop (self);
+    }
+    /*
+    Set socket option `mcast_loop`.      
+    Available from libzmq 2.0.0 to 3.0.0.
+    */
+    native static void __setMcastLoop (long self, int mcastLoop);
+    public void setMcastLoop (int mcastLoop) {
+        __setMcastLoop (self, mcastLoop);
+    }
+    /*
+    Get socket option `rcvtimeo`.
+    Available from libzmq 2.2.0. 
+    */
+    native static int __rcvtimeo (long self);
+    public int rcvtimeo () {
+        return __rcvtimeo (self);
+    }
+    /*
+    Set socket option `rcvtimeo`.
+    Available from libzmq 2.2.0. 
+    */
+    native static void __setRcvtimeo (long self, int rcvtimeo);
+    public void setRcvtimeo (int rcvtimeo) {
+        __setRcvtimeo (self, rcvtimeo);
+    }
+    /*
+    Get socket option `sndtimeo`.
+    Available from libzmq 2.2.0. 
+    */
+    native static int __sndtimeo (long self);
+    public int sndtimeo () {
+        return __sndtimeo (self);
+    }
+    /*
+    Set socket option `sndtimeo`.
+    Available from libzmq 2.2.0. 
+    */
+    native static void __setSndtimeo (long self, int sndtimeo);
+    public void setSndtimeo (int sndtimeo) {
+        __setSndtimeo (self, sndtimeo);
+    }
+    /*
+    Get socket option `sndbuf`. 
+    Available from libzmq 2.0.0.
+    */
+    native static int __sndbuf (long self);
+    public int sndbuf () {
+        return __sndbuf (self);
+    }
+    /*
+    Set socket option `sndbuf`. 
+    Available from libzmq 2.0.0.
+    */
+    native static void __setSndbuf (long self, int sndbuf);
+    public void setSndbuf (int sndbuf) {
+        __setSndbuf (self, sndbuf);
+    }
+    /*
+    Get socket option `rcvbuf`. 
+    Available from libzmq 2.0.0.
+    */
+    native static int __rcvbuf (long self);
+    public int rcvbuf () {
+        return __rcvbuf (self);
+    }
+    /*
+    Set socket option `rcvbuf`. 
+    Available from libzmq 2.0.0.
+    */
+    native static void __setRcvbuf (long self, int rcvbuf);
+    public void setRcvbuf (int rcvbuf) {
+        __setRcvbuf (self, rcvbuf);
+    }
+    /*
+    Get socket option `linger`. 
+    Available from libzmq 2.0.0.
+    */
+    native static int __linger (long self);
+    public int linger () {
+        return __linger (self);
+    }
+    /*
+    Set socket option `linger`. 
+    Available from libzmq 2.0.0.
+    */
+    native static void __setLinger (long self, int linger);
+    public void setLinger (int linger) {
+        __setLinger (self, linger);
+    }
+    /*
+    Get socket option `reconnect_ivl`.
+    Available from libzmq 2.0.0.      
+    */
+    native static int __reconnectIvl (long self);
+    public int reconnectIvl () {
+        return __reconnectIvl (self);
+    }
+    /*
+    Set socket option `reconnect_ivl`.
+    Available from libzmq 2.0.0.      
+    */
+    native static void __setReconnectIvl (long self, int reconnectIvl);
+    public void setReconnectIvl (int reconnectIvl) {
+        __setReconnectIvl (self, reconnectIvl);
+    }
+    /*
+    Get socket option `reconnect_ivl_max`.
+    Available from libzmq 2.0.0.          
+    */
+    native static int __reconnectIvlMax (long self);
+    public int reconnectIvlMax () {
+        return __reconnectIvlMax (self);
+    }
+    /*
+    Set socket option `reconnect_ivl_max`.
+    Available from libzmq 2.0.0.          
+    */
+    native static void __setReconnectIvlMax (long self, int reconnectIvlMax);
+    public void setReconnectIvlMax (int reconnectIvlMax) {
+        __setReconnectIvlMax (self, reconnectIvlMax);
+    }
+    /*
+    Get socket option `backlog`.
+    Available from libzmq 2.0.0.
+    */
+    native static int __backlog (long self);
+    public int backlog () {
+        return __backlog (self);
+    }
+    /*
+    Set socket option `backlog`.
+    Available from libzmq 2.0.0.
+    */
+    native static void __setBacklog (long self, int backlog);
+    public void setBacklog (int backlog) {
+        __setBacklog (self, backlog);
+    }
+    /*
+    Set socket option `subscribe`.
+    Available from libzmq 2.0.0.  
+    */
+    native static void __setSubscribe (long self, String subscribe);
+    public void setSubscribe (String subscribe) {
+        __setSubscribe (self, subscribe);
+    }
+    /*
+    Set socket option `unsubscribe`.
+    Available from libzmq 2.0.0.    
+    */
+    native static void __setUnsubscribe (long self, String unsubscribe);
+    public void setUnsubscribe (String unsubscribe) {
+        __setUnsubscribe (self, unsubscribe);
+    }
+    /*
+    Get socket option `type`.   
+    Available from libzmq 2.0.0.
+    */
+    native static int __type (long self);
+    public int type () {
+        return __type (self);
+    }
+    /*
+    Get socket option `rcvmore`.
+    Available from libzmq 2.0.0.
+    */
+    native static int __rcvmore (long self);
+    public int rcvmore () {
+        return __rcvmore (self);
+    }
+    /*
+    Get socket option `events`. 
+    Available from libzmq 2.0.0.
+    */
+    native static int __events (long self);
+    public int events () {
+        return __events (self);
     }
     /*
     Self test of this class.

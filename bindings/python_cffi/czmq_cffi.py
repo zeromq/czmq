@@ -2944,11 +2944,6 @@ int
 void
     zsock_set_immediate (void *self, int immediate);
 
-// Get socket option `type`.   
-// Available from libzmq 3.0.0.
-int
-    zsock_type (void *self);
-
 // Get socket option `sndhwm`. 
 // Available from libzmq 3.0.0.
 int
@@ -2969,116 +2964,6 @@ int
 void
     zsock_set_rcvhwm (void *self, int rcvhwm);
 
-// Get socket option `affinity`.
-// Available from libzmq 3.0.0. 
-int
-    zsock_affinity (void *self);
-
-// Set socket option `affinity`.
-// Available from libzmq 3.0.0. 
-void
-    zsock_set_affinity (void *self, int affinity);
-
-// Set socket option `subscribe`.
-// Available from libzmq 3.0.0.  
-void
-    zsock_set_subscribe (void *self, const char *subscribe);
-
-// Set socket option `unsubscribe`.
-// Available from libzmq 3.0.0.    
-void
-    zsock_set_unsubscribe (void *self, const char *unsubscribe);
-
-// Get socket option `identity`.
-// Available from libzmq 3.0.0. 
-char *
-    zsock_identity (void *self);
-
-// Set socket option `identity`.
-// Available from libzmq 3.0.0. 
-void
-    zsock_set_identity (void *self, const char *identity);
-
-// Get socket option `rate`.   
-// Available from libzmq 3.0.0.
-int
-    zsock_rate (void *self);
-
-// Set socket option `rate`.   
-// Available from libzmq 3.0.0.
-void
-    zsock_set_rate (void *self, int rate);
-
-// Get socket option `recovery_ivl`.
-// Available from libzmq 3.0.0.     
-int
-    zsock_recovery_ivl (void *self);
-
-// Set socket option `recovery_ivl`.
-// Available from libzmq 3.0.0.     
-void
-    zsock_set_recovery_ivl (void *self, int recovery_ivl);
-
-// Get socket option `sndbuf`. 
-// Available from libzmq 3.0.0.
-int
-    zsock_sndbuf (void *self);
-
-// Set socket option `sndbuf`. 
-// Available from libzmq 3.0.0.
-void
-    zsock_set_sndbuf (void *self, int sndbuf);
-
-// Get socket option `rcvbuf`. 
-// Available from libzmq 3.0.0.
-int
-    zsock_rcvbuf (void *self);
-
-// Set socket option `rcvbuf`. 
-// Available from libzmq 3.0.0.
-void
-    zsock_set_rcvbuf (void *self, int rcvbuf);
-
-// Get socket option `linger`. 
-// Available from libzmq 3.0.0.
-int
-    zsock_linger (void *self);
-
-// Set socket option `linger`. 
-// Available from libzmq 3.0.0.
-void
-    zsock_set_linger (void *self, int linger);
-
-// Get socket option `reconnect_ivl`.
-// Available from libzmq 3.0.0.      
-int
-    zsock_reconnect_ivl (void *self);
-
-// Set socket option `reconnect_ivl`.
-// Available from libzmq 3.0.0.      
-void
-    zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
-
-// Get socket option `reconnect_ivl_max`.
-// Available from libzmq 3.0.0.          
-int
-    zsock_reconnect_ivl_max (void *self);
-
-// Set socket option `reconnect_ivl_max`.
-// Available from libzmq 3.0.0.          
-void
-    zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
-
-// Get socket option `backlog`.
-// Available from libzmq 3.0.0.
-int
-    zsock_backlog (void *self);
-
-// Set socket option `backlog`.
-// Available from libzmq 3.0.0.
-void
-    zsock_set_backlog (void *self, int backlog);
-
 // Get socket option `maxmsgsize`.
 // Available from libzmq 3.0.0.   
 int
@@ -3098,26 +2983,6 @@ int
 // Available from libzmq 3.0.0.       
 void
     zsock_set_multicast_hops (void *self, int multicast_hops);
-
-// Get socket option `rcvtimeo`.
-// Available from libzmq 3.0.0. 
-int
-    zsock_rcvtimeo (void *self);
-
-// Set socket option `rcvtimeo`.
-// Available from libzmq 3.0.0. 
-void
-    zsock_set_rcvtimeo (void *self, int rcvtimeo);
-
-// Get socket option `sndtimeo`.
-// Available from libzmq 3.0.0. 
-int
-    zsock_sndtimeo (void *self);
-
-// Set socket option `sndtimeo`.
-// Available from libzmq 3.0.0. 
-void
-    zsock_set_sndtimeo (void *self, int sndtimeo);
 
 // Set socket option `xpub_verbose`.
 // Available from libzmq 3.0.0.     
@@ -3174,21 +3039,6 @@ char *
 void
     zsock_set_tcp_accept_filter (void *self, const char *tcp_accept_filter);
 
-// Get socket option `rcvmore`.
-// Available from libzmq 3.0.0.
-int
-    zsock_rcvmore (void *self);
-
-// Get socket option `fd`.     
-// Available from libzmq 3.0.0.
-SOCKET
-    zsock_fd (void *self);
-
-// Get socket option `events`. 
-// Available from libzmq 3.0.0.
-int
-    zsock_events (void *self);
-
 // Get socket option `last_endpoint`.
 // Available from libzmq 3.0.0.      
 char *
@@ -3213,6 +3063,196 @@ void
 // Available from libzmq 3.0.0.                
 void
     zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
+
+// Get socket option `hwm`.             
+// Available from libzmq 2.0.0 to 3.0.0.
+int
+    zsock_hwm (void *self);
+
+// Set socket option `hwm`.             
+// Available from libzmq 2.0.0 to 3.0.0.
+void
+    zsock_set_hwm (void *self, int hwm);
+
+// Get socket option `swap`.            
+// Available from libzmq 2.0.0 to 3.0.0.
+int
+    zsock_swap (void *self);
+
+// Set socket option `swap`.            
+// Available from libzmq 2.0.0 to 3.0.0.
+void
+    zsock_set_swap (void *self, int swap);
+
+// Get socket option `affinity`.
+// Available from libzmq 2.0.0. 
+int
+    zsock_affinity (void *self);
+
+// Set socket option `affinity`.
+// Available from libzmq 2.0.0. 
+void
+    zsock_set_affinity (void *self, int affinity);
+
+// Get socket option `identity`.
+// Available from libzmq 2.0.0. 
+char *
+    zsock_identity (void *self);
+
+// Set socket option `identity`.
+// Available from libzmq 2.0.0. 
+void
+    zsock_set_identity (void *self, const char *identity);
+
+// Get socket option `rate`.   
+// Available from libzmq 2.0.0.
+int
+    zsock_rate (void *self);
+
+// Set socket option `rate`.   
+// Available from libzmq 2.0.0.
+void
+    zsock_set_rate (void *self, int rate);
+
+// Get socket option `recovery_ivl`.
+// Available from libzmq 2.0.0.     
+int
+    zsock_recovery_ivl (void *self);
+
+// Set socket option `recovery_ivl`.
+// Available from libzmq 2.0.0.     
+void
+    zsock_set_recovery_ivl (void *self, int recovery_ivl);
+
+// Get socket option `recovery_ivl_msec`.
+// Available from libzmq 2.0.0 to 3.0.0. 
+int
+    zsock_recovery_ivl_msec (void *self);
+
+// Set socket option `recovery_ivl_msec`.
+// Available from libzmq 2.0.0 to 3.0.0. 
+void
+    zsock_set_recovery_ivl_msec (void *self, int recovery_ivl_msec);
+
+// Get socket option `mcast_loop`.      
+// Available from libzmq 2.0.0 to 3.0.0.
+int
+    zsock_mcast_loop (void *self);
+
+// Set socket option `mcast_loop`.      
+// Available from libzmq 2.0.0 to 3.0.0.
+void
+    zsock_set_mcast_loop (void *self, int mcast_loop);
+
+// Get socket option `rcvtimeo`.
+// Available from libzmq 2.2.0. 
+int
+    zsock_rcvtimeo (void *self);
+
+// Set socket option `rcvtimeo`.
+// Available from libzmq 2.2.0. 
+void
+    zsock_set_rcvtimeo (void *self, int rcvtimeo);
+
+// Get socket option `sndtimeo`.
+// Available from libzmq 2.2.0. 
+int
+    zsock_sndtimeo (void *self);
+
+// Set socket option `sndtimeo`.
+// Available from libzmq 2.2.0. 
+void
+    zsock_set_sndtimeo (void *self, int sndtimeo);
+
+// Get socket option `sndbuf`. 
+// Available from libzmq 2.0.0.
+int
+    zsock_sndbuf (void *self);
+
+// Set socket option `sndbuf`. 
+// Available from libzmq 2.0.0.
+void
+    zsock_set_sndbuf (void *self, int sndbuf);
+
+// Get socket option `rcvbuf`. 
+// Available from libzmq 2.0.0.
+int
+    zsock_rcvbuf (void *self);
+
+// Set socket option `rcvbuf`. 
+// Available from libzmq 2.0.0.
+void
+    zsock_set_rcvbuf (void *self, int rcvbuf);
+
+// Get socket option `linger`. 
+// Available from libzmq 2.0.0.
+int
+    zsock_linger (void *self);
+
+// Set socket option `linger`. 
+// Available from libzmq 2.0.0.
+void
+    zsock_set_linger (void *self, int linger);
+
+// Get socket option `reconnect_ivl`.
+// Available from libzmq 2.0.0.      
+int
+    zsock_reconnect_ivl (void *self);
+
+// Set socket option `reconnect_ivl`.
+// Available from libzmq 2.0.0.      
+void
+    zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
+
+// Get socket option `reconnect_ivl_max`.
+// Available from libzmq 2.0.0.          
+int
+    zsock_reconnect_ivl_max (void *self);
+
+// Set socket option `reconnect_ivl_max`.
+// Available from libzmq 2.0.0.          
+void
+    zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
+
+// Get socket option `backlog`.
+// Available from libzmq 2.0.0.
+int
+    zsock_backlog (void *self);
+
+// Set socket option `backlog`.
+// Available from libzmq 2.0.0.
+void
+    zsock_set_backlog (void *self, int backlog);
+
+// Set socket option `subscribe`.
+// Available from libzmq 2.0.0.  
+void
+    zsock_set_subscribe (void *self, const char *subscribe);
+
+// Set socket option `unsubscribe`.
+// Available from libzmq 2.0.0.    
+void
+    zsock_set_unsubscribe (void *self, const char *unsubscribe);
+
+// Get socket option `type`.   
+// Available from libzmq 2.0.0.
+int
+    zsock_type (void *self);
+
+// Get socket option `rcvmore`.
+// Available from libzmq 2.0.0.
+int
+    zsock_rcvmore (void *self);
+
+// Get socket option `fd`.     
+// Available from libzmq 2.0.0.
+SOCKET
+    zsock_fd (void *self);
+
+// Get socket option `events`. 
+// Available from libzmq 2.0.0.
+int
+    zsock_events (void *self);
 
 // Self test of this class.
 void
