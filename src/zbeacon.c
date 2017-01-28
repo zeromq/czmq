@@ -103,29 +103,29 @@ s_self_prepare_udp (self_t *self)
     }
     // if ZSYS_INTERFACE is a single digit, use the corresponding interface in
     // the interface list
-    else if (strlen(iface) == 1 && iface[0] >= '0' && iface[0] <= '9')
+    else if (strlen (iface) == 1 && iface[0] >= '0' && iface[0] <= '9')
     {
-      int if_number = atoi(iface);
-      ziflist_t *iflist = ziflist_new();
-      assert(iflist);
-      const char *name = ziflist_first(iflist);
-      int idx = -1;
-      while (name) {
-        idx++;
-        if (idx==if_number) {
-          //  Using inet_addr instead of inet_aton or inet_atop
-          //  because these are not supported in Win XP
-          send_to = inet_addr(ziflist_broadcast(iflist));
-          bind_to = inet_addr(ziflist_address(iflist));
-          if (self->verbose)
-            zsys_info("zbeacon: interface=%s address=%s broadcast=%s",
-              name, ziflist_address(iflist), ziflist_broadcast(iflist));
-          found_iface = 1;
-          break;      //  iface is known, so allow it
+        int if_number = atoi (iface);
+        ziflist_t *iflist = ziflist_new ();
+        assert (iflist);
+        const char *name = ziflist_first (iflist);
+        int idx = -1;
+        while (name) {
+            idx++;
+            if (idx == if_number) {
+                //  Using inet_addr instead of inet_aton or inet_atop
+                //  because these are not supported in Win XP
+                send_to = inet_addr (ziflist_broadcast (iflist));
+                bind_to = inet_addr (ziflist_address (iflist));
+                if (self->verbose)
+                    zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
+                            name, ziflist_address (iflist), ziflist_broadcast (iflist));
+                found_iface = 1;
+                break;      //  iface is known, so allow it
+            }
+            name = ziflist_next (iflist);
         }
-        name = ziflist_next(iflist);
-      }
-      ziflist_destroy(&iflist);
+        ziflist_destroy (&iflist);
     }
     else {
         //  Look for matching interface, or first ziflist item
