@@ -168,7 +168,7 @@ CZMQ_EXPORT int
 
 //  Receive zframe from UDP socket, and set address of peer that sent it
 //  The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
-//  NI_MAXHOST if it's enabled.
+//  NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT zframe_t *
     zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen);

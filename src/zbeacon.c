@@ -276,6 +276,8 @@ s_self_handle_udp (self_t *self)
 
     char peername [NI_MAXHOST];
     zframe_t *frame = zsys_udp_recv (self->udpsock, peername, NI_MAXHOST);
+    if (!frame)
+        return;
 
     //  If filter is set, check that beacon matches it
     bool is_valid = false;

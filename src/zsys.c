@@ -932,7 +932,7 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address, int addrlen)
 //  --------------------------------------------------------------------------
 //  Receive zframe from UDP socket, and set address of peer that sent it
 //  The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
-//  NI_MAXHOST if it's enabled.
+//  NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
 
 zframe_t *
 zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
@@ -950,8 +950,15 @@ zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
         zsys_socket_error ("recvfrom");
 
     //  Get sender address as printable string
-    getnameinfo ((struct sockaddr *) &address6, address_len,
+    int rc = getnameinfo ((struct sockaddr *) &address6, address_len,
                  peername, peerlen, NULL, 0, NI_NUMERICHOST);
+
+    if (rc) {
+        zsys_warning ("zsys_udp_recv: getnameinfo failed, reason=%s",
+                gai_strerror (rc));
+        return NULL;
+    }
+
     return zframe_new (buffer, size);
 }
 
