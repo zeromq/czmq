@@ -54,6 +54,9 @@ public slots:
 
     //  Reload network interfaces from system, including IPv6
     void reloadIpv6 ();
+
+    //  Return true if the current interface uses IPv6
+    bool isIpv6 ();
 };
 
 class QmlZiflistAttached : public QObject

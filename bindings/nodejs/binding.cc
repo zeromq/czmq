@@ -2839,6 +2839,7 @@ NAN_MODULE_INIT (Ziflist::Init) {
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "newIpv6", _new_ipv6);
     Nan::SetPrototypeMethod (tpl, "reloadIpv6", _reload_ipv6);
+    Nan::SetPrototypeMethod (tpl, "isIpv6", _is_ipv6);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -2937,6 +2938,12 @@ NAN_METHOD (Ziflist::_new_ipv6) {
 NAN_METHOD (Ziflist::_reload_ipv6) {
     Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
     ziflist_reload_ipv6 (ziflist->self);
+}
+
+NAN_METHOD (Ziflist::_is_ipv6) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    bool result = ziflist_is_ipv6 (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Ziflist::_test) {

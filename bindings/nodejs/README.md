@@ -1546,6 +1546,12 @@ nothing my_ziflist.reloadIpv6 ()
 Reload network interfaces from system, including IPv6
 
 ```
+boolean my_ziflist.isIpv6 ()
+```
+
+Return true if the current interface uses IPv6
+
+```
 nothing my_ziflist.test (Boolean)
 ```
 

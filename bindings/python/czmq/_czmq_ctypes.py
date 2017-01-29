@@ -3120,6 +3120,8 @@ lib.ziflist_new_ipv6.restype = ziflist_p
 lib.ziflist_new_ipv6.argtypes = []
 lib.ziflist_reload_ipv6.restype = None
 lib.ziflist_reload_ipv6.argtypes = [ziflist_p]
+lib.ziflist_is_ipv6.restype = c_bool
+lib.ziflist_is_ipv6.argtypes = [ziflist_p]
 lib.ziflist_test.restype = None
 lib.ziflist_test.argtypes = [c_bool]
 
@@ -3232,6 +3234,12 @@ Includes IPv6 interfaces
         Reload network interfaces from system, including IPv6
         """
         return lib.ziflist_reload_ipv6(self._as_parameter_)
+
+    def is_ipv6(self):
+        """
+        Return true if the current interface uses IPv6
+        """
+        return lib.ziflist_is_ipv6(self._as_parameter_)
 
     @staticmethod
     def test(verbose):

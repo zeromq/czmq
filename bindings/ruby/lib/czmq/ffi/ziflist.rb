@@ -190,6 +190,16 @@ module CZMQ
         result
       end
 
+      # Return true if the current interface uses IPv6
+      #
+      # @return [Boolean]
+      def is_ipv6()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_is_ipv6(self_p)
+        result
+      end
+
       # Self test of this class.
       #
       # @param verbose [Boolean]

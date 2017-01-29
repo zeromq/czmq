@@ -82,6 +82,11 @@ CZMQ_EXPORT ziflist_t *
 CZMQ_EXPORT void
     ziflist_reload_ipv6 (ziflist_t *self);
 
+//  *** Draft method, for development use, may change without warning ***
+//  Return true if the current interface uses IPv6
+CZMQ_EXPORT bool
+    ziflist_is_ipv6 (ziflist_t *self);
+
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
 

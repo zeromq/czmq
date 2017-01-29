@@ -111,6 +111,14 @@ void QZiflist::reloadIpv6 ()
 }
 
 ///
+//  Return true if the current interface uses IPv6
+bool QZiflist::isIpv6 ()
+{
+    bool rv = ziflist_is_ipv6 (self);
+    return rv;
+}
+
+///
 //  Self test of this class.
 void QZiflist::test (bool verbose)
 {

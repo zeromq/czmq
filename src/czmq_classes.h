@@ -113,6 +113,11 @@ CZMQ_PRIVATE void
     ziflist_reload_ipv6 (ziflist_t *self);
 
 //  *** Draft method, defined for internal use only ***
+//  Return true if the current interface uses IPv6
+CZMQ_PRIVATE bool
+    ziflist_is_ipv6 (ziflist_t *self);
+
+//  *** Draft method, defined for internal use only ***
 //  Return message routing ID, if the message came from a ZMQ_SERVER socket.
 //  Else returns zero.                                                      
 CZMQ_PRIVATE uint32_t

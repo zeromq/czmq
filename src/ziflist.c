@@ -30,6 +30,7 @@ typedef struct {
     char *address;
     char *netmask;
     char *broadcast;
+    bool is_ipv6;
 } interface_t;
 
 
@@ -98,6 +99,8 @@ s_interface_new (char *name, struct sockaddr *address, struct sockaddr *netmask,
         self->broadcast = strdup (zsys_ipv6_mcast_address ());
         assert (self->broadcast);
     }
+
+    self->is_ipv6 = address->sa_family == AF_INET6 ? true : false;
 
     return self;
 }
@@ -420,6 +423,18 @@ ziflist_netmask (ziflist_t *self)
         return iface->netmask;
     else
         return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return true if the current interface uses IPv6
+
+bool
+ziflist_is_ipv6 (ziflist_t *self)
+{
+    assert (self);
+    interface_t *iface = (interface_t *) zlistx_item ((zlistx_t *) self);
+    return iface->is_ipv6;
 }
 
 

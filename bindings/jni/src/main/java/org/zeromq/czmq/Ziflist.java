@@ -108,6 +108,13 @@ public class Ziflist implements AutoCloseable{
         __reloadIpv6 (self);
     }
     /*
+    Return true if the current interface uses IPv6
+    */
+    native static boolean __isIpv6 (long self);
+    public boolean isIpv6 () {
+        return __isIpv6 (self);
+    }
+    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

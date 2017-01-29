@@ -62,6 +62,12 @@ void QmlZiflist::reloadIpv6 () {
     ziflist_reload_ipv6 (self);
 };
 
+///
+//  Return true if the current interface uses IPv6
+bool QmlZiflist::isIpv6 () {
+    return ziflist_is_ipv6 (self);
+};
+
 
 QObject* QmlZiflist::qmlAttachedProperties(QObject* object) {
     return new QmlZiflistAttached(object);

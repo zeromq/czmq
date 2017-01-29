@@ -453,6 +453,17 @@ module CZMQ
           raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
+      begin # DRAFT method
+        attach_function :ziflist_is_ipv6, [:pointer], :bool, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function ziflist_is_ipv6()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.ziflist_is_ipv6(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :ziflist_test, [:bool], :void, **opts
 
       require_relative 'ffi/ziflist'

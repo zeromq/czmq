@@ -414,6 +414,7 @@ class Ziflist: public Nan::ObjectWrap {
     static NAN_METHOD (_print);
     static NAN_METHOD (_new_ipv6);
     static NAN_METHOD (_reload_ipv6);
+    static NAN_METHOD (_is_ipv6);
     static NAN_METHOD (_test);
 };
 
