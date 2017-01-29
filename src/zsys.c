@@ -939,9 +939,6 @@ zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
 {
     char buffer [UDP_FRAME_MAX];
     in6addr_t address6;
-#if (!defined (__WINDOWS__))
-    inaddr_t *address = (inaddr_t *) &address6;
-#endif
     socklen_t address_len = sizeof (in6addr_t);
     ssize_t size = recvfrom (
         udpsock,
@@ -953,15 +950,8 @@ zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
         zsys_socket_error ("recvfrom");
 
     //  Get sender address as printable string
-#if (defined (__WINDOWS__))
     getnameinfo ((struct sockaddr *) &address6, address_len,
                  peername, peerlen, NULL, 0, NI_NUMERICHOST);
-#else
-    if (address6.sin6_family == AF_INET6)
-        inet_ntop (AF_INET6, &address6.sin6_addr, peername, address_len);
-    else
-        inet_ntop (AF_INET, &address->sin_addr, peername, address_len);
-#endif
     return zframe_new (buffer, size);
 }
 
