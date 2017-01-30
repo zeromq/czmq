@@ -3116,6 +3116,12 @@ lib.ziflist_netmask.restype = c_char_p
 lib.ziflist_netmask.argtypes = [ziflist_p]
 lib.ziflist_print.restype = None
 lib.ziflist_print.argtypes = [ziflist_p]
+lib.ziflist_new_ipv6.restype = ziflist_p
+lib.ziflist_new_ipv6.argtypes = []
+lib.ziflist_reload_ipv6.restype = None
+lib.ziflist_reload_ipv6.argtypes = [ziflist_p]
+lib.ziflist_is_ipv6.restype = c_bool
+lib.ziflist_is_ipv6.argtypes = [ziflist_p]
 lib.ziflist_test.restype = None
 lib.ziflist_test.argtypes = [c_bool]
 
@@ -3214,6 +3220,26 @@ class Ziflist(object):
         Return the list of interfaces.
         """
         return lib.ziflist_print(self._as_parameter_)
+
+    @staticmethod
+    def new_ipv6():
+        """
+        Get a list of network interfaces currently defined on the system
+Includes IPv6 interfaces
+        """
+        return Ziflist(lib.ziflist_new_ipv6(), True)
+
+    def reload_ipv6(self):
+        """
+        Reload network interfaces from system, including IPv6
+        """
+        return lib.ziflist_reload_ipv6(self._as_parameter_)
+
+    def is_ipv6(self):
+        """
+        Return true if the current interface uses IPv6
+        """
+        return lib.ziflist_is_ipv6(self._as_parameter_)
 
     @staticmethod
     def test(verbose):

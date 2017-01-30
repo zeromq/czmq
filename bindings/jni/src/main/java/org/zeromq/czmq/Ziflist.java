@@ -93,6 +93,28 @@ public class Ziflist implements AutoCloseable{
         __print (self);
     }
     /*
+    Get a list of network interfaces currently defined on the system
+    Includes IPv6 interfaces                                        
+    */
+    native static long __newIpv6 ();
+    public Ziflist newIpv6 () {
+        return new Ziflist (__newIpv6 ());
+    }
+    /*
+    Reload network interfaces from system, including IPv6
+    */
+    native static void __reloadIpv6 (long self);
+    public void reloadIpv6 () {
+        __reloadIpv6 (self);
+    }
+    /*
+    Return true if the current interface uses IPv6
+    */
+    native static boolean __isIpv6 (long self);
+    public boolean isIpv6 () {
+        return __isIpv6 (self);
+    }
+    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

@@ -56,11 +56,32 @@ void QmlZiflist::print () {
     ziflist_print (self);
 };
 
+///
+//  Reload network interfaces from system, including IPv6
+void QmlZiflist::reloadIpv6 () {
+    ziflist_reload_ipv6 (self);
+};
+
+///
+//  Return true if the current interface uses IPv6
+bool QmlZiflist::isIpv6 () {
+    return ziflist_is_ipv6 (self);
+};
+
 
 QObject* QmlZiflist::qmlAttachedProperties(QObject* object) {
     return new QmlZiflistAttached(object);
 }
 
+
+///
+//  Get a list of network interfaces currently defined on the system
+//  Includes IPv6 interfaces                                        
+QmlZiflist *QmlZiflistAttached::newIpv6 () {
+    QmlZiflist *retQ_ = new QmlZiflist ();
+    retQ_->self = ziflist_new_ipv6 ();
+    return retQ_;
+};
 
 ///
 //  Self test of this class.

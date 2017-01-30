@@ -55,4 +55,19 @@
     <method name = "print">
         Return the list of interfaces.
     </method>
+
+    <method name = "new ipv6" singleton = "1" state = "draft">
+        Get a list of network interfaces currently defined on the system
+        Includes IPv6 interfaces
+        <return type = "ziflist" fresh = "1" />
+    </method>
+
+    <method name = "reload ipv6" state = "draft">
+        Reload network interfaces from system, including IPv6
+    </method>
+
+    <method name = "is ipv6" state = "draft">
+        Return true if the current interface uses IPv6
+        <return type = "boolean" />
+    </method>
 </class>

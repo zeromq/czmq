@@ -84,6 +84,26 @@ Java_org_zeromq_czmq_Ziflist__1_1print (JNIEnv *env, jclass c, jlong self)
     ziflist_print ((ziflist_t *) (intptr_t) self);
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Ziflist__1_1newIpv6 (JNIEnv *env, jclass c)
+{
+    jlong new_ipv6_ = (jlong) (intptr_t) ziflist_new_ipv6 ();
+    return new_ipv6_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Ziflist__1_1reloadIpv6 (JNIEnv *env, jclass c, jlong self)
+{
+    ziflist_reload_ipv6 ((ziflist_t *) (intptr_t) self);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_org_zeromq_czmq_Ziflist__1_1isIpv6 (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean is_ipv6_ = (jboolean) ziflist_is_ipv6 ((ziflist_t *) (intptr_t) self);
+    return is_ipv6_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {

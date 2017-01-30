@@ -1533,6 +1533,25 @@ nothing my_ziflist.print ()
 Return the list of interfaces.
 
 ```
+ziflist my_ziflist.newIpv6 ()
+```
+
+Get a list of network interfaces currently defined on the system
+Includes IPv6 interfaces
+
+```
+nothing my_ziflist.reloadIpv6 ()
+```
+
+Reload network interfaces from system, including IPv6
+
+```
+boolean my_ziflist.isIpv6 ()
+```
+
+Return true if the current interface uses IPv6
+
+```
 nothing my_ziflist.test (Boolean)
 ```
 

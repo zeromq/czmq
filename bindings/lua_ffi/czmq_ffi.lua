@@ -1468,6 +1468,19 @@ const char *
 void
     ziflist_print (ziflist_t *self);
 
+// Get a list of network interfaces currently defined on the system
+// Includes IPv6 interfaces                                        
+ziflist_t *
+    ziflist_new_ipv6 (void);
+
+// Reload network interfaces from system, including IPv6
+void
+    ziflist_reload_ipv6 (ziflist_t *self);
+
+// Return true if the current interface uses IPv6
+bool
+    ziflist_is_ipv6 (ziflist_t *self);
+
 // Self test of this class.
 void
     ziflist_test (bool verbose);

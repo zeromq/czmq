@@ -170,6 +170,36 @@ module CZMQ
         result
       end
 
+      # Get a list of network interfaces currently defined on the system
+      # Includes IPv6 interfaces                                        
+      #
+      # @return [Ziflist]
+      def self.new_ipv6()
+        result = ::CZMQ::FFI.ziflist_new_ipv6()
+        result = Ziflist.__new result, true
+        result
+      end
+
+      # Reload network interfaces from system, including IPv6
+      #
+      # @return [void]
+      def reload_ipv6()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_reload_ipv6(self_p)
+        result
+      end
+
+      # Return true if the current interface uses IPv6
+      #
+      # @return [Boolean]
+      def is_ipv6()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_is_ipv6(self_p)
+        result
+      end
+
       # Self test of this class.
       #
       # @param verbose [Boolean]
