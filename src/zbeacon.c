@@ -74,7 +74,7 @@ s_self_new (zsock_t *pipe)
 
 
 //  --------------------------------------------------------------------------
-//  Prepare beacon to work on specified UPD port.
+//  Prepare beacon to work on specified UDP port.
 
 static void
 s_self_prepare_udp (self_t *self)
@@ -300,7 +300,7 @@ s_self_prepare_udp (self_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Prepare beacon to work on specified UPD port, reply hostname to
+//  Prepare beacon to work on specified UDP port, reply hostname to
 //  pipe (or "" if this failed)
 
 static void
