@@ -281,6 +281,14 @@ s_self_prepare_udp (self_t *self)
         }
         else if (getnameinfo (bind_to->ai_addr, bind_to->ai_addrlen,
                         self->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {
+            int i=0;
+            for (i=0; self->hostname[i]; i++) {
+                if (self->hostname[i] == '%') {
+                    zsys_info("Chomp the interface : '%s' from '%s'", self->hostname+i, self->hostname);
+                    self->hostname[i] = '\0';
+                    break;
+                }
+            }
             if (self->verbose)
                 zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
         }
