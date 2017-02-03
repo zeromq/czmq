@@ -310,6 +310,7 @@ s_self_configure (self_t *self, int port_nbr)
     snprintf (self->port_nbr, 7, "%d", port_nbr);
     s_self_prepare_udp (self);
     zstr_send (self->pipe, self->hostname);
+    zsys_debug("self->hostname='%s'", self->hostname);
     if (streq (self->hostname, ""))
         zsys_error ("No broadcast interface found, (ZSYS_INTERFACE=%s)", zsys_interface ());
 }
@@ -443,14 +444,18 @@ zbeacon (zsock_t *pipe, void *args)
         if (zmq_poll (pollitems, pollset_size, timeout * ZMQ_POLL_MSEC) == -1)
             break;              //  Interrupted
 
-        if (pollitems [0].revents & ZMQ_POLLIN)
+        if (pollitems [0].revents & ZMQ_POLLIN) {
+            zsys_debug("0-revents fired");
             s_self_handle_pipe (self);
-        if (pollitems [1].revents & ZMQ_POLLIN)
+        }
+        if (pollitems [1].revents & ZMQ_POLLIN) {
+            zsys_debug("1-revents fired");
             s_self_handle_udp (self);
+        }
 
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
-            //  Send beacon to any listening peers
+            zsys_debug("Send beacon to any listening peers");
             if (!self->udpsock || self->udpsock == INVALID_SOCKET ||
                     zsys_udp_send (self->udpsock_send, self->transmit,
                             (inaddr_t *)&self->broadcast,
