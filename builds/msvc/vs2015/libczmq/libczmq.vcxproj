@@ -89,6 +89,19 @@
     <ClInclude Include="..\..\..\..\src\foreign/slre/slre.h" />
     <ClInclude Include="..\..\..\..\src\foreign/slre/readme.txt" />
   </ItemGroup>
+  
+  <ItemGroup Condition="'$(Option-draftapi)' == 'true'">
+    <ClCompile Include="..\..\..\..\src\zproc.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ztimerset.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ztrie.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+  </ItemGroup>
+  
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\zactor.c">
       <CompileAs>CompileAsCpp</CompileAs>
@@ -150,19 +163,10 @@
     <ClCompile Include="..\..\..\..\src\zpoller.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zproc.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zsock.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zstr.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\ztimerset.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\ztrie.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zuuid.c">
