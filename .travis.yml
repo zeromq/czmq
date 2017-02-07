@@ -1,4 +1,6 @@
 # Travis CI script
+# This is a skeleton created by zproject.
+# You can add hand-written code here.
 
 language: c
 
@@ -34,12 +36,13 @@ matrix:
   include:
   - env: BUILD_TYPE=valgrind
     os: linux
+    dist: trusty
     compiler: gcc
     addons:
       apt:
         sources:
-        - sourceline: 'deb http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/ ./'
-          key_url: 'http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/Release.key'
+        - sourceline: 'deb http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_14.04/ ./'
+          key_url: 'http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
         packages:
         - valgrind
         - libzmq3-dev
@@ -49,6 +52,8 @@ matrix:
   - env: BUILD_TYPE=android
     os: linux
     compiler: clang
+    addons:
+      apt:
   - env: BUILD_TYPE=bindings BINDING=jni
     os: linux
     compiler: clang
