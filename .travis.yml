@@ -83,7 +83,6 @@ before_install:
 # try to use all known knobs to ensure compatibility across various versions
 before_script:
 - if [ $TRAVIS_OS_NAME == "osx" ] ; then sudo sysctl -w kern.maxfiles=64000 ; sudo sysctl -w kern.maxfilesperproc=64000 ; sudo launchctl limit maxfiles 64000 64000 ; ulimit -n 64000 ; fi
-- if [ $BUILD_TYPE != "valgrind" ] ; then ulimit -n 64000; fi
 
 # Build and check this project according to the BUILD_TYPE
 script: ./ci_build.sh
