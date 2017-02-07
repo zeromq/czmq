@@ -257,7 +257,7 @@ engine_set_log_prefix (client_t *client, const char *string)
 {
     if (client) {
         s_client_t *self = (s_client_t *) client;
-        snprintf (self->log_prefix, sizeof (self->log_prefix) - 1,
+        snprintf (self->log_prefix, sizeof (self->log_prefix),
             "%6d:%-33s", self->unique_id, string);
     }
 }
