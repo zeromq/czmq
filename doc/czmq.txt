@@ -65,17 +65,6 @@ And these utility classes add value:
 * linkczmq:zrex[3] - work with regular expressions
 * linkczmq:zgossip[3] - decentralized configuration management
 
-These classes are deprecated:
-
-* linkczmq:zctx[3] - working with ZeroMQ contexts
-* linkczmq:zsocket[3] - working with ZeroMQ sockets (low-level)
-* linkczmq:zsockopt[3] - get/set ZeroMQ socket options
-* linkczmq:zthread[3] - working with system threads
-* linkczmq:zauth_v2[3] - authentication for ZeroMQ servers
-* linkczmq:zbeacon_v2[3] - LAN discovery and presence
-* linkczmq:zmonitor_v2[3] - socket event monitor
-* linkczmq:zproxy_v2[3] - zmq_proxy wrapper
-
 Scope and Goals
 ~~~~~~~~~~~~~~~
 
