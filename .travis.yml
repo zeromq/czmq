@@ -17,6 +17,9 @@ env:
   global:
     # Note: Secure variables must be global!
     #
+    # Wikidot upload credentials.
+    - secure: "zatpgQ+uk65yWVmV0qlPX2D37cMBk96AiccGKDXD35z7P2Roo5Fec9GJAHrzHiNbEICGkKLjoOQ36hPAgoezBQt6HTvWF5B61P+WIFDRN0DaBvmChxjfO68QWreu6V30TLvFBa1tHYoHYOc8yEnOrF/zcGp0jzalbucWm479RMM="
+    - secure: "ZcLn2Suo/YsKObDPk0hKJJbpe8bOMGZCFwBItq6vE00ZLteNqkamjdNC4p+jaX/9v+G8x1yrKfwti/WJ0/nlTqwaKyy2IhYNKCW0qYctew3w9QXG8OJqOrt0meayAskBO0ZV3RrSLdbwnFx9Nz7smAiCTy/XNkX5hhbDH3NGBSI="
     # Bintray upload credentials. (BINTRAY_USER and BINTRAY_KEY are encrypted!)
     # These are used to publish the czmq jni bindings to bintray when the deploy
     # step is triggered.
@@ -47,13 +50,7 @@ matrix:
         - valgrind
         - libzmq3-dev
   - env: BUILD_TYPE=android
-    os: osx
     compiler: clang
-  - env: BUILD_TYPE=android
-    os: linux
-    compiler: clang
-    addons:
-      apt:
   - env: BUILD_TYPE=bindings BINDING=jni
     os: linux
     compiler: clang
@@ -61,6 +58,8 @@ matrix:
       apt:
         packages:
         - openjdk-7-jdk
+  - env: BUILD_TYPE=docs
+    os: linux
 
 addons:
   apt:
@@ -86,7 +85,9 @@ before_script:
 
 # Build and check this project according to the BUILD_TYPE
 script: ./ci_build.sh
+# Prepare deployment
 before_deploy: . ./ci_deploy.sh
+# Upload the prepared deployment to github
 deploy:
   provider: releases
   api_key:
