@@ -13,7 +13,7 @@
 
 /*
 @header
-    zsubproc -
+    zsubproc - czmq based sub process supervisor
 @discuss
 @end
 */
