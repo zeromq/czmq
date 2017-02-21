@@ -79,8 +79,10 @@ This package contains development files for czmq: the high-level c binding for 0
 %{_libdir}/pkgconfig/libczmq.pc
 %{_mandir}/man3/*
 %{_mandir}/man7/*
-%{_datadir}/zproject/
-%{_datadir}/zproject/czmq/
+# Install api files into /usr/local/share/zproject
+%dir %{_datadir}/zproject/
+%dir %{_datadir}/zproject/czmq
+%{_datadir}/zproject/czmq/*.api
 
 %prep
 %setup -q
