@@ -51,7 +51,8 @@ if ENABLE_DRAFTS
 include_HEADERS += \
     include/zproc.h \
     include/ztimerset.h \
-    include/ztrie.h
+    include/ztrie.h \
+    include/zsubproc.h
 
 endif
 src_libczmq_la_SOURCES = \
@@ -101,7 +102,8 @@ if ENABLE_DRAFTS
 src_libczmq_la_SOURCES += \
     src/zproc.c \
     src/ztimerset.c \
-    src/ztrie.c
+    src/ztrie.c \
+    src/zsubproc.c
 
 endif
 

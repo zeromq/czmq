@@ -116,6 +116,8 @@
         '../../include/zsock.h',
         '../../src/zstr.c',
         '../../include/zstr.h',
+        '../../src/zsubproc.c',
+        '../../include/zsubproc.h',
         '../../src/zsys.c',
         '../../include/zsys.h',
         '../../src/ztimerset.c',

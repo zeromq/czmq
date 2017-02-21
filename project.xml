@@ -52,6 +52,9 @@
     <class name = "zrex" state = "stable" />
     <class name = "zsys" state = "stable" />
 
+    <!-- Draft (unstable) classes -->
+    <class name = "zsubproc" state = "draft" />
+
     <!-- Models that we build using GSL -->
     <model name = "sockopts" />
     <model name = "zgossip" />
