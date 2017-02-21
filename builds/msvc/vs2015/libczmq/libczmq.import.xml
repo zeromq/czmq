@@ -6,19 +6,6 @@
 ################################################################################
 -->
 <ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework">
-  <Rule Name="czmq-options-uiextension" PageTemplate="tool" DisplayName="CZMQ Options" SwitchPrefix="/" Order="1">
-    <Rule.Categories>
-      <Category Name="draftapi" DisplayName="draftapi" />
-    </Rule.Categories>
-    <Rule.DataSource>
-      <DataSource Persistence="ProjectFile" ItemType="" />
-    </Rule.DataSource>
-    <EnumProperty Name="Option-draftapi" DisplayName="Enable Draft API" Description="Enable Draft API build option" Category="draftapi">
-      <EnumValue Name="" DisplayName="No" />
-      <EnumValue Name="true" DisplayName="Yes" />
-    </EnumProperty>
-  </Rule>
-  
   <Rule Name="czmq-linkage-uiextension" PageTemplate="tool" DisplayName="Local Dependencies" SwitchPrefix="/" Order="1">
     <Rule.Categories>
       <Category Name="libczmq" DisplayName="CZMQ" />
