@@ -380,7 +380,7 @@ s_zsubproc_execve (
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
             zsubproc_destroy (&self);
             zsock_destroy (&self->pipe);
-            exit (r);
+            exit (errno);
         }
     }
     else
