@@ -97,6 +97,7 @@ struct _zsubproc_t {
 
     zactor_t *actor;
     zloop_t *loop_ref;
+    zsock_t *pipe;          // destroy actor pipe in a case of execve fail
     int stdinpipe [2];      // stdin pipe
     int stdoutpipe [2];     // stdout pipe
     int stderrpipe [2];     // stderr pipe
@@ -373,10 +374,12 @@ s_zsubproc_execve (
             close (self->stderrpipe [0]);
             dup2 (self->stderrpipe [1], STDERR_FILENO);
         }
-        zsubproc_destroy (&self);
+
         r = execve (filename, argv, env);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
+            zsubproc_destroy (&self);
+            zsock_destroy (&self->pipe);
             exit (r);
         }
     }
@@ -471,6 +474,7 @@ s_zsubproc_actor (zsock_t *pipe, void *args)
     zloop_t *loop = zloop_new ();
     assert (loop);
     self->loop_ref = loop;
+    self->pipe = pipe;
 
     zloop_reader (loop, pipe, s_pipe_handler, (void*) self);
     zloop_timer (loop, 500, 0, s_zsubproc_alive, (void*) self);

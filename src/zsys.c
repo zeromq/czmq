@@ -251,7 +251,8 @@ zsys_shutdown (void)
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
         assert (sockref->filename);
-        zsys_error ("dangling '%s' socket created at %s:%d",
+        zsys_error ("[%d]dangling '%s' socket created at %s:%d",
+                    getpid (),
                     zsys_sockname (sockref->type),
                     sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
