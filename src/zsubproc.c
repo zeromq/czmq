@@ -488,6 +488,10 @@ s_zsubproc_actor (zsock_t *pipe, void *args)
 int
 zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *const envp[])
 {
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc not yet implemented for Windows");
+    assert (false);
+#endif
     assert (self);
     assert (!self->actor);
 
@@ -523,6 +527,10 @@ zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *
 
 int
 zsubproc_wait (zsubproc_t *self, bool wait) {
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc not yet implemented for Windows");
+    assert (false);
+#endif
     assert (self);
     if (!self->pid)
         return 0;
