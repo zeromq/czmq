@@ -132,6 +132,7 @@ zsubproc_destroy (zsubproc_t **self_p) {
     assert (self_p);
     if (*self_p) {
         zsubproc_t *self = *self_p;
+        zsubproc_wait (self, true);
         zactor_destroy (&self->actor);
 
         close (self->stdinpipe [0]);
@@ -328,8 +329,6 @@ s_zsubproc_addfd (zsubproc_t *self, int fd, void* socket, int flags) {
 }
 
 
-bool
-zsubproc_running (zsubproc_t *self);
 
 static int
 s_zsubproc_alive (zloop_t *loop, int timer_id, void *args)
@@ -374,9 +373,10 @@ s_zsubproc_execve (
             close (self->stderrpipe [0]);
             dup2 (self->stderrpipe [1], STDERR_FILENO);
         }
+        zsubproc_destroy (&self);
         r = execve (filename, argv, env);
         if (r == -1) {
-            zsys_error ("execve failed: %s", strerror (errno));
+            zsys_error ("fail to run %s: %s", filename, strerror (errno));
             exit (r);
         }
     }
@@ -520,7 +520,8 @@ zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *
 int
 zsubproc_wait (zsubproc_t *self, bool wait) {
     assert (self);
-    assert (self->pid != 0);
+    if (!self->pid)
+        return 0;
 
     int status = -1;
     int options = !wait ? WNOHANG : 0;
@@ -577,8 +578,9 @@ zsubproc_test (bool verbose)
     zsubproc_set_stdout (self, NULL);
 
     char *const xargv[] = {"cat", "/etc/passwd", NULL};
+    char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
 
-    zsubproc_run (self, "/bin/cat", xargv, NULL);
+    zsubproc_run (self, "cat", xargv, xenvp);
 
     zpoller_t *poller = zpoller_new (zsubproc_actor (self), zsubproc_stdout (self), NULL);
 
