@@ -553,6 +553,16 @@ AC_ARG_ENABLE([zmakecert],
 AM_CONDITIONAL([ENABLE_ZMAKECERT], [test x$enable_zmakecert != xno])
 AM_COND_IF([ENABLE_ZMAKECERT], [AC_MSG_NOTICE([ENABLE_ZMAKECERT defined])])
 
+# Check for zsp intent
+AC_ARG_ENABLE([zsp],
+    AS_HELP_STRING([--enable-zsp],
+        [Compile 'zsp' in src [default=yes]]),
+    [enable_zsp=$enableval],
+    [enable_zsp=yes])
+
+AM_CONDITIONAL([ENABLE_ZSP], [test x$enable_zsp != xno])
+AM_COND_IF([ENABLE_ZSP], [AC_MSG_NOTICE([ENABLE_ZSP defined])])
+
 # Check for czmq_selftest intent
 AC_ARG_ENABLE([czmq_selftest],
     AS_HELP_STRING([--enable-czmq_selftest],

@@ -589,19 +589,18 @@ zsubproc_test (bool verbose)
     assert (self);
     zsubproc_set_stdout (self, NULL);
 
-    char *const xargv[] = {"cat", "/etc/passwd", NULL};
+    char *const xargv[] = {"zsp", "--stdout", NULL};
     char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
 
-    zsubproc_run (self, "cat", xargv, xenvp);
+    zsubproc_run (self, "src/zsp", xargv, xenvp);
 
     zpoller_t *poller = zpoller_new (zsubproc_actor (self), zsubproc_stdout (self), NULL);
 
     while (!zsys_interrupted) {
         void *which = zpoller_wait (poller, -1);
 
-        if (which == zsubproc_actor (self)) {
+        if (which == zsubproc_actor (self))
             break;
-        }
 
         if (which == zsubproc_stdout (self)) {
             zframe_t *frame;

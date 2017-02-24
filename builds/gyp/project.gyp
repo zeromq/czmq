@@ -162,6 +162,16 @@
       ]
     },
     {
+      'target_name': 'zsp',
+      'type': 'executable',
+      'sources': [
+        '../../src/zsp.c'
+      ],
+      'dependencies': [
+        'libczmq'
+      ]
+    },
+    {
       'target_name': 'czmq_selftest',
       'type': 'executable',
       'sources': [

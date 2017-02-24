@@ -74,6 +74,9 @@
     <!-- Command-line utilities -->
     <main name = "zmakecert" />
 
+    <!-- Private command-line utilities -->
+    <main name = "zsp" private = "1" />
+
     <!-- target configuration -->
     <target name = "nuget">
         <option name = "id" value = "czmq_vc120" />
