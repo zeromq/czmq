@@ -44,8 +44,8 @@ matrix:
     addons:
       apt:
         sources:
-        - sourceline: 'deb http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_14.04/ ./'
-          key_url: 'http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
+        - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
+          key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
         packages:
         - valgrind
         - libzmq3-dev
@@ -64,8 +64,8 @@ matrix:
 addons:
   apt:
     sources:
-    - sourceline: 'deb http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/ ./'
-      key_url: 'http://download.opensuse.org/repositories/home:/zeromq:/git-draft/xUbuntu_12.04/Release.key'
+    - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_12.04/ ./'
+      key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_12.04/Release.key'
     packages:
     - uuid-dev
     - asciidoc
