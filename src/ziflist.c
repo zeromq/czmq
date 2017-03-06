@@ -275,9 +275,28 @@ s_reload (ziflist_t *self, bool ipv6)
     DWORD rc = GetAdaptersAddresses (AF_INET, GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);
     assert (rc == ERROR_BUFFER_OVERFLOW);
 
-    PIP_ADAPTER_ADDRESSES pip_addresses = (PIP_ADAPTER_ADDRESSES) zmalloc (addr_size);
-    rc = GetAdaptersAddresses (AF_INET,
-                               GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
+    static const int maxTries = 3;
+    int iterations = 0;
+
+    PIP_ADAPTER_ADDRESSES pip_addresses = NULL;
+
+    do {
+        pip_addresses = (PIP_ADAPTER_ADDRESSES) zmalloc (addr_size);
+        rc = GetAdaptersAddresses (AF_INET,
+                                   GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
+        
+        if (rc == ERROR_BUFFER_OVERFLOW) {
+            free (pip_addresses);
+            pip_addresses = NULL;
+        } 
+        else {
+            break;
+        }
+        
+        ++iterations;
+    }
+    while ((rc == ERROR_BUFFER_OVERFLOW) && (iterations < maxTries));
+
     assert (rc == NO_ERROR);
 
     PIP_ADAPTER_ADDRESSES cur_address = pip_addresses;
