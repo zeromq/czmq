@@ -766,6 +766,10 @@ zloop_start (zloop_t *self)
             ticket = (s_ticket_t *) zlistx_last (self->tickets);
         }
 
+        //  Check if timers changed pollset
+        if (self->need_rebuild)
+            continue;
+
         //  Handle any readers and pollers that are ready
         size_t item_nbr;
         for (item_nbr = 0; item_nbr < self->poll_size && rc >= 0; item_nbr++) {
@@ -880,6 +884,33 @@ s_timer_event3 (zloop_t *loop, int timer_id, void *called)
     return -1;
 }
 
+static int
+s_socket_event1 (zloop_t *loop, zsock_t *reader, void *called)
+{
+    *((bool*) called) = true;
+    //  end the reactor
+    return -1;
+}
+
+static int
+s_timer_event4 (zloop_t *loop, int timer_id, void *arg)
+{
+    //  Just end the looper
+    return -1;
+}
+
+static int
+s_timer_event5 (zloop_t *loop, int timer_id, void *arg)
+{
+    //  remove reader from loop
+    zloop_reader_end(loop, (zsock_t *) arg);
+
+    //  end reactor on next run
+    zloop_timer(loop, 1, 1, s_timer_event4, NULL);
+
+    return 0;
+}
+
 void
 zloop_test (bool verbose)
 {
@@ -940,6 +971,19 @@ zloop_test (bool verbose)
     //  zloop runs the handler which will terminate the loop
     assert (timer_event_called);
     zsys_interrupted = 0;
+
+    //  Check if reader removed in timer is not called
+    zloop_destroy (&loop);
+    loop = zloop_new ();
+
+    bool socket_event_called = false;
+    zloop_reader (loop, output, s_socket_event1, &socket_event_called);
+    zloop_timer (loop, 0, 1, s_timer_event5, output);
+
+    zstr_send (input, "PING");
+
+    zloop_start (loop);
+    assert (!socket_event_called);
 
     //  cleanup
     zloop_destroy (&loop);
