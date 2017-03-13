@@ -26,9 +26,7 @@ int main (int argc, char *argv [])
     int argn;
 
     bool verbose = false;
-#if ! defined (__WINDOWS__)
     bool use_stdin  = false;
-#endif
     bool use_stderr = false;
     bool use_stdout = false;
 
