@@ -109,7 +109,11 @@ zpair_print (zpair_t *self) {
 }
 
 struct _zsubproc_t {
+#if ! defined (__WINDOWS__)
+    //TODO: there is no windows port, so lets exclude pid from struct
+    //      zsubproc wasn't ported there, so no reason to do so
     pid_t pid;
+#endif
     int return_code;
     bool running;
     bool verbose;
@@ -130,7 +134,6 @@ zsubproc_t*
 zsubproc_new ()
 {
     zsubproc_t *self = (zsubproc_t*) zmalloc (sizeof (zsubproc_t));
-    self->pid = 0;
     self->verbose = false;
 
     zuuid_t *uuid = zuuid_new ();
@@ -175,6 +178,10 @@ zsubproc_destroy (zsubproc_t **self_p) {
 void
 zsubproc_set_stdin (zsubproc_t *self, void* socket) {
     assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc_set_stdin not implemented for Windows");
+    return;
+#else
     assert (self->stdinpipe [0] == 0);
     int r = pipe (self->stdinpipe);
     assert (r == 0);
@@ -183,12 +190,16 @@ zsubproc_set_stdin (zsubproc_t *self, void* socket) {
         zpair_mkpair (self->stdinpair);
     else
         zpair_set_read (self->stdinpair, socket, false);
-
+#endif
 }
 
 void
 zsubproc_set_stdout (zsubproc_t *self, void* socket) {
     assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc_set_stdout not implemented for Windows");
+    return;
+#else
     assert (self->stdoutpipe [0] == 0);
     int r = pipe (self->stdoutpipe);
     assert (r == 0);
@@ -197,11 +208,16 @@ zsubproc_set_stdout (zsubproc_t *self, void* socket) {
         zpair_mkpair (self->stdoutpair);
     else
         zpair_set_write (self->stdoutpair, socket, false);
+#endif
 }
 
 void
 zsubproc_set_stderr (zsubproc_t *self, void* socket) {
     assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc_set_stdout not implemented for Windows");
+    return;
+#else
     assert (self->stderrpipe [0] == 0);
     int r = pipe (self->stderrpipe);
     assert (r == 0);
@@ -210,6 +226,7 @@ zsubproc_set_stderr (zsubproc_t *self, void* socket) {
         zpair_mkpair (self->stderrpair);
     else
         zpair_set_write (self->stderrpair, socket, false);
+#endif
 }
 
 void*
@@ -230,17 +247,25 @@ zsubproc_stderr (zsubproc_t *self) {
 int
 zsubproc_returncode (zsubproc_t *self) {
     assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc_returncode not implemented on Windows");
+    return -1;
+#else
     assert (self->pid);
-
     zsubproc_wait (self, false);
     return self->return_code;
+#endif
 }
 
 int
 zsubproc_pid (zsubproc_t *self) {
     assert (self);
-
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc_pid not implemented on Windows");
+    return -1;
+#else
     return self->pid;
+#endif
 }
 
 static char **
@@ -294,7 +319,7 @@ arr_size (char **self) {
 static int
 s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 {
-    static size_t BUF_SIZE = 1024;
+#define BUF_SIZE 1024
     byte buf [BUF_SIZE];
     ssize_t r = 1;
 
@@ -312,6 +337,7 @@ s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
         zframe_destroy (&frame);
     }
     return 0;
+#undef BUF_SIZE
 }
 
 static int
@@ -342,13 +368,17 @@ s_fd_out_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 static int
 s_zsubproc_addfd (zsubproc_t *self, int fd, void* socket, int flags) {
     assert (self);
-
+#if defined (__WINDOWS__)
+    zsys_error ("s_zsubproc_addfd not implemented for Windows");
+    return -1;
+#else
     zmq_pollitem_t it = {NULL, fd, flags, 0};
     return zloop_poller (
         self->loop_ref,
         &it,
         flags == ZMQ_POLLIN ? s_fd_in_handler : s_fd_out_handler,
         socket);
+#endif
 }
 
 static int
@@ -369,6 +399,10 @@ s_zsubproc_execve (
     char **argv,
     char **env)
 {
+#if defined(__WINDOWS__)
+    zsys_debug ("s_zsubproc_execve not implemented on Windows");
+    return -1;
+#else
     assert (self);
     int r;
 
@@ -430,6 +464,7 @@ s_zsubproc_execve (
     }
 
     return 0;
+#endif
 }
 
 static int
@@ -448,7 +483,7 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
     else
     if (streq (command, "RUN")) {
 
-        if (self->pid != 0) {
+        if (zsubproc_pid (self) > 0) {
             zsys_error ("Can't run command twice!!");
             goto end;
         }
@@ -512,7 +547,7 @@ zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *
 {
 #if defined (__WINDOWS__)
     zsys_error ("zsubproc not yet implemented for Windows");
-    assert (false);
+    return -1;
 #endif
     assert (self);
     assert (!self->actor);
@@ -550,8 +585,8 @@ int
 zsubproc_wait (zsubproc_t *self, bool wait) {
 #if defined (__WINDOWS__)
     zsys_error ("zsubproc not yet implemented for Windows");
-    assert (false);
-#endif
+    return -1;
+#else
     assert (self);
     if (!self->pid)
         return 0;
@@ -594,14 +629,19 @@ zsubproc_wait (zsubproc_t *self, bool wait) {
     if (self->verbose)
         zsys_debug ("zsubproc_wait [%d]: self->return_code=%d", self->pid, self->return_code);
     return ZPROC_RUNNING;
+#endif
 }
 
 bool
 zsubproc_running (zsubproc_t *self) {
     assert (self);
+#if defined (__WINDOWS__)
+    zsys_debug ("zsubproc_running not implemented on Windows");
+    return false;
+#else
     assert (self->pid);
-
     return zsubproc_wait (self, false) == ZPROC_RUNNING;
+#endif
 }
 
 void *
@@ -614,10 +654,15 @@ zsubproc_actor (zsubproc_t *self) {
 void
 zsubproc_kill (zsubproc_t *self, int signum) {
     assert (self);
+#if defined (__WINDOWS__)
+    zsys_debug ("zsubproc_kill not implemented on Windows");
+    return;
+#else
     int r = kill (self->pid, signum);
     if (r != 0)
         zsys_error ("kill of pid=%d failed: %s", self->pid, strerror (errno));
     zsubproc_wait (self, false);
+#endif
 }
 
 void
@@ -633,6 +678,10 @@ void
 zsubproc_test (bool verbose)
 {
     printf (" * zsubproc: ");
+#if defined (__WINDOWS__)
+    printf ("SKIPPED (on Windows)\n");
+    return;
+#endif
 
     //  @selftest
     //  Simple create/destroy test

@@ -67,10 +67,6 @@ CZMQ_EXPORT void*
 CZMQ_EXPORT int
     zsubproc_returncode (zsubproc_t *self);
 
-//  subprocess pid, asserts if process was not started
-CZMQ_EXPORT int
-    zsubproc_pid (zsubproc_t *self);
-
 //  pid of a subprocess, 0 if not yet started
 CZMQ_EXPORT int
     zsubproc_pid (zsubproc_t *self);

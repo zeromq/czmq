@@ -36,7 +36,9 @@ int main (int argc, char *argv [])
         if (streq (argv [argn], "--help")
         ||  streq (argv [argn], "-h")) {
             puts ("zsp [options] ...");
+#if ! defined (__WINDOWS__)
             puts ("  --stdin / -i           read input from stdin");
+#endif
             puts ("  --stderr / -e          output on stderr");
             puts ("  --stdout / -o          output on stdout");
             puts ("  --verbose / -v         verbose mode");
@@ -77,6 +79,7 @@ int main (int argc, char *argv [])
 
     //  Insert main code here
     while (!zsys_interrupted) {
+#if ! defined (__WINDOWS__)
         if (use_stdin) {
             size_t size = 0;
             ssize_t r = getline (&message, &size, stdin);
@@ -89,6 +92,7 @@ int main (int argc, char *argv [])
                 }
             }
         }
+#endif
         if (use_stderr)
             fputs (message, stderr);
         if (use_stdout)
