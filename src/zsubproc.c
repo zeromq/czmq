@@ -210,6 +210,7 @@ zsubproc_returncode (zsubproc_t *self) {
     assert (self);
     assert (self->pid);
 
+    zsubproc_wait (self, false);
     return self->return_code;
 }
 
@@ -535,20 +536,32 @@ zsubproc_wait (zsubproc_t *self, bool wait) {
     if (!self->pid)
         return 0;
 
+    if (self->verbose)
+        zsys_debug ("zsubproc_wait [%d]: wait=%s", self->pid, wait ? "true" : "false");
     int status = -1;
     int options = !wait ? WNOHANG : 0;
+    if (self->verbose)
+        zsys_debug ("zsubproc_wait [%d]:\t!self->running=%s", self->pid, self->running ? "true" : "false");
     if (!self->running)
         return self->return_code;
 
+    if (self->verbose)
+        zsys_debug ("zsubproc_wait [%d]:\twaitpid", self->pid);
     int r = waitpid (self->pid, &status, options);
+    if (self->verbose)
+        zsys_debug ("zsubproc_wait [%d]:\twaitpid, r=%d", self->pid, r);
     if (!wait && r == 0)
         return self->return_code;
 
     if (WIFEXITED(status)) {
+        if (self->verbose)
+            zsys_debug ("zsubproc_wait [%d]:\tWIFEXITED", self->pid);
         self->running = false;
         self->return_code = WEXITSTATUS(status);
     }
     else if (WIFSIGNALED(status)) {
+        if (self->verbose)
+            zsys_debug ("zsubproc_wait [%d]:\tWIFSIGNALED", self->pid);
         self->running = false;
         self->return_code = - WTERMSIG(status);
 
@@ -558,6 +571,8 @@ zsubproc_wait (zsubproc_t *self, bool wait) {
         }
         */
     }
+    if (self->verbose)
+        zsys_debug ("zsubproc_wait [%d]: self->return_code=%d", self->pid, self->return_code);
     return ZPROC_RUNNING;
 }
 
@@ -628,6 +643,7 @@ zsubproc_test (bool verbose)
     }
 
     zsubproc_kill (self, SIGTERM);
+    zsubproc_wait (self, true);
     if (verbose)
         zsys_info ("Process %d exited with %d", zsubproc_pid (self), zsubproc_returncode (self));
 
