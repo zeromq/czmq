@@ -78,9 +78,6 @@ zpair_write (zpair_t *self) {
 
 void
 zpair_mkpair (zpair_t *self) {
-
-    zsys_debug ("zpair_mkpair: endpoint=%s", self->endpoint);
-
     self->endpoint[0] = '>';
     self->read = zsock_new_pair (self->endpoint);
     self->read_owned = true;
@@ -391,7 +388,8 @@ s_zsubproc_execve (
         exit (EXIT_FAILURE);
     }
     else {
-        zsys_info ("process %s with pid %d started", filename, self->pid);
+        if (self->verbose)
+            zsys_debug ("process %s with pid %d started", filename, self->pid);
 
         if (self->stdinpipe [0] != 0) {
             s_zsubproc_addfd (self, self->stdinpipe [1], zpair_read (self->stdinpair), ZMQ_POLLOUT);
@@ -421,7 +419,8 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
 
     zmsg_t *msg = zmsg_recv (pipe);
     char *command = zmsg_popstr (msg);
-    zsys_debug ("API command=%s", command);
+    if (self->verbose)
+        zsys_debug ("API command=%s", command);
 
     if (streq (command, "$TERM"))
         ret = -1;
@@ -519,7 +518,6 @@ zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *
         }
     }
 
-    zmsg_print (msg);
     zmsg_send (&msg, self->actor);
     zstr_free (&asize);
     zstr_free (&esize);
