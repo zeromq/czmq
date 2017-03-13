@@ -51,7 +51,8 @@ if ENABLE_DRAFTS
 include_HEADERS += \
     include/zproc.h \
     include/ztimerset.h \
-    include/ztrie.h
+    include/ztrie.h \
+    include/zsubproc.h
 
 endif
 src_libczmq_la_SOURCES = \
@@ -101,7 +102,8 @@ if ENABLE_DRAFTS
 src_libczmq_la_SOURCES += \
     src/zproc.c \
     src/ztimerset.c \
-    src/ztrie.c
+    src/ztrie.c \
+    src/zsubproc.c
 
 endif
 
@@ -136,6 +138,13 @@ src_zmakecert_CPPFLAGS = ${AM_CPPFLAGS}
 src_zmakecert_LDADD = ${program_libs}
 src_zmakecert_SOURCES = src/zmakecert.c
 endif #ENABLE_ZMAKECERT
+
+if ENABLE_ZSP
+noinst_PROGRAMS += src/zsp
+src_zsp_CPPFLAGS = ${AM_CPPFLAGS}
+src_zsp_LDADD = ${program_libs}
+src_zsp_SOURCES = src/zsp.c
+endif #ENABLE_ZSP
 
 if ENABLE_CZMQ_SELFTEST
 check_PROGRAMS += src/czmq_selftest
@@ -180,6 +189,7 @@ dist_api_DATA = \
 # define custom target for all products of /src
 src:
 	src/zmakecert \
+	src/zsp \
 	src/czmq_selftest \
 	src/libczmq.la
 

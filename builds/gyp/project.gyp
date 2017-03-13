@@ -116,6 +116,8 @@
         '../../include/zsock.h',
         '../../src/zstr.c',
         '../../include/zstr.h',
+        '../../src/zsubproc.c',
+        '../../include/zsubproc.h',
         '../../src/zsys.c',
         '../../include/zsys.h',
         '../../src/ztimerset.c',
@@ -154,6 +156,16 @@
       'type': 'executable',
       'sources': [
         '../../src/zmakecert.c'
+      ],
+      'dependencies': [
+        'libczmq'
+      ]
+    },
+    {
+      'target_name': 'zsp',
+      'type': 'executable',
+      'sources': [
+        '../../src/zsp.c'
       ],
       'dependencies': [
         'libczmq'

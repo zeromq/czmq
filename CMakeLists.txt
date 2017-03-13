@@ -193,6 +193,7 @@ IF (ENABLE_DRAFTS)
         include/zproc.h
         include/ztimerset.h
         include/ztrie.h
+        include/zsubproc.h
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -242,6 +243,7 @@ IF (ENABLE_DRAFTS)
         src/zproc.c
         src/ztimerset.c
         src/ztrie.c
+        src/zsubproc.c
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -314,6 +316,16 @@ install(TARGETS zmakecert
     RUNTIME DESTINATION bin
 )
 add_executable(
+    zsp
+    "${SOURCE_DIR}/src/zsp.c"
+)
+target_link_libraries(
+    zsp
+    czmq
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+)
+add_executable(
     czmq_selftest
     "${SOURCE_DIR}/src/czmq_selftest.c"
 )
@@ -375,6 +387,7 @@ IF (ENABLE_DRAFTS)
     zproc
     ztimerset
     ztrie
+    zsubproc
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -415,6 +428,7 @@ set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt
                     ${CMAKE_BINARY_DIR}/src/libczmq.so
                     ${CMAKE_BINARY_DIR}/src/czmq_selftest
                     ${CMAKE_BINARY_DIR}/src/zmakecert
+                    ${CMAKE_BINARY_DIR}/src/zsp
                     ${CMAKE_BINARY_DIR}/src/czmq_selftest
 )
 

@@ -64,6 +64,7 @@ all_tests [] = {
     { "zproc", zproc_test },
     { "ztimerset", ztimerset_test },
     { "ztrie", ztrie_test },
+    { "zsubproc", zsubproc_test },
 #endif // CZMQ_BUILD_DRAFT_API
 #ifdef CZMQ_BUILD_DRAFT_API
     { "private_classes", czmq_private_selftest },
@@ -125,7 +126,7 @@ main (int argc, char **argv)
         else
         if (streq (argv [argn], "--number")
         ||  streq (argv [argn], "-n")) {
-            puts ("34");
+            puts ("35");
             return 0;
         }
         else
@@ -165,6 +166,7 @@ main (int argc, char **argv)
             puts ("    zproxy\t\t- stable");
             puts ("    zrex\t\t- stable");
             puts ("    zsys\t\t- stable");
+            puts ("    zsubproc\t\t- draft");
             puts ("    private_classes\t- draft");
             return 0;
         }

@@ -13,6 +13,7 @@ IF %1.==--help. (
     ECHO    --enable-drafts         from zip package, enables DRAFT API
     ECHO    --disable-drafts        from git repository, disables DRAFT API
     ECHO    --without-zmakecert     do not build zmakecert.exe
+    ECHO    --without-zsp           do not build zsp.exe
     ECHO    --without-czmq_selftest  do not build czmq_selftest.exe
     GOTO :eof
 )
