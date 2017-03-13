@@ -94,6 +94,7 @@ struct _zsubproc_t {
     pid_t pid;
     int return_code;
     bool running;
+    bool verbose;
 
     zactor_t *actor;
     zloop_t *loop_ref;
@@ -112,6 +113,7 @@ zsubproc_new ()
 {
     zsubproc_t *self = (zsubproc_t*) zmalloc (sizeof (zsubproc_t));
     self->pid = 0;
+    self->verbose = false;
 
     zuuid_t *uuid = zuuid_new ();
     self->stdinpair = zpair_new (
@@ -575,6 +577,22 @@ zsubproc_actor (zsubproc_t *self) {
     return self->actor;
 }
 
+//  send a signal to the subprocess
+void
+zsubproc_kill (zsubproc_t *self, int signum) {
+    assert (self);
+    int r = kill (self->pid, signum);
+    if (r != 0)
+        zsys_error ("kill of pid=%d failed: %s", self->pid, strerror (errno));
+    zsubproc_wait (self, false);
+}
+
+void
+zsubproc_set_verbose (zsubproc_t *self, bool verbose) {
+    assert (self);
+    self->verbose = verbose;
+}
+
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
@@ -586,6 +604,7 @@ zsubproc_test (bool verbose)
     //  @selftest
     //  Simple create/destroy test
     zsubproc_t *self = zsubproc_new ();
+    zsubproc_set_verbose (self, verbose);
     assert (self);
     zsubproc_set_stdout (self, NULL);
 
@@ -597,9 +616,9 @@ zsubproc_test (bool verbose)
     zpoller_t *poller = zpoller_new (zsubproc_actor (self), zsubproc_stdout (self), NULL);
 
     while (!zsys_interrupted) {
-        void *which = zpoller_wait (poller, -1);
+        void *which = zpoller_wait (poller, 1500);
 
-        if (which == zsubproc_actor (self))
+        if (!which || which == zsubproc_actor (self))
             break;
 
         if (which == zsubproc_stdout (self)) {
@@ -610,7 +629,9 @@ zsubproc_test (bool verbose)
         }
     }
 
-    zsys_info ("Process %d exited with %d", zsubproc_pid (self), zsubproc_returncode (self));
+    zsubproc_kill (self, SIGTERM);
+    if (verbose)
+        zsys_info ("Process %d exited with %d", zsubproc_pid (self), zsubproc_returncode (self));
 
     zsubproc_destroy (&self);
     //  @end

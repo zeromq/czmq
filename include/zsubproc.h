@@ -91,6 +91,14 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void *
     zsubproc_actor (zsubproc_t *self);
 
+//  send a signal to the subprocess
+CZMQ_EXPORT void
+    zsubproc_kill (zsubproc_t *self, int signum);
+
+//  set verbose or quiet mode
+CZMQ_EXPORT void
+    zsubproc_set_verbose (zsubproc_t *self, bool verbose);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zsubproc_test (bool verbose);
