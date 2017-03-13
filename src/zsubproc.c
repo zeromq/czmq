@@ -680,6 +680,7 @@ zsubproc_test (bool verbose)
     printf (" * zsubproc: ");
 #if defined (__WINDOWS__)
     printf ("SKIPPED (on Windows)\n");
+    return;
 #endif
 
     //  @selftest
