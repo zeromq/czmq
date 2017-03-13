@@ -13,8 +13,20 @@
 
 /*
 @header
-    zsubproc - czmq based sub process supervisor
+    zsubproc - Unix pipes on steroids (ZeroMQ)
 @discuss
+
+Note: zsubproc is not yet stable, so there are no guarantees regarding API stability.
+Some methods can have weird semantics or strange API.
+
+Class zsubproc run an external process and to use ZeroMQ sockets to communicate
+with it. In other words standard input and outputs MAY be connected with appropriate
+zeromq socket and data flow is managed by zsubproc itself. This makes zsubproc
+the best in class way how to run and manage sub processes.
+
+Data are sent and received as zframes (zframe_t), so zsubproc does not try to interpret
+content of the messages in any way. See test example on how to use it.
+
 @end
 */
 
@@ -85,6 +97,15 @@ zpair_mkpair (zpair_t *self) {
     self->write = zsock_new_pair (self->endpoint);
     self->write_owned = true;
     self->endpoint [0] = '#';
+}
+
+void
+zpair_print (zpair_t *self) {
+    assert (self);
+    zsys_debug ("pair<%p> {.read = <%p>, .write = <%p>}",
+        (void*) self,
+        self->read,
+        self->write);
 }
 
 struct _zsubproc_t {
@@ -162,6 +183,7 @@ zsubproc_set_stdin (zsubproc_t *self, void* socket) {
         zpair_mkpair (self->stdinpair);
     else
         zpair_set_read (self->stdinpair, socket, false);
+
 }
 
 void
@@ -278,7 +300,6 @@ s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 
     while (r > 0) {
         r = read (item->fd, buf, BUF_SIZE);
-
         if (r == -1) {
             zsys_error ("read from fd %d: %s", item->fd, strerror (errno));
             break;
@@ -321,6 +342,7 @@ s_fd_out_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 static int
 s_zsubproc_addfd (zsubproc_t *self, int fd, void* socket, int flags) {
     assert (self);
+
     zmq_pollitem_t it = {NULL, fd, flags, 0};
     return zloop_poller (
         self->loop_ref,
@@ -328,8 +350,6 @@ s_zsubproc_addfd (zsubproc_t *self, int fd, void* socket, int flags) {
         flags == ZMQ_POLLIN ? s_fd_in_handler : s_fd_out_handler,
         socket);
 }
-
-
 
 static int
 s_zsubproc_alive (zloop_t *loop, int timer_id, void *args)
@@ -356,11 +376,11 @@ s_zsubproc_execve (
     if (self->pid == 0) {
 
         if (self->stdinpipe [0] != 0) {
-            int o_flags = fcntl (self->stdinpipe[0], F_GETFL);
+            int o_flags = fcntl (self->stdinpipe [0], F_GETFL);
             int n_flags = o_flags & (~O_NONBLOCK);
-            fcntl (self->stdinpipe[0], F_SETFL, n_flags);
-            dup2 (self->stdinpipe[0], STDIN_FILENO);
-            close (self->stdinpipe[1]);
+            fcntl (self->stdinpipe [0], F_SETFL, n_flags);
+            dup2 (self->stdinpipe [0], STDIN_FILENO);
+            close (self->stdinpipe [1]);
         }
 
         // redirect stdout if set_stdout was called
@@ -628,24 +648,47 @@ zsubproc_test (bool verbose)
 
     zpoller_t *poller = zpoller_new (zsubproc_actor (self), zsubproc_stdout (self), NULL);
 
+    bool running = true;
     while (!zsys_interrupted) {
-        void *which = zpoller_wait (poller, 1500);
+        void *which = zpoller_wait (poller, 800);
 
-        if (!which || which == zsubproc_actor (self))
+        // kill the process, but continue polling
+        if (zpoller_expired (poller) && running) {
+            zsubproc_kill (self, SIGTERM);
+            zsubproc_wait (self, true);
+            if (verbose)
+                zsys_info ("Process %d exited with %d", zsubproc_pid (self), zsubproc_returncode (self));
+            running = false;
+            continue;
+        }
+
+        if (!which)
             break;
+
+        if (which == zsubproc_actor (self)) {
+            zmsg_t *msg = zmsg_recv (zsubproc_actor (self));
+            zmsg_destroy (&msg);
+            continue;
+        }
 
         if (which == zsubproc_stdout (self)) {
             zframe_t *frame;
             zsock_brecv (zsubproc_stdout (self), "f", &frame);
-            write (STDERR_FILENO, zframe_data (frame), zframe_size (frame));
-            zframe_destroy (&frame);
-        }
-    }
+            assert (!strncmp(
+                "Lorem ipsum\n",
+                (char*) zframe_data (frame),
+                12));
 
-    zsubproc_kill (self, SIGTERM);
-    zsubproc_wait (self, true);
-    if (verbose)
-        zsys_info ("Process %d exited with %d", zsubproc_pid (self), zsubproc_returncode (self));
+            if (verbose)
+                zframe_print (frame, "zsubproc_test");
+
+            zframe_destroy (&frame);
+            continue;
+        }
+
+        // should not get there
+        assert (false);
+    }
 
     zsubproc_destroy (&self);
     //  @end
