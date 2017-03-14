@@ -139,6 +139,10 @@ struct _zsubproc_t {
 zsubproc_t*
 zsubproc_new ()
 {
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc_set_stdin not implemented for Windows");
+    return NULL;
+#else
 #if ZMQ_VERSION_MAJOR < 4
     zsys_error ("Cannot use zsubproc with zmq older than 4");
     return NULL;
