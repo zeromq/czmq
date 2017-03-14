@@ -20,6 +20,9 @@ extern "C" {
 
 //  @interface
 //  Create a new zsubproc
+//  Current version works well on Linux and OSX with libzmq4.
+//  On Windows and with libzmq3 and libzmq2 this function does
+//  return NULL
 CZMQ_EXPORT zsubproc_t *
     zsubproc_new (void);
 
