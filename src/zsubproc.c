@@ -696,6 +696,9 @@ zsubproc_test (bool verbose)
     char *file = "src/zsp";
     if (zsys_file_exists ("_build/../src/zsp"))
         file = "_build/../src/zsp";
+    else
+    if (zsys_file_exists ("zsp"))
+        file = "./zsp";
 
     zsubproc_run (self, file, xargv, xenvp);
 
