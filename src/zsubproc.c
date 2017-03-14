@@ -693,7 +693,11 @@ zsubproc_test (bool verbose)
     char *const xargv[] = {"zsp", "--stdout", NULL};
     char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
 
-    zsubproc_run (self, "src/zsp", xargv, xenvp);
+    char *file = "src/zsp";
+    if (zsys_file_exists ("_build/../src/zsp"))
+        file = "_build/../src/zsp";
+
+    zsubproc_run (self, file, xargv, xenvp);
 
     zpoller_t *poller = zpoller_new (zsubproc_actor (self), zsubproc_stdout (self), NULL);
 
