@@ -16,6 +16,12 @@
     zsubproc - Unix pipes on steroids (ZeroMQ)
 @discuss
 
+WARNING: zsubproc class have several limitations atm
+ * is tested on zmq4 on Linux and OSX.
+ * does not work on Windows, where you get empty stubs for most of the methods
+ * does not work on libzmq3 and libzmq2. We have experienced stalls and timeouts
+   when running tests against such old version
+
 Note: zsubproc is not yet stable, so there are no guarantees regarding API stability.
 Some methods can have weird semantics or strange API.
 
@@ -133,6 +139,17 @@ struct _zsubproc_t {
 zsubproc_t*
 zsubproc_new ()
 {
+#if ZMQ_VERSION_MAJOR < 4
+    zsys_error ("Cannot use zsubproc with zmq older than 4");
+    return NULL;
+#endif
+    int major, minor, patch;
+    zsys_version (&major, &minor, &patch);
+    if (major < 4) {
+        zsys_error ("Cannot use zsubproc with zmq older than 4");
+        return NULL;
+    }
+
     zsubproc_t *self = (zsubproc_t*) zmalloc (sizeof (zsubproc_t));
     self->verbose = false;
 
@@ -682,6 +699,16 @@ zsubproc_test (bool verbose)
     printf ("SKIPPED (on Windows)\n");
     return;
 #endif
+#if ZMQ_VERSION_MAJOR < 4
+    printf ("SKIPPED (on zmq pre-4)\n");
+    return;
+#endif
+    int major, minor, patch;
+    zsys_version (&major, &minor, &patch);
+    if (major < 4) {
+        printf ("SKIPPED (on zmq pre-4)\n");
+        return;
+    }
 
     //  @selftest
     //  Simple create/destroy test
