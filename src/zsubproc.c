@@ -803,6 +803,7 @@ zsubproc_test (bool verbose)
         assert (false);
     }
 
+    zpoller_destroy (&poller);
     zsubproc_destroy (&self);
     //  @end
     printf ("OK\n");
