@@ -16,6 +16,12 @@
     zsubproc - Unix pipes on steroids (ZeroMQ)
 @discuss
 
+WARNING: zsubproc class have several limitations atm
+ * is tested on zmq4 on Linux and OSX.
+ * does not work on Windows, where you get empty stubs for most of the methods
+ * does not work on libzmq3 and libzmq2. We have experienced stalls and timeouts
+   when running tests against such old version
+
 Note: zsubproc is not yet stable, so there are no guarantees regarding API stability.
 Some methods can have weird semantics or strange API.
 
@@ -133,6 +139,20 @@ struct _zsubproc_t {
 zsubproc_t*
 zsubproc_new ()
 {
+#if defined (__WINDOWS__)
+    zsys_error ("zsubproc_set_stdin not implemented for Windows");
+    return NULL;
+#elif ZMQ_VERSION_MAJOR < 4
+    zsys_error ("Cannot use zsubproc with zmq older than 4");
+    return NULL;
+#endif
+    int major, minor, patch;
+    zsys_version (&major, &minor, &patch);
+    if (major < 4) {
+        zsys_error ("Cannot use zsubproc with zmq older than 4");
+        return NULL;
+    }
+
     zsubproc_t *self = (zsubproc_t*) zmalloc (sizeof (zsubproc_t));
     self->verbose = false;
 
@@ -682,6 +702,16 @@ zsubproc_test (bool verbose)
     printf ("SKIPPED (on Windows)\n");
     return;
 #endif
+#if ZMQ_VERSION_MAJOR < 4
+    printf ("SKIPPED (on zmq pre-4)\n");
+    return;
+#endif
+    int major, minor, patch;
+    zsys_version (&major, &minor, &patch);
+    if (major < 4) {
+        printf ("SKIPPED (on zmq pre-4)\n");
+        return;
+    }
 
     //  @selftest
     //  Simple create/destroy test
@@ -693,7 +723,14 @@ zsubproc_test (bool verbose)
     char *const xargv[] = {"zsp", "--stdout", NULL};
     char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
 
-    zsubproc_run (self, "src/zsp", xargv, xenvp);
+    char *file = "src/zsp";
+    if (zsys_file_exists ("_build/../src/zsp"))
+        file = "_build/../src/zsp";
+    else
+    if (zsys_file_exists ("zsp"))
+        file = "./zsp";
+
+    zsubproc_run (self, file, xargv, xenvp);
 
     zpoller_t *poller = zpoller_new (zsubproc_actor (self), zsubproc_stdout (self), NULL);
 
