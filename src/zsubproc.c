@@ -747,6 +747,12 @@ zsubproc_test (bool verbose)
     if (zsys_file_exists ("zsp"))
         file = "./zsp";
 
+    if (!zsys_file_exists (file)) {
+        zsys_warning ("cannot detect zsp binary, %s does not exists", file);
+        printf ("SKIPPED (zsp not found");
+        return;
+    }
+
     //  Create new subproc instance
     zsubproc_t *self = zsubproc_new ();
     zsubproc_set_verbose (self, verbose);
