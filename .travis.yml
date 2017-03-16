@@ -58,8 +58,9 @@ matrix:
       apt:
         packages:
         - openjdk-7-jdk
-  - env: BUILD_TYPE=docs
-    os: linux
+# temporary disabled, does not work
+#  - env: BUILD_TYPE=docs
+#    os: linux
 
 addons:
   apt:

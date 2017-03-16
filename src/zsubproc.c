@@ -33,6 +33,26 @@ the best in class way how to run and manage sub processes.
 Data are sent and received as zframes (zframe_t), so zsubproc does not try to interpret
 content of the messages in any way. See test example on how to use it.
 
+ +----------------------------------------+
+ |    /bin/cat cat /etc/passwd            |
+ |    stdin   | stdout      |    stderr   |
+ |------||--------||---------------||-----|
+ |      fd1       fd2              fd3    |
+ |       ^         v                v     |
+ |zmq://stdin |zmq://stdout |zmq://stderr |
+ |         [zsubproc supervisor]          |
+ +----------------------------------------+
+ 
+ ----------> zeromq magic here <-----------
+
+ +----------------------------------------+
+ |zmq://stdin |zmq://stdout |zmq://stderr |
+ |                                        |
+ |          consumer                      |
+ |                                        |
+ |                                        |
+ +----------------------------------------+
+
 @end
 */
 
@@ -714,15 +734,12 @@ zsubproc_test (bool verbose)
     }
 
     //  @selftest
-    //  Simple create/destroy test
-    zsubproc_t *self = zsubproc_new ();
-    zsubproc_set_verbose (self, verbose);
-    assert (self);
-    zsubproc_set_stdout (self, NULL);
-
+    //  0. initialization
+    //  initialize arguments and environment
     char *const xargv[] = {"zsp", "--stdout", NULL};
     char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
 
+    //  find the right binary
     char *file = "src/zsp";
     if (zsys_file_exists ("_build/../src/zsp"))
         file = "_build/../src/zsp";
@@ -730,6 +747,22 @@ zsubproc_test (bool verbose)
     if (zsys_file_exists ("zsp"))
         file = "./zsp";
 
+    if (!zsys_file_exists (file)) {
+        zsys_warning ("cannot detect zsp binary, %s does not exists", file);
+        printf ("SKIPPED (zsp not found");
+        return;
+    }
+
+    //  Create new subproc instance
+    zsubproc_t *self = zsubproc_new ();
+    zsubproc_set_verbose (self, verbose);
+    assert (self);
+    //  join stdout of the process to zeromq socket
+    //  all data will be readable from zsubproc_stdout socket
+    zsubproc_set_stdout (self, NULL);
+
+    // execute the binary. It runs in own actor, which monitor the process and
+    // pass data accross pipes and zeromq sockets
     zsubproc_run (self, file, xargv, xenvp);
 
     zpoller_t *poller = zpoller_new (zsubproc_actor (self), zsubproc_stdout (self), NULL);
@@ -776,6 +809,7 @@ zsubproc_test (bool verbose)
         assert (false);
     }
 
+    zpoller_destroy (&poller);
     zsubproc_destroy (&self);
     //  @end
     printf ("OK\n");
