@@ -75,33 +75,42 @@ int main (int argc, char *argv [])
     if (verbose)
         zsys_debug ("argn=%d, argc=%d", argn, argc);
 
-    message = "Lorem ipsum\n";
+    message = "Lorem ipsum";
+
+    zfile_t *stdinf = NULL;
+    
+    if (use_stdin) {
+        stdinf = zfile_new ("/dev", "stdin");
+        int r = zfile_input (stdinf);
+        assert (r == 0);
+    }
 
     //  Insert main code here
     while (!zsys_interrupted) {
 #if ! defined (__WINDOWS__)
         if (use_stdin) {
-            size_t size = 0;
-            ssize_t r = getline (&message, &size, stdin);
-            if (r == -1) {
-                if (errno == 0)
-                    break;
-                else {
+            const char *line = zfile_readln (stdinf);
+
+            if (!line && errno != 0) {
                     zsys_error ("Error reading stdin: %s", strerror (errno));
                     exit (EXIT_FAILURE);
-                }
             }
+
+            if (zfile_eof (stdinf) || !line)
+                break;
+
+            message = (char*) line;
         }
 #endif
         if (use_stderr)
-            fputs (message, stderr);
+            fprintf (stderr, "%s\n", message);
         if (use_stdout)
-            fputs (message, stdout);
+            fprintf (stdout, "%s\n", message);
 
-        if (use_stdin)
-            zstr_free (&message);
         zclock_sleep (50);
     }
+    
+    zfile_destroy (&stdinf);
 
     return 0;
 }
