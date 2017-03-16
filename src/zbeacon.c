@@ -117,7 +117,10 @@ s_self_prepare_udp (self_t *self)
     struct addrinfo *send_to = NULL;
     struct addrinfo hint;
     memset (&hint, 0, sizeof(struct addrinfo));
-    hint.ai_flags = AI_NUMERICHOST | AI_V4MAPPED;
+    hint.ai_flags = AI_NUMERICHOST;
+#if !defined (CZMQ_HAVE_ANDROID) && !defined (CZMQ_HAVE_FREEBSD)
+    hint.ai_flags |= AI_V4MAPPED;
+#endif
     hint.ai_socktype = SOCK_DGRAM;
     hint.ai_protocol = IPPROTO_UDP;
     hint.ai_family = zsys_ipv6 () ? AF_INET6 : AF_INET;
