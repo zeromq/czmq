@@ -417,6 +417,52 @@ s_self_handle_udp (self_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Send the beacon over UDP
+
+int
+s_emit_beacon (self_t *self)
+{
+#if defined (__WINDOWS__)
+    // Windows doesn't broadcast on all interfaces when using INADDR_BROADCAST
+    // only the interface with the highest metric (as seen in `route print`)
+    // so send a packet per interface to each broadcast address
+    if (streq (zsys_interface (), "*") && !zsys_ipv6 ()) {
+        INTERFACE_INFO interface_list [64];
+        DWORD bytes_received = 0;
+
+        int rc = WSAIoctl (self->udpsock, SIO_GET_INTERFACE_LIST, 0, 0, 
+            &interface_list, sizeof (interface_list), &bytes_received, NULL, NULL);
+        assert (rc != SOCKET_ERROR);
+        
+        int num_interfaces = bytes_received / sizeof (INTERFACE_INFO);
+
+        // iiBroadcastAddress is always 255.255.255.255 need to calculate the specific broadcast address using the netmask
+        // keep the same parameters as self->broadcast but just replace the address for each interface
+        inaddr_t addr;
+        memcpy(&addr, &self->broadcast, sizeof (inaddr_t));
+
+        for (int i = 0; i < num_interfaces; ++i)
+        {
+            addr.sin_addr.S_un.S_addr = (interface_list[i].iiAddress.AddressIn.sin_addr.S_un.S_addr
+                | ~(interface_list[i].iiNetmask.AddressIn.sin_addr.S_un.S_addr));
+
+            if (zsys_udp_send (self->udpsock_send, self->transmit,
+                (inaddr_t *)&addr, sizeof (inaddr_t))) {
+                // Send failed, cause zbeacon to re-init socket
+                return -1;
+            }
+        }
+        return 0;
+    }
+#endif
+
+    return zsys_udp_send (self->udpsock_send, self->transmit,
+        (inaddr_t *)&self->broadcast,
+        zsys_ipv6 () ? sizeof (in6addr_t) : sizeof (inaddr_t));
+}
+
+
+//  --------------------------------------------------------------------------
 //  zbeacon() implements the zbeacon actor interface
 
 void
@@ -451,10 +497,7 @@ zbeacon (zsock_t *pipe, void *args)
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
-            if (!self->udpsock || self->udpsock == INVALID_SOCKET ||
-                    zsys_udp_send (self->udpsock_send, self->transmit,
-                            (inaddr_t *)&self->broadcast,
-                            zsys_ipv6 () ? sizeof (in6addr_t) : sizeof (inaddr_t)))
+            if (!self->udpsock || self->udpsock == INVALID_SOCKET || s_emit_beacon(self))
             {
                 const char *reason = (!self->udpsock || self->udpsock == INVALID_SOCKET) ? "invalid socket" : strerror (errno);
                 zsys_debug ("zbeacon: failed to transmit, attempting reconnection. reason=%s", reason);
