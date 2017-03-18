@@ -13,7 +13,45 @@
 
 /*
 @header
-    zproc - process configuration and status
+    zproc - process configuration and status, plus unix pipes on steroids
+
+WARNING: zproc class have several limitations atm
+ * is tested on zmq4 on Linux and OSX.
+ * does not work on Windows, where you get empty stubs for most of the methods
+ * does not work on libzmq3 and libzmq2. We have experienced stalls and timeouts
+   when running tests against such old version
+
+Note: zproc is not yet stable, so there are no guarantees regarding API stability.
+Some methods can have weird semantics or strange API.
+
+Class zproc run an external process and to use ZeroMQ sockets to communicate
+with it. In other words standard input and outputs MAY be connected with appropriate
+zeromq socket and data flow is managed by zproc itself. This makes zproc
+the best in class way how to run and manage sub processes.
+
+Data are sent and received as zframes (zframe_t), so zproc does not try to interpret
+content of the messages in any way. See test example on how to use it.
+
+ +----------------------------------------+
+ |    /bin/cat cat /etc/passwd            |
+ |    stdin   | stdout      |    stderr   |
+ |------||--------||---------------||-----|
+ |      fd1       fd2              fd3    |
+ |       ^         v                v     |
+ |zmq://stdin |zmq://stdout |zmq://stderr |
+ |         [zproc supervisor]          |
+ +----------------------------------------+
+ 
+ ----------> zeromq magic here <-----------
+
+ +----------------------------------------+
+ |zmq://stdin |zmq://stdout |zmq://stderr |
+ |                                        |
+ |          consumer                      |
+ |                                        |
+ |                                        |
+ +----------------------------------------+
+
 @discuss
 @end
 */
