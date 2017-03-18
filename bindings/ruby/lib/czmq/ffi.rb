@@ -618,6 +618,171 @@ module CZMQ
       require_relative 'ffi/zpoller'
 
       begin # DRAFT method
+        attach_function :zproc_new, [], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_new()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_new(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_destroy, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_destroy()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_destroy(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_stdin, [:pointer, :pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_set_stdin()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_stdin(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_stdout, [:pointer, :pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_set_stdout()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_stdout(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_stderr, [:pointer, :pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_set_stderr()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_stderr(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_stdin, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_stdin()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_stdin(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_stdout, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_stdout()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_stdout(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_stderr, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_stderr()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_stderr(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_returncode, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_returncode()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_returncode(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_pid, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_pid()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_pid(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_running, [:pointer], :bool, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_running()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_running(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_wait, [:pointer, :bool], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_wait()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_wait(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_actor, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_actor()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_actor(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_kill, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_kill()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_kill(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_verbose, [:pointer, :bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_set_verbose()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_verbose(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
         attach_function :zproc_czmq_version, [], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG

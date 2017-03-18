@@ -548,12 +548,22 @@ class Zpoller: public Nan::ObjectWrap {
 class Zproc: public Nan::ObjectWrap {
     public:
         static NAN_MODULE_INIT (Init);
-        explicit Zproc ();
+        explicit Zproc (void);
+        explicit Zproc (zproc_t *self);
+        zproc_t *self;
     private:
         ~Zproc ();
     static Nan::Persistent <Function> &constructor ();
 
     static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_returncode);
+    static NAN_METHOD (_pid);
+    static NAN_METHOD (_running);
+    static NAN_METHOD (_wait);
+    static NAN_METHOD (_kill);
+    static NAN_METHOD (_set_verbose);
     static NAN_METHOD (_czmq_version);
     static NAN_METHOD (_interrupted);
     static NAN_METHOD (_has_curve);

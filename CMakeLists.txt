@@ -193,7 +193,6 @@ IF (ENABLE_DRAFTS)
         include/zproc.h
         include/ztimerset.h
         include/ztrie.h
-        include/zsubproc.h
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -243,7 +242,6 @@ IF (ENABLE_DRAFTS)
         src/zproc.c
         src/ztimerset.c
         src/ztrie.c
-        src/zsubproc.c
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -387,7 +385,6 @@ IF (ENABLE_DRAFTS)
     zproc
     ztimerset
     ztrie
-    zsubproc
     )
 ENDIF (ENABLE_DRAFTS)
 

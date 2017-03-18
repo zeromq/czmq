@@ -150,6 +150,10 @@ class zpoller_t(Structure):
     pass # Empty - only for type checking
 zpoller_p = POINTER(zpoller_t)
 
+class zproc_t(Structure):
+    pass # Empty - only for type checking
+zproc_p = POINTER(zproc_t)
+
 class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
@@ -4558,6 +4562,36 @@ was interrupted, or the parent context was destroyed.
 
 
 # zproc
+lib.zproc_new.restype = zproc_p
+lib.zproc_new.argtypes = []
+lib.zproc_destroy.restype = None
+lib.zproc_destroy.argtypes = [POINTER(zproc_p)]
+lib.zproc_set_stdin.restype = None
+lib.zproc_set_stdin.argtypes = [zproc_p, c_void_p]
+lib.zproc_set_stdout.restype = None
+lib.zproc_set_stdout.argtypes = [zproc_p, c_void_p]
+lib.zproc_set_stderr.restype = None
+lib.zproc_set_stderr.argtypes = [zproc_p, c_void_p]
+lib.zproc_stdin.restype = c_void_p
+lib.zproc_stdin.argtypes = [zproc_p]
+lib.zproc_stdout.restype = c_void_p
+lib.zproc_stdout.argtypes = [zproc_p]
+lib.zproc_stderr.restype = c_void_p
+lib.zproc_stderr.argtypes = [zproc_p]
+lib.zproc_returncode.restype = c_int
+lib.zproc_returncode.argtypes = [zproc_p]
+lib.zproc_pid.restype = c_int
+lib.zproc_pid.argtypes = [zproc_p]
+lib.zproc_running.restype = c_bool
+lib.zproc_running.argtypes = [zproc_p]
+lib.zproc_wait.restype = c_int
+lib.zproc_wait.argtypes = [zproc_p, c_bool]
+lib.zproc_actor.restype = c_void_p
+lib.zproc_actor.argtypes = [zproc_p]
+lib.zproc_kill.restype = None
+lib.zproc_kill.argtypes = [zproc_p, c_int]
+lib.zproc_set_verbose.restype = None
+lib.zproc_set_verbose.argtypes = [zproc_p, c_bool]
 lib.zproc_czmq_version.restype = c_int
 lib.zproc_czmq_version.argtypes = []
 lib.zproc_interrupted.restype = c_bool
@@ -4603,6 +4637,30 @@ class Zproc(object):
     """
 
     allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create a new zproc.
+NOTE: On Windows and with libzmq3 and libzmq2 this function
+returns NULL. Code needs to be ported there.
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zproc_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zproc_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zproc_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy zproc, wait until process ends.
+        """
+        if self.allow_destruct:
+            lib.zproc_destroy(byref(self._as_parameter_))
+
     def __eq__(self, other):
         if type(other) == type(self):
             return other.c_address() == self.c_address()
@@ -4622,6 +4680,93 @@ class Zproc(object):
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    def set_stdin(self, socket):
+        """
+        Connects process stdin with a readable ('>', connect) zeromq socket. If
+socket argument is NULL, zproc creates own managed pair of inproc
+sockets.  The writable one is then accessbile via zproc_stdin method.
+        """
+        return lib.zproc_set_stdin(self._as_parameter_, socket)
+
+    def set_stdout(self, socket):
+        """
+        Connects process stdout with a writable ('@', bind) zeromq socket. If
+socket argument is NULL, zproc creates own managed pair of inproc
+sockets.  The readable one is then accessbile via zproc_stdout method.
+        """
+        return lib.zproc_set_stdout(self._as_parameter_, socket)
+
+    def set_stderr(self, socket):
+        """
+        Connects process stderr with a writable ('@', bind) zeromq socket. If
+socket argument is NULL, zproc creates own managed pair of inproc
+sockets.  The readable one is then accessbile via zproc_stderr method.
+        """
+        return lib.zproc_set_stderr(self._as_parameter_, socket)
+
+    def stdin(self):
+        """
+        Return subprocess stdin writable socket. NULL for
+not initialized or external sockets.
+        """
+        return c_void_p(lib.zproc_stdin(self._as_parameter_))
+
+    def stdout(self):
+        """
+        Return subprocess stdout readable socket. NULL for
+not initialized or external sockets.
+        """
+        return c_void_p(lib.zproc_stdout(self._as_parameter_))
+
+    def stderr(self):
+        """
+        Return subprocess stderr readable socket. NULL for
+not initialized or external sockets.
+        """
+        return c_void_p(lib.zproc_stderr(self._as_parameter_))
+
+    def returncode(self):
+        """
+        process exit code
+        """
+        return lib.zproc_returncode(self._as_parameter_)
+
+    def pid(self):
+        """
+        process exit code
+        """
+        return lib.zproc_pid(self._as_parameter_)
+
+    def running(self):
+        """
+        return true if process is running, false if not yet started or finished
+        """
+        return lib.zproc_running(self._as_parameter_)
+
+    def wait(self, hang):
+        """
+        wait or poll process status, return return code
+        """
+        return lib.zproc_wait(self._as_parameter_, hang)
+
+    def actor(self):
+        """
+        return internal actor, usefull for the polling if process died
+        """
+        return c_void_p(lib.zproc_actor(self._as_parameter_))
+
+    def kill(self, signal):
+        """
+        send a signal to the subprocess
+        """
+        return lib.zproc_kill(self._as_parameter_, signal)
+
+    def set_verbose(self, verbose):
+        """
+        set verbose mode
+        """
+        return lib.zproc_set_verbose(self._as_parameter_, verbose)
 
     @staticmethod
     def czmq_version():

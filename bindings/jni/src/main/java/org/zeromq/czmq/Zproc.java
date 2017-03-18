@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zproc {
+public class Zproc implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,6 +16,128 @@ public class Zproc {
         }
     }
     public long self;
+    /*
+    Create a new zproc.                                        
+    NOTE: On Windows and with libzmq3 and libzmq2 this function
+    returns NULL. Code needs to be ported there.               
+    */
+    native static long __new ();
+    public Zproc () {
+        /*  TODO: if __new fails, self is null...            */
+        self = __new ();
+    }
+    public Zproc (long pointer) {
+        self = pointer;
+    }
+    /*
+    Destroy zproc, wait until process ends.
+    */
+    native static void __destroy (long self);
+    @Override
+    public void close () {
+        __destroy (self);
+        self = 0;
+    }
+    /*
+    Connects process stdin with a readable ('>', connect) zeromq socket. If
+    socket argument is NULL, zproc creates own managed pair of inproc      
+    sockets.  The writable one is then accessbile via zproc_stdin method.  
+    */
+    native static void __setStdin (long self, long socket);
+    public void setStdin (long socket) {
+        __setStdin (self, socket);
+    }
+    /*
+    Connects process stdout with a writable ('@', bind) zeromq socket. If 
+    socket argument is NULL, zproc creates own managed pair of inproc     
+    sockets.  The readable one is then accessbile via zproc_stdout method.
+    */
+    native static void __setStdout (long self, long socket);
+    public void setStdout (long socket) {
+        __setStdout (self, socket);
+    }
+    /*
+    Connects process stderr with a writable ('@', bind) zeromq socket. If 
+    socket argument is NULL, zproc creates own managed pair of inproc     
+    sockets.  The readable one is then accessbile via zproc_stderr method.
+    */
+    native static void __setStderr (long self, long socket);
+    public void setStderr (long socket) {
+        __setStderr (self, socket);
+    }
+    /*
+    Return subprocess stdin writable socket. NULL for
+    not initialized or external sockets.             
+    */
+    native static long __stdin (long self);
+    public long stdin () {
+        return __stdin (self);
+    }
+    /*
+    Return subprocess stdout readable socket. NULL for
+    not initialized or external sockets.              
+    */
+    native static long __stdout (long self);
+    public long stdout () {
+        return __stdout (self);
+    }
+    /*
+    Return subprocess stderr readable socket. NULL for
+    not initialized or external sockets.              
+    */
+    native static long __stderr (long self);
+    public long stderr () {
+        return __stderr (self);
+    }
+    /*
+    process exit code
+    */
+    native static int __returncode (long self);
+    public int returncode () {
+        return __returncode (self);
+    }
+    /*
+    process exit code
+    */
+    native static int __pid (long self);
+    public int pid () {
+        return __pid (self);
+    }
+    /*
+    return true if process is running, false if not yet started or finished
+    */
+    native static boolean __running (long self);
+    public boolean running () {
+        return __running (self);
+    }
+    /*
+    wait or poll process status, return return code
+    */
+    native static int __wait (long self, boolean hang);
+    public int Wait (boolean hang) {
+        return __wait (self, hang);
+    }
+    /*
+    return internal actor, usefull for the polling if process died
+    */
+    native static long __actor (long self);
+    public long actor () {
+        return __actor (self);
+    }
+    /*
+    send a signal to the subprocess
+    */
+    native static void __kill (long self, int signal);
+    public void kill (int signal) {
+        __kill (self, signal);
+    }
+    /*
+    set verbose mode
+    */
+    native static void __setVerbose (long self, boolean verbose);
+    public void setVerbose (boolean verbose) {
+        __setVerbose (self, verbose);
+    }
     /*
     Returns CZMQ version as a single 6-digit integer encoding the major
     version (x 10000), the minor version (x 100) and the patch.        

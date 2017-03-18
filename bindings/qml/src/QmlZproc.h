@@ -27,7 +27,55 @@ public:
     
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZproc.cpp
     
-public slots:};
+public slots:
+    //  Connects process stdin with a readable ('>', connect) zeromq socket. If
+    //  socket argument is NULL, zproc creates own managed pair of inproc      
+    //  sockets.  The writable one is then accessbile via zproc_stdin method.  
+    void setStdin (void *socket);
+
+    //  Connects process stdout with a writable ('@', bind) zeromq socket. If 
+    //  socket argument is NULL, zproc creates own managed pair of inproc     
+    //  sockets.  The readable one is then accessbile via zproc_stdout method.
+    void setStdout (void *socket);
+
+    //  Connects process stderr with a writable ('@', bind) zeromq socket. If 
+    //  socket argument is NULL, zproc creates own managed pair of inproc     
+    //  sockets.  The readable one is then accessbile via zproc_stderr method.
+    void setStderr (void *socket);
+
+    //  Return subprocess stdin writable socket. NULL for
+    //  not initialized or external sockets.             
+    void *stdin ();
+
+    //  Return subprocess stdout readable socket. NULL for
+    //  not initialized or external sockets.              
+    void *stdout ();
+
+    //  Return subprocess stderr readable socket. NULL for
+    //  not initialized or external sockets.              
+    void *stderr ();
+
+    //  process exit code
+    int returncode ();
+
+    //  process exit code
+    int pid ();
+
+    //  return true if process is running, false if not yet started or finished
+    bool running ();
+
+    //  wait or poll process status, return return code
+    int wait (bool hang);
+
+    //  return internal actor, usefull for the polling if process died
+    void *actor ();
+
+    //  send a signal to the subprocess
+    void kill (int signal);
+
+    //  set verbose mode
+    void setVerbose (bool verbose);
+};
 
 class QmlZprocAttached : public QObject
 {
@@ -131,6 +179,14 @@ public slots:
 
     //  Self test of this class.
     void test (bool verbose);
+
+    //  Create a new zproc.                                        
+    //  NOTE: On Windows and with libzmq3 and libzmq2 this function
+    //  returns NULL. Code needs to be ported there.               
+    QmlZproc *construct ();
+
+    //  Destroy zproc, wait until process ends.
+    void destruct (QmlZproc *qmlSelf);
 };
 
 

@@ -3790,6 +3790,14 @@ NAN_MODULE_INIT (Zproc::Init) {
     tpl->InstanceTemplate ()->SetInternalFieldCount (1);
 
     // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "returncode", _returncode);
+    Nan::SetPrototypeMethod (tpl, "pid", _pid);
+    Nan::SetPrototypeMethod (tpl, "running", _running);
+    Nan::SetPrototypeMethod (tpl, "wait", _wait);
+    Nan::SetPrototypeMethod (tpl, "kill", _kill);
+    Nan::SetPrototypeMethod (tpl, "setVerbose", _set_verbose);
     Nan::SetPrototypeMethod (tpl, "czmqVersion", _czmq_version);
     Nan::SetPrototypeMethod (tpl, "interrupted", _interrupted);
     Nan::SetPrototypeMethod (tpl, "hasCurve", _has_curve);
@@ -3815,7 +3823,12 @@ NAN_MODULE_INIT (Zproc::Init) {
     Nan::GetFunction (tpl).ToLocalChecked ());
 }
 
-Zproc::Zproc () {
+Zproc::Zproc (void) {
+    self = zproc_new ();
+}
+
+Zproc::Zproc (zproc_t *self_) {
+    self = self_;
 }
 
 Zproc::~Zproc () {
@@ -3828,6 +3841,75 @@ NAN_METHOD (Zproc::New) {
         zproc->Wrap (info.This ());
         info.GetReturnValue ().Set (info.This ());
     }
+}
+
+NAN_METHOD (Zproc::destroy) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    zproc_destroy (&zproc->self);
+}
+
+
+NAN_METHOD (Zproc::defined) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zproc->self != NULL));
+}
+
+NAN_METHOD (Zproc::_returncode) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    int result = zproc_returncode (zproc->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zproc::_pid) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    int result = zproc_pid (zproc->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zproc::_running) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    bool result = zproc_running (zproc->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zproc::_wait) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `hang`");
+
+    bool hang;
+    if (info [0]->IsBoolean ())
+        hang = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`hang` must be a Boolean");
+    int result = zproc_wait (zproc->self, (bool) hang);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zproc::_kill) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `signal`");
+
+    int signal;
+    if (info [0]->IsNumber ())
+        signal = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`signal` must be a number");
+    zproc_kill (zproc->self, (int) signal);
+}
+
+NAN_METHOD (Zproc::_set_verbose) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zproc_set_verbose (zproc->self, (bool) verbose);
 }
 
 NAN_METHOD (Zproc::_czmq_version) {

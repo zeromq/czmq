@@ -27,6 +27,92 @@ extern "C" {
 //  for it to be pushed to stable state. Use --enable-drafts to enable.
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
+//  Create a new zproc.                                        
+//  NOTE: On Windows and with libzmq3 and libzmq2 this function
+//  returns NULL. Code needs to be ported there.               
+CZMQ_EXPORT zproc_t *
+    zproc_new (void);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Destroy zproc, wait until process ends.
+CZMQ_EXPORT void
+    zproc_destroy (zproc_t **self_p);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Connects process stdin with a readable ('>', connect) zeromq socket. If
+//  socket argument is NULL, zproc creates own managed pair of inproc      
+//  sockets.  The writable one is then accessbile via zproc_stdin method.  
+CZMQ_EXPORT void
+    zproc_set_stdin (zproc_t *self, void *socket);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Connects process stdout with a writable ('@', bind) zeromq socket. If 
+//  socket argument is NULL, zproc creates own managed pair of inproc     
+//  sockets.  The readable one is then accessbile via zproc_stdout method.
+CZMQ_EXPORT void
+    zproc_set_stdout (zproc_t *self, void *socket);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Connects process stderr with a writable ('@', bind) zeromq socket. If 
+//  socket argument is NULL, zproc creates own managed pair of inproc     
+//  sockets.  The readable one is then accessbile via zproc_stderr method.
+CZMQ_EXPORT void
+    zproc_set_stderr (zproc_t *self, void *socket);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return subprocess stdin writable socket. NULL for
+//  not initialized or external sockets.             
+CZMQ_EXPORT void *
+    zproc_stdin (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return subprocess stdout readable socket. NULL for
+//  not initialized or external sockets.              
+CZMQ_EXPORT void *
+    zproc_stdout (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return subprocess stderr readable socket. NULL for
+//  not initialized or external sockets.              
+CZMQ_EXPORT void *
+    zproc_stderr (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  process exit code
+CZMQ_EXPORT int
+    zproc_returncode (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  process exit code
+CZMQ_EXPORT int
+    zproc_pid (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  return true if process is running, false if not yet started or finished
+CZMQ_EXPORT bool
+    zproc_running (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  wait or poll process status, return return code
+CZMQ_EXPORT int
+    zproc_wait (zproc_t *self, bool hang);
+
+//  *** Draft method, for development use, may change without warning ***
+//  return internal actor, usefull for the polling if process died
+CZMQ_EXPORT void *
+    zproc_actor (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  send a signal to the subprocess
+CZMQ_EXPORT void
+    zproc_kill (zproc_t *self, int signal);
+
+//  *** Draft method, for development use, may change without warning ***
+//  set verbose mode
+CZMQ_EXPORT void
+    zproc_set_verbose (zproc_t *self, bool verbose);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Returns CZMQ version as a single 6-digit integer encoding the major
 //  version (x 10000), the minor version (x 100) and the patch.        
 CZMQ_EXPORT int

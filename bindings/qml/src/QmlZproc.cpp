@@ -8,6 +8,93 @@
 #include "QmlZproc.h"
 
 
+///
+//  Connects process stdin with a readable ('>', connect) zeromq socket. If
+//  socket argument is NULL, zproc creates own managed pair of inproc      
+//  sockets.  The writable one is then accessbile via zproc_stdin method.  
+void QmlZproc::setStdin (void *socket) {
+    zproc_set_stdin (self, socket);
+};
+
+///
+//  Connects process stdout with a writable ('@', bind) zeromq socket. If 
+//  socket argument is NULL, zproc creates own managed pair of inproc     
+//  sockets.  The readable one is then accessbile via zproc_stdout method.
+void QmlZproc::setStdout (void *socket) {
+    zproc_set_stdout (self, socket);
+};
+
+///
+//  Connects process stderr with a writable ('@', bind) zeromq socket. If 
+//  socket argument is NULL, zproc creates own managed pair of inproc     
+//  sockets.  The readable one is then accessbile via zproc_stderr method.
+void QmlZproc::setStderr (void *socket) {
+    zproc_set_stderr (self, socket);
+};
+
+///
+//  Return subprocess stdin writable socket. NULL for
+//  not initialized or external sockets.             
+void *QmlZproc::stdin () {
+    return zproc_stdin (self);
+};
+
+///
+//  Return subprocess stdout readable socket. NULL for
+//  not initialized or external sockets.              
+void *QmlZproc::stdout () {
+    return zproc_stdout (self);
+};
+
+///
+//  Return subprocess stderr readable socket. NULL for
+//  not initialized or external sockets.              
+void *QmlZproc::stderr () {
+    return zproc_stderr (self);
+};
+
+///
+//  process exit code
+int QmlZproc::returncode () {
+    return zproc_returncode (self);
+};
+
+///
+//  process exit code
+int QmlZproc::pid () {
+    return zproc_pid (self);
+};
+
+///
+//  return true if process is running, false if not yet started or finished
+bool QmlZproc::running () {
+    return zproc_running (self);
+};
+
+///
+//  wait or poll process status, return return code
+int QmlZproc::wait (bool hang) {
+    return zproc_wait (self, hang);
+};
+
+///
+//  return internal actor, usefull for the polling if process died
+void *QmlZproc::actor () {
+    return zproc_actor (self);
+};
+
+///
+//  send a signal to the subprocess
+void QmlZproc::kill (int signal) {
+    zproc_kill (self, signal);
+};
+
+///
+//  set verbose mode
+void QmlZproc::setVerbose (bool verbose) {
+    zproc_set_verbose (self, verbose);
+};
+
 
 QObject* QmlZproc::qmlAttachedProperties(QObject* object) {
     return new QmlZprocAttached(object);
@@ -164,6 +251,22 @@ void QmlZprocAttached::logDebug (const QString &format) {
 //  Self test of this class.
 void QmlZprocAttached::test (bool verbose) {
     zproc_test (verbose);
+};
+
+///
+//  Create a new zproc.                                        
+//  NOTE: On Windows and with libzmq3 and libzmq2 this function
+//  returns NULL. Code needs to be ported there.               
+QmlZproc *QmlZprocAttached::construct () {
+    QmlZproc *qmlSelf = new QmlZproc ();
+    qmlSelf->self = zproc_new ();
+    return qmlSelf;
+};
+
+///
+//  Destroy zproc, wait until process ends.
+void QmlZprocAttached::destruct (QmlZproc *qmlSelf) {
+    zproc_destroy (&qmlSelf->self);
 };
 
 /*
