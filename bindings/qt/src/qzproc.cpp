@@ -16,6 +16,135 @@ QZproc::QZproc (zproc_t *self, QObject *qObjParent) : QObject (qObjParent)
 
 
 ///
+//  Create a new zproc.                                        
+//  NOTE: On Windows and with libzmq3 and libzmq2 this function
+//  returns NULL. Code needs to be ported there.               
+QZproc::QZproc (QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zproc_new ();
+}
+
+///
+//  Destroy zproc, wait until process ends.
+QZproc::~QZproc ()
+{
+    zproc_destroy (&self);
+}
+
+///
+//  Connects process stdin with a readable ('>', connect) zeromq socket. If
+//  socket argument is NULL, zproc creates own managed pair of inproc      
+//  sockets.  The writable one is then accessbile via zproc_stdin method.  
+void QZproc::setStdin (void *socket)
+{
+    zproc_set_stdin (self, socket);
+    
+}
+
+///
+//  Connects process stdout with a writable ('@', bind) zeromq socket. If 
+//  socket argument is NULL, zproc creates own managed pair of inproc     
+//  sockets.  The readable one is then accessbile via zproc_stdout method.
+void QZproc::setStdout (void *socket)
+{
+    zproc_set_stdout (self, socket);
+    
+}
+
+///
+//  Connects process stderr with a writable ('@', bind) zeromq socket. If 
+//  socket argument is NULL, zproc creates own managed pair of inproc     
+//  sockets.  The readable one is then accessbile via zproc_stderr method.
+void QZproc::setStderr (void *socket)
+{
+    zproc_set_stderr (self, socket);
+    
+}
+
+///
+//  Return subprocess stdin writable socket. NULL for
+//  not initialized or external sockets.             
+void * QZproc::stdin ()
+{
+    void * rv = zproc_stdin (self);
+    return rv;
+}
+
+///
+//  Return subprocess stdout readable socket. NULL for
+//  not initialized or external sockets.              
+void * QZproc::stdout ()
+{
+    void * rv = zproc_stdout (self);
+    return rv;
+}
+
+///
+//  Return subprocess stderr readable socket. NULL for
+//  not initialized or external sockets.              
+void * QZproc::stderr ()
+{
+    void * rv = zproc_stderr (self);
+    return rv;
+}
+
+///
+//  process exit code
+int QZproc::returncode ()
+{
+    int rv = zproc_returncode (self);
+    return rv;
+}
+
+///
+//  process exit code
+int QZproc::pid ()
+{
+    int rv = zproc_pid (self);
+    return rv;
+}
+
+///
+//  return true if process is running, false if not yet started or finished
+bool QZproc::running ()
+{
+    bool rv = zproc_running (self);
+    return rv;
+}
+
+///
+//  wait or poll process status, return return code
+int QZproc::wait (bool hang)
+{
+    int rv = zproc_wait (self, hang);
+    return rv;
+}
+
+///
+//  return internal actor, usefull for the polling if process died
+void * QZproc::actor ()
+{
+    void * rv = zproc_actor (self);
+    return rv;
+}
+
+///
+//  send a signal to the subprocess
+void QZproc::kill (int signal)
+{
+    zproc_kill (self, signal);
+    
+}
+
+///
+//  set verbose mode
+void QZproc::setVerbose (bool verbose)
+{
+    zproc_set_verbose (self, verbose);
+    
+}
+
+///
 //  Returns CZMQ version as a single 6-digit integer encoding the major
 //  version (x 10000), the minor version (x 100) and the patch.        
 int QZproc::czmqVersion ()

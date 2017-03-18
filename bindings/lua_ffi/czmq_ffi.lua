@@ -2127,6 +2127,77 @@ void
     zpoller_test (bool verbose);
 
 // CLASS: zproc
+// Create a new zproc.                                        
+// NOTE: On Windows and with libzmq3 and libzmq2 this function
+// returns NULL. Code needs to be ported there.               
+zproc_t *
+    zproc_new (void);
+
+// Destroy zproc, wait until process ends.
+void
+    zproc_destroy (zproc_t **self_p);
+
+// Connects process stdin with a readable ('>', connect) zeromq socket. If
+// socket argument is NULL, zproc creates own managed pair of inproc      
+// sockets.  The writable one is then accessbile via zproc_stdin method.  
+void
+    zproc_set_stdin (zproc_t *self, void *socket);
+
+// Connects process stdout with a writable ('@', bind) zeromq socket. If 
+// socket argument is NULL, zproc creates own managed pair of inproc     
+// sockets.  The readable one is then accessbile via zproc_stdout method.
+void
+    zproc_set_stdout (zproc_t *self, void *socket);
+
+// Connects process stderr with a writable ('@', bind) zeromq socket. If 
+// socket argument is NULL, zproc creates own managed pair of inproc     
+// sockets.  The readable one is then accessbile via zproc_stderr method.
+void
+    zproc_set_stderr (zproc_t *self, void *socket);
+
+// Return subprocess stdin writable socket. NULL for
+// not initialized or external sockets.             
+void *
+    zproc_stdin (zproc_t *self);
+
+// Return subprocess stdout readable socket. NULL for
+// not initialized or external sockets.              
+void *
+    zproc_stdout (zproc_t *self);
+
+// Return subprocess stderr readable socket. NULL for
+// not initialized or external sockets.              
+void *
+    zproc_stderr (zproc_t *self);
+
+// process exit code
+int
+    zproc_returncode (zproc_t *self);
+
+// process exit code
+int
+    zproc_pid (zproc_t *self);
+
+// return true if process is running, false if not yet started or finished
+bool
+    zproc_running (zproc_t *self);
+
+// wait or poll process status, return return code
+int
+    zproc_wait (zproc_t *self, bool hang);
+
+// return internal actor, usefull for the polling if process died
+void *
+    zproc_actor (zproc_t *self);
+
+// send a signal to the subprocess
+void
+    zproc_kill (zproc_t *self, int signal);
+
+// set verbose mode
+void
+    zproc_set_verbose (zproc_t *self, bool verbose);
+
 // Returns CZMQ version as a single 6-digit integer encoding the major
 // version (x 10000), the minor version (x 100) and the patch.        
 int

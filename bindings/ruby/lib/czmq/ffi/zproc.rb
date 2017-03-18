@@ -30,12 +30,13 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
+      # @param ptr [::FFI::Pointer]
       # @return [Proc]
       def self.create_finalizer_for(ptr)
         Proc.new do
-          "WARNING: "\
-          "Objects of type #{self} cannot be destroyed implicitly. "\
-          "Please call the correct destroy method with the relevant arguments."
+          ptr_ptr = ::FFI::MemoryPointer.new :pointer
+          ptr_ptr.write_pointer ptr
+          ::CZMQ::FFI.zproc_destroy ptr_ptr
         end
       end
       # @return [Boolean]
@@ -70,6 +71,173 @@ module CZMQ
       def __undef_finalizer
         ObjectSpace.undefine_finalizer self
         @finalizer = nil
+      end
+
+      # Create a new zproc.                                        
+      # NOTE: On Windows and with libzmq3 and libzmq2 this function
+      # returns NULL. Code needs to be ported there.               
+      # @return [CZMQ::Zproc]
+      def self.new()
+        ptr = ::CZMQ::FFI.zproc_new()
+        __new ptr
+      end
+
+      # Destroy zproc, wait until process ends.
+      #
+      # @return [void]
+      def destroy()
+        return unless @ptr
+        self_p = __ptr_give_ref
+        result = ::CZMQ::FFI.zproc_destroy(self_p)
+        result
+      end
+
+      # Connects process stdin with a readable ('>', connect) zeromq socket. If
+      # socket argument is NULL, zproc creates own managed pair of inproc      
+      # sockets.  The writable one is then accessbile via zproc_stdin method.  
+      #
+      # @param socket [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def set_stdin(socket)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_set_stdin(self_p, socket)
+        result
+      end
+
+      # Connects process stdout with a writable ('@', bind) zeromq socket. If 
+      # socket argument is NULL, zproc creates own managed pair of inproc     
+      # sockets.  The readable one is then accessbile via zproc_stdout method.
+      #
+      # @param socket [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def set_stdout(socket)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_set_stdout(self_p, socket)
+        result
+      end
+
+      # Connects process stderr with a writable ('@', bind) zeromq socket. If 
+      # socket argument is NULL, zproc creates own managed pair of inproc     
+      # sockets.  The readable one is then accessbile via zproc_stderr method.
+      #
+      # @param socket [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def set_stderr(socket)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_set_stderr(self_p, socket)
+        result
+      end
+
+      # Return subprocess stdin writable socket. NULL for
+      # not initialized or external sockets.             
+      #
+      # @return [::FFI::Pointer]
+      def stdin()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_stdin(self_p)
+        result
+      end
+
+      # Return subprocess stdout readable socket. NULL for
+      # not initialized or external sockets.              
+      #
+      # @return [::FFI::Pointer]
+      def stdout()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_stdout(self_p)
+        result
+      end
+
+      # Return subprocess stderr readable socket. NULL for
+      # not initialized or external sockets.              
+      #
+      # @return [::FFI::Pointer]
+      def stderr()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_stderr(self_p)
+        result
+      end
+
+      # process exit code
+      #
+      # @return [Integer]
+      def returncode()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_returncode(self_p)
+        result
+      end
+
+      # process exit code
+      #
+      # @return [Integer]
+      def pid()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_pid(self_p)
+        result
+      end
+
+      # return true if process is running, false if not yet started or finished
+      #
+      # @return [Boolean]
+      def running()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_running(self_p)
+        result
+      end
+
+      # wait or poll process status, return return code
+      #
+      # @param hang [Boolean]
+      # @return [Integer]
+      def wait(hang)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        hang = !(0==hang||!hang) # boolean
+        result = ::CZMQ::FFI.zproc_wait(self_p, hang)
+        result
+      end
+
+      # return internal actor, usefull for the polling if process died
+      #
+      # @return [::FFI::Pointer]
+      def actor()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_actor(self_p)
+        result
+      end
+
+      # send a signal to the subprocess
+      #
+      # @param signal [Integer, #to_int, #to_i]
+      # @return [void]
+      def kill(signal)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        signal = Integer(signal)
+        result = ::CZMQ::FFI.zproc_kill(self_p, signal)
+        result
+      end
+
+      # set verbose mode
+      #
+      # @param verbose [Boolean]
+      # @return [void]
+      def set_verbose(verbose)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        verbose = !(0==verbose||!verbose) # boolean
+        result = ::CZMQ::FFI.zproc_set_verbose(self_p, verbose)
+        result
       end
 
       # Returns CZMQ version as a single 6-digit integer encoding the major

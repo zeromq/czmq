@@ -20,6 +20,663 @@
 
 #include "czmq_classes.h"
 
+#define ZPROC_RUNNING -42
+
+//      #######     internal helpers for zproc      #######
+//      vvvvvvv                                     vvvvvvv
+typedef struct _zpair_t zpair_t;
+
+struct _zpair_t {
+    char *endpoint;
+    bool write_owned;
+    void *write;
+    bool read_owned;
+    void *read;
+};
+
+static zpair_t*
+zpair_new (char* endpoint) {
+    zpair_t *self = (zpair_t*) zmalloc (sizeof (zpair_t));
+    self->endpoint = strdup (endpoint);
+    return self;
+}
+
+static void
+zpair_destroy (zpair_t **self_p) {
+    assert (self_p);
+    if (*self_p) {
+        zpair_t *self = *self_p;
+        if (self->write_owned)
+            zsock_destroy ((zsock_t**)&self->write);
+        if (self->read_owned)
+            zsock_destroy ((zsock_t**)&self->read);
+        zstr_free (&self->endpoint);
+        free (self);
+        *self_p = NULL;
+    }
+}
+
+static void
+zpair_set_read (zpair_t *self, void *sock, bool owned) {
+    self->read = sock;
+    self->read_owned = owned;
+}
+
+static void
+zpair_set_write (zpair_t *self, void *sock, bool owned) {
+    self->write = sock;
+    self->write_owned = owned;
+}
+
+static void *
+zpair_read (zpair_t *self) {
+    return self->read;
+}
+
+static void *
+zpair_write (zpair_t *self) {
+    return self->write;
+}
+
+static void
+zpair_mkpair (zpair_t *self) {
+    self->endpoint[0] = '>';
+    self->read = zsock_new_pair (self->endpoint);
+    self->read_owned = true;
+    self->endpoint [0] = '@';
+    self->write = zsock_new_pair (self->endpoint);
+    self->write_owned = true;
+    self->endpoint [0] = '#';
+}
+
+static void
+zpair_print (zpair_t *self) {
+    assert (self);
+    zsys_debug ("pair<%p> {.read = <%p>, .write = <%p>}",
+        (void*) self,
+        self->read,
+        self->write);
+}
+
+static char **
+arr_new (size_t len) {
+    // we allocate one entry more, because there must be NULL at the end!
+    char **ret = (char**) zmalloc (sizeof (char*) * (len + 1));
+    return ret;
+}
+
+static void
+arr_free (char **self) {
+    assert (self);
+    char **foo = self;
+    while (*self) {
+        free (*(self++));
+    }
+    free (foo);
+}
+
+static void
+arr_add_ref (char **self, size_t i, char *s) {
+    assert (self);
+    self [i] = s;
+}
+
+static void
+arr_print (char**self) {
+    assert (self);
+    size_t i = 0;
+    while (self [i]) {
+        zsys_debug ("%zu:\t%s<%p>", i, self [i], (void*) *self);
+        i += 1;
+    }
+}
+
+static size_t
+arr_size (char **self) {
+    if (!self)
+        return 0;
+    char **foo = self;
+    size_t size = 0;
+    while (*foo) {
+        size ++;
+        foo ++;
+    }
+    return size;
+}
+
+//      ^^^^^^^                                     ^^^^^^^
+//      #######     internal helpers for zproc      #######
+
+struct _zproc_t {
+#if ! defined (__WINDOWS__)
+    //TODO: there is no windows port, so lets exclude pid from struct
+    //      zproc wasn't ported there, so no reason to do so
+    pid_t pid;
+#endif
+    int return_code;
+    bool running;
+    bool verbose;
+
+    zactor_t *actor;
+    zloop_t *loop_ref;
+    zsock_t *pipe;          // destroy actor pipe in a case of execve fail
+    int stdinpipe [2];      // stdin pipe
+    int stdoutpipe [2];     // stdout pipe
+    int stderrpipe [2];     // stderr pipe
+
+    zpair_t *stdinpair;     // stdin socketpair
+    zpair_t *stdoutpair;    // stdout socketpair
+    zpair_t *stderrpair;    // stderr socketpair
+};
+
+zproc_t*
+zproc_new ()
+{
+#if defined (__WINDOWS__)
+    zsys_error ("zproc_set_stdin not implemented for Windows");
+    return NULL;
+#elif ZMQ_VERSION_MAJOR < 4
+    zsys_error ("Cannot use zproc with zmq older than 4");
+    return NULL;
+#endif
+    int major, minor, patch;
+    zsys_version (&major, &minor, &patch);
+    if (major < 4) {
+        zsys_error ("Cannot use zproc with zmq older than 4");
+        return NULL;
+    }
+
+    zproc_t *self = (zproc_t*) zmalloc (sizeof (zproc_t));
+    self->verbose = false;
+
+    zuuid_t *uuid = zuuid_new ();
+    self->stdinpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
+    );
+    self->stdoutpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
+    );
+    self->stderrpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stderr", zuuid_str_canonical (uuid))
+    );
+    zuuid_destroy (&uuid);
+
+    return self;
+}
+
+void
+zproc_destroy (zproc_t **self_p) {
+    assert (self_p);
+    if (*self_p) {
+        zproc_t *self = *self_p;
+        zproc_wait (self, true);
+        zactor_destroy (&self->actor);
+
+        close (self->stdinpipe [0]);
+        close (self->stdinpipe [1]);
+        close (self->stdoutpipe [0]);
+        close (self->stdoutpipe [1]);
+        close (self->stderrpipe [0]);
+        close (self->stderrpipe [1]);
+
+        zpair_destroy (&self->stdinpair);
+        zpair_destroy (&self->stdoutpair);
+        zpair_destroy (&self->stderrpair);
+
+        free (self);
+        *self_p = NULL;
+    }
+}
+
+void
+zproc_set_stdin (zproc_t *self, void* socket) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zproc_set_stdin not implemented for Windows");
+    return;
+#else
+    assert (self->stdinpipe [0] == 0);
+    int r = pipe (self->stdinpipe);
+    assert (r == 0);
+
+    if (!socket)
+        zpair_mkpair (self->stdinpair);
+    else
+        zpair_set_read (self->stdinpair, socket, false);
+#endif
+}
+
+void
+zproc_set_stdout (zproc_t *self, void* socket) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zproc_set_stdout not implemented for Windows");
+    return;
+#else
+    assert (self->stdoutpipe [0] == 0);
+    int r = pipe (self->stdoutpipe);
+    assert (r == 0);
+
+    if (!socket)
+        zpair_mkpair (self->stdoutpair);
+    else
+        zpair_set_write (self->stdoutpair, socket, false);
+#endif
+}
+
+void
+zproc_set_stderr (zproc_t *self, void* socket) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zproc_set_stdout not implemented for Windows");
+    return;
+#else
+    assert (self->stderrpipe [0] == 0);
+    int r = pipe (self->stderrpipe);
+    assert (r == 0);
+
+    if (!socket)
+        zpair_mkpair (self->stderrpair);
+    else
+        zpair_set_write (self->stderrpair, socket, false);
+#endif
+}
+
+void*
+zproc_stdin (zproc_t *self) {
+    return zpair_write (self->stdinpair);
+}
+
+void*
+zproc_stdout (zproc_t *self) {
+    return zpair_read (self->stdoutpair);
+}
+
+void*
+zproc_stderr (zproc_t *self) {
+    return zpair_read (self->stderrpair);
+}
+
+int
+zproc_returncode (zproc_t *self) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zproc_returncode not implemented on Windows");
+    return -1;
+#else
+    assert (self->pid);
+    zproc_wait (self, false);
+    return self->return_code;
+#endif
+}
+
+int
+zproc_pid (zproc_t *self) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("zproc_pid not implemented on Windows");
+    return -1;
+#else
+    return self->pid;
+#endif
+}
+
+
+static int
+s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
+{
+#define BUF_SIZE 1024
+    byte buf [BUF_SIZE];
+    ssize_t r = 1;
+
+    while (r > 0) {
+        r = read (item->fd, buf, BUF_SIZE);
+        if (r == -1) {
+            zsys_error ("read from fd %d: %s", item->fd, strerror (errno));
+            break;
+        }
+        else
+        if (r == 0)
+            break;
+        zframe_t *frame = zframe_new (buf, r);
+        zsock_bsend (socket, "f", frame, NULL);
+        zframe_destroy (&frame);
+    }
+    return 0;
+#undef BUF_SIZE
+}
+
+static int
+s_fd_out_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
+{
+    ssize_t r = 1;
+
+    while (r > 0) {
+
+        zframe_t *frame;
+        r = zsock_brecv (socket, "f", &frame);
+        if (r == -1) {
+            zsys_error ("read from socket <%p>: %s", socket, strerror (errno));
+            break;
+        }
+
+        r = write (item->fd, zframe_data (frame), zframe_size (frame));
+        zframe_destroy (&frame);
+
+        if (r == -1) {
+            zsys_error ("write to fd %d: %s", item->fd, strerror (errno));
+            break;
+        }
+    }
+    return 0;
+}
+
+static int
+s_zproc_addfd (zproc_t *self, int fd, void* socket, int flags) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("s_zproc_addfd not implemented for Windows");
+    return -1;
+#else
+    zmq_pollitem_t it = {NULL, fd, flags, 0};
+    return zloop_poller (
+        self->loop_ref,
+        &it,
+        flags == ZMQ_POLLIN ? s_fd_in_handler : s_fd_out_handler,
+        socket);
+#endif
+}
+
+static int
+s_zproc_alive (zloop_t *loop, int timer_id, void *args)
+{
+    zproc_t *self = (zproc_t*) args;
+    if (zsys_interrupted)
+        return -1;
+    if (zproc_pid (self) && zproc_running (self))
+        return 0;
+    return -1;
+}
+
+static int
+s_zproc_execve (
+    zproc_t *self,
+    char *filename,
+    char **argv,
+    char **env)
+{
+#if defined(__WINDOWS__)
+    zsys_debug ("s_zproc_execve not implemented on Windows");
+    return -1;
+#else
+    assert (self);
+    int r;
+
+    self->pid = fork ();
+    if (self->pid == 0) {
+
+        if (self->stdinpipe [0] != 0) {
+            int o_flags = fcntl (self->stdinpipe [0], F_GETFL);
+            int n_flags = o_flags & (~O_NONBLOCK);
+            fcntl (self->stdinpipe [0], F_SETFL, n_flags);
+            dup2 (self->stdinpipe [0], STDIN_FILENO);
+            close (self->stdinpipe [1]);
+        }
+
+        // redirect stdout if set_stdout was called
+        if (self->stdoutpipe [0] != 0) {
+            close (self->stdoutpipe [0]);
+            dup2 (self->stdoutpipe [1], STDOUT_FILENO);
+        }
+
+        // redirect stdout if set_stderr was called
+        if (self->stderrpipe [0] != 0) {
+            close (self->stderrpipe [0]);
+            dup2 (self->stderrpipe [1], STDERR_FILENO);
+        }
+
+        r = execve (filename, argv, env);
+        if (r == -1) {
+            zsys_error ("fail to run %s: %s", filename, strerror (errno));
+            zproc_destroy (&self);
+            zsock_destroy (&self->pipe);
+            exit (errno);
+        }
+    }
+    else
+    if (self->pid == -1) {
+        zsys_error ("error fork: %s", strerror (errno));
+        exit (EXIT_FAILURE);
+    }
+    else {
+        if (self->verbose)
+            zsys_debug ("process %s with pid %d started", filename, self->pid);
+
+        if (self->stdinpipe [0] != 0) {
+            s_zproc_addfd (self, self->stdinpipe [1], zpair_read (self->stdinpair), ZMQ_POLLOUT);
+            close (self->stdinpipe [0]);
+        }
+
+        // add a handler for read end of stdout
+        if (self->stdoutpipe [1] != 0) {
+            s_zproc_addfd (self, self->stdoutpipe [0], zpair_write (self->stdoutpair), ZMQ_POLLIN);
+            close(self->stdoutpipe[1]);
+        }
+        // add a handler for read end of stderr
+        if (self->stderrpipe [1] != 0) {
+            s_zproc_addfd (self, self->stderrpipe [0], zpair_write (self->stderrpair), ZMQ_POLLIN);
+            close(self->stderrpipe[1]);
+        }
+    }
+
+    return 0;
+#endif
+}
+
+static int
+s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
+    zproc_t *self = (zproc_t*) args;
+
+    int ret = 0;
+
+    zmsg_t *msg = zmsg_recv (pipe);
+    char *command = zmsg_popstr (msg);
+    if (self->verbose)
+        zsys_debug ("API command=%s", command);
+
+    if (streq (command, "$TERM"))
+        ret = -1;
+    else
+    if (streq (command, "RUN")) {
+
+        if (zproc_pid (self) > 0) {
+            zsys_error ("Can't run command twice!!");
+            goto end;
+        }
+
+        char *filename = zmsg_popstr (msg);
+        char *argca = zmsg_popstr (msg);
+        int argc = atoi (argca);
+
+        char **argv = arr_new (argc);
+
+        for (int i = 0; i != argc; i++)
+            arr_add_ref (argv, i, zmsg_popstr (msg));
+
+        char *envca = zmsg_popstr (msg);
+        char **env = NULL;
+        if (envca) {
+            int envc = atoi (envca);
+            env = arr_new (envc);
+
+            for (int i = 0; i != envc; i++)
+                arr_add_ref (env, i, zmsg_popstr (msg));
+        }
+
+        s_zproc_execve (self, filename, argv, env);
+
+        arr_free (env);
+        arr_free (argv);
+        zstr_free (&envca);
+        zstr_free (&argca);
+        zstr_free (&filename);
+    }
+
+end:
+    zstr_free (&command);
+    zmsg_destroy (&msg);
+
+    return ret;
+}
+
+static void
+s_zproc_actor (zsock_t *pipe, void *args)
+{
+
+    zproc_t *self = (zproc_t*) args;
+    zloop_t *loop = zloop_new ();
+    assert (loop);
+    self->loop_ref = loop;
+    self->pipe = pipe;
+
+    zloop_reader (loop, pipe, s_pipe_handler, (void*) self);
+    zloop_timer (loop, 500, 0, s_zproc_alive, (void*) self);
+
+    zsock_signal (pipe, 0);
+    zloop_start (loop);
+    zloop_destroy (&loop);
+    zsock_signal (pipe, 0);
+}
+
+int
+zproc_run (zproc_t *self, const char *filename, char *const argv[], char *const envp[])
+{
+#if defined (__WINDOWS__)
+    zsys_error ("zproc not yet implemented for Windows");
+    return -1;
+#endif
+    assert (self);
+    assert (!self->actor);
+
+    self->actor = zactor_new (s_zproc_actor, (void*) self);
+    self->running = true;
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "RUN");
+    zmsg_addstr (msg, filename);
+
+    char *asize = zsys_sprintf ("%zu", arr_size ((char**)argv));
+    zmsg_addstr (msg, asize);
+    if (asize [0] != '0') {
+        while (*argv) {
+            zmsg_addstr (msg, *(argv++));
+        }
+    }
+
+    char *esize = zsys_sprintf ("%zu", arr_size ((char**)envp));
+    zmsg_addstr (msg, esize);
+    if (esize [0] != '0') {
+        while (*envp) {
+            zmsg_addstr (msg, *(envp++));
+        }
+    }
+
+    zmsg_send (&msg, self->actor);
+    zstr_free (&asize);
+    zstr_free (&esize);
+    self->return_code = ZPROC_RUNNING;
+    return 0;
+}
+
+int
+zproc_wait (zproc_t *self, bool wait) {
+#if defined (__WINDOWS__)
+    zsys_error ("zproc not yet implemented for Windows");
+    return -1;
+#else
+    assert (self);
+    if (!self->pid)
+        return 0;
+
+    if (self->verbose)
+        zsys_debug ("zproc_wait [%d]: wait=%s", self->pid, wait ? "true" : "false");
+    int status = -1;
+    int options = !wait ? WNOHANG : 0;
+    if (self->verbose)
+        zsys_debug ("zproc_wait [%d]:\t!self->running=%s", self->pid, self->running ? "true" : "false");
+    if (!self->running)
+        return self->return_code;
+
+    if (self->verbose)
+        zsys_debug ("zproc_wait [%d]:\twaitpid", self->pid);
+    int r = waitpid (self->pid, &status, options);
+    if (self->verbose)
+        zsys_debug ("zproc_wait [%d]:\twaitpid, r=%d", self->pid, r);
+    if (!wait && r == 0)
+        return self->return_code;
+
+    if (WIFEXITED(status)) {
+        if (self->verbose)
+            zsys_debug ("zproc_wait [%d]:\tWIFEXITED", self->pid);
+        self->running = false;
+        self->return_code = WEXITSTATUS(status);
+    }
+    else if (WIFSIGNALED(status)) {
+        if (self->verbose)
+            zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED", self->pid);
+        self->running = false;
+        self->return_code = - WTERMSIG(status);
+
+        /*
+        if (WCOREDUMP(status)) {
+            self->core_dumped = true;
+        }
+        */
+    }
+    if (self->verbose)
+        zsys_debug ("zproc_wait [%d]: self->return_code=%d", self->pid, self->return_code);
+    return ZPROC_RUNNING;
+#endif
+}
+
+bool
+zproc_running (zproc_t *self) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_debug ("zproc_running not implemented on Windows");
+    return false;
+#else
+    assert (self->pid);
+    return zproc_wait (self, false) == ZPROC_RUNNING;
+#endif
+}
+
+void *
+zproc_actor (zproc_t *self) {
+    assert (self);
+    return self->actor;
+}
+
+//  send a signal to the subprocess
+void
+zproc_kill (zproc_t *self, int signum) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_debug ("zproc_kill not implemented on Windows");
+    return;
+#else
+    int r = kill (self->pid, signum);
+    if (r != 0)
+        zsys_error ("kill of pid=%d failed: %s", self->pid, strerror (errno));
+    zproc_wait (self, false);
+#endif
+}
+
+void
+zproc_set_verbose (zproc_t *self, bool verbose) {
+    assert (self);
+    self->verbose = verbose;
+}
+
 //  --------------------------------------------------------------------------
 //  Returns CZMQ version as a single 6-digit integer encoding the major
 //  version (x 10000), the minor version (x 100) and the patch.        
@@ -269,7 +926,112 @@ zproc_test (bool verbose)
     printf (" * zproc: ");
 
     //  @selftest
+#if defined (__WINDOWS__)
+    printf ("SKIPPED (on Windows)\n");
+    return;
+#endif
+#if ZMQ_VERSION_MAJOR < 4
+    printf ("SKIPPED (on zmq pre-4)\n");
+    return;
+#endif
+    int major, minor, patch;
+    zsys_version (&major, &minor, &patch);
+    if (major < 4) {
+        printf ("SKIPPED (on zmq pre-4)\n");
+        return;
+    }
+
+    //  @selftest
+    //  0. initialization
+    //  initialize arguments and environment
+    char *const xargv[] = {"zsp", "--stdout", NULL};
+    char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
+
+    //  find the right binary
+    char *file = "src/zsp";
+    if (zsys_file_exists ("_build/../src/zsp"))
+        file = "_build/../src/zsp";
+    else
+    if (zsys_file_exists ("zsp"))
+        file = "./zsp";
+
+    if (!zsys_file_exists (file)) {
+        zsys_warning ("cannot detect zsp binary, %s does not exists", file);
+        printf ("SKIPPED (zsp not found");
+        return;
+    }
+
+    //  Create new subproc instance
+    zproc_t *self = zproc_new ();
+    zproc_set_verbose (self, verbose);
+    assert (self);
+    //  join stdout of the process to zeromq socket
+    //  all data will be readable from zproc_stdout socket
+    zproc_set_stdout (self, NULL);
+
+    // execute the binary. It runs in own actor, which monitor the process and
+    // pass data accross pipes and zeromq sockets
+    zproc_run (self, file, xargv, xenvp);
+
+    zpoller_t *poller = zpoller_new (zproc_actor (self), zproc_stdout (self), NULL);
+
+    bool running = true;
+    while (!zsys_interrupted) {
+        void *which = zpoller_wait (poller, 800);
+
+        // kill the process, but continue polling
+        if (zpoller_expired (poller) && running) {
+            zproc_kill (self, SIGTERM);
+            zproc_wait (self, true);
+            if (verbose)
+                zsys_info ("Process %d exited with %d", zproc_pid (self), zproc_returncode (self));
+            running = false;
+            continue;
+        }
+
+        if (!which)
+            break;
+
+        if (which == zproc_actor (self)) {
+            zmsg_t *msg = zmsg_recv (zproc_actor (self));
+            zmsg_destroy (&msg);
+            continue;
+        }
+
+        if (which == zproc_stdout (self)) {
+            zframe_t *frame;
+            zsock_brecv (zproc_stdout (self), "f", &frame);
+            assert (!strncmp(
+                "Lorem ipsum\n",
+                (char*) zframe_data (frame),
+                12));
+
+            if (verbose)
+                zframe_print (frame, "zproc_test");
+
+            zframe_destroy (&frame);
+            continue;
+        }
+
+        // should not get there
+        assert (false);
+    }
+
+    zpoller_destroy (&poller);
+    zproc_destroy (&self);
     //  @end
+
+    // to have zpair print and arr print methods
+    zpair_t *pair = zpair_new ("e");
+    assert (pair);
+    if (verbose)
+        zpair_print (pair);
+    zpair_destroy (&pair);
+
+    char ** a = arr_new (1);
+    if (verbose)
+        arr_print (a);
+    arr_free (a);
 
     printf ("OK\n");
 }

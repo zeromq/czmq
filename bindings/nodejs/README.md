@@ -2035,7 +2035,49 @@ var czmq = require ('bindings')('czmq')
 var my_zproc = new czmq.Zproc ()
 ```
 
+You *must* call the destructor on every Zproc instance:
+
+```
+my_zproc.destroy ()
+```
+
 Methods:
+
+```
+integer my_zproc.returncode ()
+```
+
+process exit code
+
+```
+integer my_zproc.pid ()
+```
+
+process exit code
+
+```
+boolean my_zproc.running ()
+```
+
+return true if process is running, false if not yet started or finished
+
+```
+integer my_zproc.wait (Boolean)
+```
+
+wait or poll process status, return return code
+
+```
+nothing my_zproc.kill (Number)
+```
+
+send a signal to the subprocess
+
+```
+nothing my_zproc.setVerbose (Boolean)
+```
+
+set verbose mode
 
 ```
 integer my_zproc.czmqVersion ()
