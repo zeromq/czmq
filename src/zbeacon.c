@@ -422,7 +422,7 @@ s_self_handle_udp (self_t *self)
 //  --------------------------------------------------------------------------
 //  Send the beacon over UDP
 
-int
+static int
 s_emit_beacon (self_t *self)
 {
 #if defined (__WINDOWS__)
