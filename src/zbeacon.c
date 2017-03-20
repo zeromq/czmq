@@ -422,7 +422,7 @@ s_self_handle_udp (self_t *self)
 //  --------------------------------------------------------------------------
 //  Send the beacon over UDP
 
-int
+static int
 s_emit_beacon (self_t *self)
 {
 #if defined (__WINDOWS__)
@@ -433,10 +433,10 @@ s_emit_beacon (self_t *self)
         INTERFACE_INFO interface_list [64];
         DWORD bytes_received = 0;
 
-        int rc = WSAIoctl (self->udpsock, SIO_GET_INTERFACE_LIST, 0, 0, 
+        int rc = WSAIoctl (self->udpsock, SIO_GET_INTERFACE_LIST, 0, 0,
             &interface_list, sizeof (interface_list), &bytes_received, NULL, NULL);
         assert (rc != SOCKET_ERROR);
-        
+
         int num_interfaces = bytes_received / sizeof (INTERFACE_INFO);
 
         // iiBroadcastAddress is always 255.255.255.255 need to calculate the specific broadcast address using the netmask
