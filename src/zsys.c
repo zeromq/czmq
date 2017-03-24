@@ -264,7 +264,10 @@ zsys_shutdown (void)
     ZMUTEX_UNLOCK (s_mutex);
 
     if (s_open_sockets == 0)
-        zmq_term (s_process_ctx);
+    {
+      zmq_term(s_process_ctx);
+      s_process_ctx = NULL;
+    }
     else
         zsys_error ("dangling sockets: cannot terminate ZMQ safely");
 
@@ -272,9 +275,13 @@ zsys_shutdown (void)
 
     //  Free dynamically allocated properties
     free (s_interface);
+    s_interface = NULL;
     free (s_ipv6_address);
+    s_ipv6_address = NULL;
     free (s_ipv6_mcast_address);
+    s_ipv6_mcast_address = NULL;
     free (s_logident);
+    s_logident = NULL;
 
 #if defined (__UNIX__)
     closelog ();                //  Just to be pedantic
