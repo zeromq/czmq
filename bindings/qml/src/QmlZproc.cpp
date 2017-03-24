@@ -67,6 +67,12 @@ void *QmlZproc::stderr () {
 };
 
 ///
+//  Starts the process.
+int QmlZproc::run () {
+    return zproc_run (self);
+};
+
+///
 //  process exit code
 int QmlZproc::returncode () {
     return zproc_returncode (self);

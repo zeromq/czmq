@@ -2179,6 +2179,10 @@ void *
 void *
     zproc_stderr (zproc_t *self);
 
+// Starts the process.
+int
+    zproc_run (zproc_t *self);
+
 // process exit code
 int
     zproc_returncode (zproc_t *self);

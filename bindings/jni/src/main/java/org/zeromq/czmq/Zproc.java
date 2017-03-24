@@ -105,6 +105,13 @@ public class Zproc implements AutoCloseable{
         return __stderr (self);
     }
     /*
+    Starts the process.
+    */
+    native static int __run (long self);
+    public int run () {
+        return __run (self);
+    }
+    /*
     process exit code
     */
     native static int __returncode (long self);

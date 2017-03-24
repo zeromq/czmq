@@ -77,6 +77,13 @@ Java_org_zeromq_czmq_Zproc__1_1stderr (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zproc__1_1run (JNIEnv *env, jclass c, jlong self)
+{
+    jint run_ = (jint) zproc_run ((zproc_t *) (intptr_t) self);
+    return run_;
+}
+
+JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zproc__1_1returncode (JNIEnv *env, jclass c, jlong self)
 {
     jint returncode_ = (jint) zproc_returncode ((zproc_t *) (intptr_t) self);

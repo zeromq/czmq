@@ -2057,6 +2057,12 @@ nothing my_zproc.setEnv (Zhashx)
 Setup the environment variables for the process.
 
 ```
+integer my_zproc.run ()
+```
+
+Starts the process.
+
+```
 integer my_zproc.returncode ()
 ```
 

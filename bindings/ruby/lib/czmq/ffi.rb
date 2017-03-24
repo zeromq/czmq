@@ -728,6 +728,17 @@ module CZMQ
         end
       end
       begin # DRAFT method
+        attach_function :zproc_run, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_run()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_run(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
         attach_function :zproc_returncode, [:pointer], :int, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG

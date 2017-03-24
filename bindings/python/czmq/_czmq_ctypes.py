@@ -4582,6 +4582,8 @@ lib.zproc_stdout.restype = c_void_p
 lib.zproc_stdout.argtypes = [zproc_p]
 lib.zproc_stderr.restype = c_void_p
 lib.zproc_stderr.argtypes = [zproc_p]
+lib.zproc_run.restype = c_int
+lib.zproc_run.argtypes = [zproc_p]
 lib.zproc_returncode.restype = c_int
 lib.zproc_returncode.argtypes = [zproc_p]
 lib.zproc_pid.restype = c_int
@@ -4742,6 +4744,12 @@ not initialized or external sockets.
 not initialized or external sockets.
         """
         return c_void_p(lib.zproc_stderr(self._as_parameter_))
+
+    def run(self):
+        """
+        Starts the process.
+        """
+        return lib.zproc_run(self._as_parameter_)
 
     def returncode(self):
         """

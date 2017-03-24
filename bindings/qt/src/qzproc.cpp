@@ -106,6 +106,14 @@ void * QZproc::stderr ()
 }
 
 ///
+//  Starts the process.
+int QZproc::run ()
+{
+    int rv = zproc_run (self);
+    return rv;
+}
+
+///
 //  process exit code
 int QZproc::returncode ()
 {

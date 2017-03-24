@@ -189,6 +189,16 @@ module CZMQ
         result
       end
 
+      # Starts the process.
+      #
+      # @return [Integer]
+      def run()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_run(self_p)
+        result
+      end
+
       # process exit code
       #
       # @return [Integer]

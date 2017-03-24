@@ -89,6 +89,11 @@ CZMQ_EXPORT void *
     zproc_stderr (zproc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Starts the process.
+CZMQ_EXPORT int
+    zproc_run (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
 //  process exit code
 CZMQ_EXPORT int
     zproc_returncode (zproc_t *self);

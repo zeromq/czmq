@@ -59,6 +59,9 @@ public:
     //  not initialized or external sockets.              
     void * stderr ();
 
+    //  Starts the process.
+    int run ();
+
     //  process exit code
     int returncode ();
 
