@@ -612,6 +612,11 @@ zproc_run (zproc_t *self)
     assert (self);
     assert (!self->actor);
 
+    if (!self->args || zlistx_size (self->args) == 0) {
+        zsys_error ("No arguments, nothing to run. Call zproc_set_args before");
+        return -1;
+    }
+
     self->actor = zactor_new (s_zproc_actor, (void*) self);
     self->running = true;
     self->return_code = ZPROC_RUNNING;
