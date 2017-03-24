@@ -25,6 +25,10 @@ public:
     //  Destroy zproc, wait until process ends.
     ~QZproc ();
 
+    //  Setup the command line arguments, the first item must be an (absolute) filename
+    //  to run.                                                                        
+    void setArgs (QZlistx *args);
+
     //  Connects process stdin with a readable ('>', connect) zeromq socket. If
     //  socket argument is NULL, zproc creates own managed pair of inproc      
     //  sockets.  The writable one is then accessbile via zproc_stdin method.  

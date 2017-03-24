@@ -4566,6 +4566,8 @@ lib.zproc_new.restype = zproc_p
 lib.zproc_new.argtypes = []
 lib.zproc_destroy.restype = None
 lib.zproc_destroy.argtypes = [POINTER(zproc_p)]
+lib.zproc_set_args.restype = None
+lib.zproc_set_args.argtypes = [zproc_p, zlistx_p]
 lib.zproc_set_stdin.restype = None
 lib.zproc_set_stdin.argtypes = [zproc_p, c_void_p]
 lib.zproc_set_stdout.restype = None
@@ -4680,6 +4682,13 @@ returns NULL. Code needs to be ported there.
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    def set_args(self, args):
+        """
+        Setup the command line arguments, the first item must be an (absolute) filename
+to run.
+        """
+        return lib.zproc_set_args(self._as_parameter_, args)
 
     def set_stdin(self, socket):
         """

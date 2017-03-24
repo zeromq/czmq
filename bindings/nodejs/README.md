@@ -2044,6 +2044,13 @@ my_zproc.destroy ()
 Methods:
 
 ```
+nothing my_zproc.setArgs (Zlistx)
+```
+
+Setup the command line arguments, the first item must be an (absolute) filename
+to run.
+
+```
 integer my_zproc.returncode ()
 ```
 
