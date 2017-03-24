@@ -32,6 +32,12 @@ Java_org_zeromq_czmq_Zproc__1_1setArgs (JNIEnv *env, jclass c, jlong self, jlong
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zproc__1_1setEnv (JNIEnv *env, jclass c, jlong self, jlong args)
+{
+    zproc_set_env ((zproc_t *) (intptr_t) self, (zhashx_t *) (intptr_t) args);
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zproc__1_1setStdin (JNIEnv *env, jclass c, jlong self, jlong socket)
 {
     zproc_set_stdin ((zproc_t *) (intptr_t) self, (void *) (intptr_t) socket);

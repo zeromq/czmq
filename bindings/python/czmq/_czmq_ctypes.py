@@ -4568,6 +4568,8 @@ lib.zproc_destroy.restype = None
 lib.zproc_destroy.argtypes = [POINTER(zproc_p)]
 lib.zproc_set_args.restype = None
 lib.zproc_set_args.argtypes = [zproc_p, zlistx_p]
+lib.zproc_set_env.restype = None
+lib.zproc_set_env.argtypes = [zproc_p, zhashx_p]
 lib.zproc_set_stdin.restype = None
 lib.zproc_set_stdin.argtypes = [zproc_p, c_void_p]
 lib.zproc_set_stdout.restype = None
@@ -4689,6 +4691,12 @@ returns NULL. Code needs to be ported there.
 to run.
         """
         return lib.zproc_set_args(self._as_parameter_, args)
+
+    def set_env(self, args):
+        """
+        Setup the environment variables for the process.
+        """
+        return lib.zproc_set_env(self._as_parameter_, args)
 
     def set_stdin(self, socket):
         """

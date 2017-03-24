@@ -207,6 +207,7 @@ struct _zproc_t {
     zpair_t *stderrpair;    // stderr socketpair
 
     zlistx_t *args;         // command line arguments
+    zhashx_t *env;          // environment
 };
 
 zproc_t*
@@ -264,6 +265,7 @@ zproc_destroy (zproc_t **self_p) {
         zpair_destroy (&self->stderrpair);
 
         zlistx_destroy (&self->args);
+        zhashx_destroy (&self->env);
         free (self);
         *self_p = NULL;
     }
@@ -274,6 +276,13 @@ zproc_set_args (zproc_t *self, zlistx_t *args) {
     assert (self);
     zlistx_destroy (&self->args);
     self->args = args;
+}
+
+void
+zproc_set_env (zproc_t *self, zhashx_t *env) {
+    assert (self);
+    zhashx_destroy (&self->env);
+    self->env = env;
 }
 
 void
@@ -480,7 +489,7 @@ s_zproc_execve (zproc_t *self)
             dup2 (self->stderrpipe [1], STDERR_FILENO);
         }
 
-        // bypass argv for now and use self->args
+        // build argv for now and use self->args
         char **argv2 = arr_new (zlistx_size (self->args) + 1);
 
         size_t i = 0;
@@ -492,7 +501,20 @@ s_zproc_execve (zproc_t *self)
         }
         arr_add_ref (argv2, i, NULL);
 
-        r = execve (filename, argv2, NULL);
+        // build environ for a new process
+        char **env = arr_new (zhashx_size (self->env) + 1);
+
+        i = 0;
+        for (char *arg = (char*) zhashx_first (self->env);
+                   arg != NULL;
+                   arg = (char*) zhashx_next (self->env)) {
+            char *name = (char*) zhashx_cursor (self->env);
+            arr_add_ref (env, i, zsys_sprintf ("%s=%s", name, arg));
+            i++;
+        }
+        arr_add_ref (env, i, NULL);
+
+        r = execve (filename, argv2, env);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
             zproc_destroy (&self);
@@ -984,6 +1006,10 @@ zproc_test (bool verbose)
     zlistx_add_end (args, file);
     zlistx_add_end (args, "--stdout");
     zproc_set_args (self, args);
+
+    zhashx_t *env = zhashx_new ();
+    zhashx_insert (env, "ZSP", "czmq is great");
+    zproc_set_env (self, env);
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets

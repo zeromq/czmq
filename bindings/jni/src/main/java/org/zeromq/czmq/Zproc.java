@@ -47,6 +47,13 @@ public class Zproc implements AutoCloseable{
         __setArgs (self, args.self);
     }
     /*
+    Setup the environment variables for the process.
+    */
+    native static void __setEnv (long self, long args);
+    public void setEnv (Zhashx args) {
+        __setEnv (self, args.self);
+    }
+    /*
     Connects process stdin with a readable ('>', connect) zeromq socket. If
     socket argument is NULL, zproc creates own managed pair of inproc      
     sockets.  The writable one is then accessbile via zproc_stdin method.  

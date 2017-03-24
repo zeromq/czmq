@@ -651,6 +651,17 @@ module CZMQ
         end
       end
       begin # DRAFT method
+        attach_function :zproc_set_env, [:pointer, :pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zproc_set_env()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zproc_set_env(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
         attach_function :zproc_set_stdin, [:pointer, :pointer], :void, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG

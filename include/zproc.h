@@ -45,6 +45,11 @@ CZMQ_EXPORT void
     zproc_set_args (zproc_t *self, zlistx_t *args);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Setup the environment variables for the process.
+CZMQ_EXPORT void
+    zproc_set_env (zproc_t *self, zhashx_t *args);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Connects process stdin with a readable ('>', connect) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc      
 //  sockets.  The writable one is then accessbile via zproc_stdin method.  

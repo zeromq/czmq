@@ -32,6 +32,9 @@ public slots:
     //  to run.                                                                        
     void setArgs (QmlZlistx *args);
 
+    //  Setup the environment variables for the process.
+    void setEnv (QmlZhashx *args);
+
     //  Connects process stdin with a readable ('>', connect) zeromq socket. If
     //  socket argument is NULL, zproc creates own managed pair of inproc      
     //  sockets.  The writable one is then accessbile via zproc_stdin method.  
