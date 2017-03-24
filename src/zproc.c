@@ -75,7 +75,7 @@ struct _zpair_t {
 static zpair_t*
 zpair_new (char* endpoint) {
     zpair_t *self = (zpair_t*) zmalloc (sizeof (zpair_t));
-    self->endpoint = strdup (endpoint);
+    self->endpoint = endpoint;
     return self;
 }
 
@@ -1089,7 +1089,7 @@ zproc_test (bool verbose)
     //  @end
 
     // to have zpair print and arr print methods
-    zpair_t *pair = zpair_new ("e");
+    zpair_t *pair = zpair_new (strdup ("e"));
     assert (pair);
     if (verbose)
         zpair_print (pair);
