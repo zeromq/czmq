@@ -447,11 +447,7 @@ s_zproc_alive (zloop_t *loop, int timer_id, void *args)
 }
 
 static int
-s_zproc_execve (
-    zproc_t *self,
-    char *filename,
-    char **argv,
-    char **env)
+s_zproc_execve (zproc_t *self)
 {
 #if defined(__WINDOWS__)
     zsys_debug ("s_zproc_execve not implemented on Windows");
@@ -460,6 +456,7 @@ s_zproc_execve (
     assert (self);
     int r;
 
+    char *filename = (char*) zlistx_first (self->args);
     self->pid = fork ();
     if (self->pid == 0) {
 
@@ -485,7 +482,6 @@ s_zproc_execve (
 
         // bypass argv for now and use self->args
         char **argv2 = arr_new (zlistx_size (self->args) + 1);
-        char *filename = (char*) zlistx_first (self->args);
 
         size_t i = 0;
         for (char *arg = (char*) zlistx_first (self->args);
@@ -496,7 +492,7 @@ s_zproc_execve (
         }
         arr_add_ref (argv2, i, NULL);
 
-        r = execve (filename, argv2, env);
+        r = execve (filename, argv2, NULL);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
             zproc_destroy (&self);
@@ -556,36 +552,10 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
             goto end;
         }
 
-        char *filename = zmsg_popstr (msg);
-        char *argca = zmsg_popstr (msg);
-        int argc = atoi (argca);
-
-        char **argv = arr_new (argc);
-
-        for (int i = 0; i != argc; i++)
-            arr_add_ref (argv, i, zmsg_popstr (msg));
-
-        char *envca = zmsg_popstr (msg);
-        char **env = NULL;
-        if (envca) {
-            int envc = atoi (envca);
-            env = arr_new (envc);
-
-            for (int i = 0; i != envc; i++)
-                arr_add_ref (env, i, zmsg_popstr (msg));
-        }
-
-        s_zproc_execve (self, filename, argv, env);
-
-        arr_free (env);
-        arr_free (argv);
-        zstr_free (&envca);
-        zstr_free (&argca);
-        zstr_free (&filename);
+        s_zproc_execve (self);
     }
 
 end:
-    zstr_free (&command);
     zmsg_destroy (&msg);
 
     return ret;
@@ -611,7 +581,7 @@ s_zproc_actor (zsock_t *pipe, void *args)
 }
 
 int
-zproc_run (zproc_t *self, const char *filename, char *const argv[], char *const envp[])
+zproc_run (zproc_t *self)
 {
 #if defined (__WINDOWS__)
     zsys_error ("zproc not yet implemented for Windows");
@@ -622,30 +592,9 @@ zproc_run (zproc_t *self, const char *filename, char *const argv[], char *const 
 
     self->actor = zactor_new (s_zproc_actor, (void*) self);
     self->running = true;
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "RUN");
-    zmsg_addstr (msg, filename);
-
-    char *asize = zsys_sprintf ("%zu", arr_size ((char**)argv));
-    zmsg_addstr (msg, asize);
-    if (asize [0] != '0') {
-        while (*argv) {
-            zmsg_addstr (msg, *(argv++));
-        }
-    }
-
-    char *esize = zsys_sprintf ("%zu", arr_size ((char**)envp));
-    zmsg_addstr (msg, esize);
-    if (esize [0] != '0') {
-        while (*envp) {
-            zmsg_addstr (msg, *(envp++));
-        }
-    }
-
-    zmsg_send (&msg, self->actor);
-    zstr_free (&asize);
-    zstr_free (&esize);
     self->return_code = ZPROC_RUNNING;
+
+    zstr_send (self->actor, "RUN");
     return 0;
 }
 
@@ -1038,7 +987,7 @@ zproc_test (bool verbose)
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
-    zproc_run (self, file, xargv, xenvp);
+    zproc_run (self);
 
     zpoller_t *poller = zpoller_new (zproc_actor (self), zproc_stdout (self), NULL);
 
