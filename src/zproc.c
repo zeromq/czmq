@@ -205,6 +205,8 @@ struct _zproc_t {
     zpair_t *stdinpair;     // stdin socketpair
     zpair_t *stdoutpair;    // stdout socketpair
     zpair_t *stderrpair;    // stderr socketpair
+
+    zlistx_t *args;         // command line arguments
 };
 
 zproc_t*
@@ -261,9 +263,17 @@ zproc_destroy (zproc_t **self_p) {
         zpair_destroy (&self->stdoutpair);
         zpair_destroy (&self->stderrpair);
 
+        zlistx_destroy (&self->args);
         free (self);
         *self_p = NULL;
     }
+}
+
+void
+zproc_set_args (zproc_t *self, zlistx_t *args) {
+    assert (self);
+    zlistx_destroy (&self->args);
+    self->args = args;
 }
 
 void
@@ -473,11 +483,25 @@ s_zproc_execve (
             dup2 (self->stderrpipe [1], STDERR_FILENO);
         }
 
-        r = execve (filename, argv, env);
+        // bypass argv for now and use self->args
+        char **argv2 = arr_new (zlistx_size (self->args) + 1);
+        char *filename = (char*) zlistx_first (self->args);
+
+        size_t i = 0;
+        for (char *arg = (char*) zlistx_first (self->args);
+                   arg != NULL;
+                   arg = (char*) zlistx_next (self->args)) {
+            arr_add_ref (argv2, i, arg);
+            i++;
+        }
+        arr_add_ref (argv2, i, NULL);
+
+        r = execve (filename, argv2, env);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
             zproc_destroy (&self);
             zsock_destroy (&self->pipe);
+            arr_free (argv2);
             exit (errno);
         }
     }
@@ -1006,6 +1030,11 @@ zproc_test (bool verbose)
     //  join stdout of the process to zeromq socket
     //  all data will be readable from zproc_stdout socket
     zproc_set_stdout (self, NULL);
+
+    zlistx_t *args = zlistx_new ();
+    zlistx_add_end (args, file);
+    zlistx_add_end (args, "--stdout");
+    zproc_set_args (self, args);
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
