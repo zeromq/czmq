@@ -39,6 +39,21 @@ public class Zproc implements AutoCloseable{
         self = 0;
     }
     /*
+    Setup the command line arguments, the first item must be an (absolute) filename
+    to run.                                                                        
+    */
+    native static void __setArgs (long self, long args);
+    public void setArgs (Zlistx args) {
+        __setArgs (self, args.self);
+    }
+    /*
+    Setup the environment variables for the process.
+    */
+    native static void __setEnv (long self, long args);
+    public void setEnv (Zhashx args) {
+        __setEnv (self, args.self);
+    }
+    /*
     Connects process stdin with a readable ('>', connect) zeromq socket. If
     socket argument is NULL, zproc creates own managed pair of inproc      
     sockets.  The writable one is then accessbile via zproc_stdin method.  
@@ -88,6 +103,13 @@ public class Zproc implements AutoCloseable{
     native static long __stderr (long self);
     public long stderr () {
         return __stderr (self);
+    }
+    /*
+    Starts the process.
+    */
+    native static int __run (long self);
+    public int run () {
+        return __run (self);
     }
     /*
     process exit code

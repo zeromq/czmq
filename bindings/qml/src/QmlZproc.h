@@ -28,6 +28,13 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZproc.cpp
     
 public slots:
+    //  Setup the command line arguments, the first item must be an (absolute) filename
+    //  to run.                                                                        
+    void setArgs (QmlZlistx *args);
+
+    //  Setup the environment variables for the process.
+    void setEnv (QmlZhashx *args);
+
     //  Connects process stdin with a readable ('>', connect) zeromq socket. If
     //  socket argument is NULL, zproc creates own managed pair of inproc      
     //  sockets.  The writable one is then accessbile via zproc_stdin method.  
@@ -54,6 +61,9 @@ public slots:
     //  Return subprocess stderr readable socket. NULL for
     //  not initialized or external sockets.              
     void *stderr ();
+
+    //  Starts the process.
+    int run ();
 
     //  process exit code
     int returncode ();

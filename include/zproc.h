@@ -39,6 +39,17 @@ CZMQ_EXPORT void
     zproc_destroy (zproc_t **self_p);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Setup the command line arguments, the first item must be an (absolute) filename
+//  to run.                                                                        
+CZMQ_EXPORT void
+    zproc_set_args (zproc_t *self, zlistx_t *args);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Setup the environment variables for the process.
+CZMQ_EXPORT void
+    zproc_set_env (zproc_t *self, zhashx_t *args);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Connects process stdin with a readable ('>', connect) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc      
 //  sockets.  The writable one is then accessbile via zproc_stdin method.  
@@ -76,6 +87,11 @@ CZMQ_EXPORT void *
 //  not initialized or external sockets.              
 CZMQ_EXPORT void *
     zproc_stderr (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Starts the process.
+CZMQ_EXPORT int
+    zproc_run (zproc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  process exit code

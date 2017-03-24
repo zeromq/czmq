@@ -9,6 +9,19 @@
 
 
 ///
+//  Setup the command line arguments, the first item must be an (absolute) filename
+//  to run.                                                                        
+void QmlZproc::setArgs (QmlZlistx *args) {
+    zproc_set_args (self, args->self);
+};
+
+///
+//  Setup the environment variables for the process.
+void QmlZproc::setEnv (QmlZhashx *args) {
+    zproc_set_env (self, args->self);
+};
+
+///
 //  Connects process stdin with a readable ('>', connect) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc      
 //  sockets.  The writable one is then accessbile via zproc_stdin method.  
@@ -51,6 +64,12 @@ void *QmlZproc::stdout () {
 //  not initialized or external sockets.              
 void *QmlZproc::stderr () {
     return zproc_stderr (self);
+};
+
+///
+//  Starts the process.
+int QmlZproc::run () {
+    return zproc_run (self);
 };
 
 ///

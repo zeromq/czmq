@@ -558,6 +558,9 @@ class Zproc: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_set_args);
+    static NAN_METHOD (_set_env);
+    static NAN_METHOD (_run);
     static NAN_METHOD (_returncode);
     static NAN_METHOD (_pid);
     static NAN_METHOD (_running);

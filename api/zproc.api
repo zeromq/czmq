@@ -20,6 +20,17 @@
         Destroy zproc, wait until process ends.
     </destructor>
 
+    <method name = "set args" >
+        Setup the command line arguments, the first item must be an (absolute) filename
+        to run.
+        <argument name = "args" type = "zlistx" />
+    </method>
+
+    <method name = "set env" >
+        Setup the environment variables for the process.
+        <argument name = "args" type = "zhashx" />
+    </method>
+
     <method name = "set stdin" >
         Connects process stdin with a readable ('>', connect) zeromq socket. If
         socket argument is NULL, zproc creates own managed pair of inproc
@@ -57,6 +68,11 @@
         Return subprocess stderr readable socket. NULL for
         not initialized or external sockets.
         <return type="anything" />
+    </method>
+
+    <method name = "run" >
+        Starts the process.
+        <return type = "integer" />
     </method>
 
     <method name = "returncode">

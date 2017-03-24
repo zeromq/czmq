@@ -4566,6 +4566,10 @@ lib.zproc_new.restype = zproc_p
 lib.zproc_new.argtypes = []
 lib.zproc_destroy.restype = None
 lib.zproc_destroy.argtypes = [POINTER(zproc_p)]
+lib.zproc_set_args.restype = None
+lib.zproc_set_args.argtypes = [zproc_p, zlistx_p]
+lib.zproc_set_env.restype = None
+lib.zproc_set_env.argtypes = [zproc_p, zhashx_p]
 lib.zproc_set_stdin.restype = None
 lib.zproc_set_stdin.argtypes = [zproc_p, c_void_p]
 lib.zproc_set_stdout.restype = None
@@ -4578,6 +4582,8 @@ lib.zproc_stdout.restype = c_void_p
 lib.zproc_stdout.argtypes = [zproc_p]
 lib.zproc_stderr.restype = c_void_p
 lib.zproc_stderr.argtypes = [zproc_p]
+lib.zproc_run.restype = c_int
+lib.zproc_run.argtypes = [zproc_p]
 lib.zproc_returncode.restype = c_int
 lib.zproc_returncode.argtypes = [zproc_p]
 lib.zproc_pid.restype = c_int
@@ -4681,6 +4687,19 @@ returns NULL. Code needs to be ported there.
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
+    def set_args(self, args):
+        """
+        Setup the command line arguments, the first item must be an (absolute) filename
+to run.
+        """
+        return lib.zproc_set_args(self._as_parameter_, args)
+
+    def set_env(self, args):
+        """
+        Setup the environment variables for the process.
+        """
+        return lib.zproc_set_env(self._as_parameter_, args)
+
     def set_stdin(self, socket):
         """
         Connects process stdin with a readable ('>', connect) zeromq socket. If
@@ -4725,6 +4744,12 @@ not initialized or external sockets.
 not initialized or external sockets.
         """
         return c_void_p(lib.zproc_stderr(self._as_parameter_))
+
+    def run(self):
+        """
+        Starts the process.
+        """
+        return lib.zproc_run(self._as_parameter_)
 
     def returncode(self):
         """
