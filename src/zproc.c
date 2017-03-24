@@ -169,19 +169,6 @@ arr_print (char**self) {
     }
 }
 
-static size_t
-arr_size (char **self) {
-    if (!self)
-        return 0;
-    char **foo = self;
-    size_t size = 0;
-    while (*foo) {
-        size ++;
-        foo ++;
-    }
-    return size;
-}
-
 //      ^^^^^^^                                     ^^^^^^^
 //      #######     internal helpers for zproc      #######
 
@@ -981,10 +968,6 @@ zproc_test (bool verbose)
 
     //  @selftest
     //  0. initialization
-    //  initialize arguments and environment
-    char *const xargv[] = {"zsp", "--stdout", NULL};
-    char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
-
     //  find the right binary
     char *file = "src/zsp";
     if (zsys_file_exists ("_build/../src/zsp"))
