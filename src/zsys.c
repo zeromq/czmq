@@ -1777,6 +1777,13 @@ zsys_test (bool verbose)
     if (verbose)
         printf ("\n");
 
+    // check that we can stop/restart the environnemnt
+    zsys_shutdown();
+    zsys_init();
+    zsys_shutdown();
+    zsys_init();
+
+
     //  @selftest
     zsys_catch_interrupts ();
 
@@ -1889,6 +1896,7 @@ zsys_test (bool verbose)
     assert (zsys_max_msgsz () == 2000);
     zsys_set_max_msgsz (-1);
     assert (zsys_max_msgsz () == 2000);
+
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
