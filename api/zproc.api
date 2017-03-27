@@ -81,7 +81,7 @@
     </method>
 
     <method name = "pid">
-        process exit code
+        PID of the process
         <return type="integer" />
     </method>
 
