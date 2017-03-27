@@ -76,6 +76,8 @@ int main (int argc, char *argv [])
         zsys_debug ("argn=%d, argc=%d", argn, argc);
 
     message = "Lorem ipsum";
+    if (getenv ("ZSP_MESSAGE"))
+        message = getenv ("ZSP_MESSAGE");
 
     zfile_t *stdinf = NULL;
     

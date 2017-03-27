@@ -996,45 +996,35 @@ zproc_test (bool verbose)
     zproc_set_args (self, args);
 
     zhashx_t *env = zhashx_new ();
-    zhashx_insert (env, "ZSP", "czmq is great");
+    zhashx_insert (env, "ZSP_MESSAGE", "czmq is great\n");
     zproc_set_env (self, env);
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
     zproc_run (self);
+    zpoller_t *poller = zpoller_new (zproc_stdout (self), NULL);
 
-    zpoller_t *poller = zpoller_new (zproc_actor (self), zproc_stdout (self), NULL);
+    // kill the binary, it never ends, but the test must
+    zclock_sleep (800);
+    zproc_kill (self, SIGTERM);
+    zproc_wait (self, true);
 
-    bool running = true;
+    // read the content from zproc_stdout - use zpoller and a loop
+    bool stdout_read = false;
     while (!zsys_interrupted) {
         void *which = zpoller_wait (poller, 800);
-
-        // kill the process, but continue polling
-        if (zpoller_expired (poller) && running) {
-            zproc_kill (self, SIGTERM);
-            zproc_wait (self, true);
-            if (verbose)
-                zsys_info ("Process %d exited with %d", zproc_pid (self), zproc_returncode (self));
-            running = false;
-            continue;
-        }
 
         if (!which)
             break;
 
-        if (which == zproc_actor (self)) {
-            zmsg_t *msg = zmsg_recv (zproc_actor (self));
-            zmsg_destroy (&msg);
-            continue;
-        }
-
         if (which == zproc_stdout (self)) {
+            stdout_read = true;
             zframe_t *frame;
             zsock_brecv (zproc_stdout (self), "f", &frame);
             assert (!strncmp(
-                "Lorem ipsum\n",
+                "czmq is great\n",
                 (char*) zframe_data (frame),
-                12));
+                14));
 
             if (verbose)
                 zframe_print (frame, "zproc_test");
@@ -1047,6 +1037,7 @@ zproc_test (bool verbose)
         assert (false);
     }
 
+    assert (stdout_read);
     zpoller_destroy (&poller);
     zproc_destroy (&self);
     //  @end
