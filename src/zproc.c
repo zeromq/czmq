@@ -996,7 +996,7 @@ zproc_test (bool verbose)
     zproc_set_args (self, args);
 
     zhashx_t *env = zhashx_new ();
-    zhashx_insert (env, "ZSP", "czmq is great");
+    zhashx_insert (env, "ZSP_MESSAGE", "czmq is great\n");
     zproc_set_env (self, env);
 
     // execute the binary. It runs in own actor, which monitor the process and
@@ -1022,9 +1022,9 @@ zproc_test (bool verbose)
             zframe_t *frame;
             zsock_brecv (zproc_stdout (self), "f", &frame);
             assert (!strncmp(
-                "Lorem ipsum\n",
+                "czmq is great\n",
                 (char*) zframe_data (frame),
-                12));
+                14));
 
             if (verbose)
                 zframe_print (frame, "zproc_test");
