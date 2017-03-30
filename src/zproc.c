@@ -565,6 +565,7 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
     }
 
 end:
+    zstr_free(&command);
     zmsg_destroy (&msg);
 
     return ret;
