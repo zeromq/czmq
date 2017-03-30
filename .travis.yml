@@ -58,6 +58,17 @@ matrix:
       apt:
         packages:
         - openjdk-7-jdk
+  - env: BUILD_TYPE=default ADDRESS_SANITIZER=enabled
+    os: linux
+    dist: trusty
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
+          key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
+        packages:
+        - libzmq3-dev
 # temporary disabled, does not work
 #  - env: BUILD_TYPE=docs
 #    os: linux

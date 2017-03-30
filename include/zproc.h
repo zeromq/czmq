@@ -99,7 +99,7 @@ CZMQ_EXPORT int
     zproc_returncode (zproc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  process exit code
+//  PID of the process
 CZMQ_EXPORT int
     zproc_pid (zproc_t *self);
 

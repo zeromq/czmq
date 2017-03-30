@@ -26,7 +26,7 @@ check_PROGRAMS =
 noinst_LTLIBRARIES =
 TESTS =
 # Prepare variables that can be populated (appended) in generated Makefiles or
-# manually maintained src/Makemodules-local.am
+# manually maintained src/Makemodule-local.am
 EXTRA_DIST =
 CLEANFILES =
 DISTCLEANFILES =
@@ -56,6 +56,8 @@ EXTRA_DIST += \
     CONTRIBUTING.md \
     src/czmq_classes.h
 
+# NOTE: this "include" syntax is not a "make" but an "autotools" keyword,
+# see https://www.gnu.org/software/automake/manual/html_node/Include.html
 include $(srcdir)/src/Makemodule.am
 include $(srcdir)/src/Makemodule-local.am # Optional project-local hook
 

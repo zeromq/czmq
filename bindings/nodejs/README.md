@@ -2072,7 +2072,7 @@ process exit code
 integer my_zproc.pid ()
 ```
 
-process exit code
+PID of the process
 
 ```
 boolean my_zproc.running ()

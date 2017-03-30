@@ -79,7 +79,7 @@ int QmlZproc::returncode () {
 };
 
 ///
-//  process exit code
+//  PID of the process
 int QmlZproc::pid () {
     return zproc_pid (self);
 };

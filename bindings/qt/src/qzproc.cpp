@@ -122,7 +122,7 @@ int QZproc::returncode ()
 }
 
 ///
-//  process exit code
+//  PID of the process
 int QZproc::pid ()
 {
     int rv = zproc_pid (self);
