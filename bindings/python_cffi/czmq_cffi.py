@@ -2214,7 +2214,7 @@ int
 int
     zproc_returncode (zproc_t *self);
 
-// process exit code
+// PID of the process
 int
     zproc_pid (zproc_t *self);
 

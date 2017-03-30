@@ -185,11 +185,11 @@ dist_api_DATA = \
     api/zgossip_msg.api
 
 # define custom target for all products of /src
-src:
-	src/zmakecert \
-	src/zsp \
-	src/czmq_selftest \
-	src/libczmq.la
+src: \
+		src/zmakecert \
+		src/zsp \
+		src/czmq_selftest \
+		src/libczmq.la
 
 # Produce generated code from models in the src directory
 code:
@@ -198,36 +198,84 @@ code:
 	cd $(srcdir)/src; gsl -topdir:.. -zproject:1 -private:1 -q zgossip_msg.xml
 	cd $(srcdir); gsl -target:- project.xml
 
-check-local: src/czmq_selftest
+# Directories with test fixtures optionally provided by the project,
+# and with volatile RW data possibly created by a selftest program.
+# It is up to the project authors to populate the RO directory with
+# filenames called from the selftest methods, if any. They will be
+# EXTRA_DISTed by the recipes generated with with zproject, however,
+# and copied into builddir (if different from srcdir) to simplify
+# the "distcheck" and similar tests (so selftest can use same paths).
+# Note that the RO directory must exist to fulfill EXTRA_DIST, so we
+# add a stub file that can be committed to SCM by project developers.
+# The RW directory will be automatically wiped by "make distclean".
+SELFTEST_DIR_RO = src/selftest-ro
+SELFTEST_DIR_RW = src/selftest-rw
+
+$(abs_top_builddir)/$(SELFTEST_DIR_RW):
+	mkdir -p "$@"
+
+$(abs_top_builddir)/$(SELFTEST_DIR_RO): $(abs_top_srcdir)/$(SELFTEST_DIR_RO)
+	@if test "$@" != "$<" ; then \
+		echo "    COPYDIR  $(SELFTEST_DIR_RO)"; \
+		rm -rf "$@"; \
+		cp -r "$<" "$@" ; \
+		fi
+
+CLEANFILES += $(abs_top_builddir)/$(SELFTEST_DIR_RW)/*
+
+# Note that this syntax dists the whole directory - including subdirs (if any)
+EXTRA_DIST += $(SELFTEST_DIR_RO)
+
+clean-local: clean-local-selftest-ro clean-local-selftest-rw
+.PHONY: clean-local-selftest-ro
+clean-local-selftest-ro:
+	@if test "$(abs_top_builddir)" != "$(abs_top_srcdir)" ; then \
+		if test -d "$(abs_top_builddir)/$(SELFTEST_DIR_RO)" ; then \
+			chmod -R u+w "$(abs_top_builddir)/$(SELFTEST_DIR_RO)" ; \
+			rm -rf "$(abs_top_builddir)/$(SELFTEST_DIR_RO)" ; \
+		fi; \
+	fi
+
+# Unlike CLEANFILES setting above, this one whould also wipe created subdirs
+.PHONY: clean-local-selftest-rw
+clean-local-selftest-rw:
+	@if test "$(abs_top_builddir)" != "$(abs_top_srcdir)" ; then \
+		if test -d "$(abs_top_builddir)/$(SELFTEST_DIR_RW)" ; then \
+			chmod -R u+w "$(abs_top_builddir)/$(SELFTEST_DIR_RW)" ; \
+			rm -rf "$(abs_top_builddir)/$(SELFTEST_DIR_RW)" ; \
+		fi; \
+	fi
+
+check-local: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute $(builddir)/src/czmq_selftest
 
-check-verbose: src/czmq_selftest
+check-verbose: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute $(builddir)/src/czmq_selftest -v
 
 # Run the selftest binary under valgrind to check for memory leaks
-memcheck: src/czmq_selftest
+memcheck: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
 		--suppressions=$(srcdir)/src/.valgrind.supp \
 		$(builddir)/src/czmq_selftest
 
 # Run the selftest binary under valgrind to check for performance leaks
-callcheck: src/czmq_selftest
+callcheck: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
 		$(builddir)/src/czmq_selftest
 
 # Run the selftest binary under gdb for debugging
-debug: src/czmq_selftest
+debug: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \
 		$(builddir)/src/czmq_selftest
 
 # Run the selftest binary with verbose switch for tracing
-animate: src/czmq_selftest
+animate: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute $(builddir)/src/czmq_selftest -v
 
 if WITH_GCOV
-coverage: src/czmq_selftest
-	@echo "called configure --with-gcov"
+coverage: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
+	@echo "you had called configure --with-gcov"
 	lcov --base-directory . --directory . --zerocounters -q
 	$(MAKE) check
 	lcov --base-directory . --directory . --capture -o coverage.info

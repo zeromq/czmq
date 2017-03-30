@@ -68,7 +68,7 @@ public slots:
     //  process exit code
     int returncode ();
 
-    //  process exit code
+    //  PID of the process
     int pid ();
 
     //  return true if process is running, false if not yet started or finished

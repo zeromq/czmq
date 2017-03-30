@@ -119,7 +119,7 @@ public class Zproc implements AutoCloseable{
         return __returncode (self);
     }
     /*
-    process exit code
+    PID of the process
     */
     native static int __pid (long self);
     public int pid () {

@@ -209,7 +209,7 @@ module CZMQ
         result
       end
 
-      # process exit code
+      # PID of the process
       #
       # @return [Integer]
       def pid()

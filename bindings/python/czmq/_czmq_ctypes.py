@@ -4759,7 +4759,7 @@ not initialized or external sockets.
 
     def pid(self):
         """
-        process exit code
+        PID of the process
         """
         return lib.zproc_pid(self._as_parameter_)
 
