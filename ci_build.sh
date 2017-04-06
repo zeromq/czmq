@@ -168,8 +168,7 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ 
     fi
 
     if [ -n "$ADDRESS_SANITIZER" ] && [ "$ADDRESS_SANITIZER" == "enabled" ]; then
-        CONFIG_OPTS+=("CFLAGS=-fsanitize=address")
-        CONFIG_OPTS+=("CXXFLAGS=-fsanitize=address")
+        CONFIG_OPTS+=("--enable-address-sanitizer=yes")
     fi
 
     # Clone and build dependencies, if not yet installed to Travis env as DEBs
