@@ -219,6 +219,44 @@ zsys_init (void)
     return s_process_ctx;
 }
 
+//  --------------------------------------------------------------------------
+//  Restores all CZMQ global state to initial values. Internal function called
+//  by zsys_shutdown().
+
+static void
+zsys_reset (void){
+    s_process_ctx = NULL;
+    zsys_interrupted = 0;
+    zctx_interrupted = 0;
+
+    s_first_time = true;
+    handle_signals = true;
+
+    s_process_ctx = NULL;
+    s_initialized = false;
+
+    s_io_threads = 1;
+    s_max_sockets = 1024;
+    s_max_msgsz = INT_MAX;
+    s_linger = 0;
+    s_sndhwm = 1000;
+    s_rcvhwm = 1000;
+    s_pipehwm = 1000;
+    s_ipv6 = 0;
+    s_interface = NULL;
+    s_ipv6_address = NULL;
+    s_ipv6_mcast_address = NULL;
+    s_auto_use_fd = 0;
+    s_logident = NULL;
+    s_logstream = NULL;
+    s_logsystem = false;
+    s_logsender = NULL;
+
+    s_open_sockets = 0;
+
+    s_sockref_list = NULL;
+}
+
 //  atexit or manual termination for the process
 void
 zsys_shutdown (void)
@@ -282,6 +320,8 @@ zsys_shutdown (void)
     s_ipv6_mcast_address = NULL;
     free (s_logident);
     s_logident = NULL;
+
+    zsys_reset();
 
 #if defined (__UNIX__)
     closelog ();                //  Just to be pedantic
