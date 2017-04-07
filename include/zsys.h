@@ -36,7 +36,8 @@ CZMQ_EXPORT void *
 //  when the process exits; however this call lets you force a shutdown
 //  earlier, avoiding any potential problems with atexit() ordering, especially
 //  with Windows DLL builds, where atexit() does not work and zsys_shutdown has
-//  to be called manually.
+//  to be called manually. A succesful shutdown resets the zsys global state
+//  (HWM, LINGER, etc).
 CZMQ_EXPORT void
     zsys_shutdown (void);
 

@@ -267,6 +267,17 @@ zsys_shutdown (void)
     {
       zmq_term(s_process_ctx);
       s_process_ctx = NULL;
+      s_io_threads = 1;
+      s_max_sockets = 1024;
+      s_max_msgsz = INT_MAX;
+      s_linger = 0;
+      s_sndhwm = 1000;
+      s_rcvhwm = 1000;
+      s_pipehwm = 1000;
+      s_ipv6 = 0;
+      s_auto_use_fd = 0;
+      s_logstream = NULL;
+      s_logsystem = false;
     }
     else
         zsys_error ("dangling sockets: cannot terminate ZMQ safely");
@@ -283,26 +294,10 @@ zsys_shutdown (void)
     free (s_logident);
     s_logident = NULL;
 
-    //  The following is a change in the side effects of public APIs
-    //  so it has to be managed carefully at release time. DRAFT for now.
-#ifdef CZMQ_BUILD_DRAFT_API
     zsys_interrupted = 0;
     zctx_interrupted = 0;
 
     zsys_handler_reset ();
-
-    s_io_threads = 1;
-    s_max_sockets = 1024;
-    s_max_msgsz = INT_MAX;
-    s_linger = 0;
-    s_sndhwm = 1000;
-    s_rcvhwm = 1000;
-    s_pipehwm = 1000;
-    s_ipv6 = 0;
-    s_auto_use_fd = 0;
-    s_logstream = NULL;
-    s_logsystem = false;
-#endif // CZMQ_BUILD_DRAFT_API
 
 #if defined (__UNIX__)
     closelog ();                //  Just to be pedantic
