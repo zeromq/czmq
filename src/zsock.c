@@ -110,9 +110,9 @@ zsock_destroy_checked (zsock_t **self_p, const char *filename, size_t line_nbr)
         self->tag = 0xDeadBeef;
         int rc = zsys_close (self->handle, filename, line_nbr);
         assert (rc == 0);
-        free (self->endpoint);
-        free (self->cache);
-        free (self);
+        FREE_AND_NULL (self->endpoint);
+        FREE_AND_NULL (self->cache);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -995,7 +995,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             int *int_p = va_arg (argptr, int *);
             if (int_p)
                 *int_p = string? atoi (string): 0;
-            free (string);
+            FREE_AND_NULL (string);
         }
         else
         if (*picture == '1') {
@@ -1003,7 +1003,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             uint8_t *uint8_p = va_arg (argptr, uint8_t *);
             if (uint8_p)
                 *uint8_p = string? (uint8_t) atoi (string): 0;
-            free (string);
+            FREE_AND_NULL (string);
         }
         else
         if (*picture == '2') {
@@ -1011,7 +1011,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             uint16_t *uint16_p = va_arg (argptr, uint16_t *);
             if (uint16_p)
                 *uint16_p = string? (uint16_t) atol (string): 0;
-            free (string);
+            FREE_AND_NULL (string);
         }
         else
         if (*picture == '4') {
@@ -1019,7 +1019,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             uint32_t *uint32_p = va_arg (argptr, uint32_t *);
             if (uint32_p)
                 *uint32_p = string? (uint32_t) strtoul (string, NULL, 10): 0;
-            free (string);
+            FREE_AND_NULL (string);
         }
         else
         if (*picture == '8') {
@@ -1027,7 +1027,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             uint64_t *uint64_p = va_arg (argptr, uint64_t *);
             if (uint64_p)
                 *uint64_p = string? (uint64_t) strtoull (string, NULL, 10): 0;
-            free (string);
+            FREE_AND_NULL (string);
         }
         else
         if (*picture == 'u') {  //  Deprecated, use 4 or 8 instead
@@ -1035,7 +1035,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             uint *uint_p = va_arg (argptr, uint *);
             if (uint_p)
                 *uint_p = string? (uint) strtoul (string, NULL, 10): 0;
-            free (string);
+            FREE_AND_NULL (string);
         }
         else
         if (*picture == 's') {
@@ -1044,7 +1044,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             if (string_p)
                 *string_p = string;
             else
-                free (string);
+                FREE_AND_NULL (string);
         }
         else
         if (*picture == 'b') {
@@ -1854,7 +1854,7 @@ zsock_test (bool verbose)
     assert (msg);
     char *string = zmsg_popstr (msg);
     assert (streq (string, "Hello, World"));
-    free (string);
+    FREE_AND_NULL (string);
     zmsg_destroy (&msg);
 
     //  Test resolve libzmq socket
@@ -1995,9 +1995,9 @@ zsock_test (bool verbose)
     value = (char *) zhashx_lookup (hash, "2");
     assert (streq (value, "value B"));
     assert (original == pointer);
-    free (string);
-    free (data);
-    free (uuid_str);
+    FREE_AND_NULL (string);
+    FREE_AND_NULL (data);
+    FREE_AND_NULL (uuid_str);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhashx_destroy (&hash);

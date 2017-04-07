@@ -94,8 +94,8 @@ zuuid_destroy (zuuid_t **self_p)
     assert (self_p);
     if (*self_p) {
         zuuid_t *self = *self_p;
-        free (self->str_canonical);
-        free (self);
+        FREE_AND_NULL (self->str_canonical);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }

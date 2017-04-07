@@ -95,7 +95,7 @@ zframe_destroy (zframe_t **self_p)
         assert (zframe_is (self));
         zmq_msg_close (&self->zmsg);
         self->tag = 0xDeadBeef;
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -617,10 +617,10 @@ zframe_test (bool verbose)
     zframe_reset (frame, "END", 3);
     char *string = zframe_strhex (frame);
     assert (streq (string, "454E44"));
-    free (string);
+    FREE_AND_NULL (string);
     string = zframe_strdup (frame);
     assert (streq (string, "END"));
-    free (string);
+    FREE_AND_NULL (string);
     rc = zframe_send (&frame, output, 0);
     assert (rc == 0);
 

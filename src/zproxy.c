@@ -81,7 +81,7 @@ s_self_destroy (self_t **self_p)
             zstr_free (&self->public_key [index]);
             zstr_free (&self->secret_key [index]);
         }
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }

@@ -13,8 +13,8 @@ assert_status (zactor_t *actor, int count)
             assert (atoi (status) == count);
             ready = true;
         }
-        free (command);
-        free (status);
+        FREE_AND_NULL (command);
+        FREE_AND_NULL (status);
     }
 }
 
@@ -165,7 +165,7 @@ main (int argn, char *argv [])
         zstr_recvx (which, &command, NULL);
         assert (streq (command, "DELIVER"));
         pending--;
-        free (command);
+        FREE_AND_NULL (command);
         if (zclock_mono () > ticker) {
             printf ("(%d%%)", (int) ((100 * (total - pending)) / total));
             fflush (stdout);

@@ -348,19 +348,19 @@ zstr_test (bool verbose)
     char *request = zstr_recv (server);
     assert (streq (request, "Hello"));
     assert (zsock_routing_id (server));
-    free (request);
+    FREE_AND_NULL (request);
 
     rc = zstr_send (server, "World");
     assert (rc == 0);
     char *reply = zstr_recv (client);
     assert (streq (reply, "World"));
-    free (reply);
+    FREE_AND_NULL (reply);
 
     rc = zstr_sendf (server, "%s", "World");
     assert (rc == 0);
     reply = zstr_recv (client);
     assert (streq (reply, "World"));
-    free (reply);
+    FREE_AND_NULL (reply);
 
     //  Try ping-pong using sendx and recx
     rc = zstr_sendx (client, "Hello", NULL);
@@ -368,14 +368,14 @@ zstr_test (bool verbose)
     rc = zstr_recvx (server, &request, NULL);
     assert (rc >= 0);
     assert (streq (request, "Hello"));
-    free (request);
+    FREE_AND_NULL (request);
 
     rc = zstr_sendx (server, "World", NULL);
     assert (rc == 0);
     rc = zstr_recvx (client, &reply, NULL);
     assert (rc >= 0);
     assert (streq (reply, "World"));
-    free (reply);
+    FREE_AND_NULL (reply);
 
     //  Client and server disallow multipart
     rc = zstr_sendm (client, "Hello");

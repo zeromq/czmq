@@ -130,9 +130,9 @@ zconfig_destroy (zconfig_t **self_p)
         //  Destroy other properties and then self
         zlist_destroy (&self->comments);
         zfile_destroy (&self->file);
-        free (self->name);
-        free (self->value);
-        free (self);
+        FREE_AND_NULL (self->name);
+        FREE_AND_NULL (self->value);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -225,7 +225,7 @@ void
 zconfig_set_name (zconfig_t *self, const char *name)
 {
     assert (self);
-    free (self->name);
+    FREE_AND_NULL (self->name);
     self->name = name? strdup (name): NULL;
 }
 
@@ -514,7 +514,7 @@ zconfig_loadf (const char *format, ...)
     va_end (argptr);
     if (filename) {
         zconfig_t *config = zconfig_load (filename);
-        free (filename);
+        FREE_AND_NULL (filename);
         return config;
     }
     else
@@ -658,7 +658,7 @@ zconfig_chunk_load (zchunk_t *chunk)
                 }
                 else {
                     zclock_log ("E (zconfig): (%d) indentation error", lineno);
-                    free (value);
+                    FREE_AND_NULL (value);
                     valid = false;
                 }
             }
@@ -667,7 +667,7 @@ zconfig_chunk_load (zchunk_t *chunk)
         if (s_verify_eoln (scanner, lineno))
             valid = false;
 
-        free (name);
+        FREE_AND_NULL (name);
         if (!valid)
             break;
     }
@@ -733,7 +733,7 @@ s_collect_name (char **start, int lineno)
     && (name [0] == '/'
     ||  name [length - 1] == '/')) {
         zclock_log ("E (zconfig): (%d) '/' not valid at name start or end", lineno);
-        free (name);
+        FREE_AND_NULL (name);
         name = NULL;
     }
     return name;
@@ -811,7 +811,7 @@ s_collect_value (char **start, int lineno)
     }
     //  If we had an error, drop value and return NULL
     if (rc) {
-        free (value);
+        FREE_AND_NULL (value);
         value = NULL;
     }
     return value;
@@ -1002,7 +1002,7 @@ zconfig_test (bool verbose)
     char *string = zconfig_str_save (root);
     assert (string);
     assert (streq (string, (char *) zchunk_data (chunk)));
-    free (string);
+    FREE_AND_NULL (string);
     assert (chunk);
     zconfig_destroy (&root);
 
