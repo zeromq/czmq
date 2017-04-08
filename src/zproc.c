@@ -89,7 +89,7 @@ zpair_destroy (zpair_t **self_p) {
         if (self->read_owned)
             zsock_destroy ((zsock_t**)&self->read);
         zstr_free (&self->endpoint);
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -148,9 +148,9 @@ arr_free (char **self) {
     assert (self);
     char **foo = self;
     while (*self) {
-        free (*(self++));
+        FREE_AND_NULL (*(self++));
     }
-    free (foo);
+    FREE_AND_NULL (foo);
 }
 
 static void
@@ -253,7 +253,7 @@ zproc_destroy (zproc_t **self_p) {
 
         zlistx_destroy (&self->args);
         zhashx_destroy (&self->env);
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }

@@ -92,8 +92,8 @@ zarmour_destroy (zarmour_t **self_p)
     assert (self_p);
     if (*self_p) {
         zarmour_t *self = *self_p;
-        free (self->line_end);
-        free (self);
+        FREE_AND_NULL (self->line_end);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -355,7 +355,7 @@ s_z85_encode (const byte *data, size_t length)
     char *str = (char *) zmalloc (5 * length / 4 + 1);
     char *result = zmq_z85_encode (str, (uint8_t *) data, length);
     if (result == NULL) {
-        free (str);
+        FREE_AND_NULL (str);
         str = NULL;
     }
     return str;
@@ -376,7 +376,7 @@ s_z85_decode (const char *data, size_t *size)
     byte *bytes = (byte *) zmalloc (*size);
     uint8_t *result = zmq_z85_decode (bytes, (char *) data);
     if (result == NULL) {
-        free (bytes);
+        FREE_AND_NULL (bytes);
         bytes = NULL;
     }
     return bytes;
@@ -449,7 +449,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
             memcpy (dest, src, strlen (src));
             dest += strlen (src);
         }
-        free (temp);
+        FREE_AND_NULL (temp);
         *dest = 0;
     }
     return encoded;
@@ -499,7 +499,7 @@ zarmour_decode (zarmour_t *self, const char *data)
             break;
     }
     zchunk_t *ret = zchunk_new (decoded, size);
-    free (decoded);
+    FREE_AND_NULL (decoded);
     return ret;
 }
 
@@ -674,7 +674,7 @@ s_armour_test (zarmour_t *self, const char *test_string, const char *expected, b
     assert (strlen (encoded) == strlen (expected));
     assert (streq (encoded, expected));
     s_armour_decode (self, encoded, test_string, verbose);
-    free (encoded);
+    FREE_AND_NULL (encoded);
 }
 
 static void
@@ -697,7 +697,7 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
     zchunk_destroy (&chunk);
     if (verbose)
         zsys_debug ("    decoded %d bytes, all match", length);
-    free (test_string);
+    FREE_AND_NULL (test_string);
 }
 
 

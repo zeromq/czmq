@@ -110,7 +110,7 @@ zcert_destroy (zcert_t **self_p)
         zcert_t *self = *self_p;
         zhash_destroy (&self->metadata);
         zconfig_destroy (&self->config);
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }

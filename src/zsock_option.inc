@@ -3552,7 +3552,7 @@ zsock_option_test (bool verbose)
     zsock_set_socks_proxy (self, "127.0.0.1");
     char *socks_proxy = zsock_socks_proxy (self);
     assert (socks_proxy);
-    free (socks_proxy);
+    FREE_AND_NULL (socks_proxy);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_XPUB_NODROP)
@@ -3601,7 +3601,7 @@ zsock_option_test (bool verbose)
     zsock_set_zap_domain (self, "test");
     char *zap_domain = zsock_zap_domain (self);
     assert (zap_domain);
-    free (zap_domain);
+    FREE_AND_NULL (zap_domain);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MECHANISM)
@@ -3624,7 +3624,7 @@ zsock_option_test (bool verbose)
     zsock_set_plain_username (self, "test");
     char *plain_username = zsock_plain_username (self);
     assert (plain_username);
-    free (plain_username);
+    FREE_AND_NULL (plain_username);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PLAIN_PASSWORD)
@@ -3633,7 +3633,7 @@ zsock_option_test (bool verbose)
     zsock_set_plain_password (self, "test");
     char *plain_password = zsock_plain_password (self);
     assert (plain_password);
-    free (plain_password);
+    FREE_AND_NULL (plain_password);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV6)
@@ -3731,7 +3731,7 @@ zsock_option_test (bool verbose)
     zsock_set_tcp_accept_filter (self, "127.0.0.1");
     char *tcp_accept_filter = zsock_tcp_accept_filter (self);
     assert (tcp_accept_filter);
-    free (tcp_accept_filter);
+    FREE_AND_NULL (tcp_accept_filter);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LAST_ENDPOINT)
@@ -3739,7 +3739,7 @@ zsock_option_test (bool verbose)
     assert (self);
     char *last_endpoint = zsock_last_endpoint (self);
     assert (last_endpoint);
-    free (last_endpoint);
+    FREE_AND_NULL (last_endpoint);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_RAW)
@@ -3799,7 +3799,7 @@ zsock_option_test (bool verbose)
     zsock_set_identity (self, "test");
     char *identity = zsock_identity (self);
     assert (identity);
-    free (identity);
+    FREE_AND_NULL (identity);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RATE)

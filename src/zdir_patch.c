@@ -74,11 +74,11 @@ zdir_patch_destroy (zdir_patch_t **self_p)
     assert (self_p);
     if (*self_p) {
         zdir_patch_t *self = *self_p;
-        free (self->path);
-        free (self->vpath);
-        free (self->digest);
+        FREE_AND_NULL (self->path);
+        FREE_AND_NULL (self->vpath);
+        FREE_AND_NULL (self->digest);
         zfile_destroy (&self->file);
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }

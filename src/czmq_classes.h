@@ -24,6 +24,8 @@
 //  External API
 #include "../include/czmq.h"
 
+#define FREE_AND_NULL(x) do {free(x); x = NULL;} while(0)
+
 //  Extra headers
 
 //  Opaque class structures to allow forward references

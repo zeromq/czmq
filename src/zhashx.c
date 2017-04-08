@@ -148,11 +148,11 @@ zhashx_destroy (zhashx_t **self_p)
         zhashx_t *self = *self_p;
         if (self->items) {
             s_purge (self);
-            free (self->items);
+            FREE_AND_NULL (self->items);
         }
         zlistx_destroy (&self->comments);
-        free (self->filename);
-        free (self);
+        FREE_AND_NULL (self->filename);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -189,7 +189,7 @@ s_item_destroy (zhashx_t *self, item_t *item, bool hard)
 
         if (self->key_destructor)
             (self->key_destructor)((void **) &item->key);
-        free (item);
+        FREE_AND_NULL (item);
     }
 }
 
@@ -225,7 +225,7 @@ s_zhashx_rehash (zhashx_t *self, uint new_prime_index)
         }
     }
     //  Destroy old hash table
-    free (self->items);
+    FREE_AND_NULL (self->items);
     self->items = new_items;
     self->prime_index = new_prime_index;
     return 0;
@@ -699,7 +699,7 @@ zhashx_load (zhashx_t *self, const char *filename)
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
     assert (filename_copy);
-    free (self->filename);
+    FREE_AND_NULL (self->filename);
     self->filename = filename_copy;
     self->modified = zsys_file_modified (self->filename);
     FILE *handle = fopen (self->filename, "r");
@@ -719,7 +719,7 @@ zhashx_load (zhashx_t *self, const char *filename)
             *equals++ = 0;
             zhashx_update (self, buffer, equals);
         }
-        free (buffer);
+        FREE_AND_NULL (buffer);
         fclose (handle);
     }
     else
@@ -797,7 +797,7 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
     //  Now serialize items into the frame
     zframe_t *frame = zframe_new (NULL, frame_size);
     if (!frame) {
-        free (values);
+        FREE_AND_NULL (values);
         return NULL;
     }
 
@@ -829,7 +829,7 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
             vindex++;
         }
     }
-    free (values);
+    FREE_AND_NULL (values);
     return frame;
 }
 
@@ -1110,7 +1110,7 @@ static void
 s_test_destroy_int (void **item)
 {
     int *int_item = (int *) *item;
-    free (int_item);
+    FREE_AND_NULL (int_item);
 }
 #endif // CZMQ_BUILD_DRAFT_API
 

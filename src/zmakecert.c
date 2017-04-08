@@ -54,7 +54,7 @@ int main (int argc, char *argv [])
     char *timestr = zclock_timestr ();
     zcert_set_meta (cert, "created-by", "CZMQ zmakecert");
     zcert_set_meta (cert, "date-created", "%s", timestr);
-    free (timestr);
+    FREE_AND_NULL (timestr);
     zcert_dump (cert);
     zcert_save (cert, filename);
     zsys_info ("CURVE certificate created in %s and %s_secret", filename, filename);

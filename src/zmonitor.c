@@ -50,7 +50,7 @@ s_self_destroy (self_t **self_p)
 #endif
         zpoller_destroy (&self->poller);
         zsock_destroy (&self->sink);
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -147,7 +147,7 @@ s_self_start (self_t *self)
     rc = zsock_connect (self->sink, "%s", endpoint);
     assert (rc == 0);
     zpoller_add (self->poller, self->sink);
-    free (endpoint);
+    FREE_AND_NULL (endpoint);
 }
 
 
@@ -290,7 +290,7 @@ s_self_handle_sink (self_t *self)
     zstr_sendfm (self->pipe, "%s", name);
     zstr_sendfm (self->pipe, "%d", value);
     zstr_send (self->pipe, address);
-    free (address);
+    FREE_AND_NULL (address);
 #endif
 }
 
@@ -332,7 +332,7 @@ s_assert_event (zactor_t *self, char *expected)
     assert (msg);
     char *event = zmsg_popstr (msg);
     assert (streq (event, expected));
-    free (event);
+    FREE_AND_NULL (event);
     zmsg_destroy (&msg);
 }
 #endif

@@ -143,9 +143,9 @@ static void
 tuple_free (void *argument)
 {
     tuple_t *self = (tuple_t *) argument;
-    free (self->key);
-    free (self->value);
-    free (self);
+    FREE_AND_NULL (self->key);
+    FREE_AND_NULL (self->value);
+    FREE_AND_NULL (self);
 }
 
 //  Handle traffic from remotes

@@ -162,7 +162,7 @@ zdir_new (const char *path, const char *parent)
     sprintf (wildcard, "%s/*", self->path);
     WIN32_FIND_DATAA entry;
     HANDLE handle = FindFirstFileA (wildcard, &entry);
-    free (wildcard);
+    FREE_AND_NULL (wildcard);
 
     if (handle != INVALID_HANDLE_VALUE) {
         //  We have read an entry, so return those values
@@ -243,8 +243,8 @@ zdir_destroy (zdir_t **self_p)
             }
         zlist_destroy (&self->subdirs);
         zlist_destroy (&self->files);
-        free (self->path);
-        free (self);
+        FREE_AND_NULL (self->path);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -376,7 +376,7 @@ void
 zdir_flatten_free (zfile_t ***files_p)
 {
     assert (files_p);
-    free (*files_p);
+    FREE_AND_NULL (*files_p);
     *files_p = NULL;
 }
 
@@ -520,8 +520,8 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
         old_index++;
         new_index++;
     }
-    free (old_files);
-    free (new_files);
+    FREE_AND_NULL (old_files);
+    FREE_AND_NULL (new_files);
 
     return patches;
 }
@@ -550,7 +550,7 @@ zdir_resync (zdir_t *self, const char *alias)
             break;
         }
     }
-    free (files);
+    FREE_AND_NULL (files);
     return patches;
 }
 
@@ -594,12 +594,12 @@ zdir_cache (zdir_t *self)
             }
         }
     }
-    free (files);
+    FREE_AND_NULL (files);
 
     //  Save cache to disk for future reference
     if (cache)
         zhash_save (cache, cache_file);
-    free (cache_file);
+    FREE_AND_NULL (cache_file);
     return cache;
 }
 
@@ -718,7 +718,7 @@ s_zdir_watch_destroy (zdir_watch_t **watch_p)
         zloop_destroy (&watch->loop);
         zhash_destroy (&watch->subs);
 
-        free (watch);
+        FREE_AND_NULL (watch);
         *watch_p = NULL;
     }
 }
@@ -729,7 +729,7 @@ s_sub_free (void *data)
     zdir_watch_sub_t *sub = (zdir_watch_sub_t *) data;
     zdir_destroy (&sub->dir);
 
-    free (sub);
+    FREE_AND_NULL (sub);
 }
 
 static void
@@ -838,7 +838,7 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
         char *path = zmsg_popstr (msg);
         if (path) {
             s_zdir_watch_subscribe (watch, path);
-            free (path);
+            FREE_AND_NULL (path);
         }
         else {
             if (watch->verbose)
@@ -852,7 +852,7 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
         if (path) {
             assert (path);
             s_zdir_watch_unsubscribe (watch, path);
-            free (path);
+            FREE_AND_NULL (path);
         }
         else {
             if (watch->verbose)
@@ -866,7 +866,7 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
         if (timeout_string) {
             int timeout = atoi (timeout_string);
             zsock_signal (watch->pipe, s_zdir_watch_timeout (watch, timeout));
-            free (timeout_string);
+            FREE_AND_NULL (timeout_string);
         }
         else {
             if (watch->verbose)
@@ -880,7 +880,7 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
         zsock_signal (watch->pipe, 1);
     }
 
-    free (command);
+    FREE_AND_NULL (command);
     zmsg_destroy (&msg);
     return 0;
 }
@@ -1006,7 +1006,7 @@ zdir_test (bool verbose)
     assert (rc == 0);
 
     assert (streq (path, "zdir-test-dir"));
-    free (path);
+    FREE_AND_NULL (path);
 
     assert (zlist_size (patches) == 1);
 
@@ -1032,7 +1032,7 @@ zdir_test (bool verbose)
     assert (rc == 0);
 
     assert (streq (path, "zdir-test-dir"));
-    free (path);
+    FREE_AND_NULL (path);
 
     assert (zlist_size (patches) == 1);
 

@@ -170,12 +170,12 @@ s_ztrie_node_destroy (ztrie_node_t **self_p)
         if (self->parameter_count > 0) {
             size_t index;
             for (index = 0; index < self->parameter_count; index++) {
-                free (self->parameter_names [index]);
+                FREE_AND_NULL (self->parameter_names [index]);
                 if (self->parameter_values [index])
-                    free (self->parameter_values [index]);
+                    FREE_AND_NULL (self->parameter_values [index]);
             }
-            free (self->parameter_names);
-            free (self->parameter_values);
+            FREE_AND_NULL (self->parameter_names);
+            FREE_AND_NULL (self->parameter_values);
         }
         if (self->token_type == NODE_TYPE_REGEX || self->token_type == NODE_TYPE_PARAM)
             zrex_destroy (&self->regex);
@@ -184,7 +184,7 @@ s_ztrie_node_destroy (ztrie_node_t **self_p)
             (self->destroy_data_fn) (&self->data);
 
         //  Free object itself
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -251,7 +251,7 @@ ztrie_destroy (ztrie_t **self_p)
         zlistx_destroy (&self->params);
 
         //  Free object itself
-        free (self);
+        FREE_AND_NULL (self);
         *self_p = NULL;
     }
 }
@@ -307,10 +307,10 @@ s_ztrie_matches_token (ztrie_node_t *parent, char *token, int len)
                             s_ztrie_node_update_param (child, index, zrex_hit (child->regex, index));
                     }
                 }
-                free (token_term);
+                FREE_AND_NULL (token_term);
                 return child;
             }
-            free (token_term);
+            FREE_AND_NULL (token_term);
         }
         child = (ztrie_node_t *) zlistx_next (parent->children);
     }
