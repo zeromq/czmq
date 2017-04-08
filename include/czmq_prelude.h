@@ -419,6 +419,7 @@ typedef struct {
 
 #define streq(s1,s2)    (!strcmp ((s1), (s2)))
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
+#define freen(x) do {free(x); x = NULL;} while(0)
 
 //  Provide random number from 0..(num-1)
 //  Note that (at least in Solaris) while rand() returns an int limited by

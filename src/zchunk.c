@@ -76,10 +76,10 @@ zchunk_destroy (zchunk_t **self_p)
         assert (zchunk_is (self));
         //  If data was reallocated independently, free it independently
         if (self->data != (byte *) self + sizeof (zchunk_t))
-            FREE_AND_NULL (self->data);
+            freen (self->data);
         self->tag = 0xDeadBeef;
         zdigest_destroy (&self->digest);
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -552,10 +552,10 @@ zchunk_test (bool verbose)
     assert (streq (zchunk_digest (chunk), "01B307ACBA4F54F55AAFC33BB06BBBF6CA803E9A"));
     char *string = zchunk_strdup (chunk);
     assert (streq (string, "1234567890"));
-    FREE_AND_NULL (string);
+    freen (string);
     string = zchunk_strhex (chunk);
     assert (streq (string, "31323334353637383930"));
-    FREE_AND_NULL (string);
+    freen (string);
 
     zframe_t *frame = zchunk_pack (chunk);
     assert (frame);

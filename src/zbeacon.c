@@ -58,7 +58,7 @@ s_self_destroy (self_t **self_p)
         zframe_destroy (&self->filter);
         if (self->udpsock) // don't close STDIN
             zsys_udp_close (self->udpsock);
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -537,10 +537,10 @@ zbeacon_test (bool verbose)
     if (!*hostname) {
         printf ("OK (skipping test, no UDP broadcasting)\n");
         zactor_destroy (&speaker);
-        FREE_AND_NULL (hostname);
+        freen (hostname);
         return;
     }
-    FREE_AND_NULL (hostname);
+    freen (hostname);
 
     //  Create listener beacon on port 9999 to lookup service
     zactor_t *listener = zactor_new (zbeacon, NULL);
@@ -550,7 +550,7 @@ zbeacon_test (bool verbose)
     zsock_send (listener, "si", "CONFIGURE", 9999);
     hostname = zstr_recv (listener);
     assert (*hostname);
-    FREE_AND_NULL (hostname);
+    freen (hostname);
 
     //  We will broadcast the magic value 0xCAFE
     byte announcement [2] = { 0xCA, 0xFE };
@@ -579,21 +579,21 @@ zbeacon_test (bool verbose)
     zsock_send (node1, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node1);
     assert (*hostname);
-    FREE_AND_NULL (hostname);
+    freen (hostname);
 
     zactor_t *node2 = zactor_new (zbeacon, NULL);
     assert (node2);
     zsock_send (node2, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node2);
     assert (*hostname);
-    FREE_AND_NULL (hostname);
+    freen (hostname);
 
     zactor_t *node3 = zactor_new (zbeacon, NULL);
     assert (node3);
     zsock_send (node3, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node3);
     assert (*hostname);
-    FREE_AND_NULL (hostname);
+    freen (hostname);
 
     zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
     zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);

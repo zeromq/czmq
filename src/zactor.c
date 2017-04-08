@@ -69,7 +69,7 @@ s_thread_shim (void *args)
     zsock_set_sndtimeo (shim->pipe, 0);
     zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
-    FREE_AND_NULL (shim);
+    freen (shim);
     return NULL;
 }
 
@@ -86,7 +86,7 @@ s_thread_shim (void *args)
     zsock_set_sndtimeo (shim->pipe, 0);
     zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
-    FREE_AND_NULL (shim);
+    freen (shim);
     _endthreadex (0);           //  Terminates thread
     return 0;
 }
@@ -164,7 +164,7 @@ zactor_destroy (zactor_t **self_p)
             zsock_destroy (&self->pipe);
         }
         self->tag = 0xDeadBeef;
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -262,7 +262,7 @@ echo_actor (zsock_t *pipe, void *args)
             puts ("E: invalid message to actor");
             assert (false);
         }
-        FREE_AND_NULL (command);
+        freen (command);
         zmsg_destroy (&msg);
     }
 }
@@ -282,7 +282,7 @@ zactor_test (bool verbose)
     zstr_sendx (actor, "ECHO", "This is a string", NULL);
     char *string = zstr_recv (actor);
     assert (streq (string, "This is a string"));
-    FREE_AND_NULL (string);
+    freen (string);
     zactor_destroy (&actor);
 
 #if defined (__WINDOWS__)
