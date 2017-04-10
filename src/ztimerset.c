@@ -58,7 +58,7 @@ ztimerset_destroy (ztimerset_t **self_p)
     if (*self_p) {
         ztimerset_t *self = *self_p;
         zmq_timers_destroy (&self->zmq_timers);
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 #endif

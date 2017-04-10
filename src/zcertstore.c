@@ -117,8 +117,8 @@ s_disk_loader_state_destroy (void **self_p)
     assert (self_p);
     if (*self_p) {
         disk_loader_state *self = (disk_loader_state *)*self_p;
-        FREE_AND_NULL (self->location);
-        FREE_AND_NULL (self);
+        freen (self->location);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -176,7 +176,7 @@ zcertstore_destroy (zcertstore_t **self_p)
         if (self->destructor)
             self->destructor (&self->state);
 
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -291,7 +291,7 @@ s_test_destructor (void **self_p)
     assert (self_p);
     if (*self_p) {
         test_loader_state *self = (test_loader_state *)*self_p;
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -337,7 +337,7 @@ zcertstore_test (bool verbose)
     assert (cert);
 #endif
 
-    FREE_AND_NULL (client_key);
+    freen (client_key);
 
     if (verbose)
         zcertstore_print (certstore);

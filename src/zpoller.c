@@ -46,9 +46,9 @@ struct _zpoller_t {
 static int
 s_rebuild_poll_set (zpoller_t *self)
 {
-    FREE_AND_NULL (self->poll_set);
+    freen (self->poll_set);
     self->poll_set = NULL;
-    FREE_AND_NULL (self->poll_readers);
+    freen (self->poll_readers);
     self->poll_readers = NULL;
 
     self->poll_size = zlist_size (self->reader_list);
@@ -124,10 +124,10 @@ zpoller_destroy (zpoller_t **self_p)
         zmq_poller_destroy (&self->zmq_poller);
 #else
         zlist_destroy (&self->reader_list);
-        FREE_AND_NULL (self->poll_readers);
-        FREE_AND_NULL (self->poll_set);
+        freen (self->poll_readers);
+        freen (self->poll_set);
 #endif
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }

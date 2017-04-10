@@ -62,7 +62,7 @@ zdigest_destroy (zdigest_t **self_p)
     assert (self_p);
     if (*self_p) {
         zdigest_t *self = *self_p;
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -152,7 +152,7 @@ zdigest_test (bool verbose)
     assert (streq (zdigest_string (digest),
                    "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
     zdigest_destroy (&digest);
-    FREE_AND_NULL (buffer);
+    freen (buffer);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();

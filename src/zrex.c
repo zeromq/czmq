@@ -95,7 +95,7 @@ zrex_destroy (zrex_t **self_p)
     if (*self_p) {
         zrex_t *self = *self_p;
         zstr_free (&self->hit_set);
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }

@@ -117,7 +117,7 @@ s_reader_destroy (s_reader_t **self_p)
     assert (self_p);
     s_reader_t *self = *self_p;
     if (self) {
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -140,7 +140,7 @@ s_poller_destroy (s_poller_t **self_p)
     assert (self_p);
     s_poller_t *self = *self_p;
     if (self) {
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -166,7 +166,7 @@ s_timer_destroy (s_timer_t **self_p)
     assert (self_p);
     s_timer_t *self = *self_p;
     if (self) {
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -203,7 +203,7 @@ s_ticket_destroy (s_ticket_t **self_p)
     s_ticket_t *self = *self_p;
     if (self) {
         self->tag = 0xDeadBeef;
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -245,15 +245,15 @@ s_rebuild_pollset (zloop_t *self)
 {
     self->poll_size = zlistx_size (self->readers) + zlistx_size (self->pollers);
 
-    FREE_AND_NULL (self->pollset);
+    freen (self->pollset);
     self->pollset = (zmq_pollitem_t *) zmalloc (self->poll_size * sizeof (zmq_pollitem_t));
     assert (self->pollset);
 
-    FREE_AND_NULL (self->readact);
+    freen (self->readact);
     self->readact = (s_reader_t *) zmalloc (self->poll_size * sizeof (s_reader_t));
     assert (self->readact);
 
-    FREE_AND_NULL (self->pollact);
+    freen (self->pollact);
     self->pollact = (s_poller_t *) zmalloc (self->poll_size * sizeof (s_poller_t));
     assert (self->pollact);
 
@@ -365,10 +365,10 @@ zloop_destroy (zloop_t **self_p)
         zlistx_destroy (&self->pollers);
         zlistx_destroy (&self->timers);
         zlistx_destroy (&self->tickets);
-        FREE_AND_NULL (self->pollset);
-        FREE_AND_NULL (self->readact);
-        FREE_AND_NULL (self->pollact);
-        FREE_AND_NULL (self);
+        freen (self->pollset);
+        freen (self->readact);
+        freen (self->pollact);
+        freen (self);
         *self_p = NULL;
     }
 }

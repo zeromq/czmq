@@ -67,7 +67,7 @@ zmsg_destroy (zmsg_t **self_p)
             zframe_destroy (&frame);
         zlist_destroy (&self->frames);
         self->tag = 0xDeadBeef;
-        FREE_AND_NULL (self);
+        freen (self);
         *self_p = NULL;
     }
 }
@@ -1068,7 +1068,7 @@ zmsg_test (bool verbose)
     assert (zmsg_size (msg) == 3);
     char *body = zmsg_popstr (msg);
     assert (streq (body, "Frame0"));
-    FREE_AND_NULL (body);
+    freen (body);
     zmsg_destroy (&msg);
 
     //  Test encoding/decoding
@@ -1094,7 +1094,7 @@ zmsg_test (bool verbose)
     assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 65537);
     assert (rc == 0);
-    FREE_AND_NULL (blank);
+    freen (blank);
     assert (zmsg_size (msg) == 9);
     frame = zmsg_encode (msg);
     zmsg_destroy (&msg);
@@ -1118,7 +1118,7 @@ zmsg_test (bool verbose)
     assert (submsg);
     body = zmsg_popstr (submsg);
     assert (streq (body, "joska"));
-    FREE_AND_NULL (body);
+    freen (body);
     zmsg_destroy (&submsg);
     frame = zmsg_pop (msg);
     assert (frame == NULL);

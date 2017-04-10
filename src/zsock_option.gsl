@@ -375,7 +375,7 @@ zsock_option_test (bool verbose)
 .           if type = "string" | type = "key"
     char *$(name) = zsock_$(name) (self);
     assert ($(name));
-    FREE_AND_NULL ($(name));
+    freen ($(name));
 .           else
     zsock_$(name) (self);
 .           endif

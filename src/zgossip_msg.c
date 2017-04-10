@@ -186,7 +186,7 @@ struct _zgossip_msg_t {
         zsys_warning ("zgossip_msg: GET_LONGSTR failed"); \
         goto malformed; \
     } \
-    FREE_AND_NULL ((host)); \
+    free ((host)); \
     (host) = (char *) malloc (string_size + 1); \
     memcpy ((host), self->needle, string_size); \
     (host) [string_size] = 0; \
@@ -217,10 +217,10 @@ zgossip_msg_destroy (zgossip_msg_t **self_p)
 
         //  Free class properties
         zframe_destroy (&self->routing_id);
-        FREE_AND_NULL (self->value);
+        free (self->value);
 
         //  Free object itself
-        FREE_AND_NULL (self);
+        free (self);
         *self_p = NULL;
     }
 }
@@ -562,7 +562,7 @@ zgossip_msg_set_value (zgossip_msg_t *self, const char *value)
 {
     assert (self);
     assert (value);
-    FREE_AND_NULL (self->value);
+    free (self->value);
     self->value = strdup (value);
 }
 

@@ -256,7 +256,7 @@ zsys_shutdown (void)
                     zsys_sockname (sockref->type),
                     sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
-        FREE_AND_NULL (sockref);
+        freen (sockref);
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
         --s_open_sockets;
     }
@@ -285,10 +285,10 @@ zsys_shutdown (void)
     ZMUTEX_DESTROY (s_mutex);
 
     //  Free dynamically allocated properties
-    FREE_AND_NULL (s_interface);
-    FREE_AND_NULL (s_ipv6_address);
-    FREE_AND_NULL (s_ipv6_mcast_address);
-    FREE_AND_NULL (s_logident);
+    freen (s_interface);
+    freen (s_ipv6_address);
+    freen (s_ipv6_mcast_address);
+    freen (s_logident);
 
     zsys_interrupted = 0;
     zctx_interrupted = 0;
@@ -380,7 +380,7 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
         while (sockref) {
             if (sockref->handle == handle) {
                 zlist_remove (s_sockref_list, sockref);
-                FREE_AND_NULL (sockref);
+                freen (sockref);
                 break;
             }
             sockref = (s_sockref_t *) zlist_next (s_sockref_list);
@@ -705,7 +705,7 @@ zsys_dir_create (const char *pathname, ...)
 #else
             if (mkdir (formatted, 0775)) {
 #endif
-                FREE_AND_NULL (formatted);
+                freen (formatted);
                 return -1;      //  Failed
             }
         }
@@ -860,7 +860,7 @@ zsys_vprintf (const char *format, va_list argptr)
     //  larger buffer for it.
     if (required >= size) {
         size = required + 1;
-        FREE_AND_NULL (string);
+        freen (string);
         string = (char *) malloc (size);
         if (string) {
             va_copy (my_argptr, argptr);
@@ -1458,7 +1458,7 @@ void
 zsys_set_interface (const char *value)
 {
     zsys_init ();
-    FREE_AND_NULL (s_interface);
+    freen (s_interface);
     s_interface = strdup (value);
     assert (s_interface);
 }
@@ -1484,7 +1484,7 @@ void
 zsys_set_ipv6_address (const char *value)
 {
     zsys_init ();
-    FREE_AND_NULL (s_ipv6_address);
+    freen (s_ipv6_address);
     s_ipv6_address = strdup (value);
     assert (s_ipv6_address);
 }
@@ -1510,7 +1510,7 @@ void
 zsys_set_ipv6_mcast_address (const char *value)
 {
     zsys_init ();
-    FREE_AND_NULL (s_ipv6_mcast_address);
+    freen (s_ipv6_mcast_address);
     s_ipv6_mcast_address = strdup (value);
     assert (s_ipv6_mcast_address);
 }
@@ -1565,7 +1565,7 @@ void
 zsys_set_logident (const char *value)
 {
     zsys_init ();
-    FREE_AND_NULL (s_logident);
+    freen (s_logident);
     s_logident = strdup (value);
 #if defined (__UNIX__)
     if (s_logsystem)
@@ -1805,7 +1805,7 @@ zsys_test (bool verbose)
     if (verbose) {
         char *hostname = zsys_hostname ();
         zsys_info ("host name is %s", hostname);
-        FREE_AND_NULL (hostname);
+        freen (hostname);
         zsys_info ("system limit is %zu ZeroMQ sockets", zsys_socket_limit ());
     }
     zsys_set_linger (0);
@@ -1821,7 +1821,7 @@ zsys_test (bool verbose)
     zstr_send (pipe_front, "Hello");
     char *string = zstr_recv (pipe_back);
     assert (streq (string, "Hello"));
-    FREE_AND_NULL (string);
+    freen (string);
     zsock_destroy (&pipe_back);
     zsock_destroy (&pipe_front);
 
@@ -1864,13 +1864,13 @@ zsys_test (bool verbose)
 
     string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
-    FREE_AND_NULL (string);
+    freen (string);
 
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
-    FREE_AND_NULL (string);
+    freen (string);
 
     //  Test logging system
     zsys_set_logident ("czmq_selftest");

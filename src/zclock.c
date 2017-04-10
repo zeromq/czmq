@@ -226,7 +226,7 @@ zclock_test (bool verbose)
     char *timestr = zclock_timestr ();
     if (verbose)
         puts (timestr);
-    FREE_AND_NULL (timestr);
+    freen (timestr);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
