@@ -66,6 +66,8 @@ static bool s_initialized = false;
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
 static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
+static int s_thread_sched_policy = -1; //  ZSYS_THREAD_SCHED_POLICY=-1
+static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
@@ -216,6 +218,16 @@ zsys_init (void)
 
     zsys_set_max_msgsz (s_max_msgsz);
 
+    if (getenv ("ZSYS_THREAD_PRIORITY"))
+        zsys_set_thread_priority (atoi (getenv ("ZSYS_THREAD_PRIORITY")));
+    else
+        zsys_set_thread_priority (s_thread_priority);
+
+    if (getenv ("ZSYS_THREAD_SCHED_POLICY"))
+        zsys_set_thread_sched_policy (atoi (getenv ("ZSYS_THREAD_SCHED_POLICY")));
+    else
+        zsys_set_thread_sched_policy (s_thread_sched_policy);
+
     return s_process_ctx;
 }
 
@@ -268,6 +280,8 @@ zsys_shutdown (void)
       zmq_term(s_process_ctx);
       s_process_ctx = NULL;
       s_io_threads = 1;
+      s_thread_sched_policy = -1;
+      s_thread_priority = -1;
       s_max_sockets = 1024;
       s_max_msgsz = INT_MAX;
       s_linger = 0;
@@ -1255,6 +1269,56 @@ zsys_set_io_threads (size_t io_threads)
 
 
 //  --------------------------------------------------------------------------
+//  Configure the scheduling policy of the ZMQ context thread pool.
+//  Not available on Windows. See the sched_setscheduler man page or sched.h
+//  for more information. If the environment variable ZSYS_THREAD_SCHED_POLICY
+//  is defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_thread_sched_policy (int policy)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (s_open_sockets)
+        zsys_error ("zsys_set_thread_sched_policy() is not valid after"
+                " creating sockets");
+    assert (s_open_sockets == 0);
+    s_thread_sched_policy = policy;
+#if defined (ZMQ_THREAD_SCHED_POLICY)
+    zmq_ctx_set (s_process_ctx, ZMQ_THREAD_SCHED_POLICY, s_thread_sched_policy);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the scheduling priority of the ZMQ context thread pool.
+//  Not available on Windows. See the sched_setscheduler man page or sched.h
+//  for more information. If the environment variable ZSYS_THREAD_PRIORITY is
+//  defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_thread_priority (int priority)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (s_open_sockets)
+        zsys_error ("zsys_set_thread_priority() is not valid after"
+                " creating sockets");
+    assert (s_open_sockets == 0);
+    s_thread_priority = priority;
+#if defined (ZMQ_THREAD_PRIORITY)
+    zmq_ctx_set (s_process_ctx, ZMQ_THREAD_PRIORITY, s_thread_priority);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Configure the number of sockets that ZeroMQ will allow. The default
 //  is 1024. The actual limit depends on the system, and you can query it
 //  by using zsys_socket_limit (). A value of zero means "maximum".
@@ -1814,6 +1878,8 @@ zsys_test (bool verbose)
     zsys_set_pipehwm (2500);
     assert (zsys_pipehwm () == 2500);
     zsys_set_ipv6 (0);
+    zsys_set_thread_priority (-1);
+    zsys_set_thread_sched_policy (-1);
 
     //  Test pipe creation
     zsock_t *pipe_back;

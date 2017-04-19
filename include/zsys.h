@@ -215,6 +215,22 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zsys_set_io_threads (size_t io_threads);
 
+//  Configure the scheduling policy of the ZMQ context thread pool.
+//  Not available on Windows. See the sched_setscheduler man page or sched.h
+//  for more information. If the environment variable ZSYS_THREAD_SCHED_POLICY
+//  is defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+CZMQ_EXPORT void
+    zsys_set_thread_sched_policy (int policy);
+
+//  Configure the scheduling priority of the ZMQ context thread pool.
+//  Not available on Windows. See the sched_setscheduler man page or sched.h
+//  for more information. If the environment variable ZSYS_THREAD_PRIORITY is
+//  defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+CZMQ_EXPORT void
+    zsys_set_thread_priority (int priority);
+
 //  Configure the number of sockets that ZeroMQ will allow. The default
 //  is 1024. The actual limit depends on the system, and you can query it
 //  by using zsys_socket_limit (). A value of zero means "maximum".
