@@ -5524,6 +5524,17 @@ This is the class interface:
         zproc_destroy (zproc_t **self_p);
     
     //  *** Draft method, for development use, may change without warning ***
+    //  Setup the command line arguments, the first item must be an (absolute) filename
+    //  to run.                                                                        
+    CZMQ_EXPORT void
+        zproc_set_args (zproc_t *self, zlistx_t *args);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Setup the environment variables for the process.
+    CZMQ_EXPORT void
+        zproc_set_env (zproc_t *self, zhashx_t *args);
+    
+    //  *** Draft method, for development use, may change without warning ***
     //  Connects process stdin with a readable ('>', connect) zeromq socket. If
     //  socket argument is NULL, zproc creates own managed pair of inproc      
     //  sockets.  The writable one is then accessbile via zproc_stdin method.  
@@ -5563,12 +5574,17 @@ This is the class interface:
         zproc_stderr (zproc_t *self);
     
     //  *** Draft method, for development use, may change without warning ***
+    //  Starts the process.
+    CZMQ_EXPORT int
+        zproc_run (zproc_t *self);
+    
+    //  *** Draft method, for development use, may change without warning ***
     //  process exit code
     CZMQ_EXPORT int
         zproc_returncode (zproc_t *self);
     
     //  *** Draft method, for development use, may change without warning ***
-    //  process exit code
+    //  PID of the process
     CZMQ_EXPORT int
         zproc_pid (zproc_t *self);
     
@@ -5752,10 +5768,6 @@ This is the class self test code:
     
     //  @selftest
     //  0. initialization
-    //  initialize arguments and environment
-    char *const xargv[] = {"zsp", "--stdout", NULL};
-    char *const xenvp[] = {"PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin", NULL};
-    
     //  find the right binary
     char *file = "src/zsp";
     if (zsys_file_exists ("_build/../src/zsp"))
@@ -5778,42 +5790,41 @@ This is the class self test code:
     //  all data will be readable from zproc_stdout socket
     zproc_set_stdout (self, NULL);
     
+    zlistx_t *args = zlistx_new ();
+    zlistx_add_end (args, file);
+    zlistx_add_end (args, "--stdout");
+    zproc_set_args (self, args);
+    
+    zhashx_t *env = zhashx_new ();
+    zhashx_insert (env, "ZSP_MESSAGE", "czmq is great\n");
+    zproc_set_env (self, env);
+    
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
-    zproc_run (self, file, xargv, xenvp);
+    zproc_run (self);
+    zpoller_t *poller = zpoller_new (zproc_stdout (self), NULL);
     
-    zpoller_t *poller = zpoller_new (zproc_actor (self), zproc_stdout (self), NULL);
+    // kill the binary, it never ends, but the test must
+    zclock_sleep (800);
+    zproc_kill (self, SIGTERM);
+    zproc_wait (self, true);
     
-    bool running = true;
+    // read the content from zproc_stdout - use zpoller and a loop
+    bool stdout_read = false;
     while (!zsys_interrupted) {
         void *which = zpoller_wait (poller, 800);
-    
-        // kill the process, but continue polling
-        if (zpoller_expired (poller) && running) {
-            zproc_kill (self, SIGTERM);
-            zproc_wait (self, true);
-            if (verbose)
-                zsys_info ("Process %d exited with %d", zproc_pid (self), zproc_returncode (self));
-            running = false;
-            continue;
-        }
     
         if (!which)
             break;
     
-        if (which == zproc_actor (self)) {
-            zmsg_t *msg = zmsg_recv (zproc_actor (self));
-            zmsg_destroy (&msg);
-            continue;
-        }
-    
         if (which == zproc_stdout (self)) {
+            stdout_read = true;
             zframe_t *frame;
             zsock_brecv (zproc_stdout (self), "f", &frame);
             assert (!strncmp(
-                "Lorem ipsum\n",
+                "czmq is great\n",
                 (char*) zframe_data (frame),
-                12));
+                14));
     
             if (verbose)
                 zframe_print (frame, "zproc_test");
@@ -5826,6 +5837,7 @@ This is the class self test code:
         assert (false);
     }
     
+    assert (stdout_read);
     zpoller_destroy (&poller);
     zproc_destroy (&self);
 ```
@@ -8006,7 +8018,8 @@ This is the class interface:
     //  when the process exits; however this call lets you force a shutdown
     //  earlier, avoiding any potential problems with atexit() ordering, especially
     //  with Windows DLL builds, where atexit() does not work and zsys_shutdown has
-    //  to be called manually.
+    //  to be called manually. A succesful shutdown resets the zsys global state
+    //  (HWM, LINGER, etc).
     CZMQ_EXPORT void
         zsys_shutdown (void);
     
@@ -8183,6 +8196,22 @@ This is the class interface:
     //  Note that this method is valid only before any socket is created.
     CZMQ_EXPORT void
         zsys_set_io_threads (size_t io_threads);
+    
+    //  Configure the scheduling policy of the ZMQ context thread pool.
+    //  Not available on Windows. See the sched_setscheduler man page or sched.h
+    //  for more information. If the environment variable ZSYS_THREAD_SCHED_POLICY
+    //  is defined, that provides the default.
+    //  Note that this method is valid only before any socket is created.
+    CZMQ_EXPORT void
+        zsys_set_thread_sched_policy (int policy);
+    
+    //  Configure the scheduling priority of the ZMQ context thread pool.
+    //  Not available on Windows. See the sched_setscheduler man page or sched.h
+    //  for more information. If the environment variable ZSYS_THREAD_PRIORITY is
+    //  defined, that provides the default.
+    //  Note that this method is valid only before any socket is created.
+    CZMQ_EXPORT void
+        zsys_set_thread_priority (int priority);
     
     //  Configure the number of sockets that ZeroMQ will allow. The default
     //  is 1024. The actual limit depends on the system, and you can query it
@@ -8381,6 +8410,8 @@ This is the class self test code:
     zsys_set_pipehwm (2500);
     assert (zsys_pipehwm () == 2500);
     zsys_set_ipv6 (0);
+    zsys_set_thread_priority (-1);
+    zsys_set_thread_sched_policy (-1);
     
     //  Test pipe creation
     zsock_t *pipe_back;
