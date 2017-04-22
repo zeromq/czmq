@@ -188,6 +188,16 @@ s_self_prepare_udp (self_t *self)
         rc = getaddrinfo (zsys_ipv6_address (), self->port_nbr,
                 &hint, &bind_to);
         assert (rc == 0);
+        //  A user might set a link-local address without appending %iface
+        if (IN6_IS_ADDR_LINKLOCAL (&((in6addr_t *)bind_to->ai_addr)->sin6_addr) &&
+                !strchr (zsys_ipv6_address (), '%')) {
+            char address_and_iface [NI_MAXHOST] = {0};
+            strcat (address_and_iface, zsys_ipv6_address ());
+            strcat (address_and_iface, "%");
+            strcat (address_and_iface, iface);
+            rc = getaddrinfo (address_and_iface, self->port_nbr, &hint, &bind_to);
+            assert (rc == 0);
+        }
         rc = getaddrinfo (zsys_ipv6_mcast_address (), self->port_nbr,
                 &hint, &send_to);
         assert (rc == 0);
