@@ -72,6 +72,15 @@ s_interface_new (char *name, struct sockaddr *address, struct sockaddr *netmask,
             sizeof (struct sockaddr_in) : sizeof (struct sockaddr_in6),
             hbuf, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
     assert (rc == 0);
+    //  Some platform's getnameinfo, like Solaris, appear not to append the
+    //  interface name when parsing a link-local IPv6 address. These addresses
+    //  cannot be used without the interface, so we must append it manually.
+    if (address->sa_family == AF_INET6 &&
+            IN6_IS_ADDR_LINKLOCAL (&((struct sockaddr_in6 *)address)->sin6_addr) &&
+            !strchr (hbuf, '%')) {
+        strcat (hbuf, "%");
+        strcat (hbuf, name);
+    }
     self->address = strdup (hbuf);
     assert (self->address);
 
