@@ -98,7 +98,7 @@ before_script:
 # Build and check this project according to the BUILD_TYPE
 script: ./ci_build.sh
 # Prepare deployment
-before_deploy: . ./ci_deploy.sh
+before_deploy: . ./ci_deploy.sh && ./ci_deploy_obs.sh
 # Upload the prepared deployment to github
 deploy:
   provider: releases

@@ -91,6 +91,13 @@ if (MSVC)
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
 endif()
 
+# specific case of windows UWP
+if( ${CMAKE_SYSTEM_NAME} STREQUAL "WindowsStore" AND ${CMAKE_SYSTEM_VERSION} STREQUAL "10.0")
+  ADD_DEFINITIONS(-DZMQ_HAVE_WINDOWS_UWP)
+  ADD_DEFINITIONS(-D_WIN32_WINNT=_WIN32_WINNT_WIN10)
+endif()
+
+
 # required libraries for mingw
 if (MINGW)
     set(MORE_LIBRARIES -lws2_32 -lrpcrt4 -liphlpapi)

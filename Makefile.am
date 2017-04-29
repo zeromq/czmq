@@ -41,6 +41,7 @@ EXTRA_DIST += \
 endif
 
 EXTRA_DIST += \
+    bindings \
     src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
