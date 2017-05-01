@@ -3,8 +3,12 @@
     <param name="url">https://github.com/zeromq/czmq</param>
     <param name="scm">git</param>
     <param name="versionformat">@PARENT_TAG@+git%cd</param>
+    <param name="versionrewrite-pattern">v(.*)</param>
+    <param name="versionrewrite-replacement">1</param>
     <!-- extract redhat packaging -->
+    <param name="exclude">.git</param>
     <param name="changesgenerate">enable</param>
+    <param name="filename">czmq</param>
   </service>
 
   <!-- extract redhat packaging -->
