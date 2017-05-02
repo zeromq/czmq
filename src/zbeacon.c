@@ -510,9 +510,9 @@ zbeacon (zsock_t *pipe, void *args)
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
-            if (!self->udpsock || self->udpsock == INVALID_SOCKET || s_emit_beacon(self))
+            if (!self->udpsock_send || self->udpsock_send == INVALID_SOCKET || s_emit_beacon(self))
             {
-                const char *reason = (!self->udpsock || self->udpsock == INVALID_SOCKET) ? "invalid socket" : strerror (errno);
+                const char *reason = (!self->udpsock_send || self->udpsock_send == INVALID_SOCKET) ? "invalid socket" : strerror (errno);
                 zsys_debug ("zbeacon: failed to transmit, attempting reconnection. reason=%s", reason);
                 //  Try to recreate UDP socket on interface
                 s_self_prepare_udp (self);
