@@ -865,6 +865,11 @@ zmsg_recv_nowait (void *source)
                 break;              //  Interrupted or terminated
             }
         }
+#if defined (ZMQ_SERVER)
+        //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
+        if (zsock_type (source) == ZMQ_SERVER)
+            self->routing_id = zframe_routing_id (frame);
+#endif
         if (zmsg_append (self, &frame)) {
             zmsg_destroy (&self);
             break;

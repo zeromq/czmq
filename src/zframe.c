@@ -521,6 +521,16 @@ zframe_recv_nowait (void *source)
         return NULL;            //  Interrupted or terminated
     }
     self->more = zsock_rcvmore (source);
+#if defined (ZMQ_SERVER)
+    //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
+    if (zsock_type (source) == ZMQ_SERVER)
+        self->routing_id = zmq_msg_routing_id (&self->zmsg);
+#endif
+#if defined (ZMQ_DISH)
+    //  Grab group if we're reading from a DISH Socket (ZMQ 4.2 and later)
+    if (zsock_type (source) == ZMQ_DISH)
+        strcpy (self->group, zmq_msg_group (&self->zmsg));
+#endif
     return self;
 }
 
