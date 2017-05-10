@@ -858,8 +858,12 @@ zmsg_recv_nowait (void *source)
     while (true) {
         zframe_t *frame = zframe_recv_nowait (source);
         if (!frame) {
-            zmsg_destroy (&self);
-            break;              //  Interrupted or terminated
+            if (errno == EINTR && zlist_head (self->frames))
+                continue;
+            else {
+                zmsg_destroy (&self);
+                break;              //  Interrupted or terminated
+            }
         }
         if (zmsg_append (self, &frame)) {
             zmsg_destroy (&self);
