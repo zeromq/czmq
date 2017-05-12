@@ -325,7 +325,7 @@ s_reload (ziflist_t *self, bool ipv6)
 
         if (valid) {
             struct sockaddr_in address, netmask, broadcast;
-            address = *(sockaddr_in *)pUnicast->Address.lpSockaddr;
+            address = *(struct sockaddr_in *)pUnicast->Address.lpSockaddr;
             address.sin_family = AF_INET;
             netmask.sin_addr.s_addr = htonl ((0xffffffffU) << (32 - pPrefix->PrefixLength));
             netmask.sin_family = AF_INET;
