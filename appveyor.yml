@@ -64,7 +64,7 @@ after_build:
   - cmd: 7z a -y -bd -mx=9 czmq.zip zmakecert.exe czmq_selftest.exe czmq.dll libzmq-*.dll
   - ps: Push-AppveyorArtifact "czmq.zip" -Filename "czmq-${env:Platform}-${env:Configuration}.zip"
   - cmd: cd "%CZMQ_BUILDDIR%"
-  - cmd: ctest -C "%Configuration%" -V
+  - cmd: ctest -C "%Configuration%" -VV --timeout 120
 
 test:
   none
