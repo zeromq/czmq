@@ -23,19 +23,20 @@ def return_fresh_string(char_p):
 
 # czmq
 lib = None
-try:
-    # check to see if the shared object was embedded locally, attempt to load it
-    # if not, try to load it using the default system paths...
-    # we need to use os.chdir instead of trying to modify $LD_LIBRARY_PATH and reloading the interpreter
-    t = os.getcwd()
-    p = os.path.join(os.path.dirname(__file__), '..')  # find the path to our $project_ctypes.py
-    os.chdir(p)  # change directories briefly
+# check to see if the shared object was embedded locally, attempt to load it
+# if not, try to load it using the default system paths...
+# we need to use os.chdir instead of trying to modify $LD_LIBRARY_PATH and reloading the interpreter
+t = os.getcwd()
+p = os.path.join(os.path.dirname(__file__), '..')  # find the path to our $project_ctypes.py
+os.chdir(p)  # change directories briefly
 
+try:
     from czmq import libczmq                        # attempt to import the shared lib if it exists
     lib = CDLL(libczmq.__file__)             # if it exists try to load the shared lib
-    os.chdir(t)  # switch back to orig dir
 except ImportError:
     pass
+finally:
+    os.chdir(t)  # switch back to orig dir
 
 if not lib:
     try:
