@@ -196,7 +196,8 @@ s_item_destroy (zhashx_t *self, item_t *item, bool hard)
 
 //  --------------------------------------------------------------------------
 //  Rehash hash table with specified new prime index
-//  Returns 0 on success, or -1 on failure (insufficient memory)
+//  Returns 0 on success, or fails the assertions (e.g. insufficient memory)
+//  Note: Older code used to return -1 in case of errors - this is no longer so
 
 static int
 s_zhashx_rehash (zhashx_t *self, uint new_prime_index)
@@ -234,9 +235,10 @@ s_zhashx_rehash (zhashx_t *self, uint new_prime_index)
 
 //  --------------------------------------------------------------------------
 //  Insert item into hash table with specified key and item. Returns 0 on
-//  success. If the key is already present, or the process heap memory ran
-//  out, returns -1 and leaves existing item unchanged. Sets the hash cursor
-//  to the item, if found.
+//  success. If the key is already present, returns -1 and leaves existing
+//  item unchanged. Sets the hash cursor to the item, if found. Dies with
+//  assertion if the process heap memory ran out. (Note: older code returned
+//  -1 in such cases; this is no longer so).
 
 int
 zhashx_insert (zhashx_t *self, const void *key, void *value)
@@ -250,8 +252,7 @@ zhashx_insert (zhashx_t *self, const void *key, void *value)
     if (self->size >= limit * LOAD_FACTOR / 100) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        if (s_zhashx_rehash (self, new_prime_index))
-            return -1;
+        assert (s_zhashx_rehash (self, new_prime_index) == 0);
         self->chain_limit += CHAIN_GROWS;
     }
     return s_item_insert (self, key, value)? 0: -1;
@@ -305,6 +306,8 @@ s_item_insert (zhashx_t *self, const void *key, void *value)
 //  --------------------------------------------------------------------------
 //  Local helper function
 //  Lookup item in hash table, returns item or NULL
+//  Dies with assertion if the process heap memory ran out (Note: older code
+//  returned NULL in such cases; this is no longer so).
 
 static item_t *
 s_item_lookup (zhashx_t *self, const void *key)
@@ -323,8 +326,7 @@ s_item_lookup (zhashx_t *self, const void *key)
     if (len > self->chain_limit) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        if (s_zhashx_rehash (self, new_prime_index))
-            return NULL;
+        assert (s_zhashx_rehash (self, new_prime_index) == 0);
         limit = primes [self->prime_index];
         self->cached_index = self->hasher (key) % limit;
     }
