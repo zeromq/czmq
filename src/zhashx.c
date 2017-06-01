@@ -395,6 +395,7 @@ zhashx_purge (zhashx_t *self)
         size_t limit = primes [INITIAL_PRIME];
         item_t **items = (item_t **) zmalloc (sizeof (item_t *) * limit);
         assert (items);
+        freen (self->items);
         self->prime_index = INITIAL_PRIME;
         self->chain_limit = INITIAL_CHAIN;
         self->items = items;
