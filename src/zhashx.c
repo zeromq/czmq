@@ -1306,6 +1306,31 @@ zhashx_test (bool verbose)
     assert (streq ((char *) zhashx_lookup (hash, "key2"), "Ring a ding ding"));
     zhashx_destroy (&hash);
 
+    //  Test purger and shrinker: no data should end up unreferenced in valgrind
+    hash = zhashx_new ();
+    assert (hash);
+    zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
+    char valuep [255];
+    strcpy (valuep, "This is a string");
+    rc = zhashx_insert (hash, "key1", valuep);
+    assert (rc == 0);
+    strcpy (valuep, "Ring a ding ding");
+    rc = zhashx_insert (hash, "key2", valuep);
+    assert (rc == 0);
+    strcpy (valuep, "Cartahena delenda est");
+    rc = zhashx_insert (hash, "key3", valuep);
+    assert (rc == 0);
+    strcpy (valuep, "So say we all!");
+    rc = zhashx_insert (hash, "key4", valuep);
+    assert (rc == 0);
+    assert (streq ((char *) zhashx_lookup (hash, "key1"), "This is a string"));
+    assert (streq ((char *) zhashx_lookup (hash, "key2"), "Ring a ding ding"));
+    assert (streq ((char *) zhashx_lookup (hash, "key3"), "Cartahena delenda est"));
+    assert (streq ((char *) zhashx_lookup (hash, "key4"), "So say we all!"));
+    zhashx_purge (hash);
+    zhashx_destroy (&hash);
+
 #if defined (__WINDOWS__)
     zsys_shutdown();
 #endif
