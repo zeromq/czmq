@@ -33,7 +33,7 @@ public class Zconfig implements AutoCloseable{
     if the file does not exist.                                             
     */
     native static long __load (String filename);
-    public Zconfig load (String filename) {
+    public static Zconfig load (String filename) {
         return new Zconfig (__load (filename));
     }
     /*
@@ -41,7 +41,7 @@ public class Zconfig implements AutoCloseable{
     filename.                                                            
     */
     native static long __loadf (String format);
-    public Zconfig loadf (String format) {
+    public static Zconfig loadf (String format) {
         return new Zconfig (__loadf (format));
     }
     /*
