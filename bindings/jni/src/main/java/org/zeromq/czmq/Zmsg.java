@@ -34,7 +34,7 @@ public class Zmsg implements AutoCloseable{
     before receiving.                                                        
     */
     native static long __recv (long source);
-    public Zmsg recv (long source) {
+    public static Zmsg recv (long source) {
         return new Zmsg (__recv (source));
     }
     /*
@@ -43,7 +43,7 @@ public class Zmsg implements AutoCloseable{
     there was insufficient memory to work.                                  
     */
     native static long __decode (long frame);
-    public Zmsg decode (Zframe frame) {
+    public static Zmsg decode (Zframe frame) {
         return new Zmsg (__decode (frame.self));
     }
     /*
@@ -52,7 +52,7 @@ public class Zmsg implements AutoCloseable{
     OK). Signals are encoded to be distinguishable from "normal" messages.  
     */
     native static long __newSignal (byte status);
-    public Zmsg newSignal (byte status) {
+    public static Zmsg newSignal (byte status) {
         return new Zmsg (__newSignal (status));
     }
     /*
