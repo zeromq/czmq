@@ -39,8 +39,8 @@ NAN_MODULE_INIT (Zargs::Init) {
     Nan::SetPrototypeMethod (tpl, "paramFirst", _param_first);
     Nan::SetPrototypeMethod (tpl, "paramNext", _param_next);
     Nan::SetPrototypeMethod (tpl, "paramName", _param_name);
-    Nan::SetPrototypeMethod (tpl, "lookup", _lookup);
-    Nan::SetPrototypeMethod (tpl, "lookupx", _lookupx);
+    Nan::SetPrototypeMethod (tpl, "paramLookup", _param_lookup);
+    Nan::SetPrototypeMethod (tpl, "paramLookupx", _param_lookupx);
     Nan::SetPrototypeMethod (tpl, "hasHelp", _has_help);
     Nan::SetPrototypeMethod (tpl, "paramEmpty", _param_empty);
     Nan::SetPrototypeMethod (tpl, "print", _print);
@@ -142,7 +142,7 @@ NAN_METHOD (Zargs::_param_name) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
-NAN_METHOD (Zargs::_lookup) {
+NAN_METHOD (Zargs::_param_lookup) {
     Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
     char *keys;
     if (info [0]->IsUndefined ())
@@ -154,11 +154,11 @@ NAN_METHOD (Zargs::_lookup) {
         Nan::Utf8String keys_utf8 (info [0].As<String>());
         keys = *keys_utf8;
     }
-    char *result = (char *) zargs_lookup (zargs->self, (const char *)keys);
+    char *result = (char *) zargs_param_lookup (zargs->self, (const char *)keys);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
-NAN_METHOD (Zargs::_lookupx) {
+NAN_METHOD (Zargs::_param_lookupx) {
     Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
     char *keys;
     if (info [0]->IsUndefined ())
@@ -170,7 +170,7 @@ NAN_METHOD (Zargs::_lookupx) {
         Nan::Utf8String keys_utf8 (info [0].As<String>());
         keys = *keys_utf8;
     }
-    char *result = (char *) zargs_lookupx (zargs->self, (const char *)keys);
+    char *result = (char *) zargs_param_lookupx (zargs->self, (const char *)keys);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 

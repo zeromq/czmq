@@ -76,7 +76,7 @@
         <return type = "string" />
     </method>
 
-    <method name = "lookup">
+    <method name = "param lookup">
 	Return value of named parameter, NULL if no given parameter has
 	been specified, or special value for wich zargs_param_empty ()
 	returns true.
@@ -84,7 +84,7 @@
         <return type="string" />
     </method>
 
-    <method name = "lookupx">
+    <method name = "param lookupx">
 	Return value of named parameter(s), NULL if no given parameter has
 	been specified, or special value for wich zargs_param_empty ()
 	returns true.

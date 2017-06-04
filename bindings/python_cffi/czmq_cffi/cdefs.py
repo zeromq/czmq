@@ -226,13 +226,13 @@ const char *
 // been specified, or special value for wich zargs_param_empty () 
 // returns true.                                                  
 const char *
-    zargs_lookup (zargs_t *self, const char *keys);
+    zargs_param_lookup (zargs_t *self, const char *keys);
 
 // Return value of named parameter(s), NULL if no given parameter has
 // been specified, or special value for wich zargs_param_empty ()    
 // returns true.                                                     
 const char *
-    zargs_lookupx (zargs_t *self, const char *keys, ...);
+    zargs_param_lookupx (zargs_t *self, const char *keys, ...);
 
 // Returns true if there are --help -h arguments
 bool

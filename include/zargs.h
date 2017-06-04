@@ -95,14 +95,14 @@ CZMQ_EXPORT const char *
 //  been specified, or special value for wich zargs_param_empty () 
 //  returns true.                                                  
 CZMQ_EXPORT const char *
-    zargs_lookup (zargs_t *self, const char *keys);
+    zargs_param_lookup (zargs_t *self, const char *keys);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Return value of named parameter(s), NULL if no given parameter has
 //  been specified, or special value for wich zargs_param_empty ()    
 //  returns true.                                                     
 CZMQ_EXPORT const char *
-    zargs_lookupx (zargs_t *self, const char *keys, ...);
+    zargs_param_lookupx (zargs_t *self, const char *keys, ...);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Returns true if there are --help -h arguments
