@@ -43,6 +43,126 @@ cd czmq/bindings/nodejs
 
 This is a wrapping of the native C libczmq library. See binding.cc for the code.
 
+### The Zargs class - Platform independent command line argument parsing helpers
+
+There are two kind of elements provided by this class
+foo --named-parameter --parameter with_value positional arguments -a gain-parameter
+zargs keeps poision only for arguments, parameters are to be accessed like hash.
+
+It DOES:
+* provide easy to use CLASS compatible API for accessing argv
+* is platform independent
+* provide getopt_long style -- argument, which delimits parameters from arguments
+* makes parameters positon independent
+
+It does NOT
+* change argv
+* provide a "declarative" way to define command line interface
+
+In future it SHALL
+* hide several formats of command line to one (-Idir, --include=dir,
+  --include dir are the same from API pov)
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zargs = new czmq.Zargs (Number, String)
+```
+
+You *must* call the destructor on every Zargs instance:
+
+```
+my_zargs.destroy ()
+```
+
+Methods:
+
+```
+string my_zargs.progname ()
+```
+
+Return program name (argv[0])
+
+```
+size my_zargs.arguments ()
+```
+
+Return number of positional arguments
+
+```
+string my_zargs.first ()
+```
+
+Return first positional argument or NULL
+
+```
+string my_zargs.next ()
+```
+
+Return next positional argument or NULL
+
+```
+string my_zargs.paramFirst ()
+```
+
+Return first named parameter value, or NULL if there are no named
+parameters, or value for which zargs_param_empty (arg) returns true.
+
+```
+string my_zargs.paramNext ()
+```
+
+Return next named parameter value, or NULL if there are no named
+parameters, or value for which zargs_param_empty (arg) returns true.
+
+```
+string my_zargs.paramName ()
+```
+
+Return current parameter name, or NULL if there are no named
+parameters.
+
+```
+string my_zargs.lookup (String)
+```
+
+Return value of named parameter, NULL if no given parameter has
+been specified, or special value for wich zargs_param_empty ()
+returns true.
+
+```
+string my_zargs.lookupx (String)
+```
+
+Return value of named parameter(s), NULL if no given parameter has
+been specified, or special value for wich zargs_param_empty ()
+returns true.
+
+```
+boolean my_zargs.hasHelp ()
+```
+
+Returns true if there are --help -h arguments
+
+```
+boolean my_zargs.paramEmpty (String)
+```
+
+Returns true if parameter did not have a value
+
+```
+nothing my_zargs.print ()
+```
+
+Print an instance of zargs.
+
+```
+nothing my_zargs.test (Boolean)
+```
+
+Self test of this class.
+
 ### The Zarmour class - armoured text encoding and decoding
 
 Constructor:

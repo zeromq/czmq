@@ -23,6 +23,7 @@ czmq_ffi.ffi.cdef [[
 typedef struct _zactor_t zactor_t;
 typedef struct _zsock_t zsock_t;
 typedef struct _zmsg_t zmsg_t;
+typedef struct _zargs_t zargs_t;
 typedef struct _zarmour_t zarmour_t;
 typedef struct _zchunk_t zchunk_t;
 typedef struct _char_t char_t;
@@ -179,6 +180,74 @@ zsock_t *
 // Self test of this class.
 void
     zactor_test (bool verbose);
+
+// CLASS: zargs
+// Create a new zargs from command line arguments.
+zargs_t *
+    zargs_new (int argc, char **argv);
+
+// Destroy zargs instance.
+void
+    zargs_destroy (zargs_t **self_p);
+
+// Return program name (argv[0])
+const char *
+    zargs_progname (zargs_t *self);
+
+// Return number of positional arguments
+size_t
+    zargs_arguments (zargs_t *self);
+
+// Return first positional argument or NULL
+const char *
+    zargs_first (zargs_t *self);
+
+// Return next positional argument or NULL
+const char *
+    zargs_next (zargs_t *self);
+
+// Return first named parameter value, or NULL if there are no named   
+// parameters, or value for which zargs_param_empty (arg) returns true.
+const char *
+    zargs_param_first (zargs_t *self);
+
+// Return next named parameter value, or NULL if there are no named    
+// parameters, or value for which zargs_param_empty (arg) returns true.
+const char *
+    zargs_param_next (zargs_t *self);
+
+// Return current parameter name, or NULL if there are no named
+// parameters.                                                 
+const char *
+    zargs_param_name (zargs_t *self);
+
+// Return value of named parameter, NULL if no given parameter has
+// been specified, or special value for wich zargs_param_empty () 
+// returns true.                                                  
+const char *
+    zargs_lookup (zargs_t *self, const char *keys);
+
+// Return value of named parameter(s), NULL if no given parameter has
+// been specified, or special value for wich zargs_param_empty ()    
+// returns true.                                                     
+const char *
+    zargs_lookupx (zargs_t *self, const char *keys, ...);
+
+// Returns true if there are --help -h arguments
+bool
+    zargs_has_help (zargs_t *self);
+
+// Returns true if parameter did not have a value
+bool
+    zargs_param_empty (const char *arg);
+
+// Print an instance of zargs.
+void
+    zargs_print (zargs_t *self);
+
+// Self test of this class.
+void
+    zargs_test (bool verbose);
 
 // CLASS: zarmour
 // Create a new zarmour

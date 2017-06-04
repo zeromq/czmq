@@ -13,6 +13,7 @@
     <use project = "libzmq" />
     <use project = "uuid" optional = "1" implied = "1" />
     <use project = "systemd" optional = "1" implied = "1" min_major = "200" />
+    <target name = "*" />
 
     <!-- These classes have an API model -->
     <class name = "zactor" />

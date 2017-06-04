@@ -33,7 +33,7 @@ public class Zhashx implements AutoCloseable{
     unpacks to an empty hash table.                                          
     */
     native static long __unpack (long frame);
-    public static Zhashx unpack (Zframe frame) {
+    public Zhashx unpack (Zframe frame) {
         return new Zhashx (__unpack (frame.self));
     }
     /*

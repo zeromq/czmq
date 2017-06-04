@@ -13,6 +13,8 @@
 
 class QmlZactor;
 class QmlZactorAttached;
+class QmlZargs;
+class QmlZargsAttached;
 class QmlZarmour;
 class QmlZarmourAttached;
 class QmlZcert;
@@ -65,6 +67,7 @@ class QmlZuuid;
 class QmlZuuidAttached;
 
 #include "QmlZactor.h"
+#include "QmlZargs.h"
 #include "QmlZarmour.h"
 #include "QmlZcert.h"
 #include "QmlZcertstore.h"
@@ -101,6 +104,8 @@ public:
     {
         qmlRegisterType<QmlZactor> (uri, 1, 0, "QmlZactor");
         qmlRegisterType<QmlZactorAttached>();
+        qmlRegisterType<QmlZargs> (uri, 1, 0, "QmlZargs");
+        qmlRegisterType<QmlZargsAttached>();
         qmlRegisterType<QmlZarmour> (uri, 1, 0, "QmlZarmour");
         qmlRegisterType<QmlZarmourAttached>();
         qmlRegisterType<QmlZcert> (uri, 1, 0, "QmlZcert");

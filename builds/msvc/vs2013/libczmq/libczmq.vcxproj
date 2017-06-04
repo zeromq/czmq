@@ -93,6 +93,9 @@
     <ClCompile Include="..\..\..\..\src\zactor.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zargs.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zarmour.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

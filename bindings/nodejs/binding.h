@@ -27,6 +27,34 @@
 using namespace v8;
 using namespace Nan;
 
+class Zargs: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit Zargs (int argc, char **argv);
+        explicit Zargs (zargs_t *self);
+        zargs_t *self;
+    private:
+        ~Zargs ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_progname);
+    static NAN_METHOD (_arguments);
+    static NAN_METHOD (_first);
+    static NAN_METHOD (_next);
+    static NAN_METHOD (_param_first);
+    static NAN_METHOD (_param_next);
+    static NAN_METHOD (_param_name);
+    static NAN_METHOD (_lookup);
+    static NAN_METHOD (_lookupx);
+    static NAN_METHOD (_has_help);
+    static NAN_METHOD (_param_empty);
+    static NAN_METHOD (_print);
+    static NAN_METHOD (_test);
+};
+
 class Zarmour: public Nan::ObjectWrap {
     public:
         static NAN_MODULE_INIT (Init);
