@@ -67,6 +67,10 @@ class zmsg_t(Structure):
     pass # Empty - only for type checking
 zmsg_p = POINTER(zmsg_t)
 
+class zargs_t(Structure):
+    pass # Empty - only for type checking
+zargs_p = POINTER(zargs_t)
+
 class zarmour_t(Structure):
     pass # Empty - only for type checking
 zarmour_p = POINTER(zarmour_t)
@@ -342,6 +346,192 @@ to work with the zsock instance rather than the actor.
         Self test of this class.
         """
         return lib.zactor_test(verbose)
+
+
+# zargs
+lib.zargs_new.restype = zargs_p
+lib.zargs_new.argtypes = [c_int, POINTER(c_char_p)]
+lib.zargs_destroy.restype = None
+lib.zargs_destroy.argtypes = [POINTER(zargs_p)]
+lib.zargs_progname.restype = c_char_p
+lib.zargs_progname.argtypes = [zargs_p]
+lib.zargs_arguments.restype = c_size_t
+lib.zargs_arguments.argtypes = [zargs_p]
+lib.zargs_first.restype = c_char_p
+lib.zargs_first.argtypes = [zargs_p]
+lib.zargs_next.restype = c_char_p
+lib.zargs_next.argtypes = [zargs_p]
+lib.zargs_param_first.restype = c_char_p
+lib.zargs_param_first.argtypes = [zargs_p]
+lib.zargs_param_next.restype = c_char_p
+lib.zargs_param_next.argtypes = [zargs_p]
+lib.zargs_param_name.restype = c_char_p
+lib.zargs_param_name.argtypes = [zargs_p]
+lib.zargs_lookup.restype = c_char_p
+lib.zargs_lookup.argtypes = [zargs_p, c_char_p]
+lib.zargs_lookupx.restype = c_char_p
+lib.zargs_lookupx.argtypes = [zargs_p, c_char_p]
+lib.zargs_has_help.restype = c_bool
+lib.zargs_has_help.argtypes = [zargs_p]
+lib.zargs_param_empty.restype = c_bool
+lib.zargs_param_empty.argtypes = [c_char_p]
+lib.zargs_print.restype = None
+lib.zargs_print.argtypes = [zargs_p]
+lib.zargs_test.restype = None
+lib.zargs_test.argtypes = [c_bool]
+
+class Zargs(object):
+    """
+    Platform independent command line argument parsing helpers
+
+There are two kind of elements provided by this class
+foo --named-parameter --parameter with_value positional arguments -a gain-parameter
+zargs keeps poision only for arguments, parameters are to be accessed like hash.
+
+It DOES:
+* provide easy to use CLASS compatible API for accessing argv
+* is platform independent
+* provide getopt_long style -- argument, which delimits parameters from arguments
+* makes parameters positon independent
+
+It does NOT
+* change argv
+* provide a "declarative" way to define command line interface
+
+In future it SHALL
+* hide several formats of command line to one (-Idir, --include=dir,
+  --include dir are the same from API pov)
+    """
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create a new zargs from command line arguments.
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zargs_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zargs_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zargs_new(args[0], byref(c_char_p.from_param(args[1]))) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy zargs instance.
+        """
+        if self.allow_destruct:
+            lib.zargs_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def progname(self):
+        """
+        Return program name (argv[0])
+        """
+        return lib.zargs_progname(self._as_parameter_)
+
+    def arguments(self):
+        """
+        Return number of positional arguments
+        """
+        return lib.zargs_arguments(self._as_parameter_)
+
+    def first(self):
+        """
+        Return first positional argument or NULL
+        """
+        return lib.zargs_first(self._as_parameter_)
+
+    def next(self):
+        """
+        Return next positional argument or NULL
+        """
+        return lib.zargs_next(self._as_parameter_)
+
+    def param_first(self):
+        """
+        Return first named parameter value, or NULL if there are no named
+parameters, or value for which zargs_param_empty (arg) returns true.
+        """
+        return lib.zargs_param_first(self._as_parameter_)
+
+    def param_next(self):
+        """
+        Return next named parameter value, or NULL if there are no named
+parameters, or value for which zargs_param_empty (arg) returns true.
+        """
+        return lib.zargs_param_next(self._as_parameter_)
+
+    def param_name(self):
+        """
+        Return current parameter name, or NULL if there are no named
+parameters.
+        """
+        return lib.zargs_param_name(self._as_parameter_)
+
+    def lookup(self, keys):
+        """
+        Return value of named parameter, NULL if no given parameter has
+been specified, or special value for wich zargs_param_empty ()
+returns true.
+        """
+        return lib.zargs_lookup(self._as_parameter_, keys)
+
+    def lookupx(self, keys, *args):
+        """
+        Return value of named parameter(s), NULL if no given parameter has
+been specified, or special value for wich zargs_param_empty ()
+returns true.
+        """
+        return lib.zargs_lookupx(self._as_parameter_, keys, *args)
+
+    def has_help(self):
+        """
+        Returns true if there are --help -h arguments
+        """
+        return lib.zargs_has_help(self._as_parameter_)
+
+    @staticmethod
+    def param_empty(arg):
+        """
+        Returns true if parameter did not have a value
+        """
+        return lib.zargs_param_empty(arg)
+
+    def print(self):
+        """
+        Print an instance of zargs.
+        """
+        return lib.zargs_print(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zargs_test(verbose)
 
 
 # zarmour

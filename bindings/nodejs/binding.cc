@@ -21,6 +21,203 @@
 using namespace v8;
 using namespace Nan;
 
+NAN_MODULE_INIT (Zargs::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zargs").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "progname", _progname);
+    Nan::SetPrototypeMethod (tpl, "arguments", _arguments);
+    Nan::SetPrototypeMethod (tpl, "first", _first);
+    Nan::SetPrototypeMethod (tpl, "next", _next);
+    Nan::SetPrototypeMethod (tpl, "paramFirst", _param_first);
+    Nan::SetPrototypeMethod (tpl, "paramNext", _param_next);
+    Nan::SetPrototypeMethod (tpl, "paramName", _param_name);
+    Nan::SetPrototypeMethod (tpl, "lookup", _lookup);
+    Nan::SetPrototypeMethod (tpl, "lookupx", _lookupx);
+    Nan::SetPrototypeMethod (tpl, "hasHelp", _has_help);
+    Nan::SetPrototypeMethod (tpl, "paramEmpty", _param_empty);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zargs").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zargs::Zargs (int argc, char **argv) {
+    self = zargs_new ((int) argc, (char **)&argv);
+}
+
+Zargs::Zargs (zargs_t *self_) {
+    self = self_;
+}
+
+Zargs::~Zargs () {
+}
+
+NAN_METHOD (Zargs::New) {
+    assert (info.IsConstructCall ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `argc`");
+
+    int argc;
+    if (info [0]->IsNumber ())
+        argc = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`argc` must be a number");
+    char *argv;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `argv`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`argv` must be a string");
+    else {
+        Nan::Utf8String argv_utf8 (info [1].As<String>());
+        argv = *argv_utf8;
+    }
+    Zargs *zargs = new Zargs ((int) argc, (char **)&argv);
+    if (zargs) {
+        zargs->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zargs::destroy) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    zargs_destroy (&zargs->self);
+}
+
+
+NAN_METHOD (Zargs::defined) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zargs->self != NULL));
+}
+
+NAN_METHOD (Zargs::_progname) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *result = (char *) zargs_progname (zargs->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_arguments) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    size_t result = zargs_arguments (zargs->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zargs::_first) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *result = (char *) zargs_first (zargs->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_next) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *result = (char *) zargs_next (zargs->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_param_first) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *result = (char *) zargs_param_first (zargs->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_param_next) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *result = (char *) zargs_param_next (zargs->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_param_name) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *result = (char *) zargs_param_name (zargs->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_lookup) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *keys;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `keys`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`keys` must be a string");
+    else {
+        Nan::Utf8String keys_utf8 (info [0].As<String>());
+        keys = *keys_utf8;
+    }
+    char *result = (char *) zargs_lookup (zargs->self, (const char *)keys);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_lookupx) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *keys;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `keys`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`keys` must be a string");
+    else {
+        Nan::Utf8String keys_utf8 (info [0].As<String>());
+        keys = *keys_utf8;
+    }
+    char *result = (char *) zargs_lookupx (zargs->self, (const char *)keys);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zargs::_has_help) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    bool result = zargs_has_help (zargs->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zargs::_param_empty) {
+    char *arg;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `arg`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`arg` must be a string");
+    else {
+        Nan::Utf8String arg_utf8 (info [0].As<String>());
+        arg = *arg_utf8;
+    }
+    bool result = zargs_param_empty ((const char *)arg);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zargs::_print) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    zargs_print (zargs->self);
+}
+
+NAN_METHOD (Zargs::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zargs_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &Zargs::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
 NAN_MODULE_INIT (Zarmour::Init) {
     Nan::HandleScope scope;
 
@@ -6686,6 +6883,7 @@ Nan::Persistent <Function> &Zuuid::constructor () {
 
 extern "C" NAN_MODULE_INIT (czmq_initialize)
 {
+    Zargs::Init (target);
     Zarmour::Init (target);
     Zcert::Init (target);
     Zcertstore::Init (target);

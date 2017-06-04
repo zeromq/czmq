@@ -61,6 +61,7 @@ all_tests [] = {
     { "zsys", zsys_test },
 #ifdef CZMQ_BUILD_DRAFT_API
 // Tests for draft public classes:
+    { "zargs", zargs_test },
     { "zproc", zproc_test },
     { "ztimerset", ztimerset_test },
     { "ztrie", ztrie_test },
@@ -125,7 +126,7 @@ main (int argc, char **argv)
         else
         if (streq (argv [argn], "--number")
         ||  streq (argv [argn], "-n")) {
-            puts ("34");
+            puts ("35");
             return 0;
         }
         else
@@ -133,6 +134,7 @@ main (int argc, char **argv)
         ||  streq (argv [argn], "-l")) {
             puts ("Available tests:");
             puts ("    zactor\t\t- stable");
+            puts ("    zargs\t\t- draft");
             puts ("    zarmour\t\t- stable");
             puts ("    zcert\t\t- stable");
             puts ("    zcertstore\t\t- stable");

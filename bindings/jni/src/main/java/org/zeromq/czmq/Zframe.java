@@ -33,14 +33,14 @@ public class Zframe implements AutoCloseable{
     Create an empty (zero-sized) frame
     */
     native static long __newEmpty ();
-    public static Zframe newEmpty () {
+    public Zframe newEmpty () {
         return new Zframe (__newEmpty ());
     }
     /*
     Create a frame with a specified string content.
     */
     native static long __from (String string);
-    public static Zframe from (String string) {
+    public Zframe from (String string) {
         return new Zframe (__from (string));
     }
     /*
@@ -49,7 +49,7 @@ public class Zframe implements AutoCloseable{
     zpoller or zloop.                                                       
     */
     native static long __recv (long source);
-    public static Zframe recv (long source) {
+    public Zframe recv (long source) {
         return new Zframe (__recv (source));
     }
     /*

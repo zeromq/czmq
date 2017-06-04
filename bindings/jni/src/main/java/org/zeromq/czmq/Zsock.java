@@ -36,7 +36,7 @@ public class Zsock implements AutoCloseable{
     Create a PUB socket. Default action is bind.
     */
     native static long __newPub (String endpoint);
-    public static Zsock newPub (String endpoint) {
+    public Zsock newPub (String endpoint) {
         return new Zsock (__newPub (endpoint));
     }
     /*
@@ -44,119 +44,119 @@ public class Zsock implements AutoCloseable{
     action is connect.                                                          
     */
     native static long __newSub (String endpoint, String subscribe);
-    public static Zsock newSub (String endpoint, String subscribe) {
+    public Zsock newSub (String endpoint, String subscribe) {
         return new Zsock (__newSub (endpoint, subscribe));
     }
     /*
     Create a REQ socket. Default action is connect.
     */
     native static long __newReq (String endpoint);
-    public static Zsock newReq (String endpoint) {
+    public Zsock newReq (String endpoint) {
         return new Zsock (__newReq (endpoint));
     }
     /*
     Create a REP socket. Default action is bind.
     */
     native static long __newRep (String endpoint);
-    public static Zsock newRep (String endpoint) {
+    public Zsock newRep (String endpoint) {
         return new Zsock (__newRep (endpoint));
     }
     /*
     Create a DEALER socket. Default action is connect.
     */
     native static long __newDealer (String endpoint);
-    public static Zsock newDealer (String endpoint) {
+    public Zsock newDealer (String endpoint) {
         return new Zsock (__newDealer (endpoint));
     }
     /*
     Create a ROUTER socket. Default action is bind.
     */
     native static long __newRouter (String endpoint);
-    public static Zsock newRouter (String endpoint) {
+    public Zsock newRouter (String endpoint) {
         return new Zsock (__newRouter (endpoint));
     }
     /*
     Create a PUSH socket. Default action is connect.
     */
     native static long __newPush (String endpoint);
-    public static Zsock newPush (String endpoint) {
+    public Zsock newPush (String endpoint) {
         return new Zsock (__newPush (endpoint));
     }
     /*
     Create a PULL socket. Default action is bind.
     */
     native static long __newPull (String endpoint);
-    public static Zsock newPull (String endpoint) {
+    public Zsock newPull (String endpoint) {
         return new Zsock (__newPull (endpoint));
     }
     /*
     Create an XPUB socket. Default action is bind.
     */
     native static long __newXpub (String endpoint);
-    public static Zsock newXpub (String endpoint) {
+    public Zsock newXpub (String endpoint) {
         return new Zsock (__newXpub (endpoint));
     }
     /*
     Create an XSUB socket. Default action is connect.
     */
     native static long __newXsub (String endpoint);
-    public static Zsock newXsub (String endpoint) {
+    public Zsock newXsub (String endpoint) {
         return new Zsock (__newXsub (endpoint));
     }
     /*
     Create a PAIR socket. Default action is connect.
     */
     native static long __newPair (String endpoint);
-    public static Zsock newPair (String endpoint) {
+    public Zsock newPair (String endpoint) {
         return new Zsock (__newPair (endpoint));
     }
     /*
     Create a STREAM socket. Default action is connect.
     */
     native static long __newStream (String endpoint);
-    public static Zsock newStream (String endpoint) {
+    public Zsock newStream (String endpoint) {
         return new Zsock (__newStream (endpoint));
     }
     /*
     Create a SERVER socket. Default action is bind.
     */
     native static long __newServer (String endpoint);
-    public static Zsock newServer (String endpoint) {
+    public Zsock newServer (String endpoint) {
         return new Zsock (__newServer (endpoint));
     }
     /*
     Create a CLIENT socket. Default action is connect.
     */
     native static long __newClient (String endpoint);
-    public static Zsock newClient (String endpoint) {
+    public Zsock newClient (String endpoint) {
         return new Zsock (__newClient (endpoint));
     }
     /*
     Create a RADIO socket. Default action is bind.
     */
     native static long __newRadio (String endpoint);
-    public static Zsock newRadio (String endpoint) {
+    public Zsock newRadio (String endpoint) {
         return new Zsock (__newRadio (endpoint));
     }
     /*
     Create a DISH socket. Default action is connect.
     */
     native static long __newDish (String endpoint);
-    public static Zsock newDish (String endpoint) {
+    public Zsock newDish (String endpoint) {
         return new Zsock (__newDish (endpoint));
     }
     /*
     Create a GATHER socket. Default action is bind.
     */
     native static long __newGather (String endpoint);
-    public static Zsock newGather (String endpoint) {
+    public Zsock newGather (String endpoint) {
         return new Zsock (__newGather (endpoint));
     }
     /*
     Create a SCATTER socket. Default action is connect.
     */
     native static long __newScatter (String endpoint);
-    public static Zsock newScatter (String endpoint) {
+    public Zsock newScatter (String endpoint) {
         return new Zsock (__newScatter (endpoint));
     }
     /*

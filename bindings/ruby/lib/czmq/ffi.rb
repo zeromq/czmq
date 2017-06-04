@@ -51,6 +51,174 @@ module CZMQ
 
       require_relative 'ffi/zactor'
 
+      begin # DRAFT method
+        attach_function :zargs_new, [:int, :pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_new()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_new(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_destroy, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_destroy()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_destroy(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_progname, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_progname()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_progname(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_arguments, [:pointer], :size_t, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_arguments()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_arguments(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_first, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_first()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_first(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_next, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_next()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_next(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_param_first, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_param_first()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_param_first(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_param_next, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_param_next()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_param_next(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_param_name, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_param_name()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_param_name(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_lookup, [:pointer, :string], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_lookup()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_lookup(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_lookupx, [:pointer, :string, :varargs], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_lookupx()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_lookupx(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_has_help, [:pointer], :bool, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_has_help()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_has_help(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_param_empty, [:string], :bool, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_param_empty()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_param_empty(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_print, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_print()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_print(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zargs_test, [:bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zargs_test()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zargs_test(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+
+      require_relative 'ffi/zargs'
+
       attach_function :zarmour_new, [], :pointer, **opts
       attach_function :zarmour_destroy, [:pointer], :void, **opts
       attach_function :zarmour_encode, [:pointer, :pointer, :size_t], :pointer, **opts

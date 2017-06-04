@@ -13,6 +13,8 @@
 # Ignore the source doc texts generated from program sources
 zactor.txt
 zactor.doc
+zargs.txt
+zargs.doc
 zarmour.txt
 zarmour.doc
 zcert.txt

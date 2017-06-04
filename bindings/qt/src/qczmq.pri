@@ -12,6 +12,7 @@ qczmq-uselib:!qczmq-buildlib {
     HEADERS       += \
                      $$PWD/qczmq.h \
                      $$PWD/qzactor.h \
+                     $$PWD/qzargs.h \
                      $$PWD/qzarmour.h \
                      $$PWD/qzcert.h \
                      $$PWD/qzcertstore.h \
@@ -40,6 +41,7 @@ qczmq-uselib:!qczmq-buildlib {
 
     SOURCES       += \
                      $$PWD/qzactor.cpp \
+                     $$PWD/qzargs.cpp \
                      $$PWD/qzarmour.cpp \
                      $$PWD/qzcert.cpp \
                      $$PWD/qzcertstore.cpp \

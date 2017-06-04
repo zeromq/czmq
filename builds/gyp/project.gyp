@@ -58,6 +58,8 @@
         '../../include/czmq_prelude.h',
         '../../src/zactor.c',
         '../../include/zactor.h',
+        '../../src/zargs.c',
+        '../../include/zargs.h',
         '../../src/zarmour.c',
         '../../include/zarmour.h',
         '../../src/zauth.c',

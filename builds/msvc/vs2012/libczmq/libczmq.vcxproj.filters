@@ -10,6 +10,9 @@
     <ClCompile Include="..\..\..\..\src\zactor.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zargs.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zarmour.c">
       <Filter>src</Filter>
     </ClCompile>

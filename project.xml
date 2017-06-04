@@ -17,6 +17,7 @@
 
     <!-- These classes have an API model -->
     <class name = "zactor" />
+    <class name = "zargs" />
     <class name = "zarmour" />
     <class name = "zcert" />
     <class name = "zcertstore" />
