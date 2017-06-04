@@ -151,24 +151,24 @@ module CZMQ
         end
       end
       begin # DRAFT method
-        attach_function :zargs_lookup, [:pointer, :string], :string, **opts
+        attach_function :zargs_param_lookup, [:pointer, :string], :string, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The DRAFT function zargs_lookup()" +
+          warn "The DRAFT function zargs_param_lookup()" +
             " is not provided by the installed CZMQ library."
         end
-        def self.zargs_lookup(*)
+        def self.zargs_param_lookup(*)
           raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end
       begin # DRAFT method
-        attach_function :zargs_lookupx, [:pointer, :string, :varargs], :string, **opts
+        attach_function :zargs_param_lookupx, [:pointer, :string, :varargs], :string, **opts
       rescue ::FFI::NotFoundError
         if $VERBOSE || $DEBUG
-          warn "The DRAFT function zargs_lookupx()" +
+          warn "The DRAFT function zargs_param_lookupx()" +
             " is not provided by the installed CZMQ library."
         end
-        def self.zargs_lookupx(*)
+        def self.zargs_param_lookupx(*)
           raise NotImplementedError, "compile CZMQ with --enable-drafts"
         end
       end

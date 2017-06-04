@@ -124,7 +124,7 @@ Return current parameter name, or NULL if there are no named
 parameters.
 
 ```
-string my_zargs.lookup (String)
+string my_zargs.paramLookup (String)
 ```
 
 Return value of named parameter, NULL if no given parameter has
@@ -132,7 +132,7 @@ been specified, or special value for wich zargs_param_empty ()
 returns true.
 
 ```
-string my_zargs.lookupx (String)
+string my_zargs.paramLookupx (String)
 ```
 
 Return value of named parameter(s), NULL if no given parameter has

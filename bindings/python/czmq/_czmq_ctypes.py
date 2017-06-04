@@ -367,10 +367,10 @@ lib.zargs_param_next.restype = c_char_p
 lib.zargs_param_next.argtypes = [zargs_p]
 lib.zargs_param_name.restype = c_char_p
 lib.zargs_param_name.argtypes = [zargs_p]
-lib.zargs_lookup.restype = c_char_p
-lib.zargs_lookup.argtypes = [zargs_p, c_char_p]
-lib.zargs_lookupx.restype = c_char_p
-lib.zargs_lookupx.argtypes = [zargs_p, c_char_p]
+lib.zargs_param_lookup.restype = c_char_p
+lib.zargs_param_lookup.argtypes = [zargs_p, c_char_p]
+lib.zargs_param_lookupx.restype = c_char_p
+lib.zargs_param_lookupx.argtypes = [zargs_p, c_char_p]
 lib.zargs_has_help.restype = c_bool
 lib.zargs_has_help.argtypes = [zargs_p]
 lib.zargs_param_empty.restype = c_bool
@@ -491,21 +491,21 @@ parameters.
         """
         return lib.zargs_param_name(self._as_parameter_)
 
-    def lookup(self, keys):
+    def param_lookup(self, keys):
         """
         Return value of named parameter, NULL if no given parameter has
 been specified, or special value for wich zargs_param_empty ()
 returns true.
         """
-        return lib.zargs_lookup(self._as_parameter_, keys)
+        return lib.zargs_param_lookup(self._as_parameter_, keys)
 
-    def lookupx(self, keys, *args):
+    def param_lookupx(self, keys, *args):
         """
         Return value of named parameter(s), NULL if no given parameter has
 been specified, or special value for wich zargs_param_empty ()
 returns true.
         """
-        return lib.zargs_lookupx(self._as_parameter_, keys, *args)
+        return lib.zargs_param_lookupx(self._as_parameter_, keys, *args)
 
     def has_help(self):
         """
