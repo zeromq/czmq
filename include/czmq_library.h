@@ -123,6 +123,8 @@ typedef struct _zsys_t zsys_t;
 #define ZSYS_T_DEFINED
 //  Draft classes are by default not built in stable releases
 #ifdef CZMQ_BUILD_DRAFT_API
+typedef struct _zargs_t zargs_t;
+#define ZARGS_T_DEFINED
 typedef struct _zproc_t zproc_t;
 #define ZPROC_T_DEFINED
 typedef struct _ztimerset_t ztimerset_t;
@@ -164,6 +166,7 @@ typedef struct _ztrie_t ztrie_t;
 #include "zrex.h"
 #include "zsys.h"
 #ifdef CZMQ_BUILD_DRAFT_API
+#include "zargs.h"
 #include "zproc.h"
 #include "ztimerset.h"
 #include "ztrie.h"

@@ -49,6 +49,7 @@ include_HEADERS = \
 
 if ENABLE_DRAFTS
 include_HEADERS += \
+    include/zargs.h \
     include/zproc.h \
     include/ztimerset.h \
     include/ztrie.h
@@ -99,6 +100,7 @@ src_libczmq_la_SOURCES = \
 
 if ENABLE_DRAFTS
 src_libczmq_la_SOURCES += \
+    src/zargs.c \
     src/zproc.c \
     src/ztimerset.c \
     src/ztrie.c
@@ -156,6 +158,7 @@ endif #ENABLE_CZMQ_SELFTEST
 apidir = @datadir@/zproject/czmq
 dist_api_DATA = \
     api/zactor.api \
+    api/zargs.api \
     api/zarmour.api \
     api/zcert.api \
     api/zcertstore.api \
