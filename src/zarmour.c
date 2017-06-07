@@ -164,7 +164,7 @@ s_base64_decode (const char *data, size_t *size, const char *alphabet, size_t li
     const byte *ceiling = (const byte *) (data + length);
 
     length -= linebreakchars;
-    *size = 3 * (length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
+    *size = 3 * (length / 4) + ((length % 4)? length % 4 - 1 : 0) + 2;
     byte *bytes = (byte *) zmalloc (*size);
     if (!bytes)
         return NULL;
