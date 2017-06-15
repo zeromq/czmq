@@ -31,7 +31,7 @@ public class Zuuid implements AutoCloseable{
     Create UUID object from supplied ZUUID_LEN-octet value.
     */
     native static long __newFrom (byte [] source);
-    public Zuuid newFrom (byte [] source) {
+    public static Zuuid newFrom (byte [] source) {
         return new Zuuid (__newFrom (source));
     }
     /*

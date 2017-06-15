@@ -67,6 +67,7 @@
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zproc.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zsock.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zstr.h" />
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zsys.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Ztimerset.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Ztrie.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zuuid.h" />
@@ -136,6 +137,9 @@
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zstr.c">
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zsys.c">
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Ztimerset.c">

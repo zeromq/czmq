@@ -31,14 +31,14 @@ public class Zcert implements AutoCloseable{
     Accepts public/secret key pair from caller
     */
     native static long __newFrom (byte [] publicKey, byte [] secretKey);
-    public Zcert newFrom (byte [] publicKey, byte [] secretKey) {
+    public static Zcert newFrom (byte [] publicKey, byte [] secretKey) {
         return new Zcert (__newFrom (publicKey, secretKey));
     }
     /*
     Load certificate from file
     */
     native static long __load (String filename);
-    public Zcert load (String filename) {
+    public static Zcert load (String filename) {
         return new Zcert (__load (filename));
     }
     /*

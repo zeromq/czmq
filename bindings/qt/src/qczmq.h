@@ -52,6 +52,7 @@ class QZpoller;
 class QZproc;
 class QZsock;
 class QZstr;
+class QZsys;
 class QZtimerset;
 class QZtrie;
 class QZuuid;
@@ -81,6 +82,7 @@ class QZuuid;
 #include "qzproc.h"
 #include "qzsock.h"
 #include "qzstr.h"
+#include "qzsys.h"
 #include "qztimerset.h"
 #include "qztrie.h"
 #include "qzuuid.h"

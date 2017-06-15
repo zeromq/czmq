@@ -1503,6 +1503,72 @@ module CZMQ
 
       require_relative 'ffi/zstr'
 
+      attach_function :zsys_init, [], :pointer, **opts
+      attach_function :zsys_shutdown, [], :void, **opts
+      attach_function :zsys_socket, [:int, :string, :size_t], :pointer, **opts
+      attach_function :zsys_close, [:pointer, :string, :size_t], :int, **opts
+      attach_function :zsys_sockname, [:int], :pointer, **opts
+      attach_function :zsys_create_pipe, [:pointer], :pointer, **opts
+      attach_function :zsys_handler_set, [:pointer], :void, **opts
+      attach_function :zsys_handler_reset, [], :void, **opts
+      attach_function :zsys_catch_interrupts, [], :void, **opts
+      attach_function :zsys_file_exists, [:string], :bool, **opts
+      attach_function :zsys_file_modified, [:string], :pointer, **opts
+      attach_function :zsys_file_mode, [:string], :int, **opts
+      attach_function :zsys_file_delete, [:string], :int, **opts
+      attach_function :zsys_file_stable, [:string], :bool, **opts
+      attach_function :zsys_dir_create, [:string, :varargs], :int, **opts
+      attach_function :zsys_dir_delete, [:string, :varargs], :int, **opts
+      attach_function :zsys_dir_change, [:string], :int, **opts
+      attach_function :zsys_file_mode_private, [], :void, **opts
+      attach_function :zsys_file_mode_default, [], :void, **opts
+      attach_function :zsys_version, [:pointer, :pointer, :pointer], :void, **opts
+      attach_function :zsys_sprintf, [:string, :varargs], :pointer, **opts
+      attach_function :zsys_vprintf, [:string, :pointer], :pointer, **opts
+      attach_function :zsys_udp_new, [:bool], (::FFI::Platform.unix? ? :int : :uint64), **opts
+      attach_function :zsys_udp_close, [(::FFI::Platform.unix? ? :int : :uint64)], :int, **opts
+      attach_function :zsys_udp_send, [(::FFI::Platform.unix? ? :int : :uint64), :pointer, :pointer, :int], :int, **opts
+      attach_function :zsys_udp_recv, [(::FFI::Platform.unix? ? :int : :uint64), :pointer, :int], :pointer, **opts
+      attach_function :zsys_socket_error, [:string], :void, **opts
+      attach_function :zsys_hostname, [], :pointer, **opts
+      attach_function :zsys_daemonize, [:string], :int, **opts
+      attach_function :zsys_run_as, [:string, :string, :string], :int, **opts
+      attach_function :zsys_has_curve, [], :bool, **opts
+      attach_function :zsys_set_io_threads, [:size_t], :void, **opts
+      attach_function :zsys_set_thread_sched_policy, [:int], :void, **opts
+      attach_function :zsys_set_thread_priority, [:int], :void, **opts
+      attach_function :zsys_set_max_sockets, [:size_t], :void, **opts
+      attach_function :zsys_socket_limit, [], :size_t, **opts
+      attach_function :zsys_set_max_msgsz, [:int], :void, **opts
+      attach_function :zsys_max_msgsz, [], :int, **opts
+      attach_function :zsys_set_linger, [:size_t], :void, **opts
+      attach_function :zsys_set_sndhwm, [:size_t], :void, **opts
+      attach_function :zsys_set_rcvhwm, [:size_t], :void, **opts
+      attach_function :zsys_set_pipehwm, [:size_t], :void, **opts
+      attach_function :zsys_pipehwm, [], :size_t, **opts
+      attach_function :zsys_set_ipv6, [:int], :void, **opts
+      attach_function :zsys_ipv6, [], :int, **opts
+      attach_function :zsys_set_interface, [:string], :void, **opts
+      attach_function :zsys_interface, [], :string, **opts
+      attach_function :zsys_set_ipv6_address, [:string], :void, **opts
+      attach_function :zsys_ipv6_address, [], :string, **opts
+      attach_function :zsys_set_ipv6_mcast_address, [:string], :void, **opts
+      attach_function :zsys_ipv6_mcast_address, [], :string, **opts
+      attach_function :zsys_set_auto_use_fd, [:int], :void, **opts
+      attach_function :zsys_auto_use_fd, [], :int, **opts
+      attach_function :zsys_set_logident, [:string], :void, **opts
+      attach_function :zsys_set_logstream, [:pointer], :void, **opts
+      attach_function :zsys_set_logsender, [:string], :void, **opts
+      attach_function :zsys_set_logsystem, [:bool], :void, **opts
+      attach_function :zsys_error, [:string, :varargs], :void, **opts
+      attach_function :zsys_warning, [:string, :varargs], :void, **opts
+      attach_function :zsys_notice, [:string, :varargs], :void, **opts
+      attach_function :zsys_info, [:string, :varargs], :void, **opts
+      attach_function :zsys_debug, [:string, :varargs], :void, **opts
+      attach_function :zsys_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zsys'
+
       begin # DRAFT method
         attach_function :ztimerset_new, [], :pointer, **opts
       rescue ::FFI::NotFoundError

@@ -73,6 +73,9 @@
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zstr.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zsys.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Ztimerset.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -151,6 +154,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zstr.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zsys.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Ztimerset.h">

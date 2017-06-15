@@ -167,10 +167,6 @@ default|default-Werror|default-with-docs|valgrind)
         CONFIG_OPTS+=("CPP=${CPP}")
     fi
 
-    if [ -n "$ADDRESS_SANITIZER" ] && [ "$ADDRESS_SANITIZER" == "enabled" ]; then
-        CONFIG_OPTS+=("--enable-address-sanitizer=yes")
-    fi
-
     CONFIG_OPTS_COMMON=$CONFIG_OPTS
     CONFIG_OPTS+=("--with-docs=no")
 
@@ -238,6 +234,9 @@ default|default-Werror|default-with-docs|valgrind)
     if [ "$BUILD_TYPE" = "default-with-docs" ]; then
         CONFIG_OPTS=$CONFIG_OPTS_COMMON
         CONFIG_OPTS+=("--with-docs=yes")
+    fi
+    if [ -n "$ADDRESS_SANITIZER" ] && [ "$ADDRESS_SANITIZER" == "enabled" ]; then
+        CONFIG_OPTS+=("--enable-address-sanitizer=yes")
     fi
     # Only use --enable-Werror on projects that are expected to have it
     # (and it is not our duty to check prerequisite projects anyway)

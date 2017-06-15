@@ -808,6 +808,70 @@ class Zstr: public Nan::ObjectWrap {
     static NAN_METHOD (_test);
 };
 
+class Zsys: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit Zsys ();
+    private:
+        ~Zsys ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (_shutdown);
+    static NAN_METHOD (_sockname);
+    static NAN_METHOD (_create_pipe);
+    static NAN_METHOD (_handler_reset);
+    static NAN_METHOD (_catch_interrupts);
+    static NAN_METHOD (_file_exists);
+    static NAN_METHOD (_file_modified);
+    static NAN_METHOD (_file_mode);
+    static NAN_METHOD (_file_delete);
+    static NAN_METHOD (_file_stable);
+    static NAN_METHOD (_dir_create);
+    static NAN_METHOD (_dir_delete);
+    static NAN_METHOD (_dir_change);
+    static NAN_METHOD (_file_mode_private);
+    static NAN_METHOD (_file_mode_default);
+    static NAN_METHOD (_version);
+    static NAN_METHOD (_sprintf);
+    static NAN_METHOD (_socket_error);
+    static NAN_METHOD (_hostname);
+    static NAN_METHOD (_daemonize);
+    static NAN_METHOD (_run_as);
+    static NAN_METHOD (_has_curve);
+    static NAN_METHOD (_set_io_threads);
+    static NAN_METHOD (_set_thread_sched_policy);
+    static NAN_METHOD (_set_thread_priority);
+    static NAN_METHOD (_set_max_sockets);
+    static NAN_METHOD (_socket_limit);
+    static NAN_METHOD (_set_max_msgsz);
+    static NAN_METHOD (_max_msgsz);
+    static NAN_METHOD (_set_linger);
+    static NAN_METHOD (_set_sndhwm);
+    static NAN_METHOD (_set_rcvhwm);
+    static NAN_METHOD (_set_pipehwm);
+    static NAN_METHOD (_pipehwm);
+    static NAN_METHOD (_set_ipv6);
+    static NAN_METHOD (_ipv6);
+    static NAN_METHOD (_set_interface);
+    static NAN_METHOD (_interface);
+    static NAN_METHOD (_set_ipv6_address);
+    static NAN_METHOD (_ipv6_address);
+    static NAN_METHOD (_set_ipv6_mcast_address);
+    static NAN_METHOD (_ipv6_mcast_address);
+    static NAN_METHOD (_set_auto_use_fd);
+    static NAN_METHOD (_auto_use_fd);
+    static NAN_METHOD (_set_logident);
+    static NAN_METHOD (_set_logsender);
+    static NAN_METHOD (_set_logsystem);
+    static NAN_METHOD (_error);
+    static NAN_METHOD (_warning);
+    static NAN_METHOD (_notice);
+    static NAN_METHOD (_info);
+    static NAN_METHOD (_debug);
+    static NAN_METHOD (_test);
+};
+
 class Ztimerset: public Nan::ObjectWrap {
     public:
         static NAN_MODULE_INIT (Init);
