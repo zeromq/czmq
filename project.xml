@@ -40,6 +40,7 @@
     <class name = "zproc" />
     <class name = "zsock" />
     <class name = "zstr" />
+    <class name = "zsys" />
     <class name = "ztimerset" />
     <class name = "ztrie" />
     <class name = "zuuid" />
@@ -51,7 +52,6 @@
     <class name = "zmonitor" state = "stable" />
     <class name = "zproxy" state = "stable" />
     <class name = "zrex" state = "stable" />
-    <class name = "zsys" state = "stable" />
 
     <!-- Models that we build using GSL -->
     <model name = "sockopts" />
