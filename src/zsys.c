@@ -592,7 +592,7 @@ zsys_file_exists (const char *filename)
 //  --------------------------------------------------------------------------
 //  Return size of file, or -1 if not found
 
-ssize_t
+off_t
 zsys_file_size (const char *filename)
 {
     struct stat
