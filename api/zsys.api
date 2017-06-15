@@ -91,12 +91,6 @@
         <return type = "boolean" />
     </method>
 
-    <method name = "file size" singleton = "1">
-        Return size of file, or -1 if not found
-        <argument name = "filename" type = "string" />
-        <return type = "file_size" />
-    </method>
-
     <method name = "file modified" singleton = "1">
         Return file modification time. Returns 0 if the file does not exist.
         <argument name = "filename" type = "string" />
