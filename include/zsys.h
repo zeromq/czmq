@@ -90,10 +90,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT bool
     zsys_file_exists (const char *filename);
 
-//  Return size of file, or -1 if not found
-CZMQ_EXPORT off_t
-    zsys_file_size (const char *filename);
-
 //  Return file modification time. Returns 0 if the file does not exist.
 CZMQ_EXPORT time_t
     zsys_file_modified (const char *filename);
@@ -404,6 +400,10 @@ CZMQ_EXPORT void
     zsys_test (bool verbose);
 
 //  @end
+
+//  Return size of file, or -1 if not found
+CZMQ_EXPORT ssize_t
+    zsys_file_size (const char *filename);
 
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process
 //  gets a SIGTERM signal.
