@@ -6436,6 +6436,701 @@ Nan::Persistent <Function> &Zstr::constructor () {
 }
 
 
+NAN_MODULE_INIT (Zsys::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zsys").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "shutdown", _shutdown);
+    Nan::SetPrototypeMethod (tpl, "sockname", _sockname);
+    Nan::SetPrototypeMethod (tpl, "createPipe", _create_pipe);
+    Nan::SetPrototypeMethod (tpl, "handlerReset", _handler_reset);
+    Nan::SetPrototypeMethod (tpl, "catchInterrupts", _catch_interrupts);
+    Nan::SetPrototypeMethod (tpl, "fileExists", _file_exists);
+    Nan::SetPrototypeMethod (tpl, "fileModified", _file_modified);
+    Nan::SetPrototypeMethod (tpl, "fileMode", _file_mode);
+    Nan::SetPrototypeMethod (tpl, "fileDelete", _file_delete);
+    Nan::SetPrototypeMethod (tpl, "fileStable", _file_stable);
+    Nan::SetPrototypeMethod (tpl, "dirCreate", _dir_create);
+    Nan::SetPrototypeMethod (tpl, "dirDelete", _dir_delete);
+    Nan::SetPrototypeMethod (tpl, "dirChange", _dir_change);
+    Nan::SetPrototypeMethod (tpl, "fileModePrivate", _file_mode_private);
+    Nan::SetPrototypeMethod (tpl, "fileModeDefault", _file_mode_default);
+    Nan::SetPrototypeMethod (tpl, "version", _version);
+    Nan::SetPrototypeMethod (tpl, "sprintf", _sprintf);
+    Nan::SetPrototypeMethod (tpl, "socketError", _socket_error);
+    Nan::SetPrototypeMethod (tpl, "hostname", _hostname);
+    Nan::SetPrototypeMethod (tpl, "daemonize", _daemonize);
+    Nan::SetPrototypeMethod (tpl, "runAs", _run_as);
+    Nan::SetPrototypeMethod (tpl, "hasCurve", _has_curve);
+    Nan::SetPrototypeMethod (tpl, "setIoThreads", _set_io_threads);
+    Nan::SetPrototypeMethod (tpl, "setThreadSchedPolicy", _set_thread_sched_policy);
+    Nan::SetPrototypeMethod (tpl, "setThreadPriority", _set_thread_priority);
+    Nan::SetPrototypeMethod (tpl, "setMaxSockets", _set_max_sockets);
+    Nan::SetPrototypeMethod (tpl, "socketLimit", _socket_limit);
+    Nan::SetPrototypeMethod (tpl, "setMaxMsgsz", _set_max_msgsz);
+    Nan::SetPrototypeMethod (tpl, "maxMsgsz", _max_msgsz);
+    Nan::SetPrototypeMethod (tpl, "setLinger", _set_linger);
+    Nan::SetPrototypeMethod (tpl, "setSndhwm", _set_sndhwm);
+    Nan::SetPrototypeMethod (tpl, "setRcvhwm", _set_rcvhwm);
+    Nan::SetPrototypeMethod (tpl, "setPipehwm", _set_pipehwm);
+    Nan::SetPrototypeMethod (tpl, "pipehwm", _pipehwm);
+    Nan::SetPrototypeMethod (tpl, "setIpv6", _set_ipv6);
+    Nan::SetPrototypeMethod (tpl, "ipv6", _ipv6);
+    Nan::SetPrototypeMethod (tpl, "setInterface", _set_interface);
+    Nan::SetPrototypeMethod (tpl, "interface", _interface);
+    Nan::SetPrototypeMethod (tpl, "setIpv6Address", _set_ipv6_address);
+    Nan::SetPrototypeMethod (tpl, "ipv6Address", _ipv6_address);
+    Nan::SetPrototypeMethod (tpl, "setIpv6McastAddress", _set_ipv6_mcast_address);
+    Nan::SetPrototypeMethod (tpl, "ipv6McastAddress", _ipv6_mcast_address);
+    Nan::SetPrototypeMethod (tpl, "setAutoUseFd", _set_auto_use_fd);
+    Nan::SetPrototypeMethod (tpl, "autoUseFd", _auto_use_fd);
+    Nan::SetPrototypeMethod (tpl, "setLogident", _set_logident);
+    Nan::SetPrototypeMethod (tpl, "setLogsender", _set_logsender);
+    Nan::SetPrototypeMethod (tpl, "setLogsystem", _set_logsystem);
+    Nan::SetPrototypeMethod (tpl, "error", _error);
+    Nan::SetPrototypeMethod (tpl, "warning", _warning);
+    Nan::SetPrototypeMethod (tpl, "notice", _notice);
+    Nan::SetPrototypeMethod (tpl, "info", _info);
+    Nan::SetPrototypeMethod (tpl, "debug", _debug);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zsys").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zsys::Zsys () {
+}
+
+Zsys::~Zsys () {
+}
+
+NAN_METHOD (Zsys::New) {
+    assert (info.IsConstructCall ());
+    Zsys *zsys = new Zsys ();
+    if (zsys) {
+        zsys->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zsys::_shutdown) {
+    zsys_shutdown ();
+}
+
+NAN_METHOD (Zsys::_sockname) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `socktype`");
+
+    int socktype;
+    if (info [0]->IsNumber ())
+        socktype = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`socktype` must be a number");
+    char *result = (char *) zsys_sockname ((int) socktype);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_create_pipe) {
+    Zsock *backend_p = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    zsock_t *result = zsys_create_pipe (&backend_p->self);
+    Zsock *zsock_result = new Zsock (result);
+    if (zsock_result) {
+    //  Don't yet know how to return a new object
+    //      zsock->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zsys::_handler_reset) {
+    zsys_handler_reset ();
+}
+
+NAN_METHOD (Zsys::_catch_interrupts) {
+    zsys_catch_interrupts ();
+}
+
+NAN_METHOD (Zsys::_file_exists) {
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    bool result = zsys_file_exists ((const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zsys::_file_modified) {
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    time_t result = zsys_file_modified ((const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_file_mode) {
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zsys_file_mode ((const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_file_delete) {
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    int result = zsys_file_delete ((const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_file_stable) {
+    char *filename;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `filename`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`filename` must be a string");
+    else {
+        Nan::Utf8String filename_utf8 (info [0].As<String>());
+        filename = *filename_utf8;
+    }
+    bool result = zsys_file_stable ((const char *)filename);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zsys::_dir_create) {
+    char *pathname;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `pathname`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`pathname` must be a string");
+    else {
+        Nan::Utf8String pathname_utf8 (info [0].As<String>());
+        pathname = *pathname_utf8;
+    }
+    int result = zsys_dir_create ((const char *)pathname);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_dir_delete) {
+    char *pathname;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `pathname`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`pathname` must be a string");
+    else {
+        Nan::Utf8String pathname_utf8 (info [0].As<String>());
+        pathname = *pathname_utf8;
+    }
+    int result = zsys_dir_delete ((const char *)pathname);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_dir_change) {
+    char *pathname;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `pathname`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`pathname` must be a string");
+    else {
+        Nan::Utf8String pathname_utf8 (info [0].As<String>());
+        pathname = *pathname_utf8;
+    }
+    int result = zsys_dir_change ((const char *)pathname);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_file_mode_private) {
+    zsys_file_mode_private ();
+}
+
+NAN_METHOD (Zsys::_file_mode_default) {
+    zsys_file_mode_default ();
+}
+
+NAN_METHOD (Zsys::_version) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `major`");
+
+    int * major;
+    if (info [0]->IsNumber ())
+        major = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`major` must be a number");
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `minor`");
+
+    int * minor;
+    if (info [1]->IsNumber ())
+        minor = Nan::To<int>(info [1]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`minor` must be a number");
+    if (info [2]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `patch`");
+
+    int * patch;
+    if (info [2]->IsNumber ())
+        patch = Nan::To<int>(info [2]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`patch` must be a number");
+    zsys_version ((int *) &major, (int *) &minor, (int *) &patch);
+}
+
+NAN_METHOD (Zsys::_sprintf) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    char *result = (char *) zsys_sprintf ((const char *)format);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_socket_error) {
+    char *reason;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `reason`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`reason` must be a string");
+    else {
+        Nan::Utf8String reason_utf8 (info [0].As<String>());
+        reason = *reason_utf8;
+    }
+    zsys_socket_error ((const char *)reason);
+}
+
+NAN_METHOD (Zsys::_hostname) {
+    char *result = (char *) zsys_hostname ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_daemonize) {
+    char *workdir;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `workdir`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`workdir` must be a string");
+    else {
+        Nan::Utf8String workdir_utf8 (info [0].As<String>());
+        workdir = *workdir_utf8;
+    }
+    int result = zsys_daemonize ((const char *)workdir);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_run_as) {
+    char *lockfile;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `lockfile`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`lockfile` must be a string");
+    else {
+        Nan::Utf8String lockfile_utf8 (info [0].As<String>());
+        lockfile = *lockfile_utf8;
+    }
+    char *group;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `group`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`group` must be a string");
+    else {
+        Nan::Utf8String group_utf8 (info [1].As<String>());
+        group = *group_utf8;
+    }
+    char *user;
+    if (info [2]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `user`");
+    else
+    if (!info [2]->IsString ())
+        return Nan::ThrowTypeError ("`user` must be a string");
+    else {
+        Nan::Utf8String user_utf8 (info [2].As<String>());
+        user = *user_utf8;
+    }
+    int result = zsys_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_has_curve) {
+    bool result = zsys_has_curve ();
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zsys::_set_io_threads) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `io_threads`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`io_threads` must be a number");
+    size_t io_threads = Nan::To<int64_t>(info [0]).FromJust ();
+    zsys_set_io_threads ((size_t) io_threads);
+}
+
+NAN_METHOD (Zsys::_set_thread_sched_policy) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `policy`");
+
+    int policy;
+    if (info [0]->IsNumber ())
+        policy = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`policy` must be a number");
+    zsys_set_thread_sched_policy ((int) policy);
+}
+
+NAN_METHOD (Zsys::_set_thread_priority) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `priority`");
+
+    int priority;
+    if (info [0]->IsNumber ())
+        priority = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`priority` must be a number");
+    zsys_set_thread_priority ((int) priority);
+}
+
+NAN_METHOD (Zsys::_set_max_sockets) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `max sockets`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`max sockets` must be a number");
+    size_t max_sockets = Nan::To<int64_t>(info [0]).FromJust ();
+    zsys_set_max_sockets ((size_t) max_sockets);
+}
+
+NAN_METHOD (Zsys::_socket_limit) {
+    size_t result = zsys_socket_limit ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_max_msgsz) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `max msgsz`");
+
+    int max_msgsz;
+    if (info [0]->IsNumber ())
+        max_msgsz = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`max msgsz` must be a number");
+    zsys_set_max_msgsz ((int) max_msgsz);
+}
+
+NAN_METHOD (Zsys::_max_msgsz) {
+    int result = zsys_max_msgsz ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_linger) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `linger`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`linger` must be a number");
+    size_t linger = Nan::To<int64_t>(info [0]).FromJust ();
+    zsys_set_linger ((size_t) linger);
+}
+
+NAN_METHOD (Zsys::_set_sndhwm) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `sndhwm`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`sndhwm` must be a number");
+    size_t sndhwm = Nan::To<int64_t>(info [0]).FromJust ();
+    zsys_set_sndhwm ((size_t) sndhwm);
+}
+
+NAN_METHOD (Zsys::_set_rcvhwm) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `rcvhwm`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`rcvhwm` must be a number");
+    size_t rcvhwm = Nan::To<int64_t>(info [0]).FromJust ();
+    zsys_set_rcvhwm ((size_t) rcvhwm);
+}
+
+NAN_METHOD (Zsys::_set_pipehwm) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `pipehwm`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`pipehwm` must be a number");
+    size_t pipehwm = Nan::To<int64_t>(info [0]).FromJust ();
+    zsys_set_pipehwm ((size_t) pipehwm);
+}
+
+NAN_METHOD (Zsys::_pipehwm) {
+    size_t result = zsys_pipehwm ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_ipv6) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `ipv6`");
+
+    int ipv6;
+    if (info [0]->IsNumber ())
+        ipv6 = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`ipv6` must be a number");
+    zsys_set_ipv6 ((int) ipv6);
+}
+
+NAN_METHOD (Zsys::_ipv6) {
+    int result = zsys_ipv6 ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_interface) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    else {
+        Nan::Utf8String value_utf8 (info [0].As<String>());
+        value = *value_utf8;
+    }
+    zsys_set_interface ((const char *)value);
+}
+
+NAN_METHOD (Zsys::_interface) {
+    char *result = (char *) zsys_interface ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_set_ipv6_address) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    else {
+        Nan::Utf8String value_utf8 (info [0].As<String>());
+        value = *value_utf8;
+    }
+    zsys_set_ipv6_address ((const char *)value);
+}
+
+NAN_METHOD (Zsys::_ipv6_address) {
+    char *result = (char *) zsys_ipv6_address ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_set_ipv6_mcast_address) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    else {
+        Nan::Utf8String value_utf8 (info [0].As<String>());
+        value = *value_utf8;
+    }
+    zsys_set_ipv6_mcast_address ((const char *)value);
+}
+
+NAN_METHOD (Zsys::_ipv6_mcast_address) {
+    char *result = (char *) zsys_ipv6_mcast_address ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_set_auto_use_fd) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `auto use fd`");
+
+    int auto_use_fd;
+    if (info [0]->IsNumber ())
+        auto_use_fd = Nan::To<int>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`auto use fd` must be a number");
+    zsys_set_auto_use_fd ((int) auto_use_fd);
+}
+
+NAN_METHOD (Zsys::_auto_use_fd) {
+    int result = zsys_auto_use_fd ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_logident) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    else {
+        Nan::Utf8String value_utf8 (info [0].As<String>());
+        value = *value_utf8;
+    }
+    zsys_set_logident ((const char *)value);
+}
+
+NAN_METHOD (Zsys::_set_logsender) {
+    char *endpoint;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `endpoint`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`endpoint` must be a string");
+    else {
+        Nan::Utf8String endpoint_utf8 (info [0].As<String>());
+        endpoint = *endpoint_utf8;
+    }
+    zsys_set_logsender ((const char *)endpoint);
+}
+
+NAN_METHOD (Zsys::_set_logsystem) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `logsystem`");
+
+    bool logsystem;
+    if (info [0]->IsBoolean ())
+        logsystem = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`logsystem` must be a Boolean");
+    zsys_set_logsystem ((bool) logsystem);
+}
+
+NAN_METHOD (Zsys::_error) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zsys_error ((const char *)format);
+}
+
+NAN_METHOD (Zsys::_warning) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zsys_warning ((const char *)format);
+}
+
+NAN_METHOD (Zsys::_notice) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zsys_notice ((const char *)format);
+}
+
+NAN_METHOD (Zsys::_info) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zsys_info ((const char *)format);
+}
+
+NAN_METHOD (Zsys::_debug) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    else {
+        Nan::Utf8String format_utf8 (info [0].As<String>());
+        format = *format_utf8;
+    }
+    zsys_debug ((const char *)format);
+}
+
+NAN_METHOD (Zsys::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    bool verbose;
+    if (info [0]->IsBoolean ())
+        verbose = Nan::To<bool>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zsys_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &Zsys::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
 NAN_MODULE_INIT (Ztimerset::Init) {
     Nan::HandleScope scope;
 
@@ -6906,6 +7601,7 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     Zproc::Init (target);
     Zsock::Init (target);
     Zstr::Init (target);
+    Zsys::Init (target);
     Ztimerset::Init (target);
     Ztrie::Init (target);
     Zuuid::Init (target);

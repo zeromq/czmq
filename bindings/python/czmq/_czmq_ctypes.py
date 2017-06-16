@@ -7084,6 +7084,721 @@ a null pointer.
         return lib.zstr_test(verbose)
 
 
+# zsys
+zsys_handler_fn = CFUNCTYPE(None, c_int)
+lib.zsys_init.restype = c_void_p
+lib.zsys_init.argtypes = []
+lib.zsys_shutdown.restype = None
+lib.zsys_shutdown.argtypes = []
+lib.zsys_socket.restype = c_void_p
+lib.zsys_socket.argtypes = [c_int, c_char_p, c_size_t]
+lib.zsys_close.restype = c_int
+lib.zsys_close.argtypes = [c_void_p, c_char_p, c_size_t]
+lib.zsys_sockname.restype = c_char_p
+lib.zsys_sockname.argtypes = [c_int]
+lib.zsys_create_pipe.restype = zsock_p
+lib.zsys_create_pipe.argtypes = [POINTER(zsock_p)]
+lib.zsys_handler_set.restype = None
+lib.zsys_handler_set.argtypes = [POINTER(zsys_handler_fn)]
+lib.zsys_handler_reset.restype = None
+lib.zsys_handler_reset.argtypes = []
+lib.zsys_catch_interrupts.restype = None
+lib.zsys_catch_interrupts.argtypes = []
+lib.zsys_file_exists.restype = c_bool
+lib.zsys_file_exists.argtypes = [c_char_p]
+lib.zsys_file_modified.restype = c_int
+lib.zsys_file_modified.argtypes = [c_char_p]
+lib.zsys_file_mode.restype = c_int
+lib.zsys_file_mode.argtypes = [c_char_p]
+lib.zsys_file_delete.restype = c_int
+lib.zsys_file_delete.argtypes = [c_char_p]
+lib.zsys_file_stable.restype = c_bool
+lib.zsys_file_stable.argtypes = [c_char_p]
+lib.zsys_dir_create.restype = c_int
+lib.zsys_dir_create.argtypes = [c_char_p]
+lib.zsys_dir_delete.restype = c_int
+lib.zsys_dir_delete.argtypes = [c_char_p]
+lib.zsys_dir_change.restype = c_int
+lib.zsys_dir_change.argtypes = [c_char_p]
+lib.zsys_file_mode_private.restype = None
+lib.zsys_file_mode_private.argtypes = []
+lib.zsys_file_mode_default.restype = None
+lib.zsys_file_mode_default.argtypes = []
+lib.zsys_version.restype = None
+lib.zsys_version.argtypes = [POINTER(c_int), POINTER(c_int), POINTER(c_int)]
+lib.zsys_sprintf.restype = c_char_p
+lib.zsys_sprintf.argtypes = [c_char_p]
+lib.zsys_vprintf.restype = c_char_p
+lib.zsys_vprintf.argtypes = [c_char_p, va_list_p]
+lib.zsys_udp_new.restype = socket_p
+lib.zsys_udp_new.argtypes = [c_bool]
+lib.zsys_udp_close.restype = c_int
+lib.zsys_udp_close.argtypes = [socket_p]
+lib.zsys_udp_send.restype = c_int
+lib.zsys_udp_send.argtypes = [socket_p, zframe_p, None, c_int]
+lib.zsys_udp_recv.restype = zframe_p
+lib.zsys_udp_recv.argtypes = [socket_p, c_char_p, c_int]
+lib.zsys_socket_error.restype = None
+lib.zsys_socket_error.argtypes = [c_char_p]
+lib.zsys_hostname.restype = c_char_p
+lib.zsys_hostname.argtypes = []
+lib.zsys_daemonize.restype = c_int
+lib.zsys_daemonize.argtypes = [c_char_p]
+lib.zsys_run_as.restype = c_int
+lib.zsys_run_as.argtypes = [c_char_p, c_char_p, c_char_p]
+lib.zsys_has_curve.restype = c_bool
+lib.zsys_has_curve.argtypes = []
+lib.zsys_set_io_threads.restype = None
+lib.zsys_set_io_threads.argtypes = [c_size_t]
+lib.zsys_set_thread_sched_policy.restype = None
+lib.zsys_set_thread_sched_policy.argtypes = [c_int]
+lib.zsys_set_thread_priority.restype = None
+lib.zsys_set_thread_priority.argtypes = [c_int]
+lib.zsys_set_max_sockets.restype = None
+lib.zsys_set_max_sockets.argtypes = [c_size_t]
+lib.zsys_socket_limit.restype = c_size_t
+lib.zsys_socket_limit.argtypes = []
+lib.zsys_set_max_msgsz.restype = None
+lib.zsys_set_max_msgsz.argtypes = [c_int]
+lib.zsys_max_msgsz.restype = c_int
+lib.zsys_max_msgsz.argtypes = []
+lib.zsys_set_linger.restype = None
+lib.zsys_set_linger.argtypes = [c_size_t]
+lib.zsys_set_sndhwm.restype = None
+lib.zsys_set_sndhwm.argtypes = [c_size_t]
+lib.zsys_set_rcvhwm.restype = None
+lib.zsys_set_rcvhwm.argtypes = [c_size_t]
+lib.zsys_set_pipehwm.restype = None
+lib.zsys_set_pipehwm.argtypes = [c_size_t]
+lib.zsys_pipehwm.restype = c_size_t
+lib.zsys_pipehwm.argtypes = []
+lib.zsys_set_ipv6.restype = None
+lib.zsys_set_ipv6.argtypes = [c_int]
+lib.zsys_ipv6.restype = c_int
+lib.zsys_ipv6.argtypes = []
+lib.zsys_set_interface.restype = None
+lib.zsys_set_interface.argtypes = [c_char_p]
+lib.zsys_interface.restype = c_char_p
+lib.zsys_interface.argtypes = []
+lib.zsys_set_ipv6_address.restype = None
+lib.zsys_set_ipv6_address.argtypes = [c_char_p]
+lib.zsys_ipv6_address.restype = c_char_p
+lib.zsys_ipv6_address.argtypes = []
+lib.zsys_set_ipv6_mcast_address.restype = None
+lib.zsys_set_ipv6_mcast_address.argtypes = [c_char_p]
+lib.zsys_ipv6_mcast_address.restype = c_char_p
+lib.zsys_ipv6_mcast_address.argtypes = []
+lib.zsys_set_auto_use_fd.restype = None
+lib.zsys_set_auto_use_fd.argtypes = [c_int]
+lib.zsys_auto_use_fd.restype = c_int
+lib.zsys_auto_use_fd.argtypes = []
+lib.zsys_set_logident.restype = None
+lib.zsys_set_logident.argtypes = [c_char_p]
+lib.zsys_set_logstream.restype = None
+lib.zsys_set_logstream.argtypes = [FILE_p]
+lib.zsys_set_logsender.restype = None
+lib.zsys_set_logsender.argtypes = [c_char_p]
+lib.zsys_set_logsystem.restype = None
+lib.zsys_set_logsystem.argtypes = [c_bool]
+lib.zsys_error.restype = None
+lib.zsys_error.argtypes = [c_char_p]
+lib.zsys_warning.restype = None
+lib.zsys_warning.argtypes = [c_char_p]
+lib.zsys_notice.restype = None
+lib.zsys_notice.argtypes = [c_char_p]
+lib.zsys_info.restype = None
+lib.zsys_info.argtypes = [c_char_p]
+lib.zsys_debug.restype = None
+lib.zsys_debug.argtypes = [c_char_p]
+lib.zsys_test.restype = None
+lib.zsys_test.argtypes = [c_bool]
+
+class Zsys(object):
+    """
+    
+    """
+
+    allow_destruct = False
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def init():
+        """
+        Initialize CZMQ zsys layer; this happens automatically when you create
+a socket or an actor; however this call lets you force initialization
+earlier, so e.g. logging is properly set-up before you start working.
+Not threadsafe, so call only from main thread. Safe to call multiple
+times. Returns global CZMQ context.
+        """
+        return c_void_p(lib.zsys_init())
+
+    @staticmethod
+    def shutdown():
+        """
+        Optionally shut down the CZMQ zsys layer; this normally happens automatically
+when the process exits; however this call lets you force a shutdown
+earlier, avoiding any potential problems with atexit() ordering, especially
+with Windows dlls.
+        """
+        return lib.zsys_shutdown()
+
+    @staticmethod
+    def socket(type, filename, line_nbr):
+        """
+        Get a new ZMQ socket, automagically creating a ZMQ context if this is
+the first time. Caller is responsible for destroying the ZMQ socket
+before process exits, to avoid a ZMQ deadlock. Note: you should not use
+this method in CZMQ apps, use zsock_new() instead.
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return c_void_p(lib.zsys_socket(type, filename, line_nbr))
+
+    @staticmethod
+    def close(handle, filename, line_nbr):
+        """
+        Destroy/close a ZMQ socket. You should call this for every socket you
+create using zsys_socket().
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return lib.zsys_close(handle, filename, line_nbr)
+
+    @staticmethod
+    def sockname(socktype):
+        """
+        Return ZMQ socket name for socket type
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return lib.zsys_sockname(socktype)
+
+    @staticmethod
+    def create_pipe(backend_p):
+        """
+        Create a pipe, which consists of two PAIR sockets connected over inproc.
+The pipe is configured to use the zsys_pipehwm setting. Returns the
+frontend socket successful, NULL if failed.
+        """
+        return Zsock(lib.zsys_create_pipe(byref(zsock_p.from_param(backend_p))), False)
+
+    @staticmethod
+    def handler_set(handler_fn):
+        """
+        Set interrupt handler; this saves the default handlers so that a
+zsys_handler_reset () can restore them. If you call this multiple times
+then the last handler will take affect. If handler_fn is NULL, disables
+default SIGINT/SIGTERM handling in CZMQ.
+        """
+        return lib.zsys_handler_set(byref(zsys_handler_fn.from_param(handler_fn)))
+
+    @staticmethod
+    def handler_reset():
+        """
+        Reset interrupt handler, call this at exit if needed
+        """
+        return lib.zsys_handler_reset()
+
+    @staticmethod
+    def catch_interrupts():
+        """
+        Set default interrupt handler, so Ctrl-C or SIGTERM will set
+zsys_interrupted. Idempotent; safe to call multiple times.
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return lib.zsys_catch_interrupts()
+
+    @staticmethod
+    def file_exists(filename):
+        """
+        Return 1 if file exists, else zero
+        """
+        return lib.zsys_file_exists(filename)
+
+    @staticmethod
+    def file_modified(filename):
+        """
+        Return file modification time. Returns 0 if the file does not exist.
+        """
+        return lib.zsys_file_modified(filename)
+
+    @staticmethod
+    def file_mode(filename):
+        """
+        Return file mode; provides at least support for the POSIX S_ISREG(m)
+and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
+Returns a mode_t cast to int, or -1 in case of error.
+        """
+        return lib.zsys_file_mode(filename)
+
+    @staticmethod
+    def file_delete(filename):
+        """
+        Delete file. Does not complain if the file is absent
+        """
+        return lib.zsys_file_delete(filename)
+
+    @staticmethod
+    def file_stable(filename):
+        """
+        Check if file is 'stable'
+        """
+        return lib.zsys_file_stable(filename)
+
+    @staticmethod
+    def dir_create(pathname, *args):
+        """
+        Create a file path if it doesn't exist. The file path is treated as
+printf format.
+        """
+        return lib.zsys_dir_create(pathname, *args)
+
+    @staticmethod
+    def dir_delete(pathname, *args):
+        """
+        Remove a file path if empty; the pathname is treated as printf format.
+        """
+        return lib.zsys_dir_delete(pathname, *args)
+
+    @staticmethod
+    def dir_change(pathname):
+        """
+        Move to a specified working directory. Returns 0 if OK, -1 if this failed.
+        """
+        return lib.zsys_dir_change(pathname)
+
+    @staticmethod
+    def file_mode_private():
+        """
+        Set private file creation mode; all files created from here will be
+readable/writable by the owner only.
+        """
+        return lib.zsys_file_mode_private()
+
+    @staticmethod
+    def file_mode_default():
+        """
+        Reset default file creation mode; all files created from here will use
+process file mode defaults.
+        """
+        return lib.zsys_file_mode_default()
+
+    @staticmethod
+    def version(major, minor, patch):
+        """
+        Return the CZMQ version for run-time API detection; returns version
+number into provided fields, providing reference isn't null in each case.
+        """
+        return lib.zsys_version(byref(c_int.from_param(major)), byref(c_int.from_param(minor)), byref(c_int.from_param(patch)))
+
+    @staticmethod
+    def sprintf(format, *args):
+        """
+        Format a string using printf formatting, returning a freshly allocated
+buffer. If there was insufficient memory, returns NULL. Free the returned
+string using zstr_free().
+        """
+        return lib.zsys_sprintf(format, *args)
+
+    @staticmethod
+    def vprintf(format, argptr):
+        """
+        Format a string with a va_list argument, returning a freshly allocated
+buffer. If there was insufficient memory, returns NULL. Free the returned
+string using zstr_free().
+        """
+        return lib.zsys_vprintf(format, argptr)
+
+    @staticmethod
+    def udp_new(routable):
+        """
+        Create UDP beacon socket; if the routable option is true, uses
+multicast (not yet implemented), else uses broadcast. This method
+and related ones might _eventually_ be moved to a zudp class.
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return lib.zsys_udp_new(routable)
+
+    @staticmethod
+    def udp_close(handle):
+        """
+        Close a UDP socket
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return lib.zsys_udp_close(handle)
+
+    @staticmethod
+    def udp_send(udpsock, frame, address, addrlen):
+        """
+        Send zframe to UDP socket, return -1 if sending failed due to
+interface having disappeared (happens easily with WiFi)
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return lib.zsys_udp_send(udpsock, frame, address, addrlen)
+
+    @staticmethod
+    def udp_recv(udpsock, peername, peerlen):
+        """
+        Receive zframe from UDP socket, and set address of peer that sent it
+The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
+NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return Zframe(lib.zsys_udp_recv(udpsock, peername, peerlen), False)
+
+    @staticmethod
+    def socket_error(reason):
+        """
+        Handle an I/O error on some socket operation; will report and die on
+fatal errors, and continue silently on "try again" errors.
+*** This is for CZMQ internal use only and may change arbitrarily ***
+        """
+        return lib.zsys_socket_error(reason)
+
+    @staticmethod
+    def hostname():
+        """
+        Return current host name, for use in public tcp:// endpoints. Caller gets
+a freshly allocated string, should free it using zstr_free(). If the host
+name is not resolvable, returns NULL.
+        """
+        return lib.zsys_hostname()
+
+    @staticmethod
+    def daemonize(workdir):
+        """
+        Move the current process into the background. The precise effect depends
+on the operating system. On POSIX boxes, moves to a specified working
+directory (if specified), closes all file handles, reopens stdin, stdout,
+and stderr to the null device, and sets the process to ignore SIGHUP. On
+Windows, does nothing. Returns 0 if OK, -1 if there was an error.
+        """
+        return lib.zsys_daemonize(workdir)
+
+    @staticmethod
+    def run_as(lockfile, group, user):
+        """
+        Drop the process ID into the lockfile, with exclusive lock, and switch
+the process to the specified group and/or user. Any of the arguments
+may be null, indicating a no-op. Returns 0 on success, -1 on failure.
+Note if you combine this with zsys_daemonize, run after, not before
+that method, or the lockfile will hold the wrong process ID.
+        """
+        return lib.zsys_run_as(lockfile, group, user)
+
+    @staticmethod
+    def has_curve():
+        """
+        Returns true if the underlying libzmq supports CURVE security.
+Uses a heuristic probe according to the version of libzmq being used.
+        """
+        return lib.zsys_has_curve()
+
+    @staticmethod
+    def set_io_threads(io_threads):
+        """
+        Configure the number of I/O threads that ZeroMQ will use. A good
+rule of thumb is one thread per gigabit of traffic in or out. The
+default is 1, sufficient for most applications. If the environment
+variable ZSYS_IO_THREADS is defined, that provides the default.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_set_io_threads(io_threads)
+
+    @staticmethod
+    def set_thread_sched_policy(policy):
+        """
+        Configure the scheduling policy of the ZMQ context thread pool.
+Not available on Windows. See the sched_setscheduler man page or sched.h
+for more information. If the environment variable ZSYS_THREAD_SCHED_POLICY
+is defined, that provides the default.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_set_thread_sched_policy(policy)
+
+    @staticmethod
+    def set_thread_priority(priority):
+        """
+        Configure the scheduling priority of the ZMQ context thread pool.
+Not available on Windows. See the sched_setscheduler man page or sched.h
+for more information. If the environment variable ZSYS_THREAD_PRIORITY is
+defined, that provides the default.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_set_thread_priority(priority)
+
+    @staticmethod
+    def set_max_sockets(max_sockets):
+        """
+        Configure the number of sockets that ZeroMQ will allow. The default
+is 1024. The actual limit depends on the system, and you can query it
+by using zsys_socket_limit (). A value of zero means "maximum".
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_set_max_sockets(max_sockets)
+
+    @staticmethod
+    def socket_limit():
+        """
+        Return maximum number of ZeroMQ sockets that the system will support.
+        """
+        return lib.zsys_socket_limit()
+
+    @staticmethod
+    def set_max_msgsz(max_msgsz):
+        """
+        Configure the maximum allowed size of a message sent.
+The default is INT_MAX.
+        """
+        return lib.zsys_set_max_msgsz(max_msgsz)
+
+    @staticmethod
+    def max_msgsz():
+        """
+        Return maximum message size.
+        """
+        return lib.zsys_max_msgsz()
+
+    @staticmethod
+    def set_linger(linger):
+        """
+        Configure the default linger timeout in msecs for new zsock instances.
+You can also set this separately on each zsock_t instance. The default
+linger time is zero, i.e. any pending messages will be dropped. If the
+environment variable ZSYS_LINGER is defined, that provides the default.
+Note that process exit will typically be delayed by the linger time.
+        """
+        return lib.zsys_set_linger(linger)
+
+    @staticmethod
+    def set_sndhwm(sndhwm):
+        """
+        Configure the default outgoing pipe limit (HWM) for new zsock instances.
+You can also set this separately on each zsock_t instance. The default
+HWM is 1,000, on all versions of ZeroMQ. If the environment variable
+ZSYS_SNDHWM is defined, that provides the default. Note that a value of
+zero means no limit, i.e. infinite memory consumption.
+        """
+        return lib.zsys_set_sndhwm(sndhwm)
+
+    @staticmethod
+    def set_rcvhwm(rcvhwm):
+        """
+        Configure the default incoming pipe limit (HWM) for new zsock instances.
+You can also set this separately on each zsock_t instance. The default
+HWM is 1,000, on all versions of ZeroMQ. If the environment variable
+ZSYS_RCVHWM is defined, that provides the default. Note that a value of
+zero means no limit, i.e. infinite memory consumption.
+        """
+        return lib.zsys_set_rcvhwm(rcvhwm)
+
+    @staticmethod
+    def set_pipehwm(pipehwm):
+        """
+        Configure the default HWM for zactor internal pipes; this is set on both
+ends of the pipe, for outgoing messages only (sndhwm). The default HWM is
+1,000, on all versions of ZeroMQ. If the environment var ZSYS_ACTORHWM is
+defined, that provides the default. Note that a value of zero means no
+limit, i.e. infinite memory consumption.
+        """
+        return lib.zsys_set_pipehwm(pipehwm)
+
+    @staticmethod
+    def pipehwm():
+        """
+        Return the HWM for zactor internal pipes.
+        """
+        return lib.zsys_pipehwm()
+
+    @staticmethod
+    def set_ipv6(ipv6):
+        """
+        Configure use of IPv6 for new zsock instances. By default sockets accept
+and make only IPv4 connections. When you enable IPv6, sockets will accept
+and connect to both IPv4 and IPv6 peers. You can override the setting on
+each zsock_t instance. The default is IPv4 only (ipv6 set to 0). If the
+environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
+default. Note: has no effect on ZMQ v2.
+        """
+        return lib.zsys_set_ipv6(ipv6)
+
+    @staticmethod
+    def ipv6():
+        """
+        Return use of IPv6 for zsock instances.
+        """
+        return lib.zsys_ipv6()
+
+    @staticmethod
+    def set_interface(value):
+        """
+        Set network interface name to use for broadcasts, particularly zbeacon.
+This lets the interface be configured for test environments where required.
+For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
+the default when there is no specified interface. If the environment
+variable ZSYS_INTERFACE is set, use that as the default interface name.
+Setting the interface to "*" means "use all available interfaces".
+        """
+        return lib.zsys_set_interface(value)
+
+    @staticmethod
+    def interface():
+        """
+        Return network interface to use for broadcasts, or "" if none was set.
+        """
+        return lib.zsys_interface()
+
+    @staticmethod
+    def set_ipv6_address(value):
+        """
+        Set IPv6 address to use zbeacon socket, particularly for receiving zbeacon.
+This needs to be set IPv6 is enabled as IPv6 can have multiple addresses
+on a given interface. If the environment variable ZSYS_IPV6_ADDRESS is set,
+use that as the default IPv6 address.
+        """
+        return lib.zsys_set_ipv6_address(value)
+
+    @staticmethod
+    def ipv6_address():
+        """
+        Return IPv6 address to use for zbeacon reception, or "" if none was set.
+        """
+        return lib.zsys_ipv6_address()
+
+    @staticmethod
+    def set_ipv6_mcast_address(value):
+        """
+        Set IPv6 milticast address to use for sending zbeacon messages. This needs
+to be set if IPv6 is enabled. If the environment variable
+ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
+address.
+        """
+        return lib.zsys_set_ipv6_mcast_address(value)
+
+    @staticmethod
+    def ipv6_mcast_address():
+        """
+        Return IPv6 multicast address to use for sending zbeacon, or "" if none was
+set.
+        """
+        return lib.zsys_ipv6_mcast_address()
+
+    @staticmethod
+    def set_auto_use_fd(auto_use_fd):
+        """
+        Configure the automatic use of pre-allocated FDs when creating new sockets.
+If 0 (default), nothing will happen. Else, when a new socket is bound, the
+system API will be used to check if an existing pre-allocated FD with a
+matching port (if TCP) or path (if IPC) exists, and if it does it will be
+set via the ZMQ_USE_FD socket option so that the library will use it
+instead of creating a new socket.
+        """
+        return lib.zsys_set_auto_use_fd(auto_use_fd)
+
+    @staticmethod
+    def auto_use_fd():
+        """
+        Return use of automatic pre-allocated FDs for zsock instances.
+        """
+        return lib.zsys_auto_use_fd()
+
+    @staticmethod
+    def set_logident(value):
+        """
+        Set log identity, which is a string that prefixes all log messages sent
+by this process. The log identity defaults to the environment variable
+ZSYS_LOGIDENT, if that is set.
+        """
+        return lib.zsys_set_logident(value)
+
+    @staticmethod
+    def set_logstream(stream):
+        """
+        Set stream to receive log traffic. By default, log traffic is sent to
+stdout. If you set the stream to NULL, no stream will receive the log
+traffic (it may still be sent to the system facility).
+        """
+        return lib.zsys_set_logstream(coerce_py_file(stream))
+
+    @staticmethod
+    def set_logsender(endpoint):
+        """
+        Sends log output to a PUB socket bound to the specified endpoint. To
+collect such log output, create a SUB socket, subscribe to the traffic
+you care about, and connect to the endpoint. Log traffic is sent as a
+single string frame, in the same format as when sent to stdout. The
+log system supports a single sender; multiple calls to this method will
+bind the same sender to multiple endpoints. To disable the sender, call
+this method with a null argument.
+        """
+        return lib.zsys_set_logsender(endpoint)
+
+    @staticmethod
+    def set_logsystem(logsystem):
+        """
+        Enable or disable logging to the system facility (syslog on POSIX boxes,
+event log on Windows). By default this is disabled.
+        """
+        return lib.zsys_set_logsystem(logsystem)
+
+    @staticmethod
+    def error(format, *args):
+        """
+        Log error condition - highest priority
+        """
+        return lib.zsys_error(format, *args)
+
+    @staticmethod
+    def warning(format, *args):
+        """
+        Log warning condition - high priority
+        """
+        return lib.zsys_warning(format, *args)
+
+    @staticmethod
+    def notice(format, *args):
+        """
+        Log normal, but significant, condition - normal priority
+        """
+        return lib.zsys_notice(format, *args)
+
+    @staticmethod
+    def info(format, *args):
+        """
+        Log informational message - low priority
+        """
+        return lib.zsys_info(format, *args)
+
+    @staticmethod
+    def debug(format, *args):
+        """
+        Log debug-level message - lowest priority
+        """
+        return lib.zsys_debug(format, *args)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zsys_test(verbose)
+
+
 # ztimerset
 ztimerset_fn = CFUNCTYPE(None, c_int, c_void_p)
 lib.ztimerset_new.restype = ztimerset_p

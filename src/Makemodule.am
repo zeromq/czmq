@@ -37,6 +37,7 @@ include_HEADERS = \
     include/zpoller.h \
     include/zsock.h \
     include/zstr.h \
+    include/zsys.h \
     include/zuuid.h \
     include/zauth.h \
     include/zbeacon.h \
@@ -44,7 +45,6 @@ include_HEADERS = \
     include/zmonitor.h \
     include/zproxy.h \
     include/zrex.h \
-    include/zsys.h \
     include/czmq_library.h
 
 if ENABLE_DRAFTS
@@ -78,6 +78,7 @@ src_libczmq_la_SOURCES = \
     src/zpoller.c \
     src/zsock.c \
     src/zstr.c \
+    src/zsys.c \
     src/zuuid.c \
     src/zauth.c \
     src/zbeacon.c \
@@ -86,7 +87,6 @@ src_libczmq_la_SOURCES = \
     src/zmonitor.c \
     src/zproxy.c \
     src/zrex.c \
-    src/zsys.c \
     src/zgossip_msg.c \
     src/zsock_option.inc \
     src/zgossip_engine.inc \
@@ -182,6 +182,7 @@ dist_api_DATA = \
     api/zsock_option.api \
     api/zsock.api \
     api/zstr.api \
+    api/zsys.api \
     api/ztimerset.api \
     api/ztrie.api \
     api/zuuid.api \

@@ -176,6 +176,7 @@ set (czmq_headers
     include/zpoller.h
     include/zsock.h
     include/zstr.h
+    include/zsys.h
     include/zuuid.h
     include/zauth.h
     include/zbeacon.h
@@ -183,7 +184,6 @@ set (czmq_headers
     include/zmonitor.h
     include/zproxy.h
     include/zrex.h
-    include/zsys.h
     src/zgossip_msg.h
     src/zsock_option.inc
     src/zgossip_engine.inc
@@ -234,6 +234,7 @@ set (czmq_sources
     src/zpoller.c
     src/zsock.c
     src/zstr.c
+    src/zsys.c
     src/zuuid.c
     src/zauth.c
     src/zbeacon.c
@@ -241,7 +242,6 @@ set (czmq_sources
     src/zmonitor.c
     src/zproxy.c
     src/zrex.c
-    src/zsys.c
     src/zgossip_msg.c
 )
 
@@ -269,7 +269,13 @@ set_target_properties(czmq
     PROPERTIES DEFINE_SYMBOL "CZMQ_EXPORTS"
 )
 set_target_properties (czmq
-    PROPERTIES SOVERSION "4.0.3"
+    PROPERTIES SOVERSION "4"
+)
+target_link_libraries(czmq
+    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
+)
+set_target_properties (czmq
+    PROPERTIES VERSION "4.0.3"
 )
 target_link_libraries(czmq
     ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
@@ -379,6 +385,7 @@ set(TEST_CLASSES
     zpoller
     zsock
     zstr
+    zsys
     zuuid
     zauth
     zbeacon
@@ -386,7 +393,6 @@ set(TEST_CLASSES
     zmonitor
     zproxy
     zrex
-    zsys
 )
 
 IF (ENABLE_DRAFTS)

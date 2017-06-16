@@ -59,6 +59,8 @@ zsock.txt
 zsock.doc
 zstr.txt
 zstr.doc
+zsys.txt
+zsys.doc
 ztimerset.txt
 ztimerset.doc
 ztrie.txt
@@ -77,8 +79,6 @@ zproxy.txt
 zproxy.doc
 zrex.txt
 zrex.doc
-zsys.txt
-zsys.doc
 zmakecert.txt
 zmakecert.doc
 

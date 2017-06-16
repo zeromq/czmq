@@ -105,6 +105,8 @@ typedef struct _zsock_t zsock_t;
 #define ZSOCK_T_DEFINED
 typedef struct _zstr_t zstr_t;
 #define ZSTR_T_DEFINED
+typedef struct _zsys_t zsys_t;
+#define ZSYS_T_DEFINED
 typedef struct _zuuid_t zuuid_t;
 #define ZUUID_T_DEFINED
 typedef struct _zauth_t zauth_t;
@@ -119,8 +121,6 @@ typedef struct _zproxy_t zproxy_t;
 #define ZPROXY_T_DEFINED
 typedef struct _zrex_t zrex_t;
 #define ZREX_T_DEFINED
-typedef struct _zsys_t zsys_t;
-#define ZSYS_T_DEFINED
 //  Draft classes are by default not built in stable releases
 #ifdef CZMQ_BUILD_DRAFT_API
 typedef struct _zargs_t zargs_t;
@@ -157,6 +157,7 @@ typedef struct _ztrie_t ztrie_t;
 #include "zpoller.h"
 #include "zsock.h"
 #include "zstr.h"
+#include "zsys.h"
 #include "zuuid.h"
 #include "zauth.h"
 #include "zbeacon.h"
@@ -164,7 +165,6 @@ typedef struct _ztrie_t ztrie_t;
 #include "zmonitor.h"
 #include "zproxy.h"
 #include "zrex.h"
-#include "zsys.h"
 #ifdef CZMQ_BUILD_DRAFT_API
 #include "zargs.h"
 #include "zproc.h"

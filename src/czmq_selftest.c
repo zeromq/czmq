@@ -51,6 +51,7 @@ all_tests [] = {
     { "zpoller", zpoller_test },
     { "zsock", zsock_test },
     { "zstr", zstr_test },
+    { "zsys", zsys_test },
     { "zuuid", zuuid_test },
     { "zauth", zauth_test },
     { "zbeacon", zbeacon_test },
@@ -58,7 +59,6 @@ all_tests [] = {
     { "zmonitor", zmonitor_test },
     { "zproxy", zproxy_test },
     { "zrex", zrex_test },
-    { "zsys", zsys_test },
 #ifdef CZMQ_BUILD_DRAFT_API
 // Tests for draft public classes:
     { "zargs", zargs_test },
@@ -157,6 +157,7 @@ main (int argc, char **argv)
             puts ("    zproc\t\t- draft");
             puts ("    zsock\t\t- stable");
             puts ("    zstr\t\t- stable");
+            puts ("    zsys\t\t- stable");
             puts ("    ztimerset\t\t- draft");
             puts ("    ztrie\t\t- draft");
             puts ("    zuuid\t\t- stable");
@@ -166,7 +167,6 @@ main (int argc, char **argv)
             puts ("    zmonitor\t\t- stable");
             puts ("    zproxy\t\t- stable");
             puts ("    zrex\t\t- stable");
-            puts ("    zsys\t\t- stable");
             puts ("    private_classes\t- draft");
             return 0;
         }
