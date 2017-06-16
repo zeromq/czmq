@@ -193,7 +193,7 @@
         *** This is for CZMQ internal use only and may change arbitrarily ***
         <argument name = "udpsock" type = "socket" />
         <argument name = "frame" type = "zframe" />
-        <argument name = "address" c_type = "inaddr_t *" />
+        <argument name = "address" type = "anything" c_type = "inaddr_t *" />
         <argument name = "addrlen" type = "integer" />
         <return type = "integer" />
     </method>

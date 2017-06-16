@@ -29,15 +29,15 @@ def pkgconfig_kwargs (libs):
     # drop starting -I -L -l from cflags
     def dropILl (string):
         def _dropILl (string):
-            if string.startswith ("-I") or string.startswith ("-L") or string.startswith ("-l"):
+            if string.startswith (b"-I") or string.startswith (b"-L") or string.startswith (b"-l"):
                 return string [2:]
         return [_dropILl (x) for x in string.split ()]
 
     # convert -Dfoo=bar to list of tuples [("foo", "bar")] expected by cffi
     def macros (string):
         def _macros (string):
-            return tuple (string [2:].split ('=', 2))
-        return [_macros (x) for x in string.split () if x.startswith ("-D")]
+            return tuple (string [2:].split (b'=', 2))
+        return [_macros (x) for x in string.split () if x.startswith (b"-D")]
 
     # pkg-config call
     def pc (libname, *args):
@@ -84,7 +84,7 @@ with open (os.path.join (
     "cdefs.py"), 'r') as fp:
     cdefs_py = fp.read()
 gl = {}
-exec cdefs_py in gl
+exec (cdefs_py, gl)
 czmq_cdefs = gl ["czmq_cdefs"]
 
 ffibuilder = cffi.FFI ()
