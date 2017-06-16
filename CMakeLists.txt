@@ -271,9 +271,6 @@ set_target_properties(czmq
 set_target_properties (czmq
     PROPERTIES SOVERSION "4"
 )
-target_link_libraries(czmq
-    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
-)
 set_target_properties (czmq
     PROPERTIES VERSION "4.0.3"
 )
