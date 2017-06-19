@@ -65,6 +65,16 @@ def pkgconfig_kwargs (libs):
             else:
                 ret [key].extend (value)
 
+    # Python3 and strict unicode
+    for key, value in ret.items ():
+        if isinstance (value, bytes):
+            ret [key] = value.decode ("utf-8")
+        elif isinstance (value, list):
+            if isinstance (value[0], tuple):
+                ret [key] = [(v[0].decode ("utf-8"), v[1].decode ("utf-8")) for v in value]
+            else:
+                ret [key] = [v.decode ("utf-8") for v in value]
+
     return ret
 
 if not pkgconfig_installed ():
@@ -74,7 +84,7 @@ if not pkgconfig_installed ():
 kwargs = pkgconfig_kwargs ([
     "libzmq",
     "uuid",
-    "systemd",
+    "libsystemd",
     "libczmq"
 ])
 import cffi

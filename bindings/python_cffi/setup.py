@@ -10,7 +10,7 @@ setup(
     license = "mplv2",
     description = """Python cffi bindings of: the high-level c binding for 0mq""",
     packages = ["czmq_cffi", ],
-    setup_requires=["cffi>=1.0.0"],
+    setup_requires=["cffi"],
     cffi_modules=["czmq_cffi/build.py:ffibuilder"],
-    install_requires=["cffi>=1.0.0"],
+    install_requires=["cffi"],
 )

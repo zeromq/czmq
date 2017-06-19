@@ -19,31 +19,38 @@ Build-Depends: debhelper (>= 9),
     libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
+    dh-python,
+    python-all-dev, python-cffi, python-setuptools,
+    python3-all-dev, python3-cffi, python3-setuptools,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 
 Package: libczmq4
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: the high-level c binding for 0mq shared library
- This package contains shared library for czmq: the high-level c binding for 0mq
+Description: czmq shared library
+ This package contains shared library for czmq:
+ the high-level c binding for 0mq
 
 Package: libczmq-dev
 Architecture: any
 Section: libdevel
 Depends:
+    ${misc:Depends},
     libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
     libczmq4 (= ${binary:Version})
-Description: the high-level c binding for 0mq development tools
- This package contains development files for czmq: the high-level c binding for 0mq
+Description: czmq development tools
+ This package contains development files for czmq:
+ the high-level c binding for 0mq
 
 Package: czmq
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends},
-Description: the high-level c binding for 0mq
- Main package for czmq: the high-level c binding for 0mq
+Description: runnable binaries from czmq
+ Main package for czmq:
+ the high-level c binding for 0mq
 
 Package: czmq-dbg
 Architecture: any
@@ -52,6 +59,26 @@ Priority: extra
 Depends:
     czmq (= ${binary:Version}),
     ${misc:Depends}
-Description: the high-level c binding for 0mq debugging symbols
- This package contains the debugging symbols for czmq : the high-level c binding for 0mq.
+Description: czmq debugging symbols
+ This package contains the debugging symbols for czmq:
+ the high-level c binding for 0mq.
 
+Package: python-czmq-cffi
+Architecture: any
+Section: python
+Depends:
+    libczmq4 (= ${binary:Version}),
+    ${misc:Depends}, ${shlibs:Depends},
+    ${python:Depends}, python-cffi,
+Description: Python CFFI bindings for czmq
+ This package contains Python CFFI bindings for czmq.
+
+Package: python3-czmq-cffi
+Architecture: any
+Section: python
+Depends:
+    libczmq4 (= ${binary:Version}),
+    ${misc:Depends}, ${shlibs:Depends},
+    ${python3:Depends}, python3-cffi,
+Description: Python 3 CFFI bindings for czmq
+ This package contains Python 3 CFFI bindings for czmq.
