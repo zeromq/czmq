@@ -9,6 +9,9 @@ Build-Depends: debhelper (>= 9),
     libzmq3-dev,
     uuid-dev,
     libsystemd-dev,
+    dh-python,
+    python-all-dev, python-cffi, python-setuptools,
+    python3-all-dev, python3-cffi, python3-setuptools,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 

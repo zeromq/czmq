@@ -22,16 +22,29 @@ ifneq (,$(findstring drafts,$(DEB_BUILD_OPTIONS)))
 DRAFTS=yes
 endif
 
+export PYBUILD_NAME=czmq-cffi
+export PKG_CONFIG_PATH=$(CURDIR)/bindings/python_cffi:$PKG_CONFIG_PATH
+
+override_dh_auto_build:
+	dh_auto_build
+	# Problem: we need pkg-config points to built and not yet installed copy of czmq
+	# Solution: chicken-egg problem - let's make "fake" pkg-config file
+	sed -e "s@^libdir.*@libdir=$(CURDIR)/src/.libs@" 		-e "s@^includedir.*@includedir=$(CURDIR)/include@" 		src/libczmq.pc > bindings/python_cffi/libczmq.pc
+	dh_auto_build --sourcedirectory=bindings/python_cffi -O--buildsystem=pybuild
+
+override_dh_auto_install:
+	dh_auto_install
+	dh_auto_install --sourcedirectory=bindings/python_cffi -O--buildsystem=pybuild
+
+override_dh_auto_clean:
+	dh_auto_clean
+	dh_auto_clean -O--buildsystem=pybuild
+	rm -f bindings/python_cffi/*.pc
+	rm -rf bindings/python_cffi/*.egg-info/
+
 # Workaround for automake < 1.14 bug
 $(shell dpkg --compare-versions `dpkg-query -W -f='$${Version}\n' automake` lt 1:1.14 && mkdir -p config)
-
-.autogened: autogen.sh
-	@echo "Executing autogen.sh for this project..."
-	./autogen.sh
-	touch $@
-
-clean-autogened:
-	rm -f .autogened
+$(shell test -f src/Makemodule-local.am || touch src/Makemodule-local.am)
 
 override_dh_strip:
 	dh_strip --dbg-package=czmq-dbg
@@ -39,14 +52,11 @@ override_dh_strip:
 override_dh_auto_test:
 	echo "Skipped for now"
 
-override_dh_auto_configure: .autogened
+override_dh_auto_configure:
 	dh_auto_configure -- \
 		--enable-drafts=$(DRAFTS)
 
-# Additional dependency for certain targets
-build: .autogened
-clean: clean-autogened
-
 %:
 	dh $@ \
+		--with python2,python3 \
 		--with autoreconf
