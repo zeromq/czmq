@@ -2,6 +2,7 @@
 # -*- makefile -*-
 
 DRAFTS=no
+DOCS=yes
 
 # OBS build: add
 #   Macros:
@@ -25,9 +26,21 @@ ifneq (,$(findstring drafts,$(DEB_BUILD_OPTIONS)))
 DRAFTS=yes
 endif
 
+ifneq (,$(findstring nodoc,$(DEB_BUILD_OPTIONS)))
+DOCS=no
+endif
+ifneq (,$(findstring nodoc,$(DEB_BUILD_PROFILES)))
+DOCS=no
+endif
+
 # User build: DEB_BUILD_OPTIONS=python_cffi dpkg-buildpackage
 ifneq (,$(findstring python_cffi,$(DEB_BUILD_OPTIONS)))
+ifeq (,$(findstring nopython,$(DEB_BUILD_OPTIONS)))
+ifeq (,$(findstring nopython,$(DEB_BUILD_PROFILES)))
 PYTHON_CFFI=yes
+WITH_PYTHON = --with=python2,python3
+endif
+endif
 endif
 
 ifeq (yes,$(PYTHON_CFFI))
@@ -50,6 +63,12 @@ override_dh_auto_clean:
 	dh_auto_clean -O--buildsystem=pybuild
 	rm -f bindings/python_cffi/*.pc
 	rm -rf bindings/python_cffi/*.egg-info/
+else
+WITH_PYTHON =
+# This tells debhelper to avoid building the python CFFI packages
+DH_OPTIONS += -Npython-czmq-cffi
+DH_OPTIONS += -Npython3-czmq-cffi
+export DH_OPTIONS
 endif
 
 # Workaround for automake < 1.14 bug
@@ -64,9 +83,10 @@ override_dh_auto_test:
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
+		--with-docs=$(DOCS) \
 		--enable-drafts=$(DRAFTS)
 
 %:
 	dh $@ \
-		--with python2,python3 \
+		$(WITH_PYTHON) \
 		--with autoreconf
