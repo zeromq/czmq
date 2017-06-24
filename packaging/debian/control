@@ -13,7 +13,7 @@ Source:         czmq
 Section:        net
 Priority:       optional
 Maintainer:     czmq Developers <zeromq-dev@lists.zeromq.org>
-Standards-Version: 3.9.7
+Standards-Version: 4.0.0
 Build-Depends: debhelper (>= 9),
     pkg-config,
     libzmq3-dev,
