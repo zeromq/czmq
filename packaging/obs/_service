@@ -51,6 +51,11 @@
   </service>
   <service name="extract_file">
     <param name="archive">*.tar</param>
+    <param name="files">*/packaging/debian/czmq.manpages</param>
+    <param name="outfilename">debian.czmq.manpages</param>
+  </service>
+  <service name="extract_file">
+    <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/format</param>
     <param name="outfilename">debian.format</param>
   </service>
@@ -63,6 +68,11 @@
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/libczmq-dev.install</param>
     <param name="outfilename">debian.libczmq-dev.install</param>
+  </service>
+  <service name="extract_file">
+    <param name="archive">*.tar</param>
+    <param name="files">*/packaging/debian/libczmq-dev.manpages</param>
+    <param name="outfilename">debian.libczmq-dev.manpages</param>
   </service>
   <service name="extract_file">
     <param name="archive">*.tar</param>
