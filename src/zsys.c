@@ -996,6 +996,8 @@ zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
     //  Some platform's getnameinfo, like Solaris, appear not to append the
     //  interface name when parsing a link-local IPv6 address. These addresses
     //  cannot be used without the interface, so we must append it manually.
+    //  On Windows, if_indextoname is only available from Vista.
+#if !defined (__WINDOWS__) || (_WIN32_WINNT >= 0x0600)
     if (address6.sin6_family == AF_INET6 &&
             IN6_IS_ADDR_LINKLOCAL (&address6.sin6_addr) &&
             !strchr (peername, '%')) {
@@ -1004,6 +1006,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
         strcat (peername, "%");
         strcat (peername, ifname);
     }
+#endif
 
     return zframe_new (buffer, size);
 }
