@@ -582,6 +582,8 @@ typedef int SOCKET;
 //  This would normally come from net/if.h
 unsigned int if_nametoindex (const char *ifname);
 char *if_indextoname (unsigned int ifindex, char *ifname);
+//  32 on Linux, 256 on Windows, pick largest to avoid overflows
+#   define IF_NAMESIZE 256
 #else
 #   if defined (HAVE_NET_IF_H)
 #       include <net/if.h>

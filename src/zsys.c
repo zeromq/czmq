@@ -999,7 +999,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
     if (address6.sin6_family == AF_INET6 &&
             IN6_IS_ADDR_LINKLOCAL (&address6.sin6_addr) &&
             !strchr (peername, '%')) {
-        char ifname [32] = {0};
+        char ifname [IF_NAMESIZE] = {0};
         if_indextoname (address6.sin6_scope_id, ifname);
         strcat (peername, "%");
         strcat (peername, ifname);
