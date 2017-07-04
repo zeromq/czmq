@@ -273,7 +273,9 @@
 
     <method name = "set_key_comparator">
         Set a user-defined comparator for keys; by default keys are
-        compared using strcmp.
+        compared using strcmp. 
+        The callback function should return zero (0) on matching
+        items.
         <argument name = "comparator" type = "zhashx_comparator_fn" callback = "1"/>
     </method>
 
