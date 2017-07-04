@@ -278,8 +278,8 @@
     </method>
 
     <method name = "set_key_hasher">
-        Set a user-defined comparator for keys; by default keys are
-        compared using strcmp.
+        Set a user-defined hash function for keys; by default keys are
+        hashed by a modified Bernstein hashing function.
         <argument name = "hasher" type = "zhashx_hash_fn" callback = "1"/>
     </method>
 
