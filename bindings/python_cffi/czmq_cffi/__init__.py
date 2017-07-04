@@ -3,11 +3,11 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 try:
-    import native
+    from . import native
     lib = native.lib
     ffi = native.ffi
 except ImportError:
-    import dlopen
+    from . import dlopen
     lib = dlopen.lib
     ffi = dlopen.ffi
 

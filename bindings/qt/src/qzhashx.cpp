@@ -307,6 +307,8 @@ void QZhashx::setKeyDuplicator (zhashx_duplicator_fn duplicator)
 ///
 //  Set a user-defined comparator for keys; by default keys are
 //  compared using strcmp.                                     
+//  The callback function should return zero (0) on matching   
+//  items.                                                     
 void QZhashx::setKeyComparator (zhashx_comparator_fn comparator)
 {
     zhashx_set_key_comparator (self, comparator);
@@ -314,8 +316,8 @@ void QZhashx::setKeyComparator (zhashx_comparator_fn comparator)
 }
 
 ///
-//  Set a user-defined comparator for keys; by default keys are
-//  compared using strcmp.                                     
+//  Set a user-defined hash function for keys; by default keys are
+//  hashed by a modified Bernstein hashing function.              
 void QZhashx::setKeyHasher (zhashx_hash_fn hasher)
 {
     zhashx_set_key_hasher (self, hasher);

@@ -233,11 +233,13 @@ CZMQ_EXPORT void
 
 //  Set a user-defined comparator for keys; by default keys are
 //  compared using strcmp.                                     
+//  The callback function should return zero (0) on matching   
+//  items.                                                     
 CZMQ_EXPORT void
     zhashx_set_key_comparator (zhashx_t *self, zhashx_comparator_fn comparator);
 
-//  Set a user-defined comparator for keys; by default keys are
-//  compared using strcmp.                                     
+//  Set a user-defined hash function for keys; by default keys are
+//  hashed by a modified Bernstein hashing function.              
 CZMQ_EXPORT void
     zhashx_set_key_hasher (zhashx_t *self, zhashx_hash_fn hasher);
 

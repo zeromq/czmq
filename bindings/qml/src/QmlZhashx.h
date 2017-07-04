@@ -168,10 +168,12 @@ public slots:
 
     //  Set a user-defined comparator for keys; by default keys are
     //  compared using strcmp.                                     
+    //  The callback function should return zero (0) on matching   
+    //  items.                                                     
     void setKeyComparator (zhashx_comparator_fn comparator);
 
-    //  Set a user-defined comparator for keys; by default keys are
-    //  compared using strcmp.                                     
+    //  Set a user-defined hash function for keys; by default keys are
+    //  hashed by a modified Bernstein hashing function.              
     void setKeyHasher (zhashx_hash_fn hasher);
 
     //  Make copy of hash table; if supplied table is null, returns null.    
