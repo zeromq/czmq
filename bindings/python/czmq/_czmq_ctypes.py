@@ -3262,14 +3262,16 @@ using strdup.
     def set_key_comparator(self, comparator):
         """
         Set a user-defined comparator for keys; by default keys are
-compared using strcmp.
+compared using strcmp. 
+The callback function should return zero (0) on matching
+items.
         """
         return lib.zhashx_set_key_comparator(self._as_parameter_, comparator)
 
     def set_key_hasher(self, hasher):
         """
-        Set a user-defined comparator for keys; by default keys are
-compared using strcmp.
+        Set a user-defined hash function for keys; by default keys are
+hashed by a modified Bernstein hashing function.
         """
         return lib.zhashx_set_key_hasher(self._as_parameter_, hasher)
 

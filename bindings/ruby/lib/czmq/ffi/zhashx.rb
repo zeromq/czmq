@@ -560,6 +560,8 @@ module CZMQ
 
       # Set a user-defined comparator for keys; by default keys are
       # compared using strcmp.                                     
+      # The callback function should return zero (0) on matching   
+      # items.                                                     
       #
       # @param comparator [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -570,8 +572,8 @@ module CZMQ
         result
       end
 
-      # Set a user-defined comparator for keys; by default keys are
-      # compared using strcmp.                                     
+      # Set a user-defined hash function for keys; by default keys are
+      # hashed by a modified Bernstein hashing function.              
       #
       # @param hasher [::FFI::Pointer, #to_ptr]
       # @return [void]

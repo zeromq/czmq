@@ -116,7 +116,7 @@ This package contains Python CFFI bindings for czmq
 %package -n python3-czmq-cffi
 Group:  Python
 Summary:    Python 3 CFFI bindings for czmq
-Requires:  python3 = %{py2_ver}
+Requires:  python3 = %{py3_ver}
 
 %description -n python3-czmq-cffi
 This package contains Python 3 CFFI bindings for czmq
