@@ -70,6 +70,8 @@ def pkgconfig_kwargs (libs):
         if isinstance (value, bytes):
             ret [key] = value.decode ("utf-8")
         elif isinstance (value, list):
+            if len (value) == 0:
+                continue
             if isinstance (value[0], tuple):
                 ret [key] = [(v[0].decode ("utf-8"), v[1].decode ("utf-8")) for v in value]
             else:

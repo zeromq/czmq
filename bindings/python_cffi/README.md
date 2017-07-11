@@ -13,5 +13,19 @@ Module is compatible with
 
     python setup.py build
 
-Note you need to have setuptools and cffi packages installed.
+Note you need to have setuptools and cffi packages installed. As well as a checkout of all dependencies
+at the same level as this project, because all dependant defs.py will be included in project cdefs.py.
 
+#Using more cffi modules together
+While zproject and CLASS encourages you to split your dependencies to smaller libraries, this does
+not work well for cffi. zproject generated backends have own private cffi instance, which can't
+be easily combined with others in one function call.
+
+See ML thread about topic https://groups.google.com/forum/#!topic/python-cffi/JtAKU-g9Exg
+
+The solution is to include all the definitions of dependant modules, so we will have an access
+to underlying functions directly from top level module. It is a sort of static linking, but
+the only way to ensure the cffi bindings will work accross multiple C libraries. And this is the
+reason you need to have a checkout at the same level as the project.
+
+The advantage is there are no python dependencies between modules.
