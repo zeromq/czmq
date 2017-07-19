@@ -290,9 +290,10 @@ KTHXBAI_actor (zsock_t *pipe, void *args) {
     zsock_signal (pipe, 0);
     while (!zsys_interrupted) {
         char *str = zstr_recv (pipe);
-        if (streq (str, "$KTHXBAI"))
-            break;
+        int done = streq (str, "$KTHXBAI");
         zstr_free (&str);
+        if (done)
+            break;
     }
 }
 
