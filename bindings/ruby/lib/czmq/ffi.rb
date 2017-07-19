@@ -47,6 +47,7 @@ module CZMQ
       attach_function :zactor_is, [:pointer], :bool, **opts
       attach_function :zactor_resolve, [:pointer], :pointer, **opts
       attach_function :zactor_sock, [:pointer], :pointer, **opts
+      attach_function :zactor_set_destructor, [:pointer, :pointer], :void, **opts
       attach_function :zactor_test, [:bool], :void, **opts
 
       require_relative 'ffi/zactor'

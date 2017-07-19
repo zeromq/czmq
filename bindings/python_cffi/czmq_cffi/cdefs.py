@@ -64,6 +64,15 @@ typedef struct _zuuid_t zuuid_t;
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
 
+// Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+//                                                                                                                  
+// An example - to send $KTHXBAI string                                                                             
+//                                                                                                                  
+//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)                                                                 
+//         zsock_wait (self->pipe);                                                                                 
+typedef void (zactor_destructor_fn) (
+    zactor_t *self);
+
 // Loaders retrieve certificates from an arbitrary source.
 typedef void (zcertstore_loader) (
     zcertstore_t *self);
@@ -188,6 +197,10 @@ void *
 // to work with the zsock instance rather than the actor.            
 zsock_t *
     zactor_sock (zactor_t *self);
+
+// Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+void
+    zactor_set_destructor (zactor_t *self, zactor_destructor_fn destructor);
 
 // Self test of this class.
 void

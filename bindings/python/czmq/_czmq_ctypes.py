@@ -237,6 +237,7 @@ def coerce_py_file(obj):
 
 # zactor
 zactor_fn = CFUNCTYPE(None, zsock_p, c_void_p)
+zactor_destructor_fn = CFUNCTYPE(None, zactor_p)
 lib.zactor_new.restype = zactor_p
 lib.zactor_new.argtypes = [zactor_fn, c_void_p]
 lib.zactor_destroy.restype = None
@@ -251,6 +252,8 @@ lib.zactor_resolve.restype = c_void_p
 lib.zactor_resolve.argtypes = [c_void_p]
 lib.zactor_sock.restype = zsock_p
 lib.zactor_sock.argtypes = [zactor_p]
+lib.zactor_set_destructor.restype = None
+lib.zactor_set_destructor.argtypes = [zactor_p, zactor_destructor_fn]
 lib.zactor_test.restype = None
 lib.zactor_test.argtypes = [c_bool]
 
@@ -339,6 +342,12 @@ a libzmq actor handle, return the supplied value.
 to work with the zsock instance rather than the actor.
         """
         return Zsock(lib.zactor_sock(self._as_parameter_), False)
+
+    def set_destructor(self, destructor):
+        """
+        Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+        """
+        return lib.zactor_set_destructor(self._as_parameter_, destructor)
 
     @staticmethod
     def test(verbose):

@@ -44,6 +44,9 @@ public:
     //  to work with the zsock instance rather than the actor.            
     QZsock * sock ();
 
+    //  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+    void setDestructor (zactor_destructor_fn destructor);
+
     //  Self test of this class.
     static void test (bool verbose);
 

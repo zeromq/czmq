@@ -16,6 +16,16 @@
         <argument name = "args" type = "anything" />
     </callback_type>
 
+    <callback_type name = "destructor_fn">
+        Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+
+        An example - to send $KTHXBAI string
+
+            if (zstr_send (self->pipe, "$KTHXBAI") == 0)
+                zsock_wait (self->pipe);
+        <argument name = "self" type = "zactor" />
+    </callback_type>
+
     <constructor>
         Create a new actor passing arbitrary arguments reference.
         <argument name = "task" type = "zactor_fn" callback = "1" />
@@ -58,5 +68,10 @@
         Return the actor's zsock handle. Use this when you absolutely need
         to work with the zsock instance rather than the actor.
         <return type = "zsock" />
+    </method>
+
+    <method name = "set destructor">
+        Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+        <argument name = "destructor" type = "zactor_destructor_fn" callback="1" />
     </method>
 </class>
