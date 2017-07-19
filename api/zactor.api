@@ -16,7 +16,7 @@
         <argument name = "args" type = "anything" />
     </callback_type>
 
-    <callback_type name = "destructor_fn">
+    <callback_type name = "destructor_fn" state = "draft">
         Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
 
         An example - to send $KTHXBAI string
@@ -70,7 +70,7 @@
         <return type = "zsock" />
     </method>
 
-    <method name = "set destructor">
+    <method name = "set destructor" state = "draft">
         Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
         <argument name = "destructor" type = "zactor_destructor_fn" callback="1" />
     </method>
