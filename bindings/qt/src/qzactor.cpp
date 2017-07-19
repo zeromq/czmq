@@ -76,6 +76,14 @@ QZsock * QZactor::sock ()
 }
 
 ///
+//  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+void QZactor::setDestructor (zactor_destructor_fn destructor)
+{
+    zactor_set_destructor (self, destructor);
+    
+}
+
+///
 //  Self test of this class.
 void QZactor::test (bool verbose)
 {

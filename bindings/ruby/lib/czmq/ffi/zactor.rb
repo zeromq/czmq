@@ -90,6 +90,28 @@ module CZMQ
         end
       end
 
+      # Create a new callback of the following type:
+      # Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+      #                                                                                                                  
+      # An example - to send $KTHXBAI string                                                                             
+      #                                                                                                                  
+      #     if (zstr_send (self->pipe, "$KTHXBAI") == 0)                                                                 
+      #         zsock_wait (self->pipe);                                                                                 
+      #     typedef void (zactor_destructor_fn) (
+      #         zactor_t *self);                 
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.destructor_fn
+        ::FFI::Function.new :void, [:pointer], blocking: true do |self_|
+          self_ = Zactor.__new self_, false
+          result = yield self_
+          result
+        end
+      end
+
       # Create a new actor passing arbitrary arguments reference.
       # @param task [::FFI::Pointer, #to_ptr]
       # @param args [::FFI::Pointer, #to_ptr]
@@ -164,6 +186,17 @@ module CZMQ
         self_p = @ptr
         result = ::CZMQ::FFI.zactor_sock(self_p)
         result = Zsock.__new result, false
+        result
+      end
+
+      # Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+      #
+      # @param destructor [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def set_destructor(destructor)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zactor_set_destructor(self_p, destructor)
         result
       end
 

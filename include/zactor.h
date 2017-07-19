@@ -27,6 +27,15 @@ extern "C" {
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
 
+// Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+//                                                                                                                  
+// An example - to send $KTHXBAI string                                                                             
+//                                                                                                                  
+//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)                                                                 
+//         zsock_wait (self->pipe);                                                                                 
+typedef void (zactor_destructor_fn) (
+    zactor_t *self);
+
 //  Create a new actor passing arbitrary arguments reference.
 CZMQ_EXPORT zactor_t *
     zactor_new (zactor_fn task, void *args);
@@ -61,6 +70,10 @@ CZMQ_EXPORT void *
 //  to work with the zsock instance rather than the actor.            
 CZMQ_EXPORT zsock_t *
     zactor_sock (zactor_t *self);
+
+//  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+CZMQ_EXPORT void
+    zactor_set_destructor (zactor_t *self, zactor_destructor_fn destructor);
 
 //  Self test of this class.
 CZMQ_EXPORT void

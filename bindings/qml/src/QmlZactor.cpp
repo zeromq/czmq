@@ -34,6 +34,12 @@ QmlZsock *QmlZactor::sock () {
     return retQ_;
 };
 
+///
+//  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+void QmlZactor::setDestructor (zactor_destructor_fn destructor) {
+    zactor_set_destructor (self, destructor);
+};
+
 
 QObject* QmlZactor::qmlAttachedProperties(QObject* object) {
     return new QmlZactorAttached(object);
