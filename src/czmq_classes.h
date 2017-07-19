@@ -38,6 +38,21 @@ typedef struct _zgossip_msg_t zgossip_msg_t;
 //  *** To avoid double-definitions, only define if building without draft ***
 #ifndef CZMQ_BUILD_DRAFT_API
 
+//  *** Draft callbacks, defined for internal use only ***
+// Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+//                                                                                                                  
+// An example - to send $KTHXBAI string                                                                             
+//                                                                                                                  
+//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)                                                                 
+//         zsock_wait (self->pipe);                                                                                 
+typedef void (zactor_destructor_fn) (
+    zactor_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+CZMQ_PRIVATE void
+    zactor_set_destructor (zactor_t *self, zactor_destructor_fn destructor);
+
 //  *** Draft method, defined for internal use only ***
 //  Unset certificate metadata.
 CZMQ_PRIVATE void

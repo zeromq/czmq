@@ -23,18 +23,11 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 // Actors get a pipe and arguments from caller
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
-
-// Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
-//                                                                                                                  
-// An example - to send $KTHXBAI string                                                                             
-//                                                                                                                  
-//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)                                                                 
-//         zsock_wait (self->pipe);                                                                                 
-typedef void (zactor_destructor_fn) (
-    zactor_t *self);
 
 //  Create a new actor passing arbitrary arguments reference.
 CZMQ_EXPORT zactor_t *
@@ -71,14 +64,26 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT zsock_t *
     zactor_sock (zactor_t *self);
 
-//  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
-CZMQ_EXPORT void
-    zactor_set_destructor (zactor_t *self, zactor_destructor_fn destructor);
-
 //  Self test of this class.
 CZMQ_EXPORT void
     zactor_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+// Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+//                                                                                                                  
+// An example - to send $KTHXBAI string                                                                             
+//                                                                                                                  
+//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)                                                                 
+//         zsock_wait (self->pipe);                                                                                 
+typedef void (zactor_destructor_fn) (
+    zactor_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+CZMQ_EXPORT void
+    zactor_set_destructor (zactor_t *self, zactor_destructor_fn destructor);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 

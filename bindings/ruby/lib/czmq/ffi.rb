@@ -47,7 +47,17 @@ module CZMQ
       attach_function :zactor_is, [:pointer], :bool, **opts
       attach_function :zactor_resolve, [:pointer], :pointer, **opts
       attach_function :zactor_sock, [:pointer], :pointer, **opts
-      attach_function :zactor_set_destructor, [:pointer, :pointer], :void, **opts
+      begin # DRAFT method
+        attach_function :zactor_set_destructor, [:pointer, :pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zactor_set_destructor()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zactor_set_destructor(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zactor_test, [:bool], :void, **opts
 
       require_relative 'ffi/zactor'
