@@ -1097,7 +1097,8 @@ byte *
     zframe_data (zframe_t *self);
 
 // Return meta data property for frame           
-// Caller must free string when finished with it.
+// The caller shall not modify or free the returned value, which shall be
+// owned by the message.
 const char *
     zframe_meta (zframe_t *self, const char *property);
 
