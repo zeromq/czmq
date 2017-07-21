@@ -654,8 +654,17 @@ zauth_test (bool verbose)
     zsock_set_plain_password (client, "Password");
     zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
     zsock_wait (auth);
-    success = s_can_connect (&server, &client, true);
+    success = s_can_connect (&server, &client, false);
     assert (success);
+
+    // Test that the User-Id metadata is present
+    zframe_t *frame = zframe_recv (server);
+    assert (frame != NULL);
+    const char *user_id = zframe_meta (frame, "User-Id");
+    assert (user_id != NULL);
+    assert (streq (user_id, "admin"));
+    zframe_destroy (&frame);
+    s_renew_sockets(&server, &client);
 
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
@@ -711,6 +720,9 @@ zauth_test (bool verbose)
         const char *meta = zframe_meta (frame, "Hello");
         assert (meta != NULL);
         assert (streq (meta, "World!"));
+        const char *user_id = zframe_meta (frame, "User-Id");
+        assert (user_id != NULL);
+        assert (streq (user_id, zcert_public_txt(client_cert)));
         zframe_destroy (&frame);
         s_renew_sockets(&server, &client);
 #endif
