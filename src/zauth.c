@@ -195,6 +195,7 @@ typedef struct {
     char *password;             //  PLAIN password, in clear text
     char *client_key;           //  CURVE client public key in ASCII
     char *principal;            //  GSSAPI client principal
+    char *user_id;              //  User-Id to return in the ZAP Response
 } zap_request_t;
 
 
@@ -214,6 +215,7 @@ s_zap_request_destroy (zap_request_t **self_p)
         freen (self->password);
         freen (self->client_key);
         freen (self->principal);
+        // self->user_id is a pointer to one of the above fields
         freen (self);
         *self_p = NULL;
     }
@@ -293,7 +295,7 @@ s_zap_request_reply (zap_request_t *self, char *status_code, char *status_text, 
     assert (rc == 0);
     rc = zmsg_addstr(msg, status_text);
     assert (rc == 0);
-    rc = zmsg_addstr(msg, "");
+    rc = zmsg_addstr(msg, self->user_id ? self->user_id : "");
     assert (rc == 0);
     rc = zmsg_addmem(msg, metadata, metasize);
     assert (rc == 0);
@@ -348,6 +350,7 @@ s_authenticate_plain (self_t *self, zap_request_t *request)
             if (self->verbose)
                 zsys_info ("zauth: - allowed (PLAIN) username=%s password=%s",
                            request->username, request->password);
+            request->user_id = request->username;
             return true;
         }
         else {
@@ -395,6 +398,7 @@ s_authenticate_curve (self_t *self, zap_request_t *request, unsigned char **meta
 
             if (self->verbose)
                 zsys_info ("zauth: - allowed (CURVE) client_key=%s", request->client_key);
+            request->user_id = request->client_key;
             return true;
         }
     }
@@ -410,6 +414,7 @@ s_authenticate_gssapi (self_t *self, zap_request_t *request)
     if (self->verbose)
         zsys_info ("zauth: - allowed (GSSAPI) principal=%s identity=%s",
                    request->principal, request->identity);
+    request->user_id = request->principal;
     return true;
 }
 
