@@ -2539,7 +2539,8 @@ Return -1 on error, 0 on success.
     def meta(self, property):
         """
         Return meta data property for frame
-Caller must free string when finished with it.
+        The caller shall not modify or free the returned value, which shall be
+        owned by the message.
         """
         return lib.zframe_meta(self._as_parameter_, property)
 

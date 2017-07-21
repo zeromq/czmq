@@ -164,7 +164,8 @@ module CZMQ
       end
 
       # Return meta data property for frame           
-      # Caller must free string when finished with it.
+      # The caller shall not modify or free the returned value, which shall be
+      # owned by the message.
       #
       # @param property [String, #to_s, nil]
       # @return [String]
