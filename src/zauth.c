@@ -657,6 +657,7 @@ zauth_test (bool verbose)
     success = s_can_connect (&server, &client, false);
     assert (success);
 
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
     // Test that the User-Id metadata is present
     zframe_t *frame = zframe_recv (server);
     assert (frame != NULL);
@@ -664,6 +665,7 @@ zauth_test (bool verbose)
     assert (user_id != NULL);
     assert (streq (user_id, "admin"));
     zframe_destroy (&frame);
+#endif
     s_renew_sockets(&server, &client);
 
     zsock_set_plain_server (server, 1);
