@@ -79,7 +79,10 @@ CZMQ_EXPORT void
     zcertstore_empty (zcertstore_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return a list of all the certificates in the store
+//  Return a list of all the certificates in the store.                  
+//  The caller takes ownership of the zlistx_t object and is responsible 
+//  for destroying it.  The caller does not take ownership of the zcert_t
+//  objects.                                                             
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlistx_t *
     zcertstore_certs (zcertstore_t *self);

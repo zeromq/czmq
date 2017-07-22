@@ -242,7 +242,11 @@ zcertstore_empty (zcertstore_t *self)
 zlistx_t *
 zcertstore_certs (zcertstore_t *self)
 {
-    return zhashx_values(self->certs);
+    if (self->loader)
+        self->loader (self);
+    zlistx_t *certs = zhashx_values(self->certs);
+    zlistx_set_destructor (certs, NULL);
+    return certs;
 }
 
 //  --------------------------------------------------------------------------
@@ -334,7 +338,7 @@ zcertstore_test (bool verbose)
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
 
-#ifndef CZMQ_BUILD_DRAFT_API
+#ifdef CZMQ_BUILD_DRAFT_API
     // Iterate through certs
     zlistx_t *certs = zcertstore_certs(certstore);
     cert = (zcert_t *) zlistx_first(certs);
@@ -345,6 +349,7 @@ zcertstore_test (bool verbose)
         cert_count++;
     }
     assert(cert_count==1);
+    zlistx_destroy(&certs);
 #endif
 
     //  Test custom loader
