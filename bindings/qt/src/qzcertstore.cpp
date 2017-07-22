@@ -80,6 +80,14 @@ void QZcertstore::print ()
 }
 
 ///
+//  Return a list of all the certificates in the store
+QZlistx * QZcertstore::certs ()
+{
+    QZlistx *rv = new QZlistx (zcertstore_certs (self));
+    return rv;
+}
+
+///
 //  Self test of this class
 void QZcertstore::test (bool verbose)
 {

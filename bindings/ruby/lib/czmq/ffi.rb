@@ -310,6 +310,17 @@ module CZMQ
         end
       end
       attach_function :zcertstore_print, [:pointer], :void, **opts
+      begin # DRAFT method
+        attach_function :zcertstore_certs, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zcertstore_certs()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zcertstore_certs(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zcertstore_test, [:bool], :void, **opts
 
       require_relative 'ffi/zcertstore'

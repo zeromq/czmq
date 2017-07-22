@@ -44,6 +44,14 @@ void QmlZcertstore::print () {
     zcertstore_print (self);
 };
 
+///
+//  Return a list of all the certificates in the store
+QmlZlistx *QmlZcertstore::certs () {
+    QmlZlistx *retQ_ = new QmlZlistx ();
+    retQ_->self = zcertstore_certs (self);
+    return retQ_;
+};
+
 
 QObject* QmlZcertstore::qmlAttachedProperties(QObject* object) {
     return new QmlZcertstoreAttached(object);

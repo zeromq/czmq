@@ -95,6 +95,10 @@ class zcertstore_t(Structure):
     pass # Empty - only for type checking
 zcertstore_p = POINTER(zcertstore_t)
 
+class zlistx_t(Structure):
+    pass # Empty - only for type checking
+zlistx_p = POINTER(zlistx_t)
+
 class FILE(Structure):
     pass # Empty - only for type checking
 FILE_p = POINTER(FILE)
@@ -134,10 +138,6 @@ zdir_patch_p = POINTER(zdir_patch_t)
 class zhashx_t(Structure):
     pass # Empty - only for type checking
 zhashx_p = POINTER(zhashx_t)
-
-class zlistx_t(Structure):
-    pass # Empty - only for type checking
-zlistx_p = POINTER(zlistx_t)
 
 class ziflist_t(Structure):
     pass # Empty - only for type checking
@@ -954,6 +954,8 @@ lib.zcertstore_empty.restype = None
 lib.zcertstore_empty.argtypes = [zcertstore_p]
 lib.zcertstore_print.restype = None
 lib.zcertstore_print.argtypes = [zcertstore_p]
+lib.zcertstore_certs.restype = zlistx_p
+lib.zcertstore_certs.argtypes = [zcertstore_p]
 lib.zcertstore_test.restype = None
 lib.zcertstore_test.argtypes = [c_bool]
 
@@ -1044,6 +1046,12 @@ which don't usually have access to struct internals.
         Print list of certificates in store to logging facility
         """
         return lib.zcertstore_print(self._as_parameter_)
+
+    def certs(self):
+        """
+        Return a list of all the certificates in the store
+        """
+        return Zlistx(lib.zcertstore_certs(self._as_parameter_), True)
 
     @staticmethod
     def test(verbose):
@@ -7337,6 +7345,7 @@ default SIGINT/SIGTERM handling in CZMQ.
         """
         Set default interrupt handler, so Ctrl-C or SIGTERM will set
 zsys_interrupted. Idempotent; safe to call multiple times.
+Can be supressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
         """
         return lib.zsys_catch_interrupts()

@@ -79,6 +79,12 @@ CZMQ_PRIVATE void
     zcertstore_empty (zcertstore_t *self);
 
 //  *** Draft method, defined for internal use only ***
+//  Return a list of all the certificates in the store
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zlistx_t *
+    zcertstore_certs (zcertstore_t *self);
+
+//  *** Draft method, defined for internal use only ***
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
 //  Else returns zero.                                                  
 CZMQ_PRIVATE uint32_t

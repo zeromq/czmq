@@ -133,6 +133,7 @@ class Zcertstore: public Nan::ObjectWrap {
     static NAN_METHOD (_insert);
     static NAN_METHOD (_empty);
     static NAN_METHOD (_print);
+    static NAN_METHOD (_certs);
     static NAN_METHOD (_test);
 };
 

@@ -85,9 +85,9 @@ public class Zframe implements AutoCloseable{
         return __data (self);
     }
     /*
-    Return meta data property for frame
+    Return meta data property for frame                                   
     The caller shall not modify or free the returned value, which shall be
-    owned by the message.
+    owned by the message.                                                 
     */
     native static String __meta (long self, String property);
     public String meta (String property) {
