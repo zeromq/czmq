@@ -66,7 +66,7 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT byte *
     zframe_data (zframe_t *self);
 
-//  Return meta data property for frame           
+//  Return meta data property for frame
 //  The caller shall not modify or free the returned value, which shall be
 //  owned by the message.
 CZMQ_EXPORT const char *

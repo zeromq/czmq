@@ -296,6 +296,8 @@ This is the class interface:
 ```h
     //  This is a stable class, and may not change except for emergencies. It
     //  is provided in stable builds.
+    //  This class has draft methods, which may change over time. They are not
+    //  in stable releases, by default. Use --enable-drafts to enable.
     // Actors get a pipe and arguments from caller
     typedef void (zactor_fn) (
         zsock_t *pipe, void *args);
@@ -339,6 +341,22 @@ This is the class interface:
     CZMQ_EXPORT void
         zactor_test (bool verbose);
     
+    #ifdef CZMQ_BUILD_DRAFT_API
+    // Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+    //
+    // An example - to send $KTHXBAI string
+    //
+    //     if (zstr_send (self->pipe, "$KTHXBAI") == 0)
+    //         zsock_wait (self->pipe);
+    typedef void (zactor_destructor_fn) (
+        zactor_t *self);
+
+    //  *** Draft method, for development use, may change without warning ***
+    //  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
+    CZMQ_EXPORT void
+        zactor_set_destructor (zactor_t *self, zactor_destructor_fn destructor);
+
+    #endif // CZMQ_BUILD_DRAFT_API
 ```
 Please add '@interface' section in './../src/zactor.c'.
 
@@ -353,6 +371,14 @@ This is the class self test code:
     free (string);
     zactor_destroy (&actor);
     
+    // custom destructor
+    // KTHXBAI_actor ends on "$KTHXBAI" string
+    zactor_t *KTHXBAI = zactor_new (KTHXBAI_actor, NULL);
+    assert (KTHXBAI);
+    // which is the one sent by KTHXBAI_destructor
+    zactor_set_destructor (KTHXBAI, KTHXBAI_destructor);
+    zactor_destroy (&KTHXBAI);
+
     #if defined (__WINDOWS__)
     zsys_shutdown();
     #endif
@@ -1686,6 +1712,39 @@ This is the class self test code:
     zconfig_destroy (&root);
     zchunk_destroy (&chunk);
     
+    // Test str_load
+    zconfig_t *config = zconfig_str_load (
+        "malamute\n"
+        "    endpoint = ipc://@/malamute\n"
+        "    producer = STREAM\n"
+        "    consumer\n"
+        "        STREAM2 = .*\n"
+        "        STREAM3 = HAM\n"
+        "server\n"
+        "    verbose = true\n"
+        );
+    assert (config);
+    assert (streq (zconfig_get (config, "malamute/endpoint", NULL), "ipc://@/malamute"));
+    assert (streq (zconfig_get (config, "malamute/producer", NULL), "STREAM"));
+    assert (zconfig_locate (config, "malamute/consumer"));
+
+    zconfig_t *c = zconfig_child (zconfig_locate (config, "malamute/consumer"));
+    assert (c);
+    assert (streq (zconfig_name (c), "STREAM2"));
+    assert (streq (zconfig_value (c), ".*"));
+
+    c = zconfig_next (c);
+    assert (c);
+    assert (streq (zconfig_name (c), "STREAM3"));
+    assert (streq (zconfig_value (c), "HAM"));
+
+    c = zconfig_next (c);
+    assert (!c);
+
+    assert (streq (zconfig_get (config, "server/verbose", NULL), "true"));
+
+    zconfig_destroy (&config);
+
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     assert (dir);
@@ -2462,7 +2521,7 @@ This is the class interface:
     CZMQ_EXPORT byte *
         zframe_data (zframe_t *self);
     
-    //  Return meta data property for frame           
+    //  Return meta data property for frame
     //  The caller shall not modify or free the returned value, which shall be
     //  owned by the message.
     CZMQ_EXPORT const char *
@@ -3744,6 +3803,31 @@ This is the class self test code:
     assert (streq ((char *) zhashx_lookup (hash, "key2"), "Ring a ding ding"));
     zhashx_destroy (&hash);
     
+    //  Test purger and shrinker: no data should end up unreferenced in valgrind
+    hash = zhashx_new ();
+    assert (hash);
+    zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
+    char valuep [255];
+    strcpy (valuep, "This is a string");
+    rc = zhashx_insert (hash, "key1", valuep);
+    assert (rc == 0);
+    strcpy (valuep, "Ring a ding ding");
+    rc = zhashx_insert (hash, "key2", valuep);
+    assert (rc == 0);
+    strcpy (valuep, "Cartahena delenda est");
+    rc = zhashx_insert (hash, "key3", valuep);
+    assert (rc == 0);
+    strcpy (valuep, "So say we all!");
+    rc = zhashx_insert (hash, "key4", valuep);
+    assert (rc == 0);
+    assert (streq ((char *) zhashx_lookup (hash, "key1"), "This is a string"));
+    assert (streq ((char *) zhashx_lookup (hash, "key2"), "Ring a ding ding"));
+    assert (streq ((char *) zhashx_lookup (hash, "key3"), "Cartahena delenda est"));
+    assert (streq ((char *) zhashx_lookup (hash, "key4"), "So say we all!"));
+    zhashx_purge (hash);
+    zhashx_destroy (&hash);
+
     #if defined (__WINDOWS__)
     zsys_shutdown();
     #endif
@@ -6046,7 +6130,8 @@ This is the class self test code:
     //  Check there's no authentication
     s_create_test_sockets (&proxy, &faucet, &sink, verbose);
     s_bind_test_sockets (proxy, &frontend, &backend);
-    bool success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    bool success = s_can_connect (&proxy, &faucet, &sink, frontend, backend,
+        verbose, true);
     assert (success);
     
     //  Install the authenticator
@@ -6059,7 +6144,8 @@ This is the class self test code:
     
     //  Check there's no authentication on a default NULL server
     s_bind_test_sockets (proxy, &frontend, &backend);
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        true);
     assert (success);
     
     //  When we set a domain on the server, we switch on authentication
@@ -6068,7 +6154,8 @@ This is the class self test code:
     zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
     zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        true);
     assert (success);
     
     //  Blacklist 127.0.0.1, connection should fail
@@ -6077,7 +6164,8 @@ This is the class self test code:
     s_bind_test_sockets (proxy, &frontend, &backend);
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
     zsock_wait (auth);
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        false);
     assert (!success);
     
     //  Whitelist our address, which overrides the blacklist
@@ -6088,7 +6176,8 @@ This is the class self test code:
     s_bind_test_sockets (proxy, &frontend, &backend);
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
     zsock_wait (auth);
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        true);
     assert (success);
     
     //  Try PLAIN authentication
@@ -6099,7 +6188,8 @@ This is the class self test code:
     s_bind_test_sockets (proxy, &frontend, &backend);
     zsock_set_plain_username (faucet, "admin");
     zsock_set_plain_password (faucet, "Password");
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        false);
     assert (!success);
     
     //  Test positive case (server-side passwords defined)
@@ -6118,7 +6208,8 @@ This is the class self test code:
     zsock_set_plain_password (sink, "Password");
     zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
     zsock_wait (auth);
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        true);
     assert (success);
     
     //  Test negative case (bad client password)
@@ -6127,7 +6218,8 @@ This is the class self test code:
     s_bind_test_sockets (proxy, &frontend, &backend);
     zsock_set_plain_username (faucet, "admin");
     zsock_set_plain_password (faucet, "Bogus");
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        false);
     assert (!success);
     
     if (zsys_has_curve ()) {
@@ -6148,7 +6240,8 @@ This is the class self test code:
         s_bind_test_sockets (proxy, &frontend, &backend);
         zcert_apply (client_cert, faucet);
         zsock_set_curve_serverkey (faucet, public_key);
-        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend,
+            verbose, false);
         assert (!success);
     
         //  Test CURVE_ALLOW_ANY
@@ -6159,7 +6252,8 @@ This is the class self test code:
         zsock_set_curve_serverkey (faucet, public_key);
         zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
         zsock_wait (auth);
-        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend,
+            verbose, true);
         assert (success);
     
         //  Test with client certificate file in authentication folder
@@ -6175,7 +6269,8 @@ This is the class self test code:
         zcert_save_public (client_cert, TESTDIR "/mycert.txt");
         zstr_sendx (auth, "CURVE", TESTDIR, NULL);
         zsock_wait (auth);
-        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend,
+            verbose, true);
         assert (success);
     
         zcert_destroy (&server_cert);
@@ -6185,7 +6280,8 @@ This is the class self test code:
     //  Remove the authenticator and check a normal connection works
     zactor_destroy (&auth);
     s_bind_test_sockets (proxy, &frontend, &backend);
-    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
+        true);
     assert (success);
     
     //  Cleanup
@@ -6579,17 +6675,23 @@ This is the class interface:
     CZMQ_EXPORT int
         zsock_bsend (void *self, const char *picture, ...);
     
-    //  Receive a binary encoded 'picture' message from the socket (or actor).  
-    //  This method is similar to zsock_recv, except the arguments are encoded  
-    //  in a binary format that is compatible with zproto, and is designed to   
+    //  Receive a binary encoded 'picture' message from the socket (or actor).
+    //  This method is similar to zsock_recv, except the arguments are encoded
+    //  in a binary format that is compatible with zproto, and is designed to
     //  reduce memory allocations. The pattern argument is a string that defines
-    //  the type of each argument. See zsock_bsend for the supported argument   
-    //  types. All arguments must be pointers; this call sets them to point to  
-    //  values held on a per-socket basis.                                      
-    //  Note that zsock_brecv creates the returned objects, and the caller must 
-    //  destroy them when finished with them. The supplied pointers do not need 
-    //  to be initialized. Returns 0 if successful, or -1 if it failed to read  
-    //  a message.                                                              
+    //  the type of each argument. See zsock_bsend for the supported argument
+    //  types. All arguments must be pointers; this call sets them to point to
+    //  values held on a per-socket basis.
+    //  For types 1, 2, 4 and 8 the caller must allocate the memory itself before
+    //  calling zsock_brecv.
+    //  For types S, the caller must free the value once finished with it, as
+    //  zsock_brecv will allocate the buffer.
+    //  For type s, the caller must not free the value as it is stored in a
+    //  local cache for performance purposes.
+    //  For types c, f, u and m the caller must call the appropriate destructor
+    //  depending on the object as zsock_brecv will create new objects.
+    //  For type p the caller must coordinate with the sender, as it is just a
+    //  pointer value being passed.
     CZMQ_EXPORT int
         zsock_brecv (void *self, const char *picture, ...);
     
@@ -8002,10 +8104,11 @@ Please add '@discuss' section in './../src/zsys.c'.
 This is the class interface:
 
 ```h
-    #define UDP_FRAME_MAX   255         //  Max size of UDP frame
-    
-    //  Callback for interrupt signal handler
-    typedef void (zsys_handler_fn) (int signal_value);
+    //  This is a stable class, and may not change except for emergencies. It
+    //  is provided in stable builds.
+    // Callback for interrupt signal handler
+    typedef void (zsys_handler_fn) (
+        int signal_value);
     
     //  Initialize CZMQ zsys layer; this happens automatically when you create
     //  a socket or an actor; however this call lets you force initialization
@@ -8018,9 +8121,7 @@ This is the class interface:
     //  Optionally shut down the CZMQ zsys layer; this normally happens automatically
     //  when the process exits; however this call lets you force a shutdown
     //  earlier, avoiding any potential problems with atexit() ordering, especially
-    //  with Windows DLL builds, where atexit() does not work and zsys_shutdown has
-    //  to be called manually. A succesful shutdown resets the zsys global state
-    //  (HWM, LINGER, etc).
+    //  with Windows dlls.
     CZMQ_EXPORT void
         zsys_shutdown (void);
     
@@ -8042,13 +8143,13 @@ This is the class interface:
     //  *** This is for CZMQ internal use only and may change arbitrarily ***
     CZMQ_EXPORT char *
         zsys_sockname (int socktype);
-        
+
     //  Create a pipe, which consists of two PAIR sockets connected over inproc.
     //  The pipe is configured to use the zsys_pipehwm setting. Returns the
     //  frontend socket successful, NULL if failed.
     CZMQ_EXPORT zsock_t *
         zsys_create_pipe (zsock_t **backend_p);
-        
+
     //  Set interrupt handler; this saves the default handlers so that a
     //  zsys_handler_reset () can restore them. If you call this multiple times
     //  then the last handler will take affect. If handler_fn is NULL, disables
@@ -8070,10 +8171,6 @@ This is the class interface:
     CZMQ_EXPORT bool
         zsys_file_exists (const char *filename);
     
-    //  Return size of file, or -1 if not found
-    CZMQ_EXPORT ssize_t
-        zsys_file_size (const char *filename);
-    
     //  Return file modification time. Returns 0 if the file does not exist.
     CZMQ_EXPORT time_t
         zsys_file_modified (const char *filename);
@@ -8092,7 +8189,7 @@ This is the class interface:
     CZMQ_EXPORT bool
         zsys_file_stable (const char *filename);
     
-    //  Create a file path if it doesn't exist. The file path is treated as a 
+    //  Create a file path if it doesn't exist. The file path is treated as
     //  printf format.
     CZMQ_EXPORT int
         zsys_dir_create (const char *pathname, ...);
@@ -8343,7 +8440,7 @@ This is the class interface:
     //  traffic (it may still be sent to the system facility).
     CZMQ_EXPORT void
         zsys_set_logstream (FILE *stream);
-        
+
     //  Sends log output to a PUB socket bound to the specified endpoint. To
     //  collect such log output, create a SUB socket, subscribe to the traffic
     //  you care about, and connect to the endpoint. Log traffic is sent as a
@@ -8358,7 +8455,7 @@ This is the class interface:
     //  event log on Windows). By default this is disabled.
     CZMQ_EXPORT void
         zsys_set_logsystem (bool logsystem);
-        
+
     //  Log error condition - highest priority
     CZMQ_EXPORT void
         zsys_error (const char *format, ...);
@@ -8366,28 +8463,23 @@ This is the class interface:
     //  Log warning condition - high priority
     CZMQ_EXPORT void
         zsys_warning (const char *format, ...);
-        
+
     //  Log normal, but significant, condition - normal priority
     CZMQ_EXPORT void
         zsys_notice (const char *format, ...);
-        
+
     //  Log informational message - low priority
     CZMQ_EXPORT void
         zsys_info (const char *format, ...);
-        
+
     //  Log debug-level message - lowest priority
     CZMQ_EXPORT void
         zsys_debug (const char *format, ...);
     
-    //  Self test of this class
+    //  Self test of this class.
     CZMQ_EXPORT void
         zsys_test (bool verbose);
-        
-    //  Global signal indicator, TRUE when user presses Ctrl-C or the process
-    //  gets a SIGTERM signal.
-    CZMQ_EXPORT extern volatile int zsys_interrupted;
-    //  Deprecated name for this variable
-    CZMQ_EXPORT extern volatile int zctx_interrupted;
+
 ```
 Please add '@interface' section in './../src/zsys.c'.
 

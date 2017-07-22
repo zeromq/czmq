@@ -163,7 +163,7 @@ module CZMQ
         result
       end
 
-      # Return meta data property for frame           
+      # Return meta data property for frame
       # The caller shall not modify or free the returned value, which shall be
       # owned by the message.
       #

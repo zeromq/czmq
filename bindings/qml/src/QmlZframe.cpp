@@ -21,7 +21,7 @@ byte *QmlZframe::data () {
 };
 
 ///
-//  Return meta data property for frame           
+//  Return meta data property for frame
 //  The caller shall not modify or free the returned value, which shall be
 //  owned by the message.
 const QString QmlZframe::meta (const QString &property) {
