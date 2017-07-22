@@ -80,6 +80,7 @@ CZMQ_EXPORT void
 
 //  *** Draft method, for development use, may change without warning ***
 //  Return a list of all the certificates in the store
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 

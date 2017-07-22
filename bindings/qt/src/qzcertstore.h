@@ -48,6 +48,9 @@ public:
     //  Print list of certificates in store to logging facility
     void print ();
 
+    //  Return a list of all the certificates in the store
+    QZlistx * certs ();
+
     //  Self test of this class
     static void test (bool verbose);
 

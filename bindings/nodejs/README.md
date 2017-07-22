@@ -439,6 +439,12 @@ nothing my_zcertstore.print ()
 Print list of certificates in store to logging facility
 
 ```
+zlistx my_zcertstore.certs ()
+```
+
+Return a list of all the certificates in the store
+
+```
 nothing my_zcertstore.test (Boolean)
 ```
 

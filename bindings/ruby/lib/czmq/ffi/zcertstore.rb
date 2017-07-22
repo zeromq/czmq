@@ -191,6 +191,17 @@ module CZMQ
         result
       end
 
+      # Return a list of all the certificates in the store
+      #
+      # @return [Zlistx]
+      def certs()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zcertstore_certs(self_p)
+        result = Zlistx.__new result, true
+        result
+      end
+
       # Self test of this class
       #
       # @param verbose [Boolean]

@@ -30,6 +30,7 @@ typedef struct _char_t char_t;
 typedef struct _zcert_t zcert_t;
 typedef struct _zlist_t zlist_t;
 typedef struct _zcertstore_t zcertstore_t;
+typedef struct _zlistx_t zlistx_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zclock_t zclock_t;
 typedef struct _msecs_t msecs_t;
@@ -40,7 +41,6 @@ typedef struct _zhash_t zhash_t;
 typedef struct _zdir_patch_t zdir_patch_t;
 typedef struct _zfile_t zfile_t;
 typedef struct _zhashx_t zhashx_t;
-typedef struct _zlistx_t zlistx_t;
 typedef struct _ziflist_t ziflist_t;
 typedef struct _zloop_t zloop_t;
 typedef struct _zmq_pollitem_t zmq_pollitem_t;
@@ -465,6 +465,10 @@ void
 // Print list of certificates in store to logging facility
 void
     zcertstore_print (zcertstore_t *self);
+
+// Return a list of all the certificates in the store
+zlistx_t *
+    zcertstore_certs (zcertstore_t *self);
 
 // Self test of this class
 void
