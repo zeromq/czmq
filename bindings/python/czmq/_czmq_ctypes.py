@@ -1049,7 +1049,10 @@ which don't usually have access to struct internals.
 
     def certs(self):
         """
-        Return a list of all the certificates in the store
+        Return a list of all the certificates in the store.
+The caller takes ownership of the zlistx_t object and is responsible
+for destroying it.  The caller does not take ownership of the zcert_t
+objects.
         """
         return Zlistx(lib.zcertstore_certs(self._as_parameter_), True)
 

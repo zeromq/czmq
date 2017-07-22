@@ -48,7 +48,10 @@ public:
     //  Print list of certificates in store to logging facility
     void print ();
 
-    //  Return a list of all the certificates in the store
+    //  Return a list of all the certificates in the store.                  
+    //  The caller takes ownership of the zlistx_t object and is responsible 
+    //  for destroying it.  The caller does not take ownership of the zcert_t
+    //  objects.                                                             
     QZlistx * certs ();
 
     //  Self test of this class
