@@ -65,6 +65,11 @@
         Print list of certificates in store to logging facility
     </method>
 
+    <method name = "certs" state = "draft">
+        Return a list of all the certificates in the store
+        <return type = "zlistx" fresh = "1" />
+    </method>
+
     <method name = "test" singleton = "1">
         Self test of this class
         <argument name = "verbose" type = "boolean" />

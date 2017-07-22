@@ -236,6 +236,14 @@ zcertstore_empty (zcertstore_t *self)
     zhashx_purge (self->certs);
 }
 
+//  --------------------------------------------------------------------------
+//  Return a list of all the certificates in the store
+
+zlistx_t *
+zcertstore_certs (zcertstore_t *self)
+{
+    return zhashx_values(self->certs);
+}
 
 //  --------------------------------------------------------------------------
 //  Print list of certificates in store to stdout
@@ -325,6 +333,19 @@ zcertstore_test (bool verbose)
     cert = zcertstore_lookup (certstore, client_key);
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
+
+#ifndef CZMQ_BUILD_DRAFT_API
+    // Iterate through certs
+    zlistx_t *certs = zcertstore_certs(certstore);
+    cert = (zcert_t *) zlistx_first(certs);
+    int cert_count = 0;
+    while (cert) {
+        assert (streq (zcert_meta (cert, "name"), "John Doe"));
+        cert = (zcert_t *) zlistx_next(certs);
+        cert_count++;
+    }
+    assert(cert_count==1);
+#endif
 
     //  Test custom loader
     test_loader_state *state = (test_loader_state *) zmalloc (sizeof (test_loader_state));
