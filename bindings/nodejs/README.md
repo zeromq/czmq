@@ -439,6 +439,12 @@ nothing my_zcertstore.print ()
 Print list of certificates in store to logging facility
 
 ```
+zlistx my_zcertstore.certs ()
+```
+
+Return a list of all the certificates in the store
+
+```
 nothing my_zcertstore.test (Boolean)
 ```
 
@@ -3721,6 +3727,7 @@ nothing my_zsys.catchInterrupts ()
 
 Set default interrupt handler, so Ctrl-C or SIGTERM will set
 zsys_interrupted. Idempotent; safe to call multiple times.
+Can be supressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
 
 ```

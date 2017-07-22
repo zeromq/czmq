@@ -80,9 +80,9 @@ byte * QZframe::data ()
 }
 
 ///
-//  Return meta data property for frame
+//  Return meta data property for frame                                   
 //  The caller shall not modify or free the returned value, which shall be
-//  owned by the message.
+//  owned by the message.                                                 
 const QString QZframe::meta (const QString &property)
 {
     const QString rv = QString (zframe_meta (self, property.toUtf8().data()));

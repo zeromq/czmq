@@ -245,23 +245,23 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_bsend (void *self, const char *picture, ...);
 
-//  Receive a binary encoded 'picture' message from the socket (or actor).
-//  This method is similar to zsock_recv, except the arguments are encoded
-//  in a binary format that is compatible with zproto, and is designed to
-//  reduce memory allocations. The pattern argument is a string that defines
-//  the type of each argument. See zsock_bsend for the supported argument
-//  types. All arguments must be pointers; this call sets them to point to
-//  values held on a per-socket basis.
+//  Receive a binary encoded 'picture' message from the socket (or actor).   
+//  This method is similar to zsock_recv, except the arguments are encoded   
+//  in a binary format that is compatible with zproto, and is designed to    
+//  reduce memory allocations. The pattern argument is a string that defines 
+//  the type of each argument. See zsock_bsend for the supported argument    
+//  types. All arguments must be pointers; this call sets them to point to   
+//  values held on a per-socket basis.                                       
 //  For types 1, 2, 4 and 8 the caller must allocate the memory itself before
-//  calling zsock_brecv.
-//  For types S, the caller must free the value once finished with it, as
-//  zsock_brecv will allocate the buffer.
-//  For type s, the caller must not free the value as it is stored in a
-//  local cache for performance purposes.
-//  For types c, f, u and m the caller must call the appropriate destructor
-//  depending on the object as zsock_brecv will create new objects.
-//  For type p the caller must coordinate with the sender, as it is just a
-//  pointer value being passed.
+//  calling zsock_brecv.                                                     
+//  For types S, the caller must free the value once finished with it, as    
+//  zsock_brecv will allocate the buffer.                                    
+//  For type s, the caller must not free the value as it is stored in a      
+//  local cache for performance purposes.                                    
+//  For types c, f, u and m the caller must call the appropriate destructor  
+//  depending on the object as zsock_brecv will create new objects.          
+//  For type p the caller must coordinate with the sender, as it is just a   
+//  pointer value being passed.                                              
 CZMQ_EXPORT int
     zsock_brecv (void *self, const char *picture, ...);
 

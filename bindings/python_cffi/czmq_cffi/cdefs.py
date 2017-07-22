@@ -37,6 +37,7 @@ typedef struct _char_t char_t;
 typedef struct _zcert_t zcert_t;
 typedef struct _zlist_t zlist_t;
 typedef struct _zcertstore_t zcertstore_t;
+typedef struct _zlistx_t zlistx_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zclock_t zclock_t;
 typedef struct _msecs_t msecs_t;
@@ -47,7 +48,6 @@ typedef struct _zhash_t zhash_t;
 typedef struct _zdir_patch_t zdir_patch_t;
 typedef struct _zfile_t zfile_t;
 typedef struct _zhashx_t zhashx_t;
-typedef struct _zlistx_t zlistx_t;
 typedef struct _ziflist_t ziflist_t;
 typedef struct _zloop_t zloop_t;
 typedef struct _zmq_pollitem_t zmq_pollitem_t;
@@ -472,6 +472,10 @@ void
 // Print list of certificates in store to logging facility
 void
     zcertstore_print (zcertstore_t *self);
+
+// Return a list of all the certificates in the store
+zlistx_t *
+    zcertstore_certs (zcertstore_t *self);
 
 // Self test of this class
 void
@@ -1098,9 +1102,9 @@ size_t
 byte *
     zframe_data (zframe_t *self);
 
-// Return meta data property for frame
+// Return meta data property for frame                                   
 // The caller shall not modify or free the returned value, which shall be
-// owned by the message.
+// owned by the message.                                                 
 const char *
     zframe_meta (zframe_t *self, const char *property);
 
@@ -2658,23 +2662,23 @@ int
 int
     zsock_bsend (void *self, const char *picture, ...);
 
-// Receive a binary encoded 'picture' message from the socket (or actor).
-// This method is similar to zsock_recv, except the arguments are encoded
-// in a binary format that is compatible with zproto, and is designed to
-// reduce memory allocations. The pattern argument is a string that defines
-// the type of each argument. See zsock_bsend for the supported argument
-// types. All arguments must be pointers; this call sets them to point to
-// values held on a per-socket basis.
+// Receive a binary encoded 'picture' message from the socket (or actor).   
+// This method is similar to zsock_recv, except the arguments are encoded   
+// in a binary format that is compatible with zproto, and is designed to    
+// reduce memory allocations. The pattern argument is a string that defines 
+// the type of each argument. See zsock_bsend for the supported argument    
+// types. All arguments must be pointers; this call sets them to point to   
+// values held on a per-socket basis.                                       
 // For types 1, 2, 4 and 8 the caller must allocate the memory itself before
-// calling zsock_brecv.
-// For types S, the caller must free the value once finished with it, as
-// zsock_brecv will allocate the buffer.
-// For type s, the caller must not free the value as it is stored in a
-// local cache for performance purposes.
-// For types c, f, u and m the caller must call the appropriate destructor
-// depending on the object as zsock_brecv will create new objects.
-// For type p the caller must coordinate with the sender, as it is just a
-// pointer value being passed.
+// calling zsock_brecv.                                                     
+// For types S, the caller must free the value once finished with it, as    
+// zsock_brecv will allocate the buffer.                                    
+// For type s, the caller must not free the value as it is stored in a      
+// local cache for performance purposes.                                    
+// For types c, f, u and m the caller must call the appropriate destructor  
+// depending on the object as zsock_brecv will create new objects.          
+// For type p the caller must coordinate with the sender, as it is just a   
+// pointer value being passed.                                              
 int
     zsock_brecv (void *self, const char *picture, ...);
 
@@ -3545,6 +3549,7 @@ void
 
 // Set default interrupt handler, so Ctrl-C or SIGTERM will set         
 // zsys_interrupted. Idempotent; safe to call multiple times.           
+// Can be supressed by ZSYS_SIGHANDLER=false                            
 // *** This is for CZMQ internal use only and may change arbitrarily ***
 void
     zsys_catch_interrupts (void);

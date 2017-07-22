@@ -708,6 +708,7 @@ NAN_MODULE_INIT (Zcertstore::Init) {
     Nan::SetPrototypeMethod (tpl, "insert", _insert);
     Nan::SetPrototypeMethod (tpl, "empty", _empty);
     Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "certs", _certs);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -792,6 +793,18 @@ NAN_METHOD (Zcertstore::_empty) {
 NAN_METHOD (Zcertstore::_print) {
     Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
     zcertstore_print (zcertstore->self);
+}
+
+NAN_METHOD (Zcertstore::_certs) {
+    Zcertstore *zcertstore = Nan::ObjectWrap::Unwrap <Zcertstore> (info.Holder ());
+    zlistx_t *result = zcertstore_certs (zcertstore->self);
+    Zlistx *zlistx_result = new Zlistx (result);
+    if (zlistx_result) {
+    //  Don't yet know how to return a new object
+    //      zlistx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
 }
 
 NAN_METHOD (Zcertstore::_test) {

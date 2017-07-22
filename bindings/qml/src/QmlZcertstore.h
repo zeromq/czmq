@@ -46,6 +46,9 @@ public slots:
 
     //  Print list of certificates in store to logging facility
     void print ();
+
+    //  Return a list of all the certificates in the store
+    QmlZlistx *certs ();
 };
 
 class QmlZcertstoreAttached : public QObject
