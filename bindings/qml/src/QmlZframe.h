@@ -34,8 +34,9 @@ public slots:
     //  Return address of frame data
     byte *data ();
 
-    //  Return meta data property for frame           
-    //  Caller must free string when finished with it.
+    //  Return meta data property for frame
+    //  The caller shall not modify or free the returned value, which shall be
+    //  owned by the message.
     const QString meta (const QString &property);
 
     //  Create a new frame that duplicates an existing frame. If frame is null,
