@@ -160,7 +160,7 @@ zfile_filename (zfile_t *self, const char *path)
     &&  strlen (self->fullname) >= strlen (path)
     &&  memcmp (self->fullname, path, strlen (path)) == 0) {
         name += strlen (path);
-        if (*name == '/')
+        while (*name == '/')
             name++;
     }
     return name;
