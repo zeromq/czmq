@@ -587,10 +587,14 @@ zframe_test (bool verbose)
 
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new_pair ("@tcp://127.0.0.1:9001");
+    zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
-    zsock_t *input = zsock_new_pair (">tcp://127.0.0.1:9001");
+    int port = zsock_bind (output, "tcp://127.0.0.1:*");
+    assert (port != -1);
+    zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
+    rc = zsock_connect (input, "tcp://127.0.0.1:%d", port);
+    assert (rc != -1);
 
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;
