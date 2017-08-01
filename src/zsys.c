@@ -1948,6 +1948,11 @@ zsys_test (bool verbose)
     zsys_file_mode_private ();
     if (verbose)
         printf ("zsys_test() at timestamp %" PRIi64 ": "
+            "Dropping .testsys/subdir (may be absent)\n",
+            zclock_time() );
+    rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
+    if (verbose)
+        printf ("zsys_test() at timestamp %" PRIi64 ": "
             "Creating .testsys/subdir\n",
             zclock_time() );
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
