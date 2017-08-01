@@ -46,14 +46,14 @@ void QmlZcert::unsetMeta (const QString &name) {
 
 ///
 //  Get metadata value from certificate; if the metadata value doesn't
-//  exist, returns NULL.                                              
+//  exist, returns NULL.
 const QString QmlZcert::meta (const QString &name) {
     return QString (zcert_meta (self, name.toUtf8().data()));
 };
 
 ///
 //  Get list of metadata fields from certificate. Caller is responsible for
-//  destroying list. Caller should not modify the values of list items.    
+//  destroying list. Caller should not modify the values of list items.
 QmlZlist *QmlZcert::metaKeys () {
     QmlZlist *retQ_ = new QmlZlist ();
     retQ_->self = zcert_meta_keys (self);
@@ -61,7 +61,7 @@ QmlZlist *QmlZcert::metaKeys () {
 };
 
 ///
-//  Save full certificate (public + secret) to file for persistent storage  
+//  Save full certificate (public + secret) to file for persistent storage
 //  This creates one public file and one secret file (filename + "_secret").
 int QmlZcert::save (const QString &filename) {
     return zcert_save (self, filename.toUtf8().data());
@@ -81,15 +81,15 @@ int QmlZcert::saveSecret (const QString &filename) {
 
 ///
 //  Apply certificate to socket, i.e. use for CURVE security on socket.
-//  If certificate was loaded from public file, the secret key will be 
-//  undefined, and this certificate will not work successfully.        
+//  If certificate was loaded from public file, the secret key will be
+//  undefined, and this certificate will not work successfully.
 void QmlZcert::apply (void *socket) {
     zcert_apply (self, socket);
 };
 
 ///
 //  Return copy of certificate; if certificate is NULL or we exhausted
-//  heap memory, returns NULL.                                        
+//  heap memory, returns NULL.
 QmlZcert *QmlZcert::dup () {
     QmlZcert *retQ_ = new QmlZcert ();
     retQ_->self = zcert_dup (self);

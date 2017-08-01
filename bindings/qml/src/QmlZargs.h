@@ -18,15 +18,15 @@ class QmlZargs : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zargs_t *self;
-    
+
     QmlZargs() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZargs.cpp
-    
+
 public slots:
     //  Return program name (argv[0])
     const QString progname ();
@@ -40,26 +40,26 @@ public slots:
     //  Return next positional argument or NULL
     const QString next ();
 
-    //  Return first named parameter value, or NULL if there are no named   
+    //  Return first named parameter value, or NULL if there are no named
     //  parameters, or value for which zargs_param_empty (arg) returns true.
     const QString paramFirst ();
 
-    //  Return next named parameter value, or NULL if there are no named    
+    //  Return next named parameter value, or NULL if there are no named
     //  parameters, or value for which zargs_param_empty (arg) returns true.
     const QString paramNext ();
 
     //  Return current parameter name, or NULL if there are no named
-    //  parameters.                                                 
+    //  parameters.
     const QString paramName ();
 
     //  Return value of named parameter, NULL if no given parameter has
-    //  been specified, or special value for wich zargs_param_empty () 
-    //  returns true.                                                  
+    //  been specified, or special value for wich zargs_param_empty ()
+    //  returns true.
     const QString paramLookup (const QString &keys);
 
     //  Return value of named parameter(s), NULL if no given parameter has
-    //  been specified, or special value for wich zargs_param_empty ()    
-    //  returns true.                                                     
+    //  been specified, or special value for wich zargs_param_empty ()
+    //  returns true.
     const QString paramLookupx (const QString &keys);
 
     //  Returns true if there are --help -h arguments
@@ -73,12 +73,12 @@ class QmlZargsAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZargsAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Returns true if parameter did not have a value
     bool paramEmpty (const QString &arg);

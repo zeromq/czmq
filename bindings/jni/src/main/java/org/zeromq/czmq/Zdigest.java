@@ -18,7 +18,7 @@ public class Zdigest implements AutoCloseable{
     public long self;
     /*
     Constructor - creates new digest object, which you use to build up a
-    digest by repeatedly calling zdigest_update() on chunks of data.    
+    digest by repeatedly calling zdigest_update() on chunks of data.
     */
     native static long __new ();
     public Zdigest () {
@@ -46,7 +46,7 @@ public class Zdigest implements AutoCloseable{
     }
     /*
     Return final digest hash data. If built without crypto support,
-    returns NULL.                                                  
+    returns NULL.
     */
     native static byte [] __data (long self);
     public byte [] data () {
@@ -60,9 +60,9 @@ public class Zdigest implements AutoCloseable{
         return __size (self);
     }
     /*
-    Return digest as printable hex string; caller should not modify nor   
+    Return digest as printable hex string; caller should not modify nor
     free this string. After calling this, you may not use zdigest_update()
-    on the same digest. If built without crypto support, returns NULL.    
+    on the same digest. If built without crypto support, returns NULL.
     */
     native static String __string (long self);
     public String string () {

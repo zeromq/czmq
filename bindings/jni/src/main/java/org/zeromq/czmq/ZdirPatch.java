@@ -38,7 +38,7 @@ public class ZdirPatch implements AutoCloseable{
     }
     /*
     Create copy of a patch. If the patch is null, or memory was exhausted,
-    returns null.                                                         
+    returns null.
     */
     native static long __dup (long self);
     public ZdirPatch dup () {

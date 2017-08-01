@@ -16,7 +16,7 @@ void QmlZdigest::update (const byte *buffer, size_t length) {
 
 ///
 //  Return final digest hash data. If built without crypto support,
-//  returns NULL.                                                  
+//  returns NULL.
 const byte *QmlZdigest::data () {
     return zdigest_data (self);
 };
@@ -28,9 +28,9 @@ size_t QmlZdigest::size () {
 };
 
 ///
-//  Return digest as printable hex string; caller should not modify nor   
+//  Return digest as printable hex string; caller should not modify nor
 //  free this string. After calling this, you may not use zdigest_update()
-//  on the same digest. If built without crypto support, returns NULL.    
+//  on the same digest. If built without crypto support, returns NULL.
 const QString QmlZdigest::string () {
     return QString (zdigest_string (self));
 };
@@ -49,7 +49,7 @@ void QmlZdigestAttached::test (bool verbose) {
 
 ///
 //  Constructor - creates new digest object, which you use to build up a
-//  digest by repeatedly calling zdigest_update() on chunks of data.    
+//  digest by repeatedly calling zdigest_update() on chunks of data.
 QmlZdigest *QmlZdigestAttached::construct () {
     QmlZdigest *qmlSelf = new QmlZdigest ();
     qmlSelf->self = zdigest_new ();

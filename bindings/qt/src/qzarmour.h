@@ -25,12 +25,12 @@ public:
 
     //  Encode a stream of bytes into an armoured string. Returns the armoured
     //  string, or NULL if there was insufficient memory available to allocate
-    //  a new string.                                                         
+    //  a new string.
     QString encode (const byte *data, size_t size);
 
-    //  Decode an armoured string into a chunk. The decoded output is    
+    //  Decode an armoured string into a chunk. The decoded output is
     //  null-terminated, so it may be treated as a string, if that's what
-    //  it was prior to encoding.                                        
+    //  it was prior to encoding.
     QZchunk * decode (const QString &data);
 
     //  Get the mode property.

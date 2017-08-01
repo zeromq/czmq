@@ -38,7 +38,7 @@ public class Zlist implements AutoCloseable{
     }
     /*
     Return the item at the head of list. If the list is empty, returns NULL.
-    Leaves cursor pointing at the head item, or NULL if the list is empty.  
+    Leaves cursor pointing at the head item, or NULL if the list is empty.
     */
     native static long __first (long self);
     public long first () {
@@ -46,7 +46,7 @@ public class Zlist implements AutoCloseable{
     }
     /*
     Return the next item. If the list is empty, returns NULL. To move to
-    the start of the list call zlist_first (). Advances the cursor.     
+    the start of the list call zlist_first (). Advances the cursor.
     */
     native static long __next (long self);
     public long next () {
@@ -54,7 +54,7 @@ public class Zlist implements AutoCloseable{
     }
     /*
     Return the item at the tail of list. If the list is empty, returns NULL.
-    Leaves cursor pointing at the tail item, or NULL if the list is empty.  
+    Leaves cursor pointing at the tail item, or NULL if the list is empty.
     */
     native static long __last (long self);
     public long last () {
@@ -75,7 +75,7 @@ public class Zlist implements AutoCloseable{
         return __tail (self);
     }
     /*
-    Return the current item of list. If the list is empty, returns NULL.     
+    Return the current item of list. If the list is empty, returns NULL.
     Leaves cursor pointing at the current item, or NULL if the list is empty.
     */
     native static long __item (long self);
@@ -83,18 +83,18 @@ public class Zlist implements AutoCloseable{
         return __item (self);
     }
     /*
-    Append an item to the end of the list, return 0 if OK or -1 if this  
+    Append an item to the end of the list, return 0 if OK or -1 if this
     failed for some reason (out of memory). Note that if a duplicator has
-    been set, this method will also duplicate the item.                  
+    been set, this method will also duplicate the item.
     */
     native static int __append (long self, long item);
     public int append (long item) {
         return __append (self, item);
     }
     /*
-    Push an item to the start of the list, return 0 if OK or -1 if this  
+    Push an item to the start of the list, return 0 if OK or -1 if this
     failed for some reason (out of memory). Note that if a duplicator has
-    been set, this method will also duplicate the item.                  
+    been set, this method will also duplicate the item.
     */
     native static int __push (long self, long item);
     public int push (long item) {
@@ -108,9 +108,9 @@ public class Zlist implements AutoCloseable{
         return __pop (self);
     }
     /*
-    Checks if an item already is present. Uses compare method to determine if 
+    Checks if an item already is present. Uses compare method to determine if
     items are equal. If the compare method is NULL the check will only compare
-    pointers. Returns true if item is present else false.                     
+    pointers. Returns true if item is present else false.
     */
     native static boolean __exists (long self, long item);
     public boolean exists (long item) {
@@ -124,10 +124,10 @@ public class Zlist implements AutoCloseable{
         __remove (self, item);
     }
     /*
-    Make a copy of list. If the list has autofree set, the copied list will  
+    Make a copy of list. If the list has autofree set, the copied list will
     duplicate all items, which must be strings. Otherwise, the list will hold
     pointers back to the items in the original list. If list is null, returns
-    NULL.                                                                    
+    NULL.
     */
     native static long __dup (long self);
     public Zlist dup () {
@@ -148,14 +148,14 @@ public class Zlist implements AutoCloseable{
         return __size (self);
     }
     /*
-    Set list for automatic item destruction; item values MUST be strings. 
-    By default a list item refers to a value held elsewhere. When you set 
+    Set list for automatic item destruction; item values MUST be strings.
+    By default a list item refers to a value held elsewhere. When you set
     this, each time you append or push a list item, zlist will take a copy
     of the string value. Then, when you destroy the list, it will free all
-    item values automatically. If you use any other technique to allocate 
+    item values automatically. If you use any other technique to allocate
     list values, you must free them explicitly before destroying the list.
-    The usual technique is to pop list items and destroy them, until the  
-    list is empty.                                                        
+    The usual technique is to pop list items and destroy them, until the
+    list is empty.
     */
     native static void __autofree (long self);
     public void autofree () {

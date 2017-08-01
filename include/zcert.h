@@ -62,16 +62,16 @@ CZMQ_EXPORT void
     zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
 
 //  Get metadata value from certificate; if the metadata value doesn't
-//  exist, returns NULL.                                              
+//  exist, returns NULL.
 CZMQ_EXPORT const char *
     zcert_meta (zcert_t *self, const char *name);
 
 //  Get list of metadata fields from certificate. Caller is responsible for
-//  destroying list. Caller should not modify the values of list items.    
+//  destroying list. Caller should not modify the values of list items.
 CZMQ_EXPORT zlist_t *
     zcert_meta_keys (zcert_t *self);
 
-//  Save full certificate (public + secret) to file for persistent storage  
+//  Save full certificate (public + secret) to file for persistent storage
 //  This creates one public file and one secret file (filename + "_secret").
 CZMQ_EXPORT int
     zcert_save (zcert_t *self, const char *filename);
@@ -85,13 +85,13 @@ CZMQ_EXPORT int
     zcert_save_secret (zcert_t *self, const char *filename);
 
 //  Apply certificate to socket, i.e. use for CURVE security on socket.
-//  If certificate was loaded from public file, the secret key will be 
-//  undefined, and this certificate will not work successfully.        
+//  If certificate was loaded from public file, the secret key will be
+//  undefined, and this certificate will not work successfully.
 CZMQ_EXPORT void
     zcert_apply (zcert_t *self, void *socket);
 
 //  Return copy of certificate; if certificate is NULL or we exhausted
-//  heap memory, returns NULL.                                        
+//  heap memory, returns NULL.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zcert_t *
     zcert_dup (zcert_t *self);

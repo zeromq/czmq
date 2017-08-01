@@ -171,7 +171,7 @@ module CZMQ
       end
 
       # Get a list of network interfaces currently defined on the system
-      # Includes IPv6 interfaces                                        
+      # Includes IPv6 interfaces
       #
       # @return [Ziflist]
       def self.new_ipv6()

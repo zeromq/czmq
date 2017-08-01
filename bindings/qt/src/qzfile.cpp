@@ -20,7 +20,7 @@ QZfile::QZfile (zfile_t *self, QObject *qObjParent) : QObject (qObjParent)
 //  links, which are files with the extension ".ln". A symbolic link is a
 //  text file containing one line, the filename of a target file. Reading
 //  data from the symbolic link actually reads from the target file. Path
-//  may be NULL, in which case it is not used.                           
+//  may be NULL, in which case it is not used.
 QZfile::QZfile (const QString &path, const QString &name, QObject *qObjParent) : QObject (qObjParent)
 {
     this->self = zfile_new (path.toUtf8().data(), name.toUtf8().data());
@@ -35,7 +35,7 @@ QZfile::~QZfile ()
 
 ///
 //  Duplicate a file item, returns a newly constructed item. If the file
-//  is null, or memory was exhausted, returns null.                     
+//  is null, or memory was exhausted, returns null.
 QZfile * QZfile::dup ()
 {
     QZfile *rv = new QZfile (zfile_dup (self));
@@ -51,18 +51,18 @@ const QString QZfile::filename (const QString &path)
 }
 
 ///
-//  Refresh file properties from disk; this is not done automatically   
+//  Refresh file properties from disk; this is not done automatically
 //  on access methods, otherwise it is not possible to compare directory
-//  snapshots.                                                          
+//  snapshots.
 void QZfile::restat ()
 {
     zfile_restat (self);
-    
+
 }
 
 ///
 //  Return when the file was last modified. If you want this to reflect the
-//  current situation, call zfile_restat before checking this property.    
+//  current situation, call zfile_restat before checking this property.
 time_t QZfile::modified ()
 {
     time_t rv = zfile_modified (self);
@@ -71,7 +71,7 @@ time_t QZfile::modified ()
 
 ///
 //  Return the last-known size of the file. If you want this to reflect the
-//  current situation, call zfile_restat before checking this property.    
+//  current situation, call zfile_restat before checking this property.
 off_t QZfile::cursize ()
 {
     off_t rv = zfile_cursize (self);
@@ -79,7 +79,7 @@ off_t QZfile::cursize ()
 }
 
 ///
-//  Return true if the file is a directory. If you want this to reflect   
+//  Return true if the file is a directory. If you want this to reflect
 //  any external changes, call zfile_restat before checking this property.
 bool QZfile::isDirectory ()
 {
@@ -98,8 +98,8 @@ bool QZfile::isRegular ()
 
 ///
 //  Return true if the file is readable by this process. If you want this to
-//  reflect any external changes, call zfile_restat before checking this    
-//  property.                                                               
+//  reflect any external changes, call zfile_restat before checking this
+//  property.
 bool QZfile::isReadable ()
 {
     bool rv = zfile_is_readable (self);
@@ -107,9 +107,9 @@ bool QZfile::isReadable ()
 }
 
 ///
-//  Return true if the file is writeable by this process. If you want this 
+//  Return true if the file is writeable by this process. If you want this
 //  to reflect any external changes, call zfile_restat before checking this
-//  property.                                                              
+//  property.
 bool QZfile::isWriteable ()
 {
     bool rv = zfile_is_writeable (self);
@@ -118,7 +118,7 @@ bool QZfile::isWriteable ()
 
 ///
 //  Check if file has stopped changing and can be safely processed.
-//  Updates the file statistics from disk at every call.           
+//  Updates the file statistics from disk at every call.
 bool QZfile::isStable ()
 {
     bool rv = zfile_is_stable (self);
@@ -127,7 +127,7 @@ bool QZfile::isStable ()
 
 ///
 //  Return true if the file was changed on disk since the zfile_t object
-//  was created, or the last zfile_restat() call made on it.            
+//  was created, or the last zfile_restat() call made on it.
 bool QZfile::hasChanged ()
 {
     bool rv = zfile_has_changed (self);
@@ -139,11 +139,11 @@ bool QZfile::hasChanged ()
 void QZfile::remove ()
 {
     zfile_remove (self);
-    
+
 }
 
 ///
-//  Open file for reading                             
+//  Open file for reading
 //  Returns 0 if OK, -1 if not found or not accessible
 int QZfile::input ()
 {
@@ -152,9 +152,9 @@ int QZfile::input ()
 }
 
 ///
-//  Open file for writing, creating directory if needed               
+//  Open file for writing, creating directory if needed
 //  File is created if necessary; chunks can be written to file at any
-//  location. Returns 0 if OK, -1 if error.                           
+//  location. Returns 0 if OK, -1 if error.
 int QZfile::output ()
 {
     int rv = zfile_output (self);
@@ -163,7 +163,7 @@ int QZfile::output ()
 
 ///
 //  Read chunk from file at specified position. If this was the last chunk,
-//  sets the eof property. Returns a null chunk in case of error.          
+//  sets the eof property. Returns a null chunk in case of error.
 QZchunk * QZfile::read (size_t bytes, off_t offset)
 {
     QZchunk *rv = new QZchunk (zfile_read (self, bytes, offset));
@@ -180,7 +180,7 @@ bool QZfile::eof ()
 
 ///
 //  Write chunk to file at specified position
-//  Return 0 if OK, else -1                  
+//  Return 0 if OK, else -1
 int QZfile::write (QZchunk *chunk, off_t offset)
 {
     int rv = zfile_write (self, chunk->self, offset);
@@ -189,7 +189,7 @@ int QZfile::write (QZchunk *chunk, off_t offset)
 
 ///
 //  Read next line of text from file. Returns a pointer to the text line,
-//  or NULL if there was nothing more to read from the file.             
+//  or NULL if there was nothing more to read from the file.
 const QString QZfile::readln ()
 {
     const QString rv = QString (zfile_readln (self));
@@ -201,7 +201,7 @@ const QString QZfile::readln ()
 void QZfile::close ()
 {
     zfile_close (self);
-    
+
 }
 
 ///
@@ -225,7 +225,7 @@ const QString QZfile::digest ()
 void QZfile::test (bool verbose)
 {
     zfile_test (verbose);
-    
+
 }
 /*
 ################################################################################

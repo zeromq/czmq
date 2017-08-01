@@ -2456,9 +2456,9 @@ class Zframe(object):
     working with single message frames
     """
 
-    MORE = 1 # 
-    REUSE = 2 # 
-    DONTWAIT = 4 # 
+    MORE = 1 #
+    REUSE = 2 #
+    DONTWAIT = 4 #
     allow_destruct = False
     def __init__(self, *args):
         """
@@ -2912,7 +2912,7 @@ already exist. Hash values must printable strings; keys may not contain
         """
         When a hash table was loaded from a file by zhash_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
-still changing. Returns 0 if OK, -1 if there was an error reloading the 
+still changing. Returns 0 if OK, -1 if there was an error reloading the
 file.
         """
         return lib.zhash_refresh(self._as_parameter_)
@@ -3283,7 +3283,7 @@ using strdup.
     def set_key_comparator(self, comparator):
         """
         Set a user-defined comparator for keys; by default keys are
-compared using strcmp. 
+compared using strcmp.
 The callback function should return zero (0) on matching
 items.
         """
@@ -7244,7 +7244,7 @@ lib.zsys_test.argtypes = [c_bool]
 
 class Zsys(object):
     """
-    
+
     """
 
     allow_destruct = False

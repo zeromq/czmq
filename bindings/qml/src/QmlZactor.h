@@ -18,27 +18,27 @@ class QmlZactor : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zactor_t *self;
-    
+
     QmlZactor() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZactor.cpp
-    
+
 public slots:
     //  Send a zmsg message to the actor, take ownership of the message
-    //  and destroy when it has been sent.                             
+    //  and destroy when it has been sent.
     int send (QmlZmsg *msgP);
 
-    //  Receive a zmsg message from the actor. Returns NULL if the actor 
+    //  Receive a zmsg message from the actor. Returns NULL if the actor
     //  was interrupted before the message could be received, or if there
-    //  was a timeout on the actor.                                      
+    //  was a timeout on the actor.
     QmlZmsg *recv ();
 
     //  Return the actor's zsock handle. Use this when you absolutely need
-    //  to work with the zsock instance rather than the actor.            
+    //  to work with the zsock instance rather than the actor.
     QmlZsock *sock ();
 
     //  Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
@@ -49,19 +49,19 @@ class QmlZactorAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZactorAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Probe the supplied object, and report if it looks like a zactor_t.
     bool is (void *self);
 
     //  Probe the supplied reference. If it looks like a zactor_t instance,
-    //  return the underlying libzmq actor handle; else if it looks like   
-    //  a libzmq actor handle, return the supplied value.                  
+    //  return the underlying libzmq actor handle; else if it looks like
+    //  a libzmq actor handle, return the supplied value.
     void *resolve (void *self);
 
     //  Self test of this class.

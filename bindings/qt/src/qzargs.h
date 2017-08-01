@@ -32,21 +32,21 @@ public:
     //  Return next positional argument or NULL
     const QString next ();
 
-    //  Return first named parameter value, or NULL if there are no named   
+    //  Return first named parameter value, or NULL if there are no named
     //  parameters, or value for which zargs_param_empty (arg) returns true.
     const QString paramFirst ();
 
-    //  Return next named parameter value, or NULL if there are no named    
+    //  Return next named parameter value, or NULL if there are no named
     //  parameters, or value for which zargs_param_empty (arg) returns true.
     const QString paramNext ();
 
     //  Return current parameter name, or NULL if there are no named
-    //  parameters.                                                 
+    //  parameters.
     const QString paramName ();
 
     //  Return value of named parameter, NULL if no given parameter has
-    //  been specified, or special value for wich zargs_param_empty () 
-    //  returns true.                                                  
+    //  been specified, or special value for wich zargs_param_empty ()
+    //  returns true.
     const QString paramLookup (const QString &keys);
 
     //  Returns true if there are --help -h arguments

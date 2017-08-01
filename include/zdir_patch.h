@@ -39,7 +39,7 @@ CZMQ_EXPORT void
     zdir_patch_destroy (zdir_patch_t **self_p);
 
 //  Create copy of a patch. If the patch is null, or memory was exhausted,
-//  returns null.                                                         
+//  returns null.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zdir_patch_t *
     zdir_patch_dup (zdir_patch_t *self);

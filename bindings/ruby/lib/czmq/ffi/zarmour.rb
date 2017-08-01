@@ -110,7 +110,7 @@ module CZMQ
 
       # Encode a stream of bytes into an armoured string. Returns the armoured
       # string, or NULL if there was insufficient memory available to allocate
-      # a new string.                                                         
+      # a new string.
       #
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -124,9 +124,9 @@ module CZMQ
         result
       end
 
-      # Decode an armoured string into a chunk. The decoded output is    
+      # Decode an armoured string into a chunk. The decoded output is
       # null-terminated, so it may be treated as a string, if that's what
-      # it was prior to encoding.                                        
+      # it was prior to encoding.
       #
       # @param data [String, #to_s, nil]
       # @return [Zchunk]

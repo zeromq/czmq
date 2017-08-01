@@ -73,9 +73,9 @@ module CZMQ
         @finalizer = nil
       end
 
-      # Create new poller, specifying zero or more readers. The list of 
+      # Create new poller, specifying zero or more readers. The list of
       # readers ends in a NULL. Each reader can be a zsock_t instance, a
-      # zactor_t instance, a libzmq socket (void *), or a file handle.  
+      # zactor_t instance, a libzmq socket (void *), or a file handle.
       # @param reader [::FFI::Pointer, #to_ptr]
       # @param args [Array<Object>]
       # @return [CZMQ::Zpoller]
@@ -95,7 +95,7 @@ module CZMQ
       end
 
       # Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
-      # be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
+      # be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
       #
       # @param reader [::FFI::Pointer, #to_ptr]
       # @return [Integer]
@@ -107,7 +107,7 @@ module CZMQ
       end
 
       # Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
-      # must have been passed during construction, or in an zpoller_add () call.   
+      # must have been passed during construction, or in an zpoller_add () call.
       #
       # @param reader [::FFI::Pointer, #to_ptr]
       # @return [Integer]
@@ -118,10 +118,10 @@ module CZMQ
         result
       end
 
-      # By default the poller stops if the process receives a SIGINT or SIGTERM  
+      # By default the poller stops if the process receives a SIGINT or SIGTERM
       # signal. This makes it impossible to shut-down message based architectures
       # like zactors. This method lets you switch off break handling. The default
-      # nonstop setting is off (false).                                          
+      # nonstop setting is off (false).
       #
       # @param nonstop [Boolean]
       # @return [void]
@@ -133,15 +133,15 @@ module CZMQ
         result
       end
 
-      # Poll the registered readers for I/O, return first reader that has input.  
-      # The reader will be a libzmq void * socket, or a zsock_t or zactor_t       
-      # instance as specified in zpoller_new/zpoller_add. The timeout should be   
-      # zero or greater, or -1 to wait indefinitely. Socket priority is defined   
-      # by their order in the poll list. If you need a balanced poll, use the low 
+      # Poll the registered readers for I/O, return first reader that has input.
+      # The reader will be a libzmq void * socket, or a zsock_t or zactor_t
+      # instance as specified in zpoller_new/zpoller_add. The timeout should be
+      # zero or greater, or -1 to wait indefinitely. Socket priority is defined
+      # by their order in the poll list. If you need a balanced poll, use the low
       # level zmq_poll method directly. If the poll call was interrupted (SIGINT),
-      # or the ZMQ context was destroyed, or the timeout expired, returns NULL.   
-      # You can test the actual exit condition by calling zpoller_expired () and  
-      # zpoller_terminated (). The timeout is in msec.                            
+      # or the ZMQ context was destroyed, or the timeout expired, returns NULL.
+      # You can test the actual exit condition by calling zpoller_expired () and
+      # zpoller_terminated (). The timeout is in msec.
       #
       # @param timeout [Integer, #to_int, #to_i]
       # @return [::FFI::Pointer]
@@ -154,7 +154,7 @@ module CZMQ
       end
 
       # Return true if the last zpoller_wait () call ended because the timeout
-      # expired, without any error.                                           
+      # expired, without any error.
       #
       # @return [Boolean]
       def expired()
@@ -165,7 +165,7 @@ module CZMQ
       end
 
       # Return true if the last zpoller_wait () call ended because the process
-      # was interrupted, or the parent context was destroyed.                 
+      # was interrupted, or the parent context was destroyed.
       #
       # @return [Boolean]
       def terminated()

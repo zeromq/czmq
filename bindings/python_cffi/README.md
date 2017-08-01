@@ -5,7 +5,7 @@
 #czmq cffi bindings
 
 This package contains low level python bindings for czmq based on cffi library.
-Module is compatible with 
+Module is compatible with
  * The “in-line”, “ABI mode”, which simply **dlopen** main library and parse C declaration on runtime
  * The “out-of-line”, “API mode”, which build C **native** Python extension
 

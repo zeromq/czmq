@@ -94,7 +94,7 @@ public class Zcert implements AutoCloseable{
     }
     /*
     Get metadata value from certificate; if the metadata value doesn't
-    exist, returns NULL.                                              
+    exist, returns NULL.
     */
     native static String __meta (long self, String name);
     public String meta (String name) {
@@ -102,14 +102,14 @@ public class Zcert implements AutoCloseable{
     }
     /*
     Get list of metadata fields from certificate. Caller is responsible for
-    destroying list. Caller should not modify the values of list items.    
+    destroying list. Caller should not modify the values of list items.
     */
     native static long __metaKeys (long self);
     public Zlist metaKeys () {
         return new Zlist (__metaKeys (self));
     }
     /*
-    Save full certificate (public + secret) to file for persistent storage  
+    Save full certificate (public + secret) to file for persistent storage
     This creates one public file and one secret file (filename + "_secret").
     */
     native static int __save (long self, String filename);
@@ -132,8 +132,8 @@ public class Zcert implements AutoCloseable{
     }
     /*
     Apply certificate to socket, i.e. use for CURVE security on socket.
-    If certificate was loaded from public file, the secret key will be 
-    undefined, and this certificate will not work successfully.        
+    If certificate was loaded from public file, the secret key will be
+    undefined, and this certificate will not work successfully.
     */
     native static void __apply (long self, long socket);
     public void apply (long socket) {
@@ -141,7 +141,7 @@ public class Zcert implements AutoCloseable{
     }
     /*
     Return copy of certificate; if certificate is NULL or we exhausted
-    heap memory, returns NULL.                                        
+    heap memory, returns NULL.
     */
     native static long __dup (long self);
     public Zcert dup () {

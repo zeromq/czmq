@@ -18,13 +18,13 @@ It does NOT
 * change argv
 * provide a "declarative" way to define command line interface
 
-    Copyright (c) the Contributors as noted in the AUTHORS file.       
-    This file is part of CZMQ, the high-level C binding for 0MQ:       
-    http://czmq.zeromq.org.                                            
-                                                                       
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
-    file, You can obtain one at http://mozilla.org/MPL/2.0/.           
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -73,34 +73,34 @@ CZMQ_EXPORT const char *
     zargs_next (zargs_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return first named parameter value, or NULL if there are no named   
+//  Return first named parameter value, or NULL if there are no named
 //  parameters, or value for which zargs_param_empty (arg) returns true.
 CZMQ_EXPORT const char *
     zargs_param_first (zargs_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return next named parameter value, or NULL if there are no named    
+//  Return next named parameter value, or NULL if there are no named
 //  parameters, or value for which zargs_param_empty (arg) returns true.
 CZMQ_EXPORT const char *
     zargs_param_next (zargs_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Return current parameter name, or NULL if there are no named
-//  parameters.                                                 
+//  parameters.
 CZMQ_EXPORT const char *
     zargs_param_name (zargs_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty () 
-//  returns true.                                                  
+//  been specified, or special value for wich zargs_param_empty ()
+//  returns true.
 CZMQ_EXPORT const char *
     zargs_param_lookup (zargs_t *self, const char *keys);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Return value of named parameter(s), NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()    
-//  returns true.                                                     
+//  been specified, or special value for wich zargs_param_empty ()
+//  returns true.
 CZMQ_EXPORT const char *
     zargs_param_lookupx (zargs_t *self, const char *keys, ...);
 

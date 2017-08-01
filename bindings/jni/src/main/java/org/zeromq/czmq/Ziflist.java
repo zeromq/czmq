@@ -94,7 +94,7 @@ public class Ziflist implements AutoCloseable{
     }
     /*
     Get a list of network interfaces currently defined on the system
-    Includes IPv6 interfaces                                        
+    Includes IPv6 interfaces
     */
     native static long __newIpv6 ();
     public Ziflist newIpv6 () {

@@ -10,7 +10,7 @@
 
 ///
 //  Duplicate a file item, returns a newly constructed item. If the file
-//  is null, or memory was exhausted, returns null.                     
+//  is null, or memory was exhausted, returns null.
 QmlZfile *QmlZfile::dup () {
     QmlZfile *retQ_ = new QmlZfile ();
     retQ_->self = zfile_dup (self);
@@ -24,29 +24,29 @@ const QString QmlZfile::filename (const QString &path) {
 };
 
 ///
-//  Refresh file properties from disk; this is not done automatically   
+//  Refresh file properties from disk; this is not done automatically
 //  on access methods, otherwise it is not possible to compare directory
-//  snapshots.                                                          
+//  snapshots.
 void QmlZfile::restat () {
     zfile_restat (self);
 };
 
 ///
 //  Return when the file was last modified. If you want this to reflect the
-//  current situation, call zfile_restat before checking this property.    
+//  current situation, call zfile_restat before checking this property.
 time_t QmlZfile::modified () {
     return zfile_modified (self);
 };
 
 ///
 //  Return the last-known size of the file. If you want this to reflect the
-//  current situation, call zfile_restat before checking this property.    
+//  current situation, call zfile_restat before checking this property.
 off_t QmlZfile::cursize () {
     return zfile_cursize (self);
 };
 
 ///
-//  Return true if the file is a directory. If you want this to reflect   
+//  Return true if the file is a directory. If you want this to reflect
 //  any external changes, call zfile_restat before checking this property.
 bool QmlZfile::isDirectory () {
     return zfile_is_directory (self);
@@ -61,30 +61,30 @@ bool QmlZfile::isRegular () {
 
 ///
 //  Return true if the file is readable by this process. If you want this to
-//  reflect any external changes, call zfile_restat before checking this    
-//  property.                                                               
+//  reflect any external changes, call zfile_restat before checking this
+//  property.
 bool QmlZfile::isReadable () {
     return zfile_is_readable (self);
 };
 
 ///
-//  Return true if the file is writeable by this process. If you want this 
+//  Return true if the file is writeable by this process. If you want this
 //  to reflect any external changes, call zfile_restat before checking this
-//  property.                                                              
+//  property.
 bool QmlZfile::isWriteable () {
     return zfile_is_writeable (self);
 };
 
 ///
 //  Check if file has stopped changing and can be safely processed.
-//  Updates the file statistics from disk at every call.           
+//  Updates the file statistics from disk at every call.
 bool QmlZfile::isStable () {
     return zfile_is_stable (self);
 };
 
 ///
 //  Return true if the file was changed on disk since the zfile_t object
-//  was created, or the last zfile_restat() call made on it.            
+//  was created, or the last zfile_restat() call made on it.
 bool QmlZfile::hasChanged () {
     return zfile_has_changed (self);
 };
@@ -96,23 +96,23 @@ void QmlZfile::remove () {
 };
 
 ///
-//  Open file for reading                             
+//  Open file for reading
 //  Returns 0 if OK, -1 if not found or not accessible
 int QmlZfile::input () {
     return zfile_input (self);
 };
 
 ///
-//  Open file for writing, creating directory if needed               
+//  Open file for writing, creating directory if needed
 //  File is created if necessary; chunks can be written to file at any
-//  location. Returns 0 if OK, -1 if error.                           
+//  location. Returns 0 if OK, -1 if error.
 int QmlZfile::output () {
     return zfile_output (self);
 };
 
 ///
 //  Read chunk from file at specified position. If this was the last chunk,
-//  sets the eof property. Returns a null chunk in case of error.          
+//  sets the eof property. Returns a null chunk in case of error.
 QmlZchunk *QmlZfile::read (size_t bytes, off_t offset) {
     QmlZchunk *retQ_ = new QmlZchunk ();
     retQ_->self = zfile_read (self, bytes, offset);
@@ -127,14 +127,14 @@ bool QmlZfile::eof () {
 
 ///
 //  Write chunk to file at specified position
-//  Return 0 if OK, else -1                  
+//  Return 0 if OK, else -1
 int QmlZfile::write (QmlZchunk *chunk, off_t offset) {
     return zfile_write (self, chunk->self, offset);
 };
 
 ///
 //  Read next line of text from file. Returns a pointer to the text line,
-//  or NULL if there was nothing more to read from the file.             
+//  or NULL if there was nothing more to read from the file.
 const QString QmlZfile::readln () {
     return QString (zfile_readln (self));
 };
@@ -174,7 +174,7 @@ void QmlZfileAttached::test (bool verbose) {
 //  links, which are files with the extension ".ln". A symbolic link is a
 //  text file containing one line, the filename of a target file. Reading
 //  data from the symbolic link actually reads from the target file. Path
-//  may be NULL, in which case it is not used.                           
+//  may be NULL, in which case it is not used.
 QmlZfile *QmlZfileAttached::construct (const QString &path, const QString &name) {
     QmlZfile *qmlSelf = new QmlZfile ();
     qmlSelf->self = zfile_new (path.toUtf8().data(), name.toUtf8().data());

@@ -76,7 +76,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Destroy an item
       #     typedef void (zlistx_destructor_fn) (
-      #         void **item);                    
+      #         void **item);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -92,7 +92,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Duplicate an item
       #     typedef void * (zlistx_duplicator_fn) (
-      #         const void *item);                 
+      #         const void *item);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -107,7 +107,7 @@ module CZMQ
 
       # Create a new callback of the following type:
       # Compare two items, for sorting
-      #     typedef int (zlistx_comparator_fn) (      
+      #     typedef int (zlistx_comparator_fn) (
       #         const void *item1, const void *item2);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
@@ -130,7 +130,7 @@ module CZMQ
       end
 
       # Destroy a list. If an item destructor was specified, all items in the
-      # list are automatically destroyed as well.                            
+      # list are automatically destroyed as well.
       #
       # @return [void]
       def destroy()
@@ -141,8 +141,8 @@ module CZMQ
       end
 
       # Add an item to the head of the list. Calls the item duplicator, if any,
-      # on the item. Resets cursor to list head. Returns an item handle on     
-      # success, NULL if memory was exhausted.                                 
+      # on the item. Resets cursor to list head. Returns an item handle on
+      # success, NULL if memory was exhausted.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [::FFI::Pointer]
@@ -154,8 +154,8 @@ module CZMQ
       end
 
       # Add an item to the tail of the list. Calls the item duplicator, if any,
-      # on the item. Resets cursor to list head. Returns an item handle on     
-      # success, NULL if memory was exhausted.                                 
+      # on the item. Resets cursor to list head. Returns an item handle on
+      # success, NULL if memory was exhausted.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [::FFI::Pointer]
@@ -197,7 +197,7 @@ module CZMQ
       end
 
       # Return the item at the head of list. If the list is empty, returns NULL.
-      # Leaves cursor pointing at the head item, or NULL if the list is empty.  
+      # Leaves cursor pointing at the head item, or NULL if the list is empty.
       #
       # @return [::FFI::Pointer]
       def first()
@@ -207,9 +207,9 @@ module CZMQ
         result
       end
 
-      # Return the next item. At the end of the list (or in an empty list),     
+      # Return the next item. At the end of the list (or in an empty list),
       # returns NULL. Use repeated zlistx_next () calls to work through the list
-      # from zlistx_first (). First time, acts as zlistx_first().               
+      # from zlistx_first (). First time, acts as zlistx_first().
       #
       # @return [::FFI::Pointer]
       def next()
@@ -220,8 +220,8 @@ module CZMQ
       end
 
       # Return the previous item. At the start of the list (or in an empty list),
-      # returns NULL. Use repeated zlistx_prev () calls to work through the list 
-      # backwards from zlistx_last (). First time, acts as zlistx_last().        
+      # returns NULL. Use repeated zlistx_prev () calls to work through the list
+      # backwards from zlistx_last (). First time, acts as zlistx_last().
       #
       # @return [::FFI::Pointer]
       def prev()
@@ -232,7 +232,7 @@ module CZMQ
       end
 
       # Return the item at the tail of list. If the list is empty, returns NULL.
-      # Leaves cursor pointing at the tail item, or NULL if the list is empty.  
+      # Leaves cursor pointing at the tail item, or NULL if the list is empty.
       #
       # @return [::FFI::Pointer]
       def last()
@@ -243,7 +243,7 @@ module CZMQ
       end
 
       # Returns the value of the item at the cursor, or NULL if the cursor is
-      # not pointing to an item.                                             
+      # not pointing to an item.
       #
       # @return [::FFI::Pointer]
       def item()
@@ -254,7 +254,7 @@ module CZMQ
       end
 
       # Returns the handle of the item at the cursor, or NULL if the cursor is
-      # not pointing to an item.                                              
+      # not pointing to an item.
       #
       # @return [::FFI::Pointer]
       def cursor()
@@ -264,7 +264,7 @@ module CZMQ
         result
       end
 
-      # Returns the item associated with the given list handle, or NULL if passed     
+      # Returns the item associated with the given list handle, or NULL if passed
       # in handle is NULL. Asserts that the passed in handle points to a list element.
       #
       # @param handle [::FFI::Pointer, #to_ptr]
@@ -274,8 +274,8 @@ module CZMQ
         result
       end
 
-      # Find an item in the list, searching from the start. Uses the item     
-      # comparator, if any, else compares item values directly. Returns the   
+      # Find an item in the list, searching from the start. Uses the item
+      # comparator, if any, else compares item values directly. Returns the
       # item handle found, or NULL. Sets the cursor to the found item, if any.
       #
       # @param item [::FFI::Pointer, #to_ptr]
@@ -287,11 +287,11 @@ module CZMQ
         result
       end
 
-      # Detach an item from the list, using its handle. The item is not modified, 
+      # Detach an item from the list, using its handle. The item is not modified,
       # and the caller is responsible for destroying it if necessary. If handle is
       # null, detaches the first item on the list. Returns item that was detached,
       # or null if none was. If cursor was at item, moves cursor to previous item,
-      # so you can detach items while iterating forwards through a list.          
+      # so you can detach items while iterating forwards through a list.
       #
       # @param handle [::FFI::Pointer, #to_ptr]
       # @return [::FFI::Pointer]
@@ -303,9 +303,9 @@ module CZMQ
       end
 
       # Detach item at the cursor, if any, from the list. The item is not modified,
-      # and the caller is responsible for destroying it as necessary. Returns item 
-      # that was detached, or null if none was. Moves cursor to previous item, so  
-      # you can detach items while iterating forwards through a list.              
+      # and the caller is responsible for destroying it as necessary. Returns item
+      # that was detached, or null if none was. Moves cursor to previous item, so
+      # you can detach items while iterating forwards through a list.
       #
       # @return [::FFI::Pointer]
       def detach_cur()
@@ -315,11 +315,11 @@ module CZMQ
         result
       end
 
-      # Delete an item, using its handle. Calls the item destructor is any is 
-      # set. If handle is null, deletes the first item on the list. Returns 0 
+      # Delete an item, using its handle. Calls the item destructor is any is
+      # set. If handle is null, deletes the first item on the list. Returns 0
       # if an item was deleted, -1 if not. If cursor was at item, moves cursor
-      # to previous item, so you can delete items while iterating forwards    
-      # through a list.                                                       
+      # to previous item, so you can delete items while iterating forwards
+      # through a list.
       #
       # @param handle [::FFI::Pointer, #to_ptr]
       # @return [Integer]
@@ -353,7 +353,7 @@ module CZMQ
       end
 
       # Remove all items from the list, and destroy them if the item destructor
-      # is set.                                                                
+      # is set.
       #
       # @return [void]
       def purge()
@@ -363,9 +363,9 @@ module CZMQ
         result
       end
 
-      # Sort the list. If an item comparator was set, calls that to compare    
+      # Sort the list. If an item comparator was set, calls that to compare
       # items, otherwise compares on item value. The sort is not stable, so may
-      # reorder equal items.                                                   
+      # reorder equal items.
       #
       # @return [void]
       def sort()
@@ -375,12 +375,12 @@ module CZMQ
         result
       end
 
-      # Create a new node and insert it into a sorted list. Calls the item        
-      # duplicator, if any, on the item. If low_value is true, starts searching   
-      # from the start of the list, otherwise searches from the end. Use the item 
-      # comparator, if any, to find where to place the new node. Returns a handle 
+      # Create a new node and insert it into a sorted list. Calls the item
+      # duplicator, if any, on the item. If low_value is true, starts searching
+      # from the start of the list, otherwise searches from the end. Use the item
+      # comparator, if any, to find where to place the new node. Returns a handle
       # to the new node, or NULL if memory was exhausted. Resets the cursor to the
-      # list head.                                                                
+      # list head.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @param low_value [Boolean]
@@ -393,10 +393,10 @@ module CZMQ
         result
       end
 
-      # Move an item, specified by handle, into position in a sorted list. Uses 
+      # Move an item, specified by handle, into position in a sorted list. Uses
       # the item comparator, if any, to determine the new location. If low_value
       # is true, starts searching from the start of the list, otherwise searches
-      # from the end.                                                           
+      # from the end.
       #
       # @param handle [::FFI::Pointer, #to_ptr]
       # @param low_value [Boolean]
@@ -410,8 +410,8 @@ module CZMQ
       end
 
       # Make a copy of the list; items are duplicated if you set a duplicator
-      # for the list, otherwise not. Copying a null reference returns a null 
-      # reference.                                                           
+      # for the list, otherwise not. Copying a null reference returns a null
+      # reference.
       #
       # @return [Zlistx]
       def dup()
@@ -423,7 +423,7 @@ module CZMQ
       end
 
       # Set a user-defined deallocator for list items; by default items are not
-      # freed when the list is destroyed.                                      
+      # freed when the list is destroyed.
       #
       # @param destructor [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -435,7 +435,7 @@ module CZMQ
       end
 
       # Set a user-defined duplicator for list items; by default items are not
-      # copied when the list is duplicated.                                   
+      # copied when the list is duplicated.
       #
       # @param duplicator [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -446,9 +446,9 @@ module CZMQ
         result
       end
 
-      # Set a user-defined comparator for zlistx_find and zlistx_sort; the method 
+      # Set a user-defined comparator for zlistx_find and zlistx_sort; the method
       # must return -1, 0, or 1 depending on whether item1 is less than, equal to,
-      # or greater than, item2.                                                   
+      # or greater than, item2.
       #
       # @param comparator [::FFI::Pointer, #to_ptr]
       # @return [void]

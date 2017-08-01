@@ -18,8 +18,8 @@ public:
     QZframe (zframe_t *self, QObject *qObjParent = 0);
 
     //  Create a new frame. If size is not null, allocates the frame data
-    //  to the specified size. If additionally, data is not null, copies 
-    //  size octets from the specified data into the frame body.         
+    //  to the specified size. If additionally, data is not null, copies
+    //  size octets from the specified data into the frame body.
     explicit QZframe (const void *data, size_t size, QObject *qObjParent = 0);
 
     //  Create an empty (zero-sized) frame
@@ -28,16 +28,16 @@ public:
     //  Create a frame with a specified string content.
     static QZframe* from (const QString &string, QObject *qObjParent = 0);
 
-    //  Receive frame from socket, returns zframe_t object or NULL if the recv  
+    //  Receive frame from socket, returns zframe_t object or NULL if the recv
     //  was interrupted. Does a blocking recv, if you want to not block then use
-    //  zpoller or zloop.                                                       
+    //  zpoller or zloop.
     static QZframe* recv (void *source, QObject *qObjParent = 0);
 
     //  Destroy a frame
     ~QZframe ();
 
     //  Send a frame to a socket, destroy frame after sending.
-    //  Return -1 on error, 0 on success.                     
+    //  Return -1 on error, 0 on success.
     int send (void *dest, int flags);
 
     //  Return number of bytes in frame data
@@ -46,58 +46,58 @@ public:
     //  Return address of frame data
     byte * data ();
 
-    //  Return meta data property for frame                                   
+    //  Return meta data property for frame
     //  The caller shall not modify or free the returned value, which shall be
-    //  owned by the message.                                                 
+    //  owned by the message.
     const QString meta (const QString &property);
 
     //  Create a new frame that duplicates an existing frame. If frame is null,
-    //  or memory was exhausted, returns null.                                 
+    //  or memory was exhausted, returns null.
     QZframe * dup ();
 
     //  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-    //  Caller must free string when finished with it.                          
+    //  Caller must free string when finished with it.
     QString strhex ();
 
     //  Return frame data copied into freshly allocated string
-    //  Caller must free string when finished with it.        
+    //  Caller must free string when finished with it.
     QString strdup ();
 
     //  Return TRUE if frame body is equal to string, excluding terminator
     bool streqNoConflict (const QString &string);
 
     //  Return frame MORE indicator (1 or 0), set when reading frame from socket
-    //  or by the zframe_set_more() method                                      
+    //  or by the zframe_set_more() method
     int more ();
 
     //  Set frame MORE indicator (1 or 0). Note this is NOT used when sending
-    //  frame to socket, you have to specify flag explicitly.                
+    //  frame to socket, you have to specify flag explicitly.
     void setMore (int more);
 
     //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
-    //  Else returns zero.                                                  
+    //  Else returns zero.
     quint32 routingId ();
 
     //  Set routing ID on frame. This is used if/when the frame is sent to a
-    //  ZMQ_SERVER socket.                                                  
+    //  ZMQ_SERVER socket.
     void setRoutingId (quint32 routingId);
 
     //  Return frame group of radio-dish pattern.
     const QString group ();
 
     //  Set group on frame. This is used if/when the frame is sent to a
-    //  ZMQ_RADIO socket.                                              
-    //  Return -1 on error, 0 on success.                              
+    //  ZMQ_RADIO socket.
+    //  Return -1 on error, 0 on success.
     int setGroup (const QString &group);
 
     //  Return TRUE if two frames have identical size and data
-    //  If either frame is NULL, equality is always false.    
+    //  If either frame is NULL, equality is always false.
     bool eq (QZframe *other);
 
     //  Set new contents for frame
     void reset (const void *data, size_t size);
 
-    //  Send message to zsys log sink (may be stdout, or system facility as       
+    //  Send message to zsys log sink (may be stdout, or system facility as
     //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
     void print (const QString &prefix);
 

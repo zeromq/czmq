@@ -33,14 +33,14 @@ const QString QmlZargs::next () {
 };
 
 ///
-//  Return first named parameter value, or NULL if there are no named   
+//  Return first named parameter value, or NULL if there are no named
 //  parameters, or value for which zargs_param_empty (arg) returns true.
 const QString QmlZargs::paramFirst () {
     return QString (zargs_param_first (self));
 };
 
 ///
-//  Return next named parameter value, or NULL if there are no named    
+//  Return next named parameter value, or NULL if there are no named
 //  parameters, or value for which zargs_param_empty (arg) returns true.
 const QString QmlZargs::paramNext () {
     return QString (zargs_param_next (self));
@@ -48,23 +48,23 @@ const QString QmlZargs::paramNext () {
 
 ///
 //  Return current parameter name, or NULL if there are no named
-//  parameters.                                                 
+//  parameters.
 const QString QmlZargs::paramName () {
     return QString (zargs_param_name (self));
 };
 
 ///
 //  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty () 
-//  returns true.                                                  
+//  been specified, or special value for wich zargs_param_empty ()
+//  returns true.
 const QString QmlZargs::paramLookup (const QString &keys) {
     return QString (zargs_param_lookup (self, keys.toUtf8().data()));
 };
 
 ///
 //  Return value of named parameter(s), NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()    
-//  returns true.                                                     
+//  been specified, or special value for wich zargs_param_empty ()
+//  returns true.
 const QString QmlZargs::paramLookupx (const QString &keys) {
     return QString (zargs_param_lookupx (self, keys.toUtf8().data()));
 };

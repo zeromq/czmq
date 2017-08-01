@@ -17,8 +17,8 @@ QZdir::QZdir (zdir_t *self, QObject *qObjParent) : QObject (qObjParent)
 
 ///
 //  Create a new directory item that loads in the full tree of the specified
-//  path, optionally located under some parent path. If parent is "-", then 
-//  loads only the top-level directory, and does not use parent as a path.  
+//  path, optionally located under some parent path. If parent is "-", then
+//  loads only the top-level directory, and does not use parent as a path.
 QZdir::QZdir (const QString &path, const QString &parent, QObject *qObjParent) : QObject (qObjParent)
 {
     this->self = zdir_new (path.toUtf8().data(), parent.toUtf8().data());
@@ -49,7 +49,7 @@ time_t QZdir::modified ()
 
 ///
 //  Return total hierarchy size, in bytes of data contained in all files
-//  in the directory tree.                                              
+//  in the directory tree.
 off_t QZdir::cursize ()
 {
     off_t rv = zdir_cursize (self);
@@ -66,8 +66,8 @@ size_t QZdir::count ()
 
 ///
 //  Returns a sorted list of zfile objects; Each entry in the list is a pointer
-//  to a zfile_t item already allocated in the zdir tree. Do not destroy the   
-//  original zdir tree until you are done with this list.                      
+//  to a zfile_t item already allocated in the zdir tree. Do not destroy the
+//  original zdir tree until you are done with this list.
 QZlist * QZdir::list ()
 {
     QZlist *rv = new QZlist (zdir_list (self));
@@ -75,20 +75,20 @@ QZlist * QZdir::list ()
 }
 
 ///
-//  Remove directory, optionally including all files that it contains, at  
+//  Remove directory, optionally including all files that it contains, at
 //  all levels. If force is false, will only remove the directory if empty.
-//  If force is true, will remove all files and all subdirectories.        
+//  If force is true, will remove all files and all subdirectories.
 void QZdir::remove (bool force)
 {
     zdir_remove (self, force);
-    
+
 }
 
 ///
-//  Calculate differences between two versions of a directory tree.    
-//  Returns a list of zdir_patch_t patches. Either older or newer may  
+//  Calculate differences between two versions of a directory tree.
+//  Returns a list of zdir_patch_t patches. Either older or newer may
 //  be null, indicating the directory is empty/absent. If alias is set,
-//  generates virtual filename (minus path, plus alias).               
+//  generates virtual filename (minus path, plus alias).
 QZlist * QZdir::diff (QZdir *older, QZdir *newer, const QString &alias)
 {
     QZlist *rv = new QZlist (zdir_diff (older->self, newer->self, alias.toUtf8().data()));
@@ -105,7 +105,7 @@ QZlist * QZdir::resync (const QString &alias)
 
 ///
 //  Load directory cache; returns a hash table containing the SHA-1 digests
-//  of every file in the tree. The cache is saved between runs in .cache.  
+//  of every file in the tree. The cache is saved between runs in .cache.
 QZhash * QZdir::cache ()
 {
     QZhash *rv = new QZhash (zdir_cache (self));
@@ -117,7 +117,7 @@ QZhash * QZdir::cache ()
 void QZdir::fprint (FILE *file, int indent)
 {
     zdir_fprint (self, file, indent);
-    
+
 }
 
 ///
@@ -125,40 +125,40 @@ void QZdir::fprint (FILE *file, int indent)
 void QZdir::print (int indent)
 {
     zdir_print (self, indent);
-    
+
 }
 
 ///
-//  Create a new zdir_watch actor instance:                       
-//                                                                
-//      zactor_t *watch = zactor_new (zdir_watch, NULL);          
-//                                                                
-//  Destroy zdir_watch instance:                                  
-//                                                                
-//      zactor_destroy (&watch);                                  
-//                                                                
-//  Enable verbose logging of commands and activity:              
-//                                                                
-//      zstr_send (watch, "VERBOSE");                             
-//                                                                
-//  Subscribe to changes to a directory path:                     
-//                                                                
-//      zsock_send (watch, "ss", "SUBSCRIBE", "directory_path");  
-//                                                                
-//  Unsubscribe from changes to a directory path:                 
-//                                                                
+//  Create a new zdir_watch actor instance:
+//
+//      zactor_t *watch = zactor_new (zdir_watch, NULL);
+//
+//  Destroy zdir_watch instance:
+//
+//      zactor_destroy (&watch);
+//
+//  Enable verbose logging of commands and activity:
+//
+//      zstr_send (watch, "VERBOSE");
+//
+//  Subscribe to changes to a directory path:
+//
+//      zsock_send (watch, "ss", "SUBSCRIBE", "directory_path");
+//
+//  Unsubscribe from changes to a directory path:
+//
 //      zsock_send (watch, "ss", "UNSUBSCRIBE", "directory_path");
-//                                                                
-//  Receive directory changes:                                    
-//      zsock_recv (watch, "sp", &path, &patches);                
-//                                                                
-//      // Delete the received data.                              
-//      free (path);                                              
-//      zlist_destroy (&patches);                                 
+//
+//  Receive directory changes:
+//      zsock_recv (watch, "sp", &path, &patches);
+//
+//      // Delete the received data.
+//      free (path);
+//      zlist_destroy (&patches);
 void QZdir::watch (QZsock *pipe, void *unused)
 {
     zdir_watch (pipe->self, unused);
-    
+
 }
 
 ///
@@ -166,7 +166,7 @@ void QZdir::watch (QZsock *pipe, void *unused)
 void QZdir::test (bool verbose)
 {
     zdir_test (verbose);
-    
+
 }
 /*
 ################################################################################

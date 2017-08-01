@@ -18,15 +18,15 @@ class QmlZchunk : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zchunk_t *self;
-    
+
     QmlZchunk() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZchunk.cpp
-    
+
 public slots:
     //  Resizes chunk max_size as requested; chunk_cur size is set to zero
     void resize (size_t size);
@@ -41,45 +41,45 @@ public slots:
     byte *data ();
 
     //  Set chunk data from user-supplied data; truncate if too large. Data may
-    //  be null. Returns actual size of chunk                                  
+    //  be null. Returns actual size of chunk
     size_t set (const void *data, size_t size);
 
     //  Fill chunk data from user-supplied octet
     size_t fill (byte filler, size_t size);
 
-    //  Append user-supplied data to chunk, return resulting chunk size. If the 
+    //  Append user-supplied data to chunk, return resulting chunk size. If the
     //  data would exceeded the available space, it is truncated. If you want to
-    //  grow the chunk to accommodate new data, use the zchunk_extend method.   
+    //  grow the chunk to accommodate new data, use the zchunk_extend method.
     size_t append (const void *data, size_t size);
 
     //  Append user-supplied data to chunk, return resulting chunk size. If the
-    //  data would exceeded the available space, the chunk grows in size.      
+    //  data would exceeded the available space, the chunk grows in size.
     size_t extend (const void *data, size_t size);
 
-    //  Copy as much data from 'source' into the chunk as possible; returns the  
-    //  new size of chunk. If all data from 'source' is used, returns exhausted  
+    //  Copy as much data from 'source' into the chunk as possible; returns the
+    //  new size of chunk. If all data from 'source' is used, returns exhausted
     //  on the source chunk. Source can be consumed as many times as needed until
-    //  it is exhausted. If source was already exhausted, does not change chunk. 
+    //  it is exhausted. If source was already exhausted, does not change chunk.
     size_t consume (QmlZchunk *source);
 
     //  Returns true if the chunk was exhausted by consume methods, or if the
-    //  chunk has a size of zero.                                            
+    //  chunk has a size of zero.
     bool exhausted ();
 
     //  Write chunk to an open file descriptor
     int write (FILE *handle);
 
-    //  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t   
+    //  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
     //  object, or null if there was not enough heap memory. If chunk is null,
-    //  returns null.                                                         
+    //  returns null.
     QmlZchunk *dup ();
 
     //  Return chunk data encoded as printable hex string. Caller must free
-    //  string when finished with it.                                      
+    //  string when finished with it.
     QString strhex ();
 
     //  Return chunk data copied into freshly allocated string
-    //  Caller must free string when finished with it.        
+    //  Caller must free string when finished with it.
     QString strdup ();
 
     //  Return TRUE if chunk body is equal to string, excluding terminator
@@ -95,7 +95,7 @@ public slots:
     void fprint (FILE *file);
 
     //  Dump message to stderr, for debugging and tracing.
-    //  See zchunk_fprint for details                     
+    //  See zchunk_fprint for details
     void print ();
 };
 
@@ -103,19 +103,19 @@ class QmlZchunkAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZchunkAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Read chunk from an open file descriptor
     QmlZchunk *read (FILE *handle, size_t bytes);
 
-    //  Try to slurp an entire file into a chunk. Will read up to maxsize of  
-    //  the file. If maxsize is 0, will attempt to read the entire file and   
-    //  fail with an assertion if that cannot fit into memory. Returns a new  
+    //  Try to slurp an entire file into a chunk. Will read up to maxsize of
+    //  the file. If maxsize is 0, will attempt to read the entire file and
+    //  fail with an assertion if that cannot fit into memory. Returns a new
     //  chunk containing the file data, or NULL if the file could not be read.
     QmlZchunk *slurp (const QString &filename, size_t maxsize);
 
@@ -128,8 +128,8 @@ public slots:
     //  Self test of this class.
     void test (bool verbose);
 
-    //  Create a new chunk of the specified size. If you specify the data, it   
-    //  is copied into the chunk. If you do not specify the data, the chunk is  
+    //  Create a new chunk of the specified size. If you specify the data, it
+    //  is copied into the chunk. If you do not specify the data, the chunk is
     //  allocated and left empty, and you can then add data using zchunk_append.
     QmlZchunk *construct (const void *data, size_t size);
 

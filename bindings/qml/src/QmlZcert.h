@@ -18,15 +18,15 @@ class QmlZcert : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zcert_t *self;
-    
+
     QmlZcert() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZcert.cpp
-    
+
 public slots:
     //  Return public part of key pair as 32-byte binary string
     const byte *publicKey ();
@@ -47,14 +47,14 @@ public slots:
     void unsetMeta (const QString &name);
 
     //  Get metadata value from certificate; if the metadata value doesn't
-    //  exist, returns NULL.                                              
+    //  exist, returns NULL.
     const QString meta (const QString &name);
 
     //  Get list of metadata fields from certificate. Caller is responsible for
-    //  destroying list. Caller should not modify the values of list items.    
+    //  destroying list. Caller should not modify the values of list items.
     QmlZlist *metaKeys ();
 
-    //  Save full certificate (public + secret) to file for persistent storage  
+    //  Save full certificate (public + secret) to file for persistent storage
     //  This creates one public file and one secret file (filename + "_secret").
     int save (const QString &filename);
 
@@ -65,12 +65,12 @@ public slots:
     int saveSecret (const QString &filename);
 
     //  Apply certificate to socket, i.e. use for CURVE security on socket.
-    //  If certificate was loaded from public file, the secret key will be 
-    //  undefined, and this certificate will not work successfully.        
+    //  If certificate was loaded from public file, the secret key will be
+    //  undefined, and this certificate will not work successfully.
     void apply (void *socket);
 
     //  Return copy of certificate; if certificate is NULL or we exhausted
-    //  heap memory, returns NULL.                                        
+    //  heap memory, returns NULL.
     QmlZcert *dup ();
 
     //  Return true if two certificates have the same keys
@@ -84,12 +84,12 @@ class QmlZcertAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZcertAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Self test of this class
     void test (bool verbose);

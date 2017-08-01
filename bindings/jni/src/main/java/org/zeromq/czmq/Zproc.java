@@ -17,9 +17,9 @@ public class Zproc implements AutoCloseable{
     }
     public long self;
     /*
-    Create a new zproc.                                        
+    Create a new zproc.
     NOTE: On Windows and with libzmq3 and libzmq2 this function
-    returns NULL. Code needs to be ported there.               
+    returns NULL. Code needs to be ported there.
     */
     native static long __new ();
     public Zproc () {
@@ -40,7 +40,7 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Setup the command line arguments, the first item must be an (absolute) filename
-    to run.                                                                        
+    to run.
     */
     native static void __setArgs (long self, long args);
     public void setArgs (Zlistx args) {
@@ -55,16 +55,16 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Connects process stdin with a readable ('>', connect) zeromq socket. If
-    socket argument is NULL, zproc creates own managed pair of inproc      
-    sockets.  The writable one is then accessbile via zproc_stdin method.  
+    socket argument is NULL, zproc creates own managed pair of inproc
+    sockets.  The writable one is then accessbile via zproc_stdin method.
     */
     native static void __setStdin (long self, long socket);
     public void setStdin (long socket) {
         __setStdin (self, socket);
     }
     /*
-    Connects process stdout with a writable ('@', bind) zeromq socket. If 
-    socket argument is NULL, zproc creates own managed pair of inproc     
+    Connects process stdout with a writable ('@', bind) zeromq socket. If
+    socket argument is NULL, zproc creates own managed pair of inproc
     sockets.  The readable one is then accessbile via zproc_stdout method.
     */
     native static void __setStdout (long self, long socket);
@@ -72,8 +72,8 @@ public class Zproc implements AutoCloseable{
         __setStdout (self, socket);
     }
     /*
-    Connects process stderr with a writable ('@', bind) zeromq socket. If 
-    socket argument is NULL, zproc creates own managed pair of inproc     
+    Connects process stderr with a writable ('@', bind) zeromq socket. If
+    socket argument is NULL, zproc creates own managed pair of inproc
     sockets.  The readable one is then accessbile via zproc_stderr method.
     */
     native static void __setStderr (long self, long socket);
@@ -82,7 +82,7 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Return subprocess stdin writable socket. NULL for
-    not initialized or external sockets.             
+    not initialized or external sockets.
     */
     native static long __stdin (long self);
     public long stdin () {
@@ -90,7 +90,7 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Return subprocess stdout readable socket. NULL for
-    not initialized or external sockets.              
+    not initialized or external sockets.
     */
     native static long __stdout (long self);
     public long stdout () {
@@ -98,7 +98,7 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Return subprocess stderr readable socket. NULL for
-    not initialized or external sockets.              
+    not initialized or external sockets.
     */
     native static long __stderr (long self);
     public long stderr () {
@@ -162,7 +162,7 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Returns CZMQ version as a single 6-digit integer encoding the major
-    version (x 10000), the minor version (x 100) and the patch.        
+    version (x 10000), the minor version (x 100) and the patch.
     */
     native static int __czmqVersion ();
     public int czmqVersion () {
@@ -171,7 +171,7 @@ public class Zproc implements AutoCloseable{
     /*
     Returns true if the process received a SIGINT or SIGTERM signal.
     It is good practice to use this method to exit any infinite loop
-    processing messages.                                            
+    processing messages.
     */
     native static boolean __interrupted ();
     public boolean interrupted () {
@@ -186,64 +186,64 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Return current host name, for use in public tcp:// endpoints.
-    If the host name is not resolvable, returns NULL.            
+    If the host name is not resolvable, returns NULL.
     */
     native static String __hostname ();
     public String hostname () {
         return __hostname ();
     }
     /*
-    Move the current process into the background. The precise effect     
+    Move the current process into the background. The precise effect
     depends on the operating system. On POSIX boxes, moves to a specified
-    working directory (if specified), closes all file handles, reopens   
+    working directory (if specified), closes all file handles, reopens
     stdin, stdout, and stderr to the null device, and sets the process to
     ignore SIGHUP. On Windows, does nothing. Returns 0 if OK, -1 if there
-    was an error.                                                        
+    was an error.
     */
     native static void __daemonize (String workdir);
     public void daemonize (String workdir) {
         __daemonize (workdir);
     }
     /*
-    Drop the process ID into the lockfile, with exclusive lock, and   
-    switch the process to the specified group and/or user. Any of the 
-    arguments may be null, indicating a no-op. Returns 0 on success,  
-    -1 on failure. Note if you combine this with zsys_daemonize, run  
+    Drop the process ID into the lockfile, with exclusive lock, and
+    switch the process to the specified group and/or user. Any of the
+    arguments may be null, indicating a no-op. Returns 0 on success,
+    -1 on failure. Note if you combine this with zsys_daemonize, run
     after, not before that method, or the lockfile will hold the wrong
-    process ID.                                                       
+    process ID.
     */
     native static void __runAs (String lockfile, String group, String user);
     public void runAs (String lockfile, String group, String user) {
         __runAs (lockfile, group, user);
     }
     /*
-    Configure the number of I/O threads that ZeroMQ will use. A good  
-    rule of thumb is one thread per gigabit of traffic in or out. The 
+    Configure the number of I/O threads that ZeroMQ will use. A good
+    rule of thumb is one thread per gigabit of traffic in or out. The
     default is 1, sufficient for most applications. If the environment
-    variable ZSYS_IO_THREADS is defined, that provides the default.   
-    Note that this method is valid only before any socket is created. 
+    variable ZSYS_IO_THREADS is defined, that provides the default.
+    Note that this method is valid only before any socket is created.
     */
     native static void __setIoThreads (long ioThreads);
     public void setIoThreads (long ioThreads) {
         __setIoThreads (ioThreads);
     }
     /*
-    Configure the number of sockets that ZeroMQ will allow. The default  
+    Configure the number of sockets that ZeroMQ will allow. The default
     is 1024. The actual limit depends on the system, and you can query it
-    by using zsys_socket_limit (). A value of zero means "maximum".      
-    Note that this method is valid only before any socket is created.    
+    by using zsys_socket_limit (). A value of zero means "maximum".
+    Note that this method is valid only before any socket is created.
     */
     native static void __setMaxSockets (long maxSockets);
     public void setMaxSockets (long maxSockets) {
         __setMaxSockets (maxSockets);
     }
     /*
-    Set network interface name to use for broadcasts, particularly zbeacon.    
+    Set network interface name to use for broadcasts, particularly zbeacon.
     This lets the interface be configured for test environments where required.
-    For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is  
-    the default when there is no specified interface. If the environment       
-    variable ZSYS_INTERFACE is set, use that as the default interface name.    
-    Setting the interface to "*" means "use all available interfaces".         
+    For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
+    the default when there is no specified interface. If the environment
+    variable ZSYS_INTERFACE is set, use that as the default interface name.
+    Setting the interface to "*" means "use all available interfaces".
     */
     native static void __setBiface (String value);
     public void setBiface (String value) {
@@ -258,21 +258,21 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Set log identity, which is a string that prefixes all log messages sent
-    by this process. The log identity defaults to the environment variable 
-    ZSYS_LOGIDENT, if that is set.                                         
+    by this process. The log identity defaults to the environment variable
+    ZSYS_LOGIDENT, if that is set.
     */
     native static void __setLogIdent (String value);
     public void setLogIdent (String value) {
         __setLogIdent (value);
     }
     /*
-    Sends log output to a PUB socket bound to the specified endpoint. To   
-    collect such log output, create a SUB socket, subscribe to the traffic 
-    you care about, and connect to the endpoint. Log traffic is sent as a  
-    single string frame, in the same format as when sent to stdout. The    
+    Sends log output to a PUB socket bound to the specified endpoint. To
+    collect such log output, create a SUB socket, subscribe to the traffic
+    you care about, and connect to the endpoint. Log traffic is sent as a
+    single string frame, in the same format as when sent to stdout. The
     log system supports a single sender; multiple calls to this method will
     bind the same sender to multiple endpoints. To disable the sender, call
-    this method with a null argument.                                      
+    this method with a null argument.
     */
     native static void __setLogSender (String endpoint);
     public void setLogSender (String endpoint) {
@@ -280,7 +280,7 @@ public class Zproc implements AutoCloseable{
     }
     /*
     Enable or disable logging to the system facility (syslog on POSIX boxes,
-    event log on Windows). By default this is disabled.                     
+    event log on Windows). By default this is disabled.
     */
     native static void __setLogSystem (boolean logsystem);
     public void setLogSystem (boolean logsystem) {

@@ -18,15 +18,15 @@ class QmlZconfig : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zconfig_t *self;
-    
+
     QmlZconfig() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZconfig.cpp
-    
+
 public slots:
     //  Return name of config item
     const QString name ();
@@ -38,20 +38,20 @@ public slots:
     void put (const QString &path, const QString &value);
 
     //  Equivalent to zconfig_put, accepting a format specifier and variable
-    //  argument list, instead of a single string value.                    
+    //  argument list, instead of a single string value.
     void putf (const QString &path, const QString &format);
 
     //  Get value for config item into a string value; leading slash is optional
-    //  and ignored.                                                            
+    //  and ignored.
     const QString get (const QString &path, const QString &defaultValue);
 
     //  Set config item name, name may be NULL
     void setName (const QString &name);
 
-    //  Set new value for config item. The new value may be a string, a printf  
-    //  format, or NULL. Note that if string may possibly contain '%', or if it 
+    //  Set new value for config item. The new value may be a string, a printf
+    //  format, or NULL. Note that if string may possibly contain '%', or if it
     //  comes from an insecure source, you must use '%s' as the format, followed
-    //  by the string.                                                          
+    //  by the string.
     void setValue (const QString &format);
 
     //  Find our first child, if any
@@ -67,23 +67,23 @@ public slots:
     QmlZconfig *atDepth (int level);
 
     //  Execute a callback for each config item in the tree; returns zero if
-    //  successful, else -1.                                                
+    //  successful, else -1.
     int execute (zconfig_fct handler, void *arg);
 
     //  Add comment to config item before saving to disk. You can add as many
     //  comment lines as you like. If you use a null format, all comments are
-    //  deleted.                                                             
+    //  deleted.
     void setComment (const QString &format);
 
     //  Return comments of config item, as zlist.
     QmlZlist *comments ();
 
     //  Save a config tree to a specified ZPL text file, where a filename
-    //  "-" means dump to standard output.                               
+    //  "-" means dump to standard output.
     int save (const QString &filename);
 
     //  Equivalent to zconfig_save, taking a format string instead of a fixed
-    //  filename.                                                            
+    //  filename.
     int savef (const QString &format);
 
     //  Report filename used during zconfig_load, or NULL if none
@@ -96,7 +96,7 @@ public slots:
     QString strSave ();
 
     //  Return true if a configuration tree was loaded from a file and that
-    //  file has changed in since the tree was loaded.                     
+    //  file has changed in since the tree was loaded.
     bool hasChanged ();
 
     //  Print the config file to open stream
@@ -110,16 +110,16 @@ class QmlZconfigAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZconfigAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Reload config tree from same file that it was previously loaded from.
-    //  Returns 0 if OK, -1 if there was an error (and then does not change  
-    //  existing data).                                                      
+    //  Returns 0 if OK, -1 if there was an error (and then does not change
+    //  existing data).
     int reload (QmlZconfig *selfP);
 
     //  Load a config tree from a memory chunk
@@ -134,13 +134,13 @@ public slots:
     //  Create new config item
     QmlZconfig *construct (const QString &name, QmlZconfig *parent);
 
-    //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+    //  Load a config tree from a specified ZPL text file; returns a zconfig_t
     //  reference for the root, if the file exists and is readable. Returns NULL
-    //  if the file does not exist.                                             
+    //  if the file does not exist.
     QmlZconfig *load (const QString &filename);
 
     //  Equivalent to zconfig_load, taking a format string instead of a fixed
-    //  filename.                                                            
+    //  filename.
     QmlZconfig *loadf (const QString &format);
 
     //  Destroy a config item and all its children

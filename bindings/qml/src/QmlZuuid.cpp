@@ -16,7 +16,7 @@ void QmlZuuid::set (const byte *source) {
 
 ///
 //  Set UUID to new supplied string value skipping '-' and '{' '}'
-//  optional delimiters. Return 0 if OK, else returns -1.         
+//  optional delimiters. Return 0 if OK, else returns -1.
 int QmlZuuid::setStr (const QString &source) {
     return zuuid_set_str (self, source.toUtf8().data());
 };
@@ -41,8 +41,8 @@ const QString QmlZuuid::str () {
 
 ///
 //  Return UUID in the canonical string format: 8-4-4-4-12, in lower
-//  case. Caller does not modify or free returned value. See        
-//  http://en.wikipedia.org/wiki/Universally_unique_identifier      
+//  case. Caller does not modify or free returned value. See
+//  http://en.wikipedia.org/wiki/Universally_unique_identifier
 const QString QmlZuuid::strCanonical () {
     return QString (zuuid_str_canonical (self));
 };
@@ -67,7 +67,7 @@ bool QmlZuuid::neq (const byte *compare) {
 
 ///
 //  Make copy of UUID object; if uuid is null, or memory was exhausted,
-//  returns null.                                                      
+//  returns null.
 QmlZuuid *QmlZuuid::dup () {
     QmlZuuid *retQ_ = new QmlZuuid ();
     retQ_->self = zuuid_dup (self);

@@ -28,14 +28,14 @@ void QmlZconfig::put (const QString &path, const QString &value) {
 
 ///
 //  Equivalent to zconfig_put, accepting a format specifier and variable
-//  argument list, instead of a single string value.                    
+//  argument list, instead of a single string value.
 void QmlZconfig::putf (const QString &path, const QString &format) {
     zconfig_putf (self, path.toUtf8().data(), "%s", format.toUtf8().data());
 };
 
 ///
 //  Get value for config item into a string value; leading slash is optional
-//  and ignored.                                                            
+//  and ignored.
 const QString QmlZconfig::get (const QString &path, const QString &defaultValue) {
     return QString (zconfig_get (self, path.toUtf8().data(), defaultValue.toUtf8().data()));
 };
@@ -47,10 +47,10 @@ void QmlZconfig::setName (const QString &name) {
 };
 
 ///
-//  Set new value for config item. The new value may be a string, a printf  
-//  format, or NULL. Note that if string may possibly contain '%', or if it 
+//  Set new value for config item. The new value may be a string, a printf
+//  format, or NULL. Note that if string may possibly contain '%', or if it
 //  comes from an insecure source, you must use '%s' as the format, followed
-//  by the string.                                                          
+//  by the string.
 void QmlZconfig::setValue (const QString &format) {
     zconfig_set_value (self, "%s", format.toUtf8().data());
 };
@@ -89,7 +89,7 @@ QmlZconfig *QmlZconfig::atDepth (int level) {
 
 ///
 //  Execute a callback for each config item in the tree; returns zero if
-//  successful, else -1.                                                
+//  successful, else -1.
 int QmlZconfig::execute (zconfig_fct handler, void *arg) {
     return zconfig_execute (self, handler, arg);
 };
@@ -97,7 +97,7 @@ int QmlZconfig::execute (zconfig_fct handler, void *arg) {
 ///
 //  Add comment to config item before saving to disk. You can add as many
 //  comment lines as you like. If you use a null format, all comments are
-//  deleted.                                                             
+//  deleted.
 void QmlZconfig::setComment (const QString &format) {
     zconfig_set_comment (self, "%s", format.toUtf8().data());
 };
@@ -112,14 +112,14 @@ QmlZlist *QmlZconfig::comments () {
 
 ///
 //  Save a config tree to a specified ZPL text file, where a filename
-//  "-" means dump to standard output.                               
+//  "-" means dump to standard output.
 int QmlZconfig::save (const QString &filename) {
     return zconfig_save (self, filename.toUtf8().data());
 };
 
 ///
 //  Equivalent to zconfig_save, taking a format string instead of a fixed
-//  filename.                                                            
+//  filename.
 int QmlZconfig::savef (const QString &format) {
     return zconfig_savef (self, "%s", format.toUtf8().data());
 };
@@ -149,7 +149,7 @@ QString QmlZconfig::strSave () {
 
 ///
 //  Return true if a configuration tree was loaded from a file and that
-//  file has changed in since the tree was loaded.                     
+//  file has changed in since the tree was loaded.
 bool QmlZconfig::hasChanged () {
     return zconfig_has_changed (self);
 };
@@ -174,8 +174,8 @@ QObject* QmlZconfig::qmlAttachedProperties(QObject* object) {
 
 ///
 //  Reload config tree from same file that it was previously loaded from.
-//  Returns 0 if OK, -1 if there was an error (and then does not change  
-//  existing data).                                                      
+//  Returns 0 if OK, -1 if there was an error (and then does not change
+//  existing data).
 int QmlZconfigAttached::reload (QmlZconfig *selfP) {
     return zconfig_reload (&selfP->self);
 };
@@ -211,9 +211,9 @@ QmlZconfig *QmlZconfigAttached::construct (const QString &name, QmlZconfig *pare
 };
 
 ///
-//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+//  Load a config tree from a specified ZPL text file; returns a zconfig_t
 //  reference for the root, if the file exists and is readable. Returns NULL
-//  if the file does not exist.                                             
+//  if the file does not exist.
 QmlZconfig *QmlZconfigAttached::load (const QString &filename) {
     QmlZconfig *qmlSelf = new QmlZconfig ();
     qmlSelf->self = zconfig_load (filename.toUtf8().data());
@@ -222,7 +222,7 @@ QmlZconfig *QmlZconfigAttached::load (const QString &filename) {
 
 ///
 //  Equivalent to zconfig_load, taking a format string instead of a fixed
-//  filename.                                                            
+//  filename.
 QmlZconfig *QmlZconfigAttached::loadf (const QString &format) {
     QmlZconfig *qmlSelf = new QmlZconfig ();
     qmlSelf->self = zconfig_loadf ("%s", format.toUtf8().data());

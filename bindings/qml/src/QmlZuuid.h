@@ -18,21 +18,21 @@ class QmlZuuid : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zuuid_t *self;
-    
+
     QmlZuuid() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZuuid.cpp
-    
+
 public slots:
     //  Set UUID to new supplied ZUUID_LEN-octet value.
     void set (const byte *source);
 
     //  Set UUID to new supplied string value skipping '-' and '{' '}'
-    //  optional delimiters. Return 0 if OK, else returns -1.         
+    //  optional delimiters. Return 0 if OK, else returns -1.
     int setStr (const QString &source);
 
     //  Return UUID binary data.
@@ -45,8 +45,8 @@ public slots:
     const QString str ();
 
     //  Return UUID in the canonical string format: 8-4-4-4-12, in lower
-    //  case. Caller does not modify or free returned value. See        
-    //  http://en.wikipedia.org/wiki/Universally_unique_identifier      
+    //  case. Caller does not modify or free returned value. See
+    //  http://en.wikipedia.org/wiki/Universally_unique_identifier
     const QString strCanonical ();
 
     //  Store UUID blob in target array
@@ -59,7 +59,7 @@ public slots:
     bool neq (const byte *compare);
 
     //  Make copy of UUID object; if uuid is null, or memory was exhausted,
-    //  returns null.                                                      
+    //  returns null.
     QmlZuuid *dup ();
 };
 
@@ -67,12 +67,12 @@ class QmlZuuidAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZuuidAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Self test of this class.
     void test (bool verbose);

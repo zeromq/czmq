@@ -23,34 +23,34 @@ public:
     //  Destroy the ztrie.
     ~QZtrie ();
 
-    //  Inserts a new route into the tree and attaches the data. Returns -1     
+    //  Inserts a new route into the tree and attaches the data. Returns -1
     //  if the route already exists, otherwise 0. This method takes ownership of
-    //  the provided data if a destroy_data_fn is provided.                     
+    //  the provided data if a destroy_data_fn is provided.
     int insertRoute (const QString &path, void *data, ztrie_destroy_data_fn destroyDataFn);
 
     //  Removes a route from the trie and destroys its data. Returns -1 if the
-    //  route does not exists, otherwise 0.                                   
-    //  the start of the list call zlist_first (). Advances the cursor.       
+    //  route does not exists, otherwise 0.
+    //  the start of the list call zlist_first (). Advances the cursor.
     int removeRoute (const QString &path);
 
     //  Returns true if the path matches a route in the tree, otherwise false.
     bool matches (const QString &path);
 
     //  Returns the data of a matched route from last ztrie_matches. If the path
-    //  did not match, returns NULL. Do not delete the data as it's owned by    
-    //  ztrie.                                                                  
+    //  did not match, returns NULL. Do not delete the data as it's owned by
+    //  ztrie.
     void * hitData ();
 
     //  Returns the count of parameters that a matched route has.
     size_t hitParameterCount ();
 
-    //  Returns the parameters of a matched route with named regexes from last   
+    //  Returns the parameters of a matched route with named regexes from last
     //  ztrie_matches. If the path did not match or the route did not contain any
-    //  named regexes, returns NULL.                                             
+    //  named regexes, returns NULL.
     QZhashx * hitParameters ();
 
     //  Returns the asterisk matched part of a route, if there has been no match
-    //  or no asterisk match, returns NULL.                                     
+    //  or no asterisk match, returns NULL.
     const QString hitAsteriskMatch ();
 
     //  Print the trie

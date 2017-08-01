@@ -38,8 +38,8 @@ public class Ztrie implements AutoCloseable{
     }
     /*
     Removes a route from the trie and destroys its data. Returns -1 if the
-    route does not exists, otherwise 0.                                   
-    the start of the list call zlist_first (). Advances the cursor.       
+    route does not exists, otherwise 0.
+    the start of the list call zlist_first (). Advances the cursor.
     */
     native static int __removeRoute (long self, String path);
     public int removeRoute (String path) {
@@ -54,8 +54,8 @@ public class Ztrie implements AutoCloseable{
     }
     /*
     Returns the data of a matched route from last ztrie_matches. If the path
-    did not match, returns NULL. Do not delete the data as it's owned by    
-    ztrie.                                                                  
+    did not match, returns NULL. Do not delete the data as it's owned by
+    ztrie.
     */
     native static long __hitData (long self);
     public long hitData () {
@@ -69,9 +69,9 @@ public class Ztrie implements AutoCloseable{
         return __hitParameterCount (self);
     }
     /*
-    Returns the parameters of a matched route with named regexes from last   
+    Returns the parameters of a matched route with named regexes from last
     ztrie_matches. If the path did not match or the route did not contain any
-    named regexes, returns NULL.                                             
+    named regexes, returns NULL.
     */
     native static long __hitParameters (long self);
     public Zhashx hitParameters () {
@@ -79,7 +79,7 @@ public class Ztrie implements AutoCloseable{
     }
     /*
     Returns the asterisk matched part of a route, if there has been no match
-    or no asterisk match, returns NULL.                                     
+    or no asterisk match, returns NULL.
     */
     native static String __hitAsteriskMatch (long self);
     public String hitAsteriskMatch () {

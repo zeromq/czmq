@@ -31,7 +31,7 @@ QZactor::~QZactor ()
 
 ///
 //  Send a zmsg message to the actor, take ownership of the message
-//  and destroy when it has been sent.                             
+//  and destroy when it has been sent.
 int QZactor::send (QZmsg *msgP)
 {
     int rv = zactor_send (self, &msgP->self);
@@ -39,9 +39,9 @@ int QZactor::send (QZmsg *msgP)
 }
 
 ///
-//  Receive a zmsg message from the actor. Returns NULL if the actor 
+//  Receive a zmsg message from the actor. Returns NULL if the actor
 //  was interrupted before the message could be received, or if there
-//  was a timeout on the actor.                                      
+//  was a timeout on the actor.
 QZmsg * QZactor::recv ()
 {
     QZmsg *rv = new QZmsg (zactor_recv (self));
@@ -58,8 +58,8 @@ bool QZactor::is (void *self)
 
 ///
 //  Probe the supplied reference. If it looks like a zactor_t instance,
-//  return the underlying libzmq actor handle; else if it looks like   
-//  a libzmq actor handle, return the supplied value.                  
+//  return the underlying libzmq actor handle; else if it looks like
+//  a libzmq actor handle, return the supplied value.
 void * QZactor::resolve (void *self)
 {
     void * rv = zactor_resolve (self);
@@ -68,7 +68,7 @@ void * QZactor::resolve (void *self)
 
 ///
 //  Return the actor's zsock handle. Use this when you absolutely need
-//  to work with the zsock instance rather than the actor.            
+//  to work with the zsock instance rather than the actor.
 QZsock * QZactor::sock ()
 {
     QZsock *rv = new QZsock (zactor_sock (self));
@@ -80,7 +80,7 @@ QZsock * QZactor::sock ()
 void QZactor::setDestructor (zactor_destructor_fn destructor)
 {
     zactor_set_destructor (self, destructor);
-    
+
 }
 
 ///
@@ -88,7 +88,7 @@ void QZactor::setDestructor (zactor_destructor_fn destructor)
 void QZactor::test (bool verbose)
 {
     zactor_test (verbose);
-    
+
 }
 /*
 ################################################################################

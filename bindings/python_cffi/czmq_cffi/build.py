@@ -18,14 +18,14 @@ def pkgconfig_installed ():
 
 def pkgconfig_kwargs (libs):
     """If pkg-config is available, then return kwargs for set_source based on pkg-config output
-    
+
     It setup include_dirs, library_dirs, libraries and define_macros
     """
 
     # make API great again!
     if isinstance (libs, (str, bytes)):
         libs = (libs, )
-    
+
     # drop starting -I -L -l from cflags
     def dropILl (string):
         def _dropILl (string):

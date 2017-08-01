@@ -76,7 +76,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Destroy an item
       #     typedef void (zhashx_destructor_fn) (
-      #         void **item);                    
+      #         void **item);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -92,7 +92,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Duplicate an item
       #     typedef void * (zhashx_duplicator_fn) (
-      #         const void *item);                 
+      #         const void *item);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -107,7 +107,7 @@ module CZMQ
 
       # Create a new callback of the following type:
       # Compare two items, for sorting
-      #     typedef int (zhashx_comparator_fn) (      
+      #     typedef int (zhashx_comparator_fn) (
       #         const void *item1, const void *item2);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
@@ -125,7 +125,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Destroy an item.
       #     typedef void (zhashx_free_fn) (
-      #         void *data);               
+      #         void *data);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -141,7 +141,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Hash function for keys.
       #     typedef size_t (zhashx_hash_fn) (
-      #         const void *key);            
+      #         const void *key);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -156,10 +156,10 @@ module CZMQ
       end
 
       # Create a new callback of the following type:
-      # Serializes an item to a longstr.                       
+      # Serializes an item to a longstr.
       # The caller takes ownership of the newly created object.
       #     typedef char * (zhashx_serializer_fn) (
-      #         const void *item);                 
+      #         const void *item);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -173,10 +173,10 @@ module CZMQ
       end
 
       # Create a new callback of the following type:
-      # Deserializes a longstr into an item.                   
+      # Deserializes a longstr into an item.
       # The caller takes ownership of the newly created object.
       #     typedef void * (zhashx_deserializer_fn) (
-      #         const char *item_str);               
+      #         const char *item_str);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -197,8 +197,8 @@ module CZMQ
       end
 
       # Unpack binary frame into a new hash table. Packed data must follow format
-      # defined by zhashx_pack. Hash table is set to autofree. An empty frame    
-      # unpacks to an empty hash table.                                          
+      # defined by zhashx_pack. Hash table is set to autofree. An empty frame
+      # unpacks to an empty hash table.
       # @param frame [Zframe, #__ptr]
       # @return [CZMQ::Zhashx]
       def self.unpack(frame)
@@ -208,7 +208,7 @@ module CZMQ
       end
 
       # Same as unpack but uses a user-defined deserializer function to convert
-      # a longstr back into item format.                                       
+      # a longstr back into item format.
       # @param frame [Zframe, #__ptr]
       # @param deserializer [::FFI::Pointer, #to_ptr]
       # @return [CZMQ::Zhashx]
@@ -228,9 +228,9 @@ module CZMQ
         result
       end
 
-      # Insert item into hash table with specified key and item.               
+      # Insert item into hash table with specified key and item.
       # If key is already present returns -1 and leaves existing item unchanged
-      # Returns 0 on success.                                                  
+      # Returns 0 on success.
       #
       # @param key [::FFI::Pointer, #to_ptr]
       # @param item [::FFI::Pointer, #to_ptr]
@@ -244,9 +244,9 @@ module CZMQ
 
       # Update or insert item into hash table with specified key and item. If the
       # key is already present, destroys old item and inserts new one. If you set
-      # a container item destructor, this is called on the old value. If the key 
-      # was not already present, inserts a new item. Sets the hash cursor to the 
-      # new item.                                                                
+      # a container item destructor, this is called on the old value. If the key
+      # was not already present, inserts a new item. Sets the hash cursor to the
+      # new item.
       #
       # @param key [::FFI::Pointer, #to_ptr]
       # @param item [::FFI::Pointer, #to_ptr]
@@ -259,7 +259,7 @@ module CZMQ
       end
 
       # Remove an item specified by key from the hash table. If there was no such
-      # item, this function does nothing.                                        
+      # item, this function does nothing.
       #
       # @param key [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -270,9 +270,9 @@ module CZMQ
         result
       end
 
-      # Delete all items from the hash table. If the key destructor is  
+      # Delete all items from the hash table. If the key destructor is
       # set, calls it on every key. If the item destructor is set, calls
-      # it on every item.                                               
+      # it on every item.
       #
       # @return [void]
       def purge()
@@ -294,7 +294,7 @@ module CZMQ
       end
 
       # Reindexes an item from an old key to a new key. If there was no such
-      # item, does nothing. Returns 0 if successful, else -1.               
+      # item, does nothing. Returns 0 if successful, else -1.
       #
       # @param old_key [::FFI::Pointer, #to_ptr]
       # @param new_key [::FFI::Pointer, #to_ptr]
@@ -307,10 +307,10 @@ module CZMQ
       end
 
       # Set a free function for the specified hash table item. When the item is
-      # destroyed, the free function, if any, is called on that item.          
-      # Use this when hash items are dynamically allocated, to ensure that     
-      # you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
-      # Returns the item, or NULL if there is no such item.                    
+      # destroyed, the free function, if any, is called on that item.
+      # Use this when hash items are dynamically allocated, to ensure that
+      # you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+      # Returns the item, or NULL if there is no such item.
       #
       # @param key [::FFI::Pointer, #to_ptr]
       # @param free_fn [::FFI::Pointer, #to_ptr]
@@ -332,9 +332,9 @@ module CZMQ
         result
       end
 
-      # Return a zlistx_t containing the keys for the items in the       
+      # Return a zlistx_t containing the keys for the items in the
       # table. Uses the key_duplicator to duplicate all keys and sets the
-      # key_destructor as destructor for the list.                       
+      # key_destructor as destructor for the list.
       #
       # @return [Zlistx]
       def keys()
@@ -345,9 +345,9 @@ module CZMQ
         result
       end
 
-      # Return a zlistx_t containing the values for the items in the  
+      # Return a zlistx_t containing the values for the items in the
       # table. Uses the duplicator to duplicate all items and sets the
-      # destructor as destructor for the list.                        
+      # destructor as destructor for the list.
       #
       # @return [Zlistx]
       def values()
@@ -358,10 +358,10 @@ module CZMQ
         result
       end
 
-      # Simple iterator; returns first item in hash table, in no given order, 
-      # or NULL if the table is empty. This method is simpler to use than the 
+      # Simple iterator; returns first item in hash table, in no given order,
+      # or NULL if the table is empty. This method is simpler to use than the
       # foreach() method, which is deprecated. To access the key for this item
-      # use zhashx_cursor(). NOTE: do NOT modify the table while iterating.   
+      # use zhashx_cursor(). NOTE: do NOT modify the table while iterating.
       #
       # @return [::FFI::Pointer]
       def first()
@@ -371,12 +371,12 @@ module CZMQ
         result
       end
 
-      # Simple iterator; returns next item in hash table, in no given order, 
+      # Simple iterator; returns next item in hash table, in no given order,
       # or NULL if the last item was already returned. Use this together with
-      # zhashx_first() to process all items in a hash table. If you need the 
-      # items in sorted order, use zhashx_keys() and then zlistx_sort(). To  
+      # zhashx_first() to process all items in a hash table. If you need the
+      # items in sorted order, use zhashx_keys() and then zlistx_sort(). To
       # access the key for this item use zhashx_cursor(). NOTE: do NOT modify
-      # the table while iterating.                                           
+      # the table while iterating.
       #
       # @return [::FFI::Pointer]
       def next()
@@ -387,9 +387,9 @@ module CZMQ
       end
 
       # After a successful first/next method, returns the key for the item that
-      # was returned. This is a constant string that you may not modify or     
-      # deallocate, and which lasts as long as the item in the hash. After an  
-      # unsuccessful first/next, returns NULL.                                 
+      # was returned. This is a constant string that you may not modify or
+      # deallocate, and which lasts as long as the item in the hash. After an
+      # unsuccessful first/next, returns NULL.
       #
       # @return [::FFI::Pointer]
       def cursor()
@@ -399,9 +399,9 @@ module CZMQ
         result
       end
 
-      # Add a comment to hash table before saving to disk. You can add as many   
+      # Add a comment to hash table before saving to disk. You can add as many
       # comment lines as you like. These comment lines are discarded when loading
-      # the file. If you use a null format, all comments are deleted.            
+      # the file. If you use a null format, all comments are deleted.
       #
       # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
@@ -414,8 +414,8 @@ module CZMQ
       end
 
       # Save hash table to a text file in name=value format. Hash values must be
-      # printable strings; keys may not contain '=' character. Returns 0 if OK, 
-      # else -1 if a file error occurred.                                       
+      # printable strings; keys may not contain '=' character. Returns 0 if OK,
+      # else -1 if a file error occurred.
       #
       # @param filename [String, #to_s, nil]
       # @return [Integer]
@@ -426,9 +426,9 @@ module CZMQ
         result
       end
 
-      # Load hash table from a text file in name=value format; hash table must 
+      # Load hash table from a text file in name=value format; hash table must
       # already exist. Hash values must printable strings; keys may not contain
-      # '=' character. Returns 0 if OK, else -1 if a file was not readable.    
+      # '=' character. Returns 0 if OK, else -1 if a file was not readable.
       #
       # @param filename [String, #to_s, nil]
       # @return [Integer]
@@ -440,9 +440,9 @@ module CZMQ
       end
 
       # When a hash table was loaded from a file by zhashx_load, this method will
-      # reload the file if it has been modified since, and is "stable", i.e. not 
-      # still changing. Returns 0 if OK, -1 if there was an error reloading the  
-      # file.                                                                    
+      # reload the file if it has been modified since, and is "stable", i.e. not
+      # still changing. Returns 0 if OK, -1 if there was an error reloading the
+      # file.
       #
       # @return [Integer]
       def refresh()
@@ -454,24 +454,24 @@ module CZMQ
 
       # Serialize hash table to a binary frame that can be sent in a message.
       # The packed format is compatible with the 'dictionary' type defined in
-      # http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:     
-      #                                                                      
-      #    ; A list of name/value pairs                                      
-      #    dictionary      = dict-count *( dict-name dict-value )            
-      #    dict-count      = number-4                                        
-      #    dict-value      = longstr                                         
-      #    dict-name       = string                                          
-      #                                                                      
-      #    ; Strings are always length + text contents                       
-      #    longstr         = number-4 *VCHAR                                 
-      #    string          = number-1 *VCHAR                                 
-      #                                                                      
-      #    ; Numbers are unsigned integers in network byte order             
-      #    number-1        = 1OCTET                                          
-      #    number-4        = 4OCTET                                          
-      #                                                                      
-      # Comments are not included in the packed data. Item values MUST be    
-      # strings.                                                             
+      # http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
+      #
+      #    ; A list of name/value pairs
+      #    dictionary      = dict-count *( dict-name dict-value )
+      #    dict-count      = number-4
+      #    dict-value      = longstr
+      #    dict-name       = string
+      #
+      #    ; Strings are always length + text contents
+      #    longstr         = number-4 *VCHAR
+      #    string          = number-1 *VCHAR
+      #
+      #    ; Numbers are unsigned integers in network byte order
+      #    number-1        = 1OCTET
+      #    number-4        = 4OCTET
+      #
+      # Comments are not included in the packed data. Item values MUST be
+      # strings.
       #
       # @return [Zframe]
       def pack()
@@ -483,7 +483,7 @@ module CZMQ
       end
 
       # Same as pack but uses a user-defined serializer function to convert items
-      # into longstr.                                                            
+      # into longstr.
       #
       # @param serializer [::FFI::Pointer, #to_ptr]
       # @return [Zframe]
@@ -495,9 +495,9 @@ module CZMQ
         result
       end
 
-      # Make a copy of the list; items are duplicated if you set a duplicator 
-      # for the list, otherwise not. Copying a null reference returns a null  
-      # reference. Note that this method's behavior changed slightly for CZMQ 
+      # Make a copy of the list; items are duplicated if you set a duplicator
+      # for the list, otherwise not. Copying a null reference returns a null
+      # reference. Note that this method's behavior changed slightly for CZMQ
       # v3.x, as it does not set nor respect autofree. It does however let you
       # duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
       #
@@ -511,7 +511,7 @@ module CZMQ
       end
 
       # Set a user-defined deallocator for hash items; by default items are not
-      # freed when the hash is destroyed.                                      
+      # freed when the hash is destroyed.
       #
       # @param destructor [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -523,7 +523,7 @@ module CZMQ
       end
 
       # Set a user-defined duplicator for hash items; by default items are not
-      # copied when the hash is duplicated.                                   
+      # copied when the hash is duplicated.
       #
       # @param duplicator [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -535,7 +535,7 @@ module CZMQ
       end
 
       # Set a user-defined deallocator for keys; by default keys are freed
-      # when the hash is destroyed using free().                          
+      # when the hash is destroyed using free().
       #
       # @param destructor [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -547,7 +547,7 @@ module CZMQ
       end
 
       # Set a user-defined duplicator for keys; by default keys are duplicated
-      # using strdup.                                                         
+      # using strdup.
       #
       # @param duplicator [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -559,9 +559,9 @@ module CZMQ
       end
 
       # Set a user-defined comparator for keys; by default keys are
-      # compared using strcmp.                                     
-      # The callback function should return zero (0) on matching   
-      # items.                                                     
+      # compared using strcmp.
+      # The callback function should return zero (0) on matching
+      # items.
       #
       # @param comparator [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -573,7 +573,7 @@ module CZMQ
       end
 
       # Set a user-defined hash function for keys; by default keys are
-      # hashed by a modified Bernstein hashing function.              
+      # hashed by a modified Bernstein hashing function.
       #
       # @param hasher [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -584,10 +584,10 @@ module CZMQ
         result
       end
 
-      # Make copy of hash table; if supplied table is null, returns null.    
-      # Does not copy items themselves. Rebuilds new table so may be slow on 
+      # Make copy of hash table; if supplied table is null, returns null.
+      # Does not copy items themselves. Rebuilds new table so may be slow on
       # very large tables. NOTE: only works with item values that are strings
-      # since there's no other way to know how to duplicate the item value.  
+      # since there's no other way to know how to duplicate the item value.
       #
       # @return [Zhashx]
       def dup_v2()

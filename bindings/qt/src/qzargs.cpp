@@ -55,7 +55,7 @@ const QString QZargs::next ()
 }
 
 ///
-//  Return first named parameter value, or NULL if there are no named   
+//  Return first named parameter value, or NULL if there are no named
 //  parameters, or value for which zargs_param_empty (arg) returns true.
 const QString QZargs::paramFirst ()
 {
@@ -64,7 +64,7 @@ const QString QZargs::paramFirst ()
 }
 
 ///
-//  Return next named parameter value, or NULL if there are no named    
+//  Return next named parameter value, or NULL if there are no named
 //  parameters, or value for which zargs_param_empty (arg) returns true.
 const QString QZargs::paramNext ()
 {
@@ -74,7 +74,7 @@ const QString QZargs::paramNext ()
 
 ///
 //  Return current parameter name, or NULL if there are no named
-//  parameters.                                                 
+//  parameters.
 const QString QZargs::paramName ()
 {
     const QString rv = QString (zargs_param_name (self));
@@ -83,8 +83,8 @@ const QString QZargs::paramName ()
 
 ///
 //  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty () 
-//  returns true.                                                  
+//  been specified, or special value for wich zargs_param_empty ()
+//  returns true.
 const QString QZargs::paramLookup (const QString &keys)
 {
     const QString rv = QString (zargs_param_lookup (self, keys.toUtf8().data()));
@@ -112,7 +112,7 @@ bool QZargs::paramEmpty (const QString &arg)
 void QZargs::print ()
 {
     zargs_print (self);
-    
+
 }
 
 ///
@@ -120,7 +120,7 @@ void QZargs::print ()
 void QZargs::test (bool verbose)
 {
     zargs_test (verbose);
-    
+
 }
 /*
 ################################################################################

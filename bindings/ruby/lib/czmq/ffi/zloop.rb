@@ -75,7 +75,7 @@ module CZMQ
 
       # Create a new callback of the following type:
       # Callback function for reactor socket activity
-      #     typedef int (zloop_reader_fn) (                
+      #     typedef int (zloop_reader_fn) (
       #         zloop_t *loop, zsock_t *reader, void *arg);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
@@ -94,7 +94,7 @@ module CZMQ
 
       # Create a new callback of the following type:
       # Callback function for reactor events (low-level)
-      #     typedef int (zloop_fn) (                            
+      #     typedef int (zloop_fn) (
       #         zloop_t *loop, zmq_pollitem_t *item, void *arg);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
@@ -112,7 +112,7 @@ module CZMQ
 
       # Create a new callback of the following type:
       # Callback for reactor timer events
-      #     typedef int (zloop_timer_fn) (              
+      #     typedef int (zloop_timer_fn) (
       #         zloop_t *loop, int timer_id, void *arg);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
@@ -145,10 +145,10 @@ module CZMQ
         result
       end
 
-      # Register socket reader with the reactor. When the reader has messages, 
+      # Register socket reader with the reactor. When the reader has messages,
       # the reactor will call the handler, passing the arg. Returns 0 if OK, -1
-      # if there was an error. If you register the same socket more than once, 
-      # each instance will invoke its corresponding handler.                   
+      # if there was an error. If you register the same socket more than once,
+      # each instance will invoke its corresponding handler.
       #
       # @param sock [Zsock, #__ptr]
       # @param handler [::FFI::Pointer, #to_ptr]
@@ -163,7 +163,7 @@ module CZMQ
       end
 
       # Cancel a socket reader from the reactor. If multiple readers exist for
-      # same socket, cancels ALL of them.                                     
+      # same socket, cancels ALL of them.
       #
       # @param sock [Zsock, #__ptr]
       # @return [void]
@@ -176,7 +176,7 @@ module CZMQ
       end
 
       # Configure a registered reader to ignore errors. If you do not set this,
-      # then readers that have errors are removed from the reactor silently.   
+      # then readers that have errors are removed from the reactor silently.
       #
       # @param sock [Zsock, #__ptr]
       # @return [void]
@@ -188,11 +188,11 @@ module CZMQ
         result
       end
 
-      # Register low-level libzmq pollitem with the reactor. When the pollitem  
-      # is ready, will call the handler, passing the arg. Returns 0 if OK, -1   
+      # Register low-level libzmq pollitem with the reactor. When the pollitem
+      # is ready, will call the handler, passing the arg. Returns 0 if OK, -1
       # if there was an error. If you register the pollitem more than once, each
-      # instance will invoke its corresponding handler. A pollitem with         
-      # socket=NULL and fd=0 means 'poll on FD zero'.                           
+      # instance will invoke its corresponding handler. A pollitem with
+      # socket=NULL and fd=0 means 'poll on FD zero'.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @param handler [::FFI::Pointer, #to_ptr]
@@ -207,7 +207,7 @@ module CZMQ
 
       # Cancel a pollitem from the reactor, specified by socket or FD. If both
       # are specified, uses only socket. If multiple poll items exist for same
-      # socket/FD, cancels ALL of them.                                       
+      # socket/FD, cancels ALL of them.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -219,7 +219,7 @@ module CZMQ
       end
 
       # Configure a registered poller to ignore errors. If you do not set this,
-      # then poller that have errors are removed from the reactor silently.    
+      # then poller that have errors are removed from the reactor silently.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -231,9 +231,9 @@ module CZMQ
       end
 
       # Register a timer that expires after some delay and repeats some number of
-      # times. At each expiry, will call the handler, passing the arg. To run a  
+      # times. At each expiry, will call the handler, passing the arg. To run a
       # timer forever, use 0 times. Returns a timer_id that is used to cancel the
-      # timer in the future. Returns -1 if there was an error.                   
+      # timer in the future. Returns -1 if there was an error.
       #
       # @param delay [Integer, #to_int, #to_i]
       # @param times [Integer, #to_int, #to_i]
@@ -250,7 +250,7 @@ module CZMQ
       end
 
       # Cancel a specific timer identified by a specific timer_id (as returned by
-      # zloop_timer).                                                            
+      # zloop_timer).
       #
       # @param timer_id [Integer, #to_int, #to_i]
       # @return [Integer]
@@ -262,15 +262,15 @@ module CZMQ
         result
       end
 
-      # Register a ticket timer. Ticket timers are very fast in the case where   
-      # you use a lot of timers (thousands), and frequently remove and add them. 
-      # The main use case is expiry timers for servers that handle many clients, 
+      # Register a ticket timer. Ticket timers are very fast in the case where
+      # you use a lot of timers (thousands), and frequently remove and add them.
+      # The main use case is expiry timers for servers that handle many clients,
       # and which reset the expiry timer for each message received from a client.
-      # Whereas normal timers perform poorly as the number of clients grows, the 
-      # cost of ticket timers is constant, no matter the number of clients. You  
-      # must set the ticket delay using zloop_set_ticket_delay before creating a 
-      # ticket. Returns a handle to the timer that you should use in             
-      # zloop_ticket_reset and zloop_ticket_delete.                              
+      # Whereas normal timers perform poorly as the number of clients grows, the
+      # cost of ticket timers is constant, no matter the number of clients. You
+      # must set the ticket delay using zloop_set_ticket_delay before creating a
+      # ticket. Returns a handle to the timer that you should use in
+      # zloop_ticket_reset and zloop_ticket_delete.
       #
       # @param handler [::FFI::Pointer, #to_ptr]
       # @param arg [::FFI::Pointer, #to_ptr]
@@ -283,7 +283,7 @@ module CZMQ
       end
 
       # Reset a ticket timer, which moves it to the end of the ticket list and
-      # resets its execution time. This is a very fast operation.             
+      # resets its execution time. This is a very fast operation.
       #
       # @param handle [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -294,9 +294,9 @@ module CZMQ
         result
       end
 
-      # Delete a ticket timer. We do not actually delete the ticket here, as    
+      # Delete a ticket timer. We do not actually delete the ticket here, as
       # other code may still refer to the ticket. We mark as deleted, and remove
-      # later and safely.                                                       
+      # later and safely.
       #
       # @param handle [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -307,7 +307,7 @@ module CZMQ
         result
       end
 
-      # Set the ticket delay, which applies to all tickets. If you lower the   
+      # Set the ticket delay, which applies to all tickets. If you lower the
       # delay and there are already tickets created, the results are undefined.
       #
       # @param ticket_delay [Integer, #to_int, #to_i]
@@ -320,11 +320,11 @@ module CZMQ
         result
       end
 
-      # Set hard limit on number of timers allowed. Setting more than a small  
+      # Set hard limit on number of timers allowed. Setting more than a small
       # number of timers (10-100) can have a dramatic impact on the performance
-      # of the reactor. For high-volume cases, use ticket timers. If the hard  
-      # limit is reached, the reactor stops creating new timers and logs an    
-      # error.                                                                 
+      # of the reactor. For high-volume cases, use ticket timers. If the hard
+      # limit is reached, the reactor stops creating new timers and logs an
+      # error.
       #
       # @param max_timers [Integer, #to_int, #to_i]
       # @return [void]
@@ -337,7 +337,7 @@ module CZMQ
       end
 
       # Set verbose tracing of reactor on/off. The default verbose setting is
-      # off (false).                                                         
+      # off (false).
       #
       # @param verbose [Boolean]
       # @return [void]
@@ -349,10 +349,10 @@ module CZMQ
         result
       end
 
-      # By default the reactor stops if the process receives a SIGINT or SIGTERM 
+      # By default the reactor stops if the process receives a SIGINT or SIGTERM
       # signal. This makes it impossible to shut-down message based architectures
       # like zactors. This method lets you switch off break handling. The default
-      # nonstop setting is off (false).                                          
+      # nonstop setting is off (false).
       #
       # @param nonstop [Boolean]
       # @return [void]
@@ -364,10 +364,10 @@ module CZMQ
         result
       end
 
-      # Start the reactor. Takes control of the thread and returns when the 0MQ  
+      # Start the reactor. Takes control of the thread and returns when the 0MQ
       # context is terminated or the process is interrupted, or any event handler
-      # returns -1. Event handlers may register new sockets and timers, and      
-      # cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.   
+      # returns -1. Event handlers may register new sockets and timers, and
+      # cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.
       #
       # @return [Integer]
       def start()

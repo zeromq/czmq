@@ -18,72 +18,72 @@ class QmlZstr : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zstr_t *self;
-    
+
     QmlZstr() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZstr.cpp
-    
+
 public slots:};
 
 class QmlZstrAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZstrAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Receive C string from socket. Caller must free returned string using
-    //  zstr_free(). Returns NULL if the context is being terminated or the 
-    //  process was interrupted.                                            
+    //  zstr_free(). Returns NULL if the context is being terminated or the
+    //  process was interrupted.
     QString recv (void *source);
 
-    //  Receive a series of strings (until NULL) from multipart data.    
-    //  Each string is allocated and filled with string data; if there   
-    //  are not enough frames, unallocated strings are set to NULL.      
-    //  Returns -1 if the message could not be read, else returns the    
+    //  Receive a series of strings (until NULL) from multipart data.
+    //  Each string is allocated and filled with string data; if there
+    //  are not enough frames, unallocated strings are set to NULL.
+    //  Returns -1 if the message could not be read, else returns the
     //  number of strings filled, zero or more. Free each returned string
-    //  using zstr_free(). If not enough strings are provided, remaining 
-    //  multipart frames in the message are dropped.                     
+    //  using zstr_free(). If not enough strings are provided, remaining
+    //  multipart frames in the message are dropped.
     int recvx (void *source, QString stringP);
 
-    //  Send a C string to a socket, as a frame. The string is sent without 
+    //  Send a C string to a socket, as a frame. The string is sent without
     //  trailing null byte; to read this you can use zstr_recv, or a similar
-    //  method that adds a null terminator on the received string. String   
-    //  may be NULL, which is sent as "".                                   
+    //  method that adds a null terminator on the received string. String
+    //  may be NULL, which is sent as "".
     int send (void *dest, const QString &string);
 
     //  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
-    //  you can send further strings in the same multi-part message.          
+    //  you can send further strings in the same multi-part message.
     int sendm (void *dest, const QString &string);
 
     //  Send a formatted string to a socket. Note that you should NOT use
-    //  user-supplied strings in the format (they may contain '%' which  
-    //  will create security holes).                                     
+    //  user-supplied strings in the format (they may contain '%' which
+    //  will create security holes).
     int sendf (void *dest, const QString &format);
 
-    //  Send a formatted string to a socket, as for zstr_sendf(), with a      
+    //  Send a formatted string to a socket, as for zstr_sendf(), with a
     //  MORE flag, so that you can send further strings in the same multi-part
-    //  message.                                                              
+    //  message.
     int sendfm (void *dest, const QString &format);
 
-    //  Send a series of strings (until NULL) as multipart data   
+    //  Send a series of strings (until NULL) as multipart data
     //  Returns 0 if the strings could be sent OK, or -1 on error.
     int sendx (void *dest, const QString &string);
 
     //  Accepts a void pointer and returns a fresh character string. If source
-    //  is null, returns an empty string.                                     
+    //  is null, returns an empty string.
     QString str (void *source);
 
     //  Free a provided string, and nullify the parent pointer. Safe to call on
-    //  a null pointer.                                                        
+    //  a null pointer.
     void free (QString stringP);
 
     //  Self test of this class.

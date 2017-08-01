@@ -18,24 +18,24 @@ class QmlZarmour : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zarmour_t *self;
-    
+
     QmlZarmour() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZarmour.cpp
-    
+
 public slots:
     //  Encode a stream of bytes into an armoured string. Returns the armoured
     //  string, or NULL if there was insufficient memory available to allocate
-    //  a new string.                                                         
+    //  a new string.
     QString encode (const byte *data, size_t size);
 
-    //  Decode an armoured string into a chunk. The decoded output is    
+    //  Decode an armoured string into a chunk. The decoded output is
     //  null-terminated, so it may be treated as a string, if that's what
-    //  it was prior to encoding.                                        
+    //  it was prior to encoding.
     QmlZchunk *decode (const QString &data);
 
     //  Get the mode property.
@@ -79,12 +79,12 @@ class QmlZarmourAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZarmourAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Self test of this class.
     void test (bool verbose);

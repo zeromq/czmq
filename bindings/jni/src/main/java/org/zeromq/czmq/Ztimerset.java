@@ -44,7 +44,7 @@ public class Ztimerset implements AutoCloseable{
         return __cancel (self, timerId);
     }
     /*
-    Set timer interval. Returns 0 if OK, -1 on failure.                                    
+    Set timer interval. Returns 0 if OK, -1 on failure.
     This method is slow, canceling the timer and adding a new one yield better performance.
     */
     native static int __setInterval (long self, int timerId, long interval);
@@ -53,16 +53,16 @@ public class Ztimerset implements AutoCloseable{
     }
     /*
     Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
-    This method is slow, canceling the timer and adding a new one yield better performance.  
+    This method is slow, canceling the timer and adding a new one yield better performance.
     */
     native static int __reset (long self, int timerId);
     public int reset (int timerId) {
         return __reset (self, timerId);
     }
     /*
-    Return the time until the next interval.                        
+    Return the time until the next interval.
     Should be used as timeout parameter for the zpoller wait method.
-    The timeout is in msec.                                         
+    The timeout is in msec.
     */
     native static int __timeout (long self);
     public int timeout () {
@@ -70,8 +70,8 @@ public class Ztimerset implements AutoCloseable{
     }
     /*
     Invoke callback function of all timers which their interval has elapsed.
-    Should be call after zpoller wait method.                               
-    Returns 0 if OK, -1 on failure.                                         
+    Should be call after zpoller wait method.
+    Returns 0 if OK, -1 on failure.
     */
     native static int __execute (long self);
     public int execute () {

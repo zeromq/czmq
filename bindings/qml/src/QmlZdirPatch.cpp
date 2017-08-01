@@ -10,7 +10,7 @@
 
 ///
 //  Create copy of a patch. If the patch is null, or memory was exhausted,
-//  returns null.                                                         
+//  returns null.
 QmlZdirPatch *QmlZdirPatch::dup () {
     QmlZdirPatch *retQ_ = new QmlZdirPatch ();
     retQ_->self = zdir_patch_dup (self);

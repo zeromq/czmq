@@ -21,7 +21,7 @@ int QmlZtimerset::cancel (int timerId) {
 };
 
 ///
-//  Set timer interval. Returns 0 if OK, -1 on failure.                                    
+//  Set timer interval. Returns 0 if OK, -1 on failure.
 //  This method is slow, canceling the timer and adding a new one yield better performance.
 int QmlZtimerset::setInterval (int timerId, size_t interval) {
     return ztimerset_set_interval (self, timerId, interval);
@@ -29,23 +29,23 @@ int QmlZtimerset::setInterval (int timerId, size_t interval) {
 
 ///
 //  Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
-//  This method is slow, canceling the timer and adding a new one yield better performance.  
+//  This method is slow, canceling the timer and adding a new one yield better performance.
 int QmlZtimerset::reset (int timerId) {
     return ztimerset_reset (self, timerId);
 };
 
 ///
-//  Return the time until the next interval.                        
+//  Return the time until the next interval.
 //  Should be used as timeout parameter for the zpoller wait method.
-//  The timeout is in msec.                                         
+//  The timeout is in msec.
 int QmlZtimerset::timeout () {
     return ztimerset_timeout (self);
 };
 
 ///
 //  Invoke callback function of all timers which their interval has elapsed.
-//  Should be call after zpoller wait method.                               
-//  Returns 0 if OK, -1 on failure.                                         
+//  Should be call after zpoller wait method.
+//  Returns 0 if OK, -1 on failure.
 int QmlZtimerset::execute () {
     return ztimerset_execute (self);
 };

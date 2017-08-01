@@ -17,7 +17,7 @@ QZdigest::QZdigest (zdigest_t *self, QObject *qObjParent) : QObject (qObjParent)
 
 ///
 //  Constructor - creates new digest object, which you use to build up a
-//  digest by repeatedly calling zdigest_update() on chunks of data.    
+//  digest by repeatedly calling zdigest_update() on chunks of data.
 QZdigest::QZdigest (QObject *qObjParent) : QObject (qObjParent)
 {
     this->self = zdigest_new ();
@@ -35,12 +35,12 @@ QZdigest::~QZdigest ()
 void QZdigest::update (const byte *buffer, size_t length)
 {
     zdigest_update (self, buffer, length);
-    
+
 }
 
 ///
 //  Return final digest hash data. If built without crypto support,
-//  returns NULL.                                                  
+//  returns NULL.
 const byte * QZdigest::data ()
 {
     const byte * rv = zdigest_data (self);
@@ -56,9 +56,9 @@ size_t QZdigest::size ()
 }
 
 ///
-//  Return digest as printable hex string; caller should not modify nor   
+//  Return digest as printable hex string; caller should not modify nor
 //  free this string. After calling this, you may not use zdigest_update()
-//  on the same digest. If built without crypto support, returns NULL.    
+//  on the same digest. If built without crypto support, returns NULL.
 const QString QZdigest::string ()
 {
     const QString rv = QString (zdigest_string (self));
@@ -70,7 +70,7 @@ const QString QZdigest::string ()
 void QZdigest::test (bool verbose)
 {
     zdigest_test (verbose);
-    
+
 }
 /*
 ################################################################################

@@ -20,13 +20,13 @@ QZclock::QZclock (zclock_t *self, QObject *qObjParent) : QObject (qObjParent)
 void QZclock::sleep (int msecs)
 {
     zclock_sleep (msecs);
-    
+
 }
 
 ///
-//  Return current system clock as milliseconds. Note that this clock can  
+//  Return current system clock as milliseconds. Note that this clock can
 //  jump backwards (if the system clock is changed) so is unsafe to use for
-//  timers and time offsets. Use zclock_mono for that instead.             
+//  timers and time offsets. Use zclock_mono for that instead.
 int64_t QZclock::time ()
 {
     int64_t rv = zclock_time ();
@@ -35,8 +35,8 @@ int64_t QZclock::time ()
 
 ///
 //  Return current monotonic clock in milliseconds. Use this when you compute
-//  time offsets. The monotonic clock is not affected by system changes and  
-//  so will never be reset backwards, unlike a system clock.                 
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
 int64_t QZclock::mono ()
 {
     int64_t rv = zclock_mono ();
@@ -45,8 +45,8 @@ int64_t QZclock::mono ()
 
 ///
 //  Return current monotonic clock in microseconds. Use this when you compute
-//  time offsets. The monotonic clock is not affected by system changes and  
-//  so will never be reset backwards, unlike a system clock.                 
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
 int64_t QZclock::usecs ()
 {
     int64_t rv = zclock_usecs ();
@@ -68,7 +68,7 @@ QString QZclock::timestr ()
 void QZclock::test (bool verbose)
 {
     zclock_test (verbose);
-    
+
 }
 /*
 ################################################################################

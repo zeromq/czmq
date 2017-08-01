@@ -20,19 +20,19 @@ public:
     //  Sleep for a number of milliseconds
     static void sleep (int msecs);
 
-    //  Return current system clock as milliseconds. Note that this clock can  
+    //  Return current system clock as milliseconds. Note that this clock can
     //  jump backwards (if the system clock is changed) so is unsafe to use for
-    //  timers and time offsets. Use zclock_mono for that instead.             
+    //  timers and time offsets. Use zclock_mono for that instead.
     static int64_t time ();
 
     //  Return current monotonic clock in milliseconds. Use this when you compute
-    //  time offsets. The monotonic clock is not affected by system changes and  
-    //  so will never be reset backwards, unlike a system clock.                 
+    //  time offsets. The monotonic clock is not affected by system changes and
+    //  so will never be reset backwards, unlike a system clock.
     static int64_t mono ();
 
     //  Return current monotonic clock in microseconds. Use this when you compute
-    //  time offsets. The monotonic clock is not affected by system changes and  
-    //  so will never be reset backwards, unlike a system clock.                 
+    //  time offsets. The monotonic clock is not affected by system changes and
+    //  so will never be reset backwards, unlike a system clock.
     static int64_t usecs ();
 
     //  Return formatted date/time as fresh string. Free using zstr_free().

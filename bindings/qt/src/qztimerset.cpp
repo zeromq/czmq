@@ -46,7 +46,7 @@ int QZtimerset::cancel (int timerId)
 }
 
 ///
-//  Set timer interval. Returns 0 if OK, -1 on failure.                                    
+//  Set timer interval. Returns 0 if OK, -1 on failure.
 //  This method is slow, canceling the timer and adding a new one yield better performance.
 int QZtimerset::setInterval (int timerId, size_t interval)
 {
@@ -56,7 +56,7 @@ int QZtimerset::setInterval (int timerId, size_t interval)
 
 ///
 //  Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
-//  This method is slow, canceling the timer and adding a new one yield better performance.  
+//  This method is slow, canceling the timer and adding a new one yield better performance.
 int QZtimerset::reset (int timerId)
 {
     int rv = ztimerset_reset (self, timerId);
@@ -64,9 +64,9 @@ int QZtimerset::reset (int timerId)
 }
 
 ///
-//  Return the time until the next interval.                        
+//  Return the time until the next interval.
 //  Should be used as timeout parameter for the zpoller wait method.
-//  The timeout is in msec.                                         
+//  The timeout is in msec.
 int QZtimerset::timeout ()
 {
     int rv = ztimerset_timeout (self);
@@ -75,8 +75,8 @@ int QZtimerset::timeout ()
 
 ///
 //  Invoke callback function of all timers which their interval has elapsed.
-//  Should be call after zpoller wait method.                               
-//  Returns 0 if OK, -1 on failure.                                         
+//  Should be call after zpoller wait method.
+//  Returns 0 if OK, -1 on failure.
 int QZtimerset::execute ()
 {
     int rv = ztimerset_execute (self);
@@ -88,7 +88,7 @@ int QZtimerset::execute ()
 void QZtimerset::test (bool verbose)
 {
     ztimerset_test (verbose);
-    
+
 }
 /*
 ################################################################################

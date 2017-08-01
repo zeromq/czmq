@@ -43,7 +43,7 @@ CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, const byte *source);
 
 //  Set UUID to new supplied string value skipping '-' and '{' '}'
-//  optional delimiters. Return 0 if OK, else returns -1.         
+//  optional delimiters. Return 0 if OK, else returns -1.
 CZMQ_EXPORT int
     zuuid_set_str (zuuid_t *self, const char *source);
 
@@ -60,8 +60,8 @@ CZMQ_EXPORT const char *
     zuuid_str (zuuid_t *self);
 
 //  Return UUID in the canonical string format: 8-4-4-4-12, in lower
-//  case. Caller does not modify or free returned value. See        
-//  http://en.wikipedia.org/wiki/Universally_unique_identifier      
+//  case. Caller does not modify or free returned value. See
+//  http://en.wikipedia.org/wiki/Universally_unique_identifier
 CZMQ_EXPORT const char *
     zuuid_str_canonical (zuuid_t *self);
 
@@ -78,7 +78,7 @@ CZMQ_EXPORT bool
     zuuid_neq (zuuid_t *self, const byte *compare);
 
 //  Make copy of UUID object; if uuid is null, or memory was exhausted,
-//  returns null.                                                      
+//  returns null.
 CZMQ_EXPORT zuuid_t *
     zuuid_dup (zuuid_t *self);
 

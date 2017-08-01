@@ -1451,7 +1451,7 @@ integer my_zhash.refresh ()
 
 When a hash table was loaded from a file by zhash_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
-still changing. Returns 0 if OK, -1 if there was an error reloading the 
+still changing. Returns 0 if OK, -1 if there was an error reloading the
 file.
 
 ```
@@ -3683,7 +3683,7 @@ nothing my_zstr.test (Boolean)
 
 Self test of this class.
 
-### The Zsys class - 
+### The Zsys class -
 
 Constructor:
 

@@ -1,6 +1,6 @@
 /*  =========================================================================
     ziflist - List of network interfaces available on system
-    
+
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
@@ -72,7 +72,7 @@ CZMQ_EXPORT void
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
 //  Get a list of network interfaces currently defined on the system
-//  Includes IPv6 interfaces                                        
+//  Includes IPv6 interfaces
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT ziflist_t *
     ziflist_new_ipv6 (void);

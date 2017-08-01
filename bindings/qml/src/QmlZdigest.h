@@ -18,29 +18,29 @@ class QmlZdigest : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zdigest_t *self;
-    
+
     QmlZdigest() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZdigest.cpp
-    
+
 public slots:
     //  Add buffer into digest calculation
     void update (const byte *buffer, size_t length);
 
     //  Return final digest hash data. If built without crypto support,
-    //  returns NULL.                                                  
+    //  returns NULL.
     const byte *data ();
 
     //  Return final digest hash size
     size_t size ();
 
-    //  Return digest as printable hex string; caller should not modify nor   
+    //  Return digest as printable hex string; caller should not modify nor
     //  free this string. After calling this, you may not use zdigest_update()
-    //  on the same digest. If built without crypto support, returns NULL.    
+    //  on the same digest. If built without crypto support, returns NULL.
     const QString string ();
 };
 
@@ -48,18 +48,18 @@ class QmlZdigestAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZdigestAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Self test of this class.
     void test (bool verbose);
 
     //  Constructor - creates new digest object, which you use to build up a
-    //  digest by repeatedly calling zdigest_update() on chunks of data.    
+    //  digest by repeatedly calling zdigest_update() on chunks of data.
     QmlZdigest *construct ();
 
     //  Destroy a digest object

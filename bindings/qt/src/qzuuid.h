@@ -30,7 +30,7 @@ public:
     void set (const byte *source);
 
     //  Set UUID to new supplied string value skipping '-' and '{' '}'
-    //  optional delimiters. Return 0 if OK, else returns -1.         
+    //  optional delimiters. Return 0 if OK, else returns -1.
     int setStr (const QString &source);
 
     //  Return UUID binary data.
@@ -43,8 +43,8 @@ public:
     const QString str ();
 
     //  Return UUID in the canonical string format: 8-4-4-4-12, in lower
-    //  case. Caller does not modify or free returned value. See        
-    //  http://en.wikipedia.org/wiki/Universally_unique_identifier      
+    //  case. Caller does not modify or free returned value. See
+    //  http://en.wikipedia.org/wiki/Universally_unique_identifier
     const QString strCanonical ();
 
     //  Store UUID blob in target array
@@ -57,7 +57,7 @@ public:
     bool neq (const byte *compare);
 
     //  Make copy of UUID object; if uuid is null, or memory was exhausted,
-    //  returns null.                                                      
+    //  returns null.
     QZuuid * dup ();
 
     //  Self test of this class.

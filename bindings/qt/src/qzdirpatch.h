@@ -24,7 +24,7 @@ public:
     ~QZdirPatch ();
 
     //  Create copy of a patch. If the patch is null, or memory was exhausted,
-    //  returns null.                                                         
+    //  returns null.
     QZdirPatch * dup ();
 
     //  Return patch file directory path
