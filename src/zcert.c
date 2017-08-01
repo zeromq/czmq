@@ -98,7 +98,6 @@ zcert_new_from (const byte *public_key, const byte *secret_key)
     return self;
 }
 
-#ifdef CZMQ_BUILD_DRAFT_API
 //  --------------------------------------------------------------------------
 //  Constructor, accepts public/secret text key pair from caller
 
@@ -124,7 +123,6 @@ zcert_new_from_txt (const char *public_txt, const char *secret_txt)
 #endif
     return self;
 }
-#endif
 
 
 //  --------------------------------------------------------------------------
