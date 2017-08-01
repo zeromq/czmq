@@ -674,7 +674,7 @@ zsys_file_delete (const char *filename)
 //  Check if file is 'stable'
 
 // Internal implementation rigged with debugs and called from selftest
-bool
+static bool
 s_zsys_file_stable (const char *filename, bool verbose)
 {
     struct stat stat_buf;
