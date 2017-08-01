@@ -4,7 +4,6 @@
 # This will setup a clean Ubuntu1404 LTS env
 
 $script = <<SCRIPT
-add-apt-repository ppa:fkrull/deadsnakes-python2.7
 apt-get update
 apt-get install -y python-pip python-dev git htop virtualenvwrapper python2.7 python-virtualenv python-support cython \
 git build-essential libtool pkg-config autotools-dev autoconf automake cmake uuid-dev libpcre3-dev valgrind \
@@ -40,7 +39,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: $script
 
   config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--cpus", "2", "--ioapic", "on", "--memory", "512" ]
+    vb.customize ["modifyvm", :id, "--cpus", "2", "--ioapic", "on", "--memory", "1024" ]
   end
 
   if File.file?(VAGRANTFILE_LOCAL)

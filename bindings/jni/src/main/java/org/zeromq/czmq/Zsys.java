@@ -380,6 +380,8 @@ public class Zsys {
     }
     /*
     Return network interface to use for broadcasts, or "" if none was set.
+    Note that "interface" is among reserved Java keywords, so it had to be
+    renamed here manually to "getInterface".
     */
     native static String __interface ();
     public String getInterface () {

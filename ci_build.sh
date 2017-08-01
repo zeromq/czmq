@@ -245,7 +245,9 @@ default|default-Werror|default-with-docs|valgrind)
     $CI_TIME ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
     if [ "$BUILD_TYPE" == "valgrind" ] ; then
         # Build and check this project
-        $CI_TIME make VERBOSE=1 memcheck
+        $CI_TIME make VERBOSE=1 memcheck && exit
+        echo "Re-running failed ($?) memcheck with greater verbosity" >&2
+        $CI_TIME make VERBOSE=1 memcheck-verbose
         exit $?
     fi
     $CI_TIME make VERBOSE=1 all
