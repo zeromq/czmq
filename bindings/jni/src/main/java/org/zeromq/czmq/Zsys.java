@@ -382,7 +382,7 @@ public class Zsys {
     Return network interface to use for broadcasts, or "" if none was set.
     */
     native static String __interface ();
-    public String interface () {
+    public String getInterface () {
         return __interface ();
     }
     /*
