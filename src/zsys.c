@@ -673,8 +673,9 @@ zsys_file_delete (const char *filename)
 //  --------------------------------------------------------------------------
 //  Check if file is 'stable'
 
+// Internal implementation rigged with debugs and called from selftest
 bool
-zsys_file_stable (const char *filename)
+s_zsys_file_stable (const char *filename, bool verbose)
 {
     struct stat stat_buf;
     if (stat (filename, &stat_buf) == 0) {
@@ -682,15 +683,33 @@ zsys_file_stable (const char *filename)
 #if (defined (WIN32))
 #   define EPOCH_DIFFERENCE 11644473600LL
         long age = (long) (zclock_time () - EPOCH_DIFFERENCE * 1000 - (stat_buf.st_mtime * 1000));
+        if (verbose)
+            zsys_debug ("zsys_file_stable@WIN32: file '%s' age is %ld msec "
+                "at timestamp %" PRIi64 " where st_mtime was %jd adjusted by %jd",
+                filename, age, zclock_time (), (intmax_t)(stat_buf.st_mtime * 1000),
+                (intmax_t)(EPOCH_DIFFERENCE * 1000) );
 #else
         long age = (long) (zclock_time () - (stat_buf.st_mtime * 1000));
+        if (verbose)
+            zsys_debug ("zsys_file_stable@non-WIN32: file '%s' age is %ld msec "
+                "at timestamp %" PRIi64 " where st_mtime was %jd",
+                filename, age, zclock_time (), (intmax_t)(stat_buf.st_mtime * 1000) );
 #endif
         return (age > 1000);
     }
-    else
+    else {
+        if (verbose)
+            zsys_debug ("zsys_file_stable: could not stat file '%s'", filename);
         return false;           //  File doesn't exist, so not stable
+    }
 }
 
+// Public implementation does not do debugs
+bool
+zsys_file_stable (const char *filename)
+{
+    return s_zsys_file_stable(filename, false);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a file path if it doesn't exist. The file path is treated as a
@@ -1924,12 +1943,34 @@ zsys_test (bool verbose)
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
 
+    // Added tracing because this file-age check fails on some systems
+    // presumably due to congestion in a mass-build and valgrind on top
     zsys_file_mode_private ();
+    if (verbose)
+        printf ("zsys_test() at timestamp %" PRIi64 ": "
+            "Creating .testsys/subdir\n",
+            zclock_time() );
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
+    if (verbose)
+        printf ("zsys_test() at timestamp %" PRIi64 ": "
+            "Finished creating .testsys/subdir with return-code %d\n",
+            zclock_time(), rc );
     assert (rc == 0);
     when = zsys_file_modified ("./.testsys/subdir");
+    if (verbose)
+        printf ("zsys_test() at timestamp %" PRIi64 ": "
+            "Finished calling zsys_file_modified(), got age %jd\n",
+            zclock_time(), (intmax_t)when );
     assert (when > 0);
-    assert (!zsys_file_stable ("./.testsys/subdir"));
+    if (verbose)
+        printf ("zsys_test() at timestamp %" PRIi64 ": "
+            "Checking if file is NOT stable (is younger than 1 sec)\n",
+            zclock_time() );
+    assert (!s_zsys_file_stable ("./.testsys/subdir", verbose));
+    if (verbose)
+        printf ("zsys_test() at timestamp %" PRIi64 ": "
+            "Passed the test, file is not stable - as expected\n",
+            zclock_time() );
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");

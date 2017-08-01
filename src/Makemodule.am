@@ -261,7 +261,12 @@ memcheck: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_bui
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
 		--suppressions=$(srcdir)/src/.valgrind.supp \
-		$(builddir)/src/czmq_selftest
+		$(builddir)/src/czmq_selftest || \
+	{ echo "Re-running failed ($$?) $@ with greater verbosity"; \
+	  $(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(builddir)/src/czmq_selftest -v ; }
 
 # Run the selftest binary under valgrind to check for performance leaks
 callcheck: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
