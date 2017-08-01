@@ -20,6 +20,12 @@
         <argument name = "secret key" type = "buffer" />
     </constructor>
 
+    <constructor name = "new from txt" state = "draft">
+        Accepts public/secret key text pair from caller
+        <argument name = "public txt" type = "string" />
+        <argument name = "secret txt" type = "string" />
+    </constructor>
+
     <constructor name = "load">
         Load certificate from file
         <argument name = "filename" type = "string" />

@@ -349,6 +349,10 @@ zcert_t *
 zcert_t *
     zcert_new_from (const byte *public_key, const byte *secret_key);
 
+// Accepts public/secret key text pair from caller
+zcert_t *
+    zcert_new_from_txt (const char *public_txt, const char *secret_txt);
+
 // Load certificate from file
 zcert_t *
     zcert_load (const char *filename);

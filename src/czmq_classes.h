@@ -55,6 +55,12 @@ CZMQ_PRIVATE void
     zactor_set_destructor (zactor_t *self, zactor_destructor_fn destructor);
 
 //  *** Draft method, defined for internal use only ***
+//  Accepts public/secret key text pair from caller
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zcert_t *
+    zcert_new_from_txt (const char *public_txt, const char *secret_txt);
+
+//  *** Draft method, defined for internal use only ***
 //  Unset certificate metadata.
 CZMQ_PRIVATE void
     zcert_unset_meta (zcert_t *self, const char *name);

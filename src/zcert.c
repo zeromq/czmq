@@ -98,6 +98,34 @@ zcert_new_from (const byte *public_key, const byte *secret_key)
     return self;
 }
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  --------------------------------------------------------------------------
+//  Constructor, accepts public/secret text key pair from caller
+
+zcert_t *
+zcert_new_from_txt (const char *public_txt, const char *secret_txt)
+{
+    zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
+    assert (self);
+    assert (public_txt);
+    assert (secret_txt);
+
+    self->metadata = zhash_new ();
+    assert (self->metadata);
+    zhash_autofree (self->metadata);
+    memcpy (self->public_txt, public_txt, 41);
+    memcpy (self->secret_txt, secret_txt, 41);
+#if (ZMQ_VERSION_MAJOR == 4)
+    zmq_z85_decode (self->public_key, self->public_txt);
+    zmq_z85_decode (self->secret_key, self->secret_txt);
+#else
+    strcpy (self->public_txt, FORTY_ZEROES);
+    strcpy (self->secret_txt, FORTY_ZEROES);
+#endif
+    return self;
+}
+#endif
+
 
 //  --------------------------------------------------------------------------
 //  Destructor
@@ -476,6 +504,14 @@ zcert_test (bool verbose)
 
     //  32-byte null key encodes as 40 '0' characters
     assert (streq (zcert_secret_txt (shadow), FORTY_ZEROES));
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    // test zcert_from_txt
+    zcert_t *cert2 = zcert_new_from_txt(cert->public_txt, cert->secret_txt);
+    assert (cert2);
+    assert (zcert_eq (cert, cert2));
+    zcert_destroy(&cert2);
+#endif
 
     zcert_destroy (&shadow);
     zcert_destroy (&cert);

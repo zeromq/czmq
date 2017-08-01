@@ -252,6 +252,17 @@ module CZMQ
 
       attach_function :zcert_new, [], :pointer, **opts
       attach_function :zcert_new_from, [:pointer, :pointer], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zcert_new_from_txt, [:string, :string], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zcert_new_from_txt()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zcert_new_from_txt(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zcert_load, [:string], :pointer, **opts
       attach_function :zcert_destroy, [:pointer], :void, **opts
       attach_function :zcert_public_key, [:pointer], :pointer, **opts

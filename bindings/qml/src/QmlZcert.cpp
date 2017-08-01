@@ -137,6 +137,14 @@ QmlZcert *QmlZcertAttached::constructFrom (const byte *publicKey, const byte *se
 };
 
 ///
+//  Accepts public/secret key text pair from caller
+QmlZcert *QmlZcertAttached::constructFromTxt (const QString &publicTxt, const QString &secretTxt) {
+    QmlZcert *qmlSelf = new QmlZcert ();
+    qmlSelf->self = zcert_new_from_txt (publicTxt.toUtf8().data(), secretTxt.toUtf8().data());
+    return qmlSelf;
+};
+
+///
 //  Load certificate from file
 QmlZcert *QmlZcertAttached::load (const QString &filename) {
     QmlZcert *qmlSelf = new QmlZcert ();
