@@ -31,7 +31,7 @@ QZdirPatch::~QZdirPatch ()
 
 ///
 //  Create copy of a patch. If the patch is null, or memory was exhausted,
-//  returns null.                                                         
+//  returns null.
 QZdirPatch * QZdirPatch::dup ()
 {
     QZdirPatch *rv = new QZdirPatch (zdir_patch_dup (self));
@@ -75,7 +75,7 @@ const QString QZdirPatch::vpath ()
 void QZdirPatch::digestSet ()
 {
     zdir_patch_digest_set (self);
-    
+
 }
 
 ///
@@ -91,7 +91,7 @@ const QString QZdirPatch::digest ()
 void QZdirPatch::test (bool verbose)
 {
     zdir_patch_test (verbose);
-    
+
 }
 /*
 ################################################################################

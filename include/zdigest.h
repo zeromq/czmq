@@ -24,7 +24,7 @@ extern "C" {
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
 //  Constructor - creates new digest object, which you use to build up a
-//  digest by repeatedly calling zdigest_update() on chunks of data.    
+//  digest by repeatedly calling zdigest_update() on chunks of data.
 CZMQ_EXPORT zdigest_t *
     zdigest_new (void);
 
@@ -37,7 +37,7 @@ CZMQ_EXPORT void
     zdigest_update (zdigest_t *self, const byte *buffer, size_t length);
 
 //  Return final digest hash data. If built without crypto support,
-//  returns NULL.                                                  
+//  returns NULL.
 CZMQ_EXPORT const byte *
     zdigest_data (zdigest_t *self);
 
@@ -45,9 +45,9 @@ CZMQ_EXPORT const byte *
 CZMQ_EXPORT size_t
     zdigest_size (zdigest_t *self);
 
-//  Return digest as printable hex string; caller should not modify nor   
+//  Return digest as printable hex string; caller should not modify nor
 //  free this string. After calling this, you may not use zdigest_update()
-//  on the same digest. If built without crypto support, returns NULL.    
+//  on the same digest. If built without crypto support, returns NULL.
 CZMQ_EXPORT char *
     zdigest_string (zdigest_t *self);
 

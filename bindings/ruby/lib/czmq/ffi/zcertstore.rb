@@ -76,7 +76,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Loaders retrieve certificates from an arbitrary source.
       #     typedef void (zcertstore_loader) (
-      #         zcertstore_t *self);          
+      #         zcertstore_t *self);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -93,7 +93,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Destructor for loader state.
       #     typedef void (zcertstore_destructor) (
-      #         void **self_p);                   
+      #         void **self_p);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -106,12 +106,12 @@ module CZMQ
         end
       end
 
-      # Create a new certificate store from a disk directory, loading and        
-      # indexing all certificates in that location. The directory itself may be  
+      # Create a new certificate store from a disk directory, loading and
+      # indexing all certificates in that location. The directory itself may be
       # absent, and created later, or modified at any time. The certificate store
-      # is automatically refreshed on any zcertstore_lookup() call. If the       
-      # location is specified as NULL, creates a pure-memory store, which you    
-      # can work with by inserting certificates at runtime.                      
+      # is automatically refreshed on any zcertstore_lookup() call. If the
+      # location is specified as NULL, creates a pure-memory store, which you
+      # can work with by inserting certificates at runtime.
       # @param location [String, #to_s, nil]
       # @return [CZMQ::Zcertstore]
       def self.new(location)
@@ -120,7 +120,7 @@ module CZMQ
       end
 
       # Destroy a certificate store object in memory. Does not affect anything
-      # stored on disk.                                                       
+      # stored on disk.
       #
       # @return [void]
       def destroy()
@@ -144,7 +144,7 @@ module CZMQ
       end
 
       # Look up certificate by public key, returns zcert_t object if found,
-      # else returns NULL. The public key is provided in Z85 text format.  
+      # else returns NULL. The public key is provided in Z85 text format.
       #
       # @param public_key [String, #to_s, nil]
       # @return [Zcert]
@@ -158,7 +158,7 @@ module CZMQ
 
       # Insert certificate into certificate store in memory. Note that this
       # does not save the certificate to disk. To do that, use zcert_save()
-      # directly on the certificate. Takes ownership of zcert_t object.    
+      # directly on the certificate. Takes ownership of zcert_t object.
       #
       # @param cert_p [#__ptr_give_ref]
       # @return [void]
@@ -171,7 +171,7 @@ module CZMQ
       end
 
       # Empty certificate hashtable. This wrapper exists to be friendly to bindings,
-      # which don't usually have access to struct internals.                        
+      # which don't usually have access to struct internals.
       #
       # @return [void]
       def empty()
@@ -191,10 +191,10 @@ module CZMQ
         result
       end
 
-      # Return a list of all the certificates in the store.                  
-      # The caller takes ownership of the zlistx_t object and is responsible 
+      # Return a list of all the certificates in the store.
+      # The caller takes ownership of the zlistx_t object and is responsible
       # for destroying it.  The caller does not take ownership of the zcert_t
-      # objects.                                                             
+      # objects.
       #
       # @return [Zlistx]
       def certs()

@@ -11,7 +11,7 @@
 ///
 //  Encode a stream of bytes into an armoured string. Returns the armoured
 //  string, or NULL if there was insufficient memory available to allocate
-//  a new string.                                                         
+//  a new string.
 QString QmlZarmour::encode (const byte *data, size_t size) {
     char *retStr_ = zarmour_encode (self, data, size);
     QString retQStr_ = QString (retStr_);
@@ -20,9 +20,9 @@ QString QmlZarmour::encode (const byte *data, size_t size) {
 };
 
 ///
-//  Decode an armoured string into a chunk. The decoded output is    
+//  Decode an armoured string into a chunk. The decoded output is
 //  null-terminated, so it may be treated as a string, if that's what
-//  it was prior to encoding.                                        
+//  it was prior to encoding.
 QmlZchunk *QmlZarmour::decode (const QString &data) {
     QmlZchunk *retQ_ = new QmlZchunk ();
     retQ_->self = zarmour_decode (self, data.toUtf8().data());

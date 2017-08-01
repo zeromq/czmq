@@ -6,25 +6,25 @@
 module CZMQ
   module FFI
 
-    # Platform independent command line argument parsing helpers                         
-    #                                                                                    
-    # There are two kind of elements provided by this class                              
+    # Platform independent command line argument parsing helpers
+    #
+    # There are two kind of elements provided by this class
     # foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-    # zargs keeps poision only for arguments, parameters are to be accessed like hash.   
-    #                                                                                    
-    # It DOES:                                                                           
-    # * provide easy to use CLASS compatible API for accessing argv                      
-    # * is platform independent                                                          
-    # * provide getopt_long style -- argument, which delimits parameters from arguments  
-    # * makes parameters positon independent                                             
-    #                                                                                    
-    # It does NOT                                                                        
-    # * change argv                                                                      
-    # * provide a "declarative" way to define command line interface                     
-    #                                                                                    
-    # In future it SHALL                                                                 
-    # * hide several formats of command line to one (-Idir, --include=dir,               
-    #   --include dir are the same from API pov)                                         
+    # zargs keeps poision only for arguments, parameters are to be accessed like hash.
+    #
+    # It DOES:
+    # * provide easy to use CLASS compatible API for accessing argv
+    # * is platform independent
+    # * provide getopt_long style -- argument, which delimits parameters from arguments
+    # * makes parameters positon independent
+    #
+    # It does NOT
+    # * change argv
+    # * provide a "declarative" way to define command line interface
+    #
+    # In future it SHALL
+    # * hide several formats of command line to one (-Idir, --include=dir,
+    #   --include dir are the same from API pov)
     # @note This class is 100% generated using zproject.
     class Zargs
       # Raised when one tries to use an instance of {Zargs} after
@@ -151,7 +151,7 @@ module CZMQ
         result
       end
 
-      # Return first named parameter value, or NULL if there are no named   
+      # Return first named parameter value, or NULL if there are no named
       # parameters, or value for which zargs_param_empty (arg) returns true.
       #
       # @return [String]
@@ -162,7 +162,7 @@ module CZMQ
         result
       end
 
-      # Return next named parameter value, or NULL if there are no named    
+      # Return next named parameter value, or NULL if there are no named
       # parameters, or value for which zargs_param_empty (arg) returns true.
       #
       # @return [String]
@@ -174,7 +174,7 @@ module CZMQ
       end
 
       # Return current parameter name, or NULL if there are no named
-      # parameters.                                                 
+      # parameters.
       #
       # @return [String]
       def param_name()
@@ -185,8 +185,8 @@ module CZMQ
       end
 
       # Return value of named parameter, NULL if no given parameter has
-      # been specified, or special value for wich zargs_param_empty () 
-      # returns true.                                                  
+      # been specified, or special value for wich zargs_param_empty ()
+      # returns true.
       #
       # @param keys [String, #to_s, nil]
       # @return [String]
@@ -198,8 +198,8 @@ module CZMQ
       end
 
       # Return value of named parameter(s), NULL if no given parameter has
-      # been specified, or special value for wich zargs_param_empty ()    
-      # returns true.                                                     
+      # been specified, or special value for wich zargs_param_empty ()
+      # returns true.
       #
       # @param keys [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs

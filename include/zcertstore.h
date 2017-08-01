@@ -25,28 +25,28 @@ extern "C" {
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
 //  in stable releases, by default. Use --enable-drafts to enable.
-//  Create a new certificate store from a disk directory, loading and        
-//  indexing all certificates in that location. The directory itself may be  
+//  Create a new certificate store from a disk directory, loading and
+//  indexing all certificates in that location. The directory itself may be
 //  absent, and created later, or modified at any time. The certificate store
-//  is automatically refreshed on any zcertstore_lookup() call. If the       
-//  location is specified as NULL, creates a pure-memory store, which you    
-//  can work with by inserting certificates at runtime.                      
+//  is automatically refreshed on any zcertstore_lookup() call. If the
+//  location is specified as NULL, creates a pure-memory store, which you
+//  can work with by inserting certificates at runtime.
 CZMQ_EXPORT zcertstore_t *
     zcertstore_new (const char *location);
 
 //  Destroy a certificate store object in memory. Does not affect anything
-//  stored on disk.                                                       
+//  stored on disk.
 CZMQ_EXPORT void
     zcertstore_destroy (zcertstore_t **self_p);
 
 //  Look up certificate by public key, returns zcert_t object if found,
-//  else returns NULL. The public key is provided in Z85 text format.  
+//  else returns NULL. The public key is provided in Z85 text format.
 CZMQ_EXPORT zcert_t *
     zcertstore_lookup (zcertstore_t *self, const char *public_key);
 
 //  Insert certificate into certificate store in memory. Note that this
 //  does not save the certificate to disk. To do that, use zcert_save()
-//  directly on the certificate. Takes ownership of zcert_t object.    
+//  directly on the certificate. Takes ownership of zcert_t object.
 CZMQ_EXPORT void
     zcertstore_insert (zcertstore_t *self, zcert_t **cert_p);
 
@@ -74,15 +74,15 @@ CZMQ_EXPORT void
 
 //  *** Draft method, for development use, may change without warning ***
 //  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
-//  which don't usually have access to struct internals.                        
+//  which don't usually have access to struct internals.
 CZMQ_EXPORT void
     zcertstore_empty (zcertstore_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return a list of all the certificates in the store.                  
-//  The caller takes ownership of the zlistx_t object and is responsible 
+//  Return a list of all the certificates in the store.
+//  The caller takes ownership of the zlistx_t object and is responsible
 //  for destroying it.  The caller does not take ownership of the zcert_t
-//  objects.                                                             
+//  objects.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlistx_t *
     zcertstore_certs (zcertstore_t *self);

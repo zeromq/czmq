@@ -26,53 +26,53 @@ extern "C" {
 //  This class has draft methods, which may change over time. They are not
 //  in stable releases, by default. Use --enable-drafts to enable.
 //  Receive C string from socket. Caller must free returned string using
-//  zstr_free(). Returns NULL if the context is being terminated or the 
-//  process was interrupted.                                            
+//  zstr_free(). Returns NULL if the context is being terminated or the
+//  process was interrupted.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zstr_recv (void *source);
 
-//  Receive a series of strings (until NULL) from multipart data.    
-//  Each string is allocated and filled with string data; if there   
-//  are not enough frames, unallocated strings are set to NULL.      
-//  Returns -1 if the message could not be read, else returns the    
+//  Receive a series of strings (until NULL) from multipart data.
+//  Each string is allocated and filled with string data; if there
+//  are not enough frames, unallocated strings are set to NULL.
+//  Returns -1 if the message could not be read, else returns the
 //  number of strings filled, zero or more. Free each returned string
-//  using zstr_free(). If not enough strings are provided, remaining 
-//  multipart frames in the message are dropped.                     
+//  using zstr_free(). If not enough strings are provided, remaining
+//  multipart frames in the message are dropped.
 CZMQ_EXPORT int
     zstr_recvx (void *source, char **string_p, ...);
 
-//  Send a C string to a socket, as a frame. The string is sent without 
+//  Send a C string to a socket, as a frame. The string is sent without
 //  trailing null byte; to read this you can use zstr_recv, or a similar
-//  method that adds a null terminator on the received string. String   
-//  may be NULL, which is sent as "".                                   
+//  method that adds a null terminator on the received string. String
+//  may be NULL, which is sent as "".
 CZMQ_EXPORT int
     zstr_send (void *dest, const char *string);
 
 //  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
-//  you can send further strings in the same multi-part message.          
+//  you can send further strings in the same multi-part message.
 CZMQ_EXPORT int
     zstr_sendm (void *dest, const char *string);
 
 //  Send a formatted string to a socket. Note that you should NOT use
-//  user-supplied strings in the format (they may contain '%' which  
-//  will create security holes).                                     
+//  user-supplied strings in the format (they may contain '%' which
+//  will create security holes).
 CZMQ_EXPORT int
     zstr_sendf (void *dest, const char *format, ...) CHECK_PRINTF (2);
 
-//  Send a formatted string to a socket, as for zstr_sendf(), with a      
+//  Send a formatted string to a socket, as for zstr_sendf(), with a
 //  MORE flag, so that you can send further strings in the same multi-part
-//  message.                                                              
+//  message.
 CZMQ_EXPORT int
     zstr_sendfm (void *dest, const char *format, ...) CHECK_PRINTF (2);
 
-//  Send a series of strings (until NULL) as multipart data   
+//  Send a series of strings (until NULL) as multipart data
 //  Returns 0 if the strings could be sent OK, or -1 on error.
 CZMQ_EXPORT int
     zstr_sendx (void *dest, const char *string, ...);
 
 //  Free a provided string, and nullify the parent pointer. Safe to call on
-//  a null pointer.                                                        
+//  a null pointer.
 CZMQ_EXPORT void
     zstr_free (char **string_p);
 
@@ -83,7 +83,7 @@ CZMQ_EXPORT void
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
 //  Accepts a void pointer and returns a fresh character string. If source
-//  is null, returns an empty string.                                     
+//  is null, returns an empty string.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zstr_str (void *source);

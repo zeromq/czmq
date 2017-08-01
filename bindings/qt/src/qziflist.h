@@ -48,7 +48,7 @@ public:
     void print ();
 
     //  Get a list of network interfaces currently defined on the system
-    //  Includes IPv6 interfaces                                        
+    //  Includes IPv6 interfaces
     static QZiflist * newIpv6 ();
 
     //  Reload network interfaces from system, including IPv6

@@ -22,32 +22,32 @@ size_t QmlZmsg::contentSize () {
 
 ///
 //  Return message routing ID, if the message came from a ZMQ_SERVER socket.
-//  Else returns zero.                                                      
+//  Else returns zero.
 uint32_t QmlZmsg::routingId () {
     return zmsg_routing_id (self);
 };
 
 ///
 //  Set routing ID on message. This is used if/when the message is sent to a
-//  ZMQ_SERVER socket.                                                      
+//  ZMQ_SERVER socket.
 void QmlZmsg::setRoutingId (uint32_t routingId) {
     zmsg_set_routing_id (self, routingId);
 };
 
 ///
-//  Push frame to the front of the message, i.e. before all other frames.  
+//  Push frame to the front of the message, i.e. before all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
-//  nullify the caller's frame reference.                                  
+//  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
+//  nullify the caller's frame reference.
 int QmlZmsg::prepend (QmlZframe *frameP) {
     return zmsg_prepend (self, &frameP->self);
 };
 
 ///
-//  Add frame to the end of the message, i.e. after all other frames.      
+//  Add frame to the end of the message, i.e. after all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success. Deprecates zmsg_add, which did not nullify the   
-//  caller's frame reference.                                              
+//  Returns 0 on success. Deprecates zmsg_add, which did not nullify the
+//  caller's frame reference.
 int QmlZmsg::append (QmlZframe *frameP) {
     return zmsg_append (self, &frameP->self);
 };
@@ -62,49 +62,49 @@ QmlZframe *QmlZmsg::pop () {
 
 ///
 //  Push block of memory to front of message, as a new frame.
-//  Returns 0 on success, -1 on error.                       
+//  Returns 0 on success, -1 on error.
 int QmlZmsg::pushmem (const void *data, size_t size) {
     return zmsg_pushmem (self, data, size);
 };
 
 ///
 //  Add block of memory to the end of the message, as a new frame.
-//  Returns 0 on success, -1 on error.                            
+//  Returns 0 on success, -1 on error.
 int QmlZmsg::addmem (const void *data, size_t size) {
     return zmsg_addmem (self, data, size);
 };
 
 ///
 //  Push string as new frame to front of message.
-//  Returns 0 on success, -1 on error.           
+//  Returns 0 on success, -1 on error.
 int QmlZmsg::pushstr (const QString &string) {
     return zmsg_pushstr (self, string.toUtf8().data());
 };
 
 ///
 //  Push string as new frame to end of message.
-//  Returns 0 on success, -1 on error.         
+//  Returns 0 on success, -1 on error.
 int QmlZmsg::addstr (const QString &string) {
     return zmsg_addstr (self, string.toUtf8().data());
 };
 
 ///
 //  Push formatted string as new frame to front of message.
-//  Returns 0 on success, -1 on error.                     
+//  Returns 0 on success, -1 on error.
 int QmlZmsg::pushstrf (const QString &format) {
     return zmsg_pushstrf (self, "%s", format.toUtf8().data());
 };
 
 ///
 //  Push formatted string as new frame to end of message.
-//  Returns 0 on success, -1 on error.                   
+//  Returns 0 on success, -1 on error.
 int QmlZmsg::addstrf (const QString &format) {
     return zmsg_addstrf (self, "%s", format.toUtf8().data());
 };
 
 ///
 //  Pop frame off front of message, return as fresh string. If there were
-//  no more frames in the message, returns NULL.                         
+//  no more frames in the message, returns NULL.
 QString QmlZmsg::popstr () {
     char *retStr_ = zmsg_popstr (self);
     QString retQStr_ = QString (retStr_);
@@ -113,16 +113,16 @@ QString QmlZmsg::popstr () {
 };
 
 ///
-//  Push encoded message as a new frame. Message takes ownership of    
+//  Push encoded message as a new frame. Message takes ownership of
 //  submessage, so the original is destroyed in this call. Returns 0 on
-//  success, -1 on error.                                              
+//  success, -1 on error.
 int QmlZmsg::addmsg (QmlZmsg *msgP) {
     return zmsg_addmsg (self, &msgP->self);
 };
 
 ///
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not successful.                                            
+//  decoding was not successful.
 QmlZmsg *QmlZmsg::popmsg () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_popmsg (self);
@@ -137,7 +137,7 @@ void QmlZmsg::remove (QmlZframe *frame) {
 
 ///
 //  Set cursor to first frame in message. Returns frame, or NULL, if the
-//  message is empty. Use this to navigate the frames as a list.        
+//  message is empty. Use this to navigate the frames as a list.
 QmlZframe *QmlZmsg::first () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zmsg_first (self);
@@ -146,7 +146,7 @@ QmlZframe *QmlZmsg::first () {
 
 ///
 //  Return the next frame. If there are no more frames, returns NULL. To move
-//  to the first frame call zmsg_first(). Advances the cursor.               
+//  to the first frame call zmsg_first(). Advances the cursor.
 QmlZframe *QmlZmsg::next () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zmsg_next (self);
@@ -162,21 +162,21 @@ QmlZframe *QmlZmsg::last () {
 };
 
 ///
-//  Save message to an open file, return 0 if OK, else -1. The message is  
-//  saved as a series of frames, each with length and data. Note that the  
-//  file is NOT guaranteed to be portable between operating systems, not   
+//  Save message to an open file, return 0 if OK, else -1. The message is
+//  saved as a series of frames, each with length and data. Note that the
+//  file is NOT guaranteed to be portable between operating systems, not
 //  versions of CZMQ. The file format is at present undocumented and liable
-//  to arbitrary change.                                                   
+//  to arbitrary change.
 int QmlZmsg::save (FILE *file) {
     return zmsg_save (self, file);
 };
 
 ///
 //  Serialize multipart message to a single message frame. Use this method
-//  to send structured messages across transports that do not support     
-//  multipart data. Allocates and returns a new frame containing the      
-//  serialized message. To decode a serialized message frame, use         
-//  zmsg_decode ().                                                       
+//  to send structured messages across transports that do not support
+//  multipart data. Allocates and returns a new frame containing the
+//  serialized message. To decode a serialized message frame, use
+//  zmsg_decode ().
 QmlZframe *QmlZmsg::encode () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zmsg_encode (self);
@@ -185,7 +185,7 @@ QmlZframe *QmlZmsg::encode () {
 
 ///
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
-//  object. If message is null, or memory was exhausted, returns null.   
+//  object. If message is null, or memory was exhausted, returns null.
 QmlZmsg *QmlZmsg::dup () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_dup (self);
@@ -194,13 +194,13 @@ QmlZmsg *QmlZmsg::dup () {
 
 ///
 //  Send message to zsys log sink (may be stdout, or system facility as
-//  configured by zsys_set_logstream).                                 
+//  configured by zsys_set_logstream).
 void QmlZmsg::print () {
     zmsg_print (self);
 };
 
 ///
-//  Return true if the two messages have the same number of frames and each  
+//  Return true if the two messages have the same number of frames and each
 //  frame in the first message is identical to the corresponding frame in the
 //  other message. As with zframe_eq, return false if either message is NULL.
 bool QmlZmsg::eq (QmlZmsg *other) {
@@ -222,19 +222,19 @@ QObject* QmlZmsg::qmlAttachedProperties(QObject* object) {
 ///
 //  Send message to destination socket, and destroy the message after sending
 //  it successfully. If the message has no frames, sends nothing but destroys
-//  the message anyhow. Nullifies the caller's reference to the message (as  
-//  it is a destructor).                                                     
+//  the message anyhow. Nullifies the caller's reference to the message (as
+//  it is a destructor).
 int QmlZmsgAttached::send (QmlZmsg *selfP, void *dest) {
     return zmsg_send (&selfP->self, dest);
 };
 
 ///
-//  Send message to destination socket as part of a multipart sequence, and 
-//  destroy the message after sending it successfully. Note that after a    
+//  Send message to destination socket as part of a multipart sequence, and
+//  destroy the message after sending it successfully. Note that after a
 //  zmsg_sendm, you must call zmsg_send or another method that sends a final
-//  message part. If the message has no frames, sends nothing but destroys  
-//  the message anyhow. Nullifies the caller's reference to the message (as 
-//  it is a destructor).                                                    
+//  message part. If the message has no frames, sends nothing but destroys
+//  the message anyhow. Nullifies the caller's reference to the message (as
+//  it is a destructor).
 int QmlZmsgAttached::sendm (QmlZmsg *selfP, void *dest) {
     return zmsg_sendm (&selfP->self, dest);
 };
@@ -260,10 +260,10 @@ QmlZmsg *QmlZmsgAttached::construct () {
 };
 
 ///
-//  Receive message from socket, returns zmsg_t object or NULL if the recv   
-//  was interrupted. Does a blocking recv. If you want to not block then use 
+//  Receive message from socket, returns zmsg_t object or NULL if the recv
+//  was interrupted. Does a blocking recv. If you want to not block then use
 //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-//  before receiving.                                                        
+//  before receiving.
 QmlZmsg *QmlZmsgAttached::recv (void *source) {
     QmlZmsg *qmlSelf = new QmlZmsg ();
     qmlSelf->self = zmsg_recv (source);
@@ -272,7 +272,7 @@ QmlZmsg *QmlZmsgAttached::recv (void *source) {
 
 ///
 //  Load/append an open file into new message, return the message.
-//  Returns NULL if the message could not be loaded.              
+//  Returns NULL if the message could not be loaded.
 QmlZmsg *QmlZmsgAttached::load (FILE *file) {
     QmlZmsg *qmlSelf = new QmlZmsg ();
     qmlSelf->self = zmsg_load (file);
@@ -281,8 +281,8 @@ QmlZmsg *QmlZmsgAttached::load (FILE *file) {
 
 ///
 //  Decodes a serialized message frame created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the frame was badly formatted or   
-//  there was insufficient memory to work.                                  
+//  a new zmsg_t object. Returns NULL if the frame was badly formatted or
+//  there was insufficient memory to work.
 QmlZmsg *QmlZmsgAttached::decode (QmlZframe *frame) {
     QmlZmsg *qmlSelf = new QmlZmsg ();
     qmlSelf->self = zmsg_decode (frame->self);
@@ -291,8 +291,8 @@ QmlZmsg *QmlZmsgAttached::decode (QmlZframe *frame) {
 
 ///
 //  Generate a signal message encoding the given status. A signal is a short
-//  message carrying a 1-byte success/failure code (by convention, 0 means  
-//  OK). Signals are encoded to be distinguishable from "normal" messages.  
+//  message carrying a 1-byte success/failure code (by convention, 0 means
+//  OK). Signals are encoded to be distinguishable from "normal" messages.
 QmlZmsg *QmlZmsgAttached::constructSignal (byte status) {
     QmlZmsg *qmlSelf = new QmlZmsg ();
     qmlSelf->self = zmsg_new_signal (status);

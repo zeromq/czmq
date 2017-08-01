@@ -18,18 +18,18 @@ class QmlZdirPatch : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zdir_patch_t *self;
-    
+
     QmlZdirPatch() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZdirPatch.cpp
-    
+
 public slots:
     //  Create copy of a patch. If the patch is null, or memory was exhausted,
-    //  returns null.                                                         
+    //  returns null.
     QmlZdirPatch *dup ();
 
     //  Return patch file directory path
@@ -55,12 +55,12 @@ class QmlZdirPatchAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZdirPatchAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Self test of this class.
     void test (bool verbose);

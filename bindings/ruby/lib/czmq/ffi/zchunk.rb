@@ -73,8 +73,8 @@ module CZMQ
         @finalizer = nil
       end
 
-      # Create a new chunk of the specified size. If you specify the data, it   
-      # is copied into the chunk. If you do not specify the data, the chunk is  
+      # Create a new chunk of the specified size. If you specify the data, it
+      # is copied into the chunk. If you do not specify the data, the chunk is
       # allocated and left empty, and you can then add data using zchunk_append.
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -138,7 +138,7 @@ module CZMQ
       end
 
       # Set chunk data from user-supplied data; truncate if too large. Data may
-      # be null. Returns actual size of chunk                                  
+      # be null. Returns actual size of chunk
       #
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -165,9 +165,9 @@ module CZMQ
         result
       end
 
-      # Append user-supplied data to chunk, return resulting chunk size. If the 
+      # Append user-supplied data to chunk, return resulting chunk size. If the
       # data would exceeded the available space, it is truncated. If you want to
-      # grow the chunk to accommodate new data, use the zchunk_extend method.   
+      # grow the chunk to accommodate new data, use the zchunk_extend method.
       #
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -181,7 +181,7 @@ module CZMQ
       end
 
       # Append user-supplied data to chunk, return resulting chunk size. If the
-      # data would exceeded the available space, the chunk grows in size.      
+      # data would exceeded the available space, the chunk grows in size.
       #
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -194,10 +194,10 @@ module CZMQ
         result
       end
 
-      # Copy as much data from 'source' into the chunk as possible; returns the  
-      # new size of chunk. If all data from 'source' is used, returns exhausted  
+      # Copy as much data from 'source' into the chunk as possible; returns the
+      # new size of chunk. If all data from 'source' is used, returns exhausted
       # on the source chunk. Source can be consumed as many times as needed until
-      # it is exhausted. If source was already exhausted, does not change chunk. 
+      # it is exhausted. If source was already exhausted, does not change chunk.
       #
       # @param source [Zchunk, #__ptr]
       # @return [Integer]
@@ -210,7 +210,7 @@ module CZMQ
       end
 
       # Returns true if the chunk was exhausted by consume methods, or if the
-      # chunk has a size of zero.                                            
+      # chunk has a size of zero.
       #
       # @return [Boolean]
       def exhausted()
@@ -243,9 +243,9 @@ module CZMQ
         result
       end
 
-      # Try to slurp an entire file into a chunk. Will read up to maxsize of  
-      # the file. If maxsize is 0, will attempt to read the entire file and   
-      # fail with an assertion if that cannot fit into memory. Returns a new  
+      # Try to slurp an entire file into a chunk. Will read up to maxsize of
+      # the file. If maxsize is 0, will attempt to read the entire file and
+      # fail with an assertion if that cannot fit into memory. Returns a new
       # chunk containing the file data, or NULL if the file could not be read.
       #
       # @param filename [String, #to_s, nil]
@@ -258,9 +258,9 @@ module CZMQ
         result
       end
 
-      # Create copy of chunk, as new chunk object. Returns a fresh zchunk_t   
+      # Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
       # object, or null if there was not enough heap memory. If chunk is null,
-      # returns null.                                                         
+      # returns null.
       #
       # @return [Zchunk]
       def dup()
@@ -272,7 +272,7 @@ module CZMQ
       end
 
       # Return chunk data encoded as printable hex string. Caller must free
-      # string when finished with it.                                      
+      # string when finished with it.
       #
       # @return [::FFI::AutoPointer]
       def strhex()
@@ -284,7 +284,7 @@ module CZMQ
       end
 
       # Return chunk data copied into freshly allocated string
-      # Caller must free string when finished with it.        
+      # Caller must free string when finished with it.
       #
       # @return [::FFI::AutoPointer]
       def strdup()
@@ -350,7 +350,7 @@ module CZMQ
       end
 
       # Dump message to stderr, for debugging and tracing.
-      # See zchunk_fprint for details                     
+      # See zchunk_fprint for details
       #
       # @return [void]
       def print()

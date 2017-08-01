@@ -23,7 +23,7 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-// 
+//
 typedef int (zconfig_fct) (
     zconfig_t *self, void *arg, int level);
 
@@ -31,14 +31,14 @@ typedef int (zconfig_fct) (
 CZMQ_EXPORT zconfig_t *
     zconfig_new (const char *name, zconfig_t *parent);
 
-//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+//  Load a config tree from a specified ZPL text file; returns a zconfig_t
 //  reference for the root, if the file exists and is readable. Returns NULL
-//  if the file does not exist.                                             
+//  if the file does not exist.
 CZMQ_EXPORT zconfig_t *
     zconfig_load (const char *filename);
 
 //  Equivalent to zconfig_load, taking a format string instead of a fixed
-//  filename.                                                            
+//  filename.
 CZMQ_EXPORT zconfig_t *
     zconfig_loadf (const char *format, ...) CHECK_PRINTF (1);
 
@@ -59,12 +59,12 @@ CZMQ_EXPORT void
     zconfig_put (zconfig_t *self, const char *path, const char *value);
 
 //  Equivalent to zconfig_put, accepting a format specifier and variable
-//  argument list, instead of a single string value.                    
+//  argument list, instead of a single string value.
 CZMQ_EXPORT void
     zconfig_putf (zconfig_t *self, const char *path, const char *format, ...) CHECK_PRINTF (3);
 
 //  Get value for config item into a string value; leading slash is optional
-//  and ignored.                                                            
+//  and ignored.
 CZMQ_EXPORT char *
     zconfig_get (zconfig_t *self, const char *path, const char *default_value);
 
@@ -72,10 +72,10 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zconfig_set_name (zconfig_t *self, const char *name);
 
-//  Set new value for config item. The new value may be a string, a printf  
-//  format, or NULL. Note that if string may possibly contain '%', or if it 
+//  Set new value for config item. The new value may be a string, a printf
+//  format, or NULL. Note that if string may possibly contain '%', or if it
 //  comes from an insecure source, you must use '%s' as the format, followed
-//  by the string.                                                          
+//  by the string.
 CZMQ_EXPORT void
     zconfig_set_value (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
 
@@ -96,13 +96,13 @@ CZMQ_EXPORT zconfig_t *
     zconfig_at_depth (zconfig_t *self, int level);
 
 //  Execute a callback for each config item in the tree; returns zero if
-//  successful, else -1.                                                
+//  successful, else -1.
 CZMQ_EXPORT int
     zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg);
 
 //  Add comment to config item before saving to disk. You can add as many
 //  comment lines as you like. If you use a null format, all comments are
-//  deleted.                                                             
+//  deleted.
 CZMQ_EXPORT void
     zconfig_set_comment (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
 
@@ -111,12 +111,12 @@ CZMQ_EXPORT zlist_t *
     zconfig_comments (zconfig_t *self);
 
 //  Save a config tree to a specified ZPL text file, where a filename
-//  "-" means dump to standard output.                               
+//  "-" means dump to standard output.
 CZMQ_EXPORT int
     zconfig_save (zconfig_t *self, const char *filename);
 
 //  Equivalent to zconfig_save, taking a format string instead of a fixed
-//  filename.                                                            
+//  filename.
 CZMQ_EXPORT int
     zconfig_savef (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
 
@@ -125,8 +125,8 @@ CZMQ_EXPORT const char *
     zconfig_filename (zconfig_t *self);
 
 //  Reload config tree from same file that it was previously loaded from.
-//  Returns 0 if OK, -1 if there was an error (and then does not change  
-//  existing data).                                                      
+//  Returns 0 if OK, -1 if there was an error (and then does not change
+//  existing data).
 CZMQ_EXPORT int
     zconfig_reload (zconfig_t **self_p);
 
@@ -149,7 +149,7 @@ CZMQ_EXPORT char *
     zconfig_str_save (zconfig_t *self);
 
 //  Return true if a configuration tree was loaded from a file and that
-//  file has changed in since the tree was loaded.                     
+//  file has changed in since the tree was loaded.
 CZMQ_EXPORT bool
     zconfig_has_changed (zconfig_t *self);
 

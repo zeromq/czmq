@@ -16,12 +16,12 @@ QZcertstore::QZcertstore (zcertstore_t *self, QObject *qObjParent) : QObject (qO
 
 
 ///
-//  Create a new certificate store from a disk directory, loading and        
-//  indexing all certificates in that location. The directory itself may be  
+//  Create a new certificate store from a disk directory, loading and
+//  indexing all certificates in that location. The directory itself may be
 //  absent, and created later, or modified at any time. The certificate store
-//  is automatically refreshed on any zcertstore_lookup() call. If the       
-//  location is specified as NULL, creates a pure-memory store, which you    
-//  can work with by inserting certificates at runtime.                      
+//  is automatically refreshed on any zcertstore_lookup() call. If the
+//  location is specified as NULL, creates a pure-memory store, which you
+//  can work with by inserting certificates at runtime.
 QZcertstore::QZcertstore (const QString &location, QObject *qObjParent) : QObject (qObjParent)
 {
     this->self = zcertstore_new (location.toUtf8().data());
@@ -29,7 +29,7 @@ QZcertstore::QZcertstore (const QString &location, QObject *qObjParent) : QObjec
 
 ///
 //  Destroy a certificate store object in memory. Does not affect anything
-//  stored on disk.                                                       
+//  stored on disk.
 QZcertstore::~QZcertstore ()
 {
     zcertstore_destroy (&self);
@@ -40,12 +40,12 @@ QZcertstore::~QZcertstore ()
 void QZcertstore::setLoader (zcertstore_loader loader, zcertstore_destructor destructor, void *state)
 {
     zcertstore_set_loader (self, loader, destructor, state);
-    
+
 }
 
 ///
 //  Look up certificate by public key, returns zcert_t object if found,
-//  else returns NULL. The public key is provided in Z85 text format.  
+//  else returns NULL. The public key is provided in Z85 text format.
 QZcert * QZcertstore::lookup (const QString &publicKey)
 {
     QZcert *rv = new QZcert (zcertstore_lookup (self, publicKey.toUtf8().data()));
@@ -55,20 +55,20 @@ QZcert * QZcertstore::lookup (const QString &publicKey)
 ///
 //  Insert certificate into certificate store in memory. Note that this
 //  does not save the certificate to disk. To do that, use zcert_save()
-//  directly on the certificate. Takes ownership of zcert_t object.    
+//  directly on the certificate. Takes ownership of zcert_t object.
 void QZcertstore::insert (QZcert *certP)
 {
     zcertstore_insert (self, &certP->self);
-    
+
 }
 
 ///
 //  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
-//  which don't usually have access to struct internals.                        
+//  which don't usually have access to struct internals.
 void QZcertstore::empty ()
 {
     zcertstore_empty (self);
-    
+
 }
 
 ///
@@ -76,14 +76,14 @@ void QZcertstore::empty ()
 void QZcertstore::print ()
 {
     zcertstore_print (self);
-    
+
 }
 
 ///
-//  Return a list of all the certificates in the store.                  
-//  The caller takes ownership of the zlistx_t object and is responsible 
+//  Return a list of all the certificates in the store.
+//  The caller takes ownership of the zlistx_t object and is responsible
 //  for destroying it.  The caller does not take ownership of the zcert_t
-//  objects.                                                             
+//  objects.
 QZlistx * QZcertstore::certs ()
 {
     QZlistx *rv = new QZlistx (zcertstore_certs (self));
@@ -95,7 +95,7 @@ QZlistx * QZcertstore::certs ()
 void QZcertstore::test (bool verbose)
 {
     zcertstore_test (verbose);
-    
+
 }
 /*
 ################################################################################

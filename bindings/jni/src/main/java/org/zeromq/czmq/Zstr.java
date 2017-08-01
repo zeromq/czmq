@@ -18,18 +18,18 @@ public class Zstr {
     public long self;
     /*
     Receive C string from socket. Caller must free returned string using
-    zstr_free(). Returns NULL if the context is being terminated or the 
-    process was interrupted.                                            
+    zstr_free(). Returns NULL if the context is being terminated or the
+    process was interrupted.
     */
     native static String __recv (long source);
     public String recv (long source) {
         return __recv (source);
     }
     /*
-    Send a C string to a socket, as a frame. The string is sent without 
+    Send a C string to a socket, as a frame. The string is sent without
     trailing null byte; to read this you can use zstr_recv, or a similar
-    method that adds a null terminator on the received string. String   
-    may be NULL, which is sent as "".                                   
+    method that adds a null terminator on the received string. String
+    may be NULL, which is sent as "".
     */
     native static int __send (long dest, String string);
     public int send (long dest, String string) {
@@ -37,7 +37,7 @@ public class Zstr {
     }
     /*
     Send a C string to a socket, as zstr_send(), with a MORE flag, so that
-    you can send further strings in the same multi-part message.          
+    you can send further strings in the same multi-part message.
     */
     native static int __sendm (long dest, String string);
     public int sendm (long dest, String string) {
@@ -45,24 +45,24 @@ public class Zstr {
     }
     /*
     Send a formatted string to a socket. Note that you should NOT use
-    user-supplied strings in the format (they may contain '%' which  
-    will create security holes).                                     
+    user-supplied strings in the format (they may contain '%' which
+    will create security holes).
     */
     native static int __sendf (long dest, String format);
     public int sendf (long dest, String format) {
         return __sendf (dest, format);
     }
     /*
-    Send a formatted string to a socket, as for zstr_sendf(), with a      
+    Send a formatted string to a socket, as for zstr_sendf(), with a
     MORE flag, so that you can send further strings in the same multi-part
-    message.                                                              
+    message.
     */
     native static int __sendfm (long dest, String format);
     public int sendfm (long dest, String format) {
         return __sendfm (dest, format);
     }
     /*
-    Send a series of strings (until NULL) as multipart data   
+    Send a series of strings (until NULL) as multipart data
     Returns 0 if the strings could be sent OK, or -1 on error.
     */
     native static int __sendx (long dest, String string);
@@ -71,7 +71,7 @@ public class Zstr {
     }
     /*
     Accepts a void pointer and returns a fresh character string. If source
-    is null, returns an empty string.                                     
+    is null, returns an empty string.
     */
     native static String __str (long source);
     public String str (long source) {

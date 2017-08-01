@@ -76,7 +76,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Callback function for ztrie_node to destroy node data.
       #     typedef void (ztrie_destroy_data_fn) (
-      #         void **data);                     
+      #         void **data);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -107,9 +107,9 @@ module CZMQ
         result
       end
 
-      # Inserts a new route into the tree and attaches the data. Returns -1     
+      # Inserts a new route into the tree and attaches the data. Returns -1
       # if the route already exists, otherwise 0. This method takes ownership of
-      # the provided data if a destroy_data_fn is provided.                     
+      # the provided data if a destroy_data_fn is provided.
       #
       # @param path [String, #to_s, nil]
       # @param data [::FFI::Pointer, #to_ptr]
@@ -123,8 +123,8 @@ module CZMQ
       end
 
       # Removes a route from the trie and destroys its data. Returns -1 if the
-      # route does not exists, otherwise 0.                                   
-      # the start of the list call zlist_first (). Advances the cursor.       
+      # route does not exists, otherwise 0.
+      # the start of the list call zlist_first (). Advances the cursor.
       #
       # @param path [String, #to_s, nil]
       # @return [Integer]
@@ -147,8 +147,8 @@ module CZMQ
       end
 
       # Returns the data of a matched route from last ztrie_matches. If the path
-      # did not match, returns NULL. Do not delete the data as it's owned by    
-      # ztrie.                                                                  
+      # did not match, returns NULL. Do not delete the data as it's owned by
+      # ztrie.
       #
       # @return [::FFI::Pointer]
       def hit_data()
@@ -168,9 +168,9 @@ module CZMQ
         result
       end
 
-      # Returns the parameters of a matched route with named regexes from last   
+      # Returns the parameters of a matched route with named regexes from last
       # ztrie_matches. If the path did not match or the route did not contain any
-      # named regexes, returns NULL.                                             
+      # named regexes, returns NULL.
       #
       # @return [Zhashx]
       def hit_parameters()
@@ -182,7 +182,7 @@ module CZMQ
       end
 
       # Returns the asterisk matched part of a route, if there has been no match
-      # or no asterisk match, returns NULL.                                     
+      # or no asterisk match, returns NULL.
       #
       # @return [String]
       def hit_asterisk_match()

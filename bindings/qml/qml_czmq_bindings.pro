@@ -27,7 +27,7 @@ android {
   !system(bash $$CZMQ_ROOT/builds/android/build.sh) {
     error(Failed to build the czmq library with $$CZMQ_ROOT/builds/android/build.sh)
   }
-  
+
   VENDOR_PREFIX = $$CZMQ_ROOT/builds/android/prefix/$(TOOLCHAIN_NAME)
   BUILDDIR  = $$PWD/build/$(TOOLCHAIN_NAME)
   QMAKE_LIBDIR += $$VENDOR_PREFIX/lib
@@ -65,7 +65,7 @@ HEADERS += \
   $$SRCDIR/QmlZsys.h \
   $$SRCDIR/QmlZtimerset.h \
   $$SRCDIR/QmlZtrie.h \
-  $$SRCDIR/QmlZuuid.h 
+  $$SRCDIR/QmlZuuid.h
 
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
@@ -95,7 +95,7 @@ SOURCES += \
   $$SRCDIR/QmlZsys.cpp \
   $$SRCDIR/QmlZtimerset.cpp \
   $$SRCDIR/QmlZtrie.cpp \
-  $$SRCDIR/QmlZuuid.cpp 
+  $$SRCDIR/QmlZuuid.cpp
 
 OBJECTS_DIR = $$BUILDDIR/.obj
 MOC_DIR     = $$BUILDDIR/.moc

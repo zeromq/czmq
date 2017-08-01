@@ -1,13 +1,13 @@
 /*  =========================================================================
     zgossip_msg - class description
 
-    Copyright (c) the Contributors as noted in the AUTHORS file.       
-    This file is part of CZMQ, the high-level C binding for 0MQ:       
-    http://czmq.zeromq.org.                                            
-                                                                       
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
-    file, You can obtain one at http://mozilla.org/MPL/2.0/.           
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -25,11 +25,11 @@ extern "C" {
 //  stable builds by default. If you use this in applications, please ask
 //  for it to be pushed to stable state. Use --enable-drafts to enable.
 #ifdef CZMQ_BUILD_DRAFT_API
-#define ZGOSSIP_MSG_HELLO 1                 // 
-#define ZGOSSIP_MSG_PUBLISH 2               // 
-#define ZGOSSIP_MSG_PING 3                  // 
-#define ZGOSSIP_MSG_PONG 4                  // 
-#define ZGOSSIP_MSG_INVALID 5               // 
+#define ZGOSSIP_MSG_HELLO 1                 //
+#define ZGOSSIP_MSG_PUBLISH 2               //
+#define ZGOSSIP_MSG_PING 3                  //
+#define ZGOSSIP_MSG_PONG 4                  //
+#define ZGOSSIP_MSG_INVALID 5               //
 
 //  *** Draft method, for development use, may change without warning ***
 //  Create a new empty zgossip_msg
@@ -43,7 +43,7 @@ CZMQ_PRIVATE void
 
 //  *** Draft method, for development use, may change without warning ***
 //  Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
-//  there was an error. Blocks if there is no message waiting.   
+//  there was an error. Blocks if there is no message waiting.
 CZMQ_PRIVATE int
     zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input);
 

@@ -16,8 +16,8 @@ QZchunk::QZchunk (zchunk_t *self, QObject *qObjParent) : QObject (qObjParent)
 
 
 ///
-//  Create a new chunk of the specified size. If you specify the data, it   
-//  is copied into the chunk. If you do not specify the data, the chunk is  
+//  Create a new chunk of the specified size. If you specify the data, it
+//  is copied into the chunk. If you do not specify the data, the chunk is
 //  allocated and left empty, and you can then add data using zchunk_append.
 QZchunk::QZchunk (const void *data, size_t size, QObject *qObjParent) : QObject (qObjParent)
 {
@@ -36,7 +36,7 @@ QZchunk::~QZchunk ()
 void QZchunk::resize (size_t size)
 {
     zchunk_resize (self, size);
-    
+
 }
 
 ///
@@ -65,7 +65,7 @@ byte * QZchunk::data ()
 
 ///
 //  Set chunk data from user-supplied data; truncate if too large. Data may
-//  be null. Returns actual size of chunk                                  
+//  be null. Returns actual size of chunk
 size_t QZchunk::set (const void *data, size_t size)
 {
     size_t rv = zchunk_set (self, data, size);
@@ -81,9 +81,9 @@ size_t QZchunk::fill (byte filler, size_t size)
 }
 
 ///
-//  Append user-supplied data to chunk, return resulting chunk size. If the 
+//  Append user-supplied data to chunk, return resulting chunk size. If the
 //  data would exceeded the available space, it is truncated. If you want to
-//  grow the chunk to accommodate new data, use the zchunk_extend method.   
+//  grow the chunk to accommodate new data, use the zchunk_extend method.
 size_t QZchunk::append (const void *data, size_t size)
 {
     size_t rv = zchunk_append (self, data, size);
@@ -92,7 +92,7 @@ size_t QZchunk::append (const void *data, size_t size)
 
 ///
 //  Append user-supplied data to chunk, return resulting chunk size. If the
-//  data would exceeded the available space, the chunk grows in size.      
+//  data would exceeded the available space, the chunk grows in size.
 size_t QZchunk::extend (const void *data, size_t size)
 {
     size_t rv = zchunk_extend (self, data, size);
@@ -100,10 +100,10 @@ size_t QZchunk::extend (const void *data, size_t size)
 }
 
 ///
-//  Copy as much data from 'source' into the chunk as possible; returns the  
-//  new size of chunk. If all data from 'source' is used, returns exhausted  
+//  Copy as much data from 'source' into the chunk as possible; returns the
+//  new size of chunk. If all data from 'source' is used, returns exhausted
 //  on the source chunk. Source can be consumed as many times as needed until
-//  it is exhausted. If source was already exhausted, does not change chunk. 
+//  it is exhausted. If source was already exhausted, does not change chunk.
 size_t QZchunk::consume (QZchunk *source)
 {
     size_t rv = zchunk_consume (self, source->self);
@@ -112,7 +112,7 @@ size_t QZchunk::consume (QZchunk *source)
 
 ///
 //  Returns true if the chunk was exhausted by consume methods, or if the
-//  chunk has a size of zero.                                            
+//  chunk has a size of zero.
 bool QZchunk::exhausted ()
 {
     bool rv = zchunk_exhausted (self);
@@ -136,9 +136,9 @@ int QZchunk::write (FILE *handle)
 }
 
 ///
-//  Try to slurp an entire file into a chunk. Will read up to maxsize of  
-//  the file. If maxsize is 0, will attempt to read the entire file and   
-//  fail with an assertion if that cannot fit into memory. Returns a new  
+//  Try to slurp an entire file into a chunk. Will read up to maxsize of
+//  the file. If maxsize is 0, will attempt to read the entire file and
+//  fail with an assertion if that cannot fit into memory. Returns a new
 //  chunk containing the file data, or NULL if the file could not be read.
 QZchunk * QZchunk::slurp (const QString &filename, size_t maxsize)
 {
@@ -147,9 +147,9 @@ QZchunk * QZchunk::slurp (const QString &filename, size_t maxsize)
 }
 
 ///
-//  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t   
+//  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
 //  object, or null if there was not enough heap memory. If chunk is null,
-//  returns null.                                                         
+//  returns null.
 QZchunk * QZchunk::dup ()
 {
     QZchunk *rv = new QZchunk (zchunk_dup (self));
@@ -158,7 +158,7 @@ QZchunk * QZchunk::dup ()
 
 ///
 //  Return chunk data encoded as printable hex string. Caller must free
-//  string when finished with it.                                      
+//  string when finished with it.
 QString QZchunk::strhex ()
 {
     char *retStr_ = zchunk_strhex (self);
@@ -169,7 +169,7 @@ QString QZchunk::strhex ()
 
 ///
 //  Return chunk data copied into freshly allocated string
-//  Caller must free string when finished with it.        
+//  Caller must free string when finished with it.
 QString QZchunk::strdup ()
 {
     char *retStr_ = zchunk_strdup (self);
@@ -215,16 +215,16 @@ const QString QZchunk::digest ()
 void QZchunk::fprint (FILE *file)
 {
     zchunk_fprint (self, file);
-    
+
 }
 
 ///
 //  Dump message to stderr, for debugging and tracing.
-//  See zchunk_fprint for details                     
+//  See zchunk_fprint for details
 void QZchunk::print ()
 {
     zchunk_print (self);
-    
+
 }
 
 ///
@@ -240,7 +240,7 @@ bool QZchunk::is (void *self)
 void QZchunk::test (bool verbose)
 {
     zchunk_test (verbose);
-    
+
 }
 /*
 ################################################################################

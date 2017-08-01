@@ -77,7 +77,7 @@ module CZMQ
       # links, which are files with the extension ".ln". A symbolic link is a
       # text file containing one line, the filename of a target file. Reading
       # data from the symbolic link actually reads from the target file. Path
-      # may be NULL, in which case it is not used.                           
+      # may be NULL, in which case it is not used.
       # @param path [String, #to_s, nil]
       # @param name [String, #to_s, nil]
       # @return [CZMQ::Zfile]
@@ -97,7 +97,7 @@ module CZMQ
       end
 
       # Duplicate a file item, returns a newly constructed item. If the file
-      # is null, or memory was exhausted, returns null.                     
+      # is null, or memory was exhausted, returns null.
       #
       # @return [Zfile]
       def dup()
@@ -119,9 +119,9 @@ module CZMQ
         result
       end
 
-      # Refresh file properties from disk; this is not done automatically   
+      # Refresh file properties from disk; this is not done automatically
       # on access methods, otherwise it is not possible to compare directory
-      # snapshots.                                                          
+      # snapshots.
       #
       # @return [void]
       def restat()
@@ -132,7 +132,7 @@ module CZMQ
       end
 
       # Return when the file was last modified. If you want this to reflect the
-      # current situation, call zfile_restat before checking this property.    
+      # current situation, call zfile_restat before checking this property.
       #
       # @return [::FFI::Pointer]
       def modified()
@@ -143,7 +143,7 @@ module CZMQ
       end
 
       # Return the last-known size of the file. If you want this to reflect the
-      # current situation, call zfile_restat before checking this property.    
+      # current situation, call zfile_restat before checking this property.
       #
       # @return [::FFI::Pointer]
       def cursize()
@@ -153,7 +153,7 @@ module CZMQ
         result
       end
 
-      # Return true if the file is a directory. If you want this to reflect   
+      # Return true if the file is a directory. If you want this to reflect
       # any external changes, call zfile_restat before checking this property.
       #
       # @return [Boolean]
@@ -176,8 +176,8 @@ module CZMQ
       end
 
       # Return true if the file is readable by this process. If you want this to
-      # reflect any external changes, call zfile_restat before checking this    
-      # property.                                                               
+      # reflect any external changes, call zfile_restat before checking this
+      # property.
       #
       # @return [Boolean]
       def is_readable()
@@ -187,9 +187,9 @@ module CZMQ
         result
       end
 
-      # Return true if the file is writeable by this process. If you want this 
+      # Return true if the file is writeable by this process. If you want this
       # to reflect any external changes, call zfile_restat before checking this
-      # property.                                                              
+      # property.
       #
       # @return [Boolean]
       def is_writeable()
@@ -200,7 +200,7 @@ module CZMQ
       end
 
       # Check if file has stopped changing and can be safely processed.
-      # Updates the file statistics from disk at every call.           
+      # Updates the file statistics from disk at every call.
       #
       # @return [Boolean]
       def is_stable()
@@ -211,7 +211,7 @@ module CZMQ
       end
 
       # Return true if the file was changed on disk since the zfile_t object
-      # was created, or the last zfile_restat() call made on it.            
+      # was created, or the last zfile_restat() call made on it.
       #
       # @return [Boolean]
       def has_changed()
@@ -231,7 +231,7 @@ module CZMQ
         result
       end
 
-      # Open file for reading                             
+      # Open file for reading
       # Returns 0 if OK, -1 if not found or not accessible
       #
       # @return [Integer]
@@ -242,9 +242,9 @@ module CZMQ
         result
       end
 
-      # Open file for writing, creating directory if needed               
+      # Open file for writing, creating directory if needed
       # File is created if necessary; chunks can be written to file at any
-      # location. Returns 0 if OK, -1 if error.                           
+      # location. Returns 0 if OK, -1 if error.
       #
       # @return [Integer]
       def output()
@@ -255,7 +255,7 @@ module CZMQ
       end
 
       # Read chunk from file at specified position. If this was the last chunk,
-      # sets the eof property. Returns a null chunk in case of error.          
+      # sets the eof property. Returns a null chunk in case of error.
       #
       # @param bytes [Integer, #to_int, #to_i]
       # @param offset [::FFI::Pointer, #to_ptr]
@@ -280,7 +280,7 @@ module CZMQ
       end
 
       # Write chunk to file at specified position
-      # Return 0 if OK, else -1                  
+      # Return 0 if OK, else -1
       #
       # @param chunk [Zchunk, #__ptr]
       # @param offset [::FFI::Pointer, #to_ptr]
@@ -294,7 +294,7 @@ module CZMQ
       end
 
       # Read next line of text from file. Returns a pointer to the text line,
-      # or NULL if there was nothing more to read from the file.             
+      # or NULL if there was nothing more to read from the file.
       #
       # @return [String]
       def readln()

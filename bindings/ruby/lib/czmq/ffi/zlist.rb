@@ -76,7 +76,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Comparison function e.g. for sorting and removing.
       #     typedef int (zlist_compare_fn) (
-      #         void *item1, void *item2);  
+      #         void *item1, void *item2);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -93,7 +93,7 @@ module CZMQ
       # Create a new callback of the following type:
       # Callback function for zlist_freefn method
       #     typedef void (zlist_free_fn) (
-      #         void *data);              
+      #         void *data);
       #
       # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
@@ -124,7 +124,7 @@ module CZMQ
       end
 
       # Return the item at the head of list. If the list is empty, returns NULL.
-      # Leaves cursor pointing at the head item, or NULL if the list is empty.  
+      # Leaves cursor pointing at the head item, or NULL if the list is empty.
       #
       # @return [::FFI::Pointer]
       def first()
@@ -135,7 +135,7 @@ module CZMQ
       end
 
       # Return the next item. If the list is empty, returns NULL. To move to
-      # the start of the list call zlist_first (). Advances the cursor.     
+      # the start of the list call zlist_first (). Advances the cursor.
       #
       # @return [::FFI::Pointer]
       def next()
@@ -146,7 +146,7 @@ module CZMQ
       end
 
       # Return the item at the tail of list. If the list is empty, returns NULL.
-      # Leaves cursor pointing at the tail item, or NULL if the list is empty.  
+      # Leaves cursor pointing at the tail item, or NULL if the list is empty.
       #
       # @return [::FFI::Pointer]
       def last()
@@ -176,7 +176,7 @@ module CZMQ
         result
       end
 
-      # Return the current item of list. If the list is empty, returns NULL.     
+      # Return the current item of list. If the list is empty, returns NULL.
       # Leaves cursor pointing at the current item, or NULL if the list is empty.
       #
       # @return [::FFI::Pointer]
@@ -187,9 +187,9 @@ module CZMQ
         result
       end
 
-      # Append an item to the end of the list, return 0 if OK or -1 if this  
+      # Append an item to the end of the list, return 0 if OK or -1 if this
       # failed for some reason (out of memory). Note that if a duplicator has
-      # been set, this method will also duplicate the item.                  
+      # been set, this method will also duplicate the item.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [Integer]
@@ -200,9 +200,9 @@ module CZMQ
         result
       end
 
-      # Push an item to the start of the list, return 0 if OK or -1 if this  
+      # Push an item to the start of the list, return 0 if OK or -1 if this
       # failed for some reason (out of memory). Note that if a duplicator has
-      # been set, this method will also duplicate the item.                  
+      # been set, this method will also duplicate the item.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [Integer]
@@ -223,9 +223,9 @@ module CZMQ
         result
       end
 
-      # Checks if an item already is present. Uses compare method to determine if 
+      # Checks if an item already is present. Uses compare method to determine if
       # items are equal. If the compare method is NULL the check will only compare
-      # pointers. Returns true if item is present else false.                     
+      # pointers. Returns true if item is present else false.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [Boolean]
@@ -247,10 +247,10 @@ module CZMQ
         result
       end
 
-      # Make a copy of list. If the list has autofree set, the copied list will  
+      # Make a copy of list. If the list has autofree set, the copied list will
       # duplicate all items, which must be strings. Otherwise, the list will hold
       # pointers back to the items in the original list. If list is null, returns
-      # NULL.                                                                    
+      # NULL.
       #
       # @return [Zlist]
       def dup()
@@ -281,11 +281,11 @@ module CZMQ
         result
       end
 
-      # Sort the list. If the compare function is null, sorts the list by     
-      # ascending key value using a straight ASCII comparison. If you specify 
+      # Sort the list. If the compare function is null, sorts the list by
+      # ascending key value using a straight ASCII comparison. If you specify
       # a compare function, this decides how items are sorted. The sort is not
       # stable, so may reorder items with the same keys. The algorithm used is
-      # combsort, a compromise between performance and simplicity.            
+      # combsort, a compromise between performance and simplicity.
       #
       # @param compare [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -296,14 +296,14 @@ module CZMQ
         result
       end
 
-      # Set list for automatic item destruction; item values MUST be strings. 
-      # By default a list item refers to a value held elsewhere. When you set 
+      # Set list for automatic item destruction; item values MUST be strings.
+      # By default a list item refers to a value held elsewhere. When you set
       # this, each time you append or push a list item, zlist will take a copy
       # of the string value. Then, when you destroy the list, it will free all
-      # item values automatically. If you use any other technique to allocate 
+      # item values automatically. If you use any other technique to allocate
       # list values, you must free them explicitly before destroying the list.
-      # The usual technique is to pop list items and destroy them, until the  
-      # list is empty.                                                        
+      # The usual technique is to pop list items and destroy them, until the
+      # list is empty.
       #
       # @return [void]
       def autofree()
@@ -314,10 +314,10 @@ module CZMQ
       end
 
       # Sets a compare function for this list. The function compares two items.
-      # It returns an integer less than, equal to, or greater than zero if the 
-      # first item is found, respectively, to be less than, to match, or be    
-      # greater than the second item.                                          
-      # This function is used for sorting, removal and exists checking.        
+      # It returns an integer less than, equal to, or greater than zero if the
+      # first item is found, respectively, to be less than, to match, or be
+      # greater than the second item.
+      # This function is used for sorting, removal and exists checking.
       #
       # @param fn [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -328,11 +328,11 @@ module CZMQ
         result
       end
 
-      # Set a free function for the specified list item. When the item is     
-      # destroyed, the free function, if any, is called on that item.         
-      # Use this when list items are dynamically allocated, to ensure that    
+      # Set a free function for the specified list item. When the item is
+      # destroyed, the free function, if any, is called on that item.
+      # Use this when list items are dynamically allocated, to ensure that
       # you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-      # Returns the item, or NULL if there is no such item.                   
+      # Returns the item, or NULL if there is no such item.
       #
       # @param item [::FFI::Pointer, #to_ptr]
       # @param fn [::FFI::Pointer, #to_ptr]

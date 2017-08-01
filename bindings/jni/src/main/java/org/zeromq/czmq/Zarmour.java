@@ -39,16 +39,16 @@ public class Zarmour implements AutoCloseable{
     /*
     Encode a stream of bytes into an armoured string. Returns the armoured
     string, or NULL if there was insufficient memory available to allocate
-    a new string.                                                         
+    a new string.
     */
     native static String __encode (long self, byte [] data, long size);
     public String encode (byte [] data, long size) {
         return __encode (self, data, size);
     }
     /*
-    Decode an armoured string into a chunk. The decoded output is    
+    Decode an armoured string into a chunk. The decoded output is
     null-terminated, so it may be treated as a string, if that's what
-    it was prior to encoding.                                        
+    it was prior to encoding.
     */
     native static long __decode (long self, String data);
     public Zchunk decode (String data) {

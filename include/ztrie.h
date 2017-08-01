@@ -1,14 +1,14 @@
 /*  =========================================================================
     ztrie - simple trie for tokenizable strings
 
-    Copyright (c) 1991-2012 iMatix Corporation -- http://www.imatix.com                
-    Copyright other contributors as noted in the AUTHORS file.                         
-                                                                                       
+    Copyright (c) 1991-2012 iMatix Corporation -- http://www.imatix.com
+    Copyright other contributors as noted in the AUTHORS file.
+
     This file is part of CZMQ, the high-level C binding for 0MQ: http://czmq.zeromq.org
-                                                                                       
-    This Source Code Form is subject to the terms of the Mozilla Public                
-    License, v. 2.0. If a copy of the MPL was not distributed with this                
-    file, You can obtain one at http://mozilla.org/MPL/2.0/.                           
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -42,16 +42,16 @@ CZMQ_EXPORT void
     ztrie_destroy (ztrie_t **self_p);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Inserts a new route into the tree and attaches the data. Returns -1     
+//  Inserts a new route into the tree and attaches the data. Returns -1
 //  if the route already exists, otherwise 0. This method takes ownership of
-//  the provided data if a destroy_data_fn is provided.                     
+//  the provided data if a destroy_data_fn is provided.
 CZMQ_EXPORT int
     ztrie_insert_route (ztrie_t *self, const char *path, void *data, ztrie_destroy_data_fn destroy_data_fn);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Removes a route from the trie and destroys its data. Returns -1 if the
-//  route does not exists, otherwise 0.                                   
-//  the start of the list call zlist_first (). Advances the cursor.       
+//  route does not exists, otherwise 0.
+//  the start of the list call zlist_first (). Advances the cursor.
 CZMQ_EXPORT int
     ztrie_remove_route (ztrie_t *self, const char *path);
 
@@ -62,8 +62,8 @@ CZMQ_EXPORT bool
 
 //  *** Draft method, for development use, may change without warning ***
 //  Returns the data of a matched route from last ztrie_matches. If the path
-//  did not match, returns NULL. Do not delete the data as it's owned by    
-//  ztrie.                                                                  
+//  did not match, returns NULL. Do not delete the data as it's owned by
+//  ztrie.
 CZMQ_EXPORT void *
     ztrie_hit_data (ztrie_t *self);
 
@@ -73,15 +73,15 @@ CZMQ_EXPORT size_t
     ztrie_hit_parameter_count (ztrie_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Returns the parameters of a matched route with named regexes from last   
+//  Returns the parameters of a matched route with named regexes from last
 //  ztrie_matches. If the path did not match or the route did not contain any
-//  named regexes, returns NULL.                                             
+//  named regexes, returns NULL.
 CZMQ_EXPORT zhashx_t *
     ztrie_hit_parameters (ztrie_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Returns the asterisk matched part of a route, if there has been no match
-//  or no asterisk match, returns NULL.                                     
+//  or no asterisk match, returns NULL.
 CZMQ_EXPORT const char *
     ztrie_hit_asterisk_match (ztrie_t *self);
 

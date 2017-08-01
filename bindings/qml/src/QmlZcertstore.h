@@ -18,39 +18,39 @@ class QmlZcertstore : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isNULL READ isNULL)
-    
+
 public:
     zcertstore_t *self;
-    
+
     QmlZcertstore() { self = NULL; }
     bool isNULL() { return self == NULL; }
-    
+
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZcertstore.cpp
-    
+
 public slots:
     //  Override the default disk loader with a custom loader fn.
     void setLoader (zcertstore_loader loader, zcertstore_destructor destructor, void *state);
 
     //  Look up certificate by public key, returns zcert_t object if found,
-    //  else returns NULL. The public key is provided in Z85 text format.  
+    //  else returns NULL. The public key is provided in Z85 text format.
     QmlZcert *lookup (const QString &publicKey);
 
     //  Insert certificate into certificate store in memory. Note that this
     //  does not save the certificate to disk. To do that, use zcert_save()
-    //  directly on the certificate. Takes ownership of zcert_t object.    
+    //  directly on the certificate. Takes ownership of zcert_t object.
     void insert (QmlZcert *certP);
 
     //  Empty certificate hashtable. This wrapper exists to be friendly to bindings,
-    //  which don't usually have access to struct internals.                        
+    //  which don't usually have access to struct internals.
     void empty ();
 
     //  Print list of certificates in store to logging facility
     void print ();
 
-    //  Return a list of all the certificates in the store.                  
-    //  The caller takes ownership of the zlistx_t object and is responsible 
+    //  Return a list of all the certificates in the store.
+    //  The caller takes ownership of the zlistx_t object and is responsible
     //  for destroying it.  The caller does not take ownership of the zcert_t
-    //  objects.                                                             
+    //  objects.
     QmlZlistx *certs ();
 };
 
@@ -58,26 +58,26 @@ class QmlZcertstoreAttached : public QObject
 {
     Q_OBJECT
     QObject* m_attached;
-    
+
 public:
     QmlZcertstoreAttached (QObject* attached) {
         Q_UNUSED (attached);
     };
-    
+
 public slots:
     //  Self test of this class
     void test (bool verbose);
 
-    //  Create a new certificate store from a disk directory, loading and        
-    //  indexing all certificates in that location. The directory itself may be  
+    //  Create a new certificate store from a disk directory, loading and
+    //  indexing all certificates in that location. The directory itself may be
     //  absent, and created later, or modified at any time. The certificate store
-    //  is automatically refreshed on any zcertstore_lookup() call. If the       
-    //  location is specified as NULL, creates a pure-memory store, which you    
-    //  can work with by inserting certificates at runtime.                      
+    //  is automatically refreshed on any zcertstore_lookup() call. If the
+    //  location is specified as NULL, creates a pure-memory store, which you
+    //  can work with by inserting certificates at runtime.
     QmlZcertstore *construct (const QString &location);
 
     //  Destroy a certificate store object in memory. Does not affect anything
-    //  stored on disk.                                                       
+    //  stored on disk.
     void destruct (QmlZcertstore *qmlSelf);
 };
 

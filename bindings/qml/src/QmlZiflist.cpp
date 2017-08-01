@@ -76,7 +76,7 @@ QObject* QmlZiflist::qmlAttachedProperties(QObject* object) {
 
 ///
 //  Get a list of network interfaces currently defined on the system
-//  Includes IPv6 interfaces                                        
+//  Includes IPv6 interfaces
 QmlZiflist *QmlZiflistAttached::newIpv6 () {
     QmlZiflist *retQ_ = new QmlZiflist ();
     retQ_->self = ziflist_new_ipv6 ();

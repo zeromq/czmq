@@ -32,7 +32,7 @@ QZarmour::~QZarmour ()
 ///
 //  Encode a stream of bytes into an armoured string. Returns the armoured
 //  string, or NULL if there was insufficient memory available to allocate
-//  a new string.                                                         
+//  a new string.
 QString QZarmour::encode (const byte *data, size_t size)
 {
     char *retStr_ = zarmour_encode (self, data, size);
@@ -42,9 +42,9 @@ QString QZarmour::encode (const byte *data, size_t size)
 }
 
 ///
-//  Decode an armoured string into a chunk. The decoded output is    
+//  Decode an armoured string into a chunk. The decoded output is
 //  null-terminated, so it may be treated as a string, if that's what
-//  it was prior to encoding.                                        
+//  it was prior to encoding.
 QZchunk * QZarmour::decode (const QString &data)
 {
     QZchunk *rv = new QZchunk (zarmour_decode (self, data.toUtf8().data()));
@@ -72,7 +72,7 @@ const QString QZarmour::modeStr ()
 void QZarmour::setMode (int mode)
 {
     zarmour_set_mode (self, mode);
-    
+
 }
 
 ///
@@ -88,7 +88,7 @@ bool QZarmour::pad ()
 void QZarmour::setPad (bool pad)
 {
     zarmour_set_pad (self, pad);
-    
+
 }
 
 ///
@@ -104,7 +104,7 @@ char QZarmour::padChar ()
 void QZarmour::setPadChar (char padChar)
 {
     zarmour_set_pad_char (self, padChar);
-    
+
 }
 
 ///
@@ -120,7 +120,7 @@ bool QZarmour::lineBreaks ()
 void QZarmour::setLineBreaks (bool lineBreaks)
 {
     zarmour_set_line_breaks (self, lineBreaks);
-    
+
 }
 
 ///
@@ -136,7 +136,7 @@ size_t QZarmour::lineLength ()
 void QZarmour::setLineLength (size_t lineLength)
 {
     zarmour_set_line_length (self, lineLength);
-    
+
 }
 
 ///
@@ -144,7 +144,7 @@ void QZarmour::setLineLength (size_t lineLength)
 void QZarmour::print ()
 {
     zarmour_print (self);
-    
+
 }
 
 ///
@@ -152,7 +152,7 @@ void QZarmour::print ()
 void QZarmour::test (bool verbose)
 {
     zarmour_test (verbose);
-    
+
 }
 /*
 ################################################################################

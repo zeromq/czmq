@@ -31,7 +31,7 @@ QZlist::~QZlist ()
 
 ///
 //  Return the item at the head of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the head item, or NULL if the list is empty.  
+//  Leaves cursor pointing at the head item, or NULL if the list is empty.
 void * QZlist::first ()
 {
     void * rv = zlist_first (self);
@@ -40,7 +40,7 @@ void * QZlist::first ()
 
 ///
 //  Return the next item. If the list is empty, returns NULL. To move to
-//  the start of the list call zlist_first (). Advances the cursor.     
+//  the start of the list call zlist_first (). Advances the cursor.
 void * QZlist::next ()
 {
     void * rv = zlist_next (self);
@@ -49,7 +49,7 @@ void * QZlist::next ()
 
 ///
 //  Return the item at the tail of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the tail item, or NULL if the list is empty.  
+//  Leaves cursor pointing at the tail item, or NULL if the list is empty.
 void * QZlist::last ()
 {
     void * rv = zlist_last (self);
@@ -73,7 +73,7 @@ void * QZlist::tail ()
 }
 
 ///
-//  Return the current item of list. If the list is empty, returns NULL.     
+//  Return the current item of list. If the list is empty, returns NULL.
 //  Leaves cursor pointing at the current item, or NULL if the list is empty.
 void * QZlist::item ()
 {
@@ -82,9 +82,9 @@ void * QZlist::item ()
 }
 
 ///
-//  Append an item to the end of the list, return 0 if OK or -1 if this  
+//  Append an item to the end of the list, return 0 if OK or -1 if this
 //  failed for some reason (out of memory). Note that if a duplicator has
-//  been set, this method will also duplicate the item.                  
+//  been set, this method will also duplicate the item.
 int QZlist::append (void *item)
 {
     int rv = zlist_append (self, item);
@@ -92,9 +92,9 @@ int QZlist::append (void *item)
 }
 
 ///
-//  Push an item to the start of the list, return 0 if OK or -1 if this  
+//  Push an item to the start of the list, return 0 if OK or -1 if this
 //  failed for some reason (out of memory). Note that if a duplicator has
-//  been set, this method will also duplicate the item.                  
+//  been set, this method will also duplicate the item.
 int QZlist::push (void *item)
 {
     int rv = zlist_push (self, item);
@@ -110,9 +110,9 @@ void * QZlist::pop ()
 }
 
 ///
-//  Checks if an item already is present. Uses compare method to determine if 
+//  Checks if an item already is present. Uses compare method to determine if
 //  items are equal. If the compare method is NULL the check will only compare
-//  pointers. Returns true if item is present else false.                     
+//  pointers. Returns true if item is present else false.
 bool QZlist::exists (void *item)
 {
     bool rv = zlist_exists (self, item);
@@ -124,14 +124,14 @@ bool QZlist::exists (void *item)
 void QZlist::remove (void *item)
 {
     zlist_remove (self, item);
-    
+
 }
 
 ///
-//  Make a copy of list. If the list has autofree set, the copied list will  
+//  Make a copy of list. If the list has autofree set, the copied list will
 //  duplicate all items, which must be strings. Otherwise, the list will hold
 //  pointers back to the items in the original list. If list is null, returns
-//  NULL.                                                                    
+//  NULL.
 QZlist * QZlist::dup ()
 {
     QZlist *rv = new QZlist (zlist_dup (self));
@@ -143,7 +143,7 @@ QZlist * QZlist::dup ()
 void QZlist::purge ()
 {
     zlist_purge (self);
-    
+
 }
 
 ///
@@ -155,50 +155,50 @@ size_t QZlist::size ()
 }
 
 ///
-//  Sort the list. If the compare function is null, sorts the list by     
-//  ascending key value using a straight ASCII comparison. If you specify 
+//  Sort the list. If the compare function is null, sorts the list by
+//  ascending key value using a straight ASCII comparison. If you specify
 //  a compare function, this decides how items are sorted. The sort is not
 //  stable, so may reorder items with the same keys. The algorithm used is
-//  combsort, a compromise between performance and simplicity.            
+//  combsort, a compromise between performance and simplicity.
 void QZlist::sort (zlist_compare_fn compare)
 {
     zlist_sort (self, compare);
-    
+
 }
 
 ///
-//  Set list for automatic item destruction; item values MUST be strings. 
-//  By default a list item refers to a value held elsewhere. When you set 
+//  Set list for automatic item destruction; item values MUST be strings.
+//  By default a list item refers to a value held elsewhere. When you set
 //  this, each time you append or push a list item, zlist will take a copy
 //  of the string value. Then, when you destroy the list, it will free all
-//  item values automatically. If you use any other technique to allocate 
+//  item values automatically. If you use any other technique to allocate
 //  list values, you must free them explicitly before destroying the list.
-//  The usual technique is to pop list items and destroy them, until the  
-//  list is empty.                                                        
+//  The usual technique is to pop list items and destroy them, until the
+//  list is empty.
 void QZlist::autofree ()
 {
     zlist_autofree (self);
-    
+
 }
 
 ///
 //  Sets a compare function for this list. The function compares two items.
-//  It returns an integer less than, equal to, or greater than zero if the 
-//  first item is found, respectively, to be less than, to match, or be    
-//  greater than the second item.                                          
-//  This function is used for sorting, removal and exists checking.        
+//  It returns an integer less than, equal to, or greater than zero if the
+//  first item is found, respectively, to be less than, to match, or be
+//  greater than the second item.
+//  This function is used for sorting, removal and exists checking.
 void QZlist::comparefn (zlist_compare_fn fn)
 {
     zlist_comparefn (self, fn);
-    
+
 }
 
 ///
-//  Set a free function for the specified list item. When the item is     
-//  destroyed, the free function, if any, is called on that item.         
-//  Use this when list items are dynamically allocated, to ensure that    
+//  Set a free function for the specified list item. When the item is
+//  destroyed, the free function, if any, is called on that item.
+//  Use this when list items are dynamically allocated, to ensure that
 //  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-//  Returns the item, or NULL if there is no such item.                   
+//  Returns the item, or NULL if there is no such item.
 void * QZlist::freefn (void *item, zlist_free_fn fn, bool atTail)
 {
     void * rv = zlist_freefn (self, item, fn, atTail);
@@ -210,7 +210,7 @@ void * QZlist::freefn (void *item, zlist_free_fn fn, bool atTail)
 void QZlist::test (bool verbose)
 {
     zlist_test (verbose);
-    
+
 }
 /*
 ################################################################################

@@ -50,28 +50,28 @@ CZMQ_EXPORT int
     ztimerset_cancel (ztimerset_t *self, int timer_id);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Set timer interval. Returns 0 if OK, -1 on failure.                                    
+//  Set timer interval. Returns 0 if OK, -1 on failure.
 //  This method is slow, canceling the timer and adding a new one yield better performance.
 CZMQ_EXPORT int
     ztimerset_set_interval (ztimerset_t *self, int timer_id, size_t interval);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Reset timer to start interval counting from current time. Returns 0 if OK, -1 on failure.
-//  This method is slow, canceling the timer and adding a new one yield better performance.  
+//  This method is slow, canceling the timer and adding a new one yield better performance.
 CZMQ_EXPORT int
     ztimerset_reset (ztimerset_t *self, int timer_id);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return the time until the next interval.                        
+//  Return the time until the next interval.
 //  Should be used as timeout parameter for the zpoller wait method.
-//  The timeout is in msec.                                         
+//  The timeout is in msec.
 CZMQ_EXPORT int
     ztimerset_timeout (ztimerset_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Invoke callback function of all timers which their interval has elapsed.
-//  Should be call after zpoller wait method.                               
-//  Returns 0 if OK, -1 on failure.                                         
+//  Should be call after zpoller wait method.
+//  Returns 0 if OK, -1 on failure.
 CZMQ_EXPORT int
     ztimerset_execute (ztimerset_t *self);
 

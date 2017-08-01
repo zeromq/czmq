@@ -9,13 +9,13 @@ module CZMQ
     # working with single message frames
     # @note This class is 100% generated using zproject.
     class Zframe
-      # 
+      #
       MORE = 1
 
-      # 
+      #
       REUSE = 2
 
-      # 
+      #
       DONTWAIT = 4
 
       # Raised when one tries to use an instance of {Zframe} after
@@ -83,8 +83,8 @@ module CZMQ
       end
 
       # Create a new frame. If size is not null, allocates the frame data
-      # to the specified size. If additionally, data is not null, copies 
-      # size octets from the specified data into the frame body.         
+      # to the specified size. If additionally, data is not null, copies
+      # size octets from the specified data into the frame body.
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
       # @return [CZMQ::Zframe]
@@ -109,9 +109,9 @@ module CZMQ
         __new ptr
       end
 
-      # Receive frame from socket, returns zframe_t object or NULL if the recv  
+      # Receive frame from socket, returns zframe_t object or NULL if the recv
       # was interrupted. Does a blocking recv, if you want to not block then use
-      # zpoller or zloop.                                                       
+      # zpoller or zloop.
       # @param source [::FFI::Pointer, #to_ptr]
       # @return [CZMQ::Zframe]
       def self.recv(source)
@@ -130,7 +130,7 @@ module CZMQ
       end
 
       # Send a frame to a socket, destroy frame after sending.
-      # Return -1 on error, 0 on success.                     
+      # Return -1 on error, 0 on success.
       #
       # @param self_p [#__ptr_give_ref]
       # @param dest [::FFI::Pointer, #to_ptr]
@@ -163,9 +163,9 @@ module CZMQ
         result
       end
 
-      # Return meta data property for frame                                   
+      # Return meta data property for frame
       # The caller shall not modify or free the returned value, which shall be
-      # owned by the message.                                                 
+      # owned by the message.
       #
       # @param property [String, #to_s, nil]
       # @return [String]
@@ -177,7 +177,7 @@ module CZMQ
       end
 
       # Create a new frame that duplicates an existing frame. If frame is null,
-      # or memory was exhausted, returns null.                                 
+      # or memory was exhausted, returns null.
       #
       # @return [Zframe]
       def dup()
@@ -189,7 +189,7 @@ module CZMQ
       end
 
       # Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-      # Caller must free string when finished with it.                          
+      # Caller must free string when finished with it.
       #
       # @return [::FFI::AutoPointer]
       def strhex()
@@ -201,7 +201,7 @@ module CZMQ
       end
 
       # Return frame data copied into freshly allocated string
-      # Caller must free string when finished with it.        
+      # Caller must free string when finished with it.
       #
       # @return [::FFI::AutoPointer]
       def strdup()
@@ -224,7 +224,7 @@ module CZMQ
       end
 
       # Return frame MORE indicator (1 or 0), set when reading frame from socket
-      # or by the zframe_set_more() method                                      
+      # or by the zframe_set_more() method
       #
       # @return [Integer]
       def more()
@@ -235,7 +235,7 @@ module CZMQ
       end
 
       # Set frame MORE indicator (1 or 0). Note this is NOT used when sending
-      # frame to socket, you have to specify flag explicitly.                
+      # frame to socket, you have to specify flag explicitly.
       #
       # @param more [Integer, #to_int, #to_i]
       # @return [void]
@@ -248,7 +248,7 @@ module CZMQ
       end
 
       # Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
-      # Else returns zero.                                                  
+      # Else returns zero.
       #
       # @return [Integer]
       def routing_id()
@@ -259,7 +259,7 @@ module CZMQ
       end
 
       # Set routing ID on frame. This is used if/when the frame is sent to a
-      # ZMQ_SERVER socket.                                                  
+      # ZMQ_SERVER socket.
       #
       # @param routing_id [Integer, #to_int, #to_i]
       # @return [void]
@@ -282,8 +282,8 @@ module CZMQ
       end
 
       # Set group on frame. This is used if/when the frame is sent to a
-      # ZMQ_RADIO socket.                                              
-      # Return -1 on error, 0 on success.                              
+      # ZMQ_RADIO socket.
+      # Return -1 on error, 0 on success.
       #
       # @param group [String, #to_s, nil]
       # @return [Integer]
@@ -295,7 +295,7 @@ module CZMQ
       end
 
       # Return TRUE if two frames have identical size and data
-      # If either frame is NULL, equality is always false.    
+      # If either frame is NULL, equality is always false.
       #
       # @param other [Zframe, #__ptr]
       # @return [Boolean]
@@ -320,7 +320,7 @@ module CZMQ
         result
       end
 
-      # Send message to zsys log sink (may be stdout, or system facility as       
+      # Send message to zsys log sink (may be stdout, or system facility as
       # configured by zsys_set_logstream). Prefix shows before frame, if not null.
       #
       # @param prefix [String, #to_s, nil]

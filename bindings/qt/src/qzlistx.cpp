@@ -24,7 +24,7 @@ QZlistx::QZlistx (QObject *qObjParent) : QObject (qObjParent)
 
 ///
 //  Destroy a list. If an item destructor was specified, all items in the
-//  list are automatically destroyed as well.                            
+//  list are automatically destroyed as well.
 QZlistx::~QZlistx ()
 {
     zlistx_destroy (&self);
@@ -32,8 +32,8 @@ QZlistx::~QZlistx ()
 
 ///
 //  Add an item to the head of the list. Calls the item duplicator, if any,
-//  on the item. Resets cursor to list head. Returns an item handle on     
-//  success, NULL if memory was exhausted.                                 
+//  on the item. Resets cursor to list head. Returns an item handle on
+//  success, NULL if memory was exhausted.
 void * QZlistx::addStart (void *item)
 {
     void * rv = zlistx_add_start (self, item);
@@ -42,8 +42,8 @@ void * QZlistx::addStart (void *item)
 
 ///
 //  Add an item to the tail of the list. Calls the item duplicator, if any,
-//  on the item. Resets cursor to list head. Returns an item handle on     
-//  success, NULL if memory was exhausted.                                 
+//  on the item. Resets cursor to list head. Returns an item handle on
+//  success, NULL if memory was exhausted.
 void * QZlistx::addEnd (void *item)
 {
     void * rv = zlistx_add_end (self, item);
@@ -76,7 +76,7 @@ void * QZlistx::tail ()
 
 ///
 //  Return the item at the head of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the head item, or NULL if the list is empty.  
+//  Leaves cursor pointing at the head item, or NULL if the list is empty.
 void * QZlistx::first ()
 {
     void * rv = zlistx_first (self);
@@ -84,9 +84,9 @@ void * QZlistx::first ()
 }
 
 ///
-//  Return the next item. At the end of the list (or in an empty list),     
+//  Return the next item. At the end of the list (or in an empty list),
 //  returns NULL. Use repeated zlistx_next () calls to work through the list
-//  from zlistx_first (). First time, acts as zlistx_first().               
+//  from zlistx_first (). First time, acts as zlistx_first().
 void * QZlistx::next ()
 {
     void * rv = zlistx_next (self);
@@ -95,8 +95,8 @@ void * QZlistx::next ()
 
 ///
 //  Return the previous item. At the start of the list (or in an empty list),
-//  returns NULL. Use repeated zlistx_prev () calls to work through the list 
-//  backwards from zlistx_last (). First time, acts as zlistx_last().        
+//  returns NULL. Use repeated zlistx_prev () calls to work through the list
+//  backwards from zlistx_last (). First time, acts as zlistx_last().
 void * QZlistx::prev ()
 {
     void * rv = zlistx_prev (self);
@@ -105,7 +105,7 @@ void * QZlistx::prev ()
 
 ///
 //  Return the item at the tail of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the tail item, or NULL if the list is empty.  
+//  Leaves cursor pointing at the tail item, or NULL if the list is empty.
 void * QZlistx::last ()
 {
     void * rv = zlistx_last (self);
@@ -114,7 +114,7 @@ void * QZlistx::last ()
 
 ///
 //  Returns the value of the item at the cursor, or NULL if the cursor is
-//  not pointing to an item.                                             
+//  not pointing to an item.
 void * QZlistx::item ()
 {
     void * rv = zlistx_item (self);
@@ -123,7 +123,7 @@ void * QZlistx::item ()
 
 ///
 //  Returns the handle of the item at the cursor, or NULL if the cursor is
-//  not pointing to an item.                                              
+//  not pointing to an item.
 void * QZlistx::cursor ()
 {
     void * rv = zlistx_cursor (self);
@@ -131,7 +131,7 @@ void * QZlistx::cursor ()
 }
 
 ///
-//  Returns the item associated with the given list handle, or NULL if passed     
+//  Returns the item associated with the given list handle, or NULL if passed
 //  in handle is NULL. Asserts that the passed in handle points to a list element.
 void * QZlistx::handleItem (void *handle)
 {
@@ -140,8 +140,8 @@ void * QZlistx::handleItem (void *handle)
 }
 
 ///
-//  Find an item in the list, searching from the start. Uses the item     
-//  comparator, if any, else compares item values directly. Returns the   
+//  Find an item in the list, searching from the start. Uses the item
+//  comparator, if any, else compares item values directly. Returns the
 //  item handle found, or NULL. Sets the cursor to the found item, if any.
 void * QZlistx::find (void *item)
 {
@@ -150,11 +150,11 @@ void * QZlistx::find (void *item)
 }
 
 ///
-//  Detach an item from the list, using its handle. The item is not modified, 
+//  Detach an item from the list, using its handle. The item is not modified,
 //  and the caller is responsible for destroying it if necessary. If handle is
 //  null, detaches the first item on the list. Returns item that was detached,
 //  or null if none was. If cursor was at item, moves cursor to previous item,
-//  so you can detach items while iterating forwards through a list.          
+//  so you can detach items while iterating forwards through a list.
 void * QZlistx::detach (void *handle)
 {
     void * rv = zlistx_detach (self, handle);
@@ -163,9 +163,9 @@ void * QZlistx::detach (void *handle)
 
 ///
 //  Detach item at the cursor, if any, from the list. The item is not modified,
-//  and the caller is responsible for destroying it as necessary. Returns item 
-//  that was detached, or null if none was. Moves cursor to previous item, so  
-//  you can detach items while iterating forwards through a list.              
+//  and the caller is responsible for destroying it as necessary. Returns item
+//  that was detached, or null if none was. Moves cursor to previous item, so
+//  you can detach items while iterating forwards through a list.
 void * QZlistx::detachCur ()
 {
     void * rv = zlistx_detach_cur (self);
@@ -173,11 +173,11 @@ void * QZlistx::detachCur ()
 }
 
 ///
-//  Delete an item, using its handle. Calls the item destructor is any is 
-//  set. If handle is null, deletes the first item on the list. Returns 0 
+//  Delete an item, using its handle. Calls the item destructor is any is
+//  set. If handle is null, deletes the first item on the list. Returns 0
 //  if an item was deleted, -1 if not. If cursor was at item, moves cursor
-//  to previous item, so you can delete items while iterating forwards    
-//  through a list.                                                       
+//  to previous item, so you can delete items while iterating forwards
+//  through a list.
 int QZlistx::deleteNoConflict (void *handle)
 {
     int rv = zlistx_delete (self, handle);
@@ -189,7 +189,7 @@ int QZlistx::deleteNoConflict (void *handle)
 void QZlistx::moveStart (void *handle)
 {
     zlistx_move_start (self, handle);
-    
+
 }
 
 ///
@@ -197,35 +197,35 @@ void QZlistx::moveStart (void *handle)
 void QZlistx::moveEnd (void *handle)
 {
     zlistx_move_end (self, handle);
-    
+
 }
 
 ///
 //  Remove all items from the list, and destroy them if the item destructor
-//  is set.                                                                
+//  is set.
 void QZlistx::purge ()
 {
     zlistx_purge (self);
-    
+
 }
 
 ///
-//  Sort the list. If an item comparator was set, calls that to compare    
+//  Sort the list. If an item comparator was set, calls that to compare
 //  items, otherwise compares on item value. The sort is not stable, so may
-//  reorder equal items.                                                   
+//  reorder equal items.
 void QZlistx::sort ()
 {
     zlistx_sort (self);
-    
+
 }
 
 ///
-//  Create a new node and insert it into a sorted list. Calls the item        
-//  duplicator, if any, on the item. If low_value is true, starts searching   
-//  from the start of the list, otherwise searches from the end. Use the item 
-//  comparator, if any, to find where to place the new node. Returns a handle 
+//  Create a new node and insert it into a sorted list. Calls the item
+//  duplicator, if any, on the item. If low_value is true, starts searching
+//  from the start of the list, otherwise searches from the end. Use the item
+//  comparator, if any, to find where to place the new node. Returns a handle
 //  to the new node, or NULL if memory was exhausted. Resets the cursor to the
-//  list head.                                                                
+//  list head.
 void * QZlistx::insert (void *item, bool lowValue)
 {
     void * rv = zlistx_insert (self, item, lowValue);
@@ -233,20 +233,20 @@ void * QZlistx::insert (void *item, bool lowValue)
 }
 
 ///
-//  Move an item, specified by handle, into position in a sorted list. Uses 
+//  Move an item, specified by handle, into position in a sorted list. Uses
 //  the item comparator, if any, to determine the new location. If low_value
 //  is true, starts searching from the start of the list, otherwise searches
-//  from the end.                                                           
+//  from the end.
 void QZlistx::reorder (void *handle, bool lowValue)
 {
     zlistx_reorder (self, handle, lowValue);
-    
+
 }
 
 ///
 //  Make a copy of the list; items are duplicated if you set a duplicator
-//  for the list, otherwise not. Copying a null reference returns a null 
-//  reference.                                                           
+//  for the list, otherwise not. Copying a null reference returns a null
+//  reference.
 QZlistx * QZlistx::dup ()
 {
     QZlistx *rv = new QZlistx (zlistx_dup (self));
@@ -255,30 +255,30 @@ QZlistx * QZlistx::dup ()
 
 ///
 //  Set a user-defined deallocator for list items; by default items are not
-//  freed when the list is destroyed.                                      
+//  freed when the list is destroyed.
 void QZlistx::setDestructor (zlistx_destructor_fn destructor)
 {
     zlistx_set_destructor (self, destructor);
-    
+
 }
 
 ///
 //  Set a user-defined duplicator for list items; by default items are not
-//  copied when the list is duplicated.                                   
+//  copied when the list is duplicated.
 void QZlistx::setDuplicator (zlistx_duplicator_fn duplicator)
 {
     zlistx_set_duplicator (self, duplicator);
-    
+
 }
 
 ///
-//  Set a user-defined comparator for zlistx_find and zlistx_sort; the method 
+//  Set a user-defined comparator for zlistx_find and zlistx_sort; the method
 //  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
-//  or greater than, item2.                                                   
+//  or greater than, item2.
 void QZlistx::setComparator (zlistx_comparator_fn comparator)
 {
     zlistx_set_comparator (self, comparator);
-    
+
 }
 
 ///
@@ -286,7 +286,7 @@ void QZlistx::setComparator (zlistx_comparator_fn comparator)
 void QZlistx::test (bool verbose)
 {
     zlistx_test (verbose);
-    
+
 }
 /*
 ################################################################################

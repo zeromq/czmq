@@ -21,7 +21,7 @@ public class Zfile implements AutoCloseable{
     links, which are files with the extension ".ln". A symbolic link is a
     text file containing one line, the filename of a target file. Reading
     data from the symbolic link actually reads from the target file. Path
-    may be NULL, in which case it is not used.                           
+    may be NULL, in which case it is not used.
     */
     native static long __new (String path, String name);
     public Zfile (String path, String name) {
@@ -42,7 +42,7 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Duplicate a file item, returns a newly constructed item. If the file
-    is null, or memory was exhausted, returns null.                     
+    is null, or memory was exhausted, returns null.
     */
     native static long __dup (long self);
     public Zfile dup () {
@@ -56,9 +56,9 @@ public class Zfile implements AutoCloseable{
         return __filename (self, path);
     }
     /*
-    Refresh file properties from disk; this is not done automatically   
+    Refresh file properties from disk; this is not done automatically
     on access methods, otherwise it is not possible to compare directory
-    snapshots.                                                          
+    snapshots.
     */
     native static void __restat (long self);
     public void restat () {
@@ -66,7 +66,7 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Return when the file was last modified. If you want this to reflect the
-    current situation, call zfile_restat before checking this property.    
+    current situation, call zfile_restat before checking this property.
     */
     native static long __modified (long self);
     public long modified () {
@@ -74,14 +74,14 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Return the last-known size of the file. If you want this to reflect the
-    current situation, call zfile_restat before checking this property.    
+    current situation, call zfile_restat before checking this property.
     */
     native static long __cursize (long self);
     public long cursize () {
         return __cursize (self);
     }
     /*
-    Return true if the file is a directory. If you want this to reflect   
+    Return true if the file is a directory. If you want this to reflect
     any external changes, call zfile_restat before checking this property.
     */
     native static boolean __isDirectory (long self);
@@ -98,17 +98,17 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Return true if the file is readable by this process. If you want this to
-    reflect any external changes, call zfile_restat before checking this    
-    property.                                                               
+    reflect any external changes, call zfile_restat before checking this
+    property.
     */
     native static boolean __isReadable (long self);
     public boolean isReadable () {
         return __isReadable (self);
     }
     /*
-    Return true if the file is writeable by this process. If you want this 
+    Return true if the file is writeable by this process. If you want this
     to reflect any external changes, call zfile_restat before checking this
-    property.                                                              
+    property.
     */
     native static boolean __isWriteable (long self);
     public boolean isWriteable () {
@@ -116,7 +116,7 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Check if file has stopped changing and can be safely processed.
-    Updates the file statistics from disk at every call.           
+    Updates the file statistics from disk at every call.
     */
     native static boolean __isStable (long self);
     public boolean isStable () {
@@ -124,7 +124,7 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Return true if the file was changed on disk since the zfile_t object
-    was created, or the last zfile_restat() call made on it.            
+    was created, or the last zfile_restat() call made on it.
     */
     native static boolean __hasChanged (long self);
     public boolean hasChanged () {
@@ -138,7 +138,7 @@ public class Zfile implements AutoCloseable{
         __remove (self);
     }
     /*
-    Open file for reading                             
+    Open file for reading
     Returns 0 if OK, -1 if not found or not accessible
     */
     native static int __input (long self);
@@ -146,9 +146,9 @@ public class Zfile implements AutoCloseable{
         return __input (self);
     }
     /*
-    Open file for writing, creating directory if needed               
+    Open file for writing, creating directory if needed
     File is created if necessary; chunks can be written to file at any
-    location. Returns 0 if OK, -1 if error.                           
+    location. Returns 0 if OK, -1 if error.
     */
     native static int __output (long self);
     public int output () {
@@ -156,7 +156,7 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Read chunk from file at specified position. If this was the last chunk,
-    sets the eof property. Returns a null chunk in case of error.          
+    sets the eof property. Returns a null chunk in case of error.
     */
     native static long __read (long self, long bytes, long offset);
     public Zchunk read (long bytes, long offset) {
@@ -171,7 +171,7 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Write chunk to file at specified position
-    Return 0 if OK, else -1                  
+    Return 0 if OK, else -1
     */
     native static int __write (long self, long chunk, long offset);
     public int write (Zchunk chunk, long offset) {
@@ -179,7 +179,7 @@ public class Zfile implements AutoCloseable{
     }
     /*
     Read next line of text from file. Returns a pointer to the text line,
-    or NULL if there was nothing more to read from the file.             
+    or NULL if there was nothing more to read from the file.
     */
     native static String __readln (long self);
     public String readln () {

@@ -10,15 +10,15 @@
 
 ///
 //  Send a zmsg message to the actor, take ownership of the message
-//  and destroy when it has been sent.                             
+//  and destroy when it has been sent.
 int QmlZactor::send (QmlZmsg *msgP) {
     return zactor_send (self, &msgP->self);
 };
 
 ///
-//  Receive a zmsg message from the actor. Returns NULL if the actor 
+//  Receive a zmsg message from the actor. Returns NULL if the actor
 //  was interrupted before the message could be received, or if there
-//  was a timeout on the actor.                                      
+//  was a timeout on the actor.
 QmlZmsg *QmlZactor::recv () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zactor_recv (self);
@@ -27,7 +27,7 @@ QmlZmsg *QmlZactor::recv () {
 
 ///
 //  Return the actor's zsock handle. Use this when you absolutely need
-//  to work with the zsock instance rather than the actor.            
+//  to work with the zsock instance rather than the actor.
 QmlZsock *QmlZactor::sock () {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zactor_sock (self);
@@ -54,8 +54,8 @@ bool QmlZactorAttached::is (void *self) {
 
 ///
 //  Probe the supplied reference. If it looks like a zactor_t instance,
-//  return the underlying libzmq actor handle; else if it looks like   
-//  a libzmq actor handle, return the supplied value.                  
+//  return the underlying libzmq actor handle; else if it looks like
+//  a libzmq actor handle, return the supplied value.
 void *QmlZactorAttached::resolve (void *self) {
     return zactor_resolve (self);
 };

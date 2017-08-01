@@ -80,10 +80,10 @@ module CZMQ
         __new ptr
       end
 
-      # Receive message from socket, returns zmsg_t object or NULL if the recv   
-      # was interrupted. Does a blocking recv. If you want to not block then use 
+      # Receive message from socket, returns zmsg_t object or NULL if the recv
+      # was interrupted. Does a blocking recv. If you want to not block then use
       # the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-      # before receiving.                                                        
+      # before receiving.
       # @param source [::FFI::Pointer, #to_ptr]
       # @return [CZMQ::Zmsg]
       def self.recv(source)
@@ -92,7 +92,7 @@ module CZMQ
       end
 
       # Load/append an open file into new message, return the message.
-      # Returns NULL if the message could not be loaded.              
+      # Returns NULL if the message could not be loaded.
       # @param file [::FFI::Pointer, #to_ptr]
       # @return [CZMQ::Zmsg]
       def self.load(file)
@@ -101,8 +101,8 @@ module CZMQ
       end
 
       # Decodes a serialized message frame created by zmsg_encode () and returns
-      # a new zmsg_t object. Returns NULL if the frame was badly formatted or   
-      # there was insufficient memory to work.                                  
+      # a new zmsg_t object. Returns NULL if the frame was badly formatted or
+      # there was insufficient memory to work.
       # @param frame [Zframe, #__ptr]
       # @return [CZMQ::Zmsg]
       def self.decode(frame)
@@ -112,8 +112,8 @@ module CZMQ
       end
 
       # Generate a signal message encoding the given status. A signal is a short
-      # message carrying a 1-byte success/failure code (by convention, 0 means  
-      # OK). Signals are encoded to be distinguishable from "normal" messages.  
+      # message carrying a 1-byte success/failure code (by convention, 0 means
+      # OK). Signals are encoded to be distinguishable from "normal" messages.
       # @param status [Integer, #to_int, #to_i]
       # @return [CZMQ::Zmsg]
       def self.new_signal(status)
@@ -134,8 +134,8 @@ module CZMQ
 
       # Send message to destination socket, and destroy the message after sending
       # it successfully. If the message has no frames, sends nothing but destroys
-      # the message anyhow. Nullifies the caller's reference to the message (as  
-      # it is a destructor).                                                     
+      # the message anyhow. Nullifies the caller's reference to the message (as
+      # it is a destructor).
       #
       # @param self_p [#__ptr_give_ref]
       # @param dest [::FFI::Pointer, #to_ptr]
@@ -146,12 +146,12 @@ module CZMQ
         result
       end
 
-      # Send message to destination socket as part of a multipart sequence, and 
-      # destroy the message after sending it successfully. Note that after a    
+      # Send message to destination socket as part of a multipart sequence, and
+      # destroy the message after sending it successfully. Note that after a
       # zmsg_sendm, you must call zmsg_send or another method that sends a final
-      # message part. If the message has no frames, sends nothing but destroys  
-      # the message anyhow. Nullifies the caller's reference to the message (as 
-      # it is a destructor).                                                    
+      # message part. If the message has no frames, sends nothing but destroys
+      # the message anyhow. Nullifies the caller's reference to the message (as
+      # it is a destructor).
       #
       # @param self_p [#__ptr_give_ref]
       # @param dest [::FFI::Pointer, #to_ptr]
@@ -183,7 +183,7 @@ module CZMQ
       end
 
       # Return message routing ID, if the message came from a ZMQ_SERVER socket.
-      # Else returns zero.                                                      
+      # Else returns zero.
       #
       # @return [Integer]
       def routing_id()
@@ -194,7 +194,7 @@ module CZMQ
       end
 
       # Set routing ID on message. This is used if/when the message is sent to a
-      # ZMQ_SERVER socket.                                                      
+      # ZMQ_SERVER socket.
       #
       # @param routing_id [Integer, #to_int, #to_i]
       # @return [void]
@@ -206,10 +206,10 @@ module CZMQ
         result
       end
 
-      # Push frame to the front of the message, i.e. before all other frames.  
+      # Push frame to the front of the message, i.e. before all other frames.
       # Message takes ownership of frame, will destroy it when message is sent.
-      # Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
-      # nullify the caller's frame reference.                                  
+      # Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
+      # nullify the caller's frame reference.
       #
       # @param frame_p [#__ptr_give_ref]
       # @return [Integer]
@@ -221,10 +221,10 @@ module CZMQ
         result
       end
 
-      # Add frame to the end of the message, i.e. after all other frames.      
+      # Add frame to the end of the message, i.e. after all other frames.
       # Message takes ownership of frame, will destroy it when message is sent.
-      # Returns 0 on success. Deprecates zmsg_add, which did not nullify the   
-      # caller's frame reference.                                              
+      # Returns 0 on success. Deprecates zmsg_add, which did not nullify the
+      # caller's frame reference.
       #
       # @param frame_p [#__ptr_give_ref]
       # @return [Integer]
@@ -248,7 +248,7 @@ module CZMQ
       end
 
       # Push block of memory to front of message, as a new frame.
-      # Returns 0 on success, -1 on error.                       
+      # Returns 0 on success, -1 on error.
       #
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -262,7 +262,7 @@ module CZMQ
       end
 
       # Add block of memory to the end of the message, as a new frame.
-      # Returns 0 on success, -1 on error.                            
+      # Returns 0 on success, -1 on error.
       #
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -276,7 +276,7 @@ module CZMQ
       end
 
       # Push string as new frame to front of message.
-      # Returns 0 on success, -1 on error.           
+      # Returns 0 on success, -1 on error.
       #
       # @param string [String, #to_s, nil]
       # @return [Integer]
@@ -288,7 +288,7 @@ module CZMQ
       end
 
       # Push string as new frame to end of message.
-      # Returns 0 on success, -1 on error.         
+      # Returns 0 on success, -1 on error.
       #
       # @param string [String, #to_s, nil]
       # @return [Integer]
@@ -300,7 +300,7 @@ module CZMQ
       end
 
       # Push formatted string as new frame to front of message.
-      # Returns 0 on success, -1 on error.                     
+      # Returns 0 on success, -1 on error.
       #
       # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
@@ -313,7 +313,7 @@ module CZMQ
       end
 
       # Push formatted string as new frame to end of message.
-      # Returns 0 on success, -1 on error.                   
+      # Returns 0 on success, -1 on error.
       #
       # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
@@ -326,7 +326,7 @@ module CZMQ
       end
 
       # Pop frame off front of message, return as fresh string. If there were
-      # no more frames in the message, returns NULL.                         
+      # no more frames in the message, returns NULL.
       #
       # @return [::FFI::AutoPointer]
       def popstr()
@@ -337,9 +337,9 @@ module CZMQ
         result
       end
 
-      # Push encoded message as a new frame. Message takes ownership of    
+      # Push encoded message as a new frame. Message takes ownership of
       # submessage, so the original is destroyed in this call. Returns 0 on
-      # success, -1 on error.                                              
+      # success, -1 on error.
       #
       # @param msg_p [#__ptr_give_ref]
       # @return [Integer]
@@ -352,7 +352,7 @@ module CZMQ
       end
 
       # Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-      # decoding was not successful.                                            
+      # decoding was not successful.
       #
       # @return [Zmsg]
       def popmsg()
@@ -376,7 +376,7 @@ module CZMQ
       end
 
       # Set cursor to first frame in message. Returns frame, or NULL, if the
-      # message is empty. Use this to navigate the frames as a list.        
+      # message is empty. Use this to navigate the frames as a list.
       #
       # @return [Zframe]
       def first()
@@ -388,7 +388,7 @@ module CZMQ
       end
 
       # Return the next frame. If there are no more frames, returns NULL. To move
-      # to the first frame call zmsg_first(). Advances the cursor.               
+      # to the first frame call zmsg_first(). Advances the cursor.
       #
       # @return [Zframe]
       def next()
@@ -410,11 +410,11 @@ module CZMQ
         result
       end
 
-      # Save message to an open file, return 0 if OK, else -1. The message is  
-      # saved as a series of frames, each with length and data. Note that the  
-      # file is NOT guaranteed to be portable between operating systems, not   
+      # Save message to an open file, return 0 if OK, else -1. The message is
+      # saved as a series of frames, each with length and data. Note that the
+      # file is NOT guaranteed to be portable between operating systems, not
       # versions of CZMQ. The file format is at present undocumented and liable
-      # to arbitrary change.                                                   
+      # to arbitrary change.
       #
       # @param file [::FFI::Pointer, #to_ptr]
       # @return [Integer]
@@ -426,10 +426,10 @@ module CZMQ
       end
 
       # Serialize multipart message to a single message frame. Use this method
-      # to send structured messages across transports that do not support     
-      # multipart data. Allocates and returns a new frame containing the      
-      # serialized message. To decode a serialized message frame, use         
-      # zmsg_decode ().                                                       
+      # to send structured messages across transports that do not support
+      # multipart data. Allocates and returns a new frame containing the
+      # serialized message. To decode a serialized message frame, use
+      # zmsg_decode ().
       #
       # @return [Zframe]
       def encode()
@@ -441,7 +441,7 @@ module CZMQ
       end
 
       # Create copy of message, as new message object. Returns a fresh zmsg_t
-      # object. If message is null, or memory was exhausted, returns null.   
+      # object. If message is null, or memory was exhausted, returns null.
       #
       # @return [Zmsg]
       def dup()
@@ -453,7 +453,7 @@ module CZMQ
       end
 
       # Send message to zsys log sink (may be stdout, or system facility as
-      # configured by zsys_set_logstream).                                 
+      # configured by zsys_set_logstream).
       #
       # @return [void]
       def print()
@@ -463,7 +463,7 @@ module CZMQ
         result
       end
 
-      # Return true if the two messages have the same number of frames and each  
+      # Return true if the two messages have the same number of frames and each
       # frame in the first message is identical to the corresponding frame in the
       # other message. As with zframe_eq, return false if either message is NULL.
       #

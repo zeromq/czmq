@@ -38,7 +38,7 @@ public class Zloop implements AutoCloseable{
     }
     /*
     Cancel a socket reader from the reactor. If multiple readers exist for
-    same socket, cancels ALL of them.                                     
+    same socket, cancels ALL of them.
     */
     native static void __readerEnd (long self, long sock);
     public void readerEnd (Zsock sock) {
@@ -46,7 +46,7 @@ public class Zloop implements AutoCloseable{
     }
     /*
     Configure a registered reader to ignore errors. If you do not set this,
-    then readers that have errors are removed from the reactor silently.   
+    then readers that have errors are removed from the reactor silently.
     */
     native static void __readerSetTolerant (long self, long sock);
     public void readerSetTolerant (Zsock sock) {
@@ -54,7 +54,7 @@ public class Zloop implements AutoCloseable{
     }
     /*
     Cancel a specific timer identified by a specific timer_id (as returned by
-    zloop_timer).                                                            
+    zloop_timer).
     */
     native static int __timerEnd (long self, int timerId);
     public int timerEnd (int timerId) {
@@ -62,23 +62,23 @@ public class Zloop implements AutoCloseable{
     }
     /*
     Reset a ticket timer, which moves it to the end of the ticket list and
-    resets its execution time. This is a very fast operation.             
+    resets its execution time. This is a very fast operation.
     */
     native static void __ticketReset (long self, long handle);
     public void ticketReset (long handle) {
         __ticketReset (self, handle);
     }
     /*
-    Delete a ticket timer. We do not actually delete the ticket here, as    
+    Delete a ticket timer. We do not actually delete the ticket here, as
     other code may still refer to the ticket. We mark as deleted, and remove
-    later and safely.                                                       
+    later and safely.
     */
     native static void __ticketDelete (long self, long handle);
     public void ticketDelete (long handle) {
         __ticketDelete (self, handle);
     }
     /*
-    Set the ticket delay, which applies to all tickets. If you lower the   
+    Set the ticket delay, which applies to all tickets. If you lower the
     delay and there are already tickets created, the results are undefined.
     */
     native static void __setTicketDelay (long self, long ticketDelay);
@@ -86,11 +86,11 @@ public class Zloop implements AutoCloseable{
         __setTicketDelay (self, ticketDelay);
     }
     /*
-    Set hard limit on number of timers allowed. Setting more than a small  
+    Set hard limit on number of timers allowed. Setting more than a small
     number of timers (10-100) can have a dramatic impact on the performance
-    of the reactor. For high-volume cases, use ticket timers. If the hard  
-    limit is reached, the reactor stops creating new timers and logs an    
-    error.                                                                 
+    of the reactor. For high-volume cases, use ticket timers. If the hard
+    limit is reached, the reactor stops creating new timers and logs an
+    error.
     */
     native static void __setMaxTimers (long self, long maxTimers);
     public void setMaxTimers (long maxTimers) {
@@ -98,27 +98,27 @@ public class Zloop implements AutoCloseable{
     }
     /*
     Set verbose tracing of reactor on/off. The default verbose setting is
-    off (false).                                                         
+    off (false).
     */
     native static void __setVerbose (long self, boolean verbose);
     public void setVerbose (boolean verbose) {
         __setVerbose (self, verbose);
     }
     /*
-    By default the reactor stops if the process receives a SIGINT or SIGTERM 
+    By default the reactor stops if the process receives a SIGINT or SIGTERM
     signal. This makes it impossible to shut-down message based architectures
     like zactors. This method lets you switch off break handling. The default
-    nonstop setting is off (false).                                          
+    nonstop setting is off (false).
     */
     native static void __setNonstop (long self, boolean nonstop);
     public void setNonstop (boolean nonstop) {
         __setNonstop (self, nonstop);
     }
     /*
-    Start the reactor. Takes control of the thread and returns when the 0MQ  
+    Start the reactor. Takes control of the thread and returns when the 0MQ
     context is terminated or the process is interrupted, or any event handler
-    returns -1. Event handlers may register new sockets and timers, and      
-    cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.   
+    returns -1. Event handlers may register new sockets and timers, and
+    cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.
     */
     native static int __start (long self);
     public int start () {

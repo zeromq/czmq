@@ -18,7 +18,7 @@ public:
     QZdigest (zdigest_t *self, QObject *qObjParent = 0);
 
     //  Constructor - creates new digest object, which you use to build up a
-    //  digest by repeatedly calling zdigest_update() on chunks of data.    
+    //  digest by repeatedly calling zdigest_update() on chunks of data.
     explicit QZdigest (QObject *qObjParent = 0);
 
     //  Destroy a digest object
@@ -28,15 +28,15 @@ public:
     void update (const byte *buffer, size_t length);
 
     //  Return final digest hash data. If built without crypto support,
-    //  returns NULL.                                                  
+    //  returns NULL.
     const byte * data ();
 
     //  Return final digest hash size
     size_t size ();
 
-    //  Return digest as printable hex string; caller should not modify nor   
+    //  Return digest as printable hex string; caller should not modify nor
     //  free this string. After calling this, you may not use zdigest_update()
-    //  on the same digest. If built without crypto support, returns NULL.    
+    //  on the same digest. If built without crypto support, returns NULL.
     const QString string ();
 
     //  Self test of this class.

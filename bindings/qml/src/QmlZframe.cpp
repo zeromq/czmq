@@ -21,16 +21,16 @@ byte *QmlZframe::data () {
 };
 
 ///
-//  Return meta data property for frame                                   
+//  Return meta data property for frame
 //  The caller shall not modify or free the returned value, which shall be
-//  owned by the message.                                                 
+//  owned by the message.
 const QString QmlZframe::meta (const QString &property) {
     return QString (zframe_meta (self, property.toUtf8().data()));
 };
 
 ///
 //  Create a new frame that duplicates an existing frame. If frame is null,
-//  or memory was exhausted, returns null.                                 
+//  or memory was exhausted, returns null.
 QmlZframe *QmlZframe::dup () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zframe_dup (self);
@@ -39,7 +39,7 @@ QmlZframe *QmlZframe::dup () {
 
 ///
 //  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-//  Caller must free string when finished with it.                          
+//  Caller must free string when finished with it.
 QString QmlZframe::strhex () {
     char *retStr_ = zframe_strhex (self);
     QString retQStr_ = QString (retStr_);
@@ -49,7 +49,7 @@ QString QmlZframe::strhex () {
 
 ///
 //  Return frame data copied into freshly allocated string
-//  Caller must free string when finished with it.        
+//  Caller must free string when finished with it.
 QString QmlZframe::strdup () {
     char *retStr_ = zframe_strdup (self);
     QString retQStr_ = QString (retStr_);
@@ -65,28 +65,28 @@ bool QmlZframe::streq (const QString &string) {
 
 ///
 //  Return frame MORE indicator (1 or 0), set when reading frame from socket
-//  or by the zframe_set_more() method                                      
+//  or by the zframe_set_more() method
 int QmlZframe::more () {
     return zframe_more (self);
 };
 
 ///
 //  Set frame MORE indicator (1 or 0). Note this is NOT used when sending
-//  frame to socket, you have to specify flag explicitly.                
+//  frame to socket, you have to specify flag explicitly.
 void QmlZframe::setMore (int more) {
     zframe_set_more (self, more);
 };
 
 ///
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
-//  Else returns zero.                                                  
+//  Else returns zero.
 uint32_t QmlZframe::routingId () {
     return zframe_routing_id (self);
 };
 
 ///
 //  Set routing ID on frame. This is used if/when the frame is sent to a
-//  ZMQ_SERVER socket.                                                  
+//  ZMQ_SERVER socket.
 void QmlZframe::setRoutingId (uint32_t routingId) {
     zframe_set_routing_id (self, routingId);
 };
@@ -99,15 +99,15 @@ const QString QmlZframe::group () {
 
 ///
 //  Set group on frame. This is used if/when the frame is sent to a
-//  ZMQ_RADIO socket.                                              
-//  Return -1 on error, 0 on success.                              
+//  ZMQ_RADIO socket.
+//  Return -1 on error, 0 on success.
 int QmlZframe::setGroup (const QString &group) {
     return zframe_set_group (self, group.toUtf8().data());
 };
 
 ///
 //  Return TRUE if two frames have identical size and data
-//  If either frame is NULL, equality is always false.    
+//  If either frame is NULL, equality is always false.
 bool QmlZframe::eq (QmlZframe *other) {
     return zframe_eq (self, other->self);
 };
@@ -119,7 +119,7 @@ void QmlZframe::reset (const void *data, size_t size) {
 };
 
 ///
-//  Send message to zsys log sink (may be stdout, or system facility as       
+//  Send message to zsys log sink (may be stdout, or system facility as
 //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
 void QmlZframe::print (const QString &prefix) {
     zframe_print (self, prefix.toUtf8().data());
@@ -133,7 +133,7 @@ QObject* QmlZframe::qmlAttachedProperties(QObject* object) {
 
 ///
 //  Send a frame to a socket, destroy frame after sending.
-//  Return -1 on error, 0 on success.                     
+//  Return -1 on error, 0 on success.
 int QmlZframeAttached::send (QmlZframe *selfP, void *dest, int flags) {
     return zframe_send (&selfP->self, dest, flags);
 };
@@ -152,8 +152,8 @@ void QmlZframeAttached::test (bool verbose) {
 
 ///
 //  Create a new frame. If size is not null, allocates the frame data
-//  to the specified size. If additionally, data is not null, copies 
-//  size octets from the specified data into the frame body.         
+//  to the specified size. If additionally, data is not null, copies
+//  size octets from the specified data into the frame body.
 QmlZframe *QmlZframeAttached::construct (const void *data, size_t size) {
     QmlZframe *qmlSelf = new QmlZframe ();
     qmlSelf->self = zframe_new (data, size);
@@ -177,9 +177,9 @@ QmlZframe *QmlZframeAttached::from (const QString &string) {
 };
 
 ///
-//  Receive frame from socket, returns zframe_t object or NULL if the recv  
+//  Receive frame from socket, returns zframe_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  zpoller or zloop.                                                       
+//  zpoller or zloop.
 QmlZframe *QmlZframeAttached::recv (void *source) {
     QmlZframe *qmlSelf = new QmlZframe ();
     qmlSelf->self = zframe_recv (source);

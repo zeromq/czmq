@@ -172,7 +172,7 @@ module CZMQ
       end
 
       # Get metadata value from certificate; if the metadata value doesn't
-      # exist, returns NULL.                                              
+      # exist, returns NULL.
       #
       # @param name [String, #to_s, nil]
       # @return [String]
@@ -184,7 +184,7 @@ module CZMQ
       end
 
       # Get list of metadata fields from certificate. Caller is responsible for
-      # destroying list. Caller should not modify the values of list items.    
+      # destroying list. Caller should not modify the values of list items.
       #
       # @return [Zlist]
       def meta_keys()
@@ -195,7 +195,7 @@ module CZMQ
         result
       end
 
-      # Save full certificate (public + secret) to file for persistent storage  
+      # Save full certificate (public + secret) to file for persistent storage
       # This creates one public file and one secret file (filename + "_secret").
       #
       # @param filename [String, #to_s, nil]
@@ -230,8 +230,8 @@ module CZMQ
       end
 
       # Apply certificate to socket, i.e. use for CURVE security on socket.
-      # If certificate was loaded from public file, the secret key will be 
-      # undefined, and this certificate will not work successfully.        
+      # If certificate was loaded from public file, the secret key will be
+      # undefined, and this certificate will not work successfully.
       #
       # @param socket [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -243,7 +243,7 @@ module CZMQ
       end
 
       # Return copy of certificate; if certificate is NULL or we exhausted
-      # heap memory, returns NULL.                                        
+      # heap memory, returns NULL.
       #
       # @return [Zcert]
       def dup()

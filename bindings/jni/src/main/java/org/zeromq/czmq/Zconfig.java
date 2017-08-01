@@ -28,9 +28,9 @@ public class Zconfig implements AutoCloseable{
         self = pointer;
     }
     /*
-    Load a config tree from a specified ZPL text file; returns a zconfig_t  
+    Load a config tree from a specified ZPL text file; returns a zconfig_t
     reference for the root, if the file exists and is readable. Returns NULL
-    if the file does not exist.                                             
+    if the file does not exist.
     */
     native static long __load (String filename);
     public static Zconfig load (String filename) {
@@ -38,7 +38,7 @@ public class Zconfig implements AutoCloseable{
     }
     /*
     Equivalent to zconfig_load, taking a format string instead of a fixed
-    filename.                                                            
+    filename.
     */
     native static long __loadf (String format);
     public static Zconfig loadf (String format) {
@@ -76,7 +76,7 @@ public class Zconfig implements AutoCloseable{
     }
     /*
     Equivalent to zconfig_put, accepting a format specifier and variable
-    argument list, instead of a single string value.                    
+    argument list, instead of a single string value.
     */
     native static void __putf (long self, String path, String format);
     public void putf (String path, String format) {
@@ -84,7 +84,7 @@ public class Zconfig implements AutoCloseable{
     }
     /*
     Get value for config item into a string value; leading slash is optional
-    and ignored.                                                            
+    and ignored.
     */
     native static String __get (long self, String path, String defaultValue);
     public String get (String path, String defaultValue) {
@@ -98,10 +98,10 @@ public class Zconfig implements AutoCloseable{
         __setName (self, name);
     }
     /*
-    Set new value for config item. The new value may be a string, a printf  
-    format, or NULL. Note that if string may possibly contain '%', or if it 
+    Set new value for config item. The new value may be a string, a printf
+    format, or NULL. Note that if string may possibly contain '%', or if it
     comes from an insecure source, you must use '%s' as the format, followed
-    by the string.                                                          
+    by the string.
     */
     native static void __setValue (long self, String format);
     public void setValue (String format) {
@@ -138,7 +138,7 @@ public class Zconfig implements AutoCloseable{
     /*
     Add comment to config item before saving to disk. You can add as many
     comment lines as you like. If you use a null format, all comments are
-    deleted.                                                             
+    deleted.
     */
     native static void __setComment (long self, String format);
     public void setComment (String format) {
@@ -153,7 +153,7 @@ public class Zconfig implements AutoCloseable{
     }
     /*
     Save a config tree to a specified ZPL text file, where a filename
-    "-" means dump to standard output.                               
+    "-" means dump to standard output.
     */
     native static int __save (long self, String filename);
     public int save (String filename) {
@@ -161,7 +161,7 @@ public class Zconfig implements AutoCloseable{
     }
     /*
     Equivalent to zconfig_save, taking a format string instead of a fixed
-    filename.                                                            
+    filename.
     */
     native static int __savef (long self, String format);
     public int savef (String format) {
@@ -176,8 +176,8 @@ public class Zconfig implements AutoCloseable{
     }
     /*
     Reload config tree from same file that it was previously loaded from.
-    Returns 0 if OK, -1 if there was an error (and then does not change  
-    existing data).                                                      
+    Returns 0 if OK, -1 if there was an error (and then does not change
+    existing data).
     */
     native static long __reload (long self);
     public int reload () {
@@ -214,7 +214,7 @@ public class Zconfig implements AutoCloseable{
     }
     /*
     Return true if a configuration tree was loaded from a file and that
-    file has changed in since the tree was loaded.                     
+    file has changed in since the tree was loaded.
     */
     native static boolean __hasChanged (long self);
     public boolean hasChanged () {
