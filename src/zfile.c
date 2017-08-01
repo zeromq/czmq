@@ -373,11 +373,11 @@ zfile_output (zfile_t *self)
     //  Create file if it doesn't exist
     if (self->handle)
         zfile_close (self);
-    
+
     self->handle = fopen (self->fullname, "r+b");
     if (!self->handle)
         self->handle = fopen (self->fullname, "w+b");
-    
+
     return self->handle? 0: -1;
 }
 
