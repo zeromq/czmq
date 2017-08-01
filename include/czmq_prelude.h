@@ -497,6 +497,18 @@ typedef intptr_t ssize_t;
 #   if (!defined (PRId64))
 #       define PRId64   "I64d"
 #   endif
+#   if (!defined (PRIi8))
+#       define PRIi8    "i"
+#   endif
+#   if (!defined (PRIi16))
+#       define PRIi16   "i"
+#   endif
+#   if (!defined (PRIi32))
+#       define PRIi32   "i"
+#   endif
+#   if (!defined (PRIi64))
+#       define PRIi64   "I64i"
+#   endif
 #   if (!defined (PRIu8))
 #       define PRIu8    "u"
 #   endif
