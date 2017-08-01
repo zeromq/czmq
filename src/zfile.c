@@ -616,6 +616,10 @@ zfile_test (bool verbose)
     zfile_destroy (&file);
 
     //  Create a test file in some random subdirectory
+    if (verbose)
+        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+            "Creating new zfile",
+            zclock_time() );
     file = zfile_new ("./this/is/a/test", "bilbo");
     assert (file);
     int rc = zfile_output (file);
@@ -625,13 +629,29 @@ zfile_test (bool verbose)
     zchunk_fill (chunk, 0, 100);
 
     //  Write 100 bytes at position 1,000,000 in the file
+    if (verbose)
+        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+            "Writing 100 bytes at position 1,000,000 in the file",
+            zclock_time() );
     rc = zfile_write (file, chunk, 1000000);
+    if (verbose)
+        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+            "Wrote 100 bytes at position 1,000,000 in the file, result code %d",
+            zclock_time(), rc );
     assert (rc == 0);
     zchunk_destroy (&chunk);
     zfile_close (file);
     assert (zfile_is_readable (file));
     assert (zfile_cursize (file) == 1000100);
+    if (verbose)
+        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+            "Testing if file is NOT stable (is younger than 1 sec)",
+            zclock_time() );
     assert (!zfile_is_stable (file));
+    if (verbose)
+        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+            "Passed the lag-dependent tests",
+            zclock_time() );
     assert (zfile_digest (file));
 
     //  Now truncate file from outside
