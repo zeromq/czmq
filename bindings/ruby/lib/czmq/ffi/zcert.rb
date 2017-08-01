@@ -89,6 +89,15 @@ module CZMQ
         __new ptr
       end
 
+      # Accepts public/secret key text pair from caller
+      # @param public_txt [String, #to_s, nil]
+      # @param secret_txt [String, #to_s, nil]
+      # @return [CZMQ::Zcert]
+      def self.new_from_txt(public_txt, secret_txt)
+        ptr = ::CZMQ::FFI.zcert_new_from_txt(public_txt, secret_txt)
+        __new ptr
+      end
+
       # Load certificate from file
       # @param filename [String, #to_s, nil]
       # @return [CZMQ::Zcert]

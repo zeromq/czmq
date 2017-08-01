@@ -31,6 +31,17 @@ Java_org_zeromq_czmq_Zcert__1_1newFrom (JNIEnv *env, jclass c, jbyteArray public
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zcert__1_1newFromTxt (JNIEnv *env, jclass c, jstring public_txt, jstring secret_txt)
+{
+    char *public_txt_ = (char *) (*env)->GetStringUTFChars (env, public_txt, NULL);
+    char *secret_txt_ = (char *) (*env)->GetStringUTFChars (env, secret_txt, NULL);
+    jlong new_from_txt_ = (jlong) (intptr_t) zcert_new_from_txt (public_txt_, secret_txt_);
+    (*env)->ReleaseStringUTFChars (env, public_txt, public_txt_);
+    (*env)->ReleaseStringUTFChars (env, secret_txt, secret_txt_);
+    return new_from_txt_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zcert__1_1load (JNIEnv *env, jclass c, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);

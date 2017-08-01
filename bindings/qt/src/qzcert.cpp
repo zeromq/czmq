@@ -30,6 +30,13 @@ QZcert* QZcert::newFrom (const byte *publicKey, const byte *secretKey, QObject *
 }
 
 ///
+//  Accepts public/secret key text pair from caller
+QZcert* QZcert::newFromTxt (const QString &publicTxt, const QString &secretTxt, QObject *qObjParent)
+{
+    return new QZcert (zcert_new_from_txt (publicTxt.toUtf8().data(), secretTxt.toUtf8().data()), qObjParent);
+}
+
+///
 //  Load certificate from file
 QZcert* QZcert::load (const QString &filename, QObject *qObjParent)
 {

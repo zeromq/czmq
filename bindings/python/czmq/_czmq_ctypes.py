@@ -736,6 +736,8 @@ lib.zcert_destroy.restype = None
 lib.zcert_destroy.argtypes = [POINTER(zcert_p)]
 lib.zcert_new_from.restype = zcert_p
 lib.zcert_new_from.argtypes = [c_void_p, c_void_p]
+lib.zcert_new_from_txt.restype = zcert_p
+lib.zcert_new_from_txt.argtypes = [c_char_p, c_char_p]
 lib.zcert_load.restype = zcert_p
 lib.zcert_load.argtypes = [c_char_p]
 lib.zcert_public_key.restype = c_void_p
@@ -825,6 +827,13 @@ class Zcert(object):
         Accepts public/secret key pair from caller
         """
         return Zcert(lib.zcert_new_from(public_key, secret_key), True)
+
+    @staticmethod
+    def new_from_txt(public_txt, secret_txt):
+        """
+        Accepts public/secret key text pair from caller
+        """
+        return Zcert(lib.zcert_new_from_txt(public_txt, secret_txt), True)
 
     @staticmethod
     def load(filename):

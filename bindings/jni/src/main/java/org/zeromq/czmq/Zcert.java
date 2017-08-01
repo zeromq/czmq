@@ -35,6 +35,13 @@ public class Zcert implements AutoCloseable{
         return new Zcert (__newFrom (publicKey, secretKey));
     }
     /*
+    Accepts public/secret key text pair from caller
+    */
+    native static long __newFromTxt (String publicTxt, String secretTxt);
+    public static Zcert newFromTxt (String publicTxt, String secretTxt) {
+        return new Zcert (__newFromTxt (publicTxt, secretTxt));
+    }
+    /*
     Load certificate from file
     */
     native static long __load (String filename);
