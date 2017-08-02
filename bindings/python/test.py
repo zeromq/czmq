@@ -56,7 +56,11 @@ class TestCZMQ(unittest.TestCase):
             initfile.handle().write(b"initial file\n")
         initfile.close()
 
-        time.sleep(1.001) # wait for initial file to become 'stable'
+        try:
+            stable_age = file_stable_age_msec()
+        except Exception:
+            stable_age = 3.001
+        time.sleep(stable_age) # wait for initial file to become 'stable'
 
         watch.sock().send(b"si", b"TIMEOUT", 100)
         self.assertEqual(watch.sock().wait(), 0)
@@ -185,9 +189,14 @@ class TestCZMQ(unittest.TestCase):
         f.close()
         del f
 
+        try:
+            stable_age = file_stable_age_msec()
+        except Exception:
+            stable_age = 3.001
+
         self.assertTrue(file.has_changed())
         self.assertFalse(file.is_stable())
-        time.sleep(1.001) # just over a second passes...
+        time.sleep(stable_age) # just over a threshold value passes...
         self.assertTrue(file.has_changed())
         self.assertFalse(file.is_stable())
 
