@@ -230,6 +230,8 @@ zsys_init (void)
 
     zsys_set_max_msgsz (s_max_msgsz);
 
+    zsys_set_file_stable_age_msec (s_file_stable_age_msec);
+
     if (getenv ("ZSYS_THREAD_PRIORITY"))
         zsys_set_thread_priority (atoi (getenv ("ZSYS_THREAD_PRIORITY")));
     else
@@ -296,6 +298,7 @@ zsys_shutdown (void)
       s_thread_priority = -1;
       s_max_sockets = 1024;
       s_max_msgsz = INT_MAX;
+      s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
       s_linger = 0;
       s_sndhwm = 1000;
       s_rcvhwm = 1000;
@@ -1484,6 +1487,39 @@ zsys_max_msgsz (void)
 
 
 //  --------------------------------------------------------------------------
+//  Configure the threshold value of filesystem object age per st_mtime
+//  that should elapse until we consider that object "stable" at the
+//  current zclock_time() moment.
+//  The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
+//  which generally depends on host OS, with fallback value of 3000.
+
+void
+    zsys_set_file_stable_age_msec (int64_t file_stable_age_msec)
+{
+    if (file_stable_age_msec < 1)
+        return;
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_file_stable_age_msec = file_stable_age_msec;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return current threshold value of file stable age in msec.
+//  This can be used in code that chooses to wait for this timeout
+//  before testing if a filesystem object is "stable" or not.
+
+int64_t
+    zsys_file_stable_age_msec (void)
+{
+    zsys_init ();
+    return s_file_stable_age_msec;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Configure the default linger timeout in msecs for new zsock instances.
 //  You can also set this separately on each zsock_t instance. The default
 //  linger time is zero, i.e. any pending messages will be dropped. If the
@@ -1966,6 +2002,10 @@ zsys_test (bool verbose)
         freen (hostname);
         zsys_info ("system limit is %zu ZeroMQ sockets", zsys_socket_limit ());
     }
+    zsys_set_file_stable_age_msec (5123);
+    assert (zsys_file_stable_age_msec() == 5123);
+    zsys_set_file_stable_age_msec (-1);
+    assert (zsys_file_stable_age_msec() == 5123);
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);
