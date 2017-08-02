@@ -610,6 +610,13 @@ zsys_file_size (const char *filename)
 //  Return file modification time (accounted in seconds usually since
 //  UNIX Epoch, with granularity dependent on underlying filesystem,
 //  and starting point dependent on host OS and maybe its bitness).
+//  Per https://msdn.microsoft.com/en-us/library/w4ddyt9h(vs.71).aspx :
+//      Note   In all versions of Microsoft C/C++ except Microsoft C/C++
+//      version 7.0, and in all versions of Microsoft Visual C++, the time
+//      function returns the current time as the number of seconds elapsed
+//      since midnight on January 1, 1970. In Microsoft C/C++ version 7.0,
+//      time() returned the current time as the number of seconds elapsed
+//      since midnight on December 31, 1899.
 //  This value is "arithmetic" with no big guarantees in the standards, and
 //  normally it should be manipulated with host's datetime suite of routines,
 //  including difftime(), or converted to "struct tm" for any predictable use.
