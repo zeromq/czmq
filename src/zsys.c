@@ -1511,6 +1511,13 @@ void
 //  This can be used in code that chooses to wait for this timeout
 //  before testing if a filesystem object is "stable" or not.
 
+//  Note that the OS timer quantization can bite you, so it may be
+//  reasonably safe to sleep/wait/poll for a larger timeout before
+//  assuming a fault, e.g. the default timer resolution on Windows
+//  is 15.6 ms (per timer interrupt 64 times a second), graphed here:
+//    https://msdn.microsoft.com/en-us/library/windows/desktop/dn553408(v=vs.85).aspx
+//  and Unix/Linux OSes also have different-resolution timers.
+
 int64_t
     zsys_file_stable_age_msec (void)
 {
