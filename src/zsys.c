@@ -63,6 +63,13 @@ s_handler_fn_shim (DWORD ctrltype)
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
 
+#ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
+// This is a private tunable that is likely to be replaced or tweaked later
+// per comment block at s_zsys_file_stable() implementation, to reflect
+// the best stat data granularity available on host OS *and* used by czmq.
+#define S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC 3000
+#endif
+
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
 static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
@@ -70,6 +77,8 @@ static int s_thread_sched_policy = -1; //  ZSYS_THREAD_SCHED_POLICY=-1
 static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
+static int s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
+                                    //  ZSYS_FILE_STABLE_AGE_MSEC=3000
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
@@ -140,6 +149,9 @@ zsys_init (void)
 
     if (getenv ("ZSYS_MAX_MSGSZ"))
         s_max_msgsz = atoi (getenv ("ZSYS_MAX_MSGSZ"));
+
+    if (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"))
+        s_file_stable_age_msec = atoi (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"));
 
     if (getenv ("ZSYS_LINGER"))
         s_linger = atoi (getenv ("ZSYS_LINGER"));
@@ -712,11 +724,6 @@ s_zsys_file_stable (const char *filename, bool verbose)
         //  It might also help to define a zsys_file_modified_msec() whose
         //  actual granularity will be OS-dependent (rounded to 1000 or not).
         //  These are TODO ideas for subsequent work.
-#ifndef S_ZSYS_FILE_STABLE_AGE_MSEC
-// This is a private tunable that is likely to be replaced or tweaked later
-// per comment block above.
-#define S_ZSYS_FILE_STABLE_AGE_MSEC 3001
-#endif
 
 #if (defined (WIN32))
 #   define EPOCH_DIFFERENCE 11644473600LL
@@ -733,7 +740,7 @@ s_zsys_file_stable (const char *filename, bool verbose)
                 "at timestamp %" PRIi64 " where st_mtime was %jd",
                 filename, age, zclock_time (), (intmax_t)(stat_buf.st_mtime * 1000) );
 #endif
-        return (age > S_ZSYS_FILE_STABLE_AGE_MSEC);
+        return (age > s_file_stable_age_msec);
     }
     else {
         if (verbose)
