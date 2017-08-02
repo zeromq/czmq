@@ -25,6 +25,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 // Callback for interrupt signal handler
 typedef void (zsys_handler_fn) (
     int signal_value);
@@ -251,20 +253,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zsys_max_msgsz (void);
 
-//  Configure the threshold value of filesystem object age per st_mtime
-//  that should elapse until we consider that object "stable" at the
-//  current zclock_time() moment.
-//  The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
-//  which generally depends on host OS, with fallback value of 3000.
-CZMQ_EXPORT void
-    zsys_set_file_stable_age_msec (int64_t file_stable_age_msec);
-
-//  Return current threshold value of file stable age in msec.
-//  This can be used in code that chooses to wait for this timeout
-//  before testing if a filesystem object is "stable" or not.
-CZMQ_EXPORT int64_t
-    zsys_file_stable_age_msec (void);
-
 //  Configure the default linger timeout in msecs for new zsock instances.
 //  You can also set this separately on each zsock_t instance. The default
 //  linger time is zero, i.e. any pending messages will be dropped. If the
@@ -414,6 +402,24 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Configure the threshold value of filesystem object age per st_mtime
+//  that should elapse until we consider that object "stable" at the
+//  current zclock_time() moment.
+//  The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
+//  which generally depends on host OS, with fallback value of 3000.
+CZMQ_EXPORT void
+    zsys_set_file_stable_age_msec (int64_t file_stable_age_msec);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return current threshold value of file stable age in msec.
+//  This can be used in code that chooses to wait for this timeout
+//  before testing if a filesystem object is "stable" or not.
+CZMQ_EXPORT int64_t
+    zsys_file_stable_age_msec (void);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 //  Return size of file, or -1 if not found

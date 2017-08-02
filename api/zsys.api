@@ -303,7 +303,7 @@
         <return type = "integer" />
     </method>
 
-    <method name = "set file stable age msec" singleton = "1">
+    <method name = "set file stable age msec" singleton = "1" state = "draft">
         Configure the threshold value of filesystem object age per st_mtime
         that should elapse until we consider that object "stable" at the
         current zclock_time() moment.
@@ -312,7 +312,7 @@
         <argument name = "file stable age msec" type = "msecs" />
     </method>
 
-    <method name = "file stable age msec" singleton = "1">
+    <method name = "file stable age msec" singleton = "1" state = "draft">
         Return current threshold value of file stable age in msec.
         This can be used in code that chooses to wait for this timeout
         before testing if a filesystem object is "stable" or not.

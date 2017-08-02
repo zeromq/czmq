@@ -1574,8 +1574,28 @@ module CZMQ
       attach_function :zsys_socket_limit, [], :size_t, **opts
       attach_function :zsys_set_max_msgsz, [:int], :void, **opts
       attach_function :zsys_max_msgsz, [], :int, **opts
-      attach_function :zsys_set_file_stable_age_msec, [:pointer], :void, **opts
-      attach_function :zsys_file_stable_age_msec, [], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zsys_set_file_stable_age_msec, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zsys_set_file_stable_age_msec()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsys_set_file_stable_age_msec(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsys_file_stable_age_msec, [], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zsys_file_stable_age_msec()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsys_file_stable_age_msec(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zsys_set_linger, [:size_t], :void, **opts
       attach_function :zsys_set_sndhwm, [:size_t], :void, **opts
       attach_function :zsys_set_rcvhwm, [:size_t], :void, **opts
