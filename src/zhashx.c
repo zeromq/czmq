@@ -1269,6 +1269,8 @@ zhashx_test (bool verbose)
     srandom ((unsigned) time (NULL));
     for (iteration = 0; iteration < 25000; iteration++) {
         testnbr = randof (testmax);
+        assert (testnbr != testmax);
+        assert (testnbr < testmax);
         if (testset [testnbr].exists) {
             item = (char *) zhashx_lookup (hash, testset [testnbr].name);
             assert (item);
@@ -1289,6 +1291,16 @@ zhashx_test (bool verbose)
     zhashx_destroy (&hash);
     zhashx_destroy (&hash);
     assert (hash == NULL);
+
+    //  Test randof() limits - should be within (0..testmax)
+    //  Note: This test can take a while on systems with weak floating point HW
+    testmax = 999;
+    for (iteration = 0; iteration < 10000000; iteration++) {
+        testnbr = randof (testmax);
+        assert (testnbr != testmax);
+        assert (testnbr < testmax);
+        assert (testnbr >= 0);
+    }
 
     //  Test destructor; automatically copies and frees string values
     hash = zhashx_new ();
