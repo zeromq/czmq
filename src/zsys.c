@@ -607,7 +607,13 @@ zsys_file_size (const char *filename)
 
 
 //  --------------------------------------------------------------------------
-//  Return file modification time. Returns 0 if the file does not exist.
+//  Return file modification time (accounted in seconds usually since
+//  UNIX Epoch, with granularity dependent on underlying filesystem,
+//  and starting point dependent on host OS and maybe its bitness).
+//  This value is "arithmetic" with no big guarantees in the standards, and
+//  normally it should be manipulated with host's datetime suite of routines,
+//  including difftime(), or converted to "struct tm" for any predictable use.
+//  Returns 0 if the file does not exist.
 
 time_t
 zsys_file_modified (const char *filename)
@@ -679,7 +685,32 @@ s_zsys_file_stable (const char *filename, bool verbose)
 {
     struct stat stat_buf;
     if (stat (filename, &stat_buf) == 0) {
-        //  File is 'stable' if more than 1 second old
+        //  File is 'stable' if older (per filesystem stats) than a threshold.
+        //  This used to mean more than 1 second old, counted in microseconds
+        //  after inflating the st_mtime data - but this way of calculation
+        //  has a caveat: if we created the file at Nsec.999msec, or rather
+        //  the FS metadata was updated at that point, the st_mtime will be
+        //  (after inflation) N.000. So a few milliseconds later, at (N+1)sec,
+        //  we find the age difference seems over 1000 so the file is 1 sec
+        //  old - even though it has barely been created. Compounding the
+        //  issue, some filesystems have worse timestamp precision - e.g. the
+        //  FAT filesystem variants are widespread (per SD standards) on
+        //  removable media, and only account even seconds in stat data.
+        //  Solutions are two-fold: when using stat fields that are precise
+        //  to a second (or inpredictably two), we should actually check for
+        //  (age > 3000) in rounded-microsecond accounting. Also, for some
+        //  systems we can have `configure`-time checks on presence of more
+        //  precise (and less standardized) stat timestamp fields, where we
+        //  can presumably avoid rounding to thousands and use (age > 2000).
+        //  It might also help to define a zsys_file_modified_msec() whose
+        //  actual granularity will be OS-dependent (rounded to 1000 or not).
+        //  These are TODO ideas for subsequent work.
+#ifndef S_ZSYS_FILE_STABLE_AGE_MSEC
+// This is a private tunable that is likely to be replaced or tweaked later
+// per comment block above.
+#define S_ZSYS_FILE_STABLE_AGE_MSEC 3001
+#endif
+
 #if (defined (WIN32))
 #   define EPOCH_DIFFERENCE 11644473600LL
         long age = (long) (zclock_time () - EPOCH_DIFFERENCE * 1000 - (stat_buf.st_mtime * 1000));
@@ -695,7 +726,7 @@ s_zsys_file_stable (const char *filename, bool verbose)
                 "at timestamp %" PRIi64 " where st_mtime was %jd",
                 filename, age, zclock_time (), (intmax_t)(stat_buf.st_mtime * 1000) );
 #endif
-        return (age > 1000);
+        return (age > S_ZSYS_FILE_STABLE_AGE_MSEC);
     }
     else {
         if (verbose)
