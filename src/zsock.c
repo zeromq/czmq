@@ -1827,15 +1827,17 @@ zsock_test (bool verbose)
         printf ("\n");
 
     //  @selftest
-    zsock_t *writer = zsock_new_push ("@tcp://127.0.0.1:5560");
+    zsock_t *writer = zsock_new (ZMQ_PUSH);
     assert (writer);
+    int port = zsock_bind (writer, "tcp://127.0.0.1:*");
+    assert (port != -1);
     assert (zsock_resolve (writer) != writer);
     assert (streq (zsock_type_str (writer), "PUSH"));
 
     int rc;
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  Check unbind
-    rc = zsock_unbind (writer, "tcp://127.0.0.1:%d", 5560);
+    rc = zsock_unbind (writer, "tcp://127.0.0.1:%d", port);
     assert (rc == 0);
 
     //  In some cases and especially when running under Valgrind, doing
@@ -1844,13 +1846,17 @@ zsock_test (bool verbose)
     zclock_sleep (100);
 
     //  Bind again
-    rc = zsock_bind (writer, "tcp://127.0.0.1:%d", 5560);
-    assert (rc == 5560);
-    assert (streq (zsock_endpoint (writer), "tcp://127.0.0.1:5560"));
+    rc = zsock_bind (writer, "tcp://127.0.0.1:%d", port);
+    assert (rc == port);
+    char endpoint [40];
+    sprintf (endpoint, "tcp://127.0.0.1:%d", port);
+    assert (streq (zsock_endpoint (writer), endpoint));
 #endif
 
-    zsock_t *reader = zsock_new_pull (">tcp://127.0.0.1:5560");
+    zsock_t *reader = zsock_new (ZMQ_PULL);
     assert (reader);
+    rc = zsock_connect (reader, "tcp://127.0.0.1:%d", port);
+    assert (rc != -1);
     assert (zsock_resolve (reader) != reader);
     assert (streq (zsock_type_str (reader), "PULL"));
 
@@ -1877,7 +1883,7 @@ zsock_test (bool verbose)
     zmq_ctx_term (zmq_ctx);
 
     //  Test resolve zsock
-    zsock_t *resolve = zsock_new_pub("@tcp://127.0.0.1:5561");
+    zsock_t *resolve = zsock_new_pub("@tcp://127.0.0.1:*");
     assert (resolve);
     assert (zsock_resolve (resolve) == resolve->handle);
     zsock_destroy (&resolve);
@@ -1887,14 +1893,14 @@ zsock_test (bool verbose)
     assert (zsock_resolve ((void *) &fd) == NULL);
 
     //  Test binding to ephemeral ports, sequential and random
-    int port = zsock_bind (writer, "tcp://127.0.0.1:*");
+    port = zsock_bind (writer, "tcp://127.0.0.1:*");
     assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
     port = zsock_bind (writer, "tcp://127.0.0.1:*[50000-]");
     assert (port >= 50000 && port <= DYNAMIC_LAST);
     port = zsock_bind (writer, "tcp://127.0.0.1:*[-50001]");
     assert (port >= DYNAMIC_FIRST && port <= 50001);
-    port = zsock_bind (writer, "tcp://127.0.0.1:*[60000-60050]");
-    assert (port >= 60000 && port <= 60050);
+    port = zsock_bind (writer, "tcp://127.0.0.1:*[60000-60500]");
+    assert (port >= 60000 && port <= 60500);
 
     port = zsock_bind (writer, "tcp://127.0.0.1:!");
     assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
@@ -1902,13 +1908,13 @@ zsock_test (bool verbose)
     assert (port >= 50000 && port <= DYNAMIC_LAST);
     port = zsock_bind (writer, "tcp://127.0.0.1:![-50001]");
     assert (port >= DYNAMIC_FIRST && port <= 50001);
-    port = zsock_bind (writer, "tcp://127.0.0.1:![60000-60050]");
-    assert (port >= 60000 && port <= 60050);
+    port = zsock_bind (writer, "tcp://127.0.0.1:![60000-60500]");
+    assert (port >= 60000 && port <= 60500);
 
     //  Test zsock_attach method
     zsock_t *server = zsock_new (ZMQ_DEALER);
     assert (server);
-    rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others", true);
+    rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:*,inproc://others", true);
     assert (rc == 0);
     rc = zsock_attach (server, "", false);
     assert (rc == 0);
@@ -2093,10 +2099,14 @@ zsock_test (bool verbose)
 #ifdef ZMQ_SERVER
 
     //  Test zsock_bsend/brecv pictures with binary encoding on SERVER and CLIENT sockets
-    server = zsock_new_server ("tcp://127.0.0.1:5561");
+    server = zsock_new (ZMQ_SERVER);
     assert (server);
-    zsock_t* client = zsock_new_client ("tcp://127.0.0.1:5561");
+    port = zsock_bind (server, "tcp://127.0.0.1:*");
+    assert (port != -1);
+    zsock_t* client = zsock_new (ZMQ_CLIENT);
     assert (client);
+    rc = zsock_connect (client, "tcp://127.0.0.1:%d", port);
+    assert (rc != -1);
 
     //  From client to server
     chunk = zchunk_new ("World", 5);
