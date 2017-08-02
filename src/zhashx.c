@@ -1292,6 +1292,16 @@ zhashx_test (bool verbose)
     zhashx_destroy (&hash);
     assert (hash == NULL);
 
+    //  Test randof() limits - should be within (0..testmax)
+    //  Note: This test can take a while on systems with weak floating point HW
+    testmax = 999;
+    for (iteration = 0; iteration < 10000000; iteration++) {
+        testnbr = randof (testmax);
+        assert (testnbr != testmax);
+        assert (testnbr < testmax);
+        assert (testnbr >= 0);
+    }
+
     //  Test destructor; automatically copies and frees string values
     hash = zhashx_new ();
     assert (hash);
