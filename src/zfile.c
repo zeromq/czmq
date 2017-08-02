@@ -711,7 +711,11 @@ zfile_test (bool verbose)
     assert (rc == 13);
     close (handle);
     assert (zfile_has_changed (file));
-    zclock_sleep (1001);
+#ifdef CZMQ_BUILD_DRAFT_API
+    zclock_sleep (zsys_file_stable_age_msec() + 1);
+#else
+    zclock_sleep (3001);
+#endif
     assert (zfile_has_changed (file));
 
     assert (!zfile_is_stable (file));

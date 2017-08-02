@@ -63,6 +63,13 @@ s_handler_fn_shim (DWORD ctrltype)
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
 
+#ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
+// This is a private tunable that is likely to be replaced or tweaked later
+// per comment block at s_zsys_file_stable() implementation, to reflect
+// the best stat data granularity available on host OS *and* used by czmq.
+#define S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC 3000
+#endif
+
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
 static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
@@ -70,6 +77,8 @@ static int s_thread_sched_policy = -1; //  ZSYS_THREAD_SCHED_POLICY=-1
 static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
+static int s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
+                                    //  ZSYS_FILE_STABLE_AGE_MSEC=3000
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
@@ -140,6 +149,9 @@ zsys_init (void)
 
     if (getenv ("ZSYS_MAX_MSGSZ"))
         s_max_msgsz = atoi (getenv ("ZSYS_MAX_MSGSZ"));
+
+    if (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"))
+        s_file_stable_age_msec = atoi (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"));
 
     if (getenv ("ZSYS_LINGER"))
         s_linger = atoi (getenv ("ZSYS_LINGER"));
@@ -218,6 +230,8 @@ zsys_init (void)
 
     zsys_set_max_msgsz (s_max_msgsz);
 
+    zsys_set_file_stable_age_msec (s_file_stable_age_msec);
+
     if (getenv ("ZSYS_THREAD_PRIORITY"))
         zsys_set_thread_priority (atoi (getenv ("ZSYS_THREAD_PRIORITY")));
     else
@@ -284,6 +298,7 @@ zsys_shutdown (void)
       s_thread_priority = -1;
       s_max_sockets = 1024;
       s_max_msgsz = INT_MAX;
+      s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
       s_linger = 0;
       s_sndhwm = 1000;
       s_rcvhwm = 1000;
@@ -607,7 +622,20 @@ zsys_file_size (const char *filename)
 
 
 //  --------------------------------------------------------------------------
-//  Return file modification time. Returns 0 if the file does not exist.
+//  Return file modification time (accounted in seconds usually since
+//  UNIX Epoch, with granularity dependent on underlying filesystem,
+//  and starting point dependent on host OS and maybe its bitness).
+//  Per https://msdn.microsoft.com/en-us/library/w4ddyt9h(vs.71).aspx :
+//      Note   In all versions of Microsoft C/C++ except Microsoft C/C++
+//      version 7.0, and in all versions of Microsoft Visual C++, the time
+//      function returns the current time as the number of seconds elapsed
+//      since midnight on January 1, 1970. In Microsoft C/C++ version 7.0,
+//      time() returned the current time as the number of seconds elapsed
+//      since midnight on December 31, 1899.
+//  This value is "arithmetic" with no big guarantees in the standards, and
+//  normally it should be manipulated with host's datetime suite of routines,
+//  including difftime(), or converted to "struct tm" for any predictable use.
+//  Returns 0 if the file does not exist.
 
 time_t
 zsys_file_modified (const char *filename)
@@ -679,7 +707,27 @@ s_zsys_file_stable (const char *filename, bool verbose)
 {
     struct stat stat_buf;
     if (stat (filename, &stat_buf) == 0) {
-        //  File is 'stable' if more than 1 second old
+        //  File is 'stable' if older (per filesystem stats) than a threshold.
+        //  This used to mean more than 1 second old, counted in microseconds
+        //  after inflating the st_mtime data - but this way of calculation
+        //  has a caveat: if we created the file at Nsec.999msec, or rather
+        //  the FS metadata was updated at that point, the st_mtime will be
+        //  (after inflation) N.000. So a few milliseconds later, at (N+1)sec,
+        //  we find the age difference seems over 1000 so the file is 1 sec
+        //  old - even though it has barely been created. Compounding the
+        //  issue, some filesystems have worse timestamp precision - e.g. the
+        //  FAT filesystem variants are widespread (per SD standards) on
+        //  removable media, and only account even seconds in stat data.
+        //  Solutions are two-fold: when using stat fields that are precise
+        //  to a second (or inpredictably two), we should actually check for
+        //  (age > 3000) in rounded-microsecond accounting. Also, for some
+        //  systems we can have `configure`-time checks on presence of more
+        //  precise (and less standardized) stat timestamp fields, where we
+        //  can presumably avoid rounding to thousands and use (age > 2000).
+        //  It might also help to define a zsys_file_modified_msec() whose
+        //  actual granularity will be OS-dependent (rounded to 1000 or not).
+        //  These are TODO ideas for subsequent work.
+
 #if (defined (WIN32))
 #   define EPOCH_DIFFERENCE 11644473600LL
         long age = (long) (zclock_time () - EPOCH_DIFFERENCE * 1000 - (stat_buf.st_mtime * 1000));
@@ -695,7 +743,7 @@ s_zsys_file_stable (const char *filename, bool verbose)
                 "at timestamp %" PRIi64 " where st_mtime was %jd",
                 filename, age, zclock_time (), (intmax_t)(stat_buf.st_mtime * 1000) );
 #endif
-        return (age > 1000);
+        return (age > s_file_stable_age_msec);
     }
     else {
         if (verbose)
@@ -1439,6 +1487,39 @@ zsys_max_msgsz (void)
 
 
 //  --------------------------------------------------------------------------
+//  Configure the threshold value of filesystem object age per st_mtime
+//  that should elapse until we consider that object "stable" at the
+//  current zclock_time() moment.
+//  The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
+//  which generally depends on host OS, with fallback value of 3000.
+
+void
+    zsys_set_file_stable_age_msec (int64_t file_stable_age_msec)
+{
+    if (file_stable_age_msec < 1)
+        return;
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_file_stable_age_msec = file_stable_age_msec;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return current threshold value of file stable age in msec.
+//  This can be used in code that chooses to wait for this timeout
+//  before testing if a filesystem object is "stable" or not.
+
+int64_t
+    zsys_file_stable_age_msec (void)
+{
+    zsys_init ();
+    return s_file_stable_age_msec;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Configure the default linger timeout in msecs for new zsock instances.
 //  You can also set this separately on each zsock_t instance. The default
 //  linger time is zero, i.e. any pending messages will be dropped. If the
@@ -1921,6 +2002,10 @@ zsys_test (bool verbose)
         freen (hostname);
         zsys_info ("system limit is %zu ZeroMQ sockets", zsys_socket_limit ());
     }
+    zsys_set_file_stable_age_msec (5123);
+    assert (zsys_file_stable_age_msec() == 5123);
+    zsys_set_file_stable_age_msec (-1);
+    assert (zsys_file_stable_age_msec() == 5123);
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);

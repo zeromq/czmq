@@ -227,6 +227,22 @@ CZMQ_PRIVATE int
 CZMQ_PRIVATE char *
     zstr_str (void *source);
 
+//  *** Draft method, defined for internal use only ***
+//  Configure the threshold value of filesystem object age per st_mtime
+//  that should elapse until we consider that object "stable" at the
+//  current zclock_time() moment.
+//  The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
+//  which generally depends on host OS, with fallback value of 3000.
+CZMQ_PRIVATE void
+    zsys_set_file_stable_age_msec (int64_t file_stable_age_msec);
+
+//  *** Draft method, defined for internal use only ***
+//  Return current threshold value of file stable age in msec.
+//  This can be used in code that chooses to wait for this timeout
+//  before testing if a filesystem object is "stable" or not.
+CZMQ_PRIVATE int64_t
+    zsys_file_stable_age_msec (void);
+
 //  *** Draft constants, defined for internal use only ***
 #define ZGOSSIP_MSG_HELLO 1                 //
 #define ZGOSSIP_MSG_PUBLISH 2               //

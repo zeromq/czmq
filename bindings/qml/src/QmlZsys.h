@@ -224,6 +224,18 @@ public slots:
     //  Return maximum message size.
     int maxMsgsz ();
 
+    //  Configure the threshold value of filesystem object age per st_mtime
+    //  that should elapse until we consider that object "stable" at the
+    //  current zclock_time() moment.
+    //  The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
+    //  which generally depends on host OS, with fallback value of 3000.
+    void setFileStableAgeMsec (int64_t fileStableAgeMsec);
+
+    //  Return current threshold value of file stable age in msec.
+    //  This can be used in code that chooses to wait for this timeout
+    //  before testing if a filesystem object is "stable" or not.
+    int64_t fileStableAgeMsec ();
+
     //  Configure the default linger timeout in msecs for new zsock instances.
     //  You can also set this separately on each zsock_t instance. The default
     //  linger time is zero, i.e. any pending messages will be dropped. If the

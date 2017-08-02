@@ -971,7 +971,12 @@ zdir_test (bool verbose)
         assert ( synced == 0);
     }
 
-    zclock_sleep (1001); // wait for initial file to become 'stable'
+    // wait for initial file to become 'stable'
+#ifdef CZMQ_BUILD_DRAFT_API
+    zclock_sleep (zsys_file_stable_age_msec() + 1);
+#else
+    zclock_sleep (3001);
+#endif
 
     zsock_send (watch, "si", "TIMEOUT", 100);
     synced = zsock_wait(watch);
@@ -996,8 +1001,13 @@ zdir_test (bool verbose)
 
     zpoller_t *watch_poll = zpoller_new (watch, NULL);
 
-    // poll for a certain timeout before giving up and failing the test.
-    void* polled = zpoller_wait(watch_poll, 1001);
+    // poll for a certain timeout before giving up and failing the test
+    void* polled = NULL;
+#ifdef CZMQ_BUILD_DRAFT_API
+    polled = zpoller_wait(watch_poll, zsys_file_stable_age_msec() + 1);
+#else
+    polled = zpoller_wait(watch_poll, 3001);
+#endif
     assert (polled == watch);
 
     // wait for notification of the file being added
@@ -1024,7 +1034,11 @@ zdir_test (bool verbose)
     zfile_destroy (&newfile);
 
     // poll for a certain timeout before giving up and failing the test.
-    polled = zpoller_wait(watch_poll, 1001);
+#ifdef CZMQ_BUILD_DRAFT_API
+    polled = zpoller_wait(watch_poll, zsys_file_stable_age_msec() + 1);
+#else
+    polled = zpoller_wait(watch_poll, 3001);
+#endif
     assert (polled == watch);
 
     // wait for notification of the file being removed
