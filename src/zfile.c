@@ -160,7 +160,7 @@ zfile_filename (zfile_t *self, const char *path)
     &&  strlen (self->fullname) >= strlen (path)
     &&  memcmp (self->fullname, path, strlen (path)) == 0) {
         name += strlen (path);
-        if (*name == '/')
+        while (*name == '/')
             name++;
     }
     return name;
@@ -373,11 +373,11 @@ zfile_output (zfile_t *self)
     //  Create file if it doesn't exist
     if (self->handle)
         zfile_close (self);
-    
+
     self->handle = fopen (self->fullname, "r+b");
     if (!self->handle)
         self->handle = fopen (self->fullname, "w+b");
-    
+
     return self->handle? 0: -1;
 }
 
@@ -609,18 +609,68 @@ zfile_test (bool verbose)
     printf (" * zfile: ");
 
     //  @selftest
-    zfile_t *file = zfile_new (NULL, "bilbo");
+
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
+    const char *testbasedir  = "this";
+    const char *testsubdir  = "is/a/test";
+    const char *testfile = "bilbo";
+    const char *testlink = "bilbo.ln";
+    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
+    char *dirpath = NULL;       // subdir in a test, under basedirpath
+    char *filepath = NULL;      // pathname to testfile in a test, in dirpath
+    char *linkpath = NULL;      // pathname to testlink in a test, in dirpath
+
+    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
+    assert (basedirpath);
+    dirpath = zsys_sprintf ("%s/%s", basedirpath, testsubdir);
+    assert (dirpath);
+    filepath = zsys_sprintf ("%s/%s", dirpath, testfile);
+    assert (filepath);
+    linkpath = zsys_sprintf ("%s/%s", dirpath, testlink);
+    assert (linkpath);
+
+    // This subtest is specifically for NULL as current directory, so
+    // no SELFTEST_DIR_RW here; testfile should have no slashes inside.
+    // Normally tests clean up in zfile_destroy(), but if a selftest run
+    // dies e.g. on assert(), workspace remains dirty. Better clean it up.
+    if (zfile_exists (testfile) ) {
+        if (verbose)
+            zsys_debug ("zfile_test() has to remove ./%s that should not have been here", testfile);
+        zfile_delete (testfile);
+    }
+    zfile_t *file = zfile_new (NULL, testfile);
     assert (file);
-    assert (streq (zfile_filename (file, "."), "bilbo"));
+    assert (streq (zfile_filename (file, "."), testfile));
     assert (zfile_is_readable (file) == false);
     zfile_destroy (&file);
 
     //  Create a test file in some random subdirectory
     if (verbose)
-        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
-            "Creating new zfile",
-            zclock_time() );
-    file = zfile_new ("./this/is/a/test", "bilbo");
+        zsys_debug ("zfile_test() at timestamp %" PRIi64 ": "
+            "Creating new zfile %s",
+            zclock_time(), filepath );
+
+    if (zfile_exists (filepath) ) {
+        if (verbose)
+            zsys_debug ("zfile_test() has to remove %s that should not have been here", filepath);
+        zfile_delete (filepath);
+    }
+
+    file = zfile_new (dirpath, testfile);
     assert (file);
     int rc = zfile_output (file);
     assert (rc == 0);
@@ -630,12 +680,12 @@ zfile_test (bool verbose)
 
     //  Write 100 bytes at position 1,000,000 in the file
     if (verbose)
-        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+        zsys_debug ("zfile_test() at timestamp %" PRIi64 ": "
             "Writing 100 bytes at position 1,000,000 in the file",
             zclock_time() );
     rc = zfile_write (file, chunk, 1000000);
     if (verbose)
-        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+        zsys_debug ("zfile_test() at timestamp %" PRIi64 ": "
             "Wrote 100 bytes at position 1,000,000 in the file, result code %d",
             zclock_time(), rc );
     assert (rc == 0);
@@ -644,18 +694,18 @@ zfile_test (bool verbose)
     assert (zfile_is_readable (file));
     assert (zfile_cursize (file) == 1000100);
     if (verbose)
-        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+        zsys_debug ("zfile_test() at timestamp %" PRIi64 ": "
             "Testing if file is NOT stable (is younger than 1 sec)",
             zclock_time() );
     assert (!zfile_is_stable (file));
     if (verbose)
-        zsys_debug ("zfile_test at timestamp %" PRIi64 ": "
+        zsys_debug ("zfile_test() at timestamp %" PRIi64 ": "
             "Passed the lag-dependent tests",
             zclock_time() );
     assert (zfile_digest (file));
 
     //  Now truncate file from outside
-    int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC | O_BINARY, 0);
+    int handle = open (filepath, O_WRONLY | O_TRUNC | O_BINARY, 0);
     assert (handle >= 0);
     rc = write (handle, "Hello, World\n", 13);
     assert (rc == 13);
@@ -688,14 +738,14 @@ zfile_test (bool verbose)
     zfile_close (file);
 
     //  Try some fun with symbolic links
-    zfile_t *link = zfile_new ("./this/is/a/test", "bilbo.ln");
+    zfile_t *link = zfile_new (dirpath, testlink);
     assert (link);
     rc = zfile_output (link);
     assert (rc == 0);
-    fprintf (zfile_handle (link), "./this/is/a/test/bilbo\n");
+    fprintf (zfile_handle (link), "%s\n", filepath);
     zfile_destroy (&link);
 
-    link = zfile_new ("./this/is/a/test", "bilbo.ln");
+    link = zfile_new (dirpath, testlink);
     assert (link);
     rc = zfile_input (link);
     assert (rc == 0);
@@ -706,7 +756,7 @@ zfile_test (bool verbose)
     zfile_destroy (&link);
 
     //  Remove file and directory
-    zdir_t *dir = zdir_new ("./this", NULL);
+    zdir_t *dir = zdir_new (basedirpath, NULL);
     assert (dir);
     assert (zdir_cursize (dir) == 26);
     zdir_remove (dir, true);
@@ -721,8 +771,26 @@ zfile_test (bool verbose)
     assert (rc == -1);
     zfile_destroy (&file);
 
-    file = zfile_new ("./", "eof_checkfile");
+    // This set of tests is done, free the strings for reuse
+    zstr_free (&basedirpath);
+    zstr_free (&dirpath);
+    zstr_free (&filepath);
+    zstr_free (&linkpath);
+
+    const char *eof_checkfile = "eof_checkfile";
+    filepath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, eof_checkfile);
+    assert (filepath);
+
+    if (zfile_exists (filepath) ) {
+        if (verbose)
+            zsys_debug ("zfile_test() has to remove %s that should not have been here", filepath);
+        zfile_delete (filepath);
+    }
+    zstr_free (&filepath);
+
+    file = zfile_new (SELFTEST_DIR_RW, eof_checkfile);
     assert (file);
+
     //  1. Write something first
     rc = zfile_output (file);
     assert (rc == 0);

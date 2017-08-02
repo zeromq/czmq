@@ -1900,6 +1900,21 @@ zsys_test (bool verbose)
     //  Check capabilities without using the return value
     int rc = zsys_has_curve ();
 
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
     if (verbose) {
         char *hostname = zsys_hostname ();
         zsys_info ("host name is %s", hostname);
@@ -1926,6 +1941,13 @@ zsys_test (bool verbose)
     zsock_destroy (&pipe_front);
 
     //  Test file manipulation
+
+    // Don't let anyone fool our workspace
+    if (zsys_file_exists ("nosuchfile")) {
+        zsys_warning ("zsys_test() had to remove 'nosuchfile' which was not expected here at all");
+        zsys_file_delete ("nosuchfile");
+    }
+
     rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
 
@@ -1943,25 +1965,49 @@ zsys_test (bool verbose)
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
 
+    const char *testbasedir  = ".testsys";
+    const char *testsubdir  = "subdir";
+    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
+    char *dirpath = NULL;       // subdir in a test, under basedirpath
+    char *relsubdir = NULL;     // relative short "path" of subdir under testbasedir
+
+    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
+    assert (basedirpath);
+    dirpath = zsys_sprintf ("%s/%s", basedirpath, testsubdir);
+    assert (dirpath);
+    relsubdir = zsys_sprintf ("%s/%s", testbasedir, testsubdir);
+    assert (relsubdir);
+
+    // Normally tests clean up in the end, but if a selftest run dies
+    // e.g. on assert(), workspace remains dirty. Better clean it up.
+    // We do not really care about results here - we clean up a possible
+    // dirty exit of an older build. If there are permission errors etc.
+    // the actual tests below would explode.
+    if (zsys_file_exists(dirpath)) {
+        if (verbose)
+            zsys_debug ("zsys_test() has to remove ./%s that should not have been here", dirpath);
+        zsys_dir_delete (dirpath);
+    }
+    if (zsys_file_exists (basedirpath)) {
+        if (verbose)
+            zsys_debug ("zsys_test() has to remove ./%s that should not have been here", basedirpath);
+        zsys_dir_delete (basedirpath);
+    }
+
     // Added tracing because this file-age check fails on some systems
     // presumably due to congestion in a mass-build and valgrind on top
     zsys_file_mode_private ();
     if (verbose)
         printf ("zsys_test() at timestamp %" PRIi64 ": "
-            "Dropping .testsys/subdir (may be absent)\n",
-            zclock_time() );
-    rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
+            "Creating %s\n",
+            zclock_time(), relsubdir );
+    rc = zsys_dir_create ("%s/%s", SELFTEST_DIR_RW, relsubdir);
     if (verbose)
         printf ("zsys_test() at timestamp %" PRIi64 ": "
-            "Creating .testsys/subdir\n",
-            zclock_time() );
-    rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
-    if (verbose)
-        printf ("zsys_test() at timestamp %" PRIi64 ": "
-            "Finished creating .testsys/subdir with return-code %d\n",
-            zclock_time(), rc );
+            "Finished creating %s with return-code %d\n",
+            zclock_time(), relsubdir, rc );
     assert (rc == 0);
-    when = zsys_file_modified ("./.testsys/subdir");
+    when = zsys_file_modified (dirpath);
     if (verbose)
         printf ("zsys_test() at timestamp %" PRIi64 ": "
             "Finished calling zsys_file_modified(), got age %jd\n",
@@ -1971,18 +2017,23 @@ zsys_test (bool verbose)
         printf ("zsys_test() at timestamp %" PRIi64 ": "
             "Checking if file is NOT stable (is younger than 1 sec)\n",
             zclock_time() );
-    assert (!s_zsys_file_stable ("./.testsys/subdir", verbose));
+    assert (!s_zsys_file_stable (dirpath, verbose));
     if (verbose)
         printf ("zsys_test() at timestamp %" PRIi64 ": "
             "Passed the test, file is not stable - as expected\n",
             zclock_time() );
-    rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
+    rc = zsys_dir_delete ("%s/%s", SELFTEST_DIR_RW, relsubdir);
     assert (rc == 0);
-    rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
+    rc = zsys_dir_delete ("%s/%s", SELFTEST_DIR_RW, testbasedir);
     assert (rc == 0);
     zsys_file_mode_default ();
-    assert (zsys_dir_change (".") == 0);
+    assert (zsys_dir_change (SELFTEST_DIR_RW) == 0);
 
+    zstr_free (&basedirpath);
+    zstr_free (&dirpath);
+    zstr_free (&relsubdir);
+
+    // Other subtests
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
     assert (major == CZMQ_VERSION_MAJOR);
