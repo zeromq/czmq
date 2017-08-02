@@ -193,17 +193,43 @@ zdir_patch_test (bool verbose)
     printf (" * zdir_patch: ");
 
     //  @selftest
-    zfile_t *file = zfile_new (".", "bilbo");
+
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
+    const char *testfile = "bilbo";
+    const char *prefix   = "/";
+    char *prefixed_testfile = zsys_sprintf ("%s%s", prefix, testfile);
+    assert (prefixed_testfile);
+
+    // Make sure old aborted tests do not hinder us
+    zsys_file_delete (prefixed_testfile);
+
+    zfile_t *file = zfile_new (SELFTEST_DIR_RW, testfile);
     assert (file);
-    zdir_patch_t *patch = zdir_patch_new (".", file, patch_create, "/");
+    zdir_patch_t *patch = zdir_patch_new (SELFTEST_DIR_RW, file, patch_create, prefix);
     assert (patch);
     zfile_destroy (&file);
 
     file = zdir_patch_file (patch);
     assert (file);
-    assert (streq (zfile_filename (file, "."), "bilbo"));
-    assert (streq (zdir_patch_vpath (patch), "/bilbo"));
+    assert (streq (zfile_filename (file, SELFTEST_DIR_RW), testfile));
+    assert (streq (zdir_patch_vpath (patch), prefixed_testfile));
     zdir_patch_destroy (&patch);
+
+    zstr_free (&prefixed_testfile);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();

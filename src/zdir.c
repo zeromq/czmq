@@ -930,22 +930,74 @@ zdir_test (bool verbose)
     printf (" * zdir: ");
 
     //  @selftest
+
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
+    const char *testbasedir  = "zdir-test-dir";
+    const char *testfile1 = "initial_file";
+    const char *testfile2 = "test_abc";
+    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
+    char *filepath1 = NULL;      // pathname to testfile in a test, in dirpath
+    char *filepath2 = NULL;      // pathname to testfile in a test, in dirpath
+
+    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
+    assert (basedirpath);
+    filepath1 = zsys_sprintf ("%s/%s", basedirpath, testfile1);
+    assert (filepath1);
+    filepath2 = zsys_sprintf ("%s/%s", basedirpath, testfile2);
+    assert (filepath2);
+
+/*
+    char *relfilepath2 = NULL;      // pathname to testfile in a test, in dirpath
+    relfilepath2 = zsys_sprintf ("%s/%s", testbasedir, testfile2);
+    assert (relfilepath2);
+*/
+
+    // Make sure old aborted tests do not hinder us
+    zdir_t *dir = zdir_new (basedirpath, NULL);
+    if (dir) {
+        zdir_remove (dir, true);
+        zdir_destroy (&dir);
+    }
+    zsys_file_delete (filepath1);
+    zsys_file_delete (filepath2);
+    zsys_dir_delete  (basedirpath);
+
+    dir = zdir_new ("does-not-exist", NULL);
+    if (dir) {
+        zdir_remove (dir, true);
+        zdir_destroy (&dir);
+    }
+
     // need to create a file in the test directory we're watching
     // in order to ensure the directory exists
-    zfile_t *initfile = zfile_new ("./zdir-test-dir", "initial_file");
+    zfile_t *initfile = zfile_new (basedirpath, testfile1);
     assert (initfile);
     zfile_output (initfile);
     fprintf (zfile_handle (initfile), "initial file\n");
     zfile_close (initfile);
     zfile_destroy (&initfile);
 
-    zdir_t *older = zdir_new ("zdir-test-dir", NULL);
+    zdir_t *older = zdir_new (basedirpath, NULL);
     assert (older);
     if (verbose) {
         printf ("\n");
         zdir_dump (older, 0);
     }
-    zdir_t *newer = zdir_new (".", NULL);
+    zdir_t *newer = zdir_new (SELFTEST_DIR_RW, NULL);
     assert (newer);
     zlist_t *patches = zdir_diff (older, newer, "/");
     assert (patches);
@@ -982,19 +1034,19 @@ zdir_test (bool verbose)
     synced = zsock_wait(watch);
     assert (synced == 0);
 
-    zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
+    zsock_send (watch, "ss", "SUBSCRIBE", basedirpath);
     synced = zsock_wait(watch);
     assert(synced == 0);
 
-    zsock_send (watch, "ss", "UNSUBSCRIBE", "zdir-test-dir");
+    zsock_send (watch, "ss", "UNSUBSCRIBE", basedirpath);
     synced = zsock_wait(watch);
     assert(synced == 0);
 
-    zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
+    zsock_send (watch, "ss", "SUBSCRIBE", basedirpath);
     synced = zsock_wait(watch);
     assert(synced == 0);
 
-    zfile_t *newfile = zfile_new ("zdir-test-dir", "test_abc");
+    zfile_t *newfile = zfile_new (basedirpath, testfile2);
     zfile_output (newfile);
     fprintf (zfile_handle (newfile), "test file\n");
     zfile_close (newfile);
@@ -1015,16 +1067,25 @@ zdir_test (bool verbose)
     int rc = zsock_recv (watch, "sp", &path, &patches);
     assert (rc == 0);
 
-    assert (streq (path, "zdir-test-dir"));
+    assert (streq (path, basedirpath));
     freen (path);
 
+    if (verbose)
+        zsys_debug("zdir_test() : added : zlist_size (patches)=%d",
+            zlist_size (patches) );
     assert (zlist_size (patches) == 1);
 
     zdir_patch_t *patch = (zdir_patch_t *) zlist_pop (patches);
-    assert (streq (zdir_patch_path (patch), "zdir-test-dir"));
+    if (verbose)
+        zsys_debug("zdir_test() : added : zdir_patch_path (patch)='%s'",
+            zdir_patch_path (patch) );
+    assert (streq (zdir_patch_path (patch), basedirpath));
 
     zfile_t *patch_file = zdir_patch_file (patch);
-    assert (streq (zfile_filename (patch_file, ""), "zdir-test-dir/test_abc"));
+    if (verbose)
+        zsys_debug("zdir_test() : added : zfile_filename (patch_file, \"\")='%s'",
+            zfile_filename (patch_file, "") );
+    assert (streq (zfile_filename (patch_file, ""), filepath2));
 
     zdir_patch_destroy (&patch);
     zlist_destroy (&patches);
@@ -1045,16 +1106,25 @@ zdir_test (bool verbose)
     rc = zsock_recv (watch, "sp", &path, &patches);
     assert (rc == 0);
 
-    assert (streq (path, "zdir-test-dir"));
+    assert (streq (path, basedirpath));
     freen (path);
 
+    if (verbose)
+        zsys_debug("zdir_test() : removed : zlist_size (patches)=%d",
+            zlist_size (patches) );
     assert (zlist_size (patches) == 1);
 
     patch = (zdir_patch_t *) zlist_pop (patches);
-    assert (streq (zdir_patch_path (patch), "zdir-test-dir"));
+    if (verbose)
+        zsys_debug("zdir_test() : removed : zdir_patch_path (patch)='%s'",
+            zdir_patch_path (patch) );
+    assert (streq (zdir_patch_path (patch), basedirpath));
 
     patch_file = zdir_patch_file (patch);
-    assert (streq (zfile_filename (patch_file, ""), "zdir-test-dir/test_abc"));
+    if (verbose)
+        zsys_debug("zdir_test() : removed : zfile_filename (patch_file, \"\")='%s'",
+            zfile_filename (patch_file, "") );
+    assert (streq (zfile_filename (patch_file, ""), filepath2));
 
     zdir_patch_destroy (&patch);
     zlist_destroy (&patches);
@@ -1063,9 +1133,14 @@ zdir_test (bool verbose)
     zactor_destroy (&watch);
 
     // clean up by removing the test directory.
-    zdir_t *testdir = zdir_new ("zdir-test-dir", NULL);
-    zdir_remove (testdir, true);
-    zdir_destroy (&testdir);
+    dir = zdir_new (basedirpath, NULL);
+    assert (dir);
+    zdir_remove (dir, true);
+    zdir_destroy (&dir);
+
+    zstr_free (&basedirpath);
+    zstr_free (&filepath1);
+    zstr_free (&filepath2);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
