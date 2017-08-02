@@ -711,7 +711,7 @@ zfile_test (bool verbose)
     assert (rc == 13);
     close (handle);
     assert (zfile_has_changed (file));
-    zclock_sleep (1001);
+    zclock_sleep (zsys_file_stable_age_msec() + 1);
     assert (zfile_has_changed (file));
 
     assert (!zfile_is_stable (file));
