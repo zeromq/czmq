@@ -258,6 +258,19 @@ Java_org_zeromq_czmq_Zsys__1_1maxMsgsz (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1setFileStableAgeMsec (JNIEnv *env, jclass c, jlong file_stable_age_msec)
+{
+    zsys_set_file_stable_age_msec ((int64_t) file_stable_age_msec);
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zsys__1_1fileStableAgeMsec (JNIEnv *env, jclass c)
+{
+    jlong file_stable_age_msec_ = (jlong) zsys_file_stable_age_msec ();
+    return file_stable_age_msec_;
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsys__1_1setLinger (JNIEnv *env, jclass c, jlong linger)
 {
     zsys_set_linger ((size_t) linger);

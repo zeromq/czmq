@@ -7200,6 +7200,10 @@ lib.zsys_set_max_msgsz.restype = None
 lib.zsys_set_max_msgsz.argtypes = [c_int]
 lib.zsys_max_msgsz.restype = c_int
 lib.zsys_max_msgsz.argtypes = []
+lib.zsys_set_file_stable_age_msec.restype = None
+lib.zsys_set_file_stable_age_msec.argtypes = [msecs_p]
+lib.zsys_file_stable_age_msec.restype = msecs_p
+lib.zsys_file_stable_age_msec.argtypes = []
 lib.zsys_set_linger.restype = None
 lib.zsys_set_linger.argtypes = [c_size_t]
 lib.zsys_set_sndhwm.restype = None
@@ -7612,6 +7616,26 @@ The default is INT_MAX.
         Return maximum message size.
         """
         return lib.zsys_max_msgsz()
+
+    @staticmethod
+    def set_file_stable_age_msec(file_stable_age_msec):
+        """
+        Configure the threshold value of filesystem object age per st_mtime
+that should elapse until we consider that object "stable" at the
+current zclock_time() moment.
+The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
+which generally depends on host OS, with fallback value of 3000.
+        """
+        return lib.zsys_set_file_stable_age_msec(file_stable_age_msec)
+
+    @staticmethod
+    def file_stable_age_msec():
+        """
+        Return current threshold value of file stable age in msec.
+This can be used in code that chooses to wait for this timeout
+before testing if a filesystem object is "stable" or not.
+        """
+        return lib.zsys_file_stable_age_msec()
 
     @staticmethod
     def set_linger(linger):

@@ -523,6 +523,29 @@ module CZMQ
         result
       end
 
+      # Configure the threshold value of filesystem object age per st_mtime
+      # that should elapse until we consider that object "stable" at the
+      # current zclock_time() moment.
+      # The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
+      # which generally depends on host OS, with fallback value of 3000.
+      #
+      # @param file_stable_age_msec [::FFI::Pointer, #to_ptr]
+      # @return [void]
+      def self.set_file_stable_age_msec(file_stable_age_msec)
+        result = ::CZMQ::FFI.zsys_set_file_stable_age_msec(file_stable_age_msec)
+        result
+      end
+
+      # Return current threshold value of file stable age in msec.
+      # This can be used in code that chooses to wait for this timeout
+      # before testing if a filesystem object is "stable" or not.
+      #
+      # @return [::FFI::Pointer]
+      def self.file_stable_age_msec()
+        result = ::CZMQ::FFI.zsys_file_stable_age_msec()
+        result
+      end
+
       # Configure the default linger timeout in msecs for new zsock instances.
       # You can also set this separately on each zsock_t instance. The default
       # linger time is zero, i.e. any pending messages will be dropped. If the

@@ -6487,6 +6487,8 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "socketLimit", _socket_limit);
     Nan::SetPrototypeMethod (tpl, "setMaxMsgsz", _set_max_msgsz);
     Nan::SetPrototypeMethod (tpl, "maxMsgsz", _max_msgsz);
+    Nan::SetPrototypeMethod (tpl, "setFileStableAgeMsec", _set_file_stable_age_msec);
+    Nan::SetPrototypeMethod (tpl, "fileStableAgeMsec", _file_stable_age_msec);
     Nan::SetPrototypeMethod (tpl, "setLinger", _set_linger);
     Nan::SetPrototypeMethod (tpl, "setSndhwm", _set_sndhwm);
     Nan::SetPrototypeMethod (tpl, "setRcvhwm", _set_rcvhwm);
@@ -6877,6 +6879,23 @@ NAN_METHOD (Zsys::_set_max_msgsz) {
 
 NAN_METHOD (Zsys::_max_msgsz) {
     int result = zsys_max_msgsz ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_file_stable_age_msec) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `file stable age msec`");
+
+    int64_t file_stable_age_msec;
+    if (info [0]->IsNumber ())
+        file_stable_age_msec = Nan::To<int64_t>(info [0]).FromJust ();
+    else
+        return Nan::ThrowTypeError ("`file stable age msec` must be a number");
+    zsys_set_file_stable_age_msec ((int64_t) file_stable_age_msec);
+}
+
+NAN_METHOD (Zsys::_file_stable_age_msec) {
+    int64_t result = zsys_file_stable_age_msec ();
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
