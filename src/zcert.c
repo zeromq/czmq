@@ -461,9 +461,46 @@ zcert_test (bool verbose)
 {
     printf (" * zcert: ");
     //  @selftest
+
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
+    const char *testbasedir  = ".test_zcert";
+    const char *testfile = "mycert.txt";
+    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
+    char *filepath = NULL;      // pathname to testfile in a test, in dirpath
+    char *filepath_s = NULL;    // pathname to testfile+secret in a test, in dirpath
+
+    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
+    assert (basedirpath);
+    filepath = zsys_sprintf ("%s/%s", basedirpath, testfile);
+    assert (filepath);
+    filepath_s = zsys_sprintf ("%s_secret", filepath);
+    assert (filepath_s);
+
+    // Make sure old aborted tests do not hinder us
+    zdir_t *dir = zdir_new (basedirpath, NULL);
+    if (dir) {
+        zdir_remove (dir, true);
+        zdir_destroy (&dir);
+    }
+    zsys_file_delete (filepath);
+    zsys_dir_delete  (basedirpath);
+
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zcert"
-    zsys_dir_create (TESTDIR);
+    zsys_dir_create (basedirpath);
 
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
@@ -485,20 +522,20 @@ zcert_test (bool verbose)
     zcert_destroy (&shadow);
 
     //  Check we can save and load certificate
-    zcert_save (cert, TESTDIR "/mycert.txt");
-    assert (zsys_file_exists (TESTDIR "/mycert.txt"));
-    assert (zsys_file_exists (TESTDIR "/mycert.txt_secret"));
+    zcert_save (cert, filepath);
+    assert (zsys_file_exists (filepath));
+    assert (zsys_file_exists (filepath_s));
 
     //  Load certificate, will in fact load secret one
-    shadow = zcert_load (TESTDIR "/mycert.txt");
+    shadow = zcert_load (filepath);
     assert (shadow);
     assert (zcert_eq (cert, shadow));
     zcert_destroy (&shadow);
 
     //  Delete secret certificate, load public one
-    int rc = zsys_file_delete (TESTDIR "/mycert.txt_secret");
+    int rc = zsys_file_delete (filepath_s);
     assert (rc == 0);
-    shadow = zcert_load (TESTDIR "/mycert.txt");
+    shadow = zcert_load (filepath);
 
     //  32-byte null key encodes as 40 '0' characters
     assert (streq (zcert_secret_txt (shadow), FORTY_ZEROES));
@@ -515,10 +552,14 @@ zcert_test (bool verbose)
     zcert_destroy (&cert);
 
     //  Delete all test files
-    zdir_t *dir = zdir_new (TESTDIR, NULL);
+    dir = zdir_new (basedirpath, NULL);
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
+
+    zstr_free (&basedirpath);
+    zstr_free (&filepath);
+    zstr_free (&filepath_s);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
