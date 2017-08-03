@@ -80,7 +80,7 @@ int main (int argc, char *argv [])
         message = getenv ("ZSP_MESSAGE");
 
     zfile_t *stdinf = NULL;
-    
+
     if (use_stdin) {
         stdinf = zfile_new ("/dev", "stdin");
         int r = zfile_input (stdinf);
@@ -111,7 +111,7 @@ int main (int argc, char *argv [])
 
         zclock_sleep (50);
     }
-    
+
     zfile_destroy (&stdinf);
 
     return 0;
