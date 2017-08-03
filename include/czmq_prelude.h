@@ -422,22 +422,24 @@ typedef struct {
 #define freen(x) do {free(x); x = NULL;} while(0)
 
 //  randof(num) : Provide random number from 0..(num-1)
-//  Note that (at least in Solaris) while rand() returns an int limited by
-//  RAND_MAX, random() returns a 32-bit value all filled with random bits.
+//  ASSUMES that "num" itself is at most an int (bit size no more than float
+//  on the host platform), and non-negative; may be a "function()" token.
 //  The math libraries on different platforms and capabilities in HW are a
 //  nightmare. Seems we have to drown the code in casts to have reasonable
 //  results... Also note that the 32-bit float has a hard time representing
 //  values close to UINT32_MAX that we had before, so now limit to UINT16_MAX.
-#if defined(RAND_MAX)
+//  Platforms where RAND_MAX is comparable to even signed INT32_MAX were
+//  rigged with problems here: even if the code used double-precision, the
+//  corner-case factors (divident close to INT32_MAX and close to divisor)
+//  were too close to 1.0, so the final product was "num" rather than "num-1".
+
 # if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
  || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * ( (float)(rand () % (RAND_MAX - 1)) / ((float)RAND_MAX)) ) ) )
-# else  // other platforms
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * ( (float)(random () % (RAND_MAX - 1)) / ((float)RAND_MAX)) ) ) )
-# endif // ifdef RAND_MAX
-#else
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * ( (float)( (uint16_t)(random ()) % (UINT16_MAX - 1) ) / ((float)UINT16_MAX)) ) ) )
+#   define randof(num)  (int) ( (float)(num) * ( (float)( (rand   () % (UINT16_MAX - 1) ) / ( (float)(UINT16_MAX) ) ) ) )
+# else
+#   define randof(num)  (int) ( (float)(num) * ( (float)( (random () % (UINT16_MAX - 1) ) / ( (float)(UINT16_MAX) ) ) ) )
 #endif
+
 
 // Windows MSVS doesn't have stdbool
 #if (defined (_MSC_VER))
