@@ -480,6 +480,36 @@ zproxy_test (bool verbose)
         printf ("\n");
 
     //  @selftest
+
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
+    const char *testbasedir  = ".test_zproxy";
+    const char *testpassfile = "password-file";
+    const char *testcertfile = "mycert.txt";
+    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
+    char *passfilepath = NULL;  // pathname to testfile in a test, in dirpath
+    char *certfilepath = NULL;  // pathname to testfile in a test, in dirpath
+
+    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
+    assert (basedirpath);
+    passfilepath = zsys_sprintf ("%s/%s", basedirpath, testpassfile);
+    assert (passfilepath);
+    certfilepath = zsys_sprintf ("%s/%s", basedirpath, testcertfile);
+    assert (certfilepath);
+
     //  Create and configure our proxy
     zactor_t *proxy = zactor_new (zproxy, NULL);
     assert (proxy);
@@ -571,10 +601,19 @@ zproxy_test (bool verbose)
 
 #if (ZMQ_VERSION_MAJOR == 4)
     // Test authentication functionality
-#   define TESTDIR ".test_zproxy"
+
+    // Make sure old aborted tests do not hinder us
+    zdir_t *dir = zdir_new (basedirpath, NULL);
+    if (dir) {
+        zdir_remove (dir, true);
+        zdir_destroy (&dir);
+    }
+    zsys_file_delete (passfilepath);
+    zsys_file_delete (certfilepath);
+    zsys_dir_delete (basedirpath);
 
     //  Create temporary directory for test files
-    zsys_dir_create (TESTDIR);
+    zsys_dir_create (basedirpath);
 
     char *frontend = NULL;
     char *backend = NULL;
@@ -645,7 +684,7 @@ zproxy_test (bool verbose)
     assert (!success);
 
     //  Test positive case (server-side passwords defined)
-    FILE *password = fopen (TESTDIR "/password-file", "w");
+    FILE *password = fopen (passfilepath, "w");
     assert (password);
     fprintf (password, "admin=Password\n");
     fclose (password);
@@ -658,7 +697,7 @@ zproxy_test (bool verbose)
     zsock_set_plain_password (faucet, "Password");
     zsock_set_plain_username (sink, "admin");
     zsock_set_plain_password (sink, "Password");
-    zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
+    zstr_sendx (auth, "PLAIN", passfilepath, NULL);
     zsock_wait (auth);
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose,
         true);
@@ -718,8 +757,8 @@ zproxy_test (bool verbose)
         zsock_set_curve_serverkey (faucet, public_key);
         zcert_apply (client_cert, sink);
         zsock_set_curve_serverkey (sink, public_key);
-        zcert_save_public (client_cert, TESTDIR "/mycert.txt");
-        zstr_sendx (auth, "CURVE", TESTDIR, NULL);
+        zcert_save_public (client_cert, certfilepath);
+        zstr_sendx (auth, "CURVE", basedirpath, NULL);
         zsock_wait (auth);
         success = s_can_connect (&proxy, &faucet, &sink, frontend, backend,
             verbose, true);
@@ -744,10 +783,14 @@ zproxy_test (bool verbose)
     zstr_free (&backend);
 
     //  Delete temporary directory and test files
-    zsys_file_delete (TESTDIR "/password-file");
-    zsys_file_delete (TESTDIR "/mycert.txt");
-    zsys_dir_delete (TESTDIR);
+    zsys_file_delete (passfilepath);
+    zsys_file_delete (certfilepath);
+    zsys_dir_delete (basedirpath);
 #endif
+
+    zstr_free (&passfilepath);
+    zstr_free (&certfilepath);
+    zstr_free (&basedirpath);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
