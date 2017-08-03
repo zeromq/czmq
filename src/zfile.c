@@ -712,7 +712,7 @@ zfile_test (bool verbose)
     close (handle);
     assert (zfile_has_changed (file));
 #ifdef CZMQ_BUILD_DRAFT_API
-    zclock_sleep (zsys_file_stable_age_msec() + 50);
+    zclock_sleep ((int)zsys_file_stable_age_msec() + 50);
 #else
     zclock_sleep (5050);
 #endif
