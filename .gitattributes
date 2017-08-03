@@ -1,2 +1,5 @@
+# This is a skeleton created by zproject.
+# You can add hand-written code here.
+
 # disables auto CRLF conversion for all files; create the file correctly and it will be allright
 * -text
