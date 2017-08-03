@@ -978,7 +978,7 @@ zproc_test (bool verbose)
         file = "./zsp";
 
     if (!zsys_file_exists (file)) {
-        zsys_warning ("cannot detect zsp binary, %s does not exists", file);
+        zsys_warning ("cannot detect zsp binary, %s does not exist", file);
         printf ("SKIPPED (zsp not found");
         return;
     }
