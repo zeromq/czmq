@@ -21,7 +21,13 @@
 */
 
 #include "czmq_classes.h"
-#include <unistd.h>
+
+// For getcwd() variants
+#if (defined (WIN32))
+# include <direct.h>
+#else
+# include <unistd.h>
+#endif
 
 //  --------------------------------------------------------------------------
 //  Signal handling
@@ -2121,9 +2127,21 @@ zsys_test (bool verbose)
     assert (rc == 0);
     zsys_file_mode_default ();
 
+#if (defined (PATH_MAX))
     char cwd[PATH_MAX];
+#else
+# if (defined (_MAX_PATH))
+    char cwd[_MAX_PATH];
+# else
+    char cwd[1024];
+# endif
+#endif
     memset (cwd, 0, sizeof(cwd));
+#if (defined (WIN32))
+    if (_getcwd(cwd, sizeof(cwd)) != NULL) {
+#else
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
+#endif
         if (verbose)
             printf ("zsys_test() at timestamp %" PRIi64 ": "
                 "current working directory is %s\n",

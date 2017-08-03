@@ -57,7 +57,13 @@ content of the messages in any way. See test example on how to use it.
 */
 
 #include "czmq_classes.h"
-#include <unistd.h>
+
+// For getcwd() variants
+#if (defined (WIN32))
+# include <direct.h>
+#else
+# include <unistd.h>
+#endif
 
 #define ZPROC_RUNNING -42
 
@@ -975,10 +981,23 @@ zproc_test (bool verbose)
         printf("\n");
     }
 
+#if (defined (PATH_MAX))
     char cwd[PATH_MAX];
+#else
+# if (defined (_MAX_PATH))
+    char cwd[_MAX_PATH];
+# else
+    char cwd[1024];
+# endif
+#endif
     memset (cwd, 0, sizeof (cwd));
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
+#if (defined (WIN32))
+    if (_getcwd(cwd, sizeof(cwd)) != NULL) {
+#else
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+#endif
         printf ("zproc_test() : current working directory is %s\n", cwd);
+    }
 
     //  find the right binary for current build (in-tree, distcheck, etc.)
     char *file = NULL;
