@@ -432,12 +432,25 @@ typedef struct {
 //  rigged with problems here: even if the code used double-precision, the
 //  corner-case factors (divident close to INT32_MAX and close to divisor)
 //  were too close to 1.0, so the final product was "num" rather than "num-1".
+//  Finally note that on some platforms RAND_MAX can be smallish, like 32767,
+//  so we should use it if small enough.
+
+#if !defined (ZSYS_RANDOF_MAX)
+# if defined (RAND_MAX)
+#  if (RAND_MAX > UINT16_MAX)
+#   define  ZSYS_RANDOF_MAX UINT16_MAX
+#  else
+#   define  ZSYS_RANDOF_MAX RAND_MAX
+#  endif
+# else
+#   define  ZSYS_RANDOF_MAX INT16_MAX
+# endif
 
 # if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
  || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
-#   define randof(num)  (int) ( (float)(num) * ( (float)( (rand   () % (UINT16_MAX - 1) ) / ( (float)(UINT16_MAX) ) ) ) )
+#   define randof(num)  (int) ( (float)(num) * ( (float)( (rand   () % (ZSYS_RANDOF_MAX - 1) ) / ( (float)(ZSYS_RANDOF_MAX) ) ) ) )
 # else
-#   define randof(num)  (int) ( (float)(num) * ( (float)( (random () % (UINT16_MAX - 1) ) / ( (float)(UINT16_MAX) ) ) ) )
+#   define randof(num)  (int) ( (float)(num) * ( (float)( (random () % (ZSYS_RANDOF_MAX - 1) ) / ( (float)(ZSYS_RANDOF_MAX) ) ) ) )
 #endif
 
 
