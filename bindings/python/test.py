@@ -57,7 +57,7 @@ class TestCZMQ(unittest.TestCase):
         initfile.close()
 
         try:
-            stable_age = float(file_stable_age_msec()) / 1000.0
+            stable_age = float(file_stable_age_msec()) / 1000.0 + 0.001
         except Exception:
             stable_age = 3.001
         time.sleep(stable_age) # wait for initial file to become 'stable'
@@ -190,7 +190,7 @@ class TestCZMQ(unittest.TestCase):
         del f
 
         try:
-            stable_age = float(file_stable_age_msec()) / 1000.0
+            stable_age = float(file_stable_age_msec()) / 1000.0 + 0.001
         except Exception:
             stable_age = 3.001
 
