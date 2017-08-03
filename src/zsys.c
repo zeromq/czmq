@@ -21,6 +21,7 @@
 */
 
 #include "czmq_classes.h"
+#include <unistd.h>
 
 //  --------------------------------------------------------------------------
 //  Signal handling
@@ -2119,7 +2120,23 @@ zsys_test (bool verbose)
     rc = zsys_dir_delete ("%s/%s", SELFTEST_DIR_RW, testbasedir);
     assert (rc == 0);
     zsys_file_mode_default ();
-    assert (zsys_dir_change (SELFTEST_DIR_RW) == 0);
+
+    char cwd[PATH_MAX];
+    memset (cwd, 0, sizeof(cwd));
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        if (verbose)
+            printf ("zsys_test() at timestamp %" PRIi64 ": "
+                "current working directory is %s\n",
+                zclock_time(), cwd);
+        assert (zsys_dir_change (SELFTEST_DIR_RW) == 0);
+        assert (zsys_dir_change (cwd) == 0);
+    }
+    else {
+        zsys_warning ("zsys_test() : got getcwd() error... "
+            "testing zsys_dir_change() anyway, but it can confuse "
+            "subsequent tests in this process");
+        assert (zsys_dir_change (SELFTEST_DIR_RW) == 0);
+    }
 
     zstr_free (&basedirpath);
     zstr_free (&dirpath);
