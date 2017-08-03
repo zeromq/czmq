@@ -3922,7 +3922,7 @@ Configure the threshold value of filesystem object age per st_mtime
 that should elapse until we consider that object "stable" at the
 current zclock_time() moment.
 The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
-which generally depends on host OS, with fallback value of 3000.
+which generally depends on host OS, with fallback value of 5000.
 
 ```
 msecs my_zsys.fileStableAgeMsec ()

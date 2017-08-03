@@ -67,7 +67,7 @@ static bool s_initialized = false;
 // This is a private tunable that is likely to be replaced or tweaked later
 // per comment block at s_zsys_file_stable() implementation, to reflect
 // the best stat data granularity available on host OS *and* used by czmq.
-#define S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC 3000
+#define S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC 5000
 #endif
 
 //  Default globals for new sockets and other joys; these can all be set
@@ -78,7 +78,7 @@ static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
 static int s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
-                                    //  ZSYS_FILE_STABLE_AGE_MSEC=3000
+                                    //  ZSYS_FILE_STABLE_AGE_MSEC=5000
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
@@ -720,7 +720,7 @@ s_zsys_file_stable (const char *filename, bool verbose)
         //  removable media, and only account even seconds in stat data.
         //  Solutions are two-fold: when using stat fields that are precise
         //  to a second (or inpredictably two), we should actually check for
-        //  (age > 3000) in rounded-microsecond accounting. Also, for some
+        //  (age > 3000+) in rounded-microsecond accounting. Also, for some
         //  systems we can have `configure`-time checks on presence of more
         //  precise (and less standardized) stat timestamp fields, where we
         //  can presumably avoid rounding to thousands and use (age > 2000).
@@ -1491,7 +1491,7 @@ zsys_max_msgsz (void)
 //  that should elapse until we consider that object "stable" at the
 //  current zclock_time() moment.
 //  The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
-//  which generally depends on host OS, with fallback value of 3000.
+//  which generally depends on host OS, with fallback value of 5000.
 
 void
     zsys_set_file_stable_age_msec (int64_t file_stable_age_msec)

@@ -527,7 +527,7 @@ module CZMQ
       # that should elapse until we consider that object "stable" at the
       # current zclock_time() moment.
       # The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
-      # which generally depends on host OS, with fallback value of 3000.
+      # which generally depends on host OS, with fallback value of 5000.
       #
       # @param file_stable_age_msec [::FFI::Pointer, #to_ptr]
       # @return [void]
