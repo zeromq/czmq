@@ -973,12 +973,12 @@ zproc_test (bool verbose)
 
     if (verbose) {
         printf("\n");
-
-        char cwd[PATH_MAX];
-        memset (cwd, 0, sizeof (cwd));
-        if (getcwd(cwd, sizeof(cwd)) != NULL)
-            printf ("zproc_test() : current working directory is %s\n", cwd);
     }
+
+    char cwd[PATH_MAX];
+    memset (cwd, 0, sizeof (cwd));
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+        printf ("zproc_test() : current working directory is %s\n", cwd);
 
     //  find the right binary for current build (in-tree, distcheck, etc.)
     char *file = "src/zsp";
