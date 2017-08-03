@@ -985,6 +985,11 @@ zproc_test (bool verbose)
     if (zsys_file_exists ("src/zsp") || zsys_file_exists ("./src/zsp"))
         file = "./src/zsp";
     else
+    if (zsys_file_exists ("../zsp"))
+    //  WHOA: zproc: zproc_test() : current working directory is
+    //      /home/travis/build/username/czmq/czmq-4.0.3/_build/src/selftest-rw
+        file = "../zsp";
+    else
     if (zsys_file_exists ("_build/../src/zsp"))
         file = "_build/../src/zsp";
     else
