@@ -946,9 +946,43 @@ zconfig_test (bool verbose)
     printf (" * zconfig: ");
 
     //  @selftest
+
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
+    const char *testbasedir  = ".test_zconfig";
+    const char *testfile = "test.cfg";
+    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
+    char *filepath = NULL;      // pathname to testfile in a test, in dirpath
+
+    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
+    assert (basedirpath);
+    filepath = zsys_sprintf ("%s/%s", basedirpath, testfile);
+    assert (filepath);
+
+    // Make sure old aborted tests do not hinder us
+    zdir_t *dir = zdir_new (basedirpath, NULL);
+    if (dir) {
+        zdir_remove (dir, true);
+        zdir_destroy (&dir);
+    }
+    zsys_file_delete (filepath);
+    zsys_dir_delete  (basedirpath);
+
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zconfig"
-    zsys_dir_create (TESTDIR);
+    zsys_dir_create (basedirpath);
 
     zconfig_t *root = zconfig_new ("root", NULL);
     assert (root);
@@ -966,12 +1000,12 @@ zconfig_test (bool verbose)
     zconfig_set_comment (root, "   CURVE certificate");
     zconfig_set_comment (root, "   -----------------");
     assert (zconfig_comments (root));
-    zconfig_save (root, TESTDIR "/test.cfg");
+    zconfig_save (root, filepath);
     zconfig_destroy (&root);
-    root = zconfig_load (TESTDIR "/test.cfg");
+    root = zconfig_load (filepath);
     if (verbose)
         zconfig_save (root, "-");
-    assert (streq (zconfig_filename (root), TESTDIR "/test.cfg"));
+    assert (streq (zconfig_filename (root), filepath));
 
     char *email = zconfig_get (root, "/headers/email", NULL);
     assert (email);
@@ -980,7 +1014,7 @@ zconfig_test (bool verbose)
     assert (passwd);
     assert (streq (passwd, "Top Secret"));
 
-    zconfig_savef (root, "%s/%s", TESTDIR, "test.cfg");
+    zconfig_savef (root, "%s/%s", basedirpath, testfile);
     assert (!zconfig_has_changed (root));
     int rc = zconfig_reload (&root);
     assert (rc == 0);
@@ -1014,7 +1048,7 @@ zconfig_test (bool verbose)
 
     //  Test config can't be saved to a file in a path that doesn't
     //  exist or isn't writable
-    rc = zconfig_savef (root, "%s/path/that/doesnt/exist/%s", TESTDIR, "test.cfg");
+    rc = zconfig_savef (root, "%s/path/that/doesnt/exist/%s", basedirpath, testfile);
     assert (rc == -1);
 
     zconfig_destroy (&root);
@@ -1054,10 +1088,13 @@ zconfig_test (bool verbose)
     zconfig_destroy (&config);
 
     //  Delete all test files
-    zdir_t *dir = zdir_new (TESTDIR, NULL);
+    dir = zdir_new (basedirpath, NULL);
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
+
+    zstr_free (&basedirpath);
+    zstr_free (&filepath);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
