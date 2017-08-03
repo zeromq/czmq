@@ -316,12 +316,46 @@ zcertstore_test (bool verbose)
         printf ("\n");
 
     //  @selftest
+
+    // Note: If your selftest reads SCMed fixture data, please keep it in
+    // src/selftest-ro; if your test creates filesystem objects, please
+    // do so under src/selftest-rw. They are defined below along with a
+    // usecase for the variables (assert) to make compilers happy.
+    const char *SELFTEST_DIR_RO = "src/selftest-ro";
+    const char *SELFTEST_DIR_RW = "src/selftest-rw";
+    assert (SELFTEST_DIR_RO);
+    assert (SELFTEST_DIR_RW);
+    // Uncomment these to use C++ strings in C++ selftest code:
+    //std::string str_SELFTEST_DIR_RO = std::string(SELFTEST_DIR_RO);
+    //std::string str_SELFTEST_DIR_RW = std::string(SELFTEST_DIR_RW);
+    //assert ( (str_SELFTEST_DIR_RO != "") );
+    //assert ( (str_SELFTEST_DIR_RW != "") );
+    // NOTE that for "char*" context you need (str_SELFTEST_DIR_RO + "/myfilename").c_str()
+
+    const char *testbasedir  = ".test_zcertstore";
+    const char *testfile = "mycert.txt";
+    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
+    char *filepath = NULL;      // pathname to testfile in a test, in dirpath
+
+    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
+    assert (basedirpath);
+    filepath = zsys_sprintf ("%s/%s", basedirpath, testfile);
+    assert (filepath);
+
+    // Make sure old aborted tests do not hinder us
+    zdir_t *dir = zdir_new (basedirpath, NULL);
+    if (dir) {
+        zdir_remove (dir, true);
+        zdir_destroy (&dir);
+    }
+    zsys_file_delete (filepath);
+    zsys_dir_delete  (basedirpath);
+
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zcertstore"
-    zsys_dir_create (TESTDIR);
+    zsys_dir_create (basedirpath);
 
     //  Load certificate store from disk; it will be empty
-    zcertstore_t *certstore = zcertstore_new (TESTDIR);
+    zcertstore_t *certstore = zcertstore_new (basedirpath);
     assert (certstore);
 
     //  Create a single new certificate and save to disk
@@ -330,7 +364,7 @@ zcertstore_test (bool verbose)
     char *client_key = strdup (zcert_public_txt (cert));
     assert (client_key);
     zcert_set_meta (cert, "name", "John Doe");
-    zcert_save (cert, TESTDIR "/mycert.txt");
+    zcert_save (cert, filepath);
     zcert_destroy (&cert);
 
     //  Check that certificate store refreshes as expected
@@ -370,10 +404,13 @@ zcertstore_test (bool verbose)
     zcertstore_destroy (&certstore);
 
     //  Delete all test files
-    zdir_t *dir = zdir_new (TESTDIR, NULL);
+    dir = zdir_new (basedirpath, NULL);
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
+
+    zstr_free (&basedirpath);
+    zstr_free (&filepath);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
