@@ -439,12 +439,13 @@ typedef struct {
 # if defined (RAND_MAX)
 #  if (RAND_MAX > UINT16_MAX)
 #   define  ZSYS_RANDOF_MAX UINT16_MAX
-#  else
+#  else // RAND_MAX is small enough to not overflow our calculations
 #   define  ZSYS_RANDOF_MAX RAND_MAX
 #  endif
-# else
+# else // No RAND_MAX - use a smaller safer limit
 #   define  ZSYS_RANDOF_MAX INT16_MAX
 # endif
+#endif // ZSYS_RANDOF_MAX is defined by caller... trust them or explode later
 
 # if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
  || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
