@@ -22,6 +22,13 @@
 
 #include "czmq_classes.h"
 
+// For getcwd() variants
+#if (defined (WIN32))
+# include <direct.h>
+#else
+# include <unistd.h>
+#endif
+
 //  --------------------------------------------------------------------------
 //  Signal handling
 
@@ -77,7 +84,7 @@ static int s_thread_sched_policy = -1; //  ZSYS_THREAD_SCHED_POLICY=-1
 static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
-static int s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
+static int64_t s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
                                     //  ZSYS_FILE_STABLE_AGE_MSEC=5000
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
@@ -2119,7 +2126,35 @@ zsys_test (bool verbose)
     rc = zsys_dir_delete ("%s/%s", SELFTEST_DIR_RW, testbasedir);
     assert (rc == 0);
     zsys_file_mode_default ();
-    assert (zsys_dir_change (SELFTEST_DIR_RW) == 0);
+
+#if (defined (PATH_MAX))
+    char cwd[PATH_MAX];
+#else
+# if (defined (_MAX_PATH))
+    char cwd[_MAX_PATH];
+# else
+    char cwd[1024];
+# endif
+#endif
+    memset (cwd, 0, sizeof(cwd));
+#if (defined (WIN32))
+    if (_getcwd(cwd, sizeof(cwd)) != NULL) {
+#else
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+#endif
+        if (verbose)
+            printf ("zsys_test() at timestamp %" PRIi64 ": "
+                "current working directory is %s\n",
+                zclock_time(), cwd);
+        assert (zsys_dir_change (SELFTEST_DIR_RW) == 0);
+        assert (zsys_dir_change (cwd) == 0);
+    }
+    else {
+        zsys_warning ("zsys_test() : got getcwd() error... "
+            "testing zsys_dir_change() anyway, but it can confuse "
+            "subsequent tests in this process");
+        assert (zsys_dir_change (SELFTEST_DIR_RW) == 0);
+    }
 
     zstr_free (&basedirpath);
     zstr_free (&dirpath);

@@ -1025,7 +1025,7 @@ zdir_test (bool verbose)
 
     // wait for initial file to become 'stable'
 #ifdef CZMQ_BUILD_DRAFT_API
-    zclock_sleep (zsys_file_stable_age_msec() + 50);
+    zclock_sleep ((int)zsys_file_stable_age_msec() + 50);
 #else
     zclock_sleep (5050);
 #endif
@@ -1056,7 +1056,7 @@ zdir_test (bool verbose)
     // poll for a certain timeout before giving up and failing the test
     void* polled = NULL;
 #ifdef CZMQ_BUILD_DRAFT_API
-    polled = zpoller_wait(watch_poll, zsys_file_stable_age_msec() + 150);
+    polled = zpoller_wait(watch_poll, (int)zsys_file_stable_age_msec() + 150);
 #else
     polled = zpoller_wait(watch_poll, 5150);
 #endif
@@ -1096,7 +1096,7 @@ zdir_test (bool verbose)
 
     // poll for a certain timeout before giving up and failing the test.
 #ifdef CZMQ_BUILD_DRAFT_API
-    polled = zpoller_wait(watch_poll, zsys_file_stable_age_msec() + 150);
+    polled = zpoller_wait(watch_poll, (int)zsys_file_stable_age_msec() + 150);
 #else
     polled = zpoller_wait(watch_poll, 5150);
 #endif
