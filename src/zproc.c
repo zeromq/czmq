@@ -975,10 +975,6 @@ zproc_test (bool verbose)
         printf("\n");
     }
 
-    char cwd[PATH_MAX];
-    memset (cwd, 0, sizeof (cwd));
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
-        printf ("zproc_test() : current working directory is %s\n", cwd);
 
     //  find the right binary for current build (in-tree, distcheck, etc.)
     char *file = NULL;
@@ -1014,11 +1010,18 @@ zproc_test (bool verbose)
 
     if (file == NULL || !zsys_file_exists (file)) {
         zsys_warning ("cannot detect zsp binary, %s does not exist", file ? file : "<null>");
+
         printf ("SKIPPED (zsp helper not found)\n");
+
+        char cwd[PATH_MAX];
+        memset (cwd, 0, sizeof (cwd));
+        if (getcwd(cwd, sizeof(cwd)) != NULL)
+            printf ("zproc_test() : current working directory is %s\n", cwd);
+
         return;
     }
     if (verbose) {
-        printf ("zproc_test() : detected a zsp binary at %s\n", file);
+        zsys_info ("zproc_test() : detected a zsp binary at %s\n", file);
     }
 
     //  Create new subproc instance
