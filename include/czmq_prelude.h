@@ -424,15 +424,18 @@ typedef struct {
 //  Provide random number from 0..(num-1)
 //  Note that (at least in Solaris) while rand() returns an int limited by
 //  RAND_MAX, random() returns a 32-bit value all filled with random bits.
-#if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
+//  The math libraries on different platforms and capabilities in HW are a
+//  nightmare. Seems we have to drown the code in casts to have reasonable
+//  results...
+#if defined(RAND_MAX)
+# if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
  || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(rand ()) / ((float)RAND_MAX + 1.0)) ) )
+#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * ( (float)(rand () % RAND_MAX) / ((float)RAND_MAX + 1.0)) ) ) )
+# else  // other platforms
+#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * ( (float)(random () % RAND_MAX) / ((float)RAND_MAX + 1.0)) ) ) )
+# endif // ifdef RAND_MAX
 #else
-# if defined(RAND_MAX)
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(random () % RAND_MAX) / ((float)RAND_MAX + 1.0)) ) )
-# else
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(uint32_t)random () / ((float)UINT32_MAX + 1.0)) ) )
-# endif
+#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * ( (float)(uint32_t)(random () % UINT32_MAX) / ((float)UINT32_MAX + 1.0)) ) ) )
 #endif
 
 // Windows MSVS doesn't have stdbool
