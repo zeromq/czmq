@@ -77,7 +77,7 @@ static int s_thread_sched_policy = -1; //  ZSYS_THREAD_SCHED_POLICY=-1
 static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
-static int s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
+static int64_t s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
                                     //  ZSYS_FILE_STABLE_AGE_MSEC=5000
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
