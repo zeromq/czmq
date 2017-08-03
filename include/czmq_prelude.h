@@ -421,19 +421,39 @@ typedef struct {
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
 #define freen(x) do {free(x); x = NULL;} while(0)
 
-//  Provide random number from 0..(num-1)
-//  Note that (at least in Solaris) while rand() returns an int limited by
-//  RAND_MAX, random() returns a 32-bit value all filled with random bits.
-#if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
- || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(rand ()) / ((float)RAND_MAX + 1.0)) ) )
-#else
-# if defined(RAND_MAX)
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(random () % RAND_MAX) / ((float)RAND_MAX + 1.0)) ) )
-# else
-#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(uint32_t)random () / ((float)UINT32_MAX + 1.0)) ) )
+//  randof(num) : Provide random number from 0..(num-1)
+//  ASSUMES that "num" itself is at most an int (bit size no more than float
+//  on the host platform), and non-negative; may be a "function()" token.
+//  The math libraries on different platforms and capabilities in HW are a
+//  nightmare. Seems we have to drown the code in casts to have reasonable
+//  results... Also note that the 32-bit float has a hard time representing
+//  values close to UINT32_MAX that we had before, so now limit to UINT16_MAX.
+//  Platforms where RAND_MAX is comparable to even signed INT32_MAX were
+//  rigged with problems here: even if the code used double-precision, the
+//  corner-case factors (divident close to INT32_MAX and close to divisor)
+//  were too close to 1.0, so the final product was "num" rather than "num-1".
+//  Finally note that on some platforms RAND_MAX can be smallish, like 32767,
+//  so we should use it if small enough.
+
+#if !defined (ZSYS_RANDOF_MAX)
+# if defined (RAND_MAX)
+#  if (RAND_MAX > UINT16_MAX)
+#   define  ZSYS_RANDOF_MAX UINT16_MAX
+#  else // RAND_MAX is small enough to not overflow our calculations
+#   define  ZSYS_RANDOF_MAX RAND_MAX
+#  endif
+# else // No RAND_MAX - use a smaller safer limit
+#   define  ZSYS_RANDOF_MAX INT16_MAX
 # endif
+#endif // ZSYS_RANDOF_MAX is defined by caller... trust them or explode later
+
+# if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
+ || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
+#   define randof(num)  (int) ( (float)(num) * ( (float)( (rand   () % (ZSYS_RANDOF_MAX - 1) ) / ( (float)(ZSYS_RANDOF_MAX) ) ) ) )
+# else
+#   define randof(num)  (int) ( (float)(num) * ( (float)( (random () % (ZSYS_RANDOF_MAX - 1) ) / ( (float)(ZSYS_RANDOF_MAX) ) ) ) )
 #endif
+
 
 // Windows MSVS doesn't have stdbool
 #if (defined (_MSC_VER))
