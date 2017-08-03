@@ -1293,14 +1293,31 @@ zhashx_test (bool verbose)
     assert (hash == NULL);
 
     //  Test randof() limits - should be within (0..testmax)
+    //  and randomness distribution - should not have (many) zero-counts
+    //  If there are - maybe the ZSYS_RANDOF_MAX is too big for this platform
     //  Note: This test can take a while on systems with weak floating point HW
     testmax = 999;
+    size_t rndcnt[999];
+    assert ((sizeof (rndcnt)/sizeof(rndcnt[0])) == testmax);
+    memset (rndcnt, 0, sizeof (rndcnt));
     for (iteration = 0; iteration < 10000000; iteration++) {
         testnbr = randof (testmax);
         assert (testnbr != testmax);
         assert (testnbr < testmax);
         assert (testnbr >= 0);
+        rndcnt[testnbr]++;
     }
+    int rndmisses = 0;
+    for (iteration = 0; iteration < testmax; iteration++) {
+        if (rndcnt[iteration] == 0) {
+            zsys_warning("zhashx_test() : random distribution fault : got 0 hits for %d/%d",
+                iteration, testmax);
+            rndmisses++;
+        }
+    }
+    //  Too many misses are suspicious... we can lose half the entries
+    //  for each bit not used in the assumed ZSYS_RANDOF_MAX...
+    assert ( (rndmisses < (testmax / 3 )) );
 
     //  Test destructor; automatically copies and frees string values
     hash = zhashx_new ();
