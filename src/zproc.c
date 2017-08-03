@@ -981,38 +981,39 @@ zproc_test (bool verbose)
         printf ("zproc_test() : current working directory is %s\n", cwd);
 
     //  find the right binary for current build (in-tree, distcheck, etc.)
-    char *file = "src/zsp";
-    if (!zsys_file_exists (file)) {
-        if (zsys_file_exists ("_build/../src/zsp"))
-            file = "_build/../src/zsp";
-        else
-        if (zsys_file_exists ("_build/src/zsp"))
-            file = "_build/src/zsp";
-        else
-        if (zsys_file_exists ("../_build/src/zsp"))
-            file = "../_build/src/zsp";
-        else
-        if (zsys_file_exists ("../../_build/src/zsp"))
-            file = "../../_build/src/zsp";
-        else
-        if (zsys_file_exists ("_build/sub/src/zsp"))
-            file = "_build/sub/src/zsp";
-        else
-        if (zsys_file_exists ("../_build/sub/src/zsp"))
-            file = "../_build/sub/src/zsp";
-        else
-        if (zsys_file_exists ("../../_build/sub/src/zsp"))
-            file = "../../_build/sub/src/zsp";
-        else
-        if (zsys_file_exists ("zsp"))
-            file = "./zsp";
-        else
-        if (zsys_file_exists ("../src/zsp"))
-            file = "../src/zsp";
-    }
+    char *file = NULL;
+    if (zsys_file_exists ("src/zsp") || zsys_file_exists ("./src/zsp"))
+        file = "./src/zsp";
+    else
+    if (zsys_file_exists ("_build/../src/zsp"))
+        file = "_build/../src/zsp";
+    else
+    if (zsys_file_exists ("_build/src/zsp"))
+        file = "_build/src/zsp";
+    else
+    if (zsys_file_exists ("../_build/src/zsp"))
+        file = "../_build/src/zsp";
+    else
+    if (zsys_file_exists ("../../_build/src/zsp"))
+        file = "../../_build/src/zsp";
+    else
+    if (zsys_file_exists ("_build/sub/src/zsp"))
+        file = "_build/sub/src/zsp";
+    else
+    if (zsys_file_exists ("../_build/sub/src/zsp"))
+        file = "../_build/sub/src/zsp";
+    else
+    if (zsys_file_exists ("../../_build/sub/src/zsp"))
+        file = "../../_build/sub/src/zsp";
+    else
+    if (zsys_file_exists ("zsp") || zsys_file_exists ("./zsp"))
+        file = "./zsp";
+    else
+    if (zsys_file_exists ("../src/zsp"))
+        file = "../src/zsp";
 
-    if (!zsys_file_exists (file)) {
-        zsys_warning ("cannot detect zsp binary, %s does not exist", file);
+    if (file == NULL || !zsys_file_exists (file)) {
+        zsys_warning ("cannot detect zsp binary, %s does not exist", file ? file : "<null>");
         printf ("SKIPPED (zsp helper not found)\n");
         return;
     }
