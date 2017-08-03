@@ -57,6 +57,7 @@ content of the messages in any way. See test example on how to use it.
 */
 
 #include "czmq_classes.h"
+#include <unistd.h>
 
 #define ZPROC_RUNNING -42
 
@@ -969,18 +970,55 @@ zproc_test (bool verbose)
 
     //  @selftest
     //  0. initialization
-    //  find the right binary
-    char *file = "src/zsp";
+
+    if (verbose) {
+        printf("\n");
+    }
+
+    char cwd[PATH_MAX];
+    memset (cwd, 0, sizeof (cwd));
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+        printf ("zproc_test() : current working directory is %s\n", cwd);
+
+    //  find the right binary for current build (in-tree, distcheck, etc.)
+    char *file = NULL;
+    if (zsys_file_exists ("src/zsp") || zsys_file_exists ("./src/zsp"))
+        file = "./src/zsp";
+    else
     if (zsys_file_exists ("_build/../src/zsp"))
         file = "_build/../src/zsp";
     else
-    if (zsys_file_exists ("zsp"))
+    if (zsys_file_exists ("_build/src/zsp"))
+        file = "_build/src/zsp";
+    else
+    if (zsys_file_exists ("../_build/src/zsp"))
+        file = "../_build/src/zsp";
+    else
+    if (zsys_file_exists ("../../_build/src/zsp"))
+        file = "../../_build/src/zsp";
+    else
+    if (zsys_file_exists ("_build/sub/src/zsp"))
+        file = "_build/sub/src/zsp";
+    else
+    if (zsys_file_exists ("../_build/sub/src/zsp"))
+        file = "../_build/sub/src/zsp";
+    else
+    if (zsys_file_exists ("../../_build/sub/src/zsp"))
+        file = "../../_build/sub/src/zsp";
+    else
+    if (zsys_file_exists ("zsp") || zsys_file_exists ("./zsp"))
         file = "./zsp";
+    else
+    if (zsys_file_exists ("../src/zsp"))
+        file = "../src/zsp";
 
-    if (!zsys_file_exists (file)) {
-        zsys_warning ("cannot detect zsp binary, %s does not exists", file);
-        printf ("SKIPPED (zsp not found");
+    if (file == NULL || !zsys_file_exists (file)) {
+        zsys_warning ("cannot detect zsp binary, %s does not exist", file ? file : "<null>");
+        printf ("SKIPPED (zsp helper not found)\n");
         return;
+    }
+    if (verbose) {
+        printf ("zproc_test() : detected a zsp binary at %s\n", file);
     }
 
     //  Create new subproc instance
