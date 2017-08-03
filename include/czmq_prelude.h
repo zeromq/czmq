@@ -426,12 +426,12 @@ typedef struct {
 //  RAND_MAX, random() returns a 32-bit value all filled with random bits.
 #if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
  || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
-#   define randof(num)  (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
+#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(rand ()) / ((float)RAND_MAX + 1.0)) ) )
 #else
 # if defined(RAND_MAX)
-#   define randof(num)  (int) ((float) (num) * (random () % RAND_MAX) / (RAND_MAX + 1.0))
+#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(random () % RAND_MAX) / ((float)RAND_MAX + 1.0)) ) )
 # else
-#   define randof(num)  (int) ((float) (num) * (uint32_t)random () / (UINT32_MAX + 1.0))
+#   define randof(num)  (int) ( floorf( (float) ( (float)(num) * (float)(uint32_t)random () / ((float)UINT32_MAX + 1.0)) ) )
 # endif
 #endif
 
