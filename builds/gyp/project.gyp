@@ -175,7 +175,7 @@
       'target_name': 'test-randof',
       'type': 'executable',
       'sources': [
-        '../../src/test-randof.c'
+        '../../src/test_randof.c'
       ],
       'dependencies': [
         'libczmq'

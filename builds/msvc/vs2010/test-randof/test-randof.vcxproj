@@ -129,7 +129,7 @@
     <Import Project="$(ProjectDir)..\..\properties\ReleaseSEXE.props" />
   </ImportGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\test-randof.c" />
+    <ClCompile Include="..\..\..\..\src\test_randof.c" />
   </ItemGroup>
     <ItemGroup>
     <ProjectReference Include="..\libczmq\libczmq.vcxproj">

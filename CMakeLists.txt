@@ -337,7 +337,7 @@ target_link_libraries(
 )
 add_executable(
     test-randof
-    "${SOURCE_DIR}/src/test-randof.c"
+    "${SOURCE_DIR}/src/test_randof.c"
 )
 target_link_libraries(
     test-randof
