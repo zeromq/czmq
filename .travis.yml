@@ -8,6 +8,8 @@ os:
 - linux
 - osx
 
+dist: trusty
+
 sudo: false
 
 compiler:
@@ -85,8 +87,8 @@ matrix:
 addons:
   apt:
     sources:
-    - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_12.04/ ./'
-      key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_12.04/Release.key'
+    - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
+      key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
     packages:
     - uuid-dev
     - asciidoc
@@ -95,7 +97,7 @@ addons:
     - libzmq3-dev
 
 before_install:
-- if [ $TRAVIS_OS_NAME == "osx" ] ; then brew update; brew reinstall ossp-uuid binutils ; fi
+- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "android" ] ; then brew install binutils ; fi
 - if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "stable_zmq" ] ; then brew install libsodium ; fi
 
 # ZMQ stress tests need more open socket (files) than the usual default
