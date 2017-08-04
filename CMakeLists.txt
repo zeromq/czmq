@@ -336,6 +336,16 @@ target_link_libraries(
     ${OPTIONAL_LIBRARIES}
 )
 add_executable(
+    test-randof
+    "${SOURCE_DIR}/src/test-randof.c"
+)
+target_link_libraries(
+    test-randof
+    czmq
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+)
+add_executable(
     czmq_selftest
     "${SOURCE_DIR}/src/czmq_selftest.c"
 )
@@ -459,6 +469,7 @@ set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt
                     ${CMAKE_BINARY_DIR}/src/czmq_selftest
                     ${CMAKE_BINARY_DIR}/src/zmakecert
                     ${CMAKE_BINARY_DIR}/src/zsp
+                    ${CMAKE_BINARY_DIR}/src/test-randof
                     ${CMAKE_BINARY_DIR}/src/czmq_selftest
 )
 

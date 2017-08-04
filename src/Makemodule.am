@@ -146,6 +146,13 @@ src_zsp_LDADD = ${program_libs}
 src_zsp_SOURCES = src/zsp.c
 endif #ENABLE_ZSP
 
+if ENABLE_TEST_RANDOF
+noinst_PROGRAMS += src/test-randof
+src_test_randof_CPPFLAGS = ${AM_CPPFLAGS}
+src_test_randof_LDADD = ${program_libs}
+src_test_randof_SOURCES = src/test_randof.c
+endif #ENABLE_TEST_RANDOF
+
 if ENABLE_CZMQ_SELFTEST
 check_PROGRAMS += src/czmq_selftest
 noinst_PROGRAMS += src/czmq_selftest
@@ -192,6 +199,7 @@ dist_api_DATA = \
 src: \
 		src/zmakecert \
 		src/zsp \
+		src/test-randof \
 		src/czmq_selftest \
 		src/libczmq.la
 
