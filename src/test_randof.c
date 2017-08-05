@@ -31,12 +31,12 @@
 
 #ifndef TESTMAX
 //# define TESTMAX 999
-# define TESTMAX (intmax_t)1000000
+# define TESTMAX (intmax_t)10000000
 #endif
 
 #ifndef ITERMAX
 //# define ITERMAX 1000000000
-# define ITERMAX (TESTMAX * 300)
+# define ITERMAX (TESTMAX * 30)
 #endif
 
 #ifdef STRINGIZE_
@@ -69,7 +69,7 @@ int main (int argc, char *argv [])
             printf ("  --help / -h            this information\n");
             printf ("  --test-range / -r NUM  generate numbers from 0 to NUM-1 (default %jd)\n",
                 (intmax_t)TESTMAX);
-            printf ("  --iterations / -i ITR  run ITR takes at generating random values (default %jd); recommended at least 1000*NUM\n",
+            printf ("  --iterations / -i ITR  run ITR takes at generating random values (default %jd); recommended at least 30*NUM\n",
                 (intmax_t)ITERMAX);
             printf ("  ZSYS_RANDOF_MAX is defined during compilation, this binary was built with \"%s\" (%jd)\n",
                 STRINGIZE(ZSYS_RANDOF_MAX), (intmax_t)ZSYS_RANDOF_MAX);
