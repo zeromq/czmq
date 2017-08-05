@@ -288,6 +288,8 @@ default|default-Werror|default-with-docs|valgrind)
         # Report built-in tunables
         $CI_TIME ./src/test-randof -h
         $CI_TIME ./src/test-randof || exit $?
+    else
+        echo "SKIPPED test of randof() : can't find a `pwd`/src/test-randof" >&2
     fi
 
     [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"
