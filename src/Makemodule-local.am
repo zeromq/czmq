@@ -5,5 +5,11 @@ if ON_ANDROID
 src_libczmq_la_LIBADD += -llog
 endif
 
+# Add a way to customize test_randof binary for quick recompiles, e.g.
+#   gmake test_randof_macros="-DZSYS_RANDOF_FLT=double -DZSYS_RANDOF_MAX=INT8_MAX" src/test-randof
+if ENABLE_TEST_RANDOF
+src_test_randof_CPPFLAGS += $(test_randof_macros)
+endif
+
 check-py: src/libczmq.la
 	$(LIBTOOL) --mode=execute -dlopen src/libczmq.la python bindings/python/test.py
