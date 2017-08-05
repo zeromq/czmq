@@ -30,11 +30,13 @@
 // Compiler can also tweak ZSYS_RANDOF_MAX to numeric or macroed value
 
 #ifndef TESTMAX
-# define TESTMAX 999
+//# define TESTMAX 999
+# define TESTMAX (intmax_t)10000000
 #endif
 
 #ifndef ITERMAX
-# define ITERMAX 10000000
+//# define ITERMAX 1000000000
+# define ITERMAX (TESTMAX * 300)
 #endif
 
 #ifdef STRINGIZE_
