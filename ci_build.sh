@@ -286,7 +286,7 @@ default|default-Werror|default-with-docs|valgrind)
         echo ""
         echo "`date`: INFO: Starting test of randof()..."
         # Report built-in tunables
-        $CI_TIME ./src/test-randof -h
+        $CI_TIME ./src/test-randof -h 2>&1 | grep ZSYS || true
         $CI_TIME ./src/test-randof || exit $?
     else
         echo "SKIPPED test of randof() : can't find a `pwd`/src/test-randof" >&2
