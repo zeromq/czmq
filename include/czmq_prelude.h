@@ -473,8 +473,10 @@ typedef struct {
 // Supplement the limited spectrum of ZSYS_RANDOF_MAX by stacking more random()s
 // Note this can still be too little for very large "num" > ZSYS_RANDOF_MAX
 // but we'd need a real randof() function to handle stacking in that case.
+// Fuzziness added below (division by slightly more than a whole number) solves
+// this wonderfully even for "num" ranges twice as big as the ZSYS_RANDOF_MAX.
 #if (ZSYS_RANDOF_MAX > UINT16_MAX)
-#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * s_randof_factor() )
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * s_randof_factor() / ( 1.0 + s_randof_factor()/100 ) )
 #else // boost dispersion
 # if (ZSYS_RANDOF_MAX > INT16_MAX)
 #   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() ) / ( 2.0 + s_randof_factor()/100 ) )
