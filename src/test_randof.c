@@ -31,7 +31,7 @@
 
 #ifndef TESTMAX
 //# define TESTMAX 999
-# define TESTMAX (intmax_t)10000000
+# define TESTMAX (intmax_t)1000000
 #endif
 
 #ifndef ITERMAX
