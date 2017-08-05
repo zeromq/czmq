@@ -20,6 +20,11 @@
 @end
 */
 
+// Custom testing, needs recompiling
+//#define ZSYS_RANDOF_MAX (INT32_MAX>>8)
+//#define ZSYS_RANDOF_FLT double
+//#define ZSYS_RANDOF_FUNC rand
+
 #include "czmq_classes.h"
 
 // Compiler can also tweak ZSYS_RANDOF_MAX to numeric or macroed value
@@ -62,12 +67,14 @@ int main (int argc, char *argv [])
             printf ("  --help / -h            this information\n");
             printf ("  --test-range / -r NUM  generate numbers from 0 to NUM-1 (default %jd)\n",
                 (intmax_t)TESTMAX);
-            printf ("  --iterations / -i ITR  run ITR takes at generating random values (default %jd)\n",
+            printf ("  --iterations / -i ITR  run ITR takes at generating random values (default %jd); recommended at least 1000*NUM\n",
                 (intmax_t)ITERMAX);
             printf ("  ZSYS_RANDOF_MAX is defined during compilation, this binary was built with \"%s\" (%jd)\n",
                 STRINGIZE(ZSYS_RANDOF_MAX), (intmax_t)ZSYS_RANDOF_MAX);
             printf ("  ZSYS_RANDOF_FLT is defined during compilation, this binary was built with \"%s\"\n",
                 STRINGIZE(ZSYS_RANDOF_FLT));
+            printf ("  ZSYS_RANDOF_FUNC is defined during compilation, this binary was built with \"%s\"\n",
+                STRINGIZE(ZSYS_RANDOF_FUNC));
             // TODO: CSV output mode to a file for pretty graphing of the spectrum?
             return 0;
         }
@@ -124,11 +131,11 @@ int main (int argc, char *argv [])
 
     size_t *rndcnt = (size_t*)zmalloc (sizeof (size_t) * testmax);;
     assert (rndcnt);
-    assert ((sizeof (rndcnt)/sizeof(rndcnt[0])) == testmax);
     memset (rndcnt, 0, sizeof (size_t) * testmax);
 
-    zsys_info ("test_randof : Runnning random loop for %jd iterations", itermax);
-    for (iteration = 0; iteration < itermax; iteration++) {
+    zsys_info ("test_randof : Running random loop for %jd iterations and %jd values (factor of %.6Lg)",
+        itermax, testmax, (long double)itermax/(long double)testmax);
+    for (iteration = 0; iteration < itermax && !zsys_interrupted ; iteration++) {
         testnbr = randof (testmax);
         assert (testnbr != testmax);
         assert (testnbr < testmax);
@@ -137,7 +144,7 @@ int main (int argc, char *argv [])
     }
 
     zsys_info ("test_randof : Testing hit-counts of %jd entries", testmax);
-    for (iteration = 0; iteration < testmax; iteration++) {
+    for (iteration = 0; iteration < testmax && !zsys_interrupted; iteration++) {
         if (rndcnt[iteration] == 0) {
             if (verbose)
                 zsys_warning("test_randof : random distribution fault : got 0 hits for %jd/%jd",
@@ -150,8 +157,13 @@ int main (int argc, char *argv [])
     //  for each bit not used in the assumed ZSYS_RANDOF_MAX...
     //  We can also have a result-spectrum too discrete with smallish
     //  ZSYS_RANDOF_MAX and largish testmax...
-    zsys_info ("test_randof : Got %jd zero-entries from %jd range with ZSYS_RANDOF_MAX=%jd",
-        rndmisses, testmax, (intmax_t)ZSYS_RANDOF_MAX);
+    zsys_info ("test_randof : Got %jd zero-entries (misses) from %jd range (%.4Lg %%) with ZSYS_RANDOF_MAX=%jd and %s precision and %s()",
+        rndmisses, testmax,
+        rndmisses ? ((long double)(rndmisses)/(long double)testmax)*100.0 : (long double)0.0,
+        (intmax_t)ZSYS_RANDOF_MAX,
+        STRINGIZE(ZSYS_RANDOF_FLT),
+        STRINGIZE(ZSYS_RANDOF_FUNC)
+        );
     assert ( (rndmisses < (testmax / 3 )) );
 
     free(rndcnt);
