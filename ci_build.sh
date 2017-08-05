@@ -281,6 +281,15 @@ default|default-Werror|default-with-docs|valgrind)
             $CI_TIME make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck || exit $?
         )
     ) || exit 1
+
+    if [ -x ./src/test-randof ] ; then
+        echo ""
+        echo "`date`: INFO: Starting test of randof()..."
+        # Report built-in tunables
+        $CI_TIME ./src/test-randof -h
+        $CI_TIME ./src/test-randof || exit $?
+    fi
+
     [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"
 
     echo "=== Are GitIgnores good after 'make distcheck' without drafts? (should have no output below)"
