@@ -23,6 +23,7 @@ save.xml
 
 # Executables
 src/czmq_selftest
+src/test-randof
 src/zmakecert
 src/zsp
 src/czmq_selftest

@@ -424,6 +424,7 @@ typedef struct {
 //  randof(num) : Provide random number from 0..(num-1)
 //  ASSUMES that "num" itself is at most an int (bit size no more than float
 //  on the host platform), and non-negative; may be a "function()" token.
+//  For practical reasons, "num" should be under 50M or so.
 //  The math libraries on different platforms and capabilities in HW are a
 //  nightmare. Seems we have to drown the code in casts to have reasonable
 //  results... Also note that the 32-bit float has a hard time representing
@@ -435,24 +436,60 @@ typedef struct {
 //  Finally note that on some platforms RAND_MAX can be smallish, like 32767,
 //  so we should use it if small enough.
 
+//  Precision for our calculations impacts the MAX values we can use below
+//  Still, say UINT64_MAX is overkill. But smaller MAXes can yield better
+//  distribution of values with e.g. double.
+#if !defined (ZSYS_RANDOF_FLT)
+#   define  ZSYS_RANDOF_FLT float
+#endif // ZSYS_RANDOF_FLT is defined by caller... trust them or explode later
+
+//  Limits below were experimented for 32-bit floats on x86 with test-randof
+//  Due to discrete rounding, greater values caused collisions with the
+//  fraction s_randof_factor() defined below returning 1.0.
 #if !defined (ZSYS_RANDOF_MAX)
 # if defined (RAND_MAX)
-#  if (RAND_MAX > UINT16_MAX)
-#   define  ZSYS_RANDOF_MAX UINT16_MAX
+#  if (RAND_MAX > (UINT32_MAX>>6))
+#   define  ZSYS_RANDOF_MAX (UINT32_MAX>>6)
 #  else // RAND_MAX is small enough to not overflow our calculations
 #   define  ZSYS_RANDOF_MAX RAND_MAX
 #  endif
-# else // No RAND_MAX - use a smaller safer limit
+# else // No RAND_MAX - use a smaller safer limit, but with values too discrete
 #   define  ZSYS_RANDOF_MAX INT16_MAX
 # endif
 #endif // ZSYS_RANDOF_MAX is defined by caller... trust them or explode later
 
+// Implementations vary...
+#if !defined (ZSYS_RANDOF_FUNC)
 # if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
  || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS)) || (defined (__UTYPE_SOLARIS))
-#   define randof(num)  (int) ( (float)(num) * ( (float)( (rand   () % (ZSYS_RANDOF_MAX - 1) ) / ( (float)(ZSYS_RANDOF_MAX) ) ) ) )
+#   define  ZSYS_RANDOF_FUNC    rand
 # else
-#   define randof(num)  (int) ( (float)(num) * ( (float)( (random () % (ZSYS_RANDOF_MAX - 1) ) / ( (float)(ZSYS_RANDOF_MAX) ) ) ) )
+#   define  ZSYS_RANDOF_FUNC    random
+# endif
+#endif // ZSYS_RANDOF_FUNC is defined by caller... trust them or explode later
+
+#define s_randof_factor()   (ZSYS_RANDOF_FLT)( (ZSYS_RANDOF_FLT)(ZSYS_RANDOF_FUNC() % (ZSYS_RANDOF_MAX - 1)) / ( (ZSYS_RANDOF_FLT)(ZSYS_RANDOF_MAX) ) )
+
+// Supplement the limited spectrum of ZSYS_RANDOF_MAX by stacking more random()s
+// Note this can still be too little for very large "num" > ZSYS_RANDOF_MAX
+// but we'd need a real randof() function to handle stacking in that case.
+// Fuzziness added below (division by slightly more than a whole number) solves
+// this wonderfully even for "num" ranges twice as big as the ZSYS_RANDOF_MAX.
+#if (ZSYS_RANDOF_MAX > UINT16_MAX)
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * s_randof_factor() / ( 1.0 + s_randof_factor()/100 ) )
+#else // boost dispersion
+# if (ZSYS_RANDOF_MAX > INT16_MAX)
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() ) / ( 2.0 + s_randof_factor()/10 ) )
+# else
+#  if (ZSYS_RANDOF_MAX > UINT8_MAX)
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() ) / ( 4.0 + s_randof_factor() ) )
+#  else
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() ) / ( 6.0 + s_randof_factor() ) )
+#  endif
+# endif
 #endif
+
+// That's it about the randof() macro definition...
 
 
 // Windows MSVS doesn't have stdbool

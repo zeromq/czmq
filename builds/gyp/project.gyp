@@ -172,6 +172,16 @@
       ]
     },
     {
+      'target_name': 'test-randof',
+      'type': 'executable',
+      'sources': [
+        '../../src/test_randof.c'
+      ],
+      'dependencies': [
+        'libczmq'
+      ]
+    },
+    {
       'target_name': 'czmq_selftest',
       'type': 'executable',
       'sources': [

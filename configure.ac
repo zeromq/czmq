@@ -587,6 +587,16 @@ AC_ARG_ENABLE([zsp],
 AM_CONDITIONAL([ENABLE_ZSP], [test x$enable_zsp != xno])
 AM_COND_IF([ENABLE_ZSP], [AC_MSG_NOTICE([ENABLE_ZSP defined])])
 
+# Check for test-randof intent
+AC_ARG_ENABLE([test-randof],
+    AS_HELP_STRING([--enable-test-randof],
+        [Compile 'test-randof' in src [default=yes]]),
+    [enable_test_randof=$enableval],
+    [enable_test_randof=yes])
+
+AM_CONDITIONAL([ENABLE_TEST_RANDOF], [test x$enable_test_randof != xno])
+AM_COND_IF([ENABLE_TEST_RANDOF], [AC_MSG_NOTICE([ENABLE_TEST_RANDOF defined])])
+
 # Check for czmq_selftest intent
 AC_ARG_ENABLE([czmq_selftest],
     AS_HELP_STRING([--enable-czmq_selftest],
