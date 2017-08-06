@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+################################################################################
+#  Note: this particular file has been edited for non-standard improvements.   #
+#  Please take care to review changes with `git difftool` such as `meld` after #
+#  re-generating the project.                                                  #
+#  See below for test-randof integration.                                      #
+################################################################################
+
 set -e
 
 # Set this to enable verbose profiling
@@ -83,9 +91,21 @@ cd ../..
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
 PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" .
-$CI_TIME make all VERBOSE=1 -j4
+$CI_TIME make VERBOSE=1 -j4 all
 $CI_TIME ctest -V
 $CI_TIME make install
+
+# Note: this is a manual addition for czmq project
+if [ -x ./src/test-randof ] ; then
+    echo ""
+    echo "`date`: INFO: Starting test of randof()..."
+    # Report built-in tunables
+    $CI_TIME ./src/test-randof -h 2>&1 | grep ZSYS || true
+    $CI_TIME ./src/test-randof -r 10000000 -i 300000000 || exit $?
+else
+    echo "SKIPPED test of randof() : can't find a `pwd`/src/test-randof" >&2
+fi
+
 [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"
 
 echo "=== Are GitIgnores good after making the project '$BUILD_TYPE'? (should have no output below)"
