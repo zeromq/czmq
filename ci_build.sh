@@ -5,6 +5,13 @@
 #  READ THE ZPROJECT/README.MD FOR INFORMATION ABOUT MAKING PERMANENT CHANGES. #
 ################################################################################
 
+################################################################################
+#  Note: this particular file has been edited for non-standard improvements.   #
+#  Please take care to review changes with `git difftool` such as `meld` after #
+#  re-generating the project.                                                  #
+#  See below for test-randof integration.                                      #
+################################################################################
+
 set -e
 
 # Set this to enable verbose profiling
@@ -282,6 +289,7 @@ default|default-Werror|default-with-docs|valgrind)
         )
     ) || exit 1
 
+    # Note: this is a manual addition for czmq project
     if [ -x ./src/test-randof ] ; then
         echo ""
         echo "`date`: INFO: Starting test of randof()..."
