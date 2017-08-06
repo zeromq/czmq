@@ -37,6 +37,21 @@ fi
 mkdir -p tmp
 BUILD_PREFIX=$PWD/tmp
 
+PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'2`"
+CCACHE_PATH="$PATH"
+CCACHE_DIR="${HOME}/.ccache"
+export CCACHE_PATH CCACHE_DIR PATH
+HAVE_CCACHE=no
+if which ccache && ls -la /usr/lib/ccache ; then
+    HAVE_CCACHE=yes
+fi
+
+mkdir -p "${CCACHE_DIR}" || HAVE_CCACHE=no
+if [ "$HAVE_CCACHE" = yes ] && [ -d "$CCACHE_DIR" ]; then
+    echo "CCache stats before build:"
+    ccache -s || true
+fi
+
 CONFIG_OPTS=()
 CONFIG_OPTS+=("CFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_OPTS+=("CPPFLAGS=-I${BUILD_PREFIX}/include")
@@ -111,3 +126,8 @@ fi
 echo "=== Are GitIgnores good after making the project '$BUILD_TYPE'? (should have no output below)"
 git status -s || true
 echo "==="
+
+if [ "$HAVE_CCACHE" = yes ]; then
+    echo "CCache stats after build:"
+    ccache -s
+fi
