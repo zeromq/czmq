@@ -27,6 +27,11 @@ src/test-randof
 src/zmakecert
 src/zsp
 src/czmq_selftest
+./czmq_selftest
+./test-randof
+./zmakecert
+./zsp
+./czmq_selftest
 *.exe
 *.out
 *.app
