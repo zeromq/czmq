@@ -126,12 +126,18 @@ int main (int argc, char *argv [])
         return 1;
     }
 
+    // WARNING: Code below implies that "size_t" used by zmalloc() and memset()
+    // would suffice to count the testmax-based byte size on your platform
+#ifdef SIZE_MAX
+    assert ( testmax < (SIZE_MAX / sizeof (size_t)) );
+#endif
+
     //  Insert main code here
     zsys_init ();
     if (verbose)
         zsys_info ("test_randof - development helper for randof() testing");
 
-    size_t *rndcnt = (size_t*)zmalloc (sizeof (size_t) * testmax);;
+    size_t *rndcnt = (size_t*)zmalloc (sizeof (size_t) * testmax);
     assert (rndcnt);
     memset (rndcnt, 0, sizeof (size_t) * testmax);
 
