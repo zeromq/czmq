@@ -126,17 +126,26 @@ int main (int argc, char *argv [])
         return 1;
     }
 
+    // WARNING: Code below implies that "size_t" used by zmalloc() and memset()
+    // would suffice to count the testmax-based byte size on your platform
+#ifdef SIZE_MAX
+    assert ( testmax < (SIZE_MAX / sizeof (size_t)) );
+#endif
+
     //  Insert main code here
     zsys_init ();
     if (verbose)
         zsys_info ("test_randof - development helper for randof() testing");
 
-    size_t *rndcnt = (size_t*)zmalloc (sizeof (size_t) * testmax);;
+    size_t *rndcnt = (size_t*)zmalloc (sizeof (size_t) * testmax);
     assert (rndcnt);
     memset (rndcnt, 0, sizeof (size_t) * testmax);
 
-    zsys_info ("test_randof : Running random loop for %jd iterations and %jd values (factor of %.6Lg)",
-        itermax, testmax, (long double)itermax/(long double)testmax);
+    unsigned int random_seed = (unsigned int) zclock_time ();
+    srandom (random_seed);
+
+    zsys_info ("test_randof : Running random loop for %jd iterations and %jd values (factor of %.6Lg) and random seed %u",
+        itermax, testmax, (long double)itermax/(long double)testmax, random_seed);
     for (iteration = 0; iteration < itermax && !zsys_interrupted ; iteration++) {
         testnbr = randof (testmax);
         assert (testnbr != testmax);
