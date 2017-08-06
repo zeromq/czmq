@@ -141,8 +141,11 @@ int main (int argc, char *argv [])
     assert (rndcnt);
     memset (rndcnt, 0, sizeof (size_t) * testmax);
 
-    zsys_info ("test_randof : Running random loop for %jd iterations and %jd values (factor of %.6Lg)",
-        itermax, testmax, (long double)itermax/(long double)testmax);
+    unsigned int random_seed = (unsigned int) zclock_time ();
+    srandom (random_seed);
+
+    zsys_info ("test_randof : Running random loop for %jd iterations and %jd values (factor of %.6Lg) and random seed %u",
+        itermax, testmax, (long double)itermax/(long double)testmax, random_seed);
     for (iteration = 0; iteration < itermax && !zsys_interrupted ; iteration++) {
         testnbr = randof (testmax);
         assert (testnbr != testmax);
