@@ -17,7 +17,8 @@
 //- Establish the compiler and computer system ------------------------------
 /*
  *  Defines zero or more of these symbols, for use in any non-portable
- *  code:
+ *  code (for pre-defined values see e.g. build-system headers as well
+ *  as output of GNU C preprocessor via `cpp -dM < /dev/null`):
  *
  *  __WINDOWS__         Microsoft C/C++ with Windows calls
  *  __MSDOS__           System is MS-DOS (set if __WINDOWS__ set)
@@ -193,10 +194,12 @@
 #elif (defined (sinix))
 #   define __UTYPE_SINIX
 #   define __UNIX__
-#elif (defined (SOLARIS) || defined (__SVR4)) || defined (SVR4)
+#elif (defined (SOLARIS) || defined (__SVR4) || defined (SVR4) || defined (__SVR4__) || defined (__svr4) || defined (svr4) || defined (__svr4__))
+    // Note: this rule and below should match legacy SunOS and Solaris
+    // on builds without the GNU toolchain; with one you get __UTYPE_GNU
 #   define __UTYPE_SUNSOLARIS
 #   define __UNIX__
-#elif (defined (SUNOS) || defined (SUN) || defined (sun))
+#elif (defined (SUNOS) || defined (SUN) || defined (sun) || defined (__sun) || defined (__sun__))
 #   define __UTYPE_SUNOS
 #   define __UNIX__
 #elif (defined (__USLC__) || defined (UnixWare))
@@ -443,7 +446,7 @@ typedef struct {
 #   define  ZSYS_RANDOF_FLT float
 #endif // ZSYS_RANDOF_FLT is defined by caller... trust them or explode later
 
-// Implementations vary...
+// Implementations vary... Note that many will get __UTYPE_GNU nowadays.
 #if !defined (ZSYS_RANDOF_FUNC)
 # if defined (ZSYS_RANDOF_FUNC_BITS)
 #  undef ZSYS_RANDOF_FUNC_BITS
