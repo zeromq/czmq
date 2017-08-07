@@ -489,15 +489,15 @@ typedef struct {
 // Fuzziness added below (division by slightly more than a whole number) solves
 // this wonderfully even for "num" ranges twice as big as the ZSYS_RANDOF_MAX.
 #if (ZSYS_RANDOF_MAX > UINT16_MAX)
-#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * s_randof_factor() / ( 1.0 + s_randof_factor()/100 ) )
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * s_randof_factor() / ( 1.0 + s_randof_factor() / 100.0 ) )
 #else // boost dispersion
 # if (ZSYS_RANDOF_MAX > INT16_MAX)
-#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() ) / ( 2.0 + s_randof_factor() / 2 ) )
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() ) / ( 2.0 + s_randof_factor() / 2.0 ) )
 # else
 #  if (ZSYS_RANDOF_MAX > UINT8_MAX)
-#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() ) / ( 4.0 + s_randof_factor() * 10 ) )
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() ) / ( 4.0 + s_randof_factor() * 10.0 ) )
 #  else
-#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() ) / ( 6.0 + s_randof_factor() * 100 ) )
+#   define randof(num)  (int) ( (ZSYS_RANDOF_FLT)(num) * ( s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() + s_randof_factor() ) / ( 6.0 + s_randof_factor() * 100.0 ) )
 #  endif
 # endif
 #endif
