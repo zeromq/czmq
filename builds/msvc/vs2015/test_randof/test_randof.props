@@ -31,6 +31,7 @@
     <Import Project="$(SolutionDir)libzmq.import.props" />
     <Import Project="$(SolutionDir)uuid.import.props" Condition="'$(HAVE_UUID)'=='1'" />
     <Import Project="$(SolutionDir)systemd.import.props" Condition="'$(HAVE_SYSTEMD)'=='1'" />
+    <Import Project="$(SolutionDir)lz4.import.props" Condition="'$(HAVE_LZ4)'=='1'" />
   </ImportGroup>
 
   <PropertyGroup Condition="$(Configuration.IndexOf('DEXE')) != -1">
@@ -38,6 +39,7 @@
     <Linkage-libzmq>dynamic</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">dynamic</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">dynamic</Linkage-systemd>
+    <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">dynamic</Linkage-lz4>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.IndexOf('LEXE')) != -1">
@@ -45,6 +47,7 @@
     <Linkage-libzmq>ltcg</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">ltcg</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">ltcg</Linkage-systemd>
+    <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">ltcg</Linkage-lz4>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.IndexOf('SEXE')) != -1">
@@ -52,6 +55,7 @@
     <Linkage-libzmq>static</Linkage-libzmq>
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">static</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">static</Linkage-systemd>
+    <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">static</Linkage-lz4>
   </PropertyGroup>
 
   <!-- Messages -->
@@ -60,6 +64,7 @@
     <Message Text="Linkage-libzmq: $(Linkage-libzmq)" Importance="high" />
     <Message Text="Linkage-uuid: $(Linkage-uuid)" Importance="high" Condition="'$(HAVE_UUID)'=='1'" />
     <Message Text="Linkage-systemd: $(Linkage-systemd)" Importance="high" Condition="'$(HAVE_SYSTEMD)'=='1'" />
+    <Message Text="Linkage-lz4: $(Linkage-lz4)" Importance="high" Condition="'$(HAVE_LZ4)'=='1'" />
   </Target>
 <!--
 ################################################################################

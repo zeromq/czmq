@@ -3459,6 +3459,13 @@ char *
 int
     zstr_recvx (void *source, char **string_p, ...);
 
+// De-compress and receive C string from socket, received as a message
+// with two frames: size of the uncompressed string, and the string itself.
+// Caller must free returned string using zstr_free(). Returns NULL if the
+// context is being terminated or the process was interrupted.
+char *
+    zstr_recv_compress (void *source);
+
 // Send a C string to a socket, as a frame. The string is sent without
 // trailing null byte; to read this you can use zstr_recv, or a similar
 // method that adds a null terminator on the received string. String
@@ -3487,6 +3494,20 @@ int
 // Returns 0 if the strings could be sent OK, or -1 on error.
 int
     zstr_sendx (void *dest, const char *string, ...);
+
+// Compress and send a C string to a socket, as a message with two frames:
+// size of the uncompressed string, and the string itself. The string is
+// sent without trailing null byte; to read this you can use
+// zstr_recv_compress, or a similar method that de-compresses and adds a
+// null terminator on the received string.
+int
+    zstr_send_compress (void *dest, const char *string);
+
+// Compress and send a C string to a socket, as zstr_send_compress(),
+// with a MORE flag, so that you can send further strings in the same
+// multi-part message.
+int
+    zstr_sendm_compress (void *dest, const char *string);
 
 // Accepts a void pointer and returns a fresh character string. If source
 // is null, returns an empty string.

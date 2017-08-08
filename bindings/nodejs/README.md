@@ -3625,6 +3625,15 @@ using zstr_free(). If not enough strings are provided, remaining
 multipart frames in the message are dropped.
 
 ```
+string my_zstr.recvCompress (Zsock)
+```
+
+De-compress and receive C string from socket, received as a message
+with two frames: size of the uncompressed string, and the string itself.
+Caller must free returned string using zstr_free(). Returns NULL if the
+context is being terminated or the process was interrupted.
+
+```
 integer my_zstr.send (Zsock, String)
 ```
 
@@ -3662,6 +3671,24 @@ integer my_zstr.sendx (Zsock, String)
 
 Send a series of strings (until NULL) as multipart data
 Returns 0 if the strings could be sent OK, or -1 on error.
+
+```
+integer my_zstr.sendCompress (Zsock, String)
+```
+
+Compress and send a C string to a socket, as a message with two frames:
+size of the uncompressed string, and the string itself. The string is
+sent without trailing null byte; to read this you can use
+zstr_recv_compress, or a similar method that de-compresses and adds a
+null terminator on the received string.
+
+```
+integer my_zstr.sendmCompress (Zsock, String)
+```
+
+Compress and send a C string to a socket, as zstr_send_compress(),
+with a MORE flag, so that you can send further strings in the same
+multi-part message.
 
 ```
 string my_zstr.str (Zsock)

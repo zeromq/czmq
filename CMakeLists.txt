@@ -148,6 +148,18 @@ IF (SYSTEMD_FOUND)
 ENDIF (SYSTEMD_FOUND)
 
 ########################################################################
+# LZ4 dependency
+########################################################################
+find_package(lz4)
+IF (LZ4_FOUND)
+    include_directories(${LZ4_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${LZ4_LIBRARIES})
+    set(pkg_config_libs_private "${pkg_config_libs_private} -llz4")
+    add_definitions(-DHAVE_LIBLZ4)
+    list(APPEND OPTIONAL_LIBRARIES ${LZ4_LIBRARIES})
+ENDIF (LZ4_FOUND)
+
+########################################################################
 # includes
 ########################################################################
 set (czmq_headers

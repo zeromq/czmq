@@ -19,6 +19,15 @@ Java_org_zeromq_czmq_Zstr__1_1recv (JNIEnv *env, jclass c, jlong source)
     return return_string_;
 }
 
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zstr__1_1recvCompress (JNIEnv *env, jclass c, jlong source)
+{
+    char *recv_compress_ = (char *) zstr_recv_compress ((void *) (intptr_t) source);
+    jstring return_string_ = (*env)->NewStringUTF (env, recv_compress_);
+    zstr_free (&recv_compress_);
+    return return_string_;
+}
+
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zstr__1_1send (JNIEnv *env, jclass c, jlong dest, jstring string)
 {
@@ -62,6 +71,24 @@ Java_org_zeromq_czmq_Zstr__1_1sendx (JNIEnv *env, jclass c, jlong dest, jstring 
     jint sendx_ = (jint) zstr_sendx ((void *) (intptr_t) dest, string_);
     (*env)->ReleaseStringUTFChars (env, string, string_);
     return sendx_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zstr__1_1sendCompress (JNIEnv *env, jclass c, jlong dest, jstring string)
+{
+    char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
+    jint send_compress_ = (jint) zstr_send_compress ((void *) (intptr_t) dest, string_);
+    (*env)->ReleaseStringUTFChars (env, string, string_);
+    return send_compress_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zstr__1_1sendmCompress (JNIEnv *env, jclass c, jlong dest, jstring string)
+{
+    char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
+    jint sendm_compress_ = (jint) zstr_sendm_compress ((void *) (intptr_t) dest, string_);
+    (*env)->ReleaseStringUTFChars (env, string, string_);
+    return sendm_compress_;
 }
 
 JNIEXPORT jstring JNICALL

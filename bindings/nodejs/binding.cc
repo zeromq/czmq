@@ -6280,11 +6280,14 @@ NAN_MODULE_INIT (Zstr::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "recv", _recv);
     Nan::SetPrototypeMethod (tpl, "recvx", _recvx);
+    Nan::SetPrototypeMethod (tpl, "recvCompress", _recv_compress);
     Nan::SetPrototypeMethod (tpl, "send", _send);
     Nan::SetPrototypeMethod (tpl, "sendm", _sendm);
     Nan::SetPrototypeMethod (tpl, "sendf", _sendf);
     Nan::SetPrototypeMethod (tpl, "sendfm", _sendfm);
     Nan::SetPrototypeMethod (tpl, "sendx", _sendx);
+    Nan::SetPrototypeMethod (tpl, "sendCompress", _send_compress);
+    Nan::SetPrototypeMethod (tpl, "sendmCompress", _sendm_compress);
     Nan::SetPrototypeMethod (tpl, "str", _str);
     Nan::SetPrototypeMethod (tpl, "free", _free);
     Nan::SetPrototypeMethod (tpl, "test", _test);
@@ -6329,6 +6332,12 @@ NAN_METHOD (Zstr::_recvx) {
     }
     int result = zstr_recvx (source->self, (char **)&string_p);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zstr::_recv_compress) {
+    Zsock *source = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    char *result = (char *) zstr_recv_compress (source->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zstr::_send) {
@@ -6408,6 +6417,38 @@ NAN_METHOD (Zstr::_sendx) {
         string = *string_utf8;
     }
     int result = zstr_sendx (dest->self, (const char *)string);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zstr::_send_compress) {
+    Zsock *dest = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    char *string;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`string` must be a string");
+    else {
+        Nan::Utf8String string_utf8 (info [1].As<String>());
+        string = *string_utf8;
+    }
+    int result = zstr_send_compress (dest->self, (const char *)string);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zstr::_sendm_compress) {
+    Zsock *dest = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    char *string;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `string`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`string` must be a string");
+    else {
+        Nan::Utf8String string_utf8 (info [1].As<String>());
+        string = *string_utf8;
+    }
+    int result = zstr_sendm_compress (dest->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 

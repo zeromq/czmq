@@ -85,6 +85,7 @@ override_dh_auto_configure:
 	dh_auto_configure -- \
 		--with-uuid=yes \
 		--with-libsystemd=yes \
+		--with-liblz4=yes \
 		--with-docs=$(DOCS) \
 		--enable-drafts=$(DRAFTS)
 

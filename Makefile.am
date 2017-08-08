@@ -13,9 +13,10 @@ AM_CPPFLAGS = \
     ${libzmq_CFLAGS} \
     ${uuid_CFLAGS} \
     ${systemd_CFLAGS} \
+    ${lz4_CFLAGS} \
     -I$(srcdir)/include
 
-project_libs = ${libzmq_LIBS} ${uuid_LIBS} ${systemd_LIBS}
+project_libs = ${libzmq_LIBS} ${uuid_LIBS} ${systemd_LIBS} ${lz4_LIBS}
 
 SUBDIRS = doc
 DIST_SUBDIRS = doc
@@ -36,6 +37,7 @@ EXTRA_DIST += \
     Findlibzmq.cmake \
     Finduuid.cmake \
     Findsystemd.cmake \
+    Findlz4.cmake \
     src/CMakeLists-local.txt \
     CMakeLists.txt
 endif

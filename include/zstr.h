@@ -82,6 +82,31 @@ CZMQ_EXPORT void
 
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
+//  De-compress and receive C string from socket, received as a message
+//  with two frames: size of the uncompressed string, and the string itself.
+//  Caller must free returned string using zstr_free(). Returns NULL if the
+//  context is being terminated or the process was interrupted.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zstr_recv_compress (void *source);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Compress and send a C string to a socket, as a message with two frames:
+//  size of the uncompressed string, and the string itself. The string is
+//  sent without trailing null byte; to read this you can use
+//  zstr_recv_compress, or a similar method that de-compresses and adds a
+//  null terminator on the received string.
+CZMQ_EXPORT int
+    zstr_send_compress (void *dest, const char *string);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Compress and send a C string to a socket, as zstr_send_compress(),
+//  with a MORE flag, so that you can send further strings in the same
+//  multi-part message.
+CZMQ_EXPORT int
+    zstr_sendm_compress (void *dest, const char *string);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Accepts a void pointer and returns a fresh character string. If source
 //  is null, returns an empty string.
 //  Caller owns return value and must destroy it when done.

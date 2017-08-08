@@ -47,6 +47,14 @@ IF EXIST "..\..\..\..\systemd\builds/msvc/vs2012\systemd.import.props" (
 ) ELSE (
     ECHO Building without systemd
 )
+IF EXIST "..\..\..\..\lz4\builds/msvc/vs2012\lz4.import.props" (
+    COPY /Y "..\..\..\..\lz4\builds/msvc/vs2012\lz4.import.props" . > %log%
+    IF errorlevel 1 GOTO error
+    SET packages=%packages% /p:HAVE_LZ4=1
+    ECHO Building with lz4
+) ELSE (
+    ECHO Building without lz4
+)
 
 ECHO %action% CZMQ... (%packages%)
 

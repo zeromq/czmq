@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-
-################################################################################
-#  Note: this particular file has been edited for non-standard improvements.   #
-#  Please take care to review changes with `git difftool` such as `meld` after #
-#  re-generating the project.                                                  #
-#  See below for test-randof integration.                                      #
-################################################################################
-
 set -e
 
 # Set this to enable verbose profiling

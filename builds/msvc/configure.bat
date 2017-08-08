@@ -55,6 +55,13 @@ IF EXIST "..\..\..\systemd" (
     ECHO Building without systemd
     ECHO #undef HAVE_SYSTEMD>> platform.h
 )
+IF EXIST "..\..\..\lz4" (
+    ECHO Building with lz4
+    ECHO #define HAVE_LZ4 1>> platform.h
+) ELSE (
+    ECHO Building without lz4
+    ECHO #undef HAVE_LZ4>> platform.h
+)
 
 :-  Check if we want to build the draft API
 if "%1" == "--enable-drafts" goto :with_draft

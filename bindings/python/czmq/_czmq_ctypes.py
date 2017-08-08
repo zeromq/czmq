@@ -6989,6 +6989,8 @@ lib.zstr_recv.restype = POINTER(c_char)
 lib.zstr_recv.argtypes = [c_void_p]
 lib.zstr_recvx.restype = c_int
 lib.zstr_recvx.argtypes = [c_void_p, POINTER(c_char_p)]
+lib.zstr_recv_compress.restype = POINTER(c_char)
+lib.zstr_recv_compress.argtypes = [c_void_p]
 lib.zstr_send.restype = c_int
 lib.zstr_send.argtypes = [c_void_p, c_char_p]
 lib.zstr_sendm.restype = c_int
@@ -6999,6 +7001,10 @@ lib.zstr_sendfm.restype = c_int
 lib.zstr_sendfm.argtypes = [c_void_p, c_char_p]
 lib.zstr_sendx.restype = c_int
 lib.zstr_sendx.argtypes = [c_void_p, c_char_p]
+lib.zstr_send_compress.restype = c_int
+lib.zstr_send_compress.argtypes = [c_void_p, c_char_p]
+lib.zstr_sendm_compress.restype = c_int
+lib.zstr_sendm_compress.argtypes = [c_void_p, c_char_p]
 lib.zstr_str.restype = POINTER(c_char)
 lib.zstr_str.argtypes = [c_void_p]
 lib.zstr_free.restype = None
@@ -7055,6 +7061,16 @@ multipart frames in the message are dropped.
         return lib.zstr_recvx(source, byref(c_char_p.from_param(string_p)), *args)
 
     @staticmethod
+    def recv_compress(source):
+        """
+        De-compress and receive C string from socket, received as a message
+with two frames: size of the uncompressed string, and the string itself.
+Caller must free returned string using zstr_free(). Returns NULL if the
+context is being terminated or the process was interrupted.
+        """
+        return return_fresh_string(lib.zstr_recv_compress(source))
+
+    @staticmethod
     def send(dest, string):
         """
         Send a C string to a socket, as a frame. The string is sent without
@@ -7097,6 +7113,26 @@ message.
 Returns 0 if the strings could be sent OK, or -1 on error.
         """
         return lib.zstr_sendx(dest, string, *args)
+
+    @staticmethod
+    def send_compress(dest, string):
+        """
+        Compress and send a C string to a socket, as a message with two frames:
+size of the uncompressed string, and the string itself. The string is
+sent without trailing null byte; to read this you can use
+zstr_recv_compress, or a similar method that de-compresses and adds a
+null terminator on the received string.
+        """
+        return lib.zstr_send_compress(dest, string)
+
+    @staticmethod
+    def sendm_compress(dest, string):
+        """
+        Compress and send a C string to a socket, as zstr_send_compress(),
+with a MORE flag, so that you can send further strings in the same
+multi-part message.
+        """
+        return lib.zstr_sendm_compress(dest, string)
 
     @staticmethod
     def str(source):

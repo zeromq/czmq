@@ -87,6 +87,7 @@ kwargs = pkgconfig_kwargs ([
     "libzmq",
     "uuid",
     "libsystemd",
+    "liblz4",
     "libczmq"
 ])
 import cffi
