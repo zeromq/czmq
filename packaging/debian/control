@@ -13,7 +13,7 @@ Source:         czmq
 Section:        net
 Priority:       optional
 Maintainer:     czmq Developers <zeromq-dev@lists.zeromq.org>
-Standards-Version: 4.0.0
+Standards-Version: 4.0.1.0
 Build-Depends: debhelper (>= 9),
     pkg-config,
     libzmq3-dev,
@@ -55,7 +55,7 @@ Description: runnable binaries from czmq
 Package: czmq-dbg
 Architecture: any
 Section: debug
-Priority: extra
+Priority: optional
 Depends:
     czmq (= ${binary:Version}),
     ${misc:Depends}

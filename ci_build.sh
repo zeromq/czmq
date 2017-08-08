@@ -9,7 +9,7 @@
 #  Note: this particular file has been edited for non-standard improvements.   #
 #  Please take care to review changes with `git difftool` such as `meld` after #
 #  re-generating the project.                                                  #
-#  See below for test-randof integration.                                      #
+#  See below for test_randof integration.                                      #
 ################################################################################
 
 set -e
@@ -221,6 +221,8 @@ default|default-Werror|default-with-docs|valgrind)
         echo "WARNING: Can not build prerequisite 'uuid'" >&2
         echo "because neither tarball nor repository sources are known for it," >&2
         echo "and it was not isntalled as a package; this may cause the test to fail!" >&2
+    else
+        CONFIG_OPTS+=("--with-uuid=yes")
     fi
 
     # Start of recipe for dependency: systemd
@@ -231,6 +233,8 @@ default|default-Werror|default-with-docs|valgrind)
         echo "WARNING: Can not build prerequisite 'systemd'" >&2
         echo "because neither tarball nor repository sources are known for it," >&2
         echo "and it was not isntalled as a package; this may cause the test to fail!" >&2
+    else
+        CONFIG_OPTS+=("--with-libsystemd=yes")
     fi
 
     # Build and check this project; note that zprojects always have an autogen.sh
@@ -290,14 +294,14 @@ default|default-Werror|default-with-docs|valgrind)
     ) || exit 1
 
     # Note: this is a manual addition for czmq project
-    if [ -x ./src/test-randof ] ; then
+    if [ -x ./src/test_randof ] ; then
         echo ""
         echo "`date`: INFO: Starting test of randof()..."
         # Report built-in tunables
-        $CI_TIME ./src/test-randof -h 2>&1 | grep ZSYS || true
-        $CI_TIME ./src/test-randof -r 10000000 -i 300000000 || exit $?
+        $CI_TIME ./src/test_randof -h 2>&1 | grep ZSYS || true
+        $CI_TIME ./src/test_randof -r 10000000 -i 300000000 || exit $?
     else
-        echo "SKIPPED test of randof() : can't find a `pwd`/src/test-randof" >&2
+        echo "SKIPPED test of randof() : can't find a `pwd`/src/test_randof" >&2
     fi
 
     [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"

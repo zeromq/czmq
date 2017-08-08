@@ -14,7 +14,7 @@ IF %1.==--help. (
     ECHO    --disable-drafts        from git repository, disables DRAFT API
     ECHO    --without-zmakecert     do not build zmakecert.exe
     ECHO    --without-zsp           do not build zsp.exe
-    ECHO    --without-test-randof   do not build test-randof.exe
+    ECHO    --without-test_randof   do not build test_randof.exe
     ECHO    --without-czmq_selftest  do not build czmq_selftest.exe
     GOTO :eof
 )

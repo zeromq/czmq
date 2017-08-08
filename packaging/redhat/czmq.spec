@@ -139,7 +139,7 @@ exit 1
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS}
+%{configure} --enable-drafts=%{DRAFTS} --with-uuid=yes --with-libsystemd=yes
 make %{_smp_mflags}
 
 %if %{with python_cffi}

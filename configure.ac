@@ -587,10 +587,10 @@ AC_ARG_ENABLE([zsp],
 AM_CONDITIONAL([ENABLE_ZSP], [test x$enable_zsp != xno])
 AM_COND_IF([ENABLE_ZSP], [AC_MSG_NOTICE([ENABLE_ZSP defined])])
 
-# Check for test-randof intent
-AC_ARG_ENABLE([test-randof],
-    AS_HELP_STRING([--enable-test-randof],
-        [Compile 'test-randof' in src [default=yes]]),
+# Check for test_randof intent
+AC_ARG_ENABLE([test_randof],
+    AS_HELP_STRING([--enable-test_randof],
+        [Compile 'test_randof' in src [default=yes]]),
     [enable_test_randof=$enableval],
     [enable_test_randof=yes])
 
