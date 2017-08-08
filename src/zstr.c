@@ -97,7 +97,8 @@ s_send_string (void *dest, bool more, char *string, bool compress)
         return -1;
 #endif
     } else {
-        zmq_msg_init_size (&message, len);
+        int rc = zmq_msg_init_size (&message, len);
+        assert (rc == 0);
         memcpy (zmq_msg_data (&message), string, len);
     }
 
