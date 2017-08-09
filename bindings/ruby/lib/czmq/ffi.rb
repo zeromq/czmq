@@ -1515,11 +1515,44 @@ module CZMQ
 
       attach_function :zstr_recv, [:pointer], :pointer, **opts
       attach_function :zstr_recvx, [:pointer, :pointer, :varargs], :int, **opts
+      begin # DRAFT method
+        attach_function :zstr_recv_compress, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zstr_recv_compress()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zstr_recv_compress(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zstr_send, [:pointer, :string], :int, **opts
       attach_function :zstr_sendm, [:pointer, :string], :int, **opts
       attach_function :zstr_sendf, [:pointer, :string, :varargs], :int, **opts
       attach_function :zstr_sendfm, [:pointer, :string, :varargs], :int, **opts
       attach_function :zstr_sendx, [:pointer, :string, :varargs], :int, **opts
+      begin # DRAFT method
+        attach_function :zstr_send_compress, [:pointer, :string], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zstr_send_compress()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zstr_send_compress(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zstr_sendm_compress, [:pointer, :string], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zstr_sendm_compress()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zstr_sendm_compress(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       begin # DRAFT method
         attach_function :zstr_str, [:pointer], :pointer, **opts
       rescue ::FFI::NotFoundError

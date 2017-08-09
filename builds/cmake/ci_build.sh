@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-
-################################################################################
-#  Note: this particular file has been edited for non-standard improvements.   #
-#  Please take care to review changes with `git difftool` such as `meld` after #
-#  re-generating the project.                                                  #
-#  See below for test-randof integration.                                      #
-################################################################################
-
 set -e
 
 # Set this to enable verbose profiling
@@ -111,14 +103,14 @@ $CI_TIME ctest -V
 $CI_TIME make install
 
 # Note: this is a manual addition for czmq project
-if [ -x ./test-randof ] ; then
+if [ -x ./test_randof ] ; then
     echo ""
     echo "`date`: INFO: Starting test of randof()..."
     # Report built-in tunables
-    $CI_TIME ./test-randof -h 2>&1 | grep ZSYS || true
-    $CI_TIME ./test-randof -r 10000000 -i 300000000 || exit $?
+    $CI_TIME ./test_randof -h 2>&1 | grep ZSYS || true
+    $CI_TIME ./test_randof -r 10000000 -i 300000000 || exit $?
 else
-    echo "SKIPPED test of randof() : can't find a `pwd`/test-randof" >&2
+    echo "SKIPPED test of randof() : can't find a `pwd`/test_randof" >&2
 fi
 
 [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"

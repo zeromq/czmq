@@ -13,6 +13,7 @@
     <use project = "libzmq" />
     <use project = "uuid" optional = "1" implied = "1" />
     <use project = "systemd" optional = "1" implied = "1" min_major = "200" />
+    <use project = "lz4" optional = "1" implied = "1" />
     <target name = "*" />
 
     <!-- These classes have an API model -->
@@ -74,7 +75,7 @@
 
     <!-- Private command-line utilities -->
     <main name = "zsp" private = "1" />
-    <main name = "test-randof" private = "1" />
+    <main name = "test_randof" private = "1" />
 
     <!-- target configuration -->
     <target name = "nuget">

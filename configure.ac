@@ -371,6 +371,91 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
 dnl END of enabled attempts to search for libsystemd
 
 
+was_lz4_check_lib_detected=no
+
+search_liblz4="no"
+
+AC_ARG_WITH([liblz4],
+    [
+        AS_HELP_STRING([--with-liblz4],
+        [yes or no. Optionally specify liblz4 prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_liblz4="yes"
+    ],
+    [])
+AS_CASE([x"${with_liblz4}"],
+    [xyes], [search_liblz4="yes"],
+    [xno],  [search_liblz4="no"])
+
+
+AS_IF([test x"${search_liblz4}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    found_linkname=""
+    PKG_CHECK_MODULES([lz4], [liblz4 >= 0.0.0],
+    [
+        AC_DEFINE(HAVE_LIBLZ4, 1, [The optional liblz4 library is to be used])
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $lz4_LIBS"
+        was_lz4_check_lib_detected=pkgcfg
+        found_pkgconfig="liblz4"
+    ],
+    [
+        AC_MSG_NOTICE([Package liblz4 not found; falling back to defined compilability tests])
+
+        lz4_synthetic_cflags=""
+        lz4_synthetic_libs="-llz4"
+
+        if test -n "${with_liblz4}" && test x"${with_liblz4}" != xyes && test x"${with_liblz4}" != xno; then
+            if test -r "${with_liblz4}/include/lz4.h"; then
+                lz4_synthetic_cflags="-I${with_liblz4}/include"
+                lz4_synthetic_libs="-L${with_liblz4}/lib -llz4"
+            else
+            AC_MSG_WARN([Header file ${with_liblz4}/include/lz4.h was not found. Please check liblz4 prefix])
+            fi
+        else
+            AC_CHECK_HEADER([lz4.h], [],
+            AC_MSG_WARN([Header file lz4.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([lz4], [LZ4_decompress_safe],
+            [
+                was_lz4_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -llz4"
+                found_linkname="lz4"
+                AC_DEFINE(HAVE_LIBLZ4, 1, [The optional liblz4 library is to be used (as -llz4)])
+            ],
+            [])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for liblz4
+    AS_CASE(["x${was_lz4_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_liblz4],[${found_pkgconfig}])
+                CFLAGS="${lz4_CFLAGS} ${CFLAGS}"
+                LIBS="${lz4_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_liblz4],[${found_linkname}])
+                CFLAGS="${lz4_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${lz4_synthetic_libs} ${LDFLAGS}"
+                LIBS="${lz4_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([lz4_CFLAGS],[${lz4_synthetic_cflags}])
+                AC_SUBST([lz4_LIBS],[${lz4_synthetic_libs}])
+            ],
+        [xno], [
+                AC_SUBST([pkgconfig_name_liblz4],[liblz4])
+            AC_MSG_WARN([Cannot find pkg-config metadata for liblz4 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for liblz4
+
+
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
 
@@ -587,10 +672,10 @@ AC_ARG_ENABLE([zsp],
 AM_CONDITIONAL([ENABLE_ZSP], [test x$enable_zsp != xno])
 AM_COND_IF([ENABLE_ZSP], [AC_MSG_NOTICE([ENABLE_ZSP defined])])
 
-# Check for test-randof intent
-AC_ARG_ENABLE([test-randof],
-    AS_HELP_STRING([--enable-test-randof],
-        [Compile 'test-randof' in src [default=yes]]),
+# Check for test_randof intent
+AC_ARG_ENABLE([test_randof],
+    AS_HELP_STRING([--enable-test_randof],
+        [Compile 'test_randof' in src [default=yes]]),
     [enable_test_randof=$enableval],
     [enable_test_randof=yes])
 

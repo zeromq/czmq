@@ -799,11 +799,14 @@ class Zstr: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (_recv);
     static NAN_METHOD (_recvx);
+    static NAN_METHOD (_recv_compress);
     static NAN_METHOD (_send);
     static NAN_METHOD (_sendm);
     static NAN_METHOD (_sendf);
     static NAN_METHOD (_sendfm);
     static NAN_METHOD (_sendx);
+    static NAN_METHOD (_send_compress);
+    static NAN_METHOD (_sendm_compress);
     static NAN_METHOD (_str);
     static NAN_METHOD (_free);
     static NAN_METHOD (_test);

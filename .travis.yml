@@ -90,6 +90,8 @@ addons:
     - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
       key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
     packages:
+    - libsystemd-dev
+    - liblz4-dev
     - uuid-dev
     - asciidoc
     - xmlto
@@ -98,7 +100,7 @@ addons:
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "android" ] ; then brew install binutils ; fi
-- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "stable_zmq" ] ; then brew install libsodium ; fi
+- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "stable_zmq" ] ; then brew install libsodium lz4 ; fi
 
 # ZMQ stress tests need more open socket (files) than the usual default
 # On OSX, it seems the way to set the max files limit is constantly changing, so

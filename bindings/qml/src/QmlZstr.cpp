@@ -38,6 +38,18 @@ int QmlZstrAttached::recvx (void *source, QString stringP) {
 };
 
 ///
+//  De-compress and receive C string from socket, received as a message
+//  with two frames: size of the uncompressed string, and the string itself.
+//  Caller must free returned string using zstr_free(). Returns NULL if the
+//  context is being terminated or the process was interrupted.
+QString QmlZstrAttached::recvCompress (void *source) {
+    char *retStr_ = zstr_recv_compress (source);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
 //  Send a C string to a socket, as a frame. The string is sent without
 //  trailing null byte; to read this you can use zstr_recv, or a similar
 //  method that adds a null terminator on the received string. String
@@ -74,6 +86,24 @@ int QmlZstrAttached::sendfm (void *dest, const QString &format) {
 //  Returns 0 if the strings could be sent OK, or -1 on error.
 int QmlZstrAttached::sendx (void *dest, const QString &string) {
     return zstr_sendx (dest, string.toUtf8().data());
+};
+
+///
+//  Compress and send a C string to a socket, as a message with two frames:
+//  size of the uncompressed string, and the string itself. The string is
+//  sent without trailing null byte; to read this you can use
+//  zstr_recv_compress, or a similar method that de-compresses and adds a
+//  null terminator on the received string.
+int QmlZstrAttached::sendCompress (void *dest, const QString &string) {
+    return zstr_send_compress (dest, string.toUtf8().data());
+};
+
+///
+//  Compress and send a C string to a socket, as zstr_send_compress(),
+//  with a MORE flag, so that you can send further strings in the same
+//  multi-part message.
+int QmlZstrAttached::sendmCompress (void *dest, const QString &string) {
+    return zstr_sendm_compress (dest, string.toUtf8().data());
 };
 
 ///

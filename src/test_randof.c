@@ -64,7 +64,7 @@ int main (int argc, char *argv [])
     for (argn = 1; argn < argc; argn++) {
         if (streq (argv [argn], "--help")
         ||  streq (argv [argn], "-h")) {
-            printf ("test-randof [options]\n");
+            printf ("test_randof [options]\n");
             printf ("  --verbose / -v         verbose test output\n");
             printf ("  --help / -h            this information\n");
             printf ("  --test-range / -r NUM  generate numbers from 0 to NUM-1 (default %jd)\n",

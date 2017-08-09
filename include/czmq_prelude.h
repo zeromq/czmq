@@ -461,7 +461,7 @@ typedef struct {
 # endif
 #endif // ZSYS_RANDOF_FUNC is defined by caller... trust them or explode later
 
-//  Limits below were experimented for 32-bit floats on x86 with test-randof
+//  Limits below were experimented for 32-bit floats on x86 with test_randof
 //  Due to discrete rounding, greater values caused collisions with the
 //  fraction s_randof_factor() defined below returning 1.0.
 #if !defined (ZSYS_RANDOF_MAX)

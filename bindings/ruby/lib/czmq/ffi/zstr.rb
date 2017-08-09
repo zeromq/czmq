@@ -101,6 +101,19 @@ module CZMQ
         result
       end
 
+      # De-compress and receive C string from socket, received as a message
+      # with two frames: size of the uncompressed string, and the string itself.
+      # Caller must free returned string using zstr_free(). Returns NULL if the
+      # context is being terminated or the process was interrupted.
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::AutoPointer]
+      def self.recv_compress(source)
+        result = ::CZMQ::FFI.zstr_recv_compress(source)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
       # Send a C string to a socket, as a frame. The string is sent without
       # trailing null byte; to read this you can use zstr_recv, or a similar
       # method that adds a null terminator on the received string. String
@@ -160,6 +173,32 @@ module CZMQ
       # @return [Integer]
       def self.sendx(dest, string, *args)
         result = ::CZMQ::FFI.zstr_sendx(dest, string, *args)
+        result
+      end
+
+      # Compress and send a C string to a socket, as a message with two frames:
+      # size of the uncompressed string, and the string itself. The string is
+      # sent without trailing null byte; to read this you can use
+      # zstr_recv_compress, or a similar method that de-compresses and adds a
+      # null terminator on the received string.
+      #
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param string [String, #to_s, nil]
+      # @return [Integer]
+      def self.send_compress(dest, string)
+        result = ::CZMQ::FFI.zstr_send_compress(dest, string)
+        result
+      end
+
+      # Compress and send a C string to a socket, as zstr_send_compress(),
+      # with a MORE flag, so that you can send further strings in the same
+      # multi-part message.
+      #
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param string [String, #to_s, nil]
+      # @return [Integer]
+      def self.sendm_compress(dest, string)
+        result = ::CZMQ::FFI.zstr_sendm_compress(dest, string)
         result
       end
 

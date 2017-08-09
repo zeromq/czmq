@@ -23,12 +23,12 @@ save.xml
 
 # Executables
 src/czmq_selftest
-src/test-randof
+src/test_randof
 src/zmakecert
 src/zsp
 src/czmq_selftest
 ./czmq_selftest
-./test-randof
+./test_randof
 ./zmakecert
 ./zsp
 ./czmq_selftest

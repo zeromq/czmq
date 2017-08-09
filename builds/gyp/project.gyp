@@ -172,7 +172,7 @@
       ]
     },
     {
-      'target_name': 'test-randof',
+      'target_name': 'test_randof',
       'type': 'executable',
       'sources': [
         '../../src/test_randof.c'
