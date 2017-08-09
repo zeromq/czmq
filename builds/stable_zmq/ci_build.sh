@@ -33,6 +33,27 @@ make -j4
 make install
 cd ../../..
 
+# Start of recipe for dependency: uuid
+if (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list uuid-dev >/dev/null 2>&1) || \
+       (command -v brew >/dev/null 2>&1 && brew ls --versions uuid >/dev/null 2>&1) \
+; then
+    CONFIG_OPTS+=("--with-uuid=yes")
+fi
+
+# Start of recipe for dependency: systemd
+if (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsystemd-dev >/dev/null 2>&1) || \
+       (command -v brew >/dev/null 2>&1 && brew ls --versions systemd >/dev/null 2>&1) \
+; then
+    CONFIG_OPTS+=("--with-libsystemd=yes")
+fi
+
+# Start of recipe for dependency: lz4
+if (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list liblz4-dev >/dev/null 2>&1) || \
+       (command -v brew >/dev/null 2>&1 && brew ls --versions lz4 >/dev/null 2>&1) \
+; then
+    CONFIG_OPTS+=("--with-liblz4=yes")
+fi
+
 # Build and check this project
 ./autogen.sh 2> /dev/null
 ./configure "${CONFIG_OPTS[@]}"
