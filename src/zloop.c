@@ -678,7 +678,7 @@ void
 zloop_set_nonstop (zloop_t *self, bool nonstop)
 {
     assert (self);
-    self->nonstop = true;
+    self->nonstop = nonstop;
 }
 
 
