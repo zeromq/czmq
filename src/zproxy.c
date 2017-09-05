@@ -441,7 +441,11 @@ s_can_connect (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, const char *f
         assert (streq (hello, "Hello, World"));
         zstr_free (&hello);
     }
-    zstr_send (*faucet, "Hello, World");
+    zframe_t *frame = zframe_from ("Hello, World");
+    rc = zframe_send (&frame, *faucet, expect_success ? 0 : ZFRAME_DONTWAIT);
+    assert (rc == 0 || !expect_success);
+    if (!expect_success && rc == -1)
+        zframe_destroy (&frame);
 
     zpoller_t *poller = zpoller_new (*sink, NULL);
     assert (poller);
