@@ -114,6 +114,11 @@ struct _server_t {
 
     tuple_t *cur_tuple;         //  Holds current tuple to publish
     zgossip_msg_t *message;     //  Message to broadcast
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    const char *public_key;
+    const char *secret_key;
+#endif
 };
 
 //  ---------------------------------------------------------------------
@@ -167,11 +172,11 @@ server_initialize (server_t *self)
     //  override this with a SET message.
     engine_configure (self, "server/timeout", "1000");
     self->message = zgossip_msg_new ();
-    
+
     self->remotes = zlistx_new ();
     assert (self->remotes);
     zlistx_set_destructor (self->remotes, (czmq_destructor *) zsock_destroy);
-    
+
     self->tuples = zhashx_new ();
     assert (self->tuples);
     return 0;
@@ -188,17 +193,30 @@ server_terminate (server_t *self)
 }
 
 //  Connect to a remote server
-
 static void
+#ifdef CZMQ_BUILD_DRAFT_API
+server_connect (server_t *self, const char *endpoint, const char *public_key)
+#else
 server_connect (server_t *self, const char *endpoint)
+#endif
 {
     zsock_t *remote = zsock_new (ZMQ_DEALER);
     assert (remote);          //  No recovery if exhausted
 
+#ifdef CZMQ_BUILD_DRAFT_API
+    if (public_key){
+        zcert_t *cert = zcert_new_from_txt (self->public_key, self->secret_key);
+        zcert_apply(cert, remote);
+        zsock_set_curve_serverkey (remote, public_key);
+        assert (zsock_mechanism (remote) == ZMQ_CURVE);
+        zcert_destroy(&cert);
+    }
+#endif
     //  Never block on sending; we use an infinite HWM and buffer as many
     //  messages as needed in outgoing pipes. Note that the maximum number
     //  is the overall tuple set size.
     zsock_set_unbounded (remote);
+
     if (zsock_connect (remote, "%s", endpoint)) {
         zsys_warning ("bad zgossip endpoint '%s'", endpoint);
         zsock_destroy (&remote);
@@ -208,7 +226,7 @@ server_connect (server_t *self, const char *endpoint)
     zgossip_msg_t *gossip = zgossip_msg_new ();
     zgossip_msg_set_id (gossip, ZGOSSIP_MSG_HELLO);
     zgossip_msg_send (gossip, remote);
-    
+
     tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
     while (tuple) {
         zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
@@ -274,7 +292,12 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     if (streq (method, "CONNECT")) {
         char *endpoint = zmsg_popstr (msg);
         assert (endpoint);
+#ifdef CZMQ_BUILD_DRAFT_API
+        const char *public_key = zmsg_popstr (msg);
+        server_connect (self, endpoint, public_key);
+#else
         server_connect (self, endpoint);
+#endif
         zstr_free (&endpoint);
     }
     else
@@ -293,6 +316,18 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         zmsg_addstr (reply, "STATUS");
         zmsg_addstrf (reply, "%d", (int) zhashx_size (self->tuples));
     }
+#ifdef CZMQ_BUILD_DRAFT_API
+    else
+    if (streq (method, "SET PUBLICKEY")) {
+        self->public_key = zmsg_popstr (msg);
+        assert (self->public_key);
+    }
+    else
+    if (streq (method, "SET SECRETKEY")) {
+        self->secret_key = zmsg_popstr (msg);
+        assert (self->secret_key);
+    }
+#endif
     else
         zsys_error ("unknown zgossip method '%s'", method);
 
@@ -435,7 +470,7 @@ zgossip_test (bool verbose)
     zsock_set_rcvtimeo (client, 2000);
     int rc = zsock_connect (client, "inproc://zgossip");
     assert (rc == 0);
-    
+
     //  Send HELLO, which gets no message
     zgossip_msg_t *message = zgossip_msg_new ();
     zgossip_msg_set_id (message, ZGOSSIP_MSG_HELLO);
@@ -447,7 +482,7 @@ zgossip_test (bool verbose)
     zgossip_msg_recv (message, client);
     assert (zgossip_msg_id (message) == ZGOSSIP_MSG_PONG);
     zgossip_msg_destroy (&message);
-    
+
     zactor_destroy (&server);
     zsock_destroy (&client);
 
@@ -519,6 +554,65 @@ zgossip_test (bool verbose)
     zactor_destroy (&base);
     zactor_destroy (&alpha);
     zactor_destroy (&beta);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    // curve
+    if (zsys_has_curve()) {
+        printf("testing CURVE support");
+        zclock_sleep (2000);
+        zactor_t *auth = zactor_new(zauth, NULL);
+        assert (auth);
+        zstr_sendx (auth, "VERBOSE", NULL);
+        zsock_wait (auth);
+        zstr_sendx(auth,"ALLOW","127.0.0.1",NULL);
+        zsock_wait(auth);
+        zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
+        zsock_wait (auth);
+
+        server = zactor_new (zgossip, "server");
+        zstr_send (server, "VERBOSE");
+        assert (server);
+
+        zcert_t *client1_cert = zcert_new ();
+        zcert_t *server_cert = zcert_new ();
+
+        zstr_sendx (server, "SET PUBLICKEY", zcert_public_txt (server_cert), NULL);
+        zstr_sendx (server, "SET SECRETKEY", zcert_secret_txt (server_cert), NULL);
+        zstr_sendx (server, "AUTH ZAP DOMAIN", "global", NULL);
+
+        zstr_sendx (server, "BIND", "tcp://127.0.0.1:9000", NULL);
+        zclock_sleep (500);
+
+        zactor_t *client1 = zactor_new (zgossip, "client");
+        zstr_send (client1, "VERBOSE");
+        assert (client1);
+
+        zstr_sendx (client1, "SET PUBLICKEY", zcert_public_txt (client1_cert));
+        zstr_sendx (client1, "SET SECRETKEY", zcert_secret_txt (client1_cert));
+
+        const char *public_txt = zcert_public_txt (server_cert);
+        zstr_sendx (client1, "CONNECT", "tcp://127.0.0.1:9000", public_txt, NULL);
+        zstr_sendx (client1, "PUBLISH", "tcp://127.0.0.1:9001", "service1", NULL);
+
+        zclock_sleep (500);
+
+        zstr_send (server, "STATUS");
+        zclock_sleep (500);
+
+        zstr_recvx (server, &command, &key, &value, NULL);
+        assert (streq (command, "DELIVER"));
+        assert (streq (value, "service1"));
+
+        zstr_sendx (client1, "$TERM", NULL);
+        zstr_sendx (server, "$TERM", NULL);
+
+        zclock_sleep(500);
+
+        zactor_destroy (&client1);
+        zactor_destroy (&server);
+        zactor_destroy (&auth);
+    }
+#endif
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
