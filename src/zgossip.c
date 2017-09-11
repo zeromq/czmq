@@ -206,6 +206,11 @@ server_connect (server_t *self, const char *endpoint)
         zcert_t *cert = zcert_new_from_txt (self->public_key, self->secret_key);
         zcert_apply(cert, remote);
         zsock_set_curve_serverkey (remote, public_key);
+#ifndef ZMQ_CURVE
+        // legacy ZMQ support
+        // inline incase the underlying assert is removed
+        ZMQ_CURVE = false;
+#endif
         assert (zsock_mechanism (remote) == ZMQ_CURVE);
         zcert_destroy(&cert);
     }
