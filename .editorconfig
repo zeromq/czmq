@@ -1,0 +1,19 @@
+# This is a skeleton created by zproject.
+# You can add hand-written code here.
+# See http://editorconfig.org/ and https://github.com/editorconfig/ for
+# details about the format and links to plugins for IDEs and editors which
+# do not yet support this configuration out of the box - but easily can.
+
+# This is a top-level setting for project sources under this directory
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+charset = utf-8
+
+[*.am]
+indent_style = tab

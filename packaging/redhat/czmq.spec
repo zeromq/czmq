@@ -129,7 +129,7 @@ This package contains Python 3 CFFI bindings for czmq
 %endif
 
 %prep
-#FIXME: %{error:...} did not worked for me
+#FIXME: error:... did not worked for me
 %if %{with python_cffi}
 %if %{without drafts}
 echo "FATAL: python_cffi not yet supported w/o drafts"
