@@ -115,10 +115,8 @@ struct _server_t {
     tuple_t *cur_tuple;         //  Holds current tuple to publish
     zgossip_msg_t *message;     //  Message to broadcast
 
-#ifdef CZMQ_BUILD_DRAFT_API
     const char *public_key;
     const char *secret_key;
-#endif
 };
 
 //  ---------------------------------------------------------------------
@@ -292,12 +290,8 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     if (streq (method, "CONNECT")) {
         char *endpoint = zmsg_popstr (msg);
         assert (endpoint);
-#ifdef CZMQ_BUILD_DRAFT_API
         const char *public_key = zmsg_popstr (msg);
         server_connect (self, endpoint, public_key);
-#else
-        server_connect (self, endpoint);
-#endif
         zstr_free (&endpoint);
     }
     else
@@ -587,8 +581,8 @@ zgossip_test (bool verbose)
         zstr_send (client1, "VERBOSE");
         assert (client1);
 
-        zstr_sendx (client1, "SET PUBLICKEY", zcert_public_txt (client1_cert));
-        zstr_sendx (client1, "SET SECRETKEY", zcert_secret_txt (client1_cert));
+        zstr_sendx (client1, "SET PUBLICKEY", zcert_public_txt (client1_cert), NULL);
+        zstr_sendx (client1, "SET SECRETKEY", zcert_secret_txt (client1_cert), NULL);
 
         const char *public_txt = zcert_public_txt (server_cert);
         zstr_sendx (client1, "CONNECT", "tcp://127.0.0.1:9000", public_txt, NULL);
