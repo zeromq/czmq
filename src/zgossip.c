@@ -115,8 +115,8 @@ struct _server_t {
     tuple_t *cur_tuple;         //  Holds current tuple to publish
     zgossip_msg_t *message;     //  Message to broadcast
 
-    const char *public_key;
-    const char *secret_key;
+    char *public_key;
+    char *secret_key;
 };
 
 //  ---------------------------------------------------------------------
@@ -188,6 +188,8 @@ server_terminate (server_t *self)
     zgossip_msg_destroy (&self->message);
     zlistx_destroy (&self->remotes);
     zhashx_destroy (&self->tuples);
+    zstr_free (&self->public_key);
+    zstr_free (&self->secret_key);
 }
 
 //  Connect to a remote server
@@ -209,7 +211,7 @@ server_connect (server_t *self, const char *endpoint)
 #ifndef ZMQ_CURVE
         // legacy ZMQ support
         // inline incase the underlying assert is removed
-        ZMQ_CURVE = false;
+        bool ZMQ_CURVE = false;
 #endif
         assert (zsock_mechanism (remote) == ZMQ_CURVE);
         zcert_destroy(&cert);
@@ -295,8 +297,16 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     if (streq (method, "CONNECT")) {
         char *endpoint = zmsg_popstr (msg);
         assert (endpoint);
-        const char *public_key = zmsg_popstr (msg);
+#ifdef CZMQ_BUILD_DRAFT_API
+        // leaving this in here for now because if/def changes the server_connect
+        // function args. it doesn't look like server_connect is used anywhere else
+        // but want to leave this in until we're sure this is stable..
+        char *public_key = zmsg_popstr (msg);
         server_connect (self, endpoint, public_key);
+        zstr_free (&public_key);
+#else
+        server_connect (self, endpoint);
+#endif
         zstr_free (&endpoint);
     }
     else
@@ -318,13 +328,17 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
 #ifdef CZMQ_BUILD_DRAFT_API
     else
     if (streq (method, "SET PUBLICKEY")) {
-        self->public_key = zmsg_popstr (msg);
+        char *key = zmsg_popstr (msg);
+        self->public_key = strdup (key);
         assert (self->public_key);
+        zstr_free (&key);
     }
     else
     if (streq (method, "SET SECRETKEY")) {
-        self->secret_key = zmsg_popstr (msg);
+        char *key = zmsg_popstr (msg);
+        self->secret_key = strdup(key);
         assert (self->secret_key);
+        zstr_free (&key);
     }
 #endif
     else
@@ -602,10 +616,17 @@ zgossip_test (bool verbose)
         assert (streq (command, "DELIVER"));
         assert (streq (value, "service1"));
 
+        zstr_free (&command);
+        zstr_free (&key);
+        zstr_free (&value);
+
         zstr_sendx (client1, "$TERM", NULL);
         zstr_sendx (server, "$TERM", NULL);
 
         zclock_sleep(500);
+
+        zcert_destroy (&client1_cert);
+        zcert_destroy (&server_cert);
 
         zactor_destroy (&client1);
         zactor_destroy (&server);

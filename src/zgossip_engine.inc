@@ -85,7 +85,7 @@ typedef struct {
     char *log_prefix;           //  Default log prefix
 
 #ifdef CZMQ_BUILD_DRAFT_API
-    const char *auth_zap_domain; // Zap Auth Domain (curve)
+    char *auth_zap_domain; // Zap Auth Domain (curve)
 #endif
 } s_server_t;
 
@@ -379,6 +379,9 @@ s_client_destroy (s_client_t **self_p)
         engine_set_log_prefix (&self->client, "*** TERMINATED ***");
         client_terminate (&self->client);
         freen (self->hashkey);
+#ifdef CZMQ_BUILD_DRAFT_API
+        zstr_free (&self->server->auth_zap_domain);
+#endif
         freen (self);
         *self_p = NULL;
     }
@@ -878,8 +881,10 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
 #ifdef CZMQ_BUILD_DRAFT_API
     else
     if (streq (method, "AUTH ZAP DOMAIN")) {
-        self->auth_zap_domain = zmsg_popstr (msg);
+        char *value = zmsg_popstr (msg);
+        self->auth_zap_domain = strdup(value);
         assert (self->auth_zap_domain);
+        zstr_free (&value);
 
         zsys_info ("auth zap domain: %s", self->auth_zap_domain);
     }
