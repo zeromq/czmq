@@ -593,8 +593,15 @@ zgossip_test (bool verbose)
         zstr_sendx (server, "SET SECRETKEY", zcert_secret_txt (server_cert), NULL);
         zstr_sendx (server, "AUTH ZAP DOMAIN", "global", NULL);
 
-        zstr_sendx (server, "BIND", "tcp://127.0.0.1:9000", NULL);
-        zclock_sleep (500);
+        zstr_sendx (server, "BIND", "tcp://127.0.0.1:*", NULL);
+        zstr_sendx (server, "PORT", NULL);
+        zstr_recvx (server, &command, &value, NULL);
+        assert (streq (command, "PORT"));
+        int port = atoi (value);
+        zstr_free (&command);
+        zstr_free (&value);
+        char endpoint [32];
+        sprintf (endpoint, "tcp://127.0.0.1:%d", port);
 
         zactor_t *client1 = zactor_new (zgossip, "client");
         zstr_send (client1, "VERBOSE");
@@ -604,7 +611,7 @@ zgossip_test (bool verbose)
         zstr_sendx (client1, "SET SECRETKEY", zcert_secret_txt (client1_cert), NULL);
 
         const char *public_txt = zcert_public_txt (server_cert);
-        zstr_sendx (client1, "CONNECT", "tcp://127.0.0.1:9000", public_txt, NULL);
+        zstr_sendx (client1, "CONNECT", endpoint, public_txt, NULL);
         zstr_sendx (client1, "PUBLISH", "tcp://127.0.0.1:9001", "service1", NULL);
 
         zclock_sleep (500);
