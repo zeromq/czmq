@@ -347,6 +347,15 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     return reply;
 }
 
+//  Apply new configuration.
+
+static void
+server_configuration (server_t *self, zconfig_t *config)
+{
+    ZPROTO_UNUSED(self);
+    ZPROTO_UNUSED(config);
+    //  Apply new configuration
+}
 
 //  Allocate properties and structures for a new client connection and
 //  optionally engine_set_next_event (). Return 0 if OK, or -1 on error.
