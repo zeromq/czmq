@@ -5,6 +5,7 @@
 from __future__ import print_function
 import os
 import sys
+from ctypes.util import find_library
 
 import cffi
 ffi = cffi.FFI()

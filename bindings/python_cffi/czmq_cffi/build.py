@@ -107,5 +107,239 @@ ffibuilder.set_source ("czmq_cffi.native", "#include <czmq.h>", **kwargs)
 for item in czmq_cdefs:
     ffibuilder.cdef(item)
 
+ffidestructorbuilder = cffi.FFI ()
+ffidestructorbuilder.cdef('''
+void
+   zactor_destroy_py (void *self);
+
+void
+   zargs_destroy_py (void *self);
+
+void
+   zarmour_destroy_py (void *self);
+
+void
+   zcert_destroy_py (void *self);
+
+void
+   zcertstore_destroy_py (void *self);
+
+void
+   zchunk_destroy_py (void *self);
+
+void
+   zconfig_destroy_py (void *self);
+
+void
+   zdigest_destroy_py (void *self);
+
+void
+   zdir_destroy_py (void *self);
+
+void
+   zdir_patch_destroy_py (void *self);
+
+void
+   zfile_destroy_py (void *self);
+
+void
+   zframe_destroy_py (void *self);
+
+void
+   zhash_destroy_py (void *self);
+
+void
+   zhashx_destroy_py (void *self);
+
+void
+   ziflist_destroy_py (void *self);
+
+void
+   zlist_destroy_py (void *self);
+
+void
+   zlistx_destroy_py (void *self);
+
+void
+   zloop_destroy_py (void *self);
+
+void
+   zmsg_destroy_py (void *self);
+
+void
+   zpoller_destroy_py (void *self);
+
+void
+   zproc_destroy_py (void *self);
+
+void
+   zsock_destroy_py (void *self);
+
+void
+   ztimerset_destroy_py (void *self);
+
+void
+   ztrie_destroy_py (void *self);
+
+void
+   zuuid_destroy_py (void *self);
+
+''')
+
+ffidestructorbuilder.set_source ("czmq_cffi.destructors", '''
+#include <czmq.h>
+void
+zactor_destroy_py (void *self)
+{
+   zactor_destroy ((zactor_t **) &self);
+}
+
+void
+zargs_destroy_py (void *self)
+{
+   zargs_destroy ((zargs_t **) &self);
+}
+
+void
+zarmour_destroy_py (void *self)
+{
+   zarmour_destroy ((zarmour_t **) &self);
+}
+
+void
+zcert_destroy_py (void *self)
+{
+   zcert_destroy ((zcert_t **) &self);
+}
+
+void
+zcertstore_destroy_py (void *self)
+{
+   zcertstore_destroy ((zcertstore_t **) &self);
+}
+
+void
+zchunk_destroy_py (void *self)
+{
+   zchunk_destroy ((zchunk_t **) &self);
+}
+
+void
+zconfig_destroy_py (void *self)
+{
+   zconfig_destroy ((zconfig_t **) &self);
+}
+
+void
+zdigest_destroy_py (void *self)
+{
+   zdigest_destroy ((zdigest_t **) &self);
+}
+
+void
+zdir_destroy_py (void *self)
+{
+   zdir_destroy ((zdir_t **) &self);
+}
+
+void
+zdir_patch_destroy_py (void *self)
+{
+   zdir_patch_destroy ((zdir_patch_t **) &self);
+}
+
+void
+zfile_destroy_py (void *self)
+{
+   zfile_destroy ((zfile_t **) &self);
+}
+
+void
+zframe_destroy_py (void *self)
+{
+   zframe_destroy ((zframe_t **) &self);
+}
+
+void
+zhash_destroy_py (void *self)
+{
+   zhash_destroy ((zhash_t **) &self);
+}
+
+void
+zhashx_destroy_py (void *self)
+{
+   zhashx_destroy ((zhashx_t **) &self);
+}
+
+void
+ziflist_destroy_py (void *self)
+{
+   ziflist_destroy ((ziflist_t **) &self);
+}
+
+void
+zlist_destroy_py (void *self)
+{
+   zlist_destroy ((zlist_t **) &self);
+}
+
+void
+zlistx_destroy_py (void *self)
+{
+   zlistx_destroy ((zlistx_t **) &self);
+}
+
+void
+zloop_destroy_py (void *self)
+{
+   zloop_destroy ((zloop_t **) &self);
+}
+
+void
+zmsg_destroy_py (void *self)
+{
+   zmsg_destroy ((zmsg_t **) &self);
+}
+
+void
+zpoller_destroy_py (void *self)
+{
+   zpoller_destroy ((zpoller_t **) &self);
+}
+
+void
+zproc_destroy_py (void *self)
+{
+   zproc_destroy ((zproc_t **) &self);
+}
+
+void
+zsock_destroy_py (void *self)
+{
+   zsock_destroy ((zsock_t **) &self);
+}
+
+void
+ztimerset_destroy_py (void *self)
+{
+   ztimerset_destroy ((ztimerset_t **) &self);
+}
+
+void
+ztrie_destroy_py (void *self)
+{
+   ztrie_destroy ((ztrie_t **) &self);
+}
+
+void
+zuuid_destroy_py (void *self)
+{
+   zuuid_destroy ((zuuid_t **) &self);
+}
+
+''', **kwargs)
+
 if __name__ == "__main__":
     ffibuilder.compile (verbose=True)
+    ffidestructorbuilder.compile (verbose=True)

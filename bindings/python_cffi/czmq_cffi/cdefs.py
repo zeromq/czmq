@@ -27,8 +27,8 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #Import definitions from dependent projects
 
 czmq_cdefs.append ('''
-typedef struct _zactor_t zactor_t;
 typedef struct _zsock_t zsock_t;
+typedef struct _zactor_t zactor_t;
 typedef struct _zmsg_t zmsg_t;
 typedef struct _zargs_t zargs_t;
 typedef struct _zarmour_t zarmour_t;
@@ -39,14 +39,14 @@ typedef struct _zlist_t zlist_t;
 typedef struct _zcertstore_t zcertstore_t;
 typedef struct _zlistx_t zlistx_t;
 typedef struct _zframe_t zframe_t;
-typedef struct _zclock_t zclock_t;
 typedef struct _msecs_t msecs_t;
+typedef struct _zclock_t zclock_t;
 typedef struct _zconfig_t zconfig_t;
 typedef struct _zdigest_t zdigest_t;
 typedef struct _zdir_t zdir_t;
 typedef struct _zhash_t zhash_t;
-typedef struct _zdir_patch_t zdir_patch_t;
 typedef struct _zfile_t zfile_t;
+typedef struct _zdir_patch_t zdir_patch_t;
 typedef struct _zhashx_t zhashx_t;
 typedef struct _ziflist_t ziflist_t;
 typedef struct _zloop_t zloop_t;
