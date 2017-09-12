@@ -828,6 +828,10 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
             }
             zcert_destroy(&cert);
         }
+#ifndef ZMQ_CURVE
+        // zmq legacy
+        bool ZMQ_CURVE = false;
+#endif
         if (self->server.secret_key)
             assert (zsock_mechanism (self->router) == ZMQ_CURVE);
 #endif
