@@ -83,6 +83,10 @@ typedef struct {
     size_t timeout;             //  Default client expiry timeout
     bool verbose;               //  Verbose logging enabled?
     char *log_prefix;           //  Default log prefix
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    char *auth_zap_domain; // Zap Auth Domain (curve)
+#endif
 } s_server_t;
 
 
@@ -375,6 +379,9 @@ s_client_destroy (s_client_t **self_p)
         engine_set_log_prefix (&self->client, "*** TERMINATED ***");
         client_terminate (&self->client);
         freen (self->hashkey);
+#ifdef CZMQ_BUILD_DRAFT_API
+        zstr_free (&self->server->auth_zap_domain);
+#endif
         freen (self);
         *self_p = NULL;
     }
@@ -759,6 +766,20 @@ s_server_config_service (s_server_t *self)
                 zsys_notice ("server is using PLAIN security");
                 zsock_set_plain_server (self->router, 1);
             }
+#ifdef CZMQ_BUILD_DRAFT_API
+            else
+            if (streq (mechanism, "curve")) {
+                zsys_notice ("using CURVE security");
+                const char *keyfile = zconfig_get (section, "secret-key", NULL);
+                assert (keyfile);
+
+                zcert_t *server_cert = zcert_load(keyfile);
+                assert (server_cert);
+
+                zcert_apply (server_cert, self->router);
+                zsock_set_curve_server (self->router, 1);
+            }
+#endif
             else
                 zsys_warning ("mechanism=%s is not supported", mechanism);
         }
@@ -794,9 +815,30 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
     if (streq (method, "BIND")) {
         //  Bind to a specified endpoint, which may use an ephemeral port
         char *endpoint = zmsg_popstr (msg);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+        if (self->server.secret_key) {
+            zcert_t *cert = zcert_new_from_txt(self->server.public_key, self->server.secret_key);
+            zcert_apply(cert, self->router);
+            zsock_set_curve_server (self->router, 1);
+
+            if (self->auth_zap_domain) {
+                zsys_info (self->auth_zap_domain);
+                zsock_set_zap_domain (self->router, self->auth_zap_domain);
+            }
+            zcert_destroy(&cert);
+        }
+#ifndef ZMQ_CURVE
+        // zmq legacy
+        bool ZMQ_CURVE = false;
+#endif
+        if (self->server.secret_key)
+            assert (zsock_mechanism (self->router) == ZMQ_CURVE);
+#endif
         self->port = zsock_bind (self->router, "%s", endpoint);
         if (self->port == -1)
             zsys_warning ("could not bind to %s", endpoint);
+
         freen (endpoint);
     }
     else
@@ -840,6 +882,17 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
             zsys_warning ("cannot save config file '%s'", filename);
         freen (filename);
     }
+#ifdef CZMQ_BUILD_DRAFT_API
+    else
+    if (streq (method, "AUTH ZAP DOMAIN")) {
+        char *value = zmsg_popstr (msg);
+        self->auth_zap_domain = strdup(value);
+        assert (self->auth_zap_domain);
+        zstr_free (&value);
+
+        zsys_info ("auth zap domain: %s", self->auth_zap_domain);
+    }
+#endif
     else {
         //  Execute custom method
         zmsg_t *reply = server_method (&self->server, method, msg);
