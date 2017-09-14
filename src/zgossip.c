@@ -347,6 +347,15 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     return reply;
 }
 
+//  Apply new configuration.
+
+static void
+server_configuration (server_t *self, zconfig_t *config)
+{
+    ZPROTO_UNUSED(self);
+    ZPROTO_UNUSED(config);
+    //  Apply new configuration
+}
 
 //  Allocate properties and structures for a new client connection and
 //  optionally engine_set_next_event (). Return 0 if OK, or -1 on error.
@@ -571,19 +580,23 @@ zgossip_test (bool verbose)
 #ifdef CZMQ_BUILD_DRAFT_API
     // curve
     if (zsys_has_curve()) {
-        printf("testing CURVE support");
+        if (verbose)
+            printf("testing CURVE support");
         zclock_sleep (2000);
         zactor_t *auth = zactor_new(zauth, NULL);
         assert (auth);
-        zstr_sendx (auth, "VERBOSE", NULL);
-        zsock_wait (auth);
+        if (verbose) {
+            zstr_sendx (auth, "VERBOSE", NULL);
+            zsock_wait (auth);
+        }
         zstr_sendx(auth,"ALLOW","127.0.0.1",NULL);
         zsock_wait(auth);
         zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
         zsock_wait (auth);
 
         server = zactor_new (zgossip, "server");
-        zstr_send (server, "VERBOSE");
+        if (verbose)
+            zstr_send (server, "VERBOSE");
         assert (server);
 
         zcert_t *client1_cert = zcert_new ();
@@ -593,18 +606,26 @@ zgossip_test (bool verbose)
         zstr_sendx (server, "SET SECRETKEY", zcert_secret_txt (server_cert), NULL);
         zstr_sendx (server, "AUTH ZAP DOMAIN", "global", NULL);
 
-        zstr_sendx (server, "BIND", "tcp://127.0.0.1:9000", NULL);
-        zclock_sleep (500);
+        zstr_sendx (server, "BIND", "tcp://127.0.0.1:*", NULL);
+        zstr_sendx (server, "PORT", NULL);
+        zstr_recvx (server, &command, &value, NULL);
+        assert (streq (command, "PORT"));
+        int port = atoi (value);
+        zstr_free (&command);
+        zstr_free (&value);
+        char endpoint [32];
+        sprintf (endpoint, "tcp://127.0.0.1:%d", port);
 
         zactor_t *client1 = zactor_new (zgossip, "client");
-        zstr_send (client1, "VERBOSE");
+        if (verbose)
+            zstr_send (client1, "VERBOSE");
         assert (client1);
 
         zstr_sendx (client1, "SET PUBLICKEY", zcert_public_txt (client1_cert), NULL);
         zstr_sendx (client1, "SET SECRETKEY", zcert_secret_txt (client1_cert), NULL);
 
         const char *public_txt = zcert_public_txt (server_cert);
-        zstr_sendx (client1, "CONNECT", "tcp://127.0.0.1:9000", public_txt, NULL);
+        zstr_sendx (client1, "CONNECT", endpoint, public_txt, NULL);
         zstr_sendx (client1, "PUBLISH", "tcp://127.0.0.1:9001", "service1", NULL);
 
         zclock_sleep (500);
