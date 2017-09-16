@@ -230,7 +230,7 @@ zpoller_wait (zpoller_t *self, int timeout)
     if (!zmq_poller_wait (self->zmq_poller, &event, timeout * ZMQ_POLL_MSEC))
         return event.user_data;
     else
-    if (errno == ETIMEDOUT)
+    if (errno == ETIMEDOUT || errno == EAGAIN)
         self->expired = true;
     else
     if (zsys_interrupted && !self->nonstop)
