@@ -595,7 +595,7 @@ typedef intptr_t ssize_t;
     //  MSVC does not support C99's va_copy so we use a regular assignment
 #       define va_copy(dest,src) (dest) = (src)
 #   endif
-#elif (defined (__UTYPE_OSX))
+#elif (defined (__UTYPE_OSX) || defined (__OpenBSD__))
     typedef unsigned long ulong;
     typedef unsigned int uint;
     //  This fixes header-order dependence problem with some Linux versions
