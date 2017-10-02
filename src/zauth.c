@@ -678,6 +678,7 @@ zauth_test (bool verbose)
     assert (success);
 
     //  Try PLAIN authentication
+    zsock_set_zap_domain (server, "global");
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Password");
@@ -688,6 +689,7 @@ zauth_test (bool verbose)
     assert (password);
     fprintf (password, "admin=Password\n");
     fclose (password);
+    zsock_set_zap_domain (server, "global");
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Password");
@@ -707,6 +709,7 @@ zauth_test (bool verbose)
 #endif
     s_renew_sockets(&server, &client);
 
+    zsock_set_zap_domain (server, "global");
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Bogus");
@@ -729,6 +732,7 @@ zauth_test (bool verbose)
         zcert_apply (client_cert, client);
         zsock_set_curve_server (server, 1);
         zsock_set_curve_serverkey (client, server_key);
+        zsock_set_zap_domain (server, "global");
         success = s_can_connect (&server, &client, true);
         assert (!success);
 
@@ -751,6 +755,7 @@ zauth_test (bool verbose)
         zcert_save_public (client_cert, certfilepath);
         zstr_sendx (auth, "CURVE", basedirpath, NULL);
         zsock_wait (auth);
+        zsock_set_zap_domain (server, "global");
         success = s_can_connect (&server, &client, false);
         assert (success);
 
