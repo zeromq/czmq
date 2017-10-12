@@ -29,6 +29,7 @@
     * CONNECT endpoint -- connect the gossip service to the specified peer
     * PUBLISH key value -- publish a key/value pair to the gossip cluster
     * STATUS -- return number of key/value pairs held by gossip service
+    * ZAP DOMAIN domain -- set the ZAP DOMAIN domain = value
 
     Returns these messages:
 
@@ -90,6 +91,11 @@
 
 #include "czmq_classes.h"
 
+// TODO- project.xml?
+#ifdef CZMQ_BUILD_DRAFT_API
+#define CZMQ_ZGOSSIP_ZAP_DOMAIN "global"
+#endif
+
 
 //  ---------------------------------------------------------------------
 //  Forward declarations for the two main classes we use here
@@ -117,6 +123,9 @@ struct _server_t {
 
     char *public_key;
     char *secret_key;
+#ifdef CZMQ_BUILD_DRAFT_API
+    char *zap_domain;
+#endif
 };
 
 //  ---------------------------------------------------------------------
@@ -177,6 +186,10 @@ server_initialize (server_t *self)
 
     self->tuples = zhashx_new ();
     assert (self->tuples);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    self->zap_domain = strdup(CZMQ_ZGOSSIP_ZAP_DOMAIN);
+#endif
     return 0;
 }
 
@@ -190,6 +203,9 @@ server_terminate (server_t *self)
     zhashx_destroy (&self->tuples);
     zstr_free (&self->public_key);
     zstr_free (&self->secret_key);
+#ifdef CZMQ_BUILD_DRAFT_API
+    zstr_free (&self->zap_domain);
+#endif
 }
 
 //  Connect to a remote server
@@ -339,6 +355,14 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         self->secret_key = strdup(key);
         assert (self->secret_key);
         zstr_free (&key);
+    }
+    else
+    if (streq (method, "ZAP DOMAIN")) {
+        char *value = zmsg_popstr (msg);
+        zstr_free(&self->zap_domain);
+        self->zap_domain = strdup(value);
+        assert (self->zap_domain);
+        zstr_free (&value);
     }
 #endif
     else
@@ -604,7 +628,7 @@ zgossip_test (bool verbose)
 
         zstr_sendx (server, "SET PUBLICKEY", zcert_public_txt (server_cert), NULL);
         zstr_sendx (server, "SET SECRETKEY", zcert_secret_txt (server_cert), NULL);
-        zstr_sendx (server, "AUTH ZAP DOMAIN", "global", NULL);
+        zstr_sendx (server, "ZAP DOMAIN", "TEST", NULL);
 
         zstr_sendx (server, "BIND", "tcp://127.0.0.1:*", NULL);
         zstr_sendx (server, "PORT", NULL);
@@ -623,6 +647,7 @@ zgossip_test (bool verbose)
 
         zstr_sendx (client1, "SET PUBLICKEY", zcert_public_txt (client1_cert), NULL);
         zstr_sendx (client1, "SET SECRETKEY", zcert_secret_txt (client1_cert), NULL);
+        zstr_sendx (client1, "ZAP DOMAIN", "TEST", NULL);
 
         const char *public_txt = zcert_public_txt (server_cert);
         zstr_sendx (client1, "CONNECT", endpoint, public_txt, NULL);
