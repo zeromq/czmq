@@ -363,8 +363,6 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         self->zap_domain = strdup(value);
         assert (self->zap_domain);
         zstr_free (&value);
-
-        zsys_info ("auth zap domain: %s", self->zap_domain);
     }
 #endif
     else
