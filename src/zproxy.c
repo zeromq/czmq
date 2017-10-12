@@ -680,6 +680,8 @@ zproxy_test (bool verbose)
     //  Test negative case (no server-side passwords defined)
     zstr_sendx (proxy, "PLAIN", "FRONTEND", NULL);
     zsock_wait (proxy);
+    zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
+    zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
     zsock_set_plain_username (faucet, "admin");
     zsock_set_plain_password (faucet, "Password");
@@ -694,7 +696,11 @@ zproxy_test (bool verbose)
     fclose (password);
     zstr_sendx (proxy, "PLAIN", "FRONTEND", NULL);
     zsock_wait (proxy);
+    zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
+    zsock_wait (proxy);
     zstr_sendx (proxy, "PLAIN", "BACKEND", NULL);
+    zsock_wait (proxy);
+    zstr_sendx (proxy, "DOMAIN", "BACKEND", "global", NULL);
     zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
     zsock_set_plain_username (faucet, "admin");
@@ -709,6 +715,8 @@ zproxy_test (bool verbose)
 
     //  Test negative case (bad client password)
     zstr_sendx (proxy, "PLAIN", "FRONTEND", NULL);
+    zsock_wait (proxy);
+    zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
     zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
     zsock_set_plain_username (faucet, "admin");
@@ -731,6 +739,8 @@ zproxy_test (bool verbose)
 
         //  Test without setting-up any authentication
         zstr_sendx (proxy, "CURVE", "FRONTEND", public_key, secret_key, NULL);
+        zsock_wait (proxy);
+        zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
         zsock_wait (proxy);
         s_bind_test_sockets (proxy, &frontend, &backend);
         zcert_apply (client_cert, faucet);
