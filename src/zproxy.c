@@ -589,14 +589,22 @@ zproxy_test (bool verbose)
 #ifdef  WIN32
 	sink = zsock_new_sub(">inproc://backend", "whatever");
 #else
-	sink = zsock_new_sub (">ipc://backend", "whatever");
+    // vagrant vms don't like using shared storage for ipc pipes..
+    if (streq(getenv("USER"), "vagrant"))
+        sink = zsock_new_sub (">ipc:///tmp/backend", "whatever");
+    else
+	    sink = zsock_new_sub (">ipc://backend", "whatever");
 #endif //  WIN32
 	assert (sink);
 
 #ifdef WIN32
 	zstr_sendx (proxy, "BACKEND", "XPUB", "inproc://backend", NULL);
 #else
-	zstr_sendx(proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
+    // vagrant vms don't like using shared storage for ipc pipes..
+    if (streq(getenv("USER"), "vagrant"))
+        zstr_sendx(proxy, "BACKEND", "XPUB", "ipc:///tmp/backend", NULL);
+    else
+        zstr_sendx(proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
 #endif
     zsock_wait (proxy);
 
