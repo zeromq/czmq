@@ -31,6 +31,11 @@ extern "C" {
 CZMQ_EXPORT zfile_t *
     zfile_new (const char *path, const char *name);
 
+//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  deleted on destroy
+CZMQ_EXPORT zfile_t *
+    zfile_tmp (void);
+
 //  Destroy a file item
 CZMQ_EXPORT void
     zfile_destroy (zfile_t **self_p);
