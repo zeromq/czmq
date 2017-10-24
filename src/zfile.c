@@ -99,6 +99,7 @@ zfile_new (const char *path, const char *name)
             fclose (handle);
         }
     }
+    self->handle = 0;
     zfile_restat (self);
     return self;
 }
@@ -185,7 +186,14 @@ zfile_restat (zfile_t *self)
         self->stable = zsys_file_stable (real_name);
     }
     else {
-        self->cursize = 0;
+        if(self->handle) {
+            long cpos = ftell(self->handle);
+            fseek(self->handle, 0L, SEEK_END);
+            self->cursize = ftell(self->handle);
+            fseek(self->handle, cpos, SEEK_SET);
+        } else {
+            self->cursize = 0;
+        }
         self->modified = 0;
         self->mode = 0;
         self->stable = false;
@@ -332,10 +340,14 @@ zfile_input (zfile_t *self)
     self->handle = fopen (real_name, "rb");
     if (self->handle) {
         struct stat stat_buf;
-        if (stat (real_name, &stat_buf) == 0)
+        if (stat (real_name, &stat_buf) == 0) {
             self->cursize = stat_buf.st_size;
-        else
-            self->cursize = 0;
+        } else {
+            long cpos = ftell(self->handle);
+            fseek(self->handle, 0L, SEEK_END);
+            self->cursize = ftell(self->handle);
+            fseek(self->handle, cpos, SEEK_SET);
+        }
     }
     return self->handle? 0: -1;
 }
@@ -490,8 +502,8 @@ zfile_close (zfile_t *self)
     assert (self);
     if (self->handle) {
         fclose (self->handle);
-        zfile_restat (self);
         self->handle = 0;
+        zfile_restat (self);
         self->eof = false;
     }
 }
