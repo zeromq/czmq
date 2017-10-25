@@ -44,6 +44,12 @@ struct _zfile_t {
     zdigest_t *digest;      //  File digest, if known
     char *curline;          //  Last read line, if any
     size_t linemax;         //  Size of allocated buffer
+    bool remove_on_destroy; //  Whenever delete file on destroy
+                            //  Typically for tempfiles
+    int fd;                 //  File descriptor - set up by zfile_tmp
+    bool close_fd;          //  XXX: for some reason self->fd == 0 in
+                            //  zdir and zdir_patch tests, this is a
+                            //  workaround for the problem
 
     //  Properties from files that exist on file system
     time_t modified;        //  Modification time
@@ -101,9 +107,59 @@ zfile_new (const char *path, const char *name)
     }
     self->handle = 0;
     zfile_restat (self);
+    self->fd = -1;
+    self->close_fd = false;
     return self;
 }
 
+//  --------------------------------------------------------------------------
+//  Constructor
+//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  deleted on destroy
+
+zfile_t *
+zfile_tmp (void)
+{
+    zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
+    assert (self);
+    self->remove_on_destroy = true;
+
+    // I know tmpnam is considered insecure, however I did not find a way
+    // how to get fullname from FILE *, or fd, which would be
+    // portable. If someone knows the way, feel free to rewrite it.
+    // ... on non Windows platforms there is O_CREAT | O_EXCL for open,
+    // which prevents the temp file name attacks
+    char name [L_tmpnam];
+    char *r = tmpnam (name);
+    if (!r) {
+        free (self);
+        return NULL;
+    }
+    self->fullname = strdup (name);
+#if defined __WINDOWS__
+    //some Windows expert should review and improve :)
+    self->handle = fopen (self->fullname, "wb+");
+#else
+    self->fd = open (self->fullname, O_WRONLY | O_CREAT | O_EXCL);
+    self->close_fd = true;
+    if (self->fd < 0) {
+        free (self->fullname);
+        free (self);
+        return NULL;
+    }
+    self->handle = fdopen (self->fd, "w");
+#endif
+    if (!self->handle) {
+        if (self->close_fd)
+            close (self->fd);
+        free (self->fullname);
+        free (self);
+        return NULL;
+    }
+
+    zfile_restat (self);
+    return self;
+}
 
 //  --------------------------------------------------------------------------
 //  Destroy a file item
@@ -115,8 +171,9 @@ zfile_destroy (zfile_t **self_p)
     if (*self_p) {
         zfile_t *self = *self_p;
         zdigest_destroy (&self->digest);
-        if (self->handle)
-            fclose (self->handle);
+        if (self->remove_on_destroy)
+            zfile_remove (self);
+        zfile_close (self);
         freen (self->fullname);
         freen (self->curline);
         freen (self->link);
@@ -506,6 +563,8 @@ zfile_close (zfile_t *self)
         zfile_restat (self);
         self->eof = false;
     }
+    if (self->close_fd)
+        close (self->fd);
 }
 
 
@@ -829,6 +888,21 @@ zfile_test (bool verbose)
     zfile_remove (file);
     zfile_close (file);
     zfile_destroy (&file);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    zfile_t *tempfile = zfile_tmp ();
+    assert (tempfile);
+    assert (zfile_filename (tempfile, NULL));
+    assert (zsys_file_exists (zfile_filename (tempfile, NULL)));
+    zchunk_t *tchunk = zchunk_new ("HELLO", 6);
+    assert (zfile_write (tempfile, tchunk, 0) == 0);
+    zchunk_destroy (&tchunk);
+
+    char *filename = strdup (zfile_filename (tempfile, NULL));
+    zfile_destroy (&tempfile);
+    assert (!zsys_file_exists (filename));
+    zstr_free (&filename);
+#endif // CZMQ_BUILD_DRAFT_API
 
 #if defined (__WINDOWS__)
     zsys_shutdown();

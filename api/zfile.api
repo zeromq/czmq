@@ -20,6 +20,11 @@
         <argument name = "name" type = "string" />
     </constructor>
 
+    <constructor name="tmp" state="draft">
+        Create new temporary file for writing via tmpfile. File is automaticaly
+        deleted on destroy
+    </constructor>
+
     <destructor>
         Destroy a file item
     </destructor>
