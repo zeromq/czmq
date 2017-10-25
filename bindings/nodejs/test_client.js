@@ -1,0 +1,24 @@
+//
+// bjornwennberg71@gmail.com
+//
+// super-simple test-client that sends 400 bytes to test-server
+//
+// build.sh first
+// macosx: node ./test-client.js
+// linux:  nodejs ./test-client.js
+//
+
+var czmq = require ('czmq')
+var zstr = new czmq.Zstr ();
+
+var host = "tcp://127.0.0.1:5678";
+
+//var client = new czmq.Zsock (czmq.ZMQ_CLIENT)
+var client = new czmq.Zsock (13);
+client.connect (host);
+
+console.log("client[" + host + "] sending 400 bytes");
+zstr.send (client, "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222233333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333334444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444")
+//var reply = zstr.recv(client)
+
+client.destroy ()

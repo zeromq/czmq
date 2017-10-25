@@ -81,11 +81,12 @@ NAN_METHOD (Zargs::New) {
     else {
         Nan::Utf8String argv_utf8 (info [1].As<String>());
         argv = *argv_utf8;
-    }
-    Zargs *zargs = new Zargs ((int) argc, (char **)&argv);
-    if (zargs) {
-        zargs->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
+    
+        Zargs *zargs = new Zargs ((int) argc, (char **)&argv);
+        if (zargs) {
+          zargs->Wrap (info.This ());
+          info.GetReturnValue ().Set (info.This ());
+        }
     }
 }
 
@@ -153,9 +154,10 @@ NAN_METHOD (Zargs::_param_lookup) {
     else {
         Nan::Utf8String keys_utf8 (info [0].As<String>());
         keys = *keys_utf8;
+    
+        char *result = (char *) zargs_param_lookup (zargs->self, (const char *)keys);
+        info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
     }
-    char *result = (char *) zargs_param_lookup (zargs->self, (const char *)keys);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zargs::_param_lookupx) {
@@ -169,9 +171,10 @@ NAN_METHOD (Zargs::_param_lookupx) {
     else {
         Nan::Utf8String keys_utf8 (info [0].As<String>());
         keys = *keys_utf8;
+    
+        char *result = (char *) zargs_param_lookupx (zargs->self, (const char *)keys);
+        info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
     }
-    char *result = (char *) zargs_param_lookupx (zargs->self, (const char *)keys);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zargs::_has_help) {
@@ -190,9 +193,10 @@ NAN_METHOD (Zargs::_param_empty) {
     else {
         Nan::Utf8String arg_utf8 (info [0].As<String>());
         arg = *arg_utf8;
+    
+        bool result = zargs_param_empty ((const char *)arg);
+        info.GetReturnValue ().Set (Nan::New<Boolean>(result));
     }
-    bool result = zargs_param_empty ((const char *)arg);
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zargs::_print) {
@@ -303,14 +307,15 @@ NAN_METHOD (Zarmour::_decode) {
     else {
         Nan::Utf8String data_utf8 (info [0].As<String>());
         data = *data_utf8;
-    }
-    zchunk_t *result = zarmour_decode (zarmour->self, (const char *)data);
-    Zchunk *zchunk_result = new Zchunk (result);
-    if (zchunk_result) {
-    //  Don't yet know how to return a new object
-    //      zchunk->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    
+        zchunk_t *result = zarmour_decode (zarmour->self, (const char *)data);
+        Zchunk *zchunk_result = new Zchunk (result);
+        if (zchunk_result) {
+              //  Don't yet know how to return a new object
+              //      zchunk->Wrap (info.This ());
+              //      info.GetReturnValue ().Set (info.This ());
+          info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        }
     }
 }
 
@@ -378,8 +383,9 @@ NAN_METHOD (Zarmour::_set_pad_char) {
         if (strlen (*pad_char_utf8) != 1)
             return Nan::ThrowTypeError ("`pad char` must be a single character");
         pad_char = (*pad_char_utf8) [0];
+    
+        zarmour_set_pad_char (zarmour->self, (char) pad_char);
     }
-    zarmour_set_pad_char (zarmour->self, (char) pad_char);
 }
 
 NAN_METHOD (Zarmour::_line_breaks) {
@@ -537,21 +543,29 @@ NAN_METHOD (Zcert::_set_meta) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`name` must be a string");
-    else {
+    else
+    {
         Nan::Utf8String name_utf8 (info [0].As<String>());
         name = *name_utf8;
+    
+        char *format;
+        if (info [1]->IsUndefined ())
+        {
+          return Nan::ThrowTypeError ("method requires a `format`");
+        }
+        else
+        {
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`format` must be a string");
+          else
+          {
+            Nan::Utf8String format_utf8 (info [1].As<String>());
+            format = *format_utf8;
+          
+            zcert_set_meta (zcert->self, (const char *)name, "%s", format);
+          }
+        }
     }
-    char *format;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `format`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [1].As<String>());
-        format = *format_utf8;
-    }
-    zcert_set_meta (zcert->self, (const char *)name, "%s", format);
 }
 
 NAN_METHOD (Zcert::_unset_meta) {
@@ -565,8 +579,9 @@ NAN_METHOD (Zcert::_unset_meta) {
     else {
         Nan::Utf8String name_utf8 (info [0].As<String>());
         name = *name_utf8;
+    
+        zcert_unset_meta (zcert->self, (const char *)name);
     }
-    zcert_unset_meta (zcert->self, (const char *)name);
 }
 
 NAN_METHOD (Zcert::_meta) {
@@ -580,9 +595,10 @@ NAN_METHOD (Zcert::_meta) {
     else {
         Nan::Utf8String name_utf8 (info [0].As<String>());
         name = *name_utf8;
+    
+        char *result = (char *) zcert_meta (zcert->self, (const char *)name);
+        info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
     }
-    char *result = (char *) zcert_meta (zcert->self, (const char *)name);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zcert::_meta_keys) {
@@ -608,9 +624,10 @@ NAN_METHOD (Zcert::_save) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+    
+        int result = zcert_save (zcert->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zcert_save (zcert->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zcert::_save_public) {
@@ -624,9 +641,10 @@ NAN_METHOD (Zcert::_save_public) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+        
+        int result = zcert_save_public (zcert->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zcert_save_public (zcert->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zcert::_save_secret) {
@@ -640,9 +658,10 @@ NAN_METHOD (Zcert::_save_secret) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+    
+        int result = zcert_save_secret (zcert->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zcert_save_secret (zcert->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zcert::_apply) {
@@ -738,11 +757,12 @@ NAN_METHOD (Zcertstore::New) {
     else {
         Nan::Utf8String location_utf8 (info [0].As<String>());
         location = *location_utf8;
-    }
-    Zcertstore *zcertstore = new Zcertstore ((const char *)location);
-    if (zcertstore) {
-        zcertstore->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
+    
+        Zcertstore *zcertstore = new Zcertstore ((const char *)location);
+        if (zcertstore) {
+          zcertstore->Wrap (info.This ());
+          info.GetReturnValue ().Set (info.This ());
+        }
     }
 }
 
@@ -768,14 +788,15 @@ NAN_METHOD (Zcertstore::_lookup) {
     else {
         Nan::Utf8String public_key_utf8 (info [0].As<String>());
         public_key = *public_key_utf8;
-    }
-    zcert_t *result = zcertstore_lookup (zcertstore->self, (const char *)public_key);
-    Zcert *zcert_result = new Zcert (result);
-    if (zcert_result) {
-    //  Don't yet know how to return a new object
-    //      zcert->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    
+        zcert_t *result = zcertstore_lookup (zcertstore->self, (const char *)public_key);
+        Zcert *zcert_result = new Zcert (result);
+        if (zcert_result) {
+              //  Don't yet know how to return a new object
+              //      zcert->Wrap (info.This ());
+              //      info.GetReturnValue ().Set (info.This ());
+          info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        }
     }
 }
 
@@ -982,20 +1003,21 @@ NAN_METHOD (Zchunk::_slurp) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
-    }
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `maxsize`");
-    else
-    if (!info [1]->IsNumber ())
-        return Nan::ThrowTypeError ("`maxsize` must be a number");
-    size_t maxsize = Nan::To<int64_t>(info [1]).FromJust ();
-    zchunk_t *result = zchunk_slurp ((const char *)filename, (size_t) maxsize);
-    Zchunk *zchunk_result = new Zchunk (result);
-    if (zchunk_result) {
-    //  Don't yet know how to return a new object
-    //      zchunk->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `maxsize`");
+        else
+          if (!info [1]->IsNumber ())
+            return Nan::ThrowTypeError ("`maxsize` must be a number");
+        size_t maxsize = Nan::To<int64_t>(info [1]).FromJust ();
+        zchunk_t *result = zchunk_slurp ((const char *)filename, (size_t) maxsize);
+        Zchunk *zchunk_result = new Zchunk (result);
+        if (zchunk_result) {
+              //  Don't yet know how to return a new object
+              //      zchunk->Wrap (info.This ());
+              //      info.GetReturnValue ().Set (info.This ());
+          info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        }
     }
 }
 
@@ -1034,9 +1056,10 @@ NAN_METHOD (Zchunk::_streq) {
     else {
         Nan::Utf8String string_utf8 (info [0].As<String>());
         string = *string_utf8;
+    
+        bool result = zchunk_streq (zchunk->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Boolean>(result));
     }
-    bool result = zchunk_streq (zchunk->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zchunk::_pack) {
@@ -1241,12 +1264,13 @@ NAN_METHOD (Zconfig::New) {
     else {
         Nan::Utf8String name_utf8 (info [0].As<String>());
         name = *name_utf8;
-    }
-    Zconfig *parent = Nan::ObjectWrap::Unwrap<Zconfig>(info [1].As<Object>());
-    Zconfig *zconfig = new Zconfig ((const char *)name, parent->self);
-    if (zconfig) {
-        zconfig->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
+    
+        Zconfig *parent = Nan::ObjectWrap::Unwrap<Zconfig>(info [1].As<Object>());
+        Zconfig *zconfig = new Zconfig ((const char *)name, parent->self);
+        if (zconfig) {
+          zconfig->Wrap (info.This ());
+          info.GetReturnValue ().Set (info.This ());
+        }
     }
 }
 
@@ -1284,18 +1308,21 @@ NAN_METHOD (Zconfig::_put) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
+    
+        char *value;
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `value`");
+        else
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`value` must be a string");
+          else {
+            Nan::Utf8String value_utf8 (info [1].As<String>());
+            value = *value_utf8;
+          
+            zconfig_put (zconfig->self, (const char *)path, (const char *)value);
+          }
+
     }
-    char *value;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `value`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [1].As<String>());
-        value = *value_utf8;
-    }
-    zconfig_put (zconfig->self, (const char *)path, (const char *)value);
 }
 
 NAN_METHOD (Zconfig::_putf) {
@@ -1309,18 +1336,20 @@ NAN_METHOD (Zconfig::_putf) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
+    
+        char *format;
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `format`");
+        else
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`format` must be a string");
+          else {
+            Nan::Utf8String format_utf8 (info [1].As<String>());
+            format = *format_utf8;
+          
+            zconfig_putf (zconfig->self, (const char *)path, "%s", format);
+          }
     }
-    char *format;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `format`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [1].As<String>());
-        format = *format_utf8;
-    }
-    zconfig_putf (zconfig->self, (const char *)path, "%s", format);
 }
 
 NAN_METHOD (Zconfig::_get) {
@@ -1334,19 +1363,21 @@ NAN_METHOD (Zconfig::_get) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
+    
+        char *default_value;
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `default value`");
+        else
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`default value` must be a string");
+          else {
+            Nan::Utf8String default_value_utf8 (info [1].As<String>());
+            default_value = *default_value_utf8;
+          
+            char *result = (char *) zconfig_get (zconfig->self, (const char *)path, (const char *)default_value);
+            info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+          }
     }
-    char *default_value;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `default value`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`default value` must be a string");
-    else {
-        Nan::Utf8String default_value_utf8 (info [1].As<String>());
-        default_value = *default_value_utf8;
-    }
-    char *result = (char *) zconfig_get (zconfig->self, (const char *)path, (const char *)default_value);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zconfig::_set_name) {
@@ -1360,8 +1391,9 @@ NAN_METHOD (Zconfig::_set_name) {
     else {
         Nan::Utf8String name_utf8 (info [0].As<String>());
         name = *name_utf8;
+        
+        zconfig_set_name (zconfig->self, (const char *)name);
     }
-    zconfig_set_name (zconfig->self, (const char *)name);
 }
 
 NAN_METHOD (Zconfig::_set_value) {
@@ -1375,8 +1407,9 @@ NAN_METHOD (Zconfig::_set_value) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zconfig_set_value (zconfig->self, "%s", format);
     }
-    zconfig_set_value (zconfig->self, "%s", format);
 }
 
 NAN_METHOD (Zconfig::_child) {
@@ -1414,14 +1447,15 @@ NAN_METHOD (Zconfig::_locate) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
-    }
-    zconfig_t *result = zconfig_locate (zconfig->self, (const char *)path);
-    Zconfig *zconfig_result = new Zconfig (result);
-    if (zconfig_result) {
-    //  Don't yet know how to return a new object
-    //      zconfig->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        
+        zconfig_t *result = zconfig_locate (zconfig->self, (const char *)path);
+        Zconfig *zconfig_result = new Zconfig (result);
+        if (zconfig_result) {
+              //  Don't yet know how to return a new object
+              //      zconfig->Wrap (info.This ());
+              //      info.GetReturnValue ().Set (info.This ());
+          info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        }
     }
 }
 
@@ -1456,8 +1490,9 @@ NAN_METHOD (Zconfig::_set_comment) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zconfig_set_comment (zconfig->self, "%s", format);
     }
-    zconfig_set_comment (zconfig->self, "%s", format);
 }
 
 NAN_METHOD (Zconfig::_comments) {
@@ -1483,9 +1518,10 @@ NAN_METHOD (Zconfig::_save) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+    
+        int result = zconfig_save (zconfig->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zconfig_save (zconfig->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zconfig::_savef) {
@@ -1499,9 +1535,10 @@ NAN_METHOD (Zconfig::_savef) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        int result = zconfig_savef (zconfig->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zconfig_savef (zconfig->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zconfig::_filename) {
@@ -1550,14 +1587,15 @@ NAN_METHOD (Zconfig::_str_load) {
     else {
         Nan::Utf8String string_utf8 (info [0].As<String>());
         string = *string_utf8;
-    }
-    zconfig_t *result = zconfig_str_load ((const char *)string);
-    Zconfig *zconfig_result = new Zconfig (result);
-    if (zconfig_result) {
-    //  Don't yet know how to return a new object
-    //      zconfig->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    
+        zconfig_t *result = zconfig_str_load ((const char *)string);
+        Zconfig *zconfig_result = new Zconfig (result);
+        if (zconfig_result) {
+              //  Don't yet know how to return a new object
+              //      zconfig->Wrap (info.This ());
+              //      info.GetReturnValue ().Set (info.This ());
+          info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        }
     }
 }
 
@@ -1745,21 +1783,23 @@ NAN_METHOD (Zdir::New) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
-    }
-    char *parent;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `parent`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`parent` must be a string");
-    else {
-        Nan::Utf8String parent_utf8 (info [1].As<String>());
-        parent = *parent_utf8;
-    }
-    Zdir *zdir = new Zdir ((const char *)path, (const char *)parent);
-    if (zdir) {
-        zdir->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
+    
+        char *parent;
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `parent`");
+        else
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`parent` must be a string");
+          else {
+            Nan::Utf8String parent_utf8 (info [1].As<String>());
+            parent = *parent_utf8;
+          
+            Zdir *zdir = new Zdir ((const char *)path, (const char *)parent);
+            if (zdir) {
+              zdir->Wrap (info.This ());
+              info.GetReturnValue ().Set (info.This ());
+            }
+          }
     }
 }
 
@@ -1835,14 +1875,15 @@ NAN_METHOD (Zdir::_diff) {
     else {
         Nan::Utf8String alias_utf8 (info [2].As<String>());
         alias = *alias_utf8;
-    }
-    zlist_t *result = zdir_diff (older->self, newer->self, (const char *)alias);
-    Zlist *zlist_result = new Zlist (result);
-    if (zlist_result) {
-    //  Don't yet know how to return a new object
-    //      zlist->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    
+        zlist_t *result = zdir_diff (older->self, newer->self, (const char *)alias);
+        Zlist *zlist_result = new Zlist (result);
+        if (zlist_result) {
+              //  Don't yet know how to return a new object
+              //      zlist->Wrap (info.This ());
+              //      info.GetReturnValue ().Set (info.This ());
+          info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        }
     }
 }
 
@@ -1857,14 +1898,15 @@ NAN_METHOD (Zdir::_resync) {
     else {
         Nan::Utf8String alias_utf8 (info [0].As<String>());
         alias = *alias_utf8;
-    }
-    zlist_t *result = zdir_resync (zdir->self, (const char *)alias);
-    Zlist *zlist_result = new Zlist (result);
-    if (zlist_result) {
-    //  Don't yet know how to return a new object
-    //      zlist->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    
+        zlist_t *result = zdir_resync (zdir->self, (const char *)alias);
+        Zlist *zlist_result = new Zlist (result);
+        if (zlist_result) {
+              //  Don't yet know how to return a new object
+              //      zlist->Wrap (info.This ());
+              //      info.GetReturnValue ().Set (info.This ());
+          info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+        }
     }
 }
 
@@ -1958,30 +2000,32 @@ NAN_METHOD (ZdirPatch::New) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
-    }
-    Zfile *file = Nan::ObjectWrap::Unwrap<Zfile>(info [1].As<Object>());
-    if (info [2]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `op`");
-
-    int op;
-    if (info [2]->IsNumber ())
-        op = Nan::To<int>(info [2]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`op` must be a number");
-    char *alias;
-    if (info [3]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `alias`");
-    else
-    if (!info [3]->IsString ())
-        return Nan::ThrowTypeError ("`alias` must be a string");
-    else {
-        Nan::Utf8String alias_utf8 (info [3].As<String>());
-        alias = *alias_utf8;
-    }
-    ZdirPatch *zdir_patch = new ZdirPatch ((const char *)path, file->self, (int) op, (const char *)alias);
-    if (zdir_patch) {
-        zdir_patch->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
+    
+        Zfile *file = Nan::ObjectWrap::Unwrap<Zfile>(info [1].As<Object>());
+        if (info [2]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `op`");
+        
+        int op;
+        if (info [2]->IsNumber ())
+          op = Nan::To<int>(info [2]).FromJust ();
+        else
+          return Nan::ThrowTypeError ("`op` must be a number");
+        char *alias;
+        if (info [3]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `alias`");
+        else
+          if (!info [3]->IsString ())
+            return Nan::ThrowTypeError ("`alias` must be a string");
+          else {
+            Nan::Utf8String alias_utf8 (info [3].As<String>());
+            alias = *alias_utf8;
+          
+            ZdirPatch *zdir_patch = new ZdirPatch ((const char *)path, file->self, (int) op, (const char *)alias);
+            if (zdir_patch) {
+              zdir_patch->Wrap (info.This ());
+              info.GetReturnValue ().Set (info.This ());
+            }
+          }
     }
 }
 
@@ -2127,21 +2171,23 @@ NAN_METHOD (Zfile::New) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
-    }
-    char *name;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `name`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`name` must be a string");
-    else {
-        Nan::Utf8String name_utf8 (info [1].As<String>());
-        name = *name_utf8;
-    }
-    Zfile *zfile = new Zfile ((const char *)path, (const char *)name);
-    if (zfile) {
-        zfile->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
+    
+        char *name;
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `name`");
+        else
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`name` must be a string");
+          else {
+            Nan::Utf8String name_utf8 (info [1].As<String>());
+            name = *name_utf8;
+          
+            Zfile *zfile = new Zfile ((const char *)path, (const char *)name);
+            if (zfile) {
+              zfile->Wrap (info.This ());
+              info.GetReturnValue ().Set (info.This ());
+            }
+          }
     }
 }
 
@@ -2179,9 +2225,10 @@ NAN_METHOD (Zfile::_filename) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
+        
+        char *result = (char *) zfile_filename (zfile->self, (const char *)path);
+        info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
     }
-    char *result = (char *) zfile_filename (zfile->self, (const char *)path);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zfile::_restat) {
@@ -2445,9 +2492,10 @@ NAN_METHOD (Zframe::_meta) {
     else {
         Nan::Utf8String property_utf8 (info [0].As<String>());
         property = *property_utf8;
+    
+        char *result = (char *) zframe_meta (zframe->self, (const char *)property);
+        info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
     }
-    char *result = (char *) zframe_meta (zframe->self, (const char *)property);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zframe::_dup) {
@@ -2485,9 +2533,10 @@ NAN_METHOD (Zframe::_streq) {
     else {
         Nan::Utf8String string_utf8 (info [0].As<String>());
         string = *string_utf8;
+    
+        bool result = zframe_streq (zframe->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Boolean>(result));
     }
-    bool result = zframe_streq (zframe->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zframe::_more) {
@@ -2545,9 +2594,10 @@ NAN_METHOD (Zframe::_set_group) {
     else {
         Nan::Utf8String group_utf8 (info [0].As<String>());
         group = *group_utf8;
+    
+        int result = zframe_set_group (zframe->self, (const char *)group);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zframe_set_group (zframe->self, (const char *)group);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zframe::_eq) {
@@ -2578,8 +2628,9 @@ NAN_METHOD (Zframe::_print) {
     else {
         Nan::Utf8String prefix_utf8 (info [0].As<String>());
         prefix = *prefix_utf8;
+    
+        zframe_print (zframe->self, (const char *)prefix);
     }
-    zframe_print (zframe->self, (const char *)prefix);
 }
 
 NAN_METHOD (Zframe::_test) {
@@ -2672,8 +2723,9 @@ NAN_METHOD (Zhash::_delete) {
     else {
         Nan::Utf8String key_utf8 (info [0].As<String>());
         key = *key_utf8;
+    
+        zhash_delete (zhash->self, (const char *)key);
     }
-    zhash_delete (zhash->self, (const char *)key);
 }
 
 NAN_METHOD (Zhash::_rename) {
@@ -2687,19 +2739,21 @@ NAN_METHOD (Zhash::_rename) {
     else {
         Nan::Utf8String old_key_utf8 (info [0].As<String>());
         old_key = *old_key_utf8;
+    
+        char *new_key;
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `new key`");
+        else
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`new key` must be a string");
+          else {
+            Nan::Utf8String new_key_utf8 (info [1].As<String>());
+            new_key = *new_key_utf8;
+          
+            int result = zhash_rename (zhash->self, (const char *)old_key, (const char *)new_key);
+            info.GetReturnValue ().Set (Nan::New<Number>(result));
+          }
     }
-    char *new_key;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `new key`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`new key` must be a string");
-    else {
-        Nan::Utf8String new_key_utf8 (info [1].As<String>());
-        new_key = *new_key_utf8;
-    }
-    int result = zhash_rename (zhash->self, (const char *)old_key, (const char *)new_key);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zhash::_size) {
@@ -2749,8 +2803,9 @@ NAN_METHOD (Zhash::_comment) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zhash_comment (zhash->self, "%s", format);
     }
-    zhash_comment (zhash->self, "%s", format);
 }
 
 NAN_METHOD (Zhash::_pack) {
@@ -2776,9 +2831,10 @@ NAN_METHOD (Zhash::_save) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+    
+        int result = zhash_save (zhash->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zhash_save (zhash->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zhash::_load) {
@@ -2792,9 +2848,10 @@ NAN_METHOD (Zhash::_load) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+        
+        int result = zhash_load (zhash->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zhash_load (zhash->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zhash::_refresh) {
@@ -2932,8 +2989,9 @@ NAN_METHOD (Zhashx::_comment) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zhashx_comment (zhashx->self, "%s", format);
     }
-    zhashx_comment (zhashx->self, "%s", format);
 }
 
 NAN_METHOD (Zhashx::_save) {
@@ -2947,9 +3005,10 @@ NAN_METHOD (Zhashx::_save) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+    
+        int result = zhashx_save (zhashx->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zhashx_save (zhashx->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zhashx::_load) {
@@ -2963,9 +3022,10 @@ NAN_METHOD (Zhashx::_load) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+    
+        int result = zhashx_load (zhashx->self, (const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zhashx_load (zhashx->self, (const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zhashx::_refresh) {
@@ -3707,9 +3767,10 @@ NAN_METHOD (Zmsg::_pushstr) {
     else {
         Nan::Utf8String string_utf8 (info [0].As<String>());
         string = *string_utf8;
+    
+        int result = zmsg_pushstr (zmsg->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zmsg_pushstr (zmsg->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zmsg::_addstr) {
@@ -3723,9 +3784,10 @@ NAN_METHOD (Zmsg::_addstr) {
     else {
         Nan::Utf8String string_utf8 (info [0].As<String>());
         string = *string_utf8;
+    
+        int result = zmsg_addstr (zmsg->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zmsg_addstr (zmsg->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zmsg::_pushstrf) {
@@ -3739,9 +3801,10 @@ NAN_METHOD (Zmsg::_pushstrf) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        int result = zmsg_pushstrf (zmsg->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zmsg_pushstrf (zmsg->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zmsg::_addstrf) {
@@ -3755,9 +3818,10 @@ NAN_METHOD (Zmsg::_addstrf) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        int result = zmsg_addstrf (zmsg->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zmsg_addstrf (zmsg->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zmsg::_popstr) {
@@ -4173,8 +4237,9 @@ NAN_METHOD (Zproc::_daemonize) {
     else {
         Nan::Utf8String workdir_utf8 (info [0].As<String>());
         workdir = *workdir_utf8;
+    
+        zproc_daemonize ((const char *)workdir);
     }
-    zproc_daemonize ((const char *)workdir);
 }
 
 NAN_METHOD (Zproc::_run_as) {
@@ -4187,28 +4252,30 @@ NAN_METHOD (Zproc::_run_as) {
     else {
         Nan::Utf8String lockfile_utf8 (info [0].As<String>());
         lockfile = *lockfile_utf8;
+    
+        char *group;
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `group`");
+        else
+          if (!info [1]->IsString ())
+            return Nan::ThrowTypeError ("`group` must be a string");
+          else {
+            Nan::Utf8String group_utf8 (info [1].As<String>());
+            group = *group_utf8;
+          
+            char *user;
+            if (info [2]->IsUndefined ())
+              return Nan::ThrowTypeError ("method requires a `user`");
+            else
+              if (!info [2]->IsString ())
+                return Nan::ThrowTypeError ("`user` must be a string");
+              else {
+                Nan::Utf8String user_utf8 (info [2].As<String>());
+                user = *user_utf8;
+              }
+            zproc_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
+          }
     }
-    char *group;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `group`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`group` must be a string");
-    else {
-        Nan::Utf8String group_utf8 (info [1].As<String>());
-        group = *group_utf8;
-    }
-    char *user;
-    if (info [2]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `user`");
-    else
-    if (!info [2]->IsString ())
-        return Nan::ThrowTypeError ("`user` must be a string");
-    else {
-        Nan::Utf8String user_utf8 (info [2].As<String>());
-        user = *user_utf8;
-    }
-    zproc_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
 }
 
 NAN_METHOD (Zproc::_set_io_threads) {
@@ -4241,8 +4308,9 @@ NAN_METHOD (Zproc::_set_biface) {
     else {
         Nan::Utf8String value_utf8 (info [0].As<String>());
         value = *value_utf8;
+    
+        zproc_set_biface ((const char *)value);
     }
-    zproc_set_biface ((const char *)value);
 }
 
 NAN_METHOD (Zproc::_biface) {
@@ -4260,8 +4328,9 @@ NAN_METHOD (Zproc::_set_log_ident) {
     else {
         Nan::Utf8String value_utf8 (info [0].As<String>());
         value = *value_utf8;
+    
+        zproc_set_log_ident ((const char *)value);
     }
-    zproc_set_log_ident ((const char *)value);
 }
 
 NAN_METHOD (Zproc::_set_log_sender) {
@@ -4274,8 +4343,9 @@ NAN_METHOD (Zproc::_set_log_sender) {
     else {
         Nan::Utf8String endpoint_utf8 (info [0].As<String>());
         endpoint = *endpoint_utf8;
+    
+        zproc_set_log_sender ((const char *)endpoint);
     }
-    zproc_set_log_sender ((const char *)endpoint);
 }
 
 NAN_METHOD (Zproc::_set_log_system) {
@@ -4300,8 +4370,9 @@ NAN_METHOD (Zproc::_log_error) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zproc_log_error ("%s", format);
     }
-    zproc_log_error ("%s", format);
 }
 
 NAN_METHOD (Zproc::_log_warning) {
@@ -4314,8 +4385,9 @@ NAN_METHOD (Zproc::_log_warning) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zproc_log_warning ("%s", format);
     }
-    zproc_log_warning ("%s", format);
 }
 
 NAN_METHOD (Zproc::_log_notice) {
@@ -4328,8 +4400,9 @@ NAN_METHOD (Zproc::_log_notice) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zproc_log_notice ("%s", format);
     }
-    zproc_log_notice ("%s", format);
 }
 
 NAN_METHOD (Zproc::_log_info) {
@@ -4342,8 +4415,10 @@ NAN_METHOD (Zproc::_log_info) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zproc_log_info ("%s", format);
     }
-    zproc_log_info ("%s", format);
+    
 }
 
 NAN_METHOD (Zproc::_log_debug) {
@@ -4356,8 +4431,9 @@ NAN_METHOD (Zproc::_log_debug) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zproc_log_debug ("%s", format);
     }
-    zproc_log_debug ("%s", format);
 }
 
 NAN_METHOD (Zproc::_test) {
@@ -4663,9 +4739,10 @@ NAN_METHOD (Zsock::_bind) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        int result = zsock_bind (zsock->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_bind (zsock->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_endpoint) {
@@ -4685,9 +4762,10 @@ NAN_METHOD (Zsock::_unbind) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        int result = zsock_unbind (zsock->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_unbind (zsock->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_connect) {
@@ -4701,9 +4779,10 @@ NAN_METHOD (Zsock::_connect) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        int result = zsock_connect (zsock->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_connect (zsock->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_disconnect) {
@@ -4717,9 +4796,10 @@ NAN_METHOD (Zsock::_disconnect) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        int result = zsock_disconnect (zsock->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_disconnect (zsock->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_attach) {
@@ -4733,17 +4813,18 @@ NAN_METHOD (Zsock::_attach) {
     else {
         Nan::Utf8String endpoints_utf8 (info [0].As<String>());
         endpoints = *endpoints_utf8;
+    
+        if (info [1]->IsUndefined ())
+          return Nan::ThrowTypeError ("method requires a `serverish`");
+        
+        bool serverish;
+        if (info [1]->IsBoolean ())
+          serverish = Nan::To<bool>(info [1]).FromJust ();
+        else
+          return Nan::ThrowTypeError ("`serverish` must be a Boolean");
+        int result = zsock_attach (zsock->self, (const char *)endpoints, (bool) serverish);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `serverish`");
-
-    bool serverish;
-    if (info [1]->IsBoolean ())
-        serverish = Nan::To<bool>(info [1]).FromJust ();
-    else
-        return Nan::ThrowTypeError ("`serverish` must be a Boolean");
-    int result = zsock_attach (zsock->self, (const char *)endpoints, (bool) serverish);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_type_str) {
@@ -4763,9 +4844,10 @@ NAN_METHOD (Zsock::_send) {
     else {
         Nan::Utf8String picture_utf8 (info [0].As<String>());
         picture = *picture_utf8;
+    
+        int result = zsock_send (zsock->self, (const char *)picture);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_send (zsock->self, (const char *)picture);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_recv) {
@@ -4779,9 +4861,9 @@ NAN_METHOD (Zsock::_recv) {
     else {
         Nan::Utf8String picture_utf8 (info [0].As<String>());
         picture = *picture_utf8;
+        int result = zsock_recv (zsock->self, (const char *)picture);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_recv (zsock->self, (const char *)picture);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_bsend) {
@@ -4795,9 +4877,9 @@ NAN_METHOD (Zsock::_bsend) {
     else {
         Nan::Utf8String picture_utf8 (info [0].As<String>());
         picture = *picture_utf8;
+        int result = zsock_bsend (zsock->self, (const char *)picture);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_bsend (zsock->self, (const char *)picture);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_brecv) {
@@ -4811,9 +4893,9 @@ NAN_METHOD (Zsock::_brecv) {
     else {
         Nan::Utf8String picture_utf8 (info [0].As<String>());
         picture = *picture_utf8;
+        int result = zsock_brecv (zsock->self, (const char *)picture);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_brecv (zsock->self, (const char *)picture);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_routing_id) {
@@ -4862,9 +4944,9 @@ NAN_METHOD (Zsock::_join) {
     else {
         Nan::Utf8String group_utf8 (info [0].As<String>());
         group = *group_utf8;
+        int result = zsock_join (zsock->self, (const char *)group);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_join (zsock->self, (const char *)group);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_leave) {
@@ -4878,9 +4960,9 @@ NAN_METHOD (Zsock::_leave) {
     else {
         Nan::Utf8String group_utf8 (info [0].As<String>());
         group = *group_utf8;
+        int result = zsock_leave (zsock->self, (const char *)group);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsock_leave (zsock->self, (const char *)group);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsock::_heartbeat_ivl) {
@@ -4983,8 +5065,8 @@ NAN_METHOD (Zsock::_set_xpub_welcome_msg) {
     else {
         Nan::Utf8String xpub_welcome_msg_utf8 (info [0].As<String>());
         xpub_welcome_msg = *xpub_welcome_msg_utf8;
+        zsock_set_xpub_welcome_msg (zsock->self, (const char *)xpub_welcome_msg);
     }
-    zsock_set_xpub_welcome_msg (zsock->self, (const char *)xpub_welcome_msg);
 }
 
 NAN_METHOD (Zsock::_set_stream_notify) {
@@ -5214,8 +5296,8 @@ NAN_METHOD (Zsock::_set_connect_rid) {
     else {
         Nan::Utf8String connect_rid_utf8 (info [0].As<String>());
         connect_rid = *connect_rid_utf8;
+        zsock_set_connect_rid (zsock->self, (const char *)connect_rid);
     }
-    zsock_set_connect_rid (zsock->self, (const char *)connect_rid);
 }
 
 NAN_METHOD (Zsock::_set_connect_rid_bin) {
@@ -5263,8 +5345,8 @@ NAN_METHOD (Zsock::_set_socks_proxy) {
     else {
         Nan::Utf8String socks_proxy_utf8 (info [0].As<String>());
         socks_proxy = *socks_proxy_utf8;
+        zsock_set_socks_proxy (zsock->self, (const char *)socks_proxy);
     }
-    zsock_set_socks_proxy (zsock->self, (const char *)socks_proxy);
 }
 
 NAN_METHOD (Zsock::_set_xpub_nodrop) {
@@ -5362,8 +5444,8 @@ NAN_METHOD (Zsock::_set_zap_domain) {
     else {
         Nan::Utf8String zap_domain_utf8 (info [0].As<String>());
         zap_domain = *zap_domain_utf8;
+        zsock_set_zap_domain (zsock->self, (const char *)zap_domain);
     }
-    zsock_set_zap_domain (zsock->self, (const char *)zap_domain);
 }
 
 NAN_METHOD (Zsock::_mechanism) {
@@ -5408,8 +5490,8 @@ NAN_METHOD (Zsock::_set_plain_username) {
     else {
         Nan::Utf8String plain_username_utf8 (info [0].As<String>());
         plain_username = *plain_username_utf8;
+        zsock_set_plain_username (zsock->self, (const char *)plain_username);
     }
-    zsock_set_plain_username (zsock->self, (const char *)plain_username);
 }
 
 NAN_METHOD (Zsock::_plain_password) {
@@ -5429,8 +5511,8 @@ NAN_METHOD (Zsock::_set_plain_password) {
     else {
         Nan::Utf8String plain_password_utf8 (info [0].As<String>());
         plain_password = *plain_password_utf8;
+        zsock_set_plain_password (zsock->self, (const char *)plain_password);
     }
-    zsock_set_plain_password (zsock->self, (const char *)plain_password);
 }
 
 NAN_METHOD (Zsock::_curve_server) {
@@ -5469,8 +5551,8 @@ NAN_METHOD (Zsock::_set_curve_publickey) {
     else {
         Nan::Utf8String curve_publickey_utf8 (info [0].As<String>());
         curve_publickey = *curve_publickey_utf8;
+        zsock_set_curve_publickey (zsock->self, (const char *)curve_publickey);
     }
-    zsock_set_curve_publickey (zsock->self, (const char *)curve_publickey);
 }
 
 NAN_METHOD (Zsock::_set_curve_publickey_bin) {
@@ -5499,8 +5581,8 @@ NAN_METHOD (Zsock::_set_curve_secretkey) {
     else {
         Nan::Utf8String curve_secretkey_utf8 (info [0].As<String>());
         curve_secretkey = *curve_secretkey_utf8;
+        zsock_set_curve_secretkey (zsock->self, (const char *)curve_secretkey);
     }
-    zsock_set_curve_secretkey (zsock->self, (const char *)curve_secretkey);
 }
 
 NAN_METHOD (Zsock::_set_curve_secretkey_bin) {
@@ -5529,8 +5611,8 @@ NAN_METHOD (Zsock::_set_curve_serverkey) {
     else {
         Nan::Utf8String curve_serverkey_utf8 (info [0].As<String>());
         curve_serverkey = *curve_serverkey_utf8;
+        zsock_set_curve_serverkey (zsock->self, (const char *)curve_serverkey);
     }
-    zsock_set_curve_serverkey (zsock->self, (const char *)curve_serverkey);
 }
 
 NAN_METHOD (Zsock::_set_curve_serverkey_bin) {
@@ -5597,8 +5679,8 @@ NAN_METHOD (Zsock::_set_gssapi_principal) {
     else {
         Nan::Utf8String gssapi_principal_utf8 (info [0].As<String>());
         gssapi_principal = *gssapi_principal_utf8;
+        zsock_set_gssapi_principal (zsock->self, (const char *)gssapi_principal);
     }
-    zsock_set_gssapi_principal (zsock->self, (const char *)gssapi_principal);
 }
 
 NAN_METHOD (Zsock::_gssapi_service_principal) {
@@ -5618,8 +5700,8 @@ NAN_METHOD (Zsock::_set_gssapi_service_principal) {
     else {
         Nan::Utf8String gssapi_service_principal_utf8 (info [0].As<String>());
         gssapi_service_principal = *gssapi_service_principal_utf8;
+        zsock_set_gssapi_service_principal (zsock->self, (const char *)gssapi_service_principal);
     }
-    zsock_set_gssapi_service_principal (zsock->self, (const char *)gssapi_service_principal);
 }
 
 NAN_METHOD (Zsock::_ipv6) {
@@ -5842,8 +5924,8 @@ NAN_METHOD (Zsock::_set_tcp_accept_filter) {
     else {
         Nan::Utf8String tcp_accept_filter_utf8 (info [0].As<String>());
         tcp_accept_filter = *tcp_accept_filter_utf8;
+        zsock_set_tcp_accept_filter (zsock->self, (const char *)tcp_accept_filter);
     }
-    zsock_set_tcp_accept_filter (zsock->self, (const char *)tcp_accept_filter);
 }
 
 NAN_METHOD (Zsock::_last_endpoint) {
@@ -5971,8 +6053,8 @@ NAN_METHOD (Zsock::_set_identity) {
     else {
         Nan::Utf8String identity_utf8 (info [0].As<String>());
         identity = *identity_utf8;
+        zsock_set_identity (zsock->self, (const char *)identity);
     }
-    zsock_set_identity (zsock->self, (const char *)identity);
 }
 
 NAN_METHOD (Zsock::_rate) {
@@ -6214,8 +6296,8 @@ NAN_METHOD (Zsock::_set_subscribe) {
     else {
         Nan::Utf8String subscribe_utf8 (info [0].As<String>());
         subscribe = *subscribe_utf8;
+        zsock_set_subscribe (zsock->self, (const char *)subscribe);
     }
-    zsock_set_subscribe (zsock->self, (const char *)subscribe);
 }
 
 NAN_METHOD (Zsock::_set_unsubscribe) {
@@ -6229,8 +6311,8 @@ NAN_METHOD (Zsock::_set_unsubscribe) {
     else {
         Nan::Utf8String unsubscribe_utf8 (info [0].As<String>());
         unsubscribe = *unsubscribe_utf8;
+        zsock_set_unsubscribe (zsock->self, (const char *)unsubscribe);
     }
-    zsock_set_unsubscribe (zsock->self, (const char *)unsubscribe);
 }
 
 NAN_METHOD (Zsock::_type) {
@@ -6329,9 +6411,9 @@ NAN_METHOD (Zstr::_recvx) {
     else {
         Nan::Utf8String string_p_utf8 (info [1].As<String>());
         string_p = *string_p_utf8;
+        int result = zstr_recvx (source->self, (char **)&string_p);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_recvx (source->self, (char **)&string_p);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_recv_compress) {
@@ -6340,20 +6422,19 @@ NAN_METHOD (Zstr::_recv_compress) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
-NAN_METHOD (Zstr::_send) {
+NAN_METHOD (Zstr::_send){
     Zsock *dest = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
     char *string;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `string`");
-    else
-    if (!info [1]->IsString ())
+    else  if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
     else {
         Nan::Utf8String string_utf8 (info [1].As<String>());
         string = *string_utf8;
+        int result = zstr_send (dest->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_send (dest->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_sendm) {
@@ -6367,9 +6448,9 @@ NAN_METHOD (Zstr::_sendm) {
     else {
         Nan::Utf8String string_utf8 (info [1].As<String>());
         string = *string_utf8;
+        int result = zstr_sendm (dest->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_sendm (dest->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_sendf) {
@@ -6383,9 +6464,10 @@ NAN_METHOD (Zstr::_sendf) {
     else {
         Nan::Utf8String format_utf8 (info [1].As<String>());
         format = *format_utf8;
+    
+        int result = zstr_sendf (dest->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_sendf (dest->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_sendfm) {
@@ -6399,9 +6481,9 @@ NAN_METHOD (Zstr::_sendfm) {
     else {
         Nan::Utf8String format_utf8 (info [1].As<String>());
         format = *format_utf8;
+        int result = zstr_sendfm (dest->self, "%s", format);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_sendfm (dest->self, "%s", format);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_sendx) {
@@ -6415,9 +6497,9 @@ NAN_METHOD (Zstr::_sendx) {
     else {
         Nan::Utf8String string_utf8 (info [1].As<String>());
         string = *string_utf8;
+        int result = zstr_sendx (dest->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_sendx (dest->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_send_compress) {
@@ -6431,9 +6513,9 @@ NAN_METHOD (Zstr::_send_compress) {
     else {
         Nan::Utf8String string_utf8 (info [1].As<String>());
         string = *string_utf8;
+        int result = zstr_send_compress (dest->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_send_compress (dest->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_sendm_compress) {
@@ -6447,9 +6529,9 @@ NAN_METHOD (Zstr::_sendm_compress) {
     else {
         Nan::Utf8String string_utf8 (info [1].As<String>());
         string = *string_utf8;
+        int result = zstr_sendm_compress (dest->self, (const char *)string);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zstr_sendm_compress (dest->self, (const char *)string);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zstr::_str) {
@@ -6468,8 +6550,8 @@ NAN_METHOD (Zstr::_free) {
     else {
         Nan::Utf8String string_p_utf8 (info [0].As<String>());
         string_p = *string_p_utf8;
+        zstr_free ((char **)&string_p);
     }
-    zstr_free ((char **)&string_p);
 }
 
 NAN_METHOD (Zstr::_test) {
@@ -6622,9 +6704,9 @@ NAN_METHOD (Zsys::_file_exists) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+        bool result = zsys_file_exists ((const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Boolean>(result));
     }
-    bool result = zsys_file_exists ((const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zsys::_file_modified) {
@@ -6637,9 +6719,9 @@ NAN_METHOD (Zsys::_file_modified) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+        time_t result = zsys_file_modified ((const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    time_t result = zsys_file_modified ((const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsys::_file_mode) {
@@ -6652,9 +6734,9 @@ NAN_METHOD (Zsys::_file_mode) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+        int result = zsys_file_mode ((const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsys_file_mode ((const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsys::_file_delete) {
@@ -6667,9 +6749,9 @@ NAN_METHOD (Zsys::_file_delete) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+        int result = zsys_file_delete ((const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsys_file_delete ((const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsys::_file_stable) {
@@ -6682,9 +6764,9 @@ NAN_METHOD (Zsys::_file_stable) {
     else {
         Nan::Utf8String filename_utf8 (info [0].As<String>());
         filename = *filename_utf8;
+        bool result = zsys_file_stable ((const char *)filename);
+        info.GetReturnValue ().Set (Nan::New<Boolean>(result));
     }
-    bool result = zsys_file_stable ((const char *)filename);
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zsys::_dir_create) {
@@ -6697,9 +6779,9 @@ NAN_METHOD (Zsys::_dir_create) {
     else {
         Nan::Utf8String pathname_utf8 (info [0].As<String>());
         pathname = *pathname_utf8;
+        int result = zsys_dir_create ((const char *)pathname);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsys_dir_create ((const char *)pathname);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsys::_dir_delete) {
@@ -6712,9 +6794,9 @@ NAN_METHOD (Zsys::_dir_delete) {
     else {
         Nan::Utf8String pathname_utf8 (info [0].As<String>());
         pathname = *pathname_utf8;
+        int result = zsys_dir_delete ((const char *)pathname);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsys_dir_delete ((const char *)pathname);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsys::_dir_change) {
@@ -6727,9 +6809,9 @@ NAN_METHOD (Zsys::_dir_change) {
     else {
         Nan::Utf8String pathname_utf8 (info [0].As<String>());
         pathname = *pathname_utf8;
+        int result = zsys_dir_change ((const char *)pathname);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsys_dir_change ((const char *)pathname);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zsys::_file_mode_private) {
@@ -6744,7 +6826,7 @@ NAN_METHOD (Zsys::_version) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `major`");
 
-    int * major;
+    int major;
     if (info [0]->IsNumber ())
         major = Nan::To<int>(info [0]).FromJust ();
     else
@@ -6752,7 +6834,7 @@ NAN_METHOD (Zsys::_version) {
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `minor`");
 
-    int * minor;
+    int minor;
     if (info [1]->IsNumber ())
         minor = Nan::To<int>(info [1]).FromJust ();
     else
@@ -6760,7 +6842,7 @@ NAN_METHOD (Zsys::_version) {
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `patch`");
 
-    int * patch;
+    int patch;
     if (info [2]->IsNumber ())
         patch = Nan::To<int>(info [2]).FromJust ();
     else
@@ -6778,9 +6860,9 @@ NAN_METHOD (Zsys::_sprintf) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+        char *result = (char *) zsys_sprintf ((const char *)format);
+        info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
     }
-    char *result = (char *) zsys_sprintf ((const char *)format);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zsys::_socket_error) {
@@ -6793,8 +6875,8 @@ NAN_METHOD (Zsys::_socket_error) {
     else {
         Nan::Utf8String reason_utf8 (info [0].As<String>());
         reason = *reason_utf8;
+        zsys_socket_error ((const char *)reason);
     }
-    zsys_socket_error ((const char *)reason);
 }
 
 NAN_METHOD (Zsys::_hostname) {
@@ -6812,44 +6894,64 @@ NAN_METHOD (Zsys::_daemonize) {
     else {
         Nan::Utf8String workdir_utf8 (info [0].As<String>());
         workdir = *workdir_utf8;
+        int result = zsys_daemonize ((const char *)workdir);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zsys_daemonize ((const char *)workdir);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
-NAN_METHOD (Zsys::_run_as) {
-    char *lockfile;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `lockfile`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`lockfile` must be a string");
-    else {
-        Nan::Utf8String lockfile_utf8 (info [0].As<String>());
-        lockfile = *lockfile_utf8;
-    }
+NAN_METHOD (Zsys::_run_as)
+{
+  char *lockfile;
+  if (info [0]->IsUndefined ())
+  {
+    return Nan::ThrowTypeError ("method requires a `lockfile`");
+  }
+  else if (!info [0]->IsString ())
+  {
+    return Nan::ThrowTypeError ("`lockfile` must be a string");
+    
+  }
+  else
+  {
+    Nan::Utf8String lockfile_utf8 (info [0].As<String>());
+    lockfile = *lockfile_utf8;
+      
     char *group;
     if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `group`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`group` must be a string");
-    else {
-        Nan::Utf8String group_utf8 (info [1].As<String>());
-        group = *group_utf8;
+    {
+      return Nan::ThrowTypeError ("method requires a `group`");
     }
-    char *user;
-    if (info [2]->IsUndefined ())
+    else  if (!info [1]->IsString ())
+    {
+      return Nan::ThrowTypeError ("`group` must be a string");
+    }
+    else
+    {
+      Nan::Utf8String group_utf8 (info [1].As<String>());
+      group = *group_utf8;
+        
+      char *user;
+      if (info [2]->IsUndefined ())
+      {
         return Nan::ThrowTypeError ("method requires a `user`");
-    else
-    if (!info [2]->IsString ())
-        return Nan::ThrowTypeError ("`user` must be a string");
-    else {
-        Nan::Utf8String user_utf8 (info [2].As<String>());
-        user = *user_utf8;
+      }
+      else
+      {
+        if (!info [2]->IsString ())
+        {
+          return Nan::ThrowTypeError ("`user` must be a string");
+        }
+        else
+        {
+          Nan::Utf8String user_utf8 (info [2].As<String>());
+          user = *user_utf8;
+            
+          int result = zsys_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
+          info.GetReturnValue ().Set (Nan::New<Number>(result));
+        }
+      }
     }
-    int result = zsys_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
+  }
 }
 
 NAN_METHOD (Zsys::_has_curve) {
@@ -7012,8 +7114,8 @@ NAN_METHOD (Zsys::_set_interface) {
     else {
         Nan::Utf8String value_utf8 (info [0].As<String>());
         value = *value_utf8;
+        zsys_set_interface ((const char *)value);
     }
-    zsys_set_interface ((const char *)value);
 }
 
 NAN_METHOD (Zsys::_interface) {
@@ -7031,8 +7133,8 @@ NAN_METHOD (Zsys::_set_ipv6_address) {
     else {
         Nan::Utf8String value_utf8 (info [0].As<String>());
         value = *value_utf8;
+        zsys_set_ipv6_address ((const char *)value);
     }
-    zsys_set_ipv6_address ((const char *)value);
 }
 
 NAN_METHOD (Zsys::_ipv6_address) {
@@ -7050,8 +7152,8 @@ NAN_METHOD (Zsys::_set_ipv6_mcast_address) {
     else {
         Nan::Utf8String value_utf8 (info [0].As<String>());
         value = *value_utf8;
+        zsys_set_ipv6_mcast_address ((const char *)value);
     }
-    zsys_set_ipv6_mcast_address ((const char *)value);
 }
 
 NAN_METHOD (Zsys::_ipv6_mcast_address) {
@@ -7086,8 +7188,8 @@ NAN_METHOD (Zsys::_set_logident) {
     else {
         Nan::Utf8String value_utf8 (info [0].As<String>());
         value = *value_utf8;
+        zsys_set_logident ((const char *)value);
     }
-    zsys_set_logident ((const char *)value);
 }
 
 NAN_METHOD (Zsys::_set_logsender) {
@@ -7100,8 +7202,8 @@ NAN_METHOD (Zsys::_set_logsender) {
     else {
         Nan::Utf8String endpoint_utf8 (info [0].As<String>());
         endpoint = *endpoint_utf8;
+        zsys_set_logsender ((const char *)endpoint);
     }
-    zsys_set_logsender ((const char *)endpoint);
 }
 
 NAN_METHOD (Zsys::_set_logsystem) {
@@ -7126,8 +7228,8 @@ NAN_METHOD (Zsys::_error) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+        zsys_error ((const char *)format);
     }
-    zsys_error ((const char *)format);
 }
 
 NAN_METHOD (Zsys::_warning) {
@@ -7140,8 +7242,8 @@ NAN_METHOD (Zsys::_warning) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+        zsys_warning ((const char *)format);
     }
-    zsys_warning ((const char *)format);
 }
 
 NAN_METHOD (Zsys::_notice) {
@@ -7154,8 +7256,8 @@ NAN_METHOD (Zsys::_notice) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+        zsys_notice ((const char *)format);
     }
-    zsys_notice ((const char *)format);
 }
 
 NAN_METHOD (Zsys::_info) {
@@ -7168,8 +7270,8 @@ NAN_METHOD (Zsys::_info) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+        zsys_info ((const char *)format);
     }
-    zsys_info ((const char *)format);
 }
 
 NAN_METHOD (Zsys::_debug) {
@@ -7182,8 +7284,9 @@ NAN_METHOD (Zsys::_debug) {
     else {
         Nan::Utf8String format_utf8 (info [0].As<String>());
         format = *format_utf8;
+    
+        zsys_debug ((const char *)format);
     }
-    zsys_debug ((const char *)format);
 }
 
 NAN_METHOD (Zsys::_test) {
@@ -7384,11 +7487,12 @@ NAN_METHOD (Ztrie::New) {
         if (strlen (*delimiter_utf8) != 1)
             return Nan::ThrowTypeError ("`delimiter` must be a single character");
         delimiter = (*delimiter_utf8) [0];
-    }
-    Ztrie *ztrie = new Ztrie ((char) delimiter);
-    if (ztrie) {
-        ztrie->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
+    
+        Ztrie *ztrie = new Ztrie ((char) delimiter);
+        if (ztrie) {
+          ztrie->Wrap (info.This ());
+          info.GetReturnValue ().Set (info.This ());
+        }
     }
 }
 
@@ -7414,9 +7518,10 @@ NAN_METHOD (Ztrie::_remove_route) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
+    
+        int result = ztrie_remove_route (ztrie->self, (const char *)path);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = ztrie_remove_route (ztrie->self, (const char *)path);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Ztrie::_matches) {
@@ -7430,9 +7535,10 @@ NAN_METHOD (Ztrie::_matches) {
     else {
         Nan::Utf8String path_utf8 (info [0].As<String>());
         path = *path_utf8;
+    
+        bool result = ztrie_matches (ztrie->self, (const char *)path);
+        info.GetReturnValue ().Set (Nan::New<Boolean>(result));
     }
-    bool result = ztrie_matches (ztrie->self, (const char *)path);
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Ztrie::_hit_parameter_count) {
@@ -7561,9 +7667,11 @@ NAN_METHOD (Zuuid::_set_str) {
     else {
         Nan::Utf8String source_utf8 (info [0].As<String>());
         source = *source_utf8;
+
+    
+        int result = zuuid_set_str (zuuid->self, (const char *)source);
+        info.GetReturnValue ().Set (Nan::New<Number>(result));
     }
-    int result = zuuid_set_str (zuuid->self, (const char *)source);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zuuid::_data) {
