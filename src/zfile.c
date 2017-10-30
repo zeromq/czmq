@@ -44,6 +44,12 @@ struct _zfile_t {
     zdigest_t *digest;      //  File digest, if known
     char *curline;          //  Last read line, if any
     size_t linemax;         //  Size of allocated buffer
+    bool remove_on_destroy; //  Whenever delete file on destroy
+                            //  Typically for tempfiles
+    int fd;                 //  File descriptor - set up by zfile_tmp
+    bool close_fd;          //  XXX: for some reason self->fd == 0 in
+                            //  zdir and zdir_patch tests, this is a
+                            //  workaround for the problem
 
     //  Properties from files that exist on file system
     time_t modified;        //  Modification time
@@ -101,9 +107,48 @@ zfile_new (const char *path, const char *name)
     }
     self->handle = 0;
     zfile_restat (self);
+    self->fd = -1;
+    self->close_fd = false;
     return self;
 }
 
+//  --------------------------------------------------------------------------
+//  Constructor
+//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  deleted on destroy
+
+zfile_t *
+zfile_tmp (void)
+{
+    zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
+    assert (self);
+
+#if defined (__WINDOWS__)
+    zsys_info ("zfile_tmp is not yet implemented for Windows");
+    free (self);
+    return NULL;
+#else
+    char buffer [PATH_MAX];
+    strcpy (buffer, "/tmp/czmq_zfile.XXXXXX");
+    self->fd = mkstemp (buffer);
+    if (self->fd == -1)
+        return NULL;
+
+    self->handle = fdopen (self->fd, "w+");
+
+    if (!self->handle) {
+        close (self->fd);
+        self->fd = -1;
+        return NULL;
+    }
+    self->close_fd = true;
+    self->fullname = strdup (buffer);
+#endif
+
+    self->remove_on_destroy = true;
+    zfile_restat (self);
+    return self;
+}
 
 //  --------------------------------------------------------------------------
 //  Destroy a file item
@@ -115,8 +160,9 @@ zfile_destroy (zfile_t **self_p)
     if (*self_p) {
         zfile_t *self = *self_p;
         zdigest_destroy (&self->digest);
-        if (self->handle)
-            fclose (self->handle);
+        if (self->remove_on_destroy)
+            zfile_remove (self);
+        zfile_close (self);
         freen (self->fullname);
         freen (self->curline);
         freen (self->link);
@@ -506,6 +552,8 @@ zfile_close (zfile_t *self)
         zfile_restat (self);
         self->eof = false;
     }
+    if (self->close_fd)
+        close (self->fd);
 }
 
 
@@ -829,6 +877,23 @@ zfile_test (bool verbose)
     zfile_remove (file);
     zfile_close (file);
     zfile_destroy (&file);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+#   if ! defined(__WINDOWS__)
+    zfile_t *tempfile = zfile_tmp ();
+    assert (tempfile);
+    assert (zfile_filename (tempfile, NULL));
+    assert (zsys_file_exists (zfile_filename (tempfile, NULL)));
+    zchunk_t *tchunk = zchunk_new ("HELLO", 6);
+    assert (zfile_write (tempfile, tchunk, 0) == 0);
+    zchunk_destroy (&tchunk);
+
+    char *filename = strdup (zfile_filename (tempfile, NULL));
+    zfile_destroy (&tempfile);
+    assert (!zsys_file_exists (filename));
+    zstr_free (&filename);
+#   endif // ! defined(__WINDOWS__)
+#endif // CZMQ_BUILD_DRAFT_API
 
 #if defined (__WINDOWS__)
     zsys_shutdown();

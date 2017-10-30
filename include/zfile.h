@@ -144,6 +144,14 @@ CZMQ_EXPORT const char *
 CZMQ_EXPORT void
     zfile_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  deleted on destroy
+CZMQ_EXPORT zfile_t *
+    zfile_tmp (void);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 

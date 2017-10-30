@@ -94,6 +94,13 @@ CZMQ_PRIVATE zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
 //  *** Draft method, defined for internal use only ***
+//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  deleted on destroy
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zfile_t *
+    zfile_tmp (void);
+
+//  *** Draft method, defined for internal use only ***
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
 //  Else returns zero.
 CZMQ_PRIVATE uint32_t
