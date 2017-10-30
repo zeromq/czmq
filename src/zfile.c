@@ -124,39 +124,22 @@ zfile_tmp (void)
     assert (self);
     self->remove_on_destroy = true;
 
-    // I know tmpnam is considered insecure, however I did not find a way
-    // how to get fullname from FILE *, or fd, which would be
-    // portable. If someone knows the way, feel free to rewrite it.
-    // ... on non Windows platforms there is O_CREAT | O_EXCL for open,
-    // which prevents the temp file name attacks
-    char name [L_tmpnam];
-    char *r = tmpnam (name);
-    if (!r) {
-        free (self);
+    char buffer [PATH_MAX];
+    strcpy (buffer, "/tmp/czmq_zfile.XXXXXX");
+    self->fd = mkstemp (buffer);
+    if (self->fd == -1)
         return NULL;
-    }
-    self->fullname = strdup (name);
-#if defined __WINDOWS__
-    //some Windows expert should review and improve :)
-    self->handle = fopen (self->fullname, "wb+");
-#else
-    self->fd = open (self->fullname, O_WRONLY | O_CREAT | O_EXCL);
-    self->close_fd = true;
-    if (self->fd < 0) {
-        free (self->fullname);
-        free (self);
-        return NULL;
-    }
-    self->handle = fdopen (self->fd, "w");
-#endif
+
+    self->handle = fdopen (self->fd, "w+");
+
     if (!self->handle) {
-        if (self->close_fd)
-            close (self->fd);
-        free (self->fullname);
-        free (self);
+        close (self->fd);
+        self->fd = -1;
         return NULL;
     }
 
+    self->close_fd = true;
+    self->fullname = strdup (buffer);
     zfile_restat (self);
     return self;
 }
