@@ -123,6 +123,8 @@ zfile_tmp (void)
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
     assert (self);
 
+#if defined (__WINDOWS__)
+#else
     char buffer [PATH_MAX];
     strcpy (buffer, "/tmp/czmq_zfile.XXXXXX");
     self->fd = mkstemp (buffer);
@@ -136,10 +138,11 @@ zfile_tmp (void)
         self->fd = -1;
         return NULL;
     }
-
-    self->remove_on_destroy = true;
     self->close_fd = true;
     self->fullname = strdup (buffer);
+#endif
+
+    self->remove_on_destroy = true;
     zfile_restat (self);
     return self;
 }
