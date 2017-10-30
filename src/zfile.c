@@ -122,7 +122,6 @@ zfile_tmp (void)
 {
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
     assert (self);
-    self->remove_on_destroy = true;
 
     char buffer [PATH_MAX];
     strcpy (buffer, "/tmp/czmq_zfile.XXXXXX");
@@ -138,6 +137,7 @@ zfile_tmp (void)
         return NULL;
     }
 
+    self->remove_on_destroy = true;
     self->close_fd = true;
     self->fullname = strdup (buffer);
     zfile_restat (self);
