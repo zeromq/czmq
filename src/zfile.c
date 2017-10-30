@@ -124,6 +124,9 @@ zfile_tmp (void)
     assert (self);
 
 #if defined (__WINDOWS__)
+    zsys_info ("zfile_tmp is not yet implemented for Windows");
+    free (self);
+    return NULL;
 #else
     char buffer [PATH_MAX];
     strcpy (buffer, "/tmp/czmq_zfile.XXXXXX");
@@ -876,6 +879,7 @@ zfile_test (bool verbose)
     zfile_destroy (&file);
 
 #ifdef CZMQ_BUILD_DRAFT_API
+#   if ! defined(__WINDOWS__)
     zfile_t *tempfile = zfile_tmp ();
     assert (tempfile);
     assert (zfile_filename (tempfile, NULL));
@@ -888,6 +892,7 @@ zfile_test (bool verbose)
     zfile_destroy (&tempfile);
     assert (!zsys_file_exists (filename));
     zstr_free (&filename);
+#   endif // ! defined(__WINDOWS__)
 #endif // CZMQ_BUILD_DRAFT_API
 
 #if defined (__WINDOWS__)
