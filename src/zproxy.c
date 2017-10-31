@@ -484,23 +484,6 @@ zproxy_test (bool verbose)
         printf ("\n");
 
     //  @selftest
-
-    const char *SELFTEST_DIR_RW = "src/selftest-rw";
-
-    const char *testbasedir  = ".test_zproxy";
-    const char *testpassfile = "password-file";
-    const char *testcertfile = "mycert.txt";
-    char *basedirpath = NULL;   // subdir in a test, under SELFTEST_DIR_RW
-    char *passfilepath = NULL;  // pathname to testfile in a test, in dirpath
-    char *certfilepath = NULL;  // pathname to testfile in a test, in dirpath
-
-    basedirpath = zsys_sprintf ("%s/%s", SELFTEST_DIR_RW, testbasedir);
-    assert (basedirpath);
-    passfilepath = zsys_sprintf ("%s/%s", basedirpath, testpassfile);
-    assert (passfilepath);
-    certfilepath = zsys_sprintf ("%s/%s", basedirpath, testcertfile);
-    assert (certfilepath);
-
     //  Create and configure our proxy
     zactor_t *proxy = zactor_new (zproxy, NULL);
     assert (proxy);
@@ -600,6 +583,9 @@ zproxy_test (bool verbose)
 
 #if (ZMQ_VERSION_MAJOR == 4)
     // Test authentication functionality
+    const char *basedirpath = "src/selftest-rw/.test_zproxy";
+    const char *passfilepath = "src/selftest-rw/.test_zproxy/password-file";
+    const char *certfilepath = "src/selftest-rw/.test_zproxy/mycert.txt";
 
     // Make sure old aborted tests do not hinder us
     zdir_t *dir = zdir_new (basedirpath, NULL);
@@ -796,10 +782,6 @@ zproxy_test (bool verbose)
     zsys_file_delete (certfilepath);
     zsys_dir_delete (basedirpath);
 #endif
-
-    zstr_free (&passfilepath);
-    zstr_free (&certfilepath);
-    zstr_free (&basedirpath);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
