@@ -120,31 +120,54 @@ zfile_new (const char *path, const char *name)
 zfile_t *
 zfile_tmp (void)
 {
-    zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
-    assert (self);
+    zfile_t *self = NULL;
 
 #if defined (__WINDOWS__)
-    zsys_info ("zfile_tmp is not yet implemented for Windows");
-    free (self);
-    return NULL;
+    // adapted from MSDN: https://msdn.microsoft.com/en-us/library/windows/desktop/aa363875(v=vs.85).aspx
+    DWORD dwRetVal = 0;
+    UINT uRetVal   = 0;
+    TCHAR lpTempPathBuffer[MAX_PATH];
+    TCHAR szTempFileName[MAX_PATH];
+
+    //  Gets the temp path env string (no guarantee it's a valid path).
+    dwRetVal = GetTempPath(MAX_PATH,          // length of the buffer
+                           lpTempPathBuffer); // buffer for path
+    if (dwRetVal > MAX_PATH || (dwRetVal == 0))
+        return NULL;
+
+    uRetVal = GetTempFileName(lpTempPathBuffer,   // directory for tmp files
+                              TEXT("CZMQ_ZFILE"), // temp file name prefix
+                              0,                  // create unique name
+                              szTempFileName);    // buffer for name
+    if (uRetVal == 0)
+        return NULL;
+
+    self = (zfile_t *) zmalloc (sizeof (zfile_t));
+    assert (self);
+    self->fullname = strdup (szTempFileName);
+    self->handle = fopen (self->fullname, "w");
 #else
     char buffer [PATH_MAX];
     strcpy (buffer, "/tmp/czmq_zfile.XXXXXX");
-    self->fd = mkstemp (buffer);
-    if (self->fd == -1)
+    int fd = mkstemp (buffer);
+    if (fd == -1)
         return NULL;
 
-    self->handle = fdopen (self->fd, "w+");
-
-    if (!self->handle) {
-        close (self->fd);
-        self->fd = -1;
-        return NULL;
-    }
+    self = (zfile_t *) zmalloc (sizeof (zfile_t));
+    assert (self);
+    self->fd = fd;
     self->close_fd = true;
     self->fullname = strdup (buffer);
+    self->handle = fdopen (self->fd, "w");
 #endif
 
+    if (!self->handle) {
+        if (self->close_fd)
+            close (self->fd);
+        zstr_free (&self->fullname);
+        free (self);
+        return NULL;
+    }
     self->remove_on_destroy = true;
     zfile_restat (self);
     return self;
@@ -879,7 +902,6 @@ zfile_test (bool verbose)
     zfile_destroy (&file);
 
 #ifdef CZMQ_BUILD_DRAFT_API
-#   if ! defined(__WINDOWS__)
     zfile_t *tempfile = zfile_tmp ();
     assert (tempfile);
     assert (zfile_filename (tempfile, NULL));
@@ -892,7 +914,6 @@ zfile_test (bool verbose)
     zfile_destroy (&tempfile);
     assert (!zsys_file_exists (filename));
     zstr_free (&filename);
-#   endif // ! defined(__WINDOWS__)
 #endif // CZMQ_BUILD_DRAFT_API
 
 #if defined (__WINDOWS__)
