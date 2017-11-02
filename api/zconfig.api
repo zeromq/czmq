@@ -189,7 +189,7 @@
         <argument name = "file" type = "FILE" />
     </method>
 
-    <method name = "print" state = "draft">
+    <method name = "print">
         Print properties of object
     </method>
 
