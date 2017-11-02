@@ -153,6 +153,10 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT bool
     zconfig_has_changed (zconfig_t *self);
 
+//  Destroy subtree (child)
+CZMQ_EXPORT void
+    zconfig_remove (zconfig_t *self);
+
 //  Print the config file to open stream
 CZMQ_EXPORT void
     zconfig_fprint (zconfig_t *self, FILE *file);

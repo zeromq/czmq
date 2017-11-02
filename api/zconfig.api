@@ -180,6 +180,10 @@
         <return type = "boolean" />
     </method>
 
+    <method name = "remove">
+        Destroy subtree (child)
+    </method>
+
     <method name = "fprint">
         Print the config file to open stream
         <argument name = "file" type = "FILE" />
