@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 //
 typedef int (zconfig_fct) (
     zconfig_t *self, void *arg, int level);
@@ -165,6 +167,13 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zconfig_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Destroy subtree (child)
+CZMQ_EXPORT void
+    zconfig_remove (zconfig_t *self);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 //  Self test of this class

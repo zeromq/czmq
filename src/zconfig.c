@@ -127,6 +127,8 @@ zconfig_destroy (zconfig_t **self_p)
         zconfig_destroy (&self->child);
         zconfig_destroy (&self->next);
 
+        
+
         //  Destroy other properties and then self
         zlist_destroy (&self->comments);
         zfile_destroy (&self->file);
@@ -137,6 +139,19 @@ zconfig_destroy (zconfig_t **self_p)
     }
 }
 
+
+//  --------------------------------------------------------------------------
+//  Destroy subtree (child)
+
+void
+zconfig_remove (zconfig_t *self)
+{
+    assert (self);
+
+    //  Destroy all children and siblings recursively
+    zconfig_destroy (&self->child);
+    self->child = NULL;
+}
 
 //  --------------------------------------------------------------------------
 //  Return name of config item
@@ -1040,6 +1055,49 @@ zconfig_test (bool verbose)
 
     zconfig_destroy (&root);
     zchunk_destroy (&chunk);
+
+    //  Test subtree removal
+	{
+		zconfig_t *root = zconfig_str_load (
+			"context\n"
+			"    iothreads = 1\n"
+			"    verbose = 1      #   Ask for a trace\n"
+			"main\n"
+			"    type = zqueue    #  ZMQ_DEVICE type\n"
+			"    frontend\n"
+			"        option\n"
+			"            hwm = 1000\n"
+			"            swap = 25000000     #  25MB\n"
+			"        bind = 'inproc://addr1'\n"
+			"        bind = 'ipc://addr2'\n"
+			"    backend\n"
+			"        bind = inproc://addr3\n"
+		);
+
+        zconfig_t *to_delete = zconfig_locate (root, "main/frontend");
+        assert (to_delete);
+
+        zconfig_remove (to_delete);
+
+        char *value = zconfig_get (root, "/main/type", NULL);
+        assert (value);
+        assert (streq (value, "zqueue"));
+
+        value = zconfig_get (root, "/main/backend/bind", NULL);
+        assert (value);
+        assert (streq (value, "inproc://addr3"));
+
+        value = zconfig_get (root, "/main/frontend", NULL);
+        assert (value);
+
+        value = zconfig_get (root, "/main/frontend/option", NULL);
+        assert (value == NULL);
+
+        value = zconfig_get (root, "/main/frontend/option/swap", NULL);
+        assert (value == NULL);
+
+        zconfig_destroy (&root);
+	}
 
     // Test str_load
     zconfig_t *config = zconfig_str_load (
