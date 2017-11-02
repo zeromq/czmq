@@ -155,17 +155,13 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT bool
     zconfig_has_changed (zconfig_t *self);
 
-#ifdef CZMQ_BUILD_DRAFT_API
-//  *** Draft method, for development use, may change without warning ***
-//  Destroy subtree (child)
-CZMQ_EXPORT void
-    zconfig_remove (zconfig_t *self);
-
-#endif // CZMQ_BUILD_DRAFT_API
-
 //  Print the config file to open stream
 CZMQ_EXPORT void
     zconfig_fprint (zconfig_t *self, FILE *file);
+
+//  Print properties of object
+CZMQ_EXPORT void
+    zconfig_print (zconfig_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT void
@@ -176,10 +172,6 @@ CZMQ_EXPORT void
 //  Destroy subtree (child)
 CZMQ_EXPORT void
     zconfig_remove (zconfig_t *self);
-
-//  Print properties of object
-CZMQ_EXPORT void
-    zconfig_print (zconfig_t *self);
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
