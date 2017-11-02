@@ -94,9 +94,9 @@ CZMQ_PRIVATE zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
 //  *** Draft method, defined for internal use only ***
-//  Print properties of object
+//  Destroy subtree (child)
 CZMQ_PRIVATE void
-    zconfig_print (zconfig_t *self);
+    zconfig_remove (zconfig_t *self);
 
 //  *** Draft method, defined for internal use only ***
 //  Create new temporary file for writing via tmpfile. File is automaticaly
