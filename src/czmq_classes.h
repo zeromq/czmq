@@ -97,6 +97,9 @@ CZMQ_PRIVATE zlistx_t *
 //  Destroy subtree (child)
 CZMQ_PRIVATE void
     zconfig_remove (zconfig_t *self);
+//  Print properties of object
+CZMQ_PRIVATE void
+    zconfig_print (zconfig_t *self);
 
 //  *** Draft method, defined for internal use only ***
 //  Create new temporary file for writing via tmpfile. File is automaticaly
