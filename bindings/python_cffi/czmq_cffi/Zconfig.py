@@ -178,6 +178,12 @@ class Zconfig(object):
         """
         return libczmq.zconfig_has_changed(self._p)
 
+    def remove(self):
+        """
+        Destroy subtree (child)
+        """
+        return libczmq.zconfig_remove(self._p)
+
     def fprint(self, file):
         """
         Print the config file to open stream

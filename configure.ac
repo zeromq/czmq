@@ -52,6 +52,9 @@ AC_PROG_SED
 AC_PROG_AWK
 PKG_PROG_PKG_CONFIG
 
+# Check endianess of the system
+AC_C_BIGENDIAN
+
 # Optional project-local hook (acinclude.m4, add AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [whatever]) )
 AX_PROJECT_LOCAL_HOOK
 

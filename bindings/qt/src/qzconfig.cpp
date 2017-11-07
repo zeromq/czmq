@@ -246,6 +246,14 @@ bool QZconfig::hasChanged ()
 }
 
 ///
+//  Destroy subtree (child)
+void QZconfig::remove ()
+{
+    zconfig_remove (self);
+
+}
+
+///
 //  Print the config file to open stream
 void QZconfig::fprint (FILE *file)
 {

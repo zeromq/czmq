@@ -283,6 +283,7 @@ memcheck: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_bui
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
 		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/czmq_selftest
 	$(MAKE) check-empty-selftest-rw
 
@@ -290,17 +291,20 @@ memcheck-verbose: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
 		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/czmq_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
 # Run the selftest binary under valgrind to check for performance leaks
 callcheck: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/czmq_selftest
 	$(MAKE) check-empty-selftest-rw
 
 callcheck-verbose: src/czmq_selftest $(abs_top_builddir)/$(SELFTEST_DIR_RW) $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/czmq_selftest -v
 	$(MAKE) check-empty-selftest-rw
 

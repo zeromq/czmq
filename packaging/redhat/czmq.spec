@@ -104,9 +104,9 @@ This package contains development files for czmq: the high-level c binding for 0
 
 %if %{with python_cffi}
 %package -n python2-czmq-cffi
-Group:  Python
-Summary:    Python CFFI bindings for czmq
-Requires:  python = %{py2_ver}
+Group: Python
+Summary: Python CFFI bindings for czmq
+Requires: python = %{py2_ver}
 
 %description -n python2-czmq-cffi
 This package contains Python CFFI bindings for czmq
@@ -116,9 +116,9 @@ This package contains Python CFFI bindings for czmq
 %{_libdir}/python%{py2_ver}/site-packages/czmq_cffi-*-py%{py2_ver}.egg-info/
 
 %package -n python3-czmq-cffi
-Group:  Python
-Summary:    Python 3 CFFI bindings for czmq
-Requires:  python3 = %{py3_ver}
+Group: Python
+Summary: Python 3 CFFI bindings for czmq
+Requires: python = %{py3_ver}
 
 %description -n python3-czmq-cffi
 This package contains Python 3 CFFI bindings for czmq

@@ -99,6 +99,9 @@ public slots:
     //  file has changed in since the tree was loaded.
     bool hasChanged ();
 
+    //  Destroy subtree (child)
+    void remove ();
+
     //  Print the config file to open stream
     void fprint (FILE *file);
 

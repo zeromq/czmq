@@ -1211,6 +1211,7 @@ NAN_MODULE_INIT (Zconfig::Init) {
     Nan::SetPrototypeMethod (tpl, "strLoad", _str_load);
     Nan::SetPrototypeMethod (tpl, "strSave", _str_save);
     Nan::SetPrototypeMethod (tpl, "hasChanged", _has_changed);
+    Nan::SetPrototypeMethod (tpl, "remove", _remove);
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
@@ -1571,6 +1572,11 @@ NAN_METHOD (Zconfig::_has_changed) {
     Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
     bool result = zconfig_has_changed (zconfig->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zconfig::_remove) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zconfig_remove (zconfig->self);
 }
 
 NAN_METHOD (Zconfig::_print) {
