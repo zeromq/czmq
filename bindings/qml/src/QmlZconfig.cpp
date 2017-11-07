@@ -155,6 +155,12 @@ bool QmlZconfig::hasChanged () {
 };
 
 ///
+//  Destroy subtree (child)
+void QmlZconfig::remove () {
+    zconfig_remove (self);
+};
+
+///
 //  Print the config file to open stream
 void QmlZconfig::fprint (FILE *file) {
     zconfig_fprint (self, file);

@@ -23,6 +23,13 @@ Java_org_zeromq_czmq_Zfile__1_1new (JNIEnv *env, jclass c, jstring path, jstring
     return new_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zfile__1_1tmp (JNIEnv *env, jclass c)
+{
+    jlong tmp_ = (jlong) (intptr_t) zfile_tmp ();
+    return tmp_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zfile__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {

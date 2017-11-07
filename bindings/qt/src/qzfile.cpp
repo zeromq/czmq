@@ -27,6 +27,14 @@ QZfile::QZfile (const QString &path, const QString &name, QObject *qObjParent) :
 }
 
 ///
+//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  deleted on destroy
+QZfile* QZfile::tmp (QObject *qObjParent)
+{
+    return new QZfile (zfile_tmp (), qObjParent);
+}
+
+///
 //  Destroy a file item
 QZfile::~QZfile ()
 {
