@@ -3,6 +3,23 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 try:
+    from . import native
+    lib = native.lib
+    ffi = native.ffi
+except ImportError:
+    from . import dlopen
+    lib = dlopen.lib
+    ffi = dlopen.ffi
+
+def rebind (_lib, _ffi):
+    """Rebind Lib and CompiledFFi objects for given package. Lib object MUST expose all functions
+       required by the classes. This is default for zproject based projects"""
+    global lib
+    global ffi
+    lib = _lib
+    ffi = _ffi
+
+try:
     text_type = unicode  # Python 2
     binary_type = str
 except NameError:
