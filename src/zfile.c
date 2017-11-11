@@ -144,7 +144,7 @@ zfile_tmp (void)
 
     self = (zfile_t *) zmalloc (sizeof (zfile_t));
     assert (self);
-    self->fullname = strdup (szTempFileName);
+    self->fullname = strdup ((char*)szTempFileName);
     self->handle = fopen (self->fullname, "w");
 #else
     char buffer [PATH_MAX];
