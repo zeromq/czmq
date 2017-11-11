@@ -23,9 +23,6 @@ be easily combined with others in one function call.
 
 See ML thread about topic https://groups.google.com/forum/#!topic/python-cffi/JtAKU-g9Exg
 
-The solution is to include all the definitions of dependant modules, so we will have an access
-to underlying functions directly from top level module. It is a sort of static linking, but
-the only way to ensure the cffi bindings will work accross multiple C libraries. And this is the
-reason you need to have a checkout at the same level as the project.
-
-The advantage is there are no python dependencies between modules.
+This is the reason the Lib and CompiledFFi objects are referenced from utils module and dynamically
+accessed on each call. Calling `lower.utils.rebind (higher.utils.lib, higher.utils.ffi)' you can
+change instance used by lower module and enforce all Python classes will use single instance.
