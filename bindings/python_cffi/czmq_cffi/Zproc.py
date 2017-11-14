@@ -31,13 +31,13 @@ class Zproc(object):
         Setup the command line arguments, the first item must be an (absolute) filename
         to run.
         """
-        return utils.lib.zproc_set_args(self._p, args._p)
+        utils.lib.zproc_set_args(self._p, args._p)
 
     def set_env(self, args):
         """
         Setup the environment variables for the process.
         """
-        return utils.lib.zproc_set_env(self._p, args._p)
+        utils.lib.zproc_set_env(self._p, args._p)
 
     def set_stdin(self, socket):
         """
@@ -45,7 +45,7 @@ class Zproc(object):
         socket argument is NULL, zproc creates own managed pair of inproc
         sockets.  The writable one is then accessbile via zproc_stdin method.
         """
-        return utils.lib.zproc_set_stdin(self._p, socket._p)
+        utils.lib.zproc_set_stdin(self._p, socket._p)
 
     def set_stdout(self, socket):
         """
@@ -53,7 +53,7 @@ class Zproc(object):
         socket argument is NULL, zproc creates own managed pair of inproc
         sockets.  The readable one is then accessbile via zproc_stdout method.
         """
-        return utils.lib.zproc_set_stdout(self._p, socket._p)
+        utils.lib.zproc_set_stdout(self._p, socket._p)
 
     def set_stderr(self, socket):
         """
@@ -61,7 +61,7 @@ class Zproc(object):
         socket argument is NULL, zproc creates own managed pair of inproc
         sockets.  The readable one is then accessbile via zproc_stderr method.
         """
-        return utils.lib.zproc_set_stderr(self._p, socket._p)
+        utils.lib.zproc_set_stderr(self._p, socket._p)
 
     def stdin(self):
         """
@@ -124,13 +124,13 @@ class Zproc(object):
         """
         send a signal to the subprocess
         """
-        return utils.lib.zproc_kill(self._p, signal)
+        utils.lib.zproc_kill(self._p, signal)
 
     def set_verbose(self, verbose):
         """
         set verbose mode
         """
-        return utils.lib.zproc_set_verbose(self._p, verbose)
+        utils.lib.zproc_set_verbose(self._p, verbose)
 
     def czmq_version():
         """
@@ -169,7 +169,7 @@ class Zproc(object):
         ignore SIGHUP. On Windows, does nothing. Returns 0 if OK, -1 if there
         was an error.
         """
-        return utils.lib.zproc_daemonize(utils.to_bytes(workdir))
+        utils.lib.zproc_daemonize(utils.to_bytes(workdir))
 
     def run_as(lockfile, group, user):
         """
@@ -180,7 +180,7 @@ class Zproc(object):
         after, not before that method, or the lockfile will hold the wrong
         process ID.
         """
-        return utils.lib.zproc_run_as(utils.to_bytes(lockfile), utils.to_bytes(group), utils.to_bytes(user))
+        utils.lib.zproc_run_as(utils.to_bytes(lockfile), utils.to_bytes(group), utils.to_bytes(user))
 
     def set_io_threads(io_threads):
         """
@@ -190,7 +190,7 @@ class Zproc(object):
         variable ZSYS_IO_THREADS is defined, that provides the default.
         Note that this method is valid only before any socket is created.
         """
-        return utils.lib.zproc_set_io_threads(io_threads)
+        utils.lib.zproc_set_io_threads(io_threads)
 
     def set_max_sockets(max_sockets):
         """
@@ -199,7 +199,7 @@ class Zproc(object):
         by using zsys_socket_limit (). A value of zero means "maximum".
         Note that this method is valid only before any socket is created.
         """
-        return utils.lib.zproc_set_max_sockets(max_sockets)
+        utils.lib.zproc_set_max_sockets(max_sockets)
 
     def set_biface(value):
         """
@@ -210,7 +210,7 @@ class Zproc(object):
         variable ZSYS_INTERFACE is set, use that as the default interface name.
         Setting the interface to "*" means "use all available interfaces".
         """
-        return utils.lib.zproc_set_biface(utils.to_bytes(value))
+        utils.lib.zproc_set_biface(utils.to_bytes(value))
 
     def biface():
         """
@@ -224,7 +224,7 @@ class Zproc(object):
         by this process. The log identity defaults to the environment variable
         ZSYS_LOGIDENT, if that is set.
         """
-        return utils.lib.zproc_set_log_ident(utils.to_bytes(value))
+        utils.lib.zproc_set_log_ident(utils.to_bytes(value))
 
     def set_log_sender(endpoint):
         """
@@ -236,50 +236,50 @@ class Zproc(object):
         bind the same sender to multiple endpoints. To disable the sender, call
         this method with a null argument.
         """
-        return utils.lib.zproc_set_log_sender(utils.to_bytes(endpoint))
+        utils.lib.zproc_set_log_sender(utils.to_bytes(endpoint))
 
     def set_log_system(logsystem):
         """
         Enable or disable logging to the system facility (syslog on POSIX boxes,
         event log on Windows). By default this is disabled.
         """
-        return utils.lib.zproc_set_log_system(logsystem)
+        utils.lib.zproc_set_log_system(logsystem)
 
     def log_error(format, ):
         """
         Log error condition - highest priority
         """
-        return utils.lib.zproc_log_error(format, )
+        utils.lib.zproc_log_error(format, )
 
     def log_warning(format, ):
         """
         Log warning condition - high priority
         """
-        return utils.lib.zproc_log_warning(format, )
+        utils.lib.zproc_log_warning(format, )
 
     def log_notice(format, ):
         """
         Log normal, but significant, condition - normal priority
         """
-        return utils.lib.zproc_log_notice(format, )
+        utils.lib.zproc_log_notice(format, )
 
     def log_info(format, ):
         """
         Log informational message - low priority
         """
-        return utils.lib.zproc_log_info(format, )
+        utils.lib.zproc_log_info(format, )
 
     def log_debug(format, ):
         """
         Log debug-level message - lowest priority
         """
-        return utils.lib.zproc_log_debug(format, )
+        utils.lib.zproc_log_debug(format, )
 
     def test(verbose):
         """
         Self test of this class.
         """
-        return utils.lib.zproc_test(verbose)
+        utils.lib.zproc_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

@@ -229,12 +229,12 @@ $(abs_top_builddir)/$(SELFTEST_DIR_RW):
 	rm -rf "$@"
 	mkdir -p "$@"
 
+if USING_VPATH
 $(abs_top_builddir)/$(SELFTEST_DIR_RO): $(abs_top_srcdir)/$(SELFTEST_DIR_RO)
-	@if test "$@" != "$<" ; then \
-		echo "    COPYDIR  $(SELFTEST_DIR_RO)"; \
-		rm -rf "$@"; \
-		cp -r "$<" "$@" ; \
-		fi
+	echo "   COPYDIR  $(SELFTEST_DIR_RO)"; \
+	rm -rf "$@"; \
+	cp -r "$<" "$@"
+endif
 
 CLEANFILES += $(abs_top_builddir)/$(SELFTEST_DIR_RW)/*
 
