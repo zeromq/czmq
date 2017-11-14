@@ -39,6 +39,9 @@ AC_SUBST(PACKAGE_VERSION)
 LTVER="4:3:0"
 AC_SUBST(LTVER)
 
+# building in a subdirectory?
+AM_CONDITIONAL([USING_VPATH], [test "x${srcdir}" != "x."])
+
 # Capture c flags
 CZMQ_ORIG_CFLAGS="${CFLAGS:-none}"
 

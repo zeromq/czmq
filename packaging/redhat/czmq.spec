@@ -25,6 +25,11 @@
 %bcond_with python_cffi
 %if %{with python_cffi}
 %define py2_ver %(python2 -c "import sys; print ('%d.%d' % (sys.version_info.major, sys.version_info.minor))")
+%endif
+
+# build with python3_cffi support enabled
+%bcond_with python3_cffi
+%if %{with python3_cffi}
 %define py3_ver %(python3 -c "import sys; print ('%d.%d' % (sys.version_info.major, sys.version_info.minor))")
 %endif
 
@@ -54,6 +59,8 @@ BuildRequires:  liblz4-devel
 BuildRequires:  python-cffi
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
+%endif
+%if %{with python3_cffi}
 BuildRequires:  python3-devel
 BuildRequires:  python3-cffi
 BuildRequires:  python3-setuptools
@@ -114,7 +121,9 @@ This package contains Python CFFI bindings for czmq
 %files -n python2-czmq-cffi
 %{_libdir}/python%{py2_ver}/site-packages/czmq_cffi/
 %{_libdir}/python%{py2_ver}/site-packages/czmq_cffi-*-py%{py2_ver}.egg-info/
+%endif
 
+%if %{with python3_cffi}
 %package -n python3-czmq-cffi
 Group: Python
 Summary: Python 3 CFFI bindings for czmq
@@ -143,7 +152,6 @@ exit 1
 sh autogen.sh
 %{configure} --enable-drafts=%{DRAFTS} --with-uuid=yes --with-libsystemd=yes --with-liblz4=yes
 make %{_smp_mflags}
-
 %if %{with python_cffi}
 # Problem: we need pkg-config points to built and not yet installed copy of czmq
 # Solution: chicken-egg problem - let's make "fake" pkg-config file
@@ -153,6 +161,16 @@ sed -e "s@^libdir.*@libdir=`pwd`/src/.libs@" \
 cd bindings/python_cffi
 export PKG_CONFIG_PATH=`pwd`
 python2 setup.py build
+%endif
+
+%if %{with python3_cffi}
+# Problem: we need pkg-config points to built and not yet installed copy of czmq
+# Solution: chicken-egg problem - let's make "fake" pkg-config file
+sed -e "s@^libdir.*@libdir=`pwd`/src/.libs@" \
+    -e "s@^includedir.*@includedir=`pwd`/include@" \
+    src/libczmq.pc > bindings/python_cffi/libczmq.pc
+cd bindings/python_cffi
+export PKG_CONFIG_PATH=`pwd`
 python3 setup.py build
 %endif
 
@@ -167,9 +185,13 @@ find %{buildroot} -name '*.la' | xargs rm -f
 cd bindings/python_cffi
 export PKG_CONFIG_PATH=`pwd`
 python2 setup.py install --root=%{buildroot} --skip-build --prefix %{_prefix}
-python3 setup.py install --root=%{buildroot} --skip-build --prefix %{_prefix}
 %endif
 
+%if %{with python3_cffi}
+cd bindings/python_cffi
+export PKG_CONFIG_PATH=`pwd`
+python3 setup.py install --root=%{buildroot} --skip-build --prefix %{_prefix}
+%endif
 %files
 %defattr(-,root,root)
 %doc README.md

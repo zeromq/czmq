@@ -67,9 +67,14 @@ NAN_METHOD (Zargs::New) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `argc`");
 
+    //int argc; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int argc;
+
+
     if (info [0]->IsNumber ())
-        argc = Nan::To<int>(info [0]).FromJust ();
+    {
+          argc = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`argc` must be a number");
     char *argv;
@@ -78,10 +83,10 @@ NAN_METHOD (Zargs::New) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`argv` must be a string");
-    else {
-        Nan::Utf8String argv_utf8 (info [1].As<String>());
-        argv = *argv_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String argv_utf8 (info [1].As<String>());
+    argv = *argv_utf8;
+         //} //bjornw end
     Zargs *zargs = new Zargs ((int) argc, (char **)&argv);
     if (zargs) {
         zargs->Wrap (info.This ());
@@ -150,10 +155,10 @@ NAN_METHOD (Zargs::_param_lookup) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`keys` must be a string");
-    else {
-        Nan::Utf8String keys_utf8 (info [0].As<String>());
-        keys = *keys_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String keys_utf8 (info [0].As<String>());
+    keys = *keys_utf8;
+         //} //bjornw end
     char *result = (char *) zargs_param_lookup (zargs->self, (const char *)keys);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
@@ -166,10 +171,10 @@ NAN_METHOD (Zargs::_param_lookupx) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`keys` must be a string");
-    else {
-        Nan::Utf8String keys_utf8 (info [0].As<String>());
-        keys = *keys_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String keys_utf8 (info [0].As<String>());
+    keys = *keys_utf8;
+         //} //bjornw end
     char *result = (char *) zargs_param_lookupx (zargs->self, (const char *)keys);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
@@ -187,10 +192,10 @@ NAN_METHOD (Zargs::_param_empty) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`arg` must be a string");
-    else {
-        Nan::Utf8String arg_utf8 (info [0].As<String>());
-        arg = *arg_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String arg_utf8 (info [0].As<String>());
+    arg = *arg_utf8;
+         //} //bjornw end
     bool result = zargs_param_empty ((const char *)arg);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
@@ -204,9 +209,14 @@ NAN_METHOD (Zargs::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zargs_test ((bool) verbose);
@@ -300,10 +310,10 @@ NAN_METHOD (Zarmour::_decode) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`data` must be a string");
-    else {
-        Nan::Utf8String data_utf8 (info [0].As<String>());
-        data = *data_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String data_utf8 (info [0].As<String>());
+    data = *data_utf8;
+         //} //bjornw end
     zchunk_t *result = zarmour_decode (zarmour->self, (const char *)data);
     Zchunk *zchunk_result = new Zchunk (result);
     if (zchunk_result) {
@@ -331,9 +341,14 @@ NAN_METHOD (Zarmour::_set_mode) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `mode`");
 
+    //int mode; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int mode;
+
+
     if (info [0]->IsNumber ())
-        mode = Nan::To<int>(info [0]).FromJust ();
+    {
+          mode = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`mode` must be a number");
     zarmour_set_mode (zarmour->self, (int) mode);
@@ -350,9 +365,14 @@ NAN_METHOD (Zarmour::_set_pad) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `pad`");
 
+    //bool pad; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool pad;
+
+
     if (info [0]->IsBoolean ())
-        pad = Nan::To<bool>(info [0]).FromJust ();
+    {
+          pad = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`pad` must be a Boolean");
     zarmour_set_pad (zarmour->self, (bool) pad);
@@ -369,16 +389,20 @@ NAN_METHOD (Zarmour::_set_pad_char) {
     Zarmour *zarmour = Nan::ObjectWrap::Unwrap <Zarmour> (info.Holder ());
     char pad_char;
     if (info [0]->IsUndefined ())
+    {
         return Nan::ThrowTypeError ("method requires a `pad char`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`pad char` must be a string");
-    else {
-        Nan::Utf8String pad_char_utf8 (info [0].As<String>());
-        if (strlen (*pad_char_utf8) != 1)
-            return Nan::ThrowTypeError ("`pad char` must be a single character");
-        pad_char = (*pad_char_utf8) [0];
     }
+    else if (!info [0]->IsString ())
+    {
+        return Nan::ThrowTypeError ("`pad char` must be a string");
+    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String pad_char_utf8 (info [0].As<String>());
+
+    if (strlen (*pad_char_utf8) != 1)
+        return Nan::ThrowTypeError ("`pad char` must be a single character");
+    pad_char = (*pad_char_utf8) [0];
+    //} // bjornw end
     zarmour_set_pad_char (zarmour->self, (char) pad_char);
 }
 
@@ -393,9 +417,14 @@ NAN_METHOD (Zarmour::_set_line_breaks) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `line breaks`");
 
+    //bool line_breaks; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool line_breaks;
+
+
     if (info [0]->IsBoolean ())
-        line_breaks = Nan::To<bool>(info [0]).FromJust ();
+    {
+          line_breaks = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`line breaks` must be a Boolean");
     zarmour_set_line_breaks (zarmour->self, (bool) line_breaks);
@@ -427,9 +456,14 @@ NAN_METHOD (Zarmour::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zarmour_test ((bool) verbose);
@@ -537,20 +571,20 @@ NAN_METHOD (Zcert::_set_meta) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`name` must be a string");
-    else {
-        Nan::Utf8String name_utf8 (info [0].As<String>());
-        name = *name_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
+         //} //bjornw end
     char *format;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `format`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [1].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [1].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zcert_set_meta (zcert->self, (const char *)name, "%s", format);
 }
 
@@ -562,10 +596,10 @@ NAN_METHOD (Zcert::_unset_meta) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`name` must be a string");
-    else {
-        Nan::Utf8String name_utf8 (info [0].As<String>());
-        name = *name_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
+         //} //bjornw end
     zcert_unset_meta (zcert->self, (const char *)name);
 }
 
@@ -577,10 +611,10 @@ NAN_METHOD (Zcert::_meta) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`name` must be a string");
-    else {
-        Nan::Utf8String name_utf8 (info [0].As<String>());
-        name = *name_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
+         //} //bjornw end
     char *result = (char *) zcert_meta (zcert->self, (const char *)name);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
@@ -605,10 +639,10 @@ NAN_METHOD (Zcert::_save) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zcert_save (zcert->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -621,10 +655,10 @@ NAN_METHOD (Zcert::_save_public) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zcert_save_public (zcert->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -637,10 +671,10 @@ NAN_METHOD (Zcert::_save_secret) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zcert_save_secret (zcert->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -679,9 +713,14 @@ NAN_METHOD (Zcert::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zcert_test ((bool) verbose);
@@ -735,10 +774,10 @@ NAN_METHOD (Zcertstore::New) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`location` must be a string");
-    else {
-        Nan::Utf8String location_utf8 (info [0].As<String>());
-        location = *location_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String location_utf8 (info [0].As<String>());
+    location = *location_utf8;
+         //} //bjornw end
     Zcertstore *zcertstore = new Zcertstore ((const char *)location);
     if (zcertstore) {
         zcertstore->Wrap (info.This ());
@@ -765,10 +804,10 @@ NAN_METHOD (Zcertstore::_lookup) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`public key` must be a string");
-    else {
-        Nan::Utf8String public_key_utf8 (info [0].As<String>());
-        public_key = *public_key_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String public_key_utf8 (info [0].As<String>());
+    public_key = *public_key_utf8;
+         //} //bjornw end
     zcert_t *result = zcertstore_lookup (zcertstore->self, (const char *)public_key);
     Zcert *zcert_result = new Zcert (result);
     if (zcert_result) {
@@ -811,9 +850,14 @@ NAN_METHOD (Zcertstore::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zcertstore_test ((bool) verbose);
@@ -979,10 +1023,10 @@ NAN_METHOD (Zchunk::_slurp) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `maxsize`");
     else
@@ -1031,10 +1075,10 @@ NAN_METHOD (Zchunk::_streq) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [0].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [0].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     bool result = zchunk_streq (zchunk->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
@@ -1078,9 +1122,14 @@ NAN_METHOD (Zchunk::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zchunk_test ((bool) verbose);
@@ -1132,9 +1181,14 @@ NAN_METHOD (Zclock::_sleep) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `msecs`");
 
+    //int msecs; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int msecs;
+
+
     if (info [0]->IsNumber ())
-        msecs = Nan::To<int>(info [0]).FromJust ();
+    {
+          msecs = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`msecs` must be a number");
     zclock_sleep ((int) msecs);
@@ -1164,9 +1218,14 @@ NAN_METHOD (Zclock::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zclock_test ((bool) verbose);
@@ -1239,10 +1298,10 @@ NAN_METHOD (Zconfig::New) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`name` must be a string");
-    else {
-        Nan::Utf8String name_utf8 (info [0].As<String>());
-        name = *name_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
+         //} //bjornw end
     Zconfig *parent = Nan::ObjectWrap::Unwrap<Zconfig>(info [1].As<Object>());
     Zconfig *zconfig = new Zconfig ((const char *)name, parent->self);
     if (zconfig) {
@@ -1282,20 +1341,20 @@ NAN_METHOD (Zconfig::_put) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     char *value;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `value`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [1].As<String>());
-        value = *value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [1].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
     zconfig_put (zconfig->self, (const char *)path, (const char *)value);
 }
 
@@ -1307,20 +1366,20 @@ NAN_METHOD (Zconfig::_putf) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     char *format;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `format`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [1].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [1].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zconfig_putf (zconfig->self, (const char *)path, "%s", format);
 }
 
@@ -1332,20 +1391,20 @@ NAN_METHOD (Zconfig::_get) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     char *default_value;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `default value`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`default value` must be a string");
-    else {
-        Nan::Utf8String default_value_utf8 (info [1].As<String>());
-        default_value = *default_value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String default_value_utf8 (info [1].As<String>());
+    default_value = *default_value_utf8;
+         //} //bjornw end
     char *result = (char *) zconfig_get (zconfig->self, (const char *)path, (const char *)default_value);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
@@ -1358,10 +1417,10 @@ NAN_METHOD (Zconfig::_set_name) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`name` must be a string");
-    else {
-        Nan::Utf8String name_utf8 (info [0].As<String>());
-        name = *name_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
+         //} //bjornw end
     zconfig_set_name (zconfig->self, (const char *)name);
 }
 
@@ -1373,10 +1432,10 @@ NAN_METHOD (Zconfig::_set_value) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zconfig_set_value (zconfig->self, "%s", format);
 }
 
@@ -1412,10 +1471,10 @@ NAN_METHOD (Zconfig::_locate) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     zconfig_t *result = zconfig_locate (zconfig->self, (const char *)path);
     Zconfig *zconfig_result = new Zconfig (result);
     if (zconfig_result) {
@@ -1431,9 +1490,14 @@ NAN_METHOD (Zconfig::_at_depth) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `level`");
 
+    //int level; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int level;
+
+
     if (info [0]->IsNumber ())
-        level = Nan::To<int>(info [0]).FromJust ();
+    {
+          level = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`level` must be a number");
     zconfig_t *result = zconfig_at_depth (zconfig->self, (int) level);
@@ -1454,10 +1518,10 @@ NAN_METHOD (Zconfig::_set_comment) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zconfig_set_comment (zconfig->self, "%s", format);
 }
 
@@ -1481,10 +1545,10 @@ NAN_METHOD (Zconfig::_save) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zconfig_save (zconfig->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -1497,10 +1561,10 @@ NAN_METHOD (Zconfig::_savef) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zconfig_savef (zconfig->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -1548,10 +1612,10 @@ NAN_METHOD (Zconfig::_str_load) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [0].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [0].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     zconfig_t *result = zconfig_str_load ((const char *)string);
     Zconfig *zconfig_result = new Zconfig (result);
     if (zconfig_result) {
@@ -1588,9 +1652,14 @@ NAN_METHOD (Zconfig::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zconfig_test ((bool) verbose);
@@ -1687,9 +1756,14 @@ NAN_METHOD (Zdigest::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zdigest_test ((bool) verbose);
@@ -1748,20 +1822,20 @@ NAN_METHOD (Zdir::New) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     char *parent;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `parent`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`parent` must be a string");
-    else {
-        Nan::Utf8String parent_utf8 (info [1].As<String>());
-        parent = *parent_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String parent_utf8 (info [1].As<String>());
+    parent = *parent_utf8;
+         //} //bjornw end
     Zdir *zdir = new Zdir ((const char *)path, (const char *)parent);
     if (zdir) {
         zdir->Wrap (info.This ());
@@ -1821,9 +1895,14 @@ NAN_METHOD (Zdir::_remove) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `force`");
 
+    //bool force; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool force;
+
+
     if (info [0]->IsBoolean ())
-        force = Nan::To<bool>(info [0]).FromJust ();
+    {
+          force = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`force` must be a Boolean");
     zdir_remove (zdir->self, (bool) force);
@@ -1838,10 +1917,10 @@ NAN_METHOD (Zdir::_diff) {
     else
     if (!info [2]->IsString ())
         return Nan::ThrowTypeError ("`alias` must be a string");
-    else {
-        Nan::Utf8String alias_utf8 (info [2].As<String>());
-        alias = *alias_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String alias_utf8 (info [2].As<String>());
+    alias = *alias_utf8;
+         //} //bjornw end
     zlist_t *result = zdir_diff (older->self, newer->self, (const char *)alias);
     Zlist *zlist_result = new Zlist (result);
     if (zlist_result) {
@@ -1860,10 +1939,10 @@ NAN_METHOD (Zdir::_resync) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`alias` must be a string");
-    else {
-        Nan::Utf8String alias_utf8 (info [0].As<String>());
-        alias = *alias_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String alias_utf8 (info [0].As<String>());
+    alias = *alias_utf8;
+         //} //bjornw end
     zlist_t *result = zdir_resync (zdir->self, (const char *)alias);
     Zlist *zlist_result = new Zlist (result);
     if (zlist_result) {
@@ -1891,9 +1970,14 @@ NAN_METHOD (Zdir::_print) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `indent`");
 
+    //int indent; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int indent;
+
+
     if (info [0]->IsNumber ())
-        indent = Nan::To<int>(info [0]).FromJust ();
+    {
+          indent = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`indent` must be a number");
     zdir_print (zdir->self, (int) indent);
@@ -1903,9 +1987,14 @@ NAN_METHOD (Zdir::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zdir_test ((bool) verbose);
@@ -1961,17 +2050,22 @@ NAN_METHOD (ZdirPatch::New) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     Zfile *file = Nan::ObjectWrap::Unwrap<Zfile>(info [1].As<Object>());
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `op`");
 
+    //int op; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int op;
+
+
     if (info [2]->IsNumber ())
-        op = Nan::To<int>(info [2]).FromJust ();
+    {
+          op = Nan::To<int>(info [2]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`op` must be a number");
     char *alias;
@@ -1980,10 +2074,10 @@ NAN_METHOD (ZdirPatch::New) {
     else
     if (!info [3]->IsString ())
         return Nan::ThrowTypeError ("`alias` must be a string");
-    else {
-        Nan::Utf8String alias_utf8 (info [3].As<String>());
-        alias = *alias_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String alias_utf8 (info [3].As<String>());
+    alias = *alias_utf8;
+         //} //bjornw end
     ZdirPatch *zdir_patch = new ZdirPatch ((const char *)path, file->self, (int) op, (const char *)alias);
     if (zdir_patch) {
         zdir_patch->Wrap (info.This ());
@@ -2059,9 +2153,14 @@ NAN_METHOD (ZdirPatch::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zdir_patch_test ((bool) verbose);
@@ -2130,20 +2229,20 @@ NAN_METHOD (Zfile::New) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     char *name;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `name`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`name` must be a string");
-    else {
-        Nan::Utf8String name_utf8 (info [1].As<String>());
-        name = *name_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String name_utf8 (info [1].As<String>());
+    name = *name_utf8;
+         //} //bjornw end
     Zfile *zfile = new Zfile ((const char *)path, (const char *)name);
     if (zfile) {
         zfile->Wrap (info.This ());
@@ -2182,10 +2281,10 @@ NAN_METHOD (Zfile::_filename) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     char *result = (char *) zfile_filename (zfile->self, (const char *)path);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
@@ -2271,9 +2370,14 @@ NAN_METHOD (Zfile::_read) {
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `offset`");
 
-    off_t offset;
+    //off_t offset; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int64_t offset;
+
+
     if (info [1]->IsNumber ())
-        offset = Nan::To<int64_t>(info [1]).FromJust ();
+    {
+          offset = Nan::To<int64_t>(info [1]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`offset` must be a number");
     zchunk_t *result = zfile_read (zfile->self, (size_t) bytes, (off_t) offset);
@@ -2298,9 +2402,14 @@ NAN_METHOD (Zfile::_write) {
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `offset`");
 
-    off_t offset;
+    //off_t offset; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int64_t offset;
+
+
     if (info [1]->IsNumber ())
-        offset = Nan::To<int64_t>(info [1]).FromJust ();
+    {
+          offset = Nan::To<int64_t>(info [1]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`offset` must be a number");
     int result = zfile_write (zfile->self, chunk->self, (off_t) offset);
@@ -2328,9 +2437,14 @@ NAN_METHOD (Zfile::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zfile_test ((bool) verbose);
@@ -2419,9 +2533,14 @@ NAN_METHOD (Zframe::_send) {
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `flags`");
 
+    //int flags; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int flags;
+
+
     if (info [2]->IsNumber ())
-        flags = Nan::To<int>(info [2]).FromJust ();
+    {
+          flags = Nan::To<int>(info [2]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`flags` must be a number");
     int result = zframe_send (&self_p->self, dest->self, (int) flags);
@@ -2448,10 +2567,10 @@ NAN_METHOD (Zframe::_meta) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`property` must be a string");
-    else {
-        Nan::Utf8String property_utf8 (info [0].As<String>());
-        property = *property_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String property_utf8 (info [0].As<String>());
+    property = *property_utf8;
+         //} //bjornw end
     char *result = (char *) zframe_meta (zframe->self, (const char *)property);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
@@ -2488,10 +2607,10 @@ NAN_METHOD (Zframe::_streq) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [0].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [0].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     bool result = zframe_streq (zframe->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
@@ -2507,9 +2626,14 @@ NAN_METHOD (Zframe::_set_more) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `more`");
 
+    //int more; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int more;
+
+
     if (info [0]->IsNumber ())
-        more = Nan::To<int>(info [0]).FromJust ();
+    {
+          more = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`more` must be a number");
     zframe_set_more (zframe->self, (int) more);
@@ -2526,9 +2650,14 @@ NAN_METHOD (Zframe::_set_routing_id) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `routing id`");
 
+    //uint32_t routing_id; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     uint32_t routing_id;
+
+
     if (info [0]->IsNumber ())
-        routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    {
+          routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`routing id` must be a number");
     zframe_set_routing_id (zframe->self, (uint32_t) routing_id);
@@ -2548,10 +2677,10 @@ NAN_METHOD (Zframe::_set_group) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`group` must be a string");
-    else {
-        Nan::Utf8String group_utf8 (info [0].As<String>());
-        group = *group_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String group_utf8 (info [0].As<String>());
+    group = *group_utf8;
+         //} //bjornw end
     int result = zframe_set_group (zframe->self, (const char *)group);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -2581,10 +2710,10 @@ NAN_METHOD (Zframe::_print) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`prefix` must be a string");
-    else {
-        Nan::Utf8String prefix_utf8 (info [0].As<String>());
-        prefix = *prefix_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String prefix_utf8 (info [0].As<String>());
+    prefix = *prefix_utf8;
+         //} //bjornw end
     zframe_print (zframe->self, (const char *)prefix);
 }
 
@@ -2592,9 +2721,14 @@ NAN_METHOD (Zframe::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zframe_test ((bool) verbose);
@@ -2675,10 +2809,10 @@ NAN_METHOD (Zhash::_delete) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`key` must be a string");
-    else {
-        Nan::Utf8String key_utf8 (info [0].As<String>());
-        key = *key_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String key_utf8 (info [0].As<String>());
+    key = *key_utf8;
+         //} //bjornw end
     zhash_delete (zhash->self, (const char *)key);
 }
 
@@ -2690,20 +2824,20 @@ NAN_METHOD (Zhash::_rename) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`old key` must be a string");
-    else {
-        Nan::Utf8String old_key_utf8 (info [0].As<String>());
-        old_key = *old_key_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String old_key_utf8 (info [0].As<String>());
+    old_key = *old_key_utf8;
+         //} //bjornw end
     char *new_key;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `new key`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`new key` must be a string");
-    else {
-        Nan::Utf8String new_key_utf8 (info [1].As<String>());
-        new_key = *new_key_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String new_key_utf8 (info [1].As<String>());
+    new_key = *new_key_utf8;
+         //} //bjornw end
     int result = zhash_rename (zhash->self, (const char *)old_key, (const char *)new_key);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -2752,10 +2886,10 @@ NAN_METHOD (Zhash::_comment) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zhash_comment (zhash->self, "%s", format);
 }
 
@@ -2779,10 +2913,10 @@ NAN_METHOD (Zhash::_save) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zhash_save (zhash->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -2795,10 +2929,10 @@ NAN_METHOD (Zhash::_load) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zhash_load (zhash->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -2818,9 +2952,14 @@ NAN_METHOD (Zhash::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zhash_test ((bool) verbose);
@@ -2935,10 +3074,10 @@ NAN_METHOD (Zhashx::_comment) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zhashx_comment (zhashx->self, "%s", format);
 }
 
@@ -2950,10 +3089,10 @@ NAN_METHOD (Zhashx::_save) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zhashx_save (zhashx->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -2966,10 +3105,10 @@ NAN_METHOD (Zhashx::_load) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zhashx_load (zhashx->self, (const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -3020,9 +3159,14 @@ NAN_METHOD (Zhashx::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zhashx_test ((bool) verbose);
@@ -3166,9 +3310,14 @@ NAN_METHOD (Ziflist::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     ziflist_test ((bool) verbose);
@@ -3265,9 +3414,14 @@ NAN_METHOD (Zlist::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zlist_test ((bool) verbose);
@@ -3364,9 +3518,14 @@ NAN_METHOD (Zlistx::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zlistx_test ((bool) verbose);
@@ -3452,9 +3611,14 @@ NAN_METHOD (Zloop::_timer_end) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `timer id`");
 
+    //int timer_id; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int timer_id;
+
+
     if (info [0]->IsNumber ())
-        timer_id = Nan::To<int>(info [0]).FromJust ();
+    {
+          timer_id = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`timer id` must be a number");
     int result = zloop_timer_end (zloop->self, (int) timer_id);
@@ -3488,9 +3652,14 @@ NAN_METHOD (Zloop::_set_verbose) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zloop_set_verbose (zloop->self, (bool) verbose);
@@ -3501,9 +3670,14 @@ NAN_METHOD (Zloop::_set_nonstop) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `nonstop`");
 
+    //bool nonstop; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool nonstop;
+
+
     if (info [0]->IsBoolean ())
-        nonstop = Nan::To<bool>(info [0]).FromJust ();
+    {
+          nonstop = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`nonstop` must be a Boolean");
     zloop_set_nonstop (zloop->self, (bool) nonstop);
@@ -3519,9 +3693,14 @@ NAN_METHOD (Zloop::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zloop_test ((bool) verbose);
@@ -3646,9 +3825,14 @@ NAN_METHOD (Zmsg::_set_routing_id) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `routing id`");
 
+    //uint32_t routing_id; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     uint32_t routing_id;
+
+
     if (info [0]->IsNumber ())
-        routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    {
+          routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`routing id` must be a number");
     zmsg_set_routing_id (zmsg->self, (uint32_t) routing_id);
@@ -3710,10 +3894,10 @@ NAN_METHOD (Zmsg::_pushstr) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [0].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [0].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     int result = zmsg_pushstr (zmsg->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -3726,10 +3910,10 @@ NAN_METHOD (Zmsg::_addstr) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [0].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [0].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     int result = zmsg_addstr (zmsg->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -3742,10 +3926,10 @@ NAN_METHOD (Zmsg::_pushstrf) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zmsg_pushstrf (zmsg->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -3758,10 +3942,10 @@ NAN_METHOD (Zmsg::_addstrf) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zmsg_addstrf (zmsg->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -3879,9 +4063,14 @@ NAN_METHOD (Zmsg::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zmsg_test ((bool) verbose);
@@ -3959,9 +4148,14 @@ NAN_METHOD (Zpoller::_set_nonstop) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `nonstop`");
 
+    //bool nonstop; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool nonstop;
+
+
     if (info [0]->IsBoolean ())
-        nonstop = Nan::To<bool>(info [0]).FromJust ();
+    {
+          nonstop = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`nonstop` must be a Boolean");
     zpoller_set_nonstop (zpoller->self, (bool) nonstop);
@@ -3983,9 +4177,14 @@ NAN_METHOD (Zpoller::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zpoller_test ((bool) verbose);
@@ -4114,9 +4313,14 @@ NAN_METHOD (Zproc::_wait) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `hang`");
 
+    //bool hang; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool hang;
+
+
     if (info [0]->IsBoolean ())
-        hang = Nan::To<bool>(info [0]).FromJust ();
+    {
+          hang = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`hang` must be a Boolean");
     int result = zproc_wait (zproc->self, (bool) hang);
@@ -4128,9 +4332,14 @@ NAN_METHOD (Zproc::_kill) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `signal`");
 
+    //int signal; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int signal;
+
+
     if (info [0]->IsNumber ())
-        signal = Nan::To<int>(info [0]).FromJust ();
+    {
+          signal = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`signal` must be a number");
     zproc_kill (zproc->self, (int) signal);
@@ -4141,9 +4350,14 @@ NAN_METHOD (Zproc::_set_verbose) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zproc_set_verbose (zproc->self, (bool) verbose);
@@ -4176,10 +4390,10 @@ NAN_METHOD (Zproc::_daemonize) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`workdir` must be a string");
-    else {
-        Nan::Utf8String workdir_utf8 (info [0].As<String>());
-        workdir = *workdir_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String workdir_utf8 (info [0].As<String>());
+    workdir = *workdir_utf8;
+         //} //bjornw end
     zproc_daemonize ((const char *)workdir);
 }
 
@@ -4190,30 +4404,30 @@ NAN_METHOD (Zproc::_run_as) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`lockfile` must be a string");
-    else {
-        Nan::Utf8String lockfile_utf8 (info [0].As<String>());
-        lockfile = *lockfile_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String lockfile_utf8 (info [0].As<String>());
+    lockfile = *lockfile_utf8;
+         //} //bjornw end
     char *group;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `group`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`group` must be a string");
-    else {
-        Nan::Utf8String group_utf8 (info [1].As<String>());
-        group = *group_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String group_utf8 (info [1].As<String>());
+    group = *group_utf8;
+         //} //bjornw end
     char *user;
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `user`");
     else
     if (!info [2]->IsString ())
         return Nan::ThrowTypeError ("`user` must be a string");
-    else {
-        Nan::Utf8String user_utf8 (info [2].As<String>());
-        user = *user_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String user_utf8 (info [2].As<String>());
+    user = *user_utf8;
+         //} //bjornw end
     zproc_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
 }
 
@@ -4244,10 +4458,10 @@ NAN_METHOD (Zproc::_set_biface) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [0].As<String>());
-        value = *value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
     zproc_set_biface ((const char *)value);
 }
 
@@ -4263,10 +4477,10 @@ NAN_METHOD (Zproc::_set_log_ident) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [0].As<String>());
-        value = *value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
     zproc_set_log_ident ((const char *)value);
 }
 
@@ -4277,10 +4491,10 @@ NAN_METHOD (Zproc::_set_log_sender) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`endpoint` must be a string");
-    else {
-        Nan::Utf8String endpoint_utf8 (info [0].As<String>());
-        endpoint = *endpoint_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String endpoint_utf8 (info [0].As<String>());
+    endpoint = *endpoint_utf8;
+         //} //bjornw end
     zproc_set_log_sender ((const char *)endpoint);
 }
 
@@ -4288,9 +4502,14 @@ NAN_METHOD (Zproc::_set_log_system) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `logsystem`");
 
+    //bool logsystem; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool logsystem;
+
+
     if (info [0]->IsBoolean ())
-        logsystem = Nan::To<bool>(info [0]).FromJust ();
+    {
+          logsystem = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`logsystem` must be a Boolean");
     zproc_set_log_system ((bool) logsystem);
@@ -4303,10 +4522,10 @@ NAN_METHOD (Zproc::_log_error) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zproc_log_error ("%s", format);
 }
 
@@ -4317,10 +4536,10 @@ NAN_METHOD (Zproc::_log_warning) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zproc_log_warning ("%s", format);
 }
 
@@ -4331,10 +4550,10 @@ NAN_METHOD (Zproc::_log_notice) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zproc_log_notice ("%s", format);
 }
 
@@ -4345,10 +4564,10 @@ NAN_METHOD (Zproc::_log_info) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zproc_log_info ("%s", format);
 }
 
@@ -4359,10 +4578,10 @@ NAN_METHOD (Zproc::_log_debug) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zproc_log_debug ("%s", format);
 }
 
@@ -4370,9 +4589,14 @@ NAN_METHOD (Zproc::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zproc_test ((bool) verbose);
@@ -4573,9 +4797,12 @@ NAN_METHOD (Zsock::New) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `type`");
 
+    //int type; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int type;
+
     if (info [0]->IsString ()) {
         Nan::Utf8String type_utf8 (info [0].As<String>());
+            // bjornw: check if we need to remove scope here
         char *type_name = *type_utf8;
         for (char *type_ptr = type_name; *type_ptr; type_ptr++)
             *type_ptr = tolower (*type_ptr);
@@ -4636,8 +4863,11 @@ NAN_METHOD (Zsock::New) {
             return Nan::ThrowTypeError ("`type` not a valid string");
     }
     else
+
     if (info [0]->IsNumber ())
-        type = Nan::To<int>(info [0]).FromJust ();
+    {
+          type = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`type` must be a number or string");
     Zsock *zsock = new Zsock ((int) type);
@@ -4666,10 +4896,10 @@ NAN_METHOD (Zsock::_bind) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zsock_bind (zsock->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4688,10 +4918,10 @@ NAN_METHOD (Zsock::_unbind) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zsock_unbind (zsock->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4704,10 +4934,10 @@ NAN_METHOD (Zsock::_connect) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zsock_connect (zsock->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4720,10 +4950,10 @@ NAN_METHOD (Zsock::_disconnect) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zsock_disconnect (zsock->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4736,16 +4966,21 @@ NAN_METHOD (Zsock::_attach) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`endpoints` must be a string");
-    else {
-        Nan::Utf8String endpoints_utf8 (info [0].As<String>());
-        endpoints = *endpoints_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String endpoints_utf8 (info [0].As<String>());
+    endpoints = *endpoints_utf8;
+         //} //bjornw end
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `serverish`");
 
+    //bool serverish; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool serverish;
+
+
     if (info [1]->IsBoolean ())
-        serverish = Nan::To<bool>(info [1]).FromJust ();
+    {
+          serverish = Nan::To<bool>(info [1]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`serverish` must be a Boolean");
     int result = zsock_attach (zsock->self, (const char *)endpoints, (bool) serverish);
@@ -4766,10 +5001,10 @@ NAN_METHOD (Zsock::_send) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`picture` must be a string");
-    else {
-        Nan::Utf8String picture_utf8 (info [0].As<String>());
-        picture = *picture_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String picture_utf8 (info [0].As<String>());
+    picture = *picture_utf8;
+         //} //bjornw end
     int result = zsock_send (zsock->self, (const char *)picture);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4782,10 +5017,10 @@ NAN_METHOD (Zsock::_recv) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`picture` must be a string");
-    else {
-        Nan::Utf8String picture_utf8 (info [0].As<String>());
-        picture = *picture_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String picture_utf8 (info [0].As<String>());
+    picture = *picture_utf8;
+         //} //bjornw end
     int result = zsock_recv (zsock->self, (const char *)picture);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4798,10 +5033,10 @@ NAN_METHOD (Zsock::_bsend) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`picture` must be a string");
-    else {
-        Nan::Utf8String picture_utf8 (info [0].As<String>());
-        picture = *picture_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String picture_utf8 (info [0].As<String>());
+    picture = *picture_utf8;
+         //} //bjornw end
     int result = zsock_bsend (zsock->self, (const char *)picture);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4814,10 +5049,10 @@ NAN_METHOD (Zsock::_brecv) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`picture` must be a string");
-    else {
-        Nan::Utf8String picture_utf8 (info [0].As<String>());
-        picture = *picture_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String picture_utf8 (info [0].As<String>());
+    picture = *picture_utf8;
+         //} //bjornw end
     int result = zsock_brecv (zsock->self, (const char *)picture);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4833,9 +5068,14 @@ NAN_METHOD (Zsock::_set_routing_id) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `routing id`");
 
+    //uint32_t routing_id; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     uint32_t routing_id;
+
+
     if (info [0]->IsNumber ())
-        routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    {
+          routing_id = Nan::To<uint32_t>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`routing id` must be a number");
     zsock_set_routing_id (zsock->self, (uint32_t) routing_id);
@@ -4865,10 +5105,10 @@ NAN_METHOD (Zsock::_join) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`group` must be a string");
-    else {
-        Nan::Utf8String group_utf8 (info [0].As<String>());
-        group = *group_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String group_utf8 (info [0].As<String>());
+    group = *group_utf8;
+         //} //bjornw end
     int result = zsock_join (zsock->self, (const char *)group);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4881,10 +5121,10 @@ NAN_METHOD (Zsock::_leave) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`group` must be a string");
-    else {
-        Nan::Utf8String group_utf8 (info [0].As<String>());
-        group = *group_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String group_utf8 (info [0].As<String>());
+    group = *group_utf8;
+         //} //bjornw end
     int result = zsock_leave (zsock->self, (const char *)group);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -4900,9 +5140,14 @@ NAN_METHOD (Zsock::_set_heartbeat_ivl) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `heartbeat ivl`");
 
+    //int heartbeat_ivl; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int heartbeat_ivl;
+
+
     if (info [0]->IsNumber ())
-        heartbeat_ivl = Nan::To<int>(info [0]).FromJust ();
+    {
+          heartbeat_ivl = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`heartbeat ivl` must be a number");
     zsock_set_heartbeat_ivl (zsock->self, (int) heartbeat_ivl);
@@ -4919,9 +5164,14 @@ NAN_METHOD (Zsock::_set_heartbeat_ttl) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `heartbeat ttl`");
 
+    //int heartbeat_ttl; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int heartbeat_ttl;
+
+
     if (info [0]->IsNumber ())
-        heartbeat_ttl = Nan::To<int>(info [0]).FromJust ();
+    {
+          heartbeat_ttl = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`heartbeat ttl` must be a number");
     zsock_set_heartbeat_ttl (zsock->self, (int) heartbeat_ttl);
@@ -4938,9 +5188,14 @@ NAN_METHOD (Zsock::_set_heartbeat_timeout) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `heartbeat timeout`");
 
+    //int heartbeat_timeout; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int heartbeat_timeout;
+
+
     if (info [0]->IsNumber ())
-        heartbeat_timeout = Nan::To<int>(info [0]).FromJust ();
+    {
+          heartbeat_timeout = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`heartbeat timeout` must be a number");
     zsock_set_heartbeat_timeout (zsock->self, (int) heartbeat_timeout);
@@ -4957,9 +5212,14 @@ NAN_METHOD (Zsock::_set_use_fd) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `use fd`");
 
+    //int use_fd; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int use_fd;
+
+
     if (info [0]->IsNumber ())
-        use_fd = Nan::To<int>(info [0]).FromJust ();
+    {
+          use_fd = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`use fd` must be a number");
     zsock_set_use_fd (zsock->self, (int) use_fd);
@@ -4970,9 +5230,14 @@ NAN_METHOD (Zsock::_set_xpub_manual) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `xpub manual`");
 
+    //int xpub_manual; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int xpub_manual;
+
+
     if (info [0]->IsNumber ())
-        xpub_manual = Nan::To<int>(info [0]).FromJust ();
+    {
+          xpub_manual = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`xpub manual` must be a number");
     zsock_set_xpub_manual (zsock->self, (int) xpub_manual);
@@ -4986,10 +5251,10 @@ NAN_METHOD (Zsock::_set_xpub_welcome_msg) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`xpub welcome msg` must be a string");
-    else {
-        Nan::Utf8String xpub_welcome_msg_utf8 (info [0].As<String>());
-        xpub_welcome_msg = *xpub_welcome_msg_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String xpub_welcome_msg_utf8 (info [0].As<String>());
+    xpub_welcome_msg = *xpub_welcome_msg_utf8;
+         //} //bjornw end
     zsock_set_xpub_welcome_msg (zsock->self, (const char *)xpub_welcome_msg);
 }
 
@@ -4998,9 +5263,14 @@ NAN_METHOD (Zsock::_set_stream_notify) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `stream notify`");
 
+    //int stream_notify; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int stream_notify;
+
+
     if (info [0]->IsNumber ())
-        stream_notify = Nan::To<int>(info [0]).FromJust ();
+    {
+          stream_notify = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`stream notify` must be a number");
     zsock_set_stream_notify (zsock->self, (int) stream_notify);
@@ -5017,9 +5287,14 @@ NAN_METHOD (Zsock::_set_invert_matching) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `invert matching`");
 
+    //int invert_matching; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int invert_matching;
+
+
     if (info [0]->IsNumber ())
-        invert_matching = Nan::To<int>(info [0]).FromJust ();
+    {
+          invert_matching = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`invert matching` must be a number");
     zsock_set_invert_matching (zsock->self, (int) invert_matching);
@@ -5030,9 +5305,14 @@ NAN_METHOD (Zsock::_set_xpub_verboser) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `xpub verboser`");
 
+    //int xpub_verboser; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int xpub_verboser;
+
+
     if (info [0]->IsNumber ())
-        xpub_verboser = Nan::To<int>(info [0]).FromJust ();
+    {
+          xpub_verboser = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`xpub verboser` must be a number");
     zsock_set_xpub_verboser (zsock->self, (int) xpub_verboser);
@@ -5049,9 +5329,14 @@ NAN_METHOD (Zsock::_set_connect_timeout) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `connect timeout`");
 
+    //int connect_timeout; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int connect_timeout;
+
+
     if (info [0]->IsNumber ())
-        connect_timeout = Nan::To<int>(info [0]).FromJust ();
+    {
+          connect_timeout = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`connect timeout` must be a number");
     zsock_set_connect_timeout (zsock->self, (int) connect_timeout);
@@ -5068,9 +5353,14 @@ NAN_METHOD (Zsock::_set_tcp_maxrt) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `tcp maxrt`");
 
+    //int tcp_maxrt; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int tcp_maxrt;
+
+
     if (info [0]->IsNumber ())
-        tcp_maxrt = Nan::To<int>(info [0]).FromJust ();
+    {
+          tcp_maxrt = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`tcp maxrt` must be a number");
     zsock_set_tcp_maxrt (zsock->self, (int) tcp_maxrt);
@@ -5093,9 +5383,14 @@ NAN_METHOD (Zsock::_set_multicast_maxtpdu) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `multicast maxtpdu`");
 
+    //int multicast_maxtpdu; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int multicast_maxtpdu;
+
+
     if (info [0]->IsNumber ())
-        multicast_maxtpdu = Nan::To<int>(info [0]).FromJust ();
+    {
+          multicast_maxtpdu = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`multicast maxtpdu` must be a number");
     zsock_set_multicast_maxtpdu (zsock->self, (int) multicast_maxtpdu);
@@ -5112,9 +5407,14 @@ NAN_METHOD (Zsock::_set_vmci_buffer_size) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `vmci buffer size`");
 
+    //int vmci_buffer_size; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int vmci_buffer_size;
+
+
     if (info [0]->IsNumber ())
-        vmci_buffer_size = Nan::To<int>(info [0]).FromJust ();
+    {
+          vmci_buffer_size = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`vmci buffer size` must be a number");
     zsock_set_vmci_buffer_size (zsock->self, (int) vmci_buffer_size);
@@ -5131,9 +5431,14 @@ NAN_METHOD (Zsock::_set_vmci_buffer_min_size) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `vmci buffer min size`");
 
+    //int vmci_buffer_min_size; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int vmci_buffer_min_size;
+
+
     if (info [0]->IsNumber ())
-        vmci_buffer_min_size = Nan::To<int>(info [0]).FromJust ();
+    {
+          vmci_buffer_min_size = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`vmci buffer min size` must be a number");
     zsock_set_vmci_buffer_min_size (zsock->self, (int) vmci_buffer_min_size);
@@ -5150,9 +5455,14 @@ NAN_METHOD (Zsock::_set_vmci_buffer_max_size) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `vmci buffer max size`");
 
+    //int vmci_buffer_max_size; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int vmci_buffer_max_size;
+
+
     if (info [0]->IsNumber ())
-        vmci_buffer_max_size = Nan::To<int>(info [0]).FromJust ();
+    {
+          vmci_buffer_max_size = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`vmci buffer max size` must be a number");
     zsock_set_vmci_buffer_max_size (zsock->self, (int) vmci_buffer_max_size);
@@ -5169,9 +5479,14 @@ NAN_METHOD (Zsock::_set_vmci_connect_timeout) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `vmci connect timeout`");
 
+    //int vmci_connect_timeout; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int vmci_connect_timeout;
+
+
     if (info [0]->IsNumber ())
-        vmci_connect_timeout = Nan::To<int>(info [0]).FromJust ();
+    {
+          vmci_connect_timeout = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`vmci connect timeout` must be a number");
     zsock_set_vmci_connect_timeout (zsock->self, (int) vmci_connect_timeout);
@@ -5188,9 +5503,14 @@ NAN_METHOD (Zsock::_set_tos) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `tos`");
 
+    //int tos; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int tos;
+
+
     if (info [0]->IsNumber ())
-        tos = Nan::To<int>(info [0]).FromJust ();
+    {
+          tos = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`tos` must be a number");
     zsock_set_tos (zsock->self, (int) tos);
@@ -5201,9 +5521,14 @@ NAN_METHOD (Zsock::_set_router_handover) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `router handover`");
 
+    //int router_handover; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int router_handover;
+
+
     if (info [0]->IsNumber ())
-        router_handover = Nan::To<int>(info [0]).FromJust ();
+    {
+          router_handover = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`router handover` must be a number");
     zsock_set_router_handover (zsock->self, (int) router_handover);
@@ -5217,10 +5542,10 @@ NAN_METHOD (Zsock::_set_connect_rid) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`connect rid` must be a string");
-    else {
-        Nan::Utf8String connect_rid_utf8 (info [0].As<String>());
-        connect_rid = *connect_rid_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String connect_rid_utf8 (info [0].As<String>());
+    connect_rid = *connect_rid_utf8;
+         //} //bjornw end
     zsock_set_connect_rid (zsock->self, (const char *)connect_rid);
 }
 
@@ -5244,9 +5569,14 @@ NAN_METHOD (Zsock::_set_handshake_ivl) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `handshake ivl`");
 
+    //int handshake_ivl; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int handshake_ivl;
+
+
     if (info [0]->IsNumber ())
-        handshake_ivl = Nan::To<int>(info [0]).FromJust ();
+    {
+          handshake_ivl = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`handshake ivl` must be a number");
     zsock_set_handshake_ivl (zsock->self, (int) handshake_ivl);
@@ -5266,10 +5596,10 @@ NAN_METHOD (Zsock::_set_socks_proxy) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`socks proxy` must be a string");
-    else {
-        Nan::Utf8String socks_proxy_utf8 (info [0].As<String>());
-        socks_proxy = *socks_proxy_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String socks_proxy_utf8 (info [0].As<String>());
+    socks_proxy = *socks_proxy_utf8;
+         //} //bjornw end
     zsock_set_socks_proxy (zsock->self, (const char *)socks_proxy);
 }
 
@@ -5278,9 +5608,14 @@ NAN_METHOD (Zsock::_set_xpub_nodrop) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `xpub nodrop`");
 
+    //int xpub_nodrop; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int xpub_nodrop;
+
+
     if (info [0]->IsNumber ())
-        xpub_nodrop = Nan::To<int>(info [0]).FromJust ();
+    {
+          xpub_nodrop = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`xpub nodrop` must be a number");
     zsock_set_xpub_nodrop (zsock->self, (int) xpub_nodrop);
@@ -5291,9 +5626,14 @@ NAN_METHOD (Zsock::_set_router_mandatory) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `router mandatory`");
 
+    //int router_mandatory; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int router_mandatory;
+
+
     if (info [0]->IsNumber ())
-        router_mandatory = Nan::To<int>(info [0]).FromJust ();
+    {
+          router_mandatory = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`router mandatory` must be a number");
     zsock_set_router_mandatory (zsock->self, (int) router_mandatory);
@@ -5304,9 +5644,14 @@ NAN_METHOD (Zsock::_set_probe_router) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `probe router`");
 
+    //int probe_router; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int probe_router;
+
+
     if (info [0]->IsNumber ())
-        probe_router = Nan::To<int>(info [0]).FromJust ();
+    {
+          probe_router = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`probe router` must be a number");
     zsock_set_probe_router (zsock->self, (int) probe_router);
@@ -5317,9 +5662,14 @@ NAN_METHOD (Zsock::_set_req_relaxed) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `req relaxed`");
 
+    //int req_relaxed; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int req_relaxed;
+
+
     if (info [0]->IsNumber ())
-        req_relaxed = Nan::To<int>(info [0]).FromJust ();
+    {
+          req_relaxed = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`req relaxed` must be a number");
     zsock_set_req_relaxed (zsock->self, (int) req_relaxed);
@@ -5330,9 +5680,14 @@ NAN_METHOD (Zsock::_set_req_correlate) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `req correlate`");
 
+    //int req_correlate; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int req_correlate;
+
+
     if (info [0]->IsNumber ())
-        req_correlate = Nan::To<int>(info [0]).FromJust ();
+    {
+          req_correlate = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`req correlate` must be a number");
     zsock_set_req_correlate (zsock->self, (int) req_correlate);
@@ -5343,9 +5698,14 @@ NAN_METHOD (Zsock::_set_conflate) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `conflate`");
 
+    //int conflate; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int conflate;
+
+
     if (info [0]->IsNumber ())
-        conflate = Nan::To<int>(info [0]).FromJust ();
+    {
+          conflate = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`conflate` must be a number");
     zsock_set_conflate (zsock->self, (int) conflate);
@@ -5365,10 +5725,10 @@ NAN_METHOD (Zsock::_set_zap_domain) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`zap domain` must be a string");
-    else {
-        Nan::Utf8String zap_domain_utf8 (info [0].As<String>());
-        zap_domain = *zap_domain_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String zap_domain_utf8 (info [0].As<String>());
+    zap_domain = *zap_domain_utf8;
+         //} //bjornw end
     zsock_set_zap_domain (zsock->self, (const char *)zap_domain);
 }
 
@@ -5389,9 +5749,14 @@ NAN_METHOD (Zsock::_set_plain_server) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `plain server`");
 
+    //int plain_server; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int plain_server;
+
+
     if (info [0]->IsNumber ())
-        plain_server = Nan::To<int>(info [0]).FromJust ();
+    {
+          plain_server = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`plain server` must be a number");
     zsock_set_plain_server (zsock->self, (int) plain_server);
@@ -5411,10 +5776,10 @@ NAN_METHOD (Zsock::_set_plain_username) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`plain username` must be a string");
-    else {
-        Nan::Utf8String plain_username_utf8 (info [0].As<String>());
-        plain_username = *plain_username_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String plain_username_utf8 (info [0].As<String>());
+    plain_username = *plain_username_utf8;
+         //} //bjornw end
     zsock_set_plain_username (zsock->self, (const char *)plain_username);
 }
 
@@ -5432,10 +5797,10 @@ NAN_METHOD (Zsock::_set_plain_password) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`plain password` must be a string");
-    else {
-        Nan::Utf8String plain_password_utf8 (info [0].As<String>());
-        plain_password = *plain_password_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String plain_password_utf8 (info [0].As<String>());
+    plain_password = *plain_password_utf8;
+         //} //bjornw end
     zsock_set_plain_password (zsock->self, (const char *)plain_password);
 }
 
@@ -5450,9 +5815,14 @@ NAN_METHOD (Zsock::_set_curve_server) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `curve server`");
 
+    //int curve_server; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int curve_server;
+
+
     if (info [0]->IsNumber ())
-        curve_server = Nan::To<int>(info [0]).FromJust ();
+    {
+          curve_server = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`curve server` must be a number");
     zsock_set_curve_server (zsock->self, (int) curve_server);
@@ -5472,10 +5842,10 @@ NAN_METHOD (Zsock::_set_curve_publickey) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`curve publickey` must be a string");
-    else {
-        Nan::Utf8String curve_publickey_utf8 (info [0].As<String>());
-        curve_publickey = *curve_publickey_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String curve_publickey_utf8 (info [0].As<String>());
+    curve_publickey = *curve_publickey_utf8;
+         //} //bjornw end
     zsock_set_curve_publickey (zsock->self, (const char *)curve_publickey);
 }
 
@@ -5502,10 +5872,10 @@ NAN_METHOD (Zsock::_set_curve_secretkey) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`curve secretkey` must be a string");
-    else {
-        Nan::Utf8String curve_secretkey_utf8 (info [0].As<String>());
-        curve_secretkey = *curve_secretkey_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String curve_secretkey_utf8 (info [0].As<String>());
+    curve_secretkey = *curve_secretkey_utf8;
+         //} //bjornw end
     zsock_set_curve_secretkey (zsock->self, (const char *)curve_secretkey);
 }
 
@@ -5532,10 +5902,10 @@ NAN_METHOD (Zsock::_set_curve_serverkey) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`curve serverkey` must be a string");
-    else {
-        Nan::Utf8String curve_serverkey_utf8 (info [0].As<String>());
-        curve_serverkey = *curve_serverkey_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String curve_serverkey_utf8 (info [0].As<String>());
+    curve_serverkey = *curve_serverkey_utf8;
+         //} //bjornw end
     zsock_set_curve_serverkey (zsock->self, (const char *)curve_serverkey);
 }
 
@@ -5559,9 +5929,14 @@ NAN_METHOD (Zsock::_set_gssapi_server) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `gssapi server`");
 
+    //int gssapi_server; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int gssapi_server;
+
+
     if (info [0]->IsNumber ())
-        gssapi_server = Nan::To<int>(info [0]).FromJust ();
+    {
+          gssapi_server = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`gssapi server` must be a number");
     zsock_set_gssapi_server (zsock->self, (int) gssapi_server);
@@ -5578,9 +5953,14 @@ NAN_METHOD (Zsock::_set_gssapi_plaintext) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `gssapi plaintext`");
 
+    //int gssapi_plaintext; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int gssapi_plaintext;
+
+
     if (info [0]->IsNumber ())
-        gssapi_plaintext = Nan::To<int>(info [0]).FromJust ();
+    {
+          gssapi_plaintext = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`gssapi plaintext` must be a number");
     zsock_set_gssapi_plaintext (zsock->self, (int) gssapi_plaintext);
@@ -5600,10 +5980,10 @@ NAN_METHOD (Zsock::_set_gssapi_principal) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`gssapi principal` must be a string");
-    else {
-        Nan::Utf8String gssapi_principal_utf8 (info [0].As<String>());
-        gssapi_principal = *gssapi_principal_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String gssapi_principal_utf8 (info [0].As<String>());
+    gssapi_principal = *gssapi_principal_utf8;
+         //} //bjornw end
     zsock_set_gssapi_principal (zsock->self, (const char *)gssapi_principal);
 }
 
@@ -5621,10 +6001,10 @@ NAN_METHOD (Zsock::_set_gssapi_service_principal) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`gssapi service principal` must be a string");
-    else {
-        Nan::Utf8String gssapi_service_principal_utf8 (info [0].As<String>());
-        gssapi_service_principal = *gssapi_service_principal_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String gssapi_service_principal_utf8 (info [0].As<String>());
+    gssapi_service_principal = *gssapi_service_principal_utf8;
+         //} //bjornw end
     zsock_set_gssapi_service_principal (zsock->self, (const char *)gssapi_service_principal);
 }
 
@@ -5639,9 +6019,14 @@ NAN_METHOD (Zsock::_set_ipv6) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `ipv6`");
 
+    //int ipv6; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int ipv6;
+
+
     if (info [0]->IsNumber ())
-        ipv6 = Nan::To<int>(info [0]).FromJust ();
+    {
+          ipv6 = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`ipv6` must be a number");
     zsock_set_ipv6 (zsock->self, (int) ipv6);
@@ -5658,9 +6043,14 @@ NAN_METHOD (Zsock::_set_immediate) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `immediate`");
 
+    //int immediate; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int immediate;
+
+
     if (info [0]->IsNumber ())
-        immediate = Nan::To<int>(info [0]).FromJust ();
+    {
+          immediate = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`immediate` must be a number");
     zsock_set_immediate (zsock->self, (int) immediate);
@@ -5677,9 +6067,14 @@ NAN_METHOD (Zsock::_set_sndhwm) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `sndhwm`");
 
+    //int sndhwm; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int sndhwm;
+
+
     if (info [0]->IsNumber ())
-        sndhwm = Nan::To<int>(info [0]).FromJust ();
+    {
+          sndhwm = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`sndhwm` must be a number");
     zsock_set_sndhwm (zsock->self, (int) sndhwm);
@@ -5696,9 +6091,14 @@ NAN_METHOD (Zsock::_set_rcvhwm) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `rcvhwm`");
 
+    //int rcvhwm; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int rcvhwm;
+
+
     if (info [0]->IsNumber ())
-        rcvhwm = Nan::To<int>(info [0]).FromJust ();
+    {
+          rcvhwm = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`rcvhwm` must be a number");
     zsock_set_rcvhwm (zsock->self, (int) rcvhwm);
@@ -5715,9 +6115,14 @@ NAN_METHOD (Zsock::_set_maxmsgsize) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `maxmsgsize`");
 
+    //int maxmsgsize; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int maxmsgsize;
+
+
     if (info [0]->IsNumber ())
-        maxmsgsize = Nan::To<int>(info [0]).FromJust ();
+    {
+          maxmsgsize = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`maxmsgsize` must be a number");
     zsock_set_maxmsgsize (zsock->self, (int) maxmsgsize);
@@ -5734,9 +6139,14 @@ NAN_METHOD (Zsock::_set_multicast_hops) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `multicast hops`");
 
+    //int multicast_hops; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int multicast_hops;
+
+
     if (info [0]->IsNumber ())
-        multicast_hops = Nan::To<int>(info [0]).FromJust ();
+    {
+          multicast_hops = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`multicast hops` must be a number");
     zsock_set_multicast_hops (zsock->self, (int) multicast_hops);
@@ -5747,9 +6157,14 @@ NAN_METHOD (Zsock::_set_xpub_verbose) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `xpub verbose`");
 
+    //int xpub_verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int xpub_verbose;
+
+
     if (info [0]->IsNumber ())
-        xpub_verbose = Nan::To<int>(info [0]).FromJust ();
+    {
+          xpub_verbose = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`xpub verbose` must be a number");
     zsock_set_xpub_verbose (zsock->self, (int) xpub_verbose);
@@ -5766,9 +6181,14 @@ NAN_METHOD (Zsock::_set_tcp_keepalive) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `tcp keepalive`");
 
+    //int tcp_keepalive; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int tcp_keepalive;
+
+
     if (info [0]->IsNumber ())
-        tcp_keepalive = Nan::To<int>(info [0]).FromJust ();
+    {
+          tcp_keepalive = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`tcp keepalive` must be a number");
     zsock_set_tcp_keepalive (zsock->self, (int) tcp_keepalive);
@@ -5785,9 +6205,14 @@ NAN_METHOD (Zsock::_set_tcp_keepalive_idle) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `tcp keepalive idle`");
 
+    //int tcp_keepalive_idle; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int tcp_keepalive_idle;
+
+
     if (info [0]->IsNumber ())
-        tcp_keepalive_idle = Nan::To<int>(info [0]).FromJust ();
+    {
+          tcp_keepalive_idle = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`tcp keepalive idle` must be a number");
     zsock_set_tcp_keepalive_idle (zsock->self, (int) tcp_keepalive_idle);
@@ -5804,9 +6229,14 @@ NAN_METHOD (Zsock::_set_tcp_keepalive_cnt) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `tcp keepalive cnt`");
 
+    //int tcp_keepalive_cnt; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int tcp_keepalive_cnt;
+
+
     if (info [0]->IsNumber ())
-        tcp_keepalive_cnt = Nan::To<int>(info [0]).FromJust ();
+    {
+          tcp_keepalive_cnt = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`tcp keepalive cnt` must be a number");
     zsock_set_tcp_keepalive_cnt (zsock->self, (int) tcp_keepalive_cnt);
@@ -5823,9 +6253,14 @@ NAN_METHOD (Zsock::_set_tcp_keepalive_intvl) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `tcp keepalive intvl`");
 
+    //int tcp_keepalive_intvl; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int tcp_keepalive_intvl;
+
+
     if (info [0]->IsNumber ())
-        tcp_keepalive_intvl = Nan::To<int>(info [0]).FromJust ();
+    {
+          tcp_keepalive_intvl = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`tcp keepalive intvl` must be a number");
     zsock_set_tcp_keepalive_intvl (zsock->self, (int) tcp_keepalive_intvl);
@@ -5845,10 +6280,10 @@ NAN_METHOD (Zsock::_set_tcp_accept_filter) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`tcp accept filter` must be a string");
-    else {
-        Nan::Utf8String tcp_accept_filter_utf8 (info [0].As<String>());
-        tcp_accept_filter = *tcp_accept_filter_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String tcp_accept_filter_utf8 (info [0].As<String>());
+    tcp_accept_filter = *tcp_accept_filter_utf8;
+         //} //bjornw end
     zsock_set_tcp_accept_filter (zsock->self, (const char *)tcp_accept_filter);
 }
 
@@ -5863,9 +6298,14 @@ NAN_METHOD (Zsock::_set_router_raw) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `router raw`");
 
+    //int router_raw; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int router_raw;
+
+
     if (info [0]->IsNumber ())
-        router_raw = Nan::To<int>(info [0]).FromJust ();
+    {
+          router_raw = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`router raw` must be a number");
     zsock_set_router_raw (zsock->self, (int) router_raw);
@@ -5882,9 +6322,14 @@ NAN_METHOD (Zsock::_set_ipv4only) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `ipv4only`");
 
+    //int ipv4only; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int ipv4only;
+
+
     if (info [0]->IsNumber ())
-        ipv4only = Nan::To<int>(info [0]).FromJust ();
+    {
+          ipv4only = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`ipv4only` must be a number");
     zsock_set_ipv4only (zsock->self, (int) ipv4only);
@@ -5895,9 +6340,14 @@ NAN_METHOD (Zsock::_set_delay_attach_on_connect) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `delay attach on connect`");
 
+    //int delay_attach_on_connect; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int delay_attach_on_connect;
+
+
     if (info [0]->IsNumber ())
-        delay_attach_on_connect = Nan::To<int>(info [0]).FromJust ();
+    {
+          delay_attach_on_connect = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`delay attach on connect` must be a number");
     zsock_set_delay_attach_on_connect (zsock->self, (int) delay_attach_on_connect);
@@ -5914,9 +6364,14 @@ NAN_METHOD (Zsock::_set_hwm) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `hwm`");
 
+    //int hwm; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int hwm;
+
+
     if (info [0]->IsNumber ())
-        hwm = Nan::To<int>(info [0]).FromJust ();
+    {
+          hwm = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`hwm` must be a number");
     zsock_set_hwm (zsock->self, (int) hwm);
@@ -5933,9 +6388,14 @@ NAN_METHOD (Zsock::_set_swap) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `swap`");
 
+    //int swap; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int swap;
+
+
     if (info [0]->IsNumber ())
-        swap = Nan::To<int>(info [0]).FromJust ();
+    {
+          swap = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`swap` must be a number");
     zsock_set_swap (zsock->self, (int) swap);
@@ -5952,9 +6412,14 @@ NAN_METHOD (Zsock::_set_affinity) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `affinity`");
 
+    //int affinity; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int affinity;
+
+
     if (info [0]->IsNumber ())
-        affinity = Nan::To<int>(info [0]).FromJust ();
+    {
+          affinity = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`affinity` must be a number");
     zsock_set_affinity (zsock->self, (int) affinity);
@@ -5974,10 +6439,10 @@ NAN_METHOD (Zsock::_set_identity) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`identity` must be a string");
-    else {
-        Nan::Utf8String identity_utf8 (info [0].As<String>());
-        identity = *identity_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String identity_utf8 (info [0].As<String>());
+    identity = *identity_utf8;
+         //} //bjornw end
     zsock_set_identity (zsock->self, (const char *)identity);
 }
 
@@ -5992,9 +6457,14 @@ NAN_METHOD (Zsock::_set_rate) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `rate`");
 
+    //int rate; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int rate;
+
+
     if (info [0]->IsNumber ())
-        rate = Nan::To<int>(info [0]).FromJust ();
+    {
+          rate = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`rate` must be a number");
     zsock_set_rate (zsock->self, (int) rate);
@@ -6011,9 +6481,14 @@ NAN_METHOD (Zsock::_set_recovery_ivl) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `recovery ivl`");
 
+    //int recovery_ivl; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int recovery_ivl;
+
+
     if (info [0]->IsNumber ())
-        recovery_ivl = Nan::To<int>(info [0]).FromJust ();
+    {
+          recovery_ivl = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`recovery ivl` must be a number");
     zsock_set_recovery_ivl (zsock->self, (int) recovery_ivl);
@@ -6030,9 +6505,14 @@ NAN_METHOD (Zsock::_set_recovery_ivl_msec) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `recovery ivl msec`");
 
+    //int recovery_ivl_msec; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int recovery_ivl_msec;
+
+
     if (info [0]->IsNumber ())
-        recovery_ivl_msec = Nan::To<int>(info [0]).FromJust ();
+    {
+          recovery_ivl_msec = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`recovery ivl msec` must be a number");
     zsock_set_recovery_ivl_msec (zsock->self, (int) recovery_ivl_msec);
@@ -6049,9 +6529,14 @@ NAN_METHOD (Zsock::_set_mcast_loop) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `mcast loop`");
 
+    //int mcast_loop; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int mcast_loop;
+
+
     if (info [0]->IsNumber ())
-        mcast_loop = Nan::To<int>(info [0]).FromJust ();
+    {
+          mcast_loop = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`mcast loop` must be a number");
     zsock_set_mcast_loop (zsock->self, (int) mcast_loop);
@@ -6068,9 +6553,14 @@ NAN_METHOD (Zsock::_set_rcvtimeo) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `rcvtimeo`");
 
+    //int rcvtimeo; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int rcvtimeo;
+
+
     if (info [0]->IsNumber ())
-        rcvtimeo = Nan::To<int>(info [0]).FromJust ();
+    {
+          rcvtimeo = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`rcvtimeo` must be a number");
     zsock_set_rcvtimeo (zsock->self, (int) rcvtimeo);
@@ -6087,9 +6577,14 @@ NAN_METHOD (Zsock::_set_sndtimeo) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `sndtimeo`");
 
+    //int sndtimeo; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int sndtimeo;
+
+
     if (info [0]->IsNumber ())
-        sndtimeo = Nan::To<int>(info [0]).FromJust ();
+    {
+          sndtimeo = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`sndtimeo` must be a number");
     zsock_set_sndtimeo (zsock->self, (int) sndtimeo);
@@ -6106,9 +6601,14 @@ NAN_METHOD (Zsock::_set_sndbuf) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `sndbuf`");
 
+    //int sndbuf; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int sndbuf;
+
+
     if (info [0]->IsNumber ())
-        sndbuf = Nan::To<int>(info [0]).FromJust ();
+    {
+          sndbuf = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`sndbuf` must be a number");
     zsock_set_sndbuf (zsock->self, (int) sndbuf);
@@ -6125,9 +6625,14 @@ NAN_METHOD (Zsock::_set_rcvbuf) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `rcvbuf`");
 
+    //int rcvbuf; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int rcvbuf;
+
+
     if (info [0]->IsNumber ())
-        rcvbuf = Nan::To<int>(info [0]).FromJust ();
+    {
+          rcvbuf = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`rcvbuf` must be a number");
     zsock_set_rcvbuf (zsock->self, (int) rcvbuf);
@@ -6144,9 +6649,14 @@ NAN_METHOD (Zsock::_set_linger) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `linger`");
 
+    //int linger; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int linger;
+
+
     if (info [0]->IsNumber ())
-        linger = Nan::To<int>(info [0]).FromJust ();
+    {
+          linger = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`linger` must be a number");
     zsock_set_linger (zsock->self, (int) linger);
@@ -6163,9 +6673,14 @@ NAN_METHOD (Zsock::_set_reconnect_ivl) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `reconnect ivl`");
 
+    //int reconnect_ivl; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int reconnect_ivl;
+
+
     if (info [0]->IsNumber ())
-        reconnect_ivl = Nan::To<int>(info [0]).FromJust ();
+    {
+          reconnect_ivl = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`reconnect ivl` must be a number");
     zsock_set_reconnect_ivl (zsock->self, (int) reconnect_ivl);
@@ -6182,9 +6697,14 @@ NAN_METHOD (Zsock::_set_reconnect_ivl_max) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `reconnect ivl max`");
 
+    //int reconnect_ivl_max; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int reconnect_ivl_max;
+
+
     if (info [0]->IsNumber ())
-        reconnect_ivl_max = Nan::To<int>(info [0]).FromJust ();
+    {
+          reconnect_ivl_max = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`reconnect ivl max` must be a number");
     zsock_set_reconnect_ivl_max (zsock->self, (int) reconnect_ivl_max);
@@ -6201,9 +6721,14 @@ NAN_METHOD (Zsock::_set_backlog) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `backlog`");
 
+    //int backlog; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int backlog;
+
+
     if (info [0]->IsNumber ())
-        backlog = Nan::To<int>(info [0]).FromJust ();
+    {
+          backlog = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`backlog` must be a number");
     zsock_set_backlog (zsock->self, (int) backlog);
@@ -6217,10 +6742,10 @@ NAN_METHOD (Zsock::_set_subscribe) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`subscribe` must be a string");
-    else {
-        Nan::Utf8String subscribe_utf8 (info [0].As<String>());
-        subscribe = *subscribe_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String subscribe_utf8 (info [0].As<String>());
+    subscribe = *subscribe_utf8;
+         //} //bjornw end
     zsock_set_subscribe (zsock->self, (const char *)subscribe);
 }
 
@@ -6232,10 +6757,10 @@ NAN_METHOD (Zsock::_set_unsubscribe) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`unsubscribe` must be a string");
-    else {
-        Nan::Utf8String unsubscribe_utf8 (info [0].As<String>());
-        unsubscribe = *unsubscribe_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String unsubscribe_utf8 (info [0].As<String>());
+    unsubscribe = *unsubscribe_utf8;
+         //} //bjornw end
     zsock_set_unsubscribe (zsock->self, (const char *)unsubscribe);
 }
 
@@ -6261,9 +6786,14 @@ NAN_METHOD (Zsock::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zsock_test ((bool) verbose);
@@ -6332,10 +6862,10 @@ NAN_METHOD (Zstr::_recvx) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`string_p` must be a string");
-    else {
-        Nan::Utf8String string_p_utf8 (info [1].As<String>());
-        string_p = *string_p_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_p_utf8 (info [1].As<String>());
+    string_p = *string_p_utf8;
+         //} //bjornw end
     int result = zstr_recvx (source->self, (char **)&string_p);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6354,10 +6884,10 @@ NAN_METHOD (Zstr::_send) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [1].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [1].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     int result = zstr_send (dest->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6370,10 +6900,10 @@ NAN_METHOD (Zstr::_sendm) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [1].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [1].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     int result = zstr_sendm (dest->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6386,10 +6916,10 @@ NAN_METHOD (Zstr::_sendf) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [1].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [1].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zstr_sendf (dest->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6402,10 +6932,10 @@ NAN_METHOD (Zstr::_sendfm) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [1].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [1].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     int result = zstr_sendfm (dest->self, "%s", format);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6418,10 +6948,10 @@ NAN_METHOD (Zstr::_sendx) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [1].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [1].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     int result = zstr_sendx (dest->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6434,10 +6964,10 @@ NAN_METHOD (Zstr::_send_compress) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [1].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [1].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     int result = zstr_send_compress (dest->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6450,10 +6980,10 @@ NAN_METHOD (Zstr::_sendm_compress) {
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`string` must be a string");
-    else {
-        Nan::Utf8String string_utf8 (info [1].As<String>());
-        string = *string_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_utf8 (info [1].As<String>());
+    string = *string_utf8;
+         //} //bjornw end
     int result = zstr_sendm_compress (dest->self, (const char *)string);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6471,10 +7001,10 @@ NAN_METHOD (Zstr::_free) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`string_p` must be a string");
-    else {
-        Nan::Utf8String string_p_utf8 (info [0].As<String>());
-        string_p = *string_p_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String string_p_utf8 (info [0].As<String>());
+    string_p = *string_p_utf8;
+         //} //bjornw end
     zstr_free ((char **)&string_p);
 }
 
@@ -6482,9 +7012,14 @@ NAN_METHOD (Zstr::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zstr_test ((bool) verbose);
@@ -6589,9 +7124,14 @@ NAN_METHOD (Zsys::_sockname) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `socktype`");
 
+    //int socktype; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int socktype;
+
+
     if (info [0]->IsNumber ())
-        socktype = Nan::To<int>(info [0]).FromJust ();
+    {
+          socktype = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`socktype` must be a number");
     char *result = (char *) zsys_sockname ((int) socktype);
@@ -6625,10 +7165,10 @@ NAN_METHOD (Zsys::_file_exists) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     bool result = zsys_file_exists ((const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
@@ -6640,10 +7180,10 @@ NAN_METHOD (Zsys::_file_modified) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     time_t result = zsys_file_modified ((const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6655,10 +7195,10 @@ NAN_METHOD (Zsys::_file_mode) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zsys_file_mode ((const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6670,10 +7210,10 @@ NAN_METHOD (Zsys::_file_delete) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     int result = zsys_file_delete ((const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6685,10 +7225,10 @@ NAN_METHOD (Zsys::_file_stable) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`filename` must be a string");
-    else {
-        Nan::Utf8String filename_utf8 (info [0].As<String>());
-        filename = *filename_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String filename_utf8 (info [0].As<String>());
+    filename = *filename_utf8;
+         //} //bjornw end
     bool result = zsys_file_stable ((const char *)filename);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
@@ -6700,10 +7240,10 @@ NAN_METHOD (Zsys::_dir_create) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`pathname` must be a string");
-    else {
-        Nan::Utf8String pathname_utf8 (info [0].As<String>());
-        pathname = *pathname_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String pathname_utf8 (info [0].As<String>());
+    pathname = *pathname_utf8;
+         //} //bjornw end
     int result = zsys_dir_create ((const char *)pathname);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6715,10 +7255,10 @@ NAN_METHOD (Zsys::_dir_delete) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`pathname` must be a string");
-    else {
-        Nan::Utf8String pathname_utf8 (info [0].As<String>());
-        pathname = *pathname_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String pathname_utf8 (info [0].As<String>());
+    pathname = *pathname_utf8;
+         //} //bjornw end
     int result = zsys_dir_delete ((const char *)pathname);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6730,10 +7270,10 @@ NAN_METHOD (Zsys::_dir_change) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`pathname` must be a string");
-    else {
-        Nan::Utf8String pathname_utf8 (info [0].As<String>());
-        pathname = *pathname_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String pathname_utf8 (info [0].As<String>());
+    pathname = *pathname_utf8;
+         //} //bjornw end
     int result = zsys_dir_change ((const char *)pathname);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6750,25 +7290,40 @@ NAN_METHOD (Zsys::_version) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `major`");
 
-    int * major;
+    //int * major; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int major;
+
+
     if (info [0]->IsNumber ())
-        major = Nan::To<int>(info [0]).FromJust ();
+    {
+          major = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`major` must be a number");
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `minor`");
 
-    int * minor;
+    //int * minor; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int minor;
+
+
     if (info [1]->IsNumber ())
-        minor = Nan::To<int>(info [1]).FromJust ();
+    {
+          minor = Nan::To<int>(info [1]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`minor` must be a number");
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `patch`");
 
-    int * patch;
+    //int * patch; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int patch;
+
+
     if (info [2]->IsNumber ())
-        patch = Nan::To<int>(info [2]).FromJust ();
+    {
+          patch = Nan::To<int>(info [2]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`patch` must be a number");
     zsys_version ((int *) &major, (int *) &minor, (int *) &patch);
@@ -6781,10 +7336,10 @@ NAN_METHOD (Zsys::_sprintf) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     char *result = (char *) zsys_sprintf ((const char *)format);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
@@ -6796,10 +7351,10 @@ NAN_METHOD (Zsys::_socket_error) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`reason` must be a string");
-    else {
-        Nan::Utf8String reason_utf8 (info [0].As<String>());
-        reason = *reason_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String reason_utf8 (info [0].As<String>());
+    reason = *reason_utf8;
+         //} //bjornw end
     zsys_socket_error ((const char *)reason);
 }
 
@@ -6815,10 +7370,10 @@ NAN_METHOD (Zsys::_daemonize) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`workdir` must be a string");
-    else {
-        Nan::Utf8String workdir_utf8 (info [0].As<String>());
-        workdir = *workdir_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String workdir_utf8 (info [0].As<String>());
+    workdir = *workdir_utf8;
+         //} //bjornw end
     int result = zsys_daemonize ((const char *)workdir);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6830,30 +7385,30 @@ NAN_METHOD (Zsys::_run_as) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`lockfile` must be a string");
-    else {
-        Nan::Utf8String lockfile_utf8 (info [0].As<String>());
-        lockfile = *lockfile_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String lockfile_utf8 (info [0].As<String>());
+    lockfile = *lockfile_utf8;
+         //} //bjornw end
     char *group;
     if (info [1]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `group`");
     else
     if (!info [1]->IsString ())
         return Nan::ThrowTypeError ("`group` must be a string");
-    else {
-        Nan::Utf8String group_utf8 (info [1].As<String>());
-        group = *group_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String group_utf8 (info [1].As<String>());
+    group = *group_utf8;
+         //} //bjornw end
     char *user;
     if (info [2]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `user`");
     else
     if (!info [2]->IsString ())
         return Nan::ThrowTypeError ("`user` must be a string");
-    else {
-        Nan::Utf8String user_utf8 (info [2].As<String>());
-        user = *user_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String user_utf8 (info [2].As<String>());
+    user = *user_utf8;
+         //} //bjornw end
     int result = zsys_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -6877,9 +7432,14 @@ NAN_METHOD (Zsys::_set_thread_sched_policy) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `policy`");
 
+    //int policy; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int policy;
+
+
     if (info [0]->IsNumber ())
-        policy = Nan::To<int>(info [0]).FromJust ();
+    {
+          policy = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`policy` must be a number");
     zsys_set_thread_sched_policy ((int) policy);
@@ -6889,9 +7449,14 @@ NAN_METHOD (Zsys::_set_thread_priority) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `priority`");
 
+    //int priority; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int priority;
+
+
     if (info [0]->IsNumber ())
-        priority = Nan::To<int>(info [0]).FromJust ();
+    {
+          priority = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`priority` must be a number");
     zsys_set_thread_priority ((int) priority);
@@ -6916,9 +7481,14 @@ NAN_METHOD (Zsys::_set_max_msgsz) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `max msgsz`");
 
+    //int max_msgsz; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int max_msgsz;
+
+
     if (info [0]->IsNumber ())
-        max_msgsz = Nan::To<int>(info [0]).FromJust ();
+    {
+          max_msgsz = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`max msgsz` must be a number");
     zsys_set_max_msgsz ((int) max_msgsz);
@@ -6933,9 +7503,14 @@ NAN_METHOD (Zsys::_set_file_stable_age_msec) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `file stable age msec`");
 
+    //int64_t file_stable_age_msec; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int64_t file_stable_age_msec;
+
+
     if (info [0]->IsNumber ())
-        file_stable_age_msec = Nan::To<int64_t>(info [0]).FromJust ();
+    {
+          file_stable_age_msec = Nan::To<int64_t>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`file stable age msec` must be a number");
     zsys_set_file_stable_age_msec ((int64_t) file_stable_age_msec);
@@ -6995,9 +7570,14 @@ NAN_METHOD (Zsys::_set_ipv6) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `ipv6`");
 
+    //int ipv6; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int ipv6;
+
+
     if (info [0]->IsNumber ())
-        ipv6 = Nan::To<int>(info [0]).FromJust ();
+    {
+          ipv6 = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`ipv6` must be a number");
     zsys_set_ipv6 ((int) ipv6);
@@ -7015,10 +7595,10 @@ NAN_METHOD (Zsys::_set_interface) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [0].As<String>());
-        value = *value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
     zsys_set_interface ((const char *)value);
 }
 
@@ -7034,10 +7614,10 @@ NAN_METHOD (Zsys::_set_ipv6_address) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [0].As<String>());
-        value = *value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
     zsys_set_ipv6_address ((const char *)value);
 }
 
@@ -7053,10 +7633,10 @@ NAN_METHOD (Zsys::_set_ipv6_mcast_address) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [0].As<String>());
-        value = *value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
     zsys_set_ipv6_mcast_address ((const char *)value);
 }
 
@@ -7069,9 +7649,14 @@ NAN_METHOD (Zsys::_set_auto_use_fd) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `auto use fd`");
 
+    //int auto_use_fd; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int auto_use_fd;
+
+
     if (info [0]->IsNumber ())
-        auto_use_fd = Nan::To<int>(info [0]).FromJust ();
+    {
+          auto_use_fd = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`auto use fd` must be a number");
     zsys_set_auto_use_fd ((int) auto_use_fd);
@@ -7089,10 +7674,10 @@ NAN_METHOD (Zsys::_set_logident) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`value` must be a string");
-    else {
-        Nan::Utf8String value_utf8 (info [0].As<String>());
-        value = *value_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
     zsys_set_logident ((const char *)value);
 }
 
@@ -7103,10 +7688,10 @@ NAN_METHOD (Zsys::_set_logsender) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`endpoint` must be a string");
-    else {
-        Nan::Utf8String endpoint_utf8 (info [0].As<String>());
-        endpoint = *endpoint_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String endpoint_utf8 (info [0].As<String>());
+    endpoint = *endpoint_utf8;
+         //} //bjornw end
     zsys_set_logsender ((const char *)endpoint);
 }
 
@@ -7114,9 +7699,14 @@ NAN_METHOD (Zsys::_set_logsystem) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `logsystem`");
 
+    //bool logsystem; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool logsystem;
+
+
     if (info [0]->IsBoolean ())
-        logsystem = Nan::To<bool>(info [0]).FromJust ();
+    {
+          logsystem = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`logsystem` must be a Boolean");
     zsys_set_logsystem ((bool) logsystem);
@@ -7129,10 +7719,10 @@ NAN_METHOD (Zsys::_error) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zsys_error ((const char *)format);
 }
 
@@ -7143,10 +7733,10 @@ NAN_METHOD (Zsys::_warning) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zsys_warning ((const char *)format);
 }
 
@@ -7157,10 +7747,10 @@ NAN_METHOD (Zsys::_notice) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zsys_notice ((const char *)format);
 }
 
@@ -7171,10 +7761,10 @@ NAN_METHOD (Zsys::_info) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zsys_info ((const char *)format);
 }
 
@@ -7185,10 +7775,10 @@ NAN_METHOD (Zsys::_debug) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`format` must be a string");
-    else {
-        Nan::Utf8String format_utf8 (info [0].As<String>());
-        format = *format_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
     zsys_debug ((const char *)format);
 }
 
@@ -7196,9 +7786,14 @@ NAN_METHOD (Zsys::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zsys_test ((bool) verbose);
@@ -7269,9 +7864,14 @@ NAN_METHOD (Ztimerset::_cancel) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `timer id`");
 
+    //int timer_id; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int timer_id;
+
+
     if (info [0]->IsNumber ())
-        timer_id = Nan::To<int>(info [0]).FromJust ();
+    {
+          timer_id = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`timer id` must be a number");
     int result = ztimerset_cancel (ztimerset->self, (int) timer_id);
@@ -7283,9 +7883,14 @@ NAN_METHOD (Ztimerset::_set_interval) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `timer id`");
 
+    //int timer_id; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int timer_id;
+
+
     if (info [0]->IsNumber ())
-        timer_id = Nan::To<int>(info [0]).FromJust ();
+    {
+          timer_id = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`timer id` must be a number");
     if (info [1]->IsUndefined ())
@@ -7303,9 +7908,14 @@ NAN_METHOD (Ztimerset::_reset) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `timer id`");
 
+    //int timer_id; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     int timer_id;
+
+
     if (info [0]->IsNumber ())
-        timer_id = Nan::To<int>(info [0]).FromJust ();
+    {
+          timer_id = Nan::To<int>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`timer id` must be a number");
     int result = ztimerset_reset (ztimerset->self, (int) timer_id);
@@ -7328,9 +7938,14 @@ NAN_METHOD (Ztimerset::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     ztimerset_test ((bool) verbose);
@@ -7381,16 +7996,20 @@ NAN_METHOD (Ztrie::New) {
     assert (info.IsConstructCall ());
     char delimiter;
     if (info [0]->IsUndefined ())
+    {
         return Nan::ThrowTypeError ("method requires a `delimiter`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`delimiter` must be a string");
-    else {
-        Nan::Utf8String delimiter_utf8 (info [0].As<String>());
-        if (strlen (*delimiter_utf8) != 1)
-            return Nan::ThrowTypeError ("`delimiter` must be a single character");
-        delimiter = (*delimiter_utf8) [0];
     }
+    else if (!info [0]->IsString ())
+    {
+        return Nan::ThrowTypeError ("`delimiter` must be a string");
+    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String delimiter_utf8 (info [0].As<String>());
+
+    if (strlen (*delimiter_utf8) != 1)
+        return Nan::ThrowTypeError ("`delimiter` must be a single character");
+    delimiter = (*delimiter_utf8) [0];
+    //} // bjornw end
     Ztrie *ztrie = new Ztrie ((char) delimiter);
     if (ztrie) {
         ztrie->Wrap (info.This ());
@@ -7417,10 +8036,10 @@ NAN_METHOD (Ztrie::_remove_route) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     int result = ztrie_remove_route (ztrie->self, (const char *)path);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -7433,10 +8052,10 @@ NAN_METHOD (Ztrie::_matches) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`path` must be a string");
-    else {
-        Nan::Utf8String path_utf8 (info [0].As<String>());
-        path = *path_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String path_utf8 (info [0].As<String>());
+    path = *path_utf8;
+         //} //bjornw end
     bool result = ztrie_matches (ztrie->self, (const char *)path);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
@@ -7474,9 +8093,14 @@ NAN_METHOD (Ztrie::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     ztrie_test ((bool) verbose);
@@ -7564,10 +8188,10 @@ NAN_METHOD (Zuuid::_set_str) {
     else
     if (!info [0]->IsString ())
         return Nan::ThrowTypeError ("`source` must be a string");
-    else {
-        Nan::Utf8String source_utf8 (info [0].As<String>());
-        source = *source_utf8;
-    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String source_utf8 (info [0].As<String>());
+    source = *source_utf8;
+         //} //bjornw end
     int result = zuuid_set_str (zuuid->self, (const char *)source);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
@@ -7641,9 +8265,14 @@ NAN_METHOD (Zuuid::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
 
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
     bool verbose;
+
+
     if (info [0]->IsBoolean ())
-        verbose = Nan::To<bool>(info [0]).FromJust ();
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zuuid_test ((bool) verbose);
