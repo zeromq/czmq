@@ -1488,6 +1488,8 @@ lib.zconfig_str_save.restype = POINTER(c_char)
 lib.zconfig_str_save.argtypes = [zconfig_p]
 lib.zconfig_has_changed.restype = c_bool
 lib.zconfig_has_changed.argtypes = [zconfig_p]
+lib.zconfig_remove.restype = None
+lib.zconfig_remove.argtypes = [zconfig_p]
 lib.zconfig_fprint.restype = None
 lib.zconfig_fprint.argtypes = [zconfig_p, FILE_p]
 lib.zconfig_print.restype = None
@@ -1713,6 +1715,12 @@ existing data).
 file has changed in since the tree was loaded.
         """
         return lib.zconfig_has_changed(self._as_parameter_)
+
+    def remove(self):
+        """
+        Destroy subtree (child)
+        """
+        return lib.zconfig_remove(self._as_parameter_)
 
     def fprint(self, file):
         """
@@ -2160,6 +2168,8 @@ lib.zfile_new.restype = zfile_p
 lib.zfile_new.argtypes = [c_char_p, c_char_p]
 lib.zfile_destroy.restype = None
 lib.zfile_destroy.argtypes = [POINTER(zfile_p)]
+lib.zfile_tmp.restype = zfile_p
+lib.zfile_tmp.argtypes = []
 lib.zfile_dup.restype = zfile_p
 lib.zfile_dup.argtypes = [zfile_p]
 lib.zfile_filename.restype = c_char_p
@@ -2256,6 +2266,14 @@ may be NULL, in which case it is not used.
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def tmp():
+        """
+        Create new temporary file for writing via tmpfile. File is automaticaly
+deleted on destroy
+        """
+        return Zfile(lib.zfile_tmp(), True)
 
     def dup(self):
         """

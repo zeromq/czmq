@@ -24,6 +24,10 @@ public:
     //  may be NULL, in which case it is not used.
     explicit QZfile (const QString &path, const QString &name, QObject *qObjParent = 0);
 
+    //  Create new temporary file for writing via tmpfile. File is automaticaly
+    //  deleted on destroy
+    static QZfile* tmp (QObject *qObjParent = 0);
+
     //  Destroy a file item
     ~QZfile ();
 

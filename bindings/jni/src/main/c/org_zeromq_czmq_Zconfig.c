@@ -227,6 +227,12 @@ Java_org_zeromq_czmq_Zconfig__1_1hasChanged (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zconfig__1_1remove (JNIEnv *env, jclass c, jlong self)
+{
+    zconfig_remove ((zconfig_t *) (intptr_t) self);
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1print (JNIEnv *env, jclass c, jlong self)
 {
     zconfig_print ((zconfig_t *) (intptr_t) self);

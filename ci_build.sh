@@ -5,13 +5,6 @@
 #  READ THE ZPROJECT/README.MD FOR INFORMATION ABOUT MAKING PERMANENT CHANGES. #
 ################################################################################
 
-################################################################################
-#  Note: this particular file has been edited for non-standard improvements.   #
-#  Please take care to review changes with `git difftool` such as `meld` after #
-#  re-generating the project.                                                  #
-#  See below for test_randof integration.                                      #
-################################################################################
-
 set -e
 
 # Set this to enable verbose profiling
@@ -52,12 +45,12 @@ default|default-Werror|default-with-docs|valgrind)
     if which ccache && ls -la /usr/lib/ccache ; then
         HAVE_CCACHE=yes
     fi
+    mkdir -p "${CCACHE_DIR}" || HAVE_CCACHE=no
 
     if [ "$HAVE_CCACHE" = yes ] && [ -d "$CCACHE_DIR" ]; then
         echo "CCache stats before build:"
         ccache -s || true
     fi
-    mkdir -p "${HOME}/.ccache"
 
     CONFIG_OPTS=()
     COMMON_CFLAGS=""
@@ -304,18 +297,6 @@ default|default-Werror|default-with-docs|valgrind)
             $CI_TIME make VERBOSE=1 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" distcheck || exit $?
         )
     ) || exit 1
-
-    # Note: this is a manual addition for czmq project
-    if [ -x ./src/test_randof ] ; then
-        echo ""
-        echo "`date`: INFO: Starting test of randof()..."
-        # Report built-in tunables
-        $CI_TIME ./src/test_randof -h 2>&1 | grep ZSYS || true
-        $CI_TIME ./src/test_randof -r 10000000 -i 300000000 || exit $?
-    else
-        echo "SKIPPED test of randof() : can't find a `pwd`/src/test_randof" >&2
-    fi
-
     [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"
 
     echo "=== Are GitIgnores good after 'make distcheck' without drafts? (should have no output below)"

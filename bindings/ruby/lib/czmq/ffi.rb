@@ -401,6 +401,17 @@ module CZMQ
       attach_function :zconfig_str_load, [:string], :pointer, **opts
       attach_function :zconfig_str_save, [:pointer], :pointer, **opts
       attach_function :zconfig_has_changed, [:pointer], :bool, **opts
+      begin # DRAFT method
+        attach_function :zconfig_remove, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zconfig_remove()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zconfig_remove(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zconfig_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zconfig_print, [:pointer], :void, **opts
       attach_function :zconfig_test, [:bool], :void, **opts
@@ -449,6 +460,17 @@ module CZMQ
       require_relative 'ffi/zdir_patch'
 
       attach_function :zfile_new, [:string, :string], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zfile_tmp, [], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zfile_tmp()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zfile_tmp(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zfile_destroy, [:pointer], :void, **opts
       attach_function :zfile_dup, [:pointer], :pointer, **opts
       attach_function :zfile_filename, [:pointer, :string], :string, **opts

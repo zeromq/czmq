@@ -760,6 +760,10 @@ char *
 bool
     zconfig_has_changed (zconfig_t *self);
 
+// Destroy subtree (child)
+void
+    zconfig_remove (zconfig_t *self);
+
 // Print the config file to open stream
 void
     zconfig_fprint (zconfig_t *self, FILE *file);
@@ -952,6 +956,11 @@ void
 // may be NULL, in which case it is not used.
 zfile_t *
     zfile_new (const char *path, const char *name);
+
+// Create new temporary file for writing via tmpfile. File is automaticaly
+// deleted on destroy
+zfile_t *
+    zfile_tmp (void);
 
 // Destroy a file item
 void

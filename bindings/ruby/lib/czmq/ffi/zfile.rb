@@ -86,6 +86,14 @@ module CZMQ
         __new ptr
       end
 
+      # Create new temporary file for writing via tmpfile. File is automaticaly
+      # deleted on destroy
+      # @return [CZMQ::Zfile]
+      def self.tmp()
+        ptr = ::CZMQ::FFI.zfile_tmp()
+        __new ptr
+      end
+
       # Destroy a file item
       #
       # @return [void]

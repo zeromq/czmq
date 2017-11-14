@@ -221,6 +221,13 @@ public class Zconfig implements AutoCloseable{
         return __hasChanged (self);
     }
     /*
+    Destroy subtree (child)
+    */
+    native static void __remove (long self);
+    public void remove () {
+        __remove (self);
+    }
+    /*
     Print properties of object
     */
     native static void __print (long self);

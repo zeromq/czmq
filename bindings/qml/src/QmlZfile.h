@@ -132,6 +132,10 @@ public slots:
     //  may be NULL, in which case it is not used.
     QmlZfile *construct (const QString &path, const QString &name);
 
+    //  Create new temporary file for writing via tmpfile. File is automaticaly
+    //  deleted on destroy
+    QmlZfile *tmp ();
+
     //  Destroy a file item
     void destruct (QmlZfile *qmlSelf);
 };

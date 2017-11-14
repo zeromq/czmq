@@ -402,6 +402,16 @@ module CZMQ
         result
       end
 
+      # Destroy subtree (child)
+      #
+      # @return [void]
+      def remove()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zconfig_remove(self_p)
+        result
+      end
+
       # Print the config file to open stream
       #
       # @param file [::FFI::Pointer, #to_ptr]
