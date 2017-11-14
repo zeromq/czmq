@@ -787,7 +787,7 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
             //  We store key as short string
             frame_size += 1 + strlen ((char *) item->key);
             //  We store value as long string
-            if (serializer)
+            if (serializer != NULL)
                 values [vindex] = serializer (item->value);
             else
                 values [vindex] = (char *) item->value;
@@ -826,7 +826,7 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
             item = item->next;
 
             //  Destroy serialized value
-            if (serializer)
+            if (serializer != NULL)
                 zstr_free (&values [vindex]);
 
             vindex++;
@@ -908,7 +908,7 @@ zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
 
                     //  Convert string to real value
                     void *real_value;
-                    if (deserializer) {
+                    if (deserializer != NULL) {
                         real_value = deserializer (value);
                         zstr_free (&value);
                     }
