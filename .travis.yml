@@ -99,8 +99,8 @@ addons:
     - libzmq3-dev
 
 before_install:
-- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "android" ] ; then brew install binutils ; fi
-- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "stable_zmq" ] ; then brew install libsodium lz4 ; fi
+- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "android" ] ; then brew update; brew install binutils ; fi
+- if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "stable_zmq" ] ; then brew update; brew install libsodium lz4 ; fi
 
 # ZMQ stress tests need more open socket (files) than the usual default
 # On OSX, it seems the way to set the max files limit is constantly changing, so
