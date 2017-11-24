@@ -13,8 +13,10 @@
 ******************************************************************
 -->
 .function state(option)
-.  if defined(my.option.state) & my.option.state = 'draft'
-.    return ' state = "draft"'
+.  if defined(my.option.state)
+.    return " state = \"$(my.option.state)\""
+.  elsif defined(my.option.major_removed)
+.    return ' state = "deprecated"'
 .  endif
 .  return ''
 .endfunction
