@@ -261,7 +261,7 @@
         <argument name = "io_threads" type = "size" />
     </method>
 
-    <method name = "set thread sched policy" singleton = "1">
+    <method name = "set thread sched policy" singleton = "1" state = "draft">
         Configure the scheduling policy of the ZMQ context thread pool.
         Not available on Windows. See the sched_setscheduler man page or sched.h
         for more information. If the environment variable ZSYS_THREAD_SCHED_POLICY
@@ -270,7 +270,7 @@
         <argument name = "policy" type = "integer" />
     </method>
 
-    <method name = "set thread priority" singleton = "1">
+    <method name = "set thread priority" singleton = "1" state = "draft">
         Configure the scheduling priority of the ZMQ context thread pool.
         Not available on Windows. See the sched_setscheduler man page or sched.h
         for more information. If the environment variable ZSYS_THREAD_PRIORITY is
