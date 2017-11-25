@@ -265,6 +265,24 @@ CZMQ_PRIVATE char *
     zstr_str (void *source);
 
 //  *** Draft method, defined for internal use only ***
+//  Configure the scheduling policy of the ZMQ context thread pool.
+//  Not available on Windows. See the sched_setscheduler man page or sched.h
+//  for more information. If the environment variable ZSYS_THREAD_SCHED_POLICY
+//  is defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+CZMQ_PRIVATE void
+    zsys_set_thread_sched_policy (int policy);
+
+//  *** Draft method, defined for internal use only ***
+//  Configure the scheduling priority of the ZMQ context thread pool.
+//  Not available on Windows. See the sched_setscheduler man page or sched.h
+//  for more information. If the environment variable ZSYS_THREAD_PRIORITY is
+//  defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+CZMQ_PRIVATE void
+    zsys_set_thread_priority (int priority);
+
+//  *** Draft method, defined for internal use only ***
 //  Configure the threshold value of filesystem object age per st_mtime
 //  that should elapse until we consider that object "stable" at the
 //  current zclock_time() moment.

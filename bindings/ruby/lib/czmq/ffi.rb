@@ -1493,10 +1493,50 @@ module CZMQ
       attach_function :zsock_ipv4only, [:pointer], :int, **opts
       attach_function :zsock_set_ipv4only, [:pointer, :int], :void, **opts
       attach_function :zsock_set_delay_attach_on_connect, [:pointer, :int], :void, **opts
-      attach_function :zsock_hwm, [:pointer], :int, **opts
-      attach_function :zsock_set_hwm, [:pointer, :int], :void, **opts
-      attach_function :zsock_swap, [:pointer], :int, **opts
-      attach_function :zsock_set_swap, [:pointer, :int], :void, **opts
+      begin # DEPRECATED method
+        attach_function :zsock_hwm, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_hwm()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_hwm(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
+      begin # DEPRECATED method
+        attach_function :zsock_set_hwm, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_set_hwm()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_set_hwm(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
+      begin # DEPRECATED method
+        attach_function :zsock_swap, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_swap()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_swap(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
+      begin # DEPRECATED method
+        attach_function :zsock_set_swap, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_set_swap()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_set_swap(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
       attach_function :zsock_affinity, [:pointer], :int, **opts
       attach_function :zsock_set_affinity, [:pointer, :int], :void, **opts
       attach_function :zsock_identity, [:pointer], :pointer, **opts
@@ -1505,10 +1545,50 @@ module CZMQ
       attach_function :zsock_set_rate, [:pointer, :int], :void, **opts
       attach_function :zsock_recovery_ivl, [:pointer], :int, **opts
       attach_function :zsock_set_recovery_ivl, [:pointer, :int], :void, **opts
-      attach_function :zsock_recovery_ivl_msec, [:pointer], :int, **opts
-      attach_function :zsock_set_recovery_ivl_msec, [:pointer, :int], :void, **opts
-      attach_function :zsock_mcast_loop, [:pointer], :int, **opts
-      attach_function :zsock_set_mcast_loop, [:pointer, :int], :void, **opts
+      begin # DEPRECATED method
+        attach_function :zsock_recovery_ivl_msec, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_recovery_ivl_msec()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_recovery_ivl_msec(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
+      begin # DEPRECATED method
+        attach_function :zsock_set_recovery_ivl_msec, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_set_recovery_ivl_msec()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_set_recovery_ivl_msec(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
+      begin # DEPRECATED method
+        attach_function :zsock_mcast_loop, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_mcast_loop()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_mcast_loop(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
+      begin # DEPRECATED method
+        attach_function :zsock_set_mcast_loop, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DEPRECATED function zsock_set_mcast_loop()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsock_set_mcast_loop(*)
+          raise NotImplementedError, "update your code or downgrade the CZMQ library"
+        end
+      end
       attach_function :zsock_rcvtimeo, [:pointer], :int, **opts
       attach_function :zsock_set_rcvtimeo, [:pointer, :int], :void, **opts
       attach_function :zsock_sndtimeo, [:pointer], :int, **opts
@@ -1623,8 +1703,28 @@ module CZMQ
       attach_function :zsys_run_as, [:string, :string, :string], :int, **opts
       attach_function :zsys_has_curve, [], :bool, **opts
       attach_function :zsys_set_io_threads, [:size_t], :void, **opts
-      attach_function :zsys_set_thread_sched_policy, [:int], :void, **opts
-      attach_function :zsys_set_thread_priority, [:int], :void, **opts
+      begin # DRAFT method
+        attach_function :zsys_set_thread_sched_policy, [:int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zsys_set_thread_sched_policy()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsys_set_thread_sched_policy(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsys_set_thread_priority, [:int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The DRAFT function zsys_set_thread_priority()" +
+            " is not provided by the installed CZMQ library."
+        end
+        def self.zsys_set_thread_priority(*)
+          raise NotImplementedError, "compile CZMQ with --enable-drafts"
+        end
+      end
       attach_function :zsys_set_max_sockets, [:size_t], :void, **opts
       attach_function :zsys_socket_limit, [], :size_t, **opts
       attach_function :zsys_set_max_msgsz, [:int], :void, **opts
