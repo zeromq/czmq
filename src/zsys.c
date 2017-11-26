@@ -1367,6 +1367,9 @@ zsys_set_io_threads (size_t io_threads)
 void
 zsys_set_thread_sched_policy (int policy)
 {
+    if (policy < 0)
+        return;
+
     zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
@@ -1392,6 +1395,9 @@ zsys_set_thread_sched_policy (int policy)
 void
 zsys_set_thread_priority (int priority)
 {
+    if (priority < 0)
+        return;
+
     zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
