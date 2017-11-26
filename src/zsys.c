@@ -1349,11 +1349,11 @@ zsys_set_io_threads (size_t io_threads)
     zmq_term (s_process_ctx);
     s_io_threads = io_threads;
     s_process_ctx = zmq_init ((int) s_io_threads);
-#if defined (ZMQ_MAX_SOCKETS)
-    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
-#endif
     ZMUTEX_UNLOCK (s_mutex);
+
+    //  Reinitialised outside of the lock to avoid recursive lock
     zsys_set_max_msgsz (s_max_msgsz);
+    zsys_set_max_sockets (s_max_sockets);
 }
 
 
