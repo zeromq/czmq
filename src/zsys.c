@@ -1346,14 +1346,23 @@ zsys_set_io_threads (size_t io_threads)
     if (s_open_sockets)
         zsys_error ("zsys_io_threads() is not valid after creating sockets");
     assert (s_open_sockets == 0);
-    zmq_term (s_process_ctx);
+
     s_io_threads = io_threads;
+#if ZMQ_VERSION < ZMQ_MAKE_VERSION(3, 2, 0)
+    zmq_term (s_process_ctx);
     s_process_ctx = zmq_init ((int) s_io_threads);
+#else
+#  if defined (ZMQ_IO_THREADS)
+    zmq_ctx_set (s_process_ctx, ZMQ_IO_THREADS, s_io_threads);
+#  endif
+#endif
     ZMUTEX_UNLOCK (s_mutex);
 
+#if ZMQ_VERSION < ZMQ_MAKE_VERSION(3, 2, 0)
     //  Reinitialised outside of the lock to avoid recursive lock
     zsys_set_max_msgsz (s_max_msgsz);
     zsys_set_max_sockets (s_max_sockets);
+#endif
 }
 
 
