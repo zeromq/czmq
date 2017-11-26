@@ -618,25 +618,25 @@
 
 <!-- The following socket options are available in libzmq from version 2.0.0 -->
 
-<method name = "hwm" polymorphic = "1" state = "deprecated">
+<method name = "hwm" polymorphic = "1">
     Get socket option `hwm`.
     Available from libzmq 2.0.0 to 3.0.0.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set hwm" polymorphic = "1" state = "deprecated">
+<method name = "set hwm" polymorphic = "1">
     Set socket option `hwm`.
     Available from libzmq 2.0.0 to 3.0.0.
     <argument name = "hwm" type = "integer" />
 </method>
 
-<method name = "swap" polymorphic = "1" state = "deprecated">
+<method name = "swap" polymorphic = "1">
     Get socket option `swap`.
     Available from libzmq 2.0.0 to 3.0.0.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set swap" polymorphic = "1" state = "deprecated">
+<method name = "set swap" polymorphic = "1">
     Set socket option `swap`.
     Available from libzmq 2.0.0 to 3.0.0.
     <argument name = "swap" type = "integer" />
@@ -690,25 +690,25 @@
     <argument name = "recovery ivl" type = "integer" />
 </method>
 
-<method name = "recovery ivl msec" polymorphic = "1" state = "deprecated">
+<method name = "recovery ivl msec" polymorphic = "1">
     Get socket option `recovery_ivl_msec`.
     Available from libzmq 2.0.0 to 3.0.0.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set recovery ivl msec" polymorphic = "1" state = "deprecated">
+<method name = "set recovery ivl msec" polymorphic = "1">
     Set socket option `recovery_ivl_msec`.
     Available from libzmq 2.0.0 to 3.0.0.
     <argument name = "recovery ivl msec" type = "integer" />
 </method>
 
-<method name = "mcast loop" polymorphic = "1" state = "deprecated">
+<method name = "mcast loop" polymorphic = "1">
     Get socket option `mcast_loop`.
     Available from libzmq 2.0.0 to 3.0.0.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set mcast loop" polymorphic = "1" state = "deprecated">
+<method name = "set mcast loop" polymorphic = "1">
     Set socket option `mcast_loop`.
     Available from libzmq 2.0.0 to 3.0.0.
     <argument name = "mcast loop" type = "integer" />
