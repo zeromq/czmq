@@ -654,7 +654,9 @@ typedef int SOCKET;
 #   define closesocket      close
 #   define INVALID_SOCKET   -1
 #   define SOCKET_ERROR     -1
-#   define O_BINARY         0
+#   if !defined O_BINARY
+#       define O_BINARY      0
+#   endif
 #endif
 
 //- Include non-portable header files based on platform.h -------------------
