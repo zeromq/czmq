@@ -105,7 +105,7 @@ s_self_listen (self_t *self, const char *event)
     if (streq (event, "DISCONNECTED"))
         self->events |= ZMQ_EVENT_DISCONNECTED;
     else
-#if (ZMQ_VERSION_MAJOR == 4)
+#if defined (ZMQ_EVENT_MONITOR_STOPPED)
     if (streq (event, "MONITOR_STOPPED"))
         self->events |= ZMQ_EVENT_MONITOR_STOPPED;
     else
@@ -227,7 +227,7 @@ static void
 s_self_handle_sink (self_t *self)
 {
 #if defined (ZMQ_EVENT_ALL)
-#if (ZMQ_VERSION_MAJOR == 4)
+#if (ZMQ_VERSION_MAJOR >= 4)
     //  First frame is event number and value
     zframe_t *frame = zframe_recv (self->sink);
     int event = *(uint16_t *) (zframe_data (frame));
@@ -284,7 +284,7 @@ s_self_handle_sink (self_t *self)
         case ZMQ_EVENT_LISTENING:
             name = "LISTENING";
             break;
-#if (ZMQ_VERSION_MAJOR == 4)
+#if defined (ZMQ_EVENT_MONITOR_STOPPED)
         case ZMQ_EVENT_MONITOR_STOPPED:
             name = "MONITOR_STOPPED";
             break;
