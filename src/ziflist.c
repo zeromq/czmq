@@ -213,6 +213,9 @@ s_reload (ziflist_t *self, bool ipv6)
                     || (ipv6 && (interface->ifa_addr->sa_family == AF_INET6)))
             &&(interface->ifa_addr->sa_family == AF_INET
                     || (ipv6 && (interface->ifa_addr->sa_family == AF_INET6)))
+            // Seems to be needed for running VirtualBox VMs on MacOS (see #1802)
+            &&(interface->ifa_netmask->sa_family == AF_INET
+                    || (ipv6 && (interface->ifa_netmask->sa_family == AF_INET6)))
             &&  s_valid_flags (interface->ifa_flags,
                     ipv6 && (interface->ifa_addr->sa_family == AF_INET6))) {
                 interface_t *item = s_interface_new (interface->ifa_name,
