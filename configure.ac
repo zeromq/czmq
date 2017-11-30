@@ -496,6 +496,9 @@ else
     AC_CHECK_PROG(czmq_have_asciidoc, asciidoc, yes, no)
     AC_CHECK_PROG(czmq_have_xmlto, xmlto, yes, no)
     if test "x$czmq_have_asciidoc" = "xno" -o "x$czmq_have_xmlto" = "xno"; then
+        if test "x$with_docs" = "xyes" ; then
+            AC_MSG_ERROR([Build with docs was explicitly requested, but tools are not available])
+        fi
         czmq_build_doc="no"
         # Tarballs built with 'make dist' ship with prebuilt documentation.
         if ! test -f doc/czmq.7; then
