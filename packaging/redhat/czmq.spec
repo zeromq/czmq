@@ -113,7 +113,7 @@ This package contains development files for czmq: the high-level c binding for 0
 %package -n python2-czmq-cffi
 Group: Python
 Summary: Python CFFI bindings for czmq
-Requires: python = %{py2_ver}
+Requires: python >= %{py2_ver}.0, python < 3.0.0
 
 %description -n python2-czmq-cffi
 This package contains Python CFFI bindings for czmq

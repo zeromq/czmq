@@ -39,6 +39,7 @@ def to_strings (s):
     """Convert Python native list types to zlist_t of strings"""
     if issubclass (s.__class__, (list, set, frozenset, tuple)):
         foo = lib.zlist_new ()
+        lib.zlist_autofree (foo)
         for item in s:
             lib.zlist_append (foo, to_bytes (item))
         return foo
