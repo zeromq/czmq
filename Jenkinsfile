@@ -11,7 +11,7 @@
 */
 
 pipeline {
-                    agent any
+                    agent { label "linux || macosx || bsd || solaris || posix || windows" }
     parameters {
         // Use DEFAULT_DEPLOY_BRANCH_PATTERN and DEFAULT_DEPLOY_JOB_NAME if
         // defined in this jenkins setup -- in Jenkins Management Web-GUI
@@ -163,6 +163,13 @@ pipeline {
                 }
             }
         }
+        // Self-test stages below should be run sequentially, as decreed by
+        // project authors for the time being (e.g. port conflicts, etc.)
+        // You can uncomment the closures below experimentally, but proper
+        // fix belongs in the project.xml (e.g. use separate agents if your
+        // infrastructure is set up to only schedule one build on the agent
+        // at a time) and better yet - in the project sources, to not have
+        // the conflicts at all.
 //        stage ('check') {
 //            parallel {
                 stage ('check with DRAFT') {
@@ -330,6 +337,7 @@ pipeline {
                       }
                     }
                 }
+        // Sequential block of self-tests end here
 //            }
 //        }
         stage ('deploy if appropriate') {
