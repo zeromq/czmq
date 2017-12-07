@@ -118,7 +118,8 @@ pipeline {
                         unstash 'prepped'
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; ./configure --enable-drafts=yes --with-docs=no'
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make -k -j4 || make'
-                        sh 'if test -x src/.libs/lt-zsp ; then rm -f src/zsp ; fi'
+//                        sh 'if test -x src/.libs/lt-zsp ; then rm -f src/zsp ; fi'
+                        sh 'rm -f src/zsp'
                         sh 'echo "Are GitIgnores good after make with drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         stash (name: 'built-draft', includes: '**/*', excludes: '**/cppcheck.xml')
                         script {
@@ -137,7 +138,8 @@ pipeline {
                         unstash 'prepped'
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; ./configure --enable-drafts=no --with-docs=no'
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make -k -j4 || make'
-                        sh 'if test -x src/.libs/lt-zsp ; then rm -f src/zsp ; fi'
+//                        sh 'if test -x src/.libs/lt-zsp ; then rm -f src/zsp ; fi'
+                        sh 'rm -f src/zsp'
                         sh 'echo "Are GitIgnores good after make without drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         stash (name: 'built-nondraft', includes: '**/*', excludes: '**/cppcheck.xml')
                         script {
@@ -156,7 +158,8 @@ pipeline {
                         unstash 'prepped'
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; ./configure --enable-drafts=yes --with-docs=yes'
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make -k -j4 || make'
-                        sh 'if test -x src/.libs/lt-zsp ; then rm -f src/zsp ; fi'
+//                        sh 'if test -x src/.libs/lt-zsp ; then rm -f src/zsp ; fi'
+                        sh 'rm -f src/zsp'
                         sh 'echo "Are GitIgnores good after make with docs? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         stash (name: 'built-docs', includes: '**/*', excludes: '**/cppcheck.xml')
                         script {
