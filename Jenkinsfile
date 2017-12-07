@@ -184,7 +184,8 @@ pipeline {
                 stage ('check with DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITH_DRAFT_API && params.DO_TEST_CHECK ) } }
                     steps {
-                      dir("tmp/test-check-withDRAFT") {
+//                      dir("tmp/test-check-withDRAFT") {
+                      dir("tmp/build-withDRAFT") {
                         deleteDir()
                         unstash 'built-draft'
                         timeout (time: 20, unit: 'MINUTES') {
@@ -202,7 +203,8 @@ pipeline {
                 stage ('check without DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITHOUT_DRAFT_API && params.DO_TEST_CHECK ) } }
                     steps {
-                      dir("tmp/test-check-withoutDRAFT") {
+//                      dir("tmp/test-check-withoutDRAFT") {
+                      dir("tmp/build-withoutDRAFT") {
                         deleteDir()
                         unstash 'built-nondraft'
                         timeout (time: 20, unit: 'MINUTES') {
@@ -220,7 +222,8 @@ pipeline {
                 stage ('memcheck with DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITH_DRAFT_API && params.DO_TEST_MEMCHECK ) } }
                     steps {
-                      dir("tmp/test-memcheck-withDRAFT") {
+//                      dir("tmp/test-memcheck-withDRAFT") {
+                      dir("tmp/build-withDRAFT") {
                         deleteDir()
                         unstash 'built-draft'
                         timeout (time: 20, unit: 'MINUTES') {
@@ -238,7 +241,8 @@ pipeline {
                 stage ('memcheck without DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITHOUT_DRAFT_API && params.DO_TEST_MEMCHECK ) } }
                     steps {
-                      dir("tmp/test-memcheck-withoutDRAFT") {
+//                      dir("tmp/test-memcheck-withoutDRAFT") {
+                      dir("tmp/build-withoutDRAFT") {
                         deleteDir()
                         unstash 'built-nondraft'
                         timeout (time: 20, unit: 'MINUTES') {
@@ -256,7 +260,8 @@ pipeline {
                 stage ('distcheck with DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITH_DRAFT_API && params.DO_TEST_DISTCHECK ) } }
                     steps {
-                      dir("tmp/test-distcheck-withDRAFT") {
+//                      dir("tmp/test-distcheck-withDRAFT") {
+                      dir("tmp/build-withDRAFT") {
                         deleteDir()
                         unstash 'built-draft'
                         timeout (time: 30, unit: 'MINUTES') {
@@ -274,7 +279,8 @@ pipeline {
                 stage ('distcheck without DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITHOUT_DRAFT_API && params.DO_TEST_DISTCHECK ) } }
                     steps {
-                      dir("tmp/test-distcheck-withoutDRAFT") {
+//                      dir("tmp/test-distcheck-withoutDRAFT") {
+                      dir("tmp/build-withoutDRAFT") {
                         deleteDir()
                         unstash 'built-nondraft'
                         timeout (time: 30, unit: 'MINUTES') {
@@ -292,7 +298,8 @@ pipeline {
                 stage ('install with DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITH_DRAFT_API && params.DO_TEST_INSTALL ) } }
                     steps {
-                      dir("tmp/test-install-withDRAFT") {
+//                      dir("tmp/test-install-withDRAFT") {
+                      dir("tmp/build-withDRAFT") {
                         deleteDir()
                         unstash 'built-draft'
                         timeout (time: 20, unit: 'MINUTES') {
@@ -311,7 +318,8 @@ pipeline {
                 stage ('install without DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITHOUT_DRAFT_API && params.DO_TEST_INSTALL ) } }
                     steps {
-                      dir("tmp/test-install-withoutDRAFT") {
+//                      dir("tmp/test-install-withoutDRAFT") {
+                      dir("tmp/build-withoutDRAFT") {
                         deleteDir()
                         unstash 'built-nondraft'
                         timeout (time: 20, unit: 'MINUTES') {
@@ -330,7 +338,8 @@ pipeline {
                 stage ('install with DOCS') {
                     when { expression { return ( params.DO_BUILD_DOCS && params.DO_TEST_INSTALL ) } }
                     steps {
-                      dir("tmp/test-install-withDOCS") {
+//                      dir("tmp/test-install-withDOCS") {
+                      dir("tmp/build-DOCS") {
                         deleteDir()
                         unstash 'built-docs'
                         timeout (time: 20, unit: 'MINUTES') {
