@@ -1,4 +1,7 @@
 /*
+        NOTE: This file was customized after generation; regenerate its
+              zproject and merge differences carefully!
+
     czmq - The high-level C binding for 0MQ
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
