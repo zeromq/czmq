@@ -86,4 +86,9 @@
         </option>
     </target>
 
+    <target name = "jenkins" >
+        <option name = "agent_label" value = "linux || macosx || bsd || solaris || posix || windows" />
+        <option name = "check_sequential" value = "1" />
+    </target>
+
 </project>

@@ -105,7 +105,7 @@ s_self_listen (self_t *self, const char *event)
     if (streq (event, "DISCONNECTED"))
         self->events |= ZMQ_EVENT_DISCONNECTED;
     else
-#if (ZMQ_VERSION_MAJOR == 4)
+#if defined (ZMQ_EVENT_MONITOR_STOPPED)
     if (streq (event, "MONITOR_STOPPED"))
         self->events |= ZMQ_EVENT_MONITOR_STOPPED;
     else
@@ -118,6 +118,26 @@ s_self_listen (self_t *self, const char *event)
 #if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
     if (streq (event, "HANDSHAKE_SUCCEED"))
         self->events |= ZMQ_EVENT_HANDSHAKE_SUCCEED;
+    else
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEEDED)
+    if (streq (event, "HANDSHAKE_SUCCEEDED"))
+        self->events |= ZMQ_EVENT_HANDSHAKE_SUCCEEDED;
+    else
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL)
+    if (streq (event, "HANDSHAKE_FAILED_NO_DETAIL"))
+        self->events |= ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL;
+    else
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL)
+    if (streq (event, "HANDSHAKE_FAILED_PROTOCOL"))
+        self->events |= ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL;
+    else
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED_AUTH)
+    if (streq (event, "HANDSHAKE_FAILED_AUTH"))
+        self->events |= ZMQ_EVENT_HANDSHAKE_FAILED_AUTH;
     else
 #endif
     if (streq (event, "ALL"))
@@ -207,7 +227,7 @@ static void
 s_self_handle_sink (self_t *self)
 {
 #if defined (ZMQ_EVENT_ALL)
-#if (ZMQ_VERSION_MAJOR == 4)
+#if (ZMQ_VERSION_MAJOR >= 4)
     //  First frame is event number and value
     zframe_t *frame = zframe_recv (self->sink);
     int event = *(uint16_t *) (zframe_data (frame));
@@ -264,7 +284,7 @@ s_self_handle_sink (self_t *self)
         case ZMQ_EVENT_LISTENING:
             name = "LISTENING";
             break;
-#if (ZMQ_VERSION_MAJOR == 4)
+#if defined (ZMQ_EVENT_MONITOR_STOPPED)
         case ZMQ_EVENT_MONITOR_STOPPED:
             name = "MONITOR_STOPPED";
             break;
@@ -277,6 +297,26 @@ s_self_handle_sink (self_t *self)
 #if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
         case ZMQ_EVENT_HANDSHAKE_SUCCEED:
             name = "HANDSHAKE_SUCCEED";
+            break;
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEEDED)
+        case ZMQ_EVENT_HANDSHAKE_SUCCEEDED:
+            name = "HANDSHAKE_SUCCEEDED";
+            break;
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL)
+        case ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL:
+            name = "HANDSHAKE_FAILED_NO_DETAIL";
+            break;
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL)
+        case ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL:
+            name = "HANDSHAKE_FAILED_PROTOCOL";
+            break;
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_FAILED_AUTH)
+        case ZMQ_EVENT_HANDSHAKE_FAILED_AUTH:
+            name = "HANDSHAKE_FAILED_AUTH";
             break;
 #endif
         default:
@@ -356,6 +396,9 @@ zmonitor_test (bool verbose)
 #if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
     zstr_sendx (clientmon, "LISTEN", "HANDSHAKE_SUCCEED", NULL);
 #endif
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEEDED)
+    zstr_sendx (clientmon, "LISTEN", "HANDSHAKE_SUCCEEDED", NULL);
+#endif
     zstr_sendx (clientmon, "START", NULL);
     zsock_wait (clientmon);
 
@@ -385,6 +428,9 @@ zmonitor_test (bool verbose)
     s_assert_event (clientmon, "ACCEPTED");
 #if defined (ZMQ_EVENT_HANDSHAKE_SUCCEED)
     s_assert_event (clientmon, "HANDSHAKE_SUCCEED");
+#endif
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEEDED)
+    s_assert_event (clientmon, "HANDSHAKE_SUCCEEDED");
 #endif
 
     zactor_destroy (&clientmon);

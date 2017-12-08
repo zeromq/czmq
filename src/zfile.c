@@ -123,28 +123,22 @@ zfile_tmp (void)
     zfile_t *self = NULL;
 
 #if defined (__WINDOWS__)
-    // adapted from MSDN: https://msdn.microsoft.com/en-us/library/windows/desktop/aa363875(v=vs.85).aspx
-    DWORD dwRetVal = 0;
-    UINT uRetVal   = 0;
-    TCHAR lpTempPathBuffer[MAX_PATH];
-    TCHAR szTempFileName[MAX_PATH];
+    DWORD result;
+    UINT value;
+    char name [MAX_PATH];
+    char path [MAX_PATH];
 
-    //  Gets the temp path env string (no guarantee it's a valid path).
-    dwRetVal = GetTempPath(MAX_PATH,          // length of the buffer
-                           lpTempPathBuffer); // buffer for path
-    if (dwRetVal > MAX_PATH || (dwRetVal == 0))
+    result = GetTempPathA (MAX_PATH, path);
+    if (result > MAX_PATH || (result == 0))
         return NULL;
 
-    uRetVal = GetTempFileName(lpTempPathBuffer,   // directory for tmp files
-                              TEXT("CZMQ_ZFILE"), // temp file name prefix
-                              0,                  // create unique name
-                              szTempFileName);    // buffer for name
-    if (uRetVal == 0)
+    value = GetTempFileNameA (path, "CZMQ_ZFILE", 0, name);
+    if (value == 0)
         return NULL;
 
     self = (zfile_t *) zmalloc (sizeof (zfile_t));
     assert (self);
-    self->fullname = strdup ((char*)szTempFileName);
+    self->fullname = strdup (name);
     self->handle = fopen (self->fullname, "w");
 #else
     char buffer [PATH_MAX];

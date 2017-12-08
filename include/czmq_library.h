@@ -50,6 +50,9 @@
 #       define CZMQ_EXPORT __declspec(dllimport)
 #   endif
 #   define CZMQ_PRIVATE
+#elif defined (__CYGWIN__)
+#   define CZMQ_EXPORT
+#   define CZMQ_PRIVATE
 #else
 #   define CZMQ_EXPORT
 #   if (defined __GNUC__ && __GNUC__ >= 4) || defined __INTEL_COMPILER

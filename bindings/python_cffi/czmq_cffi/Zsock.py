@@ -238,7 +238,7 @@ class Zsock(object):
         Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
         This will be used when sending messages on the socket via the zsock API.
         """
-        return utils.lib.zsock_set_routing_id(self._p, routing_id)
+        utils.lib.zsock_set_routing_id(self._p, routing_id)
 
     def set_unbounded(self):
         """
@@ -246,7 +246,7 @@ class Zsock(object):
         totally certain the message volume can fit in memory. This method works
         across all versions of ZeroMQ. Takes a polymorphic socket reference.
         """
-        return utils.lib.zsock_set_unbounded(self._p)
+        utils.lib.zsock_set_unbounded(self._p)
 
     def signal(self, status):
         """
@@ -273,7 +273,7 @@ class Zsock(object):
         discard it. This is useful when reading partial messages, to get specific
         message types.
         """
-        return utils.lib.zsock_flush(self._p)
+        utils.lib.zsock_flush(self._p)
 
     def join(self, group):
         """
@@ -317,7 +317,7 @@ class Zsock(object):
         Set socket option `heartbeat_ivl`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_heartbeat_ivl(self._p, heartbeat_ivl)
+        utils.lib.zsock_set_heartbeat_ivl(self._p, heartbeat_ivl)
 
     def heartbeat_ttl(self):
         """
@@ -331,7 +331,7 @@ class Zsock(object):
         Set socket option `heartbeat_ttl`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_heartbeat_ttl(self._p, heartbeat_ttl)
+        utils.lib.zsock_set_heartbeat_ttl(self._p, heartbeat_ttl)
 
     def heartbeat_timeout(self):
         """
@@ -345,7 +345,7 @@ class Zsock(object):
         Set socket option `heartbeat_timeout`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_heartbeat_timeout(self._p, heartbeat_timeout)
+        utils.lib.zsock_set_heartbeat_timeout(self._p, heartbeat_timeout)
 
     def use_fd(self):
         """
@@ -359,28 +359,28 @@ class Zsock(object):
         Set socket option `use_fd`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_use_fd(self._p, use_fd)
+        utils.lib.zsock_set_use_fd(self._p, use_fd)
 
     def set_xpub_manual(self, xpub_manual):
         """
         Set socket option `xpub_manual`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_xpub_manual(self._p, xpub_manual)
+        utils.lib.zsock_set_xpub_manual(self._p, xpub_manual)
 
     def set_xpub_welcome_msg(self, xpub_welcome_msg):
         """
         Set socket option `xpub_welcome_msg`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_xpub_welcome_msg(self._p, utils.to_bytes(xpub_welcome_msg))
+        utils.lib.zsock_set_xpub_welcome_msg(self._p, utils.to_bytes(xpub_welcome_msg))
 
     def set_stream_notify(self, stream_notify):
         """
         Set socket option `stream_notify`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_stream_notify(self._p, stream_notify)
+        utils.lib.zsock_set_stream_notify(self._p, stream_notify)
 
     def invert_matching(self):
         """
@@ -394,14 +394,14 @@ class Zsock(object):
         Set socket option `invert_matching`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_invert_matching(self._p, invert_matching)
+        utils.lib.zsock_set_invert_matching(self._p, invert_matching)
 
     def set_xpub_verboser(self, xpub_verboser):
         """
         Set socket option `xpub_verboser`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_xpub_verboser(self._p, xpub_verboser)
+        utils.lib.zsock_set_xpub_verboser(self._p, xpub_verboser)
 
     def connect_timeout(self):
         """
@@ -415,7 +415,7 @@ class Zsock(object):
         Set socket option `connect_timeout`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_connect_timeout(self._p, connect_timeout)
+        utils.lib.zsock_set_connect_timeout(self._p, connect_timeout)
 
     def tcp_maxrt(self):
         """
@@ -429,7 +429,7 @@ class Zsock(object):
         Set socket option `tcp_maxrt`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_tcp_maxrt(self._p, tcp_maxrt)
+        utils.lib.zsock_set_tcp_maxrt(self._p, tcp_maxrt)
 
     def thread_safe(self):
         """
@@ -450,7 +450,7 @@ class Zsock(object):
         Set socket option `multicast_maxtpdu`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_multicast_maxtpdu(self._p, multicast_maxtpdu)
+        utils.lib.zsock_set_multicast_maxtpdu(self._p, multicast_maxtpdu)
 
     def vmci_buffer_size(self):
         """
@@ -464,7 +464,7 @@ class Zsock(object):
         Set socket option `vmci_buffer_size`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_vmci_buffer_size(self._p, vmci_buffer_size)
+        utils.lib.zsock_set_vmci_buffer_size(self._p, vmci_buffer_size)
 
     def vmci_buffer_min_size(self):
         """
@@ -478,7 +478,7 @@ class Zsock(object):
         Set socket option `vmci_buffer_min_size`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_vmci_buffer_min_size(self._p, vmci_buffer_min_size)
+        utils.lib.zsock_set_vmci_buffer_min_size(self._p, vmci_buffer_min_size)
 
     def vmci_buffer_max_size(self):
         """
@@ -492,7 +492,7 @@ class Zsock(object):
         Set socket option `vmci_buffer_max_size`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_vmci_buffer_max_size(self._p, vmci_buffer_max_size)
+        utils.lib.zsock_set_vmci_buffer_max_size(self._p, vmci_buffer_max_size)
 
     def vmci_connect_timeout(self):
         """
@@ -506,7 +506,7 @@ class Zsock(object):
         Set socket option `vmci_connect_timeout`.
         Available from libzmq 4.2.0.
         """
-        return utils.lib.zsock_set_vmci_connect_timeout(self._p, vmci_connect_timeout)
+        utils.lib.zsock_set_vmci_connect_timeout(self._p, vmci_connect_timeout)
 
     def tos(self):
         """
@@ -520,28 +520,28 @@ class Zsock(object):
         Set socket option `tos`.
         Available from libzmq 4.1.0.
         """
-        return utils.lib.zsock_set_tos(self._p, tos)
+        utils.lib.zsock_set_tos(self._p, tos)
 
     def set_router_handover(self, router_handover):
         """
         Set socket option `router_handover`.
         Available from libzmq 4.1.0.
         """
-        return utils.lib.zsock_set_router_handover(self._p, router_handover)
+        utils.lib.zsock_set_router_handover(self._p, router_handover)
 
     def set_connect_rid(self, connect_rid):
         """
         Set socket option `connect_rid`.
         Available from libzmq 4.1.0.
         """
-        return utils.lib.zsock_set_connect_rid(self._p, utils.to_bytes(connect_rid))
+        utils.lib.zsock_set_connect_rid(self._p, utils.to_bytes(connect_rid))
 
     def set_connect_rid_bin(self, connect_rid):
         """
         Set socket option `connect_rid` from 32-octet binary
         Available from libzmq 4.1.0.
         """
-        return utils.lib.zsock_set_connect_rid_bin(self._p, connect_rid)
+        utils.lib.zsock_set_connect_rid_bin(self._p, connect_rid)
 
     def handshake_ivl(self):
         """
@@ -555,7 +555,7 @@ class Zsock(object):
         Set socket option `handshake_ivl`.
         Available from libzmq 4.1.0.
         """
-        return utils.lib.zsock_set_handshake_ivl(self._p, handshake_ivl)
+        utils.lib.zsock_set_handshake_ivl(self._p, handshake_ivl)
 
     def socks_proxy(self):
         """
@@ -569,49 +569,49 @@ class Zsock(object):
         Set socket option `socks_proxy`.
         Available from libzmq 4.1.0.
         """
-        return utils.lib.zsock_set_socks_proxy(self._p, utils.to_bytes(socks_proxy))
+        utils.lib.zsock_set_socks_proxy(self._p, utils.to_bytes(socks_proxy))
 
     def set_xpub_nodrop(self, xpub_nodrop):
         """
         Set socket option `xpub_nodrop`.
         Available from libzmq 4.1.0.
         """
-        return utils.lib.zsock_set_xpub_nodrop(self._p, xpub_nodrop)
+        utils.lib.zsock_set_xpub_nodrop(self._p, xpub_nodrop)
 
     def set_router_mandatory(self, router_mandatory):
         """
         Set socket option `router_mandatory`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_router_mandatory(self._p, router_mandatory)
+        utils.lib.zsock_set_router_mandatory(self._p, router_mandatory)
 
     def set_probe_router(self, probe_router):
         """
         Set socket option `probe_router`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_probe_router(self._p, probe_router)
+        utils.lib.zsock_set_probe_router(self._p, probe_router)
 
     def set_req_relaxed(self, req_relaxed):
         """
         Set socket option `req_relaxed`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_req_relaxed(self._p, req_relaxed)
+        utils.lib.zsock_set_req_relaxed(self._p, req_relaxed)
 
     def set_req_correlate(self, req_correlate):
         """
         Set socket option `req_correlate`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_req_correlate(self._p, req_correlate)
+        utils.lib.zsock_set_req_correlate(self._p, req_correlate)
 
     def set_conflate(self, conflate):
         """
         Set socket option `conflate`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_conflate(self._p, conflate)
+        utils.lib.zsock_set_conflate(self._p, conflate)
 
     def zap_domain(self):
         """
@@ -625,7 +625,7 @@ class Zsock(object):
         Set socket option `zap_domain`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_zap_domain(self._p, utils.to_bytes(zap_domain))
+        utils.lib.zsock_set_zap_domain(self._p, utils.to_bytes(zap_domain))
 
     def mechanism(self):
         """
@@ -646,7 +646,7 @@ class Zsock(object):
         Set socket option `plain_server`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_plain_server(self._p, plain_server)
+        utils.lib.zsock_set_plain_server(self._p, plain_server)
 
     def plain_username(self):
         """
@@ -660,7 +660,7 @@ class Zsock(object):
         Set socket option `plain_username`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_plain_username(self._p, utils.to_bytes(plain_username))
+        utils.lib.zsock_set_plain_username(self._p, utils.to_bytes(plain_username))
 
     def plain_password(self):
         """
@@ -674,7 +674,7 @@ class Zsock(object):
         Set socket option `plain_password`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_plain_password(self._p, utils.to_bytes(plain_password))
+        utils.lib.zsock_set_plain_password(self._p, utils.to_bytes(plain_password))
 
     def curve_server(self):
         """
@@ -688,7 +688,7 @@ class Zsock(object):
         Set socket option `curve_server`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_curve_server(self._p, curve_server)
+        utils.lib.zsock_set_curve_server(self._p, curve_server)
 
     def curve_publickey(self):
         """
@@ -702,14 +702,14 @@ class Zsock(object):
         Set socket option `curve_publickey`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_curve_publickey(self._p, utils.to_bytes(curve_publickey))
+        utils.lib.zsock_set_curve_publickey(self._p, utils.to_bytes(curve_publickey))
 
     def set_curve_publickey_bin(self, curve_publickey):
         """
         Set socket option `curve_publickey` from 32-octet binary
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_curve_publickey_bin(self._p, curve_publickey)
+        utils.lib.zsock_set_curve_publickey_bin(self._p, curve_publickey)
 
     def curve_secretkey(self):
         """
@@ -723,14 +723,14 @@ class Zsock(object):
         Set socket option `curve_secretkey`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_curve_secretkey(self._p, utils.to_bytes(curve_secretkey))
+        utils.lib.zsock_set_curve_secretkey(self._p, utils.to_bytes(curve_secretkey))
 
     def set_curve_secretkey_bin(self, curve_secretkey):
         """
         Set socket option `curve_secretkey` from 32-octet binary
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_curve_secretkey_bin(self._p, curve_secretkey)
+        utils.lib.zsock_set_curve_secretkey_bin(self._p, curve_secretkey)
 
     def curve_serverkey(self):
         """
@@ -744,14 +744,14 @@ class Zsock(object):
         Set socket option `curve_serverkey`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_curve_serverkey(self._p, utils.to_bytes(curve_serverkey))
+        utils.lib.zsock_set_curve_serverkey(self._p, utils.to_bytes(curve_serverkey))
 
     def set_curve_serverkey_bin(self, curve_serverkey):
         """
         Set socket option `curve_serverkey` from 32-octet binary
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_curve_serverkey_bin(self._p, curve_serverkey)
+        utils.lib.zsock_set_curve_serverkey_bin(self._p, curve_serverkey)
 
     def gssapi_server(self):
         """
@@ -765,7 +765,7 @@ class Zsock(object):
         Set socket option `gssapi_server`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_gssapi_server(self._p, gssapi_server)
+        utils.lib.zsock_set_gssapi_server(self._p, gssapi_server)
 
     def gssapi_plaintext(self):
         """
@@ -779,7 +779,7 @@ class Zsock(object):
         Set socket option `gssapi_plaintext`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_gssapi_plaintext(self._p, gssapi_plaintext)
+        utils.lib.zsock_set_gssapi_plaintext(self._p, gssapi_plaintext)
 
     def gssapi_principal(self):
         """
@@ -793,7 +793,7 @@ class Zsock(object):
         Set socket option `gssapi_principal`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_gssapi_principal(self._p, utils.to_bytes(gssapi_principal))
+        utils.lib.zsock_set_gssapi_principal(self._p, utils.to_bytes(gssapi_principal))
 
     def gssapi_service_principal(self):
         """
@@ -807,7 +807,7 @@ class Zsock(object):
         Set socket option `gssapi_service_principal`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_gssapi_service_principal(self._p, utils.to_bytes(gssapi_service_principal))
+        utils.lib.zsock_set_gssapi_service_principal(self._p, utils.to_bytes(gssapi_service_principal))
 
     def ipv6(self):
         """
@@ -821,7 +821,7 @@ class Zsock(object):
         Set socket option `ipv6`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_ipv6(self._p, ipv6)
+        utils.lib.zsock_set_ipv6(self._p, ipv6)
 
     def immediate(self):
         """
@@ -835,7 +835,7 @@ class Zsock(object):
         Set socket option `immediate`.
         Available from libzmq 4.0.0.
         """
-        return utils.lib.zsock_set_immediate(self._p, immediate)
+        utils.lib.zsock_set_immediate(self._p, immediate)
 
     def sndhwm(self):
         """
@@ -849,7 +849,7 @@ class Zsock(object):
         Set socket option `sndhwm`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_sndhwm(self._p, sndhwm)
+        utils.lib.zsock_set_sndhwm(self._p, sndhwm)
 
     def rcvhwm(self):
         """
@@ -863,7 +863,7 @@ class Zsock(object):
         Set socket option `rcvhwm`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_rcvhwm(self._p, rcvhwm)
+        utils.lib.zsock_set_rcvhwm(self._p, rcvhwm)
 
     def maxmsgsize(self):
         """
@@ -877,7 +877,7 @@ class Zsock(object):
         Set socket option `maxmsgsize`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_maxmsgsize(self._p, maxmsgsize)
+        utils.lib.zsock_set_maxmsgsize(self._p, maxmsgsize)
 
     def multicast_hops(self):
         """
@@ -891,14 +891,14 @@ class Zsock(object):
         Set socket option `multicast_hops`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_multicast_hops(self._p, multicast_hops)
+        utils.lib.zsock_set_multicast_hops(self._p, multicast_hops)
 
     def set_xpub_verbose(self, xpub_verbose):
         """
         Set socket option `xpub_verbose`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_xpub_verbose(self._p, xpub_verbose)
+        utils.lib.zsock_set_xpub_verbose(self._p, xpub_verbose)
 
     def tcp_keepalive(self):
         """
@@ -912,7 +912,7 @@ class Zsock(object):
         Set socket option `tcp_keepalive`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_tcp_keepalive(self._p, tcp_keepalive)
+        utils.lib.zsock_set_tcp_keepalive(self._p, tcp_keepalive)
 
     def tcp_keepalive_idle(self):
         """
@@ -926,7 +926,7 @@ class Zsock(object):
         Set socket option `tcp_keepalive_idle`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_tcp_keepalive_idle(self._p, tcp_keepalive_idle)
+        utils.lib.zsock_set_tcp_keepalive_idle(self._p, tcp_keepalive_idle)
 
     def tcp_keepalive_cnt(self):
         """
@@ -940,7 +940,7 @@ class Zsock(object):
         Set socket option `tcp_keepalive_cnt`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_tcp_keepalive_cnt(self._p, tcp_keepalive_cnt)
+        utils.lib.zsock_set_tcp_keepalive_cnt(self._p, tcp_keepalive_cnt)
 
     def tcp_keepalive_intvl(self):
         """
@@ -954,7 +954,7 @@ class Zsock(object):
         Set socket option `tcp_keepalive_intvl`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_tcp_keepalive_intvl(self._p, tcp_keepalive_intvl)
+        utils.lib.zsock_set_tcp_keepalive_intvl(self._p, tcp_keepalive_intvl)
 
     def tcp_accept_filter(self):
         """
@@ -968,7 +968,7 @@ class Zsock(object):
         Set socket option `tcp_accept_filter`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_tcp_accept_filter(self._p, utils.to_bytes(tcp_accept_filter))
+        utils.lib.zsock_set_tcp_accept_filter(self._p, utils.to_bytes(tcp_accept_filter))
 
     def last_endpoint(self):
         """
@@ -982,7 +982,7 @@ class Zsock(object):
         Set socket option `router_raw`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_router_raw(self._p, router_raw)
+        utils.lib.zsock_set_router_raw(self._p, router_raw)
 
     def ipv4only(self):
         """
@@ -996,14 +996,14 @@ class Zsock(object):
         Set socket option `ipv4only`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_ipv4only(self._p, ipv4only)
+        utils.lib.zsock_set_ipv4only(self._p, ipv4only)
 
     def set_delay_attach_on_connect(self, delay_attach_on_connect):
         """
         Set socket option `delay_attach_on_connect`.
         Available from libzmq 3.0.0.
         """
-        return utils.lib.zsock_set_delay_attach_on_connect(self._p, delay_attach_on_connect)
+        utils.lib.zsock_set_delay_attach_on_connect(self._p, delay_attach_on_connect)
 
     def hwm(self):
         """
@@ -1017,7 +1017,7 @@ class Zsock(object):
         Set socket option `hwm`.
         Available from libzmq 2.0.0 to 3.0.0.
         """
-        return utils.lib.zsock_set_hwm(self._p, hwm)
+        utils.lib.zsock_set_hwm(self._p, hwm)
 
     def swap(self):
         """
@@ -1031,7 +1031,7 @@ class Zsock(object):
         Set socket option `swap`.
         Available from libzmq 2.0.0 to 3.0.0.
         """
-        return utils.lib.zsock_set_swap(self._p, swap)
+        utils.lib.zsock_set_swap(self._p, swap)
 
     def affinity(self):
         """
@@ -1045,7 +1045,7 @@ class Zsock(object):
         Set socket option `affinity`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_affinity(self._p, affinity)
+        utils.lib.zsock_set_affinity(self._p, affinity)
 
     def identity(self):
         """
@@ -1059,7 +1059,7 @@ class Zsock(object):
         Set socket option `identity`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_identity(self._p, utils.to_bytes(identity))
+        utils.lib.zsock_set_identity(self._p, utils.to_bytes(identity))
 
     def rate(self):
         """
@@ -1073,7 +1073,7 @@ class Zsock(object):
         Set socket option `rate`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_rate(self._p, rate)
+        utils.lib.zsock_set_rate(self._p, rate)
 
     def recovery_ivl(self):
         """
@@ -1087,7 +1087,7 @@ class Zsock(object):
         Set socket option `recovery_ivl`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_recovery_ivl(self._p, recovery_ivl)
+        utils.lib.zsock_set_recovery_ivl(self._p, recovery_ivl)
 
     def recovery_ivl_msec(self):
         """
@@ -1101,7 +1101,7 @@ class Zsock(object):
         Set socket option `recovery_ivl_msec`.
         Available from libzmq 2.0.0 to 3.0.0.
         """
-        return utils.lib.zsock_set_recovery_ivl_msec(self._p, recovery_ivl_msec)
+        utils.lib.zsock_set_recovery_ivl_msec(self._p, recovery_ivl_msec)
 
     def mcast_loop(self):
         """
@@ -1115,7 +1115,7 @@ class Zsock(object):
         Set socket option `mcast_loop`.
         Available from libzmq 2.0.0 to 3.0.0.
         """
-        return utils.lib.zsock_set_mcast_loop(self._p, mcast_loop)
+        utils.lib.zsock_set_mcast_loop(self._p, mcast_loop)
 
     def rcvtimeo(self):
         """
@@ -1129,7 +1129,7 @@ class Zsock(object):
         Set socket option `rcvtimeo`.
         Available from libzmq 2.2.0.
         """
-        return utils.lib.zsock_set_rcvtimeo(self._p, rcvtimeo)
+        utils.lib.zsock_set_rcvtimeo(self._p, rcvtimeo)
 
     def sndtimeo(self):
         """
@@ -1143,7 +1143,7 @@ class Zsock(object):
         Set socket option `sndtimeo`.
         Available from libzmq 2.2.0.
         """
-        return utils.lib.zsock_set_sndtimeo(self._p, sndtimeo)
+        utils.lib.zsock_set_sndtimeo(self._p, sndtimeo)
 
     def sndbuf(self):
         """
@@ -1157,7 +1157,7 @@ class Zsock(object):
         Set socket option `sndbuf`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_sndbuf(self._p, sndbuf)
+        utils.lib.zsock_set_sndbuf(self._p, sndbuf)
 
     def rcvbuf(self):
         """
@@ -1171,7 +1171,7 @@ class Zsock(object):
         Set socket option `rcvbuf`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_rcvbuf(self._p, rcvbuf)
+        utils.lib.zsock_set_rcvbuf(self._p, rcvbuf)
 
     def linger(self):
         """
@@ -1185,7 +1185,7 @@ class Zsock(object):
         Set socket option `linger`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_linger(self._p, linger)
+        utils.lib.zsock_set_linger(self._p, linger)
 
     def reconnect_ivl(self):
         """
@@ -1199,7 +1199,7 @@ class Zsock(object):
         Set socket option `reconnect_ivl`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_reconnect_ivl(self._p, reconnect_ivl)
+        utils.lib.zsock_set_reconnect_ivl(self._p, reconnect_ivl)
 
     def reconnect_ivl_max(self):
         """
@@ -1213,7 +1213,7 @@ class Zsock(object):
         Set socket option `reconnect_ivl_max`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_reconnect_ivl_max(self._p, reconnect_ivl_max)
+        utils.lib.zsock_set_reconnect_ivl_max(self._p, reconnect_ivl_max)
 
     def backlog(self):
         """
@@ -1227,21 +1227,21 @@ class Zsock(object):
         Set socket option `backlog`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_backlog(self._p, backlog)
+        utils.lib.zsock_set_backlog(self._p, backlog)
 
     def set_subscribe(self, subscribe):
         """
         Set socket option `subscribe`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_subscribe(self._p, utils.to_bytes(subscribe))
+        utils.lib.zsock_set_subscribe(self._p, utils.to_bytes(subscribe))
 
     def set_unsubscribe(self, unsubscribe):
         """
         Set socket option `unsubscribe`.
         Available from libzmq 2.0.0.
         """
-        return utils.lib.zsock_set_unsubscribe(self._p, utils.to_bytes(unsubscribe))
+        utils.lib.zsock_set_unsubscribe(self._p, utils.to_bytes(unsubscribe))
 
     def type(self):
         """
@@ -1275,7 +1275,7 @@ class Zsock(object):
         """
         Self test of this class.
         """
-        return utils.lib.zsock_test(verbose)
+        utils.lib.zsock_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

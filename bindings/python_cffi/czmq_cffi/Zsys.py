@@ -28,7 +28,7 @@ class Zsys(object):
         earlier, avoiding any potential problems with atexit() ordering, especially
         with Windows dlls.
         """
-        return utils.lib.zsys_shutdown()
+        utils.lib.zsys_shutdown()
 
     def socket(type, filename, line_nbr):
         """
@@ -70,13 +70,13 @@ class Zsys(object):
         then the last handler will take affect. If handler_fn is NULL, disables
         default SIGINT/SIGTERM handling in CZMQ.
         """
-        return utils.lib.zsys_handler_set(handler_fn)
+        utils.lib.zsys_handler_set(handler_fn)
 
     def handler_reset():
         """
         Reset interrupt handler, call this at exit if needed
         """
-        return utils.lib.zsys_handler_reset()
+        utils.lib.zsys_handler_reset()
 
     def catch_interrupts():
         """
@@ -85,7 +85,7 @@ class Zsys(object):
         Can be supressed by ZSYS_SIGHANDLER=false
         *** This is for CZMQ internal use only and may change arbitrarily ***
         """
-        return utils.lib.zsys_catch_interrupts()
+        utils.lib.zsys_catch_interrupts()
 
     def file_exists(filename):
         """
@@ -143,21 +143,21 @@ class Zsys(object):
         Set private file creation mode; all files created from here will be
         readable/writable by the owner only.
         """
-        return utils.lib.zsys_file_mode_private()
+        utils.lib.zsys_file_mode_private()
 
     def file_mode_default():
         """
         Reset default file creation mode; all files created from here will use
         process file mode defaults.
         """
-        return utils.lib.zsys_file_mode_default()
+        utils.lib.zsys_file_mode_default()
 
     def version(major, minor, patch):
         """
         Return the CZMQ version for run-time API detection; returns version
         number into provided fields, providing reference isn't null in each case.
         """
-        return utils.lib.zsys_version(major, minor, patch)
+        utils.lib.zsys_version(major, minor, patch)
 
     def sprintf(format, ):
         """
@@ -214,7 +214,7 @@ class Zsys(object):
         fatal errors, and continue silently on "try again" errors.
         *** This is for CZMQ internal use only and may change arbitrarily ***
         """
-        return utils.lib.zsys_socket_error(utils.to_bytes(reason))
+        utils.lib.zsys_socket_error(utils.to_bytes(reason))
 
     def hostname():
         """
@@ -259,7 +259,7 @@ class Zsys(object):
         variable ZSYS_IO_THREADS is defined, that provides the default.
         Note that this method is valid only before any socket is created.
         """
-        return utils.lib.zsys_set_io_threads(io_threads)
+        utils.lib.zsys_set_io_threads(io_threads)
 
     def set_thread_sched_policy(policy):
         """
@@ -269,7 +269,7 @@ class Zsys(object):
         is defined, that provides the default.
         Note that this method is valid only before any socket is created.
         """
-        return utils.lib.zsys_set_thread_sched_policy(policy)
+        utils.lib.zsys_set_thread_sched_policy(policy)
 
     def set_thread_priority(priority):
         """
@@ -279,7 +279,7 @@ class Zsys(object):
         defined, that provides the default.
         Note that this method is valid only before any socket is created.
         """
-        return utils.lib.zsys_set_thread_priority(priority)
+        utils.lib.zsys_set_thread_priority(priority)
 
     def set_max_sockets(max_sockets):
         """
@@ -288,7 +288,7 @@ class Zsys(object):
         by using zsys_socket_limit (). A value of zero means "maximum".
         Note that this method is valid only before any socket is created.
         """
-        return utils.lib.zsys_set_max_sockets(max_sockets)
+        utils.lib.zsys_set_max_sockets(max_sockets)
 
     def socket_limit():
         """
@@ -301,7 +301,7 @@ class Zsys(object):
         Configure the maximum allowed size of a message sent.
         The default is INT_MAX.
         """
-        return utils.lib.zsys_set_max_msgsz(max_msgsz)
+        utils.lib.zsys_set_max_msgsz(max_msgsz)
 
     def max_msgsz():
         """
@@ -317,7 +317,7 @@ class Zsys(object):
         The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
         which generally depends on host OS, with fallback value of 5000.
         """
-        return utils.lib.zsys_set_file_stable_age_msec(file_stable_age_msec._p)
+        utils.lib.zsys_set_file_stable_age_msec(file_stable_age_msec._p)
 
     def file_stable_age_msec():
         """
@@ -335,7 +335,7 @@ class Zsys(object):
         environment variable ZSYS_LINGER is defined, that provides the default.
         Note that process exit will typically be delayed by the linger time.
         """
-        return utils.lib.zsys_set_linger(linger)
+        utils.lib.zsys_set_linger(linger)
 
     def set_sndhwm(sndhwm):
         """
@@ -345,7 +345,7 @@ class Zsys(object):
         ZSYS_SNDHWM is defined, that provides the default. Note that a value of
         zero means no limit, i.e. infinite memory consumption.
         """
-        return utils.lib.zsys_set_sndhwm(sndhwm)
+        utils.lib.zsys_set_sndhwm(sndhwm)
 
     def set_rcvhwm(rcvhwm):
         """
@@ -355,7 +355,7 @@ class Zsys(object):
         ZSYS_RCVHWM is defined, that provides the default. Note that a value of
         zero means no limit, i.e. infinite memory consumption.
         """
-        return utils.lib.zsys_set_rcvhwm(rcvhwm)
+        utils.lib.zsys_set_rcvhwm(rcvhwm)
 
     def set_pipehwm(pipehwm):
         """
@@ -365,7 +365,7 @@ class Zsys(object):
         defined, that provides the default. Note that a value of zero means no
         limit, i.e. infinite memory consumption.
         """
-        return utils.lib.zsys_set_pipehwm(pipehwm)
+        utils.lib.zsys_set_pipehwm(pipehwm)
 
     def pipehwm():
         """
@@ -382,7 +382,7 @@ class Zsys(object):
         environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
         default. Note: has no effect on ZMQ v2.
         """
-        return utils.lib.zsys_set_ipv6(ipv6)
+        utils.lib.zsys_set_ipv6(ipv6)
 
     def ipv6():
         """
@@ -399,7 +399,7 @@ class Zsys(object):
         variable ZSYS_INTERFACE is set, use that as the default interface name.
         Setting the interface to "*" means "use all available interfaces".
         """
-        return utils.lib.zsys_set_interface(utils.to_bytes(value))
+        utils.lib.zsys_set_interface(utils.to_bytes(value))
 
     def interface():
         """
@@ -414,7 +414,7 @@ class Zsys(object):
         on a given interface. If the environment variable ZSYS_IPV6_ADDRESS is set,
         use that as the default IPv6 address.
         """
-        return utils.lib.zsys_set_ipv6_address(utils.to_bytes(value))
+        utils.lib.zsys_set_ipv6_address(utils.to_bytes(value))
 
     def ipv6_address():
         """
@@ -429,7 +429,7 @@ class Zsys(object):
         ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
         address.
         """
-        return utils.lib.zsys_set_ipv6_mcast_address(utils.to_bytes(value))
+        utils.lib.zsys_set_ipv6_mcast_address(utils.to_bytes(value))
 
     def ipv6_mcast_address():
         """
@@ -447,7 +447,7 @@ class Zsys(object):
         set via the ZMQ_USE_FD socket option so that the library will use it
         instead of creating a new socket.
         """
-        return utils.lib.zsys_set_auto_use_fd(auto_use_fd)
+        utils.lib.zsys_set_auto_use_fd(auto_use_fd)
 
     def auto_use_fd():
         """
@@ -461,7 +461,7 @@ class Zsys(object):
         by this process. The log identity defaults to the environment variable
         ZSYS_LOGIDENT, if that is set.
         """
-        return utils.lib.zsys_set_logident(utils.to_bytes(value))
+        utils.lib.zsys_set_logident(utils.to_bytes(value))
 
     def set_logstream(stream):
         """
@@ -469,7 +469,7 @@ class Zsys(object):
         stdout. If you set the stream to NULL, no stream will receive the log
         traffic (it may still be sent to the system facility).
         """
-        return utils.lib.zsys_set_logstream(stream)
+        utils.lib.zsys_set_logstream(stream)
 
     def set_logsender(endpoint):
         """
@@ -481,50 +481,50 @@ class Zsys(object):
         bind the same sender to multiple endpoints. To disable the sender, call
         this method with a null argument.
         """
-        return utils.lib.zsys_set_logsender(utils.to_bytes(endpoint))
+        utils.lib.zsys_set_logsender(utils.to_bytes(endpoint))
 
     def set_logsystem(logsystem):
         """
         Enable or disable logging to the system facility (syslog on POSIX boxes,
         event log on Windows). By default this is disabled.
         """
-        return utils.lib.zsys_set_logsystem(logsystem)
+        utils.lib.zsys_set_logsystem(logsystem)
 
     def error(format, ):
         """
         Log error condition - highest priority
         """
-        return utils.lib.zsys_error(utils.to_bytes(format), )
+        utils.lib.zsys_error(utils.to_bytes(format), )
 
     def warning(format, ):
         """
         Log warning condition - high priority
         """
-        return utils.lib.zsys_warning(utils.to_bytes(format), )
+        utils.lib.zsys_warning(utils.to_bytes(format), )
 
     def notice(format, ):
         """
         Log normal, but significant, condition - normal priority
         """
-        return utils.lib.zsys_notice(utils.to_bytes(format), )
+        utils.lib.zsys_notice(utils.to_bytes(format), )
 
     def info(format, ):
         """
         Log informational message - low priority
         """
-        return utils.lib.zsys_info(utils.to_bytes(format), )
+        utils.lib.zsys_info(utils.to_bytes(format), )
 
     def debug(format, ):
         """
         Log debug-level message - lowest priority
         """
-        return utils.lib.zsys_debug(utils.to_bytes(format), )
+        utils.lib.zsys_debug(utils.to_bytes(format), )
 
     def test(verbose):
         """
         Self test of this class.
         """
-        return utils.lib.zsys_test(verbose)
+        utils.lib.zsys_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #
