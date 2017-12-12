@@ -160,6 +160,16 @@ IF (LZ4_FOUND)
 ENDIF (LZ4_FOUND)
 
 ########################################################################
+# version
+########################################################################
+set(CZMQ_VERSION_MAJOR 4)
+set(CZMQ_VERSION_MINOR 0)
+set(CZMQ_VERSION_PATCH 3)
+set(CZMQ_VERSION "${CZMQ_VERSION_MAJOR}.${CZMQ_VERSION_MINOR}.${CZMQ_VERSION_PATCH}")
+message(STATUS "Detected CZMQ Version - ${CZMQ_VERSION}")
+
+
+########################################################################
 # includes
 ########################################################################
 set (czmq_headers
@@ -273,28 +283,97 @@ IF (ENABLE_DRAFTS)
 ENDIF (ENABLE_DRAFTS)
 
 source_group("Source Files" FILES ${czmq_sources})
-if (NOT DEFINED BUILD_SHARED_LIBS)
-    SET(BUILD_SHARED_LIBS ON)
-endif()
-add_library(czmq ${czmq_sources})
-set_target_properties(czmq
-    PROPERTIES DEFINE_SYMBOL "CZMQ_EXPORTS"
-)
-set_target_properties (czmq
-    PROPERTIES SOVERSION "4"
-)
-set_target_properties (czmq
-    PROPERTIES VERSION "4.0.3"
-)
-target_link_libraries(czmq
-    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
-)
 
-install(TARGETS czmq
+
+option(CZMQ_BUILD_SHARED "Whether or not to build the shared object" ON)
+option(CZMQ_BUILD_STATIC "Whether or not to build the static archive" ON)
+
+if (NOT CZMQ_BUILD_SHARED AND NOT CZMQ_BUILD_STATIC)
+  message(FATAL_ERROR "Neither static nor shared library build enabled")
+endif()
+
+# shared
+if (CZMQ_BUILD_SHARED)
+  add_library(czmq SHARED ${czmq_sources})
+  set_target_properties(czmq
+    PROPERTIES DEFINE_SYMBOL "CZMQ_EXPORTS"
+  )
+
+if (MSVC)
+  set_target_properties (czmq PROPERTIES
+    PUBLIC_HEADER "${public_headers}"
+    RELEASE_POSTFIX "${MSVC_TOOLSET}-mt-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
+    RELWITHDEBINFO_POSTFIX "${MSVC_TOOLSET}-mt-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
+    DEBUG_POSTFIX "${MSVC_TOOLSET}-mt-gd-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
+    COMPILE_DEFINITIONS "DLL_EXPORT"
+    OUTPUT_NAME "czmq")
+else()
+  set_target_properties (czmq PROPERTIES
+    PUBLIC_HEADER "${public_headers}"
+    VERSION "${CZMQ_VERSION}"
+    SOVERSION "4"
+    COMPILE_DEFINITIONS "DLL_EXPORT"
+    OUTPUT_NAME "czmq"
+    PREFIX "lib")
+endif()
+
+  target_link_libraries(czmq
+    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
+  )
+
+  install(TARGETS czmq
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin              # .dll file
-)
+    RUNTIME DESTINATION bin                # .dll file
+  )
+
+  target_include_directories(czmq
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
+endif()
+
+# static
+if (CZMQ_BUILD_STATIC)
+  add_library(czmq-static STATIC ${czmq_sources})
+
+  if (MSVC)
+    set_target_properties(czmq-static PROPERTIES
+      PUBLIC_HEADER "${public_headers}"
+      RELEASE_POSTFIX "${MSVC_TOOLSET}-mt-s-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
+      RELWITHDEBINFO_POSTFIX "${MSVC_TOOLSET}-mt-s-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
+      DEBUG_POSTFIX "${MSVC_TOOLSET}-mt-sgd-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
+      COMPILE_DEFINITIONS "CZMQ_STATIC"
+      OUTPUT_NAME "czmq"
+    )
+  else()
+    set_target_properties(czmq-static PROPERTIES
+      PUBLIC_HEADER "${public_headers}"
+      COMPILE_DEFINITIONS "CZMQ_STATIC"
+      OUTPUT_NAME "czmq"
+      PREFIX "lib"
+    )
+  endif()
+
+  target_link_libraries(czmq-static
+    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
+  )
+
+  install(TARGETS czmq-static
+    LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+    ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+    RUNTIME DESTINATION bin                # .dll file
+  )
+
+  target_include_directories(czmq-static
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
+  target_compile_definitions(czmq-static
+    PUBLIC CZMQ_STATIC
+  )
+
+endif()
+
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project-local hook
 
@@ -328,12 +407,22 @@ add_executable(
     zmakecert
     "${SOURCE_DIR}/src/zmakecert.c"
 )
+if (TARGET czmq)
 target_link_libraries(
     zmakecert
     czmq
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
+endif()
+if (NOT TARGET czmq AND TARGET czmq-static)
+target_link_libraries(
+    zmakecert
+    czmq-static
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+)
+endif()
 install(TARGETS zmakecert
     RUNTIME DESTINATION bin
 )
@@ -341,32 +430,62 @@ add_executable(
     zsp
     "${SOURCE_DIR}/src/zsp.c"
 )
+if (TARGET czmq)
 target_link_libraries(
     zsp
     czmq
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
+endif()
+if (NOT TARGET czmq AND TARGET czmq-static)
+target_link_libraries(
+    zsp
+    czmq-static
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+)
+endif()
 add_executable(
     test_randof
     "${SOURCE_DIR}/src/test_randof.c"
 )
+if (TARGET czmq)
 target_link_libraries(
     test_randof
     czmq
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
+endif()
+if (NOT TARGET czmq AND TARGET czmq-static)
+target_link_libraries(
+    test_randof
+    czmq-static
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+)
+endif()
 add_executable(
     czmq_selftest
     "${SOURCE_DIR}/src/czmq_selftest.c"
 )
+if (TARGET czmq)
 target_link_libraries(
     czmq_selftest
     czmq
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
+endif()
+if (NOT TARGET czmq AND TARGET czmq-static)
+target_link_libraries(
+    czmq_selftest
+    czmq-static
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+)
+endif()
 
 ########################################################################
 # tests
@@ -505,6 +624,8 @@ message (STATUS "  C compiler        :   ${CMAKE_C_COMPILER}")
 message (STATUS "  Debug C flags     :   ${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS}")
 message (STATUS "  Release C flags   :   ${CMAKE_C_FLAGS_RELEASE} ${CMAKE_C_FLAGS}")
 message (STATUS "  Build type        :   ${CMAKE_BUILD_TYPE}")
+message (STATUS "  Static build      :   ${CZMQ_BUILD_STATIC}")
+message (STATUS "  Shared build      :   ${CZMQ_BUILD_SHARED}")
 IF (ENABLE_DRAFTS)
 message (STATUS "  Draft API         :   Yes")
 ELSE (ENABLE_DRAFTS)
