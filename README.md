@@ -24,7 +24,7 @@
 
 **[Building and Installing](#building-and-installing)**
 
-**[Building on Windows](#building-on-windows)**
+**[~Building on Windows~](#building-on-windows)**
 
 **[Linking with an Application](#linking-with-an-application)**
 
@@ -185,58 +185,8 @@ You will need the pkg-config, libtool, and autoreconf packages. After building, 
 
 ### Building on Windows
 
-To start with, you need MS Visual Studio (C/C++). The free community edition works well.
-
-Then, install git, and make sure it works from a DevStudio command prompt:
-
-```
-git
-```
-
-Now let's build CZMQ from GitHub:
-
-```
-    git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
-    cd libsodium\builds\msvc\build
-    buildall.bat
-    cd ..\..\..\..
-
-    :: if libsodium is on disk, the Windows build of libzmq will automatically use it
-    git clone git://github.com/zeromq/libzmq.git
-    cd libzmq\builds\msvc
-    configure.bat
-    cd build
-    buildall.bat
-    cd ..\..\..\..
-
-    git clone git://github.com/zeromq/czmq.git
-    cd czmq\builds\msvc
-    configure.bat
-    cd build
-    buildall.bat
-    cd ..\..\..\..
-```
-
-Let's test by running `czmq_selftest`:
-
-```
-   czmq>dir/s/b czmq_selftest.exe
-   czmq\builds\msvc\vs2013\DebugDEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\DebugLEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\DebugSEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\ReleaseDEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\ReleaseLEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\ReleaseSEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\x64\DebugDEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\x64\DebugLEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\x64\DebugSEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\x64\ReleaseDEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\x64\ReleaseLEXE\czmq_selftest.exe
-   czmq\builds\msvc\vs2013\x64\ReleaseSEXE\czmq_selftest.exe
-
-    :: select your choice and run it
-    czmq\builds\msvc\vs2013\x64\ReleaseDEXE\czmq_selftest.exe
-```
+Building on windows is supported to some extent, but the instructions for building on windows are currently incomplete. 
+Please check back later, or see the latest passing appveyor build to see how it's done there.
 
 ### Linking with an Application
 
