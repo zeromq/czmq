@@ -89,6 +89,12 @@ if (MSVC)
         PROPERTIES LANGUAGE CXX
     )
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
+
+    if (MSVC_IDE)
+        set (MSVC_TOOLSET "-${CMAKE_VS_PLATFORM_TOOLSET}")
+    else()
+        set (MSVC_TOOLSET "")
+    endif()
 endif()
 
 # specific case of windows UWP
