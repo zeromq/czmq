@@ -89,12 +89,6 @@ if (MSVC)
         PROPERTIES LANGUAGE CXX
     )
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
-
-    if (MSVC_IDE)
-        set (MSVC_TOOLSET "-${CMAKE_VS_PLATFORM_TOOLSET}")
-    else()
-        set (MSVC_TOOLSET "")
-    endif()
 endif()
 
 # specific case of windows UWP
@@ -301,28 +295,14 @@ endif()
 # shared
 if (CZMQ_BUILD_SHARED)
   add_library(czmq SHARED ${czmq_sources})
-  set_target_properties(czmq
-    PROPERTIES DEFINE_SYMBOL "CZMQ_EXPORTS"
-  )
 
-if (MSVC)
   set_target_properties (czmq PROPERTIES
     PUBLIC_HEADER "${public_headers}"
-    RELEASE_POSTFIX "${MSVC_TOOLSET}-mt-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
-    RELWITHDEBINFO_POSTFIX "${MSVC_TOOLSET}-mt-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
-    DEBUG_POSTFIX "${MSVC_TOOLSET}-mt-gd-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
-    COMPILE_DEFINITIONS "DLL_EXPORT"
-    OUTPUT_NAME "czmq")
-else()
-  set_target_properties (czmq PROPERTIES
-    PUBLIC_HEADER "${public_headers}"
-    VERSION "${CZMQ_VERSION}"
+    DEFINE_SYMBOL "CZMQ_EXPORTS"
     SOVERSION "4"
+    VERSION "${CZMQ_VERSION}"
     COMPILE_DEFINITIONS "DLL_EXPORT"
-    OUTPUT_NAME "czmq"
-    PREFIX "lib")
-endif()
+  )
 
   target_link_libraries(czmq
     ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
@@ -343,23 +323,10 @@ endif()
 if (CZMQ_BUILD_STATIC)
   add_library(czmq-static STATIC ${czmq_sources})
 
-  if (MSVC)
-    set_target_properties(czmq-static PROPERTIES
-      PUBLIC_HEADER "${public_headers}"
-      RELEASE_POSTFIX "${MSVC_TOOLSET}-mt-s-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
-      RELWITHDEBINFO_POSTFIX "${MSVC_TOOLSET}-mt-s-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
-      DEBUG_POSTFIX "${MSVC_TOOLSET}-mt-sgd-${CZMQ_VERSION_MAJOR}_${CZMQ_VERSION_MINOR}_${CZMQ_VERSION_PATCH}"
-      COMPILE_DEFINITIONS "CZMQ_STATIC"
-      OUTPUT_NAME "czmq"
-    )
-  else()
-    set_target_properties(czmq-static PROPERTIES
-      PUBLIC_HEADER "${public_headers}"
-      COMPILE_DEFINITIONS "CZMQ_STATIC"
-      OUTPUT_NAME "czmq"
-      PREFIX "lib"
-    )
-  endif()
+  set_target_properties(czmq-static PROPERTIES
+    PUBLIC_HEADER "${public_headers}"
+    COMPILE_DEFINITIONS "CZMQ_STATIC"
+  )
 
   target_link_libraries(czmq-static
     ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
