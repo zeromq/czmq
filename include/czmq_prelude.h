@@ -684,7 +684,7 @@ char *if_indextoname (unsigned int ifindex, char *ifname);
 #   define HAVE_UUID 1
 #endif
 #if defined (HAVE_UUID)
-#   if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
+#   if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD) || defined(__UTYPE_OPENBSD)
 #       include <uuid.h>
 #   elif defined __UTYPE_HPUX
 #       include <dce/uuid.h>
