@@ -1093,6 +1093,39 @@ zconfig_test (bool verbose)
     zconfig_destroy (&root);
     zchunk_destroy (&chunk);
 
+    // Test str_load
+    zconfig_t *config = zconfig_str_load (
+        "malamute\n"
+        "    endpoint = ipc://@/malamute\n"
+        "    producer = STREAM\n"
+        "    consumer\n"
+        "        STREAM2 = .*\n"
+        "        STREAM3 = HAM\n"
+        "server\n"
+        "    verbose = true\n"
+        );
+    assert (config);
+    assert (streq (zconfig_get (config, "malamute/endpoint", NULL), "ipc://@/malamute"));
+    assert (streq (zconfig_get (config, "malamute/producer", NULL), "STREAM"));
+    assert (zconfig_locate (config, "malamute/consumer"));
+
+    zconfig_t *c = zconfig_child (zconfig_locate (config, "malamute/consumer"));
+    assert (c);
+    assert (streq (zconfig_name (c), "STREAM2"));
+    assert (streq (zconfig_value (c), ".*"));
+
+    c = zconfig_next (c);
+    assert (c);
+    assert (streq (zconfig_name (c), "STREAM3"));
+    assert (streq (zconfig_value (c), "HAM"));
+
+    c = zconfig_next (c);
+    assert (!c);
+
+    assert (streq (zconfig_get (config, "server/verbose", NULL), "true"));
+
+    zconfig_destroy (&config);
+
     //  Test subtree removal
 	{
 		zconfig_t *root = zconfig_str_load (
@@ -1135,39 +1168,6 @@ zconfig_test (bool verbose)
 
         zconfig_destroy (&root);
 	}
-
-    // Test str_load
-    zconfig_t *config = zconfig_str_load (
-        "malamute\n"
-        "    endpoint = ipc://@/malamute\n"
-        "    producer = STREAM\n"
-        "    consumer\n"
-        "        STREAM2 = .*\n"
-        "        STREAM3 = HAM\n"
-        "server\n"
-        "    verbose = true\n"
-        );
-    assert (config);
-    assert (streq (zconfig_get (config, "malamute/endpoint", NULL), "ipc://@/malamute"));
-    assert (streq (zconfig_get (config, "malamute/producer", NULL), "STREAM"));
-    assert (zconfig_locate (config, "malamute/consumer"));
-
-    zconfig_t *c = zconfig_child (zconfig_locate (config, "malamute/consumer"));
-    assert (c);
-    assert (streq (zconfig_name (c), "STREAM2"));
-    assert (streq (zconfig_value (c), ".*"));
-
-    c = zconfig_next (c);
-    assert (c);
-    assert (streq (zconfig_name (c), "STREAM3"));
-    assert (streq (zconfig_value (c), "HAM"));
-
-    c = zconfig_next (c);
-    assert (!c);
-
-    assert (streq (zconfig_get (config, "server/verbose", NULL), "true"));
-
-    zconfig_destroy (&config);
 
     //  Delete all test files
     dir = zdir_new (basedirpath, NULL);
