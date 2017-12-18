@@ -169,9 +169,14 @@ CZMQ_EXPORT void
 
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
-//  Destroy subtree (child)
+//  Destroy subtree (all children)
 CZMQ_EXPORT void
-    zconfig_remove (zconfig_t *self);
+    zconfig_remove_subtree (zconfig_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Destroy node and subtree (all children)
+CZMQ_EXPORT void
+    zconfig_remove (zconfig_t **self_p);
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
