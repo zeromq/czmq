@@ -127,8 +127,6 @@ zconfig_destroy (zconfig_t **self_p)
         zconfig_destroy (&self->child);
         zconfig_destroy (&self->next);
 
-        
-
         //  Destroy other properties and then self
         zlist_destroy (&self->comments);
         zfile_destroy (&self->file);
@@ -141,14 +139,53 @@ zconfig_destroy (zconfig_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Destroy subtree (child)
+//  Destroy node and subtree (all children)
 
 void
-zconfig_remove (zconfig_t *self)
+zconfig_remove (zconfig_t **self_p)
+{
+    assert (self_p);
+
+    if (*self_p == NULL)
+        return;
+
+    zconfig_t *self = *self_p;
+
+    //  Destroy all children
+    zconfig_remove_subtree (self);
+
+    if (self->parent) {
+        if (self->parent->child == self) {
+           self->parent->child = self->next;
+        }
+        else {
+            zconfig_t *prev = self->parent->child;
+            while (prev->next != self) {
+                prev = prev->next;
+            }
+            prev->next = self->next;
+        }
+    }
+
+    //  Destroy other properties and then self
+    zlist_destroy (&self->comments);
+    zfile_destroy (&self->file);
+    freen (self->name);
+    freen (self->value);
+    freen (self);
+    *self_p = NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Destroy subtree (all children)
+
+void
+zconfig_remove_subtree (zconfig_t *self)
 {
     assert (self);
 
-    //  Destroy all children and siblings recursively
+    //  Destroy all children
     zconfig_destroy (&self->child);
     self->child = NULL;
 }
@@ -1077,7 +1114,7 @@ zconfig_test (bool verbose)
         zconfig_t *to_delete = zconfig_locate (root, "main/frontend");
         assert (to_delete);
 
-        zconfig_remove (to_delete);
+        zconfig_remove_subtree (to_delete);
 
         char *value = zconfig_get (root, "/main/type", NULL);
         assert (value);
