@@ -1230,6 +1230,126 @@ zconfig_test (bool verbose)
         zconfig_destroy (&root);
     }
 
+    //  Test node and subtree removal
+	{
+		zconfig_t *root = zconfig_str_load (
+			"A1 = abc\n"
+			"    x\n"
+			"        1\n"
+			"        2\n"
+			"    y = 1      #   Ask for a trace\n"
+			"A2\n"
+			"    B1 = zqueue    #  ZMQ_DEVICE type\n"
+			"    B2\n"
+			"        C1\n"
+			"            hwm = 1000\n"
+			"            swap = 25000000     #  25MB\n"
+			"        C2 = 50\n"
+			"        C3\n"
+			"            bind = addr3\n"
+			"    B3\n"
+			"        bind = inproc://addr4\n"
+			"    B4 = Ignac\n"
+			"        z = 5\n"
+			"A3\n"
+			"A4\n"
+		);
+
+        zconfig_t *to_delete = zconfig_locate (root, "A2/B2/C3");
+        assert (to_delete);
+
+        zconfig_remove (&to_delete);
+
+        zconfig_t *check = zconfig_locate (root, "A2/B2/C2");
+        assert (check);
+        assert (streq (zconfig_value (check), "50"));
+        assert (zconfig_next (check) == NULL);
+        assert (zconfig_locate (root, "A2/B2/C3/bind") == NULL);
+        assert (zconfig_locate (root, "A2/B2/C3") == NULL);
+
+        to_delete = zconfig_locate (root, "A2/B2");
+        assert (to_delete);
+
+        zconfig_remove (&to_delete);
+
+        check = zconfig_locate (root, "A2");
+        assert (check);
+        check = zconfig_child (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "B1"));
+        assert (streq (zconfig_value (check), "zqueue"));
+        check = zconfig_next (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "B3"));
+        assert (streq (zconfig_value (check), ""));
+        assert (zconfig_locate (root, "A2/B2/C1") == NULL);
+        assert (zconfig_locate (root, "A2/B2/C2") == NULL);
+        assert (zconfig_locate (root, "A2/B2") == NULL);
+        assert (zconfig_locate (root, "A2/B4"));
+
+        to_delete = zconfig_locate (root, "A2/B1");
+        assert (to_delete);
+
+        zconfig_remove (&to_delete);
+
+        check = zconfig_locate (root, "A2");
+        assert (check);
+        check = zconfig_child (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "B3"));
+        assert (streq (zconfig_value (check), ""));
+        check = zconfig_next (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "B4"));
+        assert (streq (zconfig_value (check), "Ignac"));
+        assert (zconfig_next (check) == NULL);
+        assert (zconfig_locate (root, "A2/B1") == NULL);
+        assert (zconfig_locate (root, "A2/B2") == NULL);
+
+        to_delete = zconfig_locate (root, "A2/B3");
+        assert (to_delete);
+
+        zconfig_remove (&to_delete);
+
+        check = zconfig_locate (root, "A2");
+        assert (check);
+        check = zconfig_child (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "B4"));
+        assert (streq (zconfig_value (check), "Ignac"));
+        assert (zconfig_next (check) == NULL);
+
+        to_delete = zconfig_locate (root, "A2");
+        assert (to_delete);
+
+        zconfig_remove (&to_delete);
+
+        check = zconfig_locate (root, "A1");
+        assert (check);
+        check = zconfig_next (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "A3"));
+        assert (zconfig_locate (root, "A2/B4") == NULL);
+        assert (zconfig_locate (root, "A2") == NULL);
+
+        to_delete = zconfig_locate (root, "A1");
+        assert (to_delete);
+
+        zconfig_remove (&to_delete);
+
+        check = zconfig_child (root);
+        assert (check);
+        assert (streq (zconfig_name (check), "A3"));
+        assert (zconfig_locate (root, "A1/x/1") == NULL);
+        assert (zconfig_locate (root, "A1/x") == NULL);
+        assert (zconfig_locate (root, "A1/y") == NULL);
+        assert (zconfig_locate (root, "A3"));
+        assert (zconfig_locate (root, "A4"));
+
+        //  called on root should be equivalent to zconfig_destroy (&root)
+        zconfig_remove (&root);
+    }
+
     //  Delete all test files
     dir = zdir_new (basedirpath, NULL);
     assert (dir);
