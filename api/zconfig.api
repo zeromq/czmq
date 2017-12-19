@@ -180,8 +180,13 @@
         <return type = "boolean" />
     </method>
 
-    <method name = "remove" state = "draft">
-        Destroy subtree (child)
+    <method name = "remove_subtree" state = "draft">
+        Destroy subtree (all children)
+    </method>
+
+    <method name = "remove" singleton = "1" state = "draft">
+        Destroy node and subtree (all children)
+        <argument name = "self_p" type = "zconfig" by_reference = "1" />
     </method>
 
     <method name = "fprint">
