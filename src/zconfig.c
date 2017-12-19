@@ -1144,30 +1144,91 @@ zconfig_test (bool verbose)
 			"        bind = inproc://addr3\n"
 		);
 
-        zconfig_t *to_delete = zconfig_locate (root, "main/frontend");
+        //  no subtree
+        zconfig_t *to_delete = zconfig_locate (root, "context/iothreads");
         assert (to_delete);
 
         zconfig_remove_subtree (to_delete);
 
-        char *value = zconfig_get (root, "/main/type", NULL);
-        assert (value);
-        assert (streq (value, "zqueue"));
+        zconfig_t *check = zconfig_locate (root, "context/iothreads");
+        assert (check);
+        assert (streq (zconfig_value (check), "1"));
 
-        value = zconfig_get (root, "/main/backend/bind", NULL);
-        assert (value);
-        assert (streq (value, "inproc://addr3"));
+        check = zconfig_locate (root, "context/verbose");
+        assert (check);
+        assert (streq (zconfig_value (check), "1"));
 
-        value = zconfig_get (root, "/main/frontend", NULL);
-        assert (value);
+        //  existing subtree
+        to_delete = zconfig_locate (root, "main/frontend/option");
+        assert (to_delete);
 
-        value = zconfig_get (root, "/main/frontend/option", NULL);
-        assert (value == NULL);
+        zconfig_remove_subtree (to_delete);
 
-        value = zconfig_get (root, "/main/frontend/option/swap", NULL);
-        assert (value == NULL);
+        check = zconfig_locate (root, "main/frontend/option/hwm");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/frontend/option/swap");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/frontend/option");
+        assert (check);
+        assert (streq (zconfig_value (check), ""));
+        check = zconfig_next (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "bind"));
+        assert (streq (zconfig_value (check), "inproc://addr1"));
+        check = zconfig_next (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "bind"));
+        assert (streq (zconfig_value (check), "ipc://addr2"));
+        assert (zconfig_next (check) == NULL);
+
+        to_delete = zconfig_locate (root, "main/frontend");
+        assert (to_delete);
+
+        zconfig_remove_subtree (to_delete);
+
+        check = zconfig_locate (root, "main/frontend/option/hwm");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/frontend/option/swap");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/frontend/option");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/frontend/bind");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/frontend");
+        assert (check);
+        assert (streq (zconfig_value (check), ""));
+        assert (zconfig_child (check) == NULL);
+        check = zconfig_next (check);
+        assert (check);
+        assert (streq (zconfig_name (check), "backend"));
+        assert (streq (zconfig_value (check), ""));
+
+        to_delete = zconfig_locate (root, "main");
+        assert (to_delete);
+
+        zconfig_remove_subtree (to_delete);
+
+        check = zconfig_locate (root, "main/type");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/frontend");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main/backend");
+        assert (check == NULL);
+        check = zconfig_locate (root, "main");
+        assert (check);
+
+        //  root
+        zconfig_remove_subtree (root);
+
+        assert (root);
+        assert (zconfig_child (root) == NULL);
+        check = zconfig_locate (root, "main");
+        assert (check == NULL);
+        check = zconfig_locate (root, "context");
+        assert (check == NULL);
 
         zconfig_destroy (&root);
-	}
+    }
 
     //  Delete all test files
     dir = zdir_new (basedirpath, NULL);
