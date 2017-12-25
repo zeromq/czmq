@@ -99,8 +99,8 @@ public slots:
     //  file has changed in since the tree was loaded.
     bool hasChanged ();
 
-    //  Destroy subtree (child)
-    void remove ();
+    //  Destroy subtree (all children)
+    void removeSubtree ();
 
     //  Print the config file to open stream
     void fprint (FILE *file);
@@ -130,6 +130,9 @@ public slots:
 
     //  Load a config tree from a null-terminated string
     QmlZconfig *strLoad (const QString &string);
+
+    //  Destroy node and subtree (all children)
+    void remove (QmlZconfig *selfP);
 
     //  Self test of this class
     void test (bool verbose);

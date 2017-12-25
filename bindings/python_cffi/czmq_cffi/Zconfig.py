@@ -175,11 +175,17 @@ class Zconfig(object):
         """
         return utils.lib.zconfig_has_changed(self._p)
 
-    def remove(self):
+    def remove_subtree(self):
         """
-        Destroy subtree (child)
+        Destroy subtree (all children)
         """
-        utils.lib.zconfig_remove(self._p)
+        utils.lib.zconfig_remove_subtree(self._p)
+
+    def remove(self_p):
+        """
+        Destroy node and subtree (all children)
+        """
+        utils.lib.zconfig_remove(self_p._p)
 
     def fprint(self, file):
         """

@@ -402,12 +402,22 @@ module CZMQ
         result
       end
 
-      # Destroy subtree (child)
+      # Destroy subtree (all children)
       #
       # @return [void]
-      def remove()
+      def remove_subtree()
         raise DestroyedError unless @ptr
         self_p = @ptr
+        result = ::CZMQ::FFI.zconfig_remove_subtree(self_p)
+        result
+      end
+
+      # Destroy node and subtree (all children)
+      #
+      # @param self_p [#__ptr_give_ref]
+      # @return [void]
+      def self.remove(self_p)
+        self_p = self_p.__ptr_give_ref
         result = ::CZMQ::FFI.zconfig_remove(self_p)
         result
       end

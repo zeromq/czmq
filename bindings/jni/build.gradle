@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "org.zeromq"
-version = "4.0.3"
+version = "4.1.0"
 
 repositories {
     mavenLocal()
@@ -136,8 +136,8 @@ bintray {
         vcsUrl = 'https://github.com/zeromq/czmq.git'
         githubRepo = System.getenv('BINTRAY_USER_ORG') + '/czmq'
         version {
-            name = '4.0.3'
-            vcsTag= '4.0.3'
+            name = '4.1.0'
+            vcsTag= '4.1.0'
         }
     }
 }

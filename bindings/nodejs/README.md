@@ -815,10 +815,16 @@ Return true if a configuration tree was loaded from a file and that
 file has changed in since the tree was loaded.
 
 ```
-nothing my_zconfig.remove ()
+nothing my_zconfig.removeSubtree ()
 ```
 
-Destroy subtree (child)
+Destroy subtree (all children)
+
+```
+nothing my_zconfig.remove (Zconfig)
+```
+
+Destroy node and subtree (all children)
 
 ```
 nothing my_zconfig.print ()

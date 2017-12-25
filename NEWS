@@ -1,5 +1,228 @@
-CZMQ version 4.0.3 stable, released on 20xx/xx/xx
+CZMQ version 4.1.0 stable, released on 20xx/xx/xx
 =================================================
+
+* New STABLE APIs have been added to wrap new libzmq context
+  options:
+  - zsys_set_thread_sched_policy
+  - zsys_set_thread_priority
+  See zsys manpage for more details.
+
+* New DRAFT class to parse command line arguments in a platform
+  independent way: zargs. See zargs manpage for more info.
+
+* New DRAFT APIs have been added to the zproc class to manage
+  subprocesses in a platform-independent unified API. See the
+  zproc manpage for more details.
+
+* New DRAFT APIs have been added to the zactor class to override
+  the default destructor:
+  - zactor_destructor_fn
+  - zactor_set_destructor
+  See zactor manpage for more info.
+
+* New DRAFT APIs have been added to the zcertstore class to return
+  a zlistx of all the certificates in the store:
+  - zcertstore_certs
+  See zcertstore manpage for more info.
+
+* New DRAFT APIs have been added to the zcert class to create a new
+  zcert from public/secret keypair in text form:
+  - zcert_new_from_txt
+  See zcert manpage for more info.
+
+* New DRAFT APIs have been added to the zsys class to get/set the
+  default "stable" age value of files in zfile:
+  - zsys_file_stable_age_msec
+  - zsys_set_file_stable_age_msec
+  See zsys and zfile manpages for more info.
+
+* New DRAFT APIs have been added to the zstr class to send and receive
+  compressed strings:
+  - zstr_recv_compress
+  - zstr_send_compress
+  - zstr_sendm_compress
+  To enable them, build with the new (optional) lz4 dependency.
+  See zstr manpage for more info.
+
+* New DRAFT APIs have been added to the zgossip class to support CURVE
+  security:
+  - "ZAP DOMAIN" actor message to set the ZAP domain for authentication
+  - "SET PUBLICKEY" actor message to set the local public key
+  - "SET SECRETKEY" actor message to set the local secret key
+  - new optional parameter appended to "CONNECT" actor message, public
+    key of the server
+  See zgossip manpage for more info.
+
+* New DRAFT APIs have been added to the zfile class to support managing
+  temporary files in a platform independent way:
+  - zfile_tmp
+  See zfile manpage for more info.
+
+* New DRAFT APIs have been added to the zconfig class to support removing
+  a node and its subtrees or only the subtrees:
+  - zconfig_remove_subtree
+  - zconfig_remove
+  See zconfig manpage for more info.
+
+* Added new FFI Python and Ruby bindings.
+
+* Add support for new ZMQ socket monitoring events to the zmonitor class:
+  - HANDSHAKE_SUCCEEDED
+  - HANDSHAKE_FAILED_NO_DETAIL
+  - HANDSHAKE_FAILED_PROTOCOL
+  - HANDSHAKE_FAILED_AUTH
+  Requires libzmq version 4.2.3 or higher with DRAFT APIs enabled.
+
+* Fixed #1811 - add CZMQ_BUILD_SHARED/STATIC options to CMake to control
+                whether to build shared/static libraries. Default to ON.
+                The minimum required CMake version has been bumped from
+                2.8 to 2.8.8.
+
+* Fixed #1802 - fix using ziflist in a VirtualBox VM running on OSX.
+
+* Fixed #1798 - fix build on Cygwin.
+
+* Fixed #1773 - fix zfile_restat on Windows XP with newer MSVC++.
+
+* Fixed #1765 - fix build on OpenBSD.
+
+* Fixed #1755 - improve reliability of zproxy selftest in slower
+                environments.
+
+* Fixed #1753 - fix zloop_set_nonstop to actually use the parameter
+                passed by the user rather than always setting
+                nonstop to true.
+
+* Fixed #1747 - check for OOM condition in zstr_send* functions.
+
+* Fixed #1730 - improve the internal usage of system random generator
+                APIs to be more reliable.
+
+* Fixed #1728 - chomp all leading "/" in zfile_filename.
+
+* Fixed #1726 - do not bind to hard-coded TCP ports in self tests.
+
+* Fixed #1722 - define the PRI* types if not available on Windows.
+
+* Fixed #1715 - document ZSYS_SIGHANDLER behaviour w.r.t. the
+                zsys_catch_interrupts API.
+
+* Fixed #1712 - clarify zsock_brecv documentation w.r.t buffers.
+
+* Fixed #1711 - set User-Id field in ZAP responses.
+
+* Fixed #1710 - clarify documentation of zframe_meta - the caller
+                must not modify the returned value.
+
+* Fixed #1702 - clarify documentation of zhashx_set_key_comparator
+                and zhashx_set_key_hasher.
+
+* Fixed #1675 - fix zhashx_purge memory leak when shrinking.
+
+* Fixed #1672 - fix compile error 'sockaddr_in': undeclared
+                identifier on MSVC.
+
+* Fixed #1671 - add support for new (DRAFT) socket types in
+                zframe_recv_nowait and zmsg_recv_nowait.
+
+* Fixed #1671 - correctly complete multipart receives in
+                zmsg_recv_nowait.
+
+* Fixed #1667 - if ZSYS_IPV6_ADDRESS is link-local but does not
+                have the %interface suffix, append it from
+                ZSYS_INTERFACE.
+
+* Fixed #1659 - reset all CZMQ internal state in zsys_shutdown
+                to facilitate use with fork without exec.
+
+* Fixed #1649 - set static pointers to NULL to fix restarting
+                CZMQ via zsys_shutdown -> zsys_init.
+
+* Fixed #1644 - zbeacon on Windows only sends on one interfaces
+                with INADDR_BROADCAST set (interface option "*").
+
+* Fixed #1634 - zloop is using reader callback after
+                zloop_reader_end.
+
+* Fixed #1632 - NULL pointer exception in ziflist on Windows
+                if network adapters are added/removed whilst
+                being enumerated.
+
+* Fixed #1623 - remove mentions of retired APIs from manpages.
+
+* Fixed #1618 - fix build with GCC 7.
+
+* Fixed #1616 - zsys_udp_recv will now return NULL when failing
+                to retrieve the peer's address instead of
+                silently failing.
+
+* Fixed #1616 - zsys_udp_recv's parameter peername must now be
+                at least NI_MAXHOST long when IPv6 is enabled.
+
+* Fixed #1616 - add IPv6 support to zbeacon using, by default,
+                link-local all-node address fe02::1 in lieu of
+                broadcast (which does not exist on v6).
+                The multicast address can be specified via zsys
+                so, theoretically, it should work across
+                multiple networks as well (untested!).
+
+* Fixed #1615 - add link-local all-node fe02::1 as the default
+                zsys IPv6 multicast address.
+
+* Fixed #1615 - add IPv6 support to ziflist on *nix through new
+                (DRAFT) APIs to avoid changing the output of old
+                ones: ziflist_new_ipv6, ziflist_reload_ipv6 and
+                ziflist_is_ipv6.
+
+* Fixed #1603 - generated socket options, and public API/ABI, were
+                changing depending on the version of libzmq used
+                at build time. Keep all the symbols stable instead
+                and add additional runtime checks.
+                Socket options APIs will now be built as empty
+                stubs if unavailable in the libzmq version used at
+                build time, and will return an error if not
+                available in the libzmq version used at runtime.
+
+* Fixed #1609 - fix zdir selftest on Windows.
+
+* Fixed #1608 - document that on Windows it is necessary to call
+                zsys_shutdown manually as DLLs do not support
+                atexit() callbacks, and manually call it from all
+                unit tests.
+
+* Fixed #1606 - use inproc instead of ipc in zproxy selftest to
+                fix failure on Windows.
+
+* Fixed #1602 - ZSYS_INTERFACE: if the value is a single digit,
+                interpret it as an index. Facilitates using it
+                on Windows with complicated interface names.
+
+* Fixed #1599 - correctly handle CTRL_CLOSE_EVENT in Windows.
+
+* Fixed #1597 - added czmq_private_selftest to test private
+                classes without exporting their symbols in the
+                shared library.
+
+* Fixed #1597 - declare some internal-only helper functions as
+                static to avoid exporting their symbols.
+
+* Fixed #1594 - correctly return -1 and set errno to EINVAL from
+                zpoller_remove if the reader does not exist
+
+* Fixed #1590 - zsys_shutdown does not call zmq_term when it
+                closes sockets which results in dangling sockets
+                warnings.
+
+* Fixed #1588 - fix debian/kfreebsd build and always use external
+                UUID library, if available, regardless of the OS.
+
+* Fixed #1459 - clarify zgossip documentation.
+
+* Fixed #1026 - zmsg_remove decreased count of frames even when it
+                failed.
+
+* Fixed #1032 - clarify documentation of zhash_autofree and zhashx
+                callbacks.
 
 
 CZMQ version 4.0.2 stable, released on 2016/12/31

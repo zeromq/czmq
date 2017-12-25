@@ -229,11 +229,12 @@ $(top_builddir)/$(SELFTEST_DIR_RW):
 	rm -rf "$@"
 	mkdir -p "$@"
 
+# Note: for some reason "$<" misfired in rule below on Travis, so be explicit
 if USING_VPATH
 $(abs_top_builddir)/$(SELFTEST_DIR_RO): $(abs_top_srcdir)/$(SELFTEST_DIR_RO)
-	echo "   COPYDIR  $(SELFTEST_DIR_RO)"; \
+	@echo "   COPYDIR  $(SELFTEST_DIR_RO)"; \
 	rm -rf "$@"; \
-	cp -r "$<" "$@"
+	cp -r "$(abs_top_srcdir)/$(SELFTEST_DIR_RO)" "$@"
 
 $(top_builddir)/$(SELFTEST_DIR_RO): $(abs_top_builddir)/$(SELFTEST_DIR_RO)
 endif

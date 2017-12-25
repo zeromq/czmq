@@ -1270,6 +1270,7 @@ NAN_MODULE_INIT (Zconfig::Init) {
     Nan::SetPrototypeMethod (tpl, "strLoad", _str_load);
     Nan::SetPrototypeMethod (tpl, "strSave", _str_save);
     Nan::SetPrototypeMethod (tpl, "hasChanged", _has_changed);
+    Nan::SetPrototypeMethod (tpl, "removeSubtree", _remove_subtree);
     Nan::SetPrototypeMethod (tpl, "remove", _remove);
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "test", _test);
@@ -1638,9 +1639,14 @@ NAN_METHOD (Zconfig::_has_changed) {
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
-NAN_METHOD (Zconfig::_remove) {
+NAN_METHOD (Zconfig::_remove_subtree) {
     Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
-    zconfig_remove (zconfig->self);
+    zconfig_remove_subtree (zconfig->self);
+}
+
+NAN_METHOD (Zconfig::_remove) {
+    Zconfig *self_p = Nan::ObjectWrap::Unwrap<Zconfig>(info [0].As<Object>());
+    zconfig_remove (&self_p->self);
 }
 
 NAN_METHOD (Zconfig::_print) {

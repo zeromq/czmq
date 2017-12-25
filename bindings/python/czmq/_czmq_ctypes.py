@@ -1488,8 +1488,10 @@ lib.zconfig_str_save.restype = POINTER(c_char)
 lib.zconfig_str_save.argtypes = [zconfig_p]
 lib.zconfig_has_changed.restype = c_bool
 lib.zconfig_has_changed.argtypes = [zconfig_p]
+lib.zconfig_remove_subtree.restype = None
+lib.zconfig_remove_subtree.argtypes = [zconfig_p]
 lib.zconfig_remove.restype = None
-lib.zconfig_remove.argtypes = [zconfig_p]
+lib.zconfig_remove.argtypes = [POINTER(zconfig_p)]
 lib.zconfig_fprint.restype = None
 lib.zconfig_fprint.argtypes = [zconfig_p, FILE_p]
 lib.zconfig_print.restype = None
@@ -1716,11 +1718,18 @@ file has changed in since the tree was loaded.
         """
         return lib.zconfig_has_changed(self._as_parameter_)
 
-    def remove(self):
+    def remove_subtree(self):
         """
-        Destroy subtree (child)
+        Destroy subtree (all children)
         """
-        return lib.zconfig_remove(self._as_parameter_)
+        return lib.zconfig_remove_subtree(self._as_parameter_)
+
+    @staticmethod
+    def remove(self_p):
+        """
+        Destroy node and subtree (all children)
+        """
+        return lib.zconfig_remove(byref(zconfig_p.from_param(self_p)))
 
     def fprint(self, file):
         """

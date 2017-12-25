@@ -1,10 +1,20 @@
 # pthread requires special checks and flags to be added
 find_package(Threads)
 if(THREADS_HAVE_PTHREAD_ARG)
-  target_compile_options(PUBLIC czmq "-pthread")
+  if(CZMQ_BUILD_SHARED)
+    target_compile_options(PUBLIC czmq "-pthread")
+  endif()
+  if(CZMQ_BUILD_STATIC)
+    target_compile_options(PUBLIC czmq-static "-pthread")
+  endif()
 endif()
 if(CMAKE_THREAD_LIBS_INIT)
-  target_link_libraries(czmq "${CMAKE_THREAD_LIBS_INIT}")
+  if(CZMQ_BUILD_SHARED)
+    target_link_libraries(czmq "${CMAKE_THREAD_LIBS_INIT}")
+  endif()
+  if(CZMQ_BUILD_STATIC)
+    target_link_libraries(czmq-static "${CMAKE_THREAD_LIBS_INIT}")
+  endif()
 endif()
 
 # at least C99 is required for zdir which uses ‘for’ loop initial declarations
