@@ -6,7 +6,7 @@
 ########################################################################
 # Project setup
 ########################################################################
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.8)
 project(czmq)
 enable_language(C)
 enable_testing()
@@ -92,7 +92,7 @@ if (MSVC)
 endif()
 
 # specific case of windows UWP
-if( ${CMAKE_SYSTEM_NAME} STREQUAL "WindowsStore" AND ${CMAKE_SYSTEM_VERSION} STREQUAL "10.0")
+if( "${CMAKE_SYSTEM_NAME}" STREQUAL "WindowsStore" AND "${CMAKE_SYSTEM_VERSION}" STREQUAL "10.0")
   ADD_DEFINITIONS(-DZMQ_HAVE_WINDOWS_UWP)
   ADD_DEFINITIONS(-D_WIN32_WINNT=_WIN32_WINNT_WIN10)
 endif()
@@ -163,8 +163,8 @@ ENDIF (LZ4_FOUND)
 # version
 ########################################################################
 set(CZMQ_VERSION_MAJOR 4)
-set(CZMQ_VERSION_MINOR 0)
-set(CZMQ_VERSION_PATCH 3)
+set(CZMQ_VERSION_MINOR 1)
+set(CZMQ_VERSION_PATCH 0)
 set(CZMQ_VERSION "${CZMQ_VERSION_MAJOR}.${CZMQ_VERSION_MINOR}.${CZMQ_VERSION_PATCH}")
 message(STATUS "Detected CZMQ Version - ${CZMQ_VERSION}")
 
@@ -292,9 +292,20 @@ if (NOT CZMQ_BUILD_SHARED AND NOT CZMQ_BUILD_STATIC)
   message(FATAL_ERROR "Neither static nor shared library build enabled")
 endif()
 
+IF (NOT MSVC)
+  # avoid building everything twice for shared + static
+  # only on *nix, as Windows needs different preprocessor defines in static builds
+  add_library (objects OBJECT ${czmq_sources})
+  set_property(TARGET objects PROPERTY POSITION_INDEPENDENT_CODE ON)
+ENDIF (NOT MSVC)
+
 # shared
 if (CZMQ_BUILD_SHARED)
-  add_library(czmq SHARED ${czmq_sources})
+  IF (MSVC)
+    add_library(czmq SHARED ${czmq_sources})
+  ELSE (MSVC)
+    add_library(czmq SHARED $<TARGET_OBJECTS:objects>)
+  ENDIF (MSVC)
 
   set_target_properties (czmq PROPERTIES
     PUBLIC_HEADER "${public_headers}"
@@ -302,6 +313,8 @@ if (CZMQ_BUILD_SHARED)
     SOVERSION "4"
     VERSION "${CZMQ_VERSION}"
     COMPILE_DEFINITIONS "DLL_EXPORT"
+    OUTPUT_NAME "czmq"
+    PREFIX "lib"
   )
 
   target_link_libraries(czmq
@@ -321,11 +334,17 @@ endif()
 
 # static
 if (CZMQ_BUILD_STATIC)
-  add_library(czmq-static STATIC ${czmq_sources})
+  IF (MSVC)
+    add_library(czmq-static STATIC ${czmq_sources})
+  ELSE (MSVC)
+    add_library(czmq-static STATIC $<TARGET_OBJECTS:objects>)
+  ENDIF (MSVC)
 
   set_target_properties(czmq-static PROPERTIES
     PUBLIC_HEADER "${public_headers}"
     COMPILE_DEFINITIONS "CZMQ_STATIC"
+    OUTPUT_NAME "czmq"
+    PREFIX "lib"
   )
 
   target_link_libraries(czmq-static
@@ -353,7 +372,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project
 ########################################################################
 # pkgconfig
 ########################################################################
-set (VERSION "4.0.3")
+set (VERSION "4.1.0")
 set (prefix "${CMAKE_INSTALL_PREFIX}")
 set (exec_prefix "\${prefix}")
 set (libdir "\${prefix}/lib${LIB_SUFFIX}")

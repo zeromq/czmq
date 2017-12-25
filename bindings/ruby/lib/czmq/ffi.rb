@@ -204,6 +204,7 @@ module CZMQ
       attach_function :zconfig_str_load, [:string], :pointer, **opts
       attach_function :zconfig_str_save, [:pointer], :pointer, **opts
       attach_function :zconfig_has_changed, [:pointer], :bool, **opts
+      attach_function :zconfig_remove_subtree, [:pointer], :void, **opts
       attach_function :zconfig_remove, [:pointer], :void, **opts
       attach_function :zconfig_fprint, [:pointer, :pointer], :void, **opts
       attach_function :zconfig_print, [:pointer], :void, **opts

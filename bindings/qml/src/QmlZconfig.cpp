@@ -155,9 +155,9 @@ bool QmlZconfig::hasChanged () {
 };
 
 ///
-//  Destroy subtree (child)
-void QmlZconfig::remove () {
-    zconfig_remove (self);
+//  Destroy subtree (all children)
+void QmlZconfig::removeSubtree () {
+    zconfig_remove_subtree (self);
 };
 
 ///
@@ -200,6 +200,12 @@ QmlZconfig *QmlZconfigAttached::strLoad (const QString &string) {
     QmlZconfig *retQ_ = new QmlZconfig ();
     retQ_->self = zconfig_str_load (string.toUtf8().data());
     return retQ_;
+};
+
+///
+//  Destroy node and subtree (all children)
+void QmlZconfigAttached::remove (QmlZconfig *selfP) {
+    zconfig_remove (&selfP->self);
 };
 
 ///

@@ -765,9 +765,13 @@ char *
 bool
     zconfig_has_changed (zconfig_t *self);
 
-// Destroy subtree (child)
+// Destroy subtree (all children)
 void
-    zconfig_remove (zconfig_t *self);
+    zconfig_remove_subtree (zconfig_t *self);
+
+// Destroy node and subtree (all children)
+void
+    zconfig_remove (zconfig_t **self_p);
 
 // Print the config file to open stream
 void

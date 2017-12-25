@@ -246,10 +246,18 @@ bool QZconfig::hasChanged ()
 }
 
 ///
-//  Destroy subtree (child)
+//  Destroy subtree (all children)
+void QZconfig::removeSubtree ()
+{
+    zconfig_remove_subtree (self);
+
+}
+
+///
+//  Destroy node and subtree (all children)
 void QZconfig::remove ()
 {
-    zconfig_remove (self);
+    zconfig_remove (&self);
 
 }
 

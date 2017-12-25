@@ -223,6 +223,7 @@ class Zconfig: public Nan::ObjectWrap {
     static NAN_METHOD (_str_load);
     static NAN_METHOD (_str_save);
     static NAN_METHOD (_has_changed);
+    static NAN_METHOD (_remove_subtree);
     static NAN_METHOD (_remove);
     static NAN_METHOD (_print);
     static NAN_METHOD (_test);
