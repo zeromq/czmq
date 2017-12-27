@@ -1089,6 +1089,10 @@ zproc_test (bool verbose)
         zproc_test_elapsed_msec = zclock_mono() - zproc_test_start_msec;
 
         if (!which) {
+            if (stdout_read) {
+                zsys_debug("zproc_test() : did not get stdout from helper, but we already have some (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+                break;
+            }
             if (zproc_timeout_msec > zproc_test_elapsed_msec) {
                 zsys_debug("zproc_test() : did not get stdout from helper, %" PRIi64 " msec remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
                 continue;
