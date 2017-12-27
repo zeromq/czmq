@@ -1071,25 +1071,29 @@ zproc_test (bool verbose)
     // read the content from zproc_stdout - use zpoller and a loop
     bool stdout_read = false;
     // kill the binary, it never ends, but the test must
-    int zproc_timeout_msec = 4000;
+    int64_t zproc_timeout_msec = 4000;
+    int64_t zproc_test_start_msec = zclock_mono();
+    int64_t zproc_test_elapsed_msec = 0;
 
     while (!zsys_interrupted) {
         void *which = zpoller_wait (poller, 800);
+        zproc_test_elapsed_msec = zclock_mono() - zproc_test_start_msec;
 
         if (!which) {
-            if (zproc_timeout_msec > 0) {
+            if (zproc_timeout_msec > zproc_test_elapsed_msec) {
                 zproc_timeout_msec -= 800;
-                zsys_debug("zproc_test : did not get stdout from helper, %i msec remaining to retry", zproc_timeout_msec);
+                zsys_debug("zproc_test : did not get stdout from helper, %" PRIi64 " msec remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
                 continue;
             }
             // ...else : we've slept a lot and got no response; kill the helper
-            zsys_debug("zproc_test : did not get stdout from helper, patience expired (%i msec remaining to retry)", zproc_timeout_msec);
+            zsys_debug("zproc_test : did not get stdout from helper, patience expired (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
             zproc_kill (self, SIGTERM);
             zproc_wait (self, true);
             break;
         }
 
         if (which == zproc_stdout (self)) {
+            zsys_debug("zproc_test : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
             stdout_read = true;
             zframe_t *frame;
             zsock_brecv (zproc_stdout (self), "f", &frame);
@@ -1110,6 +1114,7 @@ zproc_test (bool verbose)
         }
 
         // should not get there
+        zsys_debug("zproc_test : reached the unreachable point (unexpected zpoller result), %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
         assert (false);
     }
 
