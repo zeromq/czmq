@@ -1071,7 +1071,7 @@ zproc_test (bool verbose)
     // read the content from zproc_stdout - use zpoller and a loop
     bool stdout_read = false;
     // kill the binary, it never ends, but the test must
-    int64_t zproc_timeout_msec = 4000;
+    int64_t zproc_timeout_msec = 10000;
     int64_t zproc_test_start_msec = zclock_mono();
     int64_t zproc_test_elapsed_msec = 0;
 
