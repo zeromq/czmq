@@ -87,8 +87,13 @@
     </target>
 
     <target name = "jenkins" >
-        <option name = "agent_label" value = "linux || macosx || bsd || solaris || posix || windows" />
+        <!-- While Jenkinsfile does not build prerequisites,
+             request via node label that they are expected
+             present in that OS deployment / buildroot -->
+        <option name = "agent_label" value = "libzmq4-dev && ( linux || macosx || bsd || solaris || posix || windows )" />
         <option name = "check_sequential" value = "1" />
+        <option name = "use_test_timeout" value = "30" />
+        <option name = "use_test_retry" value = "3" />
     </target>
 
 </project>
