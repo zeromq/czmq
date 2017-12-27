@@ -1068,18 +1068,24 @@ zproc_test (bool verbose)
     zproc_run (self);
     zpoller_t *poller = zpoller_new (zproc_stdout (self), NULL);
 
-    // kill the binary, it never ends, but the test must
-    zclock_sleep (800);
-    zproc_kill (self, SIGTERM);
-    zproc_wait (self, true);
-
     // read the content from zproc_stdout - use zpoller and a loop
     bool stdout_read = false;
+    // kill the binary, it never ends, but the test must
+    int zproc_timeout_msec = 4000;
+
     while (!zsys_interrupted) {
         void *which = zpoller_wait (poller, 800);
 
-        if (!which)
+        if (!which) {
+            if (zproc_timeout_msec > 0) {
+                zproc_timeout_msec -= 800;
+                continue;
+            }
+            // ...else : we've slept a lot and got no response; kill the helper
+            zproc_kill (self, SIGTERM);
+            zproc_wait (self, true);
             break;
+        }
 
         if (which == zproc_stdout (self)) {
             stdout_read = true;
@@ -1094,6 +1100,10 @@ zproc_test (bool verbose)
                 zframe_print (frame, "zproc_test");
 
             zframe_destroy (&frame);
+
+            // it suffices for us to have read something
+            zproc_kill (self, SIGTERM);
+            zproc_wait (self, true);
             continue;
         }
 
