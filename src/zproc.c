@@ -1079,9 +1079,11 @@ zproc_test (bool verbose)
         if (!which) {
             if (zproc_timeout_msec > 0) {
                 zproc_timeout_msec -= 800;
+                zsys_debug("zproc_test : did not get stdout from helper, %i msec remaining to retry", zproc_timeout_msec);
                 continue;
             }
             // ...else : we've slept a lot and got no response; kill the helper
+            zsys_debug("zproc_test : did not get stdout from helper, patience expired (%i msec remaining to retry)", zproc_timeout_msec);
             zproc_kill (self, SIGTERM);
             zproc_wait (self, true);
             break;
