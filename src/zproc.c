@@ -1069,9 +1069,17 @@ zproc_test (bool verbose)
     zproc_run (self);
     zpoller_t *poller = zpoller_new (zproc_stdout (self), NULL);
 
+    // kill the binary, it never ends, but the test must:
+    // termination also flushes the output streams so we can
+    // read them entirely; note that other process runs in
+    // parallel to this thread
+    zsys_debug("zproc_test() : sleeping 4000 msec to gather some output from helper");
+    zclock_sleep (4000);
+    zproc_kill (self, SIGTERM);
+    zproc_wait (self, true);
+
     // read the content from zproc_stdout - use zpoller and a loop
     bool stdout_read = false;
-    // kill the binary, it never ends, but the test must
     int64_t zproc_timeout_msec = 10000;
     int64_t zproc_test_start_msec = zclock_mono();
     int64_t zproc_test_elapsed_msec = 0;
@@ -1087,12 +1095,11 @@ zproc_test (bool verbose)
             }
             // ...else : we've slept a lot and got no response; kill the helper
             zsys_debug("zproc_test() : did not get stdout from helper, patience expired (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
-            zproc_kill (self, SIGTERM);
-            zproc_wait (self, true);
             break;
         }
 
         if (which == zproc_stdout (self)) {
+            // it suffices for us to have read something
             zsys_debug("zproc_test() : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
             stdout_read = true;
             zframe_t *frame;
@@ -1106,10 +1113,6 @@ zproc_test (bool verbose)
                 zframe_print (frame, "zproc_test");
 
             zframe_destroy (&frame);
-
-            // it suffices for us to have read something
-            zproc_kill (self, SIGTERM);
-            zproc_wait (self, true);
             continue;
         }
 
