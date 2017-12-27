@@ -1081,18 +1081,18 @@ zproc_test (bool verbose)
 
         if (!which) {
             if (zproc_timeout_msec > zproc_test_elapsed_msec) {
-                zsys_debug("zproc_test : did not get stdout from helper, %" PRIi64 " msec remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+                zsys_debug("zproc_test() : did not get stdout from helper, %" PRIi64 " msec remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
                 continue;
             }
             // ...else : we've slept a lot and got no response; kill the helper
-            zsys_debug("zproc_test : did not get stdout from helper, patience expired (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+            zsys_debug("zproc_test() : did not get stdout from helper, patience expired (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
             zproc_kill (self, SIGTERM);
             zproc_wait (self, true);
             break;
         }
 
         if (which == zproc_stdout (self)) {
-            zsys_debug("zproc_test : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+            zsys_debug("zproc_test() : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
             stdout_read = true;
             zframe_t *frame;
             zsock_brecv (zproc_stdout (self), "f", &frame);
@@ -1113,7 +1113,7 @@ zproc_test (bool verbose)
         }
 
         // should not get there
-        zsys_debug("zproc_test : reached the unreachable point (unexpected zpoller result), %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+        zsys_debug("zproc_test() : reached the unreachable point (unexpected zpoller result), %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
         assert (false);
     }
 
