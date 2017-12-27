@@ -1065,6 +1065,7 @@ zproc_test (bool verbose)
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
+    zsys_debug("zproc_test() : launching helper '%s'", file );
     zproc_run (self);
     zpoller_t *poller = zpoller_new (zproc_stdout (self), NULL);
 
