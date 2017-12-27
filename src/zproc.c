@@ -1100,14 +1100,21 @@ zproc_test (bool verbose)
 
         if (which == zproc_stdout (self)) {
             // it suffices for us to have read something
-            zsys_debug("zproc_test() : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
-            stdout_read = true;
+            // we only check the first frame, others may start with the
+            // expected key string broken mid-way due to alignment etc.,
+            // but we drain the whole incoming queue of stdout frames.
             zframe_t *frame;
             zsock_brecv (zproc_stdout (self), "f", &frame);
-            assert (!strncmp(
-                "czmq is great\n",
-                (char*) zframe_data (frame),
-                14));
+            assert (frame);
+            assert (zframe_data (frame));
+            if (!stdout_read) {
+                zsys_debug("zproc_test() : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec));
+                assert (!strncmp(
+                    "czmq is great\n",
+                    (char*) zframe_data (frame),
+                    14));
+                stdout_read = true;
+            }
 
             if (verbose)
                 zframe_print (frame, "zproc_test");
