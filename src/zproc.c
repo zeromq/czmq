@@ -1065,7 +1065,8 @@ zproc_test (bool verbose)
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
-    zsys_debug("zproc_test() : launching helper '%s'", file );
+    if (verbose)
+        zsys_debug("zproc_test() : launching helper '%s'", file );
     zproc_run (self);
     zpoller_t *poller = zpoller_new (zproc_stdout (self), NULL);
 
@@ -1073,7 +1074,8 @@ zproc_test (bool verbose)
     // termination also flushes the output streams so we can
     // read them entirely; note that other process runs in
     // parallel to this thread
-    zsys_debug("zproc_test() : sleeping 4000 msec to gather some output from helper");
+    if (verbose)
+        zsys_debug("zproc_test() : sleeping 4000 msec to gather some output from helper");
     zclock_sleep (4000);
     zproc_kill (self, SIGTERM);
     zproc_wait (self, true);
@@ -1090,15 +1092,18 @@ zproc_test (bool verbose)
 
         if (!which) {
             if (stdout_read) {
-                zsys_debug("zproc_test() : did not get stdout from helper, but we already have some (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+                if (verbose)
+                    zsys_debug("zproc_test() : did not get stdout from helper, but we already have some (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
                 break;
             }
             if (zproc_timeout_msec > zproc_test_elapsed_msec) {
-                zsys_debug("zproc_test() : did not get stdout from helper, %" PRIi64 " msec remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+                if (verbose)
+                    zsys_debug("zproc_test() : did not get stdout from helper, %" PRIi64 " msec remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
                 continue;
             }
             // ...else : we've slept a lot and got no response; kill the helper
-            zsys_debug("zproc_test() : did not get stdout from helper, patience expired (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+            if (verbose)
+                zsys_debug("zproc_test() : did not get stdout from helper, patience expired (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
             break;
         }
 
@@ -1112,7 +1117,8 @@ zproc_test (bool verbose)
             assert (frame);
             assert (zframe_data (frame));
             if (!stdout_read) {
-                zsys_debug("zproc_test() : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec));
+                if (verbose)
+                    zsys_debug("zproc_test() : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec));
                 assert (!strncmp(
                     "czmq is great\n",
                     (char*) zframe_data (frame),
@@ -1128,7 +1134,8 @@ zproc_test (bool verbose)
         }
 
         // should not get there
-        zsys_debug("zproc_test() : reached the unreachable point (unexpected zpoller result), %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+        if (verbose)
+            zsys_debug("zproc_test() : reached the unreachable point (unexpected zpoller result), %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
         assert (false);
     }
 
