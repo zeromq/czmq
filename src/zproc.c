@@ -1065,30 +1065,60 @@ zproc_test (bool verbose)
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
+    zsys_debug("zproc_test() : launching helper '%s'", file );
     zproc_run (self);
     zpoller_t *poller = zpoller_new (zproc_stdout (self), NULL);
 
-    // kill the binary, it never ends, but the test must
-    zclock_sleep (800);
+    // kill the binary, it never ends, but the test must:
+    // termination also flushes the output streams so we can
+    // read them entirely; note that other process runs in
+    // parallel to this thread
+    zsys_debug("zproc_test() : sleeping 4000 msec to gather some output from helper");
+    zclock_sleep (4000);
     zproc_kill (self, SIGTERM);
     zproc_wait (self, true);
 
     // read the content from zproc_stdout - use zpoller and a loop
     bool stdout_read = false;
+    int64_t zproc_timeout_msec = 10000;
+    int64_t zproc_test_start_msec = zclock_mono();
+    int64_t zproc_test_elapsed_msec = 0;
+
     while (!zsys_interrupted) {
         void *which = zpoller_wait (poller, 800);
+        zproc_test_elapsed_msec = zclock_mono() - zproc_test_start_msec;
 
-        if (!which)
+        if (!which) {
+            if (stdout_read) {
+                zsys_debug("zproc_test() : did not get stdout from helper, but we already have some (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+                break;
+            }
+            if (zproc_timeout_msec > zproc_test_elapsed_msec) {
+                zsys_debug("zproc_test() : did not get stdout from helper, %" PRIi64 " msec remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
+                continue;
+            }
+            // ...else : we've slept a lot and got no response; kill the helper
+            zsys_debug("zproc_test() : did not get stdout from helper, patience expired (%" PRIi64 " msec remaining to retry)", (zproc_timeout_msec - zproc_test_elapsed_msec) );
             break;
+        }
 
         if (which == zproc_stdout (self)) {
-            stdout_read = true;
+            // it suffices for us to have read something
+            // we only check the first frame, others may start with the
+            // expected key string broken mid-way due to alignment etc.,
+            // but we drain the whole incoming queue of stdout frames.
             zframe_t *frame;
             zsock_brecv (zproc_stdout (self), "f", &frame);
-            assert (!strncmp(
-                "czmq is great\n",
-                (char*) zframe_data (frame),
-                14));
+            assert (frame);
+            assert (zframe_data (frame));
+            if (!stdout_read) {
+                zsys_debug("zproc_test() : got stdout from helper, %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec));
+                assert (!strncmp(
+                    "czmq is great\n",
+                    (char*) zframe_data (frame),
+                    14));
+                stdout_read = true;
+            }
 
             if (verbose)
                 zframe_print (frame, "zproc_test");
@@ -1098,6 +1128,7 @@ zproc_test (bool verbose)
         }
 
         // should not get there
+        zsys_debug("zproc_test() : reached the unreachable point (unexpected zpoller result), %" PRIi64 " msec was remaining to retry", (zproc_timeout_msec - zproc_test_elapsed_msec) );
         assert (false);
     }
 
