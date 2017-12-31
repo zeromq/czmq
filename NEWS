@@ -1,4 +1,4 @@
-CZMQ version 4.1.0 stable, released on 20xx/xx/xx
+CZMQ version 4.1.0 stable, released on 2017/12/31
 =================================================
 
 * New STABLE APIs have been added to wrap new libzmq context
