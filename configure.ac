@@ -132,7 +132,9 @@ AC_ARG_WITH([libzmq],
     [
         search_libzmq="yes"
     ],
-    [])
+    [
+        search_libzmq="yes"
+    ])
 AS_CASE([x"${with_libzmq}"],
     [xyes], [search_libzmq="yes"],
     [xno],  [search_libzmq="no"])
@@ -219,7 +221,9 @@ AC_ARG_WITH([uuid],
     [
         search_uuid="yes"
     ],
-    [])
+    [
+        search_uuid="yes"
+    ])
 AS_CASE([x"${with_uuid}"],
     [xyes], [search_uuid="yes"],
     [xno],  [search_uuid="no"])
@@ -304,7 +308,9 @@ AC_ARG_WITH([libsystemd],
     [
         search_libsystemd="yes"
     ],
-    [])
+    [
+        search_libsystemd="yes"
+    ])
 AS_CASE([x"${with_libsystemd}"],
     [xyes], [search_libsystemd="yes"],
     [xno],  [search_libsystemd="no"])
@@ -389,7 +395,9 @@ AC_ARG_WITH([liblz4],
     [
         search_liblz4="yes"
     ],
-    [])
+    [
+        search_liblz4="yes"
+    ])
 AS_CASE([x"${with_liblz4}"],
     [xyes], [search_liblz4="yes"],
     [xno],  [search_liblz4="no"])
