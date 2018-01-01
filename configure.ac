@@ -7,7 +7,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 #
-AC_INIT([czmq],[4.1.0],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[4.1.1],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -31,12 +31,12 @@ AC_SUBST(PACKAGE_VERSION)
 #
 # Libtool -version-info (ABI version)
 #
-# Currently 5:0:1 ("stable"). Don't change this unless you
+# Currently 5:1:1 ("stable"). Don't change this unless you
 # know exactly what you're doing and have read and understand
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
 # libczmq -version-info
-LTVER="5:0:1"
+LTVER="5:1:1"
 AC_SUBST(LTVER)
 
 # building in a subdirectory?
@@ -132,7 +132,9 @@ AC_ARG_WITH([libzmq],
     [
         search_libzmq="yes"
     ],
-    [])
+    [
+        search_libzmq="yes"
+    ])
 AS_CASE([x"${with_libzmq}"],
     [xyes], [search_libzmq="yes"],
     [xno],  [search_libzmq="no"])
@@ -219,7 +221,9 @@ AC_ARG_WITH([uuid],
     [
         search_uuid="yes"
     ],
-    [])
+    [
+        search_uuid="yes"
+    ])
 AS_CASE([x"${with_uuid}"],
     [xyes], [search_uuid="yes"],
     [xno],  [search_uuid="no"])
@@ -304,7 +308,9 @@ AC_ARG_WITH([libsystemd],
     [
         search_libsystemd="yes"
     ],
-    [])
+    [
+        search_libsystemd="yes"
+    ])
 AS_CASE([x"${with_libsystemd}"],
     [xyes], [search_libsystemd="yes"],
     [xno],  [search_libsystemd="no"])
@@ -389,7 +395,9 @@ AC_ARG_WITH([liblz4],
     [
         search_liblz4="yes"
     ],
-    [])
+    [
+        search_liblz4="yes"
+    ])
 AS_CASE([x"${with_liblz4}"],
     [xyes], [search_liblz4="yes"],
     [xno],  [search_liblz4="no"])
