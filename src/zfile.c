@@ -141,12 +141,18 @@ zfile_tmp (void)
     self->fullname = strdup (name);
     self->handle = fopen (self->fullname, "w");
 #else
+
 # if (defined (PATH_MAX))
     char buffer [PATH_MAX];
 # else
+   # if (defined (_MAX_PATH))
+    char buffer [_MAX_PATH];
+   # else
     char buffer [1024];
+   # endif
 # endif
-    strcpy (buffer, "/tmp/czmq_zfile.XXXXXX");
+    memset (buffer, 0, sizeof (buffer));
+    strncpy (buffer, "/tmp/czmq_zfile.XXXXXX", sizeof(buffer)-1);
     int fd = mkstemp (buffer);
     if (fd == -1)
         return NULL;
