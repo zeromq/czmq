@@ -164,6 +164,7 @@ endif #ENABLE_CZMQ_SELFTEST
 # Install api files into /usr/local/share/zproject
 apidir = @datadir@/zproject/czmq
 dist_api_DATA = \
+    api/python_cffi.slurp \
     api/zactor.api \
     api/zargs.api \
     api/zarmour.api \
