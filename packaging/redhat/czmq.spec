@@ -107,7 +107,7 @@ This package contains development files for czmq: the high-level c binding for 0
 # Install api files into /usr/local/share/zproject
 %dir %{_datadir}/zproject/
 %dir %{_datadir}/zproject/czmq
-%{_datadir}/zproject/czmq/*.api
+%{_datadir}/zproject/czmq/*
 
 %if %{with python_cffi}
 %package -n python2-czmq-cffi
@@ -155,10 +155,13 @@ make %{_smp_mflags}
 %if %{with python_cffi}
 # Problem: we need pkg-config points to built and not yet installed copy of czmq
 # Solution: chicken-egg problem - let's make "fake" pkg-config file
-sed -e "s@^libdir.*@libdir=`pwd`/src/.libs@" \
-    -e "s@^includedir.*@includedir=`pwd`/include@" \
+sed -e "s@^libdir.*@libdir=.libs/@" \
+    -e "s@^includedir.*@includedir=include/@" \
     src/libczmq.pc > bindings/python_cffi/libczmq.pc
 cd bindings/python_cffi
+# This avoids problem with "weird" character quoting between shell and python3
+ln -sfr ../../include/ .
+ln -sfr ../../src/.libs/ .
 export PKG_CONFIG_PATH=`pwd`
 python2 setup.py build
 %endif
@@ -166,10 +169,13 @@ python2 setup.py build
 %if %{with python3_cffi}
 # Problem: we need pkg-config points to built and not yet installed copy of czmq
 # Solution: chicken-egg problem - let's make "fake" pkg-config file
-sed -e "s@^libdir.*@libdir=`pwd`/src/.libs@" \
-    -e "s@^includedir.*@includedir=`pwd`/include@" \
+sed -e "s@^libdir.*@libdir=.libs/@" \
+    -e "s@^includedir.*@includedir=include/@" \
     src/libczmq.pc > bindings/python_cffi/libczmq.pc
 cd bindings/python_cffi
+# This avoids problem with "weird" character quoting between shell and python3
+ln -sfr ../../include/ .
+ln -sfr ../../src/.libs/ .
 export PKG_CONFIG_PATH=`pwd`
 python3 setup.py build
 %endif
