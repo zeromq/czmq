@@ -386,6 +386,13 @@
 #   define S_ISREG(m) (((m) & S_IFREG) != 0)
 #endif
 
+#if defined (_MAX_PATH) && !defined (PATH_MAX)
+#   define PATH_MAX _MAX_PATH
+#endif
+#if !defined (PATH_MAX)
+#   define PATH_MAX 1024
+#endif
+
 
 //- Check compiler data type sizes ------------------------------------------
 

@@ -1022,16 +1022,7 @@ zproc_test (bool verbose)
         zsys_warning ("cannot detect zsp binary, %s does not exist", file ? file : "<null>");
 
         printf ("SKIPPED (zsp helper not found)\n");
-
-#if (defined (PATH_MAX))
-        char cwd[PATH_MAX];
-#else
-# if (defined (_MAX_PATH))
-        char cwd[_MAX_PATH];
-# else
-        char cwd[1024];
-# endif
-#endif
+        char cwd [PATH_MAX];
         memset (cwd, 0, sizeof (cwd));
 #if (defined (WIN32))
         if (_getcwd(cwd, sizeof(cwd)) != NULL)
