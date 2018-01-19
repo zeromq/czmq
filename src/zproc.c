@@ -662,16 +662,18 @@ zproc_wait (zproc_t *self, bool wait) {
         return self->return_code;
 
     if (WIFEXITED(status)) {
-        if (self->verbose)
-            zsys_debug ("zproc_wait [%d]:\tWIFEXITED", self->pid);
         self->running = false;
         self->return_code = WEXITSTATUS(status);
+        if (self->verbose)
+            zsys_debug ("zproc_wait [%d]:\tWIFEXITED, self->return_code", self->pid, self->return_code);
+        return self->return_code;
     }
     else if (WIFSIGNALED(status)) {
-        if (self->verbose)
-            zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED", self->pid);
         self->running = false;
         self->return_code = - WTERMSIG(status);
+        if (self->verbose)
+            zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED, self->return_code", self->pid, self->return_code);
+        return self->return_code;
 
         /*
         if (WCOREDUMP(status)) {
