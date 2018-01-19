@@ -393,7 +393,11 @@ zproc_pid (zproc_t *self) {
 static int
 s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 {
-#define BUF_SIZE 1024
+#if defined (PIPE_BUF)
+#   define BUF_SIZE PIPE_BUF
+#else
+#   define BUF_SIZE 65535
+#endif
     byte buf [BUF_SIZE];
     ssize_t r = 1;
 
