@@ -1024,11 +1024,7 @@ zproc_test (bool verbose)
         printf ("SKIPPED (zsp helper not found)\n");
         char cwd [PATH_MAX];
         memset (cwd, 0, sizeof (cwd));
-#if (defined (WIN32))
-        if (_getcwd(cwd, sizeof(cwd)) != NULL)
-#else
         if (getcwd(cwd, sizeof(cwd)) != NULL)
-#endif
             printf ("zproc_test() : current working directory is %s\n", cwd);
 
         return;

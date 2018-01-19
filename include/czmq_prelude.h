@@ -393,6 +393,9 @@
 #   define PATH_MAX 1024
 #endif
 
+#if defined (WIN32)
+#   define getcwd _getcwd
+#endif
 
 //- Check compiler data type sizes ------------------------------------------
 
