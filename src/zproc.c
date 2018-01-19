@@ -592,7 +592,6 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
             goto end;
         }
 
-        zsys_debug ("API command=RUN: zproc_pid=%u, to call s_zproc_execve", zproc_pid (self));
         s_zproc_execve (self);
     }
 
