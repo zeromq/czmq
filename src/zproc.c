@@ -224,6 +224,13 @@ zproc_new ()
     zproc_t *self = (zproc_t*) zmalloc (sizeof (zproc_t));
     self->verbose = false;
 
+    self->stdinpipe [0] = -1;
+    self->stdinpipe [1] = -1;
+    self->stdoutpipe [0] = -1;
+    self->stdoutpipe [1] = -1;
+    self->stderrpipe [0] = -1;
+    self->stderrpipe [1] = -1;
+
     zuuid_t *uuid = zuuid_new ();
     self->stdinpair = zpair_new (
         zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
@@ -239,6 +246,7 @@ zproc_new ()
     return self;
 }
 
+
 void
 zproc_destroy (zproc_t **self_p) {
     assert (self_p);
@@ -247,12 +255,18 @@ zproc_destroy (zproc_t **self_p) {
         zproc_wait (self, true);
         zactor_destroy (&self->actor);
 
-        close (self->stdinpipe [0]);
-        close (self->stdinpipe [1]);
-        close (self->stdoutpipe [0]);
-        close (self->stdoutpipe [1]);
-        close (self->stderrpipe [0]);
-        close (self->stderrpipe [1]);
+        if (self->stdinpipe [0] != -1) {
+            close (self->stdinpipe [0]);
+            close (self->stdinpipe [1]);
+        }
+        if (self->stdoutpipe [0] != -1) {
+            close (self->stdoutpipe [0]);
+            close (self->stdoutpipe [1]);
+        }
+        if (self->stderrpipe [0] != -1) {
+            close (self->stderrpipe [0]);
+            close (self->stderrpipe [1]);
+        }
 
         zpair_destroy (&self->stdinpair);
         zpair_destroy (&self->stdoutpair);
@@ -260,7 +274,7 @@ zproc_destroy (zproc_t **self_p) {
 
         zlistx_destroy (&self->args);
         zhashx_destroy (&self->env);
-        freen (self);
+        free (self);
         *self_p = NULL;
     }
 }
@@ -286,7 +300,8 @@ zproc_set_stdin (zproc_t *self, void* socket) {
     zsys_error ("zproc_set_stdin not implemented for Windows");
     return;
 #else
-    assert (self->stdinpipe [0] == 0);
+    if (self->stdinpipe [0] != 0)
+        return;
     int r = pipe (self->stdinpipe);
     assert (r == 0);
 
@@ -304,7 +319,8 @@ zproc_set_stdout (zproc_t *self, void* socket) {
     zsys_error ("zproc_set_stdout not implemented for Windows");
     return;
 #else
-    assert (self->stdoutpipe [0] == 0);
+    if (self->stdoutpipe [0] != -1)
+        return;
     int r = pipe (self->stdoutpipe);
     assert (r == 0);
 
@@ -322,7 +338,8 @@ zproc_set_stderr (zproc_t *self, void* socket) {
     zsys_error ("zproc_set_stdout not implemented for Windows");
     return;
 #else
-    assert (self->stderrpipe [0] == 0);
+    if (self->stderrpipe [0] != -1)
+        return;
     int r = pipe (self->stderrpipe);
     assert (r == 0);
 
@@ -376,11 +393,16 @@ zproc_pid (zproc_t *self) {
 static int
 s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 {
-#define BUF_SIZE 1024
+#if defined (PIPE_BUF)
+#   define BUF_SIZE PIPE_BUF
+#else
+#   define BUF_SIZE 65535
+#endif
     byte buf [BUF_SIZE];
     ssize_t r = 1;
 
     while (r > 0) {
+        memset (buf, '\0', BUF_SIZE);
         r = read (item->fd, buf, BUF_SIZE);
         if (r == -1) {
             zsys_error ("read from fd %d: %s", item->fd, strerror (errno));
@@ -496,17 +518,23 @@ s_zproc_execve (zproc_t *self)
         arr_add_ref (argv2, i, NULL);
 
         // build environ for a new process
-        char **env = arr_new (zhashx_size (self->env) + 1);
+        char **env = NULL;
 
-        i = 0;
-        for (char *arg = (char*) zhashx_first (self->env);
-                   arg != NULL;
-                   arg = (char*) zhashx_next (self->env)) {
-            char *name = (char*) zhashx_cursor (self->env);
-            arr_add_ref (env, i, zsys_sprintf ("%s=%s", name, arg));
-            i++;
+        if (self->env) {
+            env = arr_new (zhashx_size (self->env) + 1);
+
+            i = 0;
+            for (char *arg = (char*) zhashx_first (self->env);
+                       arg != NULL;
+                       arg = (char*) zhashx_next (self->env)) {
+                char *name = (char*) zhashx_cursor (self->env);
+                arr_add_ref (env, i, zsys_sprintf ("%s=%s", name, arg));
+                i++;
+            }
+            arr_add_ref (env, i, NULL);
         }
-        arr_add_ref (env, i, NULL);
+        else
+            env = environ;
 
         r = execve (filename, argv2, env);
         if (r == -1) {
@@ -526,18 +554,18 @@ s_zproc_execve (zproc_t *self)
         if (self->verbose)
             zsys_debug ("process %s with pid %d started", filename, self->pid);
 
-        if (self->stdinpipe [0] != 0) {
+        if (self->stdinpipe [0] != -1) {
             s_zproc_addfd (self, self->stdinpipe [1], zpair_read (self->stdinpair), ZMQ_POLLOUT);
             close (self->stdinpipe [0]);
         }
 
         // add a handler for read end of stdout
-        if (self->stdoutpipe [1] != 0) {
+        if (self->stdoutpipe [1] != -1) {
             s_zproc_addfd (self, self->stdoutpipe [0], zpair_write (self->stdoutpair), ZMQ_POLLIN);
             close(self->stdoutpipe[1]);
         }
         // add a handler for read end of stderr
-        if (self->stderrpipe [1] != 0) {
+        if (self->stderrpipe [1] != -1) {
             s_zproc_addfd (self, self->stderrpipe [0], zpair_write (self->stderrpair), ZMQ_POLLIN);
             close(self->stderrpipe[1]);
         }
@@ -648,16 +676,18 @@ zproc_wait (zproc_t *self, bool wait) {
         return self->return_code;
 
     if (WIFEXITED(status)) {
-        if (self->verbose)
-            zsys_debug ("zproc_wait [%d]:\tWIFEXITED", self->pid);
         self->running = false;
         self->return_code = WEXITSTATUS(status);
+        if (self->verbose)
+            zsys_debug ("zproc_wait [%d]:\tWIFEXITED, self->return_code=%d", self->pid, self->return_code);
+        return self->return_code;
     }
     else if (WIFSIGNALED(status)) {
-        if (self->verbose)
-            zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED", self->pid);
         self->running = false;
         self->return_code = - WTERMSIG(status);
+        if (self->verbose)
+            zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED, self->return_code=%d", self->pid, self->return_code);
+        return self->return_code;
 
         /*
         if (WCOREDUMP(status)) {
@@ -1022,22 +1052,9 @@ zproc_test (bool verbose)
         zsys_warning ("cannot detect zsp binary, %s does not exist", file ? file : "<null>");
 
         printf ("SKIPPED (zsp helper not found)\n");
-
-#if (defined (PATH_MAX))
-        char cwd[PATH_MAX];
-#else
-# if (defined (_MAX_PATH))
-        char cwd[_MAX_PATH];
-# else
-        char cwd[1024];
-# endif
-#endif
+        char cwd [PATH_MAX];
         memset (cwd, 0, sizeof (cwd));
-#if (defined (WIN32))
-        if (_getcwd(cwd, sizeof(cwd)) != NULL)
-#else
         if (getcwd(cwd, sizeof(cwd)) != NULL)
-#endif
             printf ("zproc_test() : current working directory is %s\n", cwd);
 
         return;
@@ -1046,7 +1063,7 @@ zproc_test (bool verbose)
         zsys_info ("zproc_test() : detected a zsp binary at %s\n", file);
     }
 
-    //  Create new subproc instance
+    //  Create new zproc instance
     zproc_t *self = zproc_new ();
     zproc_set_verbose (self, verbose);
     assert (self);
@@ -1141,6 +1158,41 @@ zproc_test (bool verbose)
 
     assert (stdout_read);
     zpoller_destroy (&poller);
+    zproc_destroy (&self);
+
+    self = zproc_new ();
+    zproc_destroy (&self);
+    // try to use zproc second time
+    self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
+
+    //  join stdout of the process to zeromq socket
+    //  all data will be readable from zproc_stdout socket
+    assert (!zproc_stdout (self));
+    zproc_set_stdout (self, NULL);
+    assert (zproc_stdout (self));
+
+    args = zlistx_new ();
+    zlistx_add_end (args, file);
+    zlistx_add_end (args, "--help");
+    zproc_set_args (self, args);
+
+    if (verbose)
+        zsys_debug("zproc_test() : launching helper '%s' --help", file );
+
+    int r = zproc_run (self);
+    assert (r == 0);
+    zframe_t *frame;
+    zsock_brecv (zproc_stdout (self), "f", &frame);
+    assert (frame);
+    assert (zframe_data (frame));
+    // TODO: real test
+    if (verbose)
+        zframe_print (frame, "1:");
+    zframe_destroy (&frame);
+    r = zproc_wait (self, true);
+    assert (r == 0);
     zproc_destroy (&self);
     //  @end
 

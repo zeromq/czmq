@@ -30,4 +30,16 @@
     fun:__static_initialization_and_destruction_0
     ...
 }
-
+{
+   <gcrypt_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   ...
+   fun:_gcry_mpi_alloc
+   fun:_gcry_mpi_alloc_set_ui
+   fun:_gcry_mpi_init
+   ...
+}
