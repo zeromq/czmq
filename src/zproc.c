@@ -494,20 +494,31 @@ s_zproc_execve (zproc_t *self)
             i++;
         }
         arr_add_ref (argv2, i, NULL);
+        arr_print (argv2);
 
         // build environ for a new process
-        char **env = arr_new (zhashx_size (self->env) + 1);
+        char **env = NULL;
 
-        i = 0;
-        for (char *arg = (char*) zhashx_first (self->env);
-                   arg != NULL;
-                   arg = (char*) zhashx_next (self->env)) {
-            char *name = (char*) zhashx_cursor (self->env);
-            arr_add_ref (env, i, zsys_sprintf ("%s=%s", name, arg));
-            i++;
+        if (self->env) {
+            env = arr_new (zhashx_size (self->env) + 1);
+
+            i = 0;
+            for (char *arg = (char*) zhashx_first (self->env);
+                       arg != NULL;
+                       arg = (char*) zhashx_next (self->env)) {
+                char *name = (char*) zhashx_cursor (self->env);
+                arr_add_ref (env, i, zsys_sprintf ("%s=%s", name, arg));
+                i++;
+            }
+            arr_add_ref (env, i, NULL);
         }
-        arr_add_ref (env, i, NULL);
+        else
+            env = environ;
 
+        if (self->verbose) {
+            zsys_debug ("zproc.c: execve (%s", filename);
+            arr_print (argv2);
+        }
         r = execve (filename, argv2, env);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
@@ -563,11 +574,14 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
     else
     if (streq (command, "RUN")) {
 
+        if (self->verbose)
+            zsys_debug ("API command=RUN: zproc_pid=%u", zproc_pid (self));
         if (zproc_pid (self) > 0) {
             zsys_error ("Can't run command twice!!");
             goto end;
         }
 
+        zsys_debug ("API command=RUN: zproc_pid=%u, to call s_zproc_execve", zproc_pid (self));
         s_zproc_execve (self);
     }
 
@@ -1128,6 +1142,37 @@ zproc_test (bool verbose)
 
     assert (stdout_read);
     zpoller_destroy (&poller);
+    zproc_destroy (&self);
+
+    // try to use zproc second time
+    zsys_set_logstream (stderr);
+    self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
+
+    //  join stdout of the process to zeromq socket
+    //  all data will be readable from zproc_stdout socket
+    assert (!zproc_stdout (self));
+    zproc_set_stdout (self, NULL);
+    assert (zproc_stdout (self));
+
+    args = zlistx_new ();
+    zlistx_add_end (args, file);
+    zlistx_add_end (args, "--help");
+    zproc_set_args (self, args);
+
+    if (verbose)
+        zsys_debug("zproc_test() : launching helper '%s' --help", file );
+
+    int r = zproc_run (self);
+    assert (r == 0);
+    char *x = zstr_recv (zproc_stdout (self));
+    zsys_debug ("x=%s", x);
+    zstr_free (&x);
+
+    r = zproc_wait (self, true);
+    zsys_debug ("r==%d", r);
+    assert (r == 0);
     zproc_destroy (&self);
     //  @end
 
