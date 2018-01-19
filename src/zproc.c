@@ -494,7 +494,6 @@ s_zproc_execve (zproc_t *self)
             i++;
         }
         arr_add_ref (argv2, i, NULL);
-        arr_print (argv2);
 
         // build environ for a new process
         char **env = NULL;
@@ -515,10 +514,6 @@ s_zproc_execve (zproc_t *self)
         else
             env = environ;
 
-        if (self->verbose) {
-            zsys_debug ("zproc.c: execve (%s", filename);
-            arr_print (argv2);
-        }
         r = execve (filename, argv2, env);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
@@ -574,8 +569,6 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
     else
     if (streq (command, "RUN")) {
 
-        if (self->verbose)
-            zsys_debug ("API command=RUN: zproc_pid=%u", zproc_pid (self));
         if (zproc_pid (self) > 0) {
             zsys_error ("Can't run command twice!!");
             goto end;
