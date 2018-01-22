@@ -200,8 +200,8 @@ struct _zproc_t {
     zpair_t *stdoutpair;    // stdout socketpair
     zpair_t *stderrpair;    // stderr socketpair
 
-    zlistx_t *args;         // command line arguments
-    zhashx_t *env;          // environment
+    zlist_t *args;         // command line arguments
+    zhash_t *env;          // environment
 };
 
 zproc_t*
@@ -272,25 +272,31 @@ zproc_destroy (zproc_t **self_p) {
         zpair_destroy (&self->stdoutpair);
         zpair_destroy (&self->stderrpair);
 
-        zlistx_destroy (&self->args);
-        zhashx_destroy (&self->env);
+        zlist_destroy (&self->args);
+        zhash_destroy (&self->env);
         free (self);
         *self_p = NULL;
     }
 }
 
 void
-zproc_set_args (zproc_t *self, zlistx_t *args) {
+zproc_set_args (zproc_t *self, zlist_t **args_p) {
     assert (self);
-    zlistx_destroy (&self->args);
+    assert (*args_p);
+    zlist_t *args = *args_p;
+    zlist_destroy (&self->args);
     self->args = args;
+    *args_p = NULL;
 }
 
 void
-zproc_set_env (zproc_t *self, zhashx_t *env) {
+zproc_set_env (zproc_t *self, zhash_t **env_p) {
     assert (self);
-    zhashx_destroy (&self->env);
+    assert (*env_p);
+    zhash_t *env = *env_p;
+    zhash_destroy (&self->env);
     self->env = env;
+    *env_p = NULL;
 }
 
 void
@@ -481,7 +487,7 @@ s_zproc_execve (zproc_t *self)
     assert (self);
     int r;
 
-    char *filename = (char*) zlistx_first (self->args);
+    char *filename = (char*) zlist_first (self->args);
     self->pid = fork ();
     if (self->pid == 0) {
 
@@ -506,12 +512,12 @@ s_zproc_execve (zproc_t *self)
         }
 
         // build argv for now and use self->args
-        char **argv2 = arr_new (zlistx_size (self->args) + 1);
+        char **argv2 = arr_new (zlist_size (self->args) + 1);
 
         size_t i = 0;
-        for (char *arg = (char*) zlistx_first (self->args);
+        for (char *arg = (char*) zlist_first (self->args);
                    arg != NULL;
-                   arg = (char*) zlistx_next (self->args)) {
+                   arg = (char*) zlist_next (self->args)) {
             arr_add_ref (argv2, i, arg);
             i++;
         }
@@ -521,13 +527,13 @@ s_zproc_execve (zproc_t *self)
         char **env = NULL;
 
         if (self->env) {
-            env = arr_new (zhashx_size (self->env) + 1);
+            env = arr_new (zhash_size (self->env) + 1);
 
             i = 0;
-            for (char *arg = (char*) zhashx_first (self->env);
+            for (char *arg = (char*) zhash_first (self->env);
                        arg != NULL;
-                       arg = (char*) zhashx_next (self->env)) {
-                char *name = (char*) zhashx_cursor (self->env);
+                       arg = (char*) zhash_next (self->env)) {
+                char *name = (char*) zhash_cursor (self->env);
                 arr_add_ref (env, i, zsys_sprintf ("%s=%s", name, arg));
                 i++;
             }
@@ -635,7 +641,7 @@ zproc_run (zproc_t *self)
     assert (self);
     assert (!self->actor);
 
-    if (!self->args || zlistx_size (self->args) == 0) {
+    if (!self->args || zlist_size (self->args) == 0) {
         zsys_error ("No arguments, nothing to run. Call zproc_set_args before");
         return -1;
     }
@@ -1071,14 +1077,16 @@ zproc_test (bool verbose)
     //  all data will be readable from zproc_stdout socket
     zproc_set_stdout (self, NULL);
 
-    zlistx_t *args = zlistx_new ();
-    zlistx_add_end (args, file);
-    zlistx_add_end (args, "--stdout");
-    zproc_set_args (self, args);
+    zlist_t *args = zlist_new ();
+    zlist_autofree (args);
+    zlist_append (args, file);
+    zlist_append (args, "--stdout");
+    zproc_set_args (self, &args);
 
-    zhashx_t *env = zhashx_new ();
-    zhashx_insert (env, "ZSP_MESSAGE", "czmq is great\n");
-    zproc_set_env (self, env);
+    zhash_t *env = zhash_new ();
+    zhash_autofree (env);
+    zhash_insert (env, "ZSP_MESSAGE", "czmq is great\n");
+    zproc_set_env (self, &env);
 
     // execute the binary. It runs in own actor, which monitor the process and
     // pass data accross pipes and zeromq sockets
@@ -1173,10 +1181,11 @@ zproc_test (bool verbose)
     zproc_set_stdout (self, NULL);
     assert (zproc_stdout (self));
 
-    args = zlistx_new ();
-    zlistx_add_end (args, file);
-    zlistx_add_end (args, "--help");
-    zproc_set_args (self, args);
+    args = zlist_new ();
+    zlist_autofree (args);
+    zlist_append (args, file);
+    zlist_append (args, "--help");
+    zproc_set_args (self, &args);
 
     if (verbose)
         zsys_debug("zproc_test() : launching helper '%s' --help", file );

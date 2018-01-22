@@ -42,12 +42,12 @@ CZMQ_EXPORT void
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
 CZMQ_EXPORT void
-    zproc_set_args (zproc_t *self, zlistx_t *args);
+    zproc_set_args (zproc_t *self, zlist_t **args);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Setup the environment variables for the process.
 CZMQ_EXPORT void
-    zproc_set_env (zproc_t *self, zhashx_t *args);
+    zproc_set_env (zproc_t *self, zhash_t **args);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Connects process stdin with a readable ('>', connect) zeromq socket. If

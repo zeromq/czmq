@@ -23,12 +23,12 @@
     <method name = "set args" >
         Setup the command line arguments, the first item must be an (absolute) filename
         to run.
-        <argument name = "args" type = "zlistx" />
+        <argument name = "args" type = "zlist" by_reference = "1" />
     </method>
 
     <method name = "set env" >
         Setup the environment variables for the process.
-        <argument name = "args" type = "zhashx" />
+        <argument name = "args" type = "zhash" by_reference = "1" />
     </method>
 
     <method name = "set stdin" >
