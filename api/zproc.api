@@ -26,6 +26,12 @@
         <argument name = "args" type = "zlist" by_reference = "1" />
     </method>
 
+    <method name = "set argsx" >
+        Setup the command line arguments, the first item must be an (absolute) filename
+        to run. Variadic function, must be NULL terminated.
+        <argument name = "args" type = "string" variadic = "1" />
+    </method>
+
     <method name = "set env" >
         Setup the environment variables for the process.
         <argument name = "args" type = "zhash" by_reference = "1" />

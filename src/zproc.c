@@ -289,6 +289,23 @@ zproc_set_args (zproc_t *self, zlist_t **args_p) {
     *args_p = NULL;
 }
 
+//  Setup the command line arguments, the first item must be an (absolute) filename
+//  to run. Variadic function, must be NULL terminated.
+CZMQ_EXPORT void
+    zproc_set_argsx (zproc_t *self, const char *args, ...)
+{
+    assert (self);
+    va_list vargs;
+    va_start (vargs, args);
+    zlist_t *zargs = zlist_new ();
+    zlist_autofree (zargs);
+    while (args) {
+        zlist_append (zargs, (void*) args);
+        args = va_arg (vargs, const char *);
+    }
+    zproc_set_args (self, &zargs);
+}
+
 void
 zproc_set_env (zproc_t *self, zhash_t **env_p) {
     assert (self);
@@ -1181,11 +1198,7 @@ zproc_test (bool verbose)
     zproc_set_stdout (self, NULL);
     assert (zproc_stdout (self));
 
-    args = zlist_new ();
-    zlist_autofree (args);
-    zlist_append (args, file);
-    zlist_append (args, "--help");
-    zproc_set_args (self, &args);
+    zproc_set_argsx (self, file, "--help", NULL);
 
     if (verbose)
         zsys_debug("zproc_test() : launching helper '%s' --help", file );

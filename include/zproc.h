@@ -45,6 +45,12 @@ CZMQ_EXPORT void
     zproc_set_args (zproc_t *self, zlist_t **args);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Setup the command line arguments, the first item must be an (absolute) filename
+//  to run. Variadic function, must be NULL terminated.
+CZMQ_EXPORT void
+    zproc_set_argsx (zproc_t *self, const char *args, ...);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Setup the environment variables for the process.
 CZMQ_EXPORT void
     zproc_set_env (zproc_t *self, zhash_t **args);
