@@ -65,6 +65,10 @@ content of the messages in any way. See test example on how to use it.
 # include <unistd.h>
 #endif
 
+#if defined (__UTYPE_OSX)
+#include <crt_externs.h>
+#endif
+
 #define ZPROC_RUNNING -42
 
 //      #######     internal helpers for zproc      #######
@@ -534,7 +538,11 @@ s_zproc_execve (zproc_t *self)
             arr_add_ref (env, i, NULL);
         }
         else
+#if defined (__UTYPE_OSX)
+            env = _NSGetEnviron ();
+#else
             env = environ;
+#endif
 
         r = execve (filename, argv2, env);
         if (r == -1) {
