@@ -1086,8 +1086,39 @@ zproc_test (bool verbose)
         zsys_info ("zproc_test() : detected a zsp binary at %s\n", file);
     }
 
-    //  Create new zproc instance
+    // Test case #1: run command, wait until it ends and get the (stdandard) output
     zproc_t *self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
+
+    //  join stdout of the process to zeromq socket
+    //  all data will be readable from zproc_stdout socket
+    assert (!zproc_stdout (self));
+    zproc_set_stdout (self, NULL);
+    assert (zproc_stdout (self));
+
+    zproc_set_argsx (self, file, "--help", NULL);
+
+    if (verbose)
+        zsys_debug("zproc_test() : launching helper '%s' --help", file );
+
+    int r = zproc_run (self);
+    assert (r == 0);
+    zframe_t *frame;
+    zsock_brecv (zproc_stdout (self), "f", &frame);
+    assert (frame);
+    assert (zframe_data (frame));
+    // TODO: real test
+    if (verbose)
+        zframe_print (frame, "1:");
+    zframe_destroy (&frame);
+    r = zproc_wait (self, true);
+    assert (r == 0);
+    zproc_destroy (&self);
+
+    // Test case #2: use never ending subprocess and poller to read data from it
+    //  Create new zproc instance
+    self = zproc_new ();
     zproc_set_verbose (self, verbose);
     assert (self);
     //  join stdout of the process to zeromq socket
@@ -1183,38 +1214,6 @@ zproc_test (bool verbose)
 
     assert (stdout_read);
     zpoller_destroy (&poller);
-    zproc_destroy (&self);
-
-    self = zproc_new ();
-    zproc_destroy (&self);
-    // try to use zproc second time
-    self = zproc_new ();
-    assert (self);
-    zproc_set_verbose (self, verbose);
-
-    //  join stdout of the process to zeromq socket
-    //  all data will be readable from zproc_stdout socket
-    assert (!zproc_stdout (self));
-    zproc_set_stdout (self, NULL);
-    assert (zproc_stdout (self));
-
-    zproc_set_argsx (self, file, "--help", NULL);
-
-    if (verbose)
-        zsys_debug("zproc_test() : launching helper '%s' --help", file );
-
-    int r = zproc_run (self);
-    assert (r == 0);
-    zframe_t *frame;
-    zsock_brecv (zproc_stdout (self), "f", &frame);
-    assert (frame);
-    assert (zframe_data (frame));
-    // TODO: real test
-    if (verbose)
-        zframe_print (frame, "1:");
-    zframe_destroy (&frame);
-    r = zproc_wait (self, true);
-    assert (r == 0);
     zproc_destroy (&self);
     //  @end
 
