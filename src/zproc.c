@@ -539,7 +539,7 @@ s_zproc_execve (zproc_t *self)
         }
         else
 #if defined (__UTYPE_OSX)
-            env = _NSGetEnviron ();
+            env = *_NSGetEnviron ();
 #else
             env = environ;
 #endif
