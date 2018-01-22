@@ -58,6 +58,12 @@ content of the messages in any way. See test example on how to use it.
 
 #include "czmq_classes.h"
 
+#if defined (__UNIX__)
+#   if !defined (_GNU_SOURCE)
+extern char **environ;          // declared in unistd.h if _GNU_SOURCE is defined
+#   endif
+#endif
+
 // For getcwd() variants
 #if (defined (WIN32))
 # include <direct.h>
