@@ -1011,7 +1011,6 @@ zproc_test (bool verbose)
 {
     printf (" * zproc: ");
 
-    //  @selftest
 #if defined (__WINDOWS__)
     printf ("SKIPPED (on Windows)\n");
     return;
@@ -1027,7 +1026,6 @@ zproc_test (bool verbose)
         return;
     }
 
-    //  @selftest
     //  0. initialization
 
     if (verbose) {
@@ -1085,6 +1083,11 @@ zproc_test (bool verbose)
     if (verbose) {
         zsys_info ("zproc_test() : detected a zsp binary at %s\n", file);
     }
+
+    //  @selftest
+
+    //  variable zsp contains path to zsp executable:
+    //  static const char *zsp = "path/to/zsp";
 
     // Test case #1: run command, wait until it ends and get the (stdandard) output
     zproc_t *self = zproc_new ();
