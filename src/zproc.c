@@ -60,7 +60,9 @@ content of the messages in any way. See test example on how to use it.
 
 #if defined (__UNIX__)
 #   if defined (__UTYPE_OSX)
-char **environ = *_NSGetEnviron (); // issue#1836
+// issue#1836
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron ()) 
 #   else
 extern char **environ;              // should be declared as a part of unistd.h, but fail in some targets in Travis
                                     // declare it explicitly
