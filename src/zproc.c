@@ -59,8 +59,11 @@ content of the messages in any way. See test example on how to use it.
 #include "czmq_classes.h"
 
 #if defined (__UNIX__)
-#   if !defined (_GNU_SOURCE)
-extern char **environ;          // declared in unistd.h if _GNU_SOURCE is defined
+#   if defined (__UTYPE_OSX)
+char **environ = *_NSGetEnviron (); // issue#1836
+#   else
+extern char **environ;              // should be declared as a part of unistd.h, but fail in some targets in Travis
+                                    // declare it explicitly
 #   endif
 #endif
 
@@ -544,11 +547,7 @@ s_zproc_execve (zproc_t *self)
             arr_add_ref (env, i, NULL);
         }
         else
-#if defined (__UTYPE_OSX)
-            env = *_NSGetEnviron ();
-#else
             env = environ;
-#endif
 
         r = execve (filename, argv2, env);
         if (r == -1) {
