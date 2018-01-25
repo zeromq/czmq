@@ -58,11 +58,26 @@ content of the messages in any way. See test example on how to use it.
 
 #include "czmq_classes.h"
 
+#if defined (__UNIX__)
+#   if defined (__UTYPE_OSX)
+// issue#1836
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron ()) 
+#   else
+extern char **environ;              // should be declared as a part of unistd.h, but fail in some targets in Travis
+                                    // declare it explicitly
+#   endif
+#endif
+
 // For getcwd() variants
 #if (defined (WIN32))
 # include <direct.h>
 #else
 # include <unistd.h>
+#endif
+
+#if defined (__UTYPE_OSX)
+#include <crt_externs.h>
 #endif
 
 #define ZPROC_RUNNING -42
