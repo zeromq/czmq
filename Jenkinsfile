@@ -1,6 +1,6 @@
 /*
-        NOTE: This file was customized after generation; regenerate its
-              zproject and merge differences carefully!
+        NOTE: This file was customized after generation regarding zsp (zproc
+        selftests); regenerate its zproject and merge differences carefully!
 
     czmq - The high-level C binding for 0MQ
 
