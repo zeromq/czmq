@@ -224,7 +224,8 @@ pipeline {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" check'
                           }
                           catch (Exception e) {
-                            sh 'D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let it "improve"
+                            sh '''D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'''
                             archiveArtifacts artifacts: "**/test-suite*.tgz", allowEmpty: true
                             throw e
                           }
@@ -254,7 +255,8 @@ pipeline {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" check'
                           }
                           catch (Exception e) {
-                            sh 'D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let it "improve"
+                            sh '''D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'''
                             archiveArtifacts artifacts: "**/test-suite*.tgz", allowEmpty: true
                             throw e
                           }
@@ -284,7 +286,8 @@ pipeline {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" memcheck && exit 0 ; echo "Re-running failed ($?) memcheck with greater verbosity" >&2 ; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" VERBOSE=1 memcheck-verbose'
                           }
                           catch (Exception e) {
-                            sh 'D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let it "improve"
+                            sh '''D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'''
                             archiveArtifacts artifacts: "**/test-suite*.tgz", allowEmpty: true
                             throw e
                           }
@@ -314,7 +317,8 @@ pipeline {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" memcheck && exit 0 ; echo "Re-running failed ($?) memcheck with greater verbosity" >&2 ; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" VERBOSE=1 memcheck-verbose'
                           }
                           catch (Exception e) {
-                            sh 'D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let it "improve"
+                            sh '''D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'''
                             archiveArtifacts artifacts: "**/test-suite*.tgz", allowEmpty: true
                             throw e
                           }
@@ -344,7 +348,8 @@ pipeline {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=yes --with-docs=no" ; export DISTCHECK_CONFIGURE_FLAGS; make DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" distcheck'
                           }
                           catch (Exception e) {
-                            sh 'D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let it "improve"
+                            sh '''D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'''
                             archiveArtifacts artifacts: "**/test-suite*.tgz", allowEmpty: true
                             throw e
                           }
@@ -374,7 +379,8 @@ pipeline {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=no --with-docs=no" ; export DISTCHECK_CONFIGURE_FLAGS; make DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" distcheck'
                           }
                           catch (Exception e) {
-                            sh 'D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let it "improve"
+                            sh '''D="`pwd`"; B="`basename "$D"`" ; tar czf test-suite_"$B".tgz `find . -name '*.trs'` `find . -name '*.log'`'''
                             archiveArtifacts artifacts: "**/test-suite*.tgz", allowEmpty: true
                             throw e
                           }
