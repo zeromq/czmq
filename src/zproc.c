@@ -197,7 +197,6 @@ arr_print (char**self) {
 struct _zproc_t {
 #if defined (__WINDOWS__)
    PROCESS_INFORMATION piProcInfo;
-   STARTUPINFO siStartInfo;
 #else
     //TODO: there is no windows port, so lets exclude pid from struct
     //      zproc wasn't ported there, so no reason to do so
@@ -406,22 +405,16 @@ zproc_stderr (zproc_t *self) {
 int
 zproc_returncode (zproc_t *self) {
     assert (self);
-#if defined (__WINDOWS__)
-    zsys_error ("zproc_returncode not implemented on Windows");
-    return -1;
-#else
-    assert (self->pid);
+    assert (zproc_pid(self));
     zproc_wait (self, false);
     return self->return_code;
-#endif
 }
 
 int
 zproc_pid (zproc_t *self) {
     assert (self);
 #if defined (__WINDOWS__)
-    zsys_error ("zproc_pid not implemented on Windows");
-    return -1;
+    return self->piProcInfo.dwProcessId;
 #else
     return self->pid;
 #endif
@@ -512,11 +505,40 @@ s_zproc_alive (zloop_t *loop, int timer_id, void *args)
 static int
 s_zproc_execve (zproc_t *self)
 {
-#if defined(__WINDOWS__)
-    zsys_debug ("s_zproc_execve not implemented on Windows");
-    return -1;
-#else
     assert (self);
+#if defined(__WINDOWS__)
+    STARTUPINFO siStartInfo;
+    ZeroMemory (&siStartInfo, sizeof (siStartInfo));
+
+    char *commandline = strdup ((char *)zlist_first (self->args));
+    char *arg = (char *) zlist_next (self->args);
+    while (arg) {
+        char *tmp = zsys_sprintf ("%s %s", commandline, arg);
+        zstr_free (&commandline);
+        commandline = tmp;
+        arg = (char *) zlist_next (self->args);
+    }
+    if (self->verbose)
+        zsys_debug ("zproc: command to start: %s", commandline);
+
+    siStartInfo.cb = sizeof (siStartInfo);
+    self->running = CreateProcess(
+        NULL,          // app name
+        commandline,   // command line
+        NULL,          // process security attributes
+        NULL,          // primary thread security attributes
+        TRUE,         // handles are not inherited
+        0,             // creation flags
+        NULL,          // use parent's environment
+        NULL ,         // use parent's current directory
+        &siStartInfo,  // STARTUPINFO pointer
+        &self->piProcInfo);  // receives PROCESS_INFORMATION
+    WaitForInputIdle (self->piProcInfo.hProcess, 1000);
+    if (self->verbose)
+        zsys_debug ("zproc: %s", self->running ? "started" : "failed to start");
+    zstr_free (&commandline);
+    return 0;
+#else
     int r;
 
     char *filename = (char*) zlist_first (self->args);
@@ -666,10 +688,6 @@ s_zproc_actor (zsock_t *pipe, void *args)
 int
 zproc_run (zproc_t *self)
 {
-#if defined (__WINDOWS__)
-    zsys_error ("zproc not yet implemented for Windows");
-    return -1;
-#endif
     assert (self);
     assert (!self->actor);
 
@@ -689,10 +707,29 @@ zproc_run (zproc_t *self)
 int
 zproc_wait (zproc_t *self, bool wait) {
 #if defined (__WINDOWS__)
-    if (self->piProcInfo.hProcess == 0)
-        return 0;
+    if (!self->running) {
+        if (self->verbose)
+            zsys_debug ("zproc_wait: not running");
+        return self->return_code;
+    }
 
-    zsys_error ("zproc not yet implemented for Windows");
+    uint32_t r = WaitForSingleObject (self->piProcInfo.hProcess, wait ? INFINITE : 0);
+    if (self->verbose)
+        zsys_debug ("zproc_wait [%d]:\twaitforsingleobject, r=%d", zproc_pid (self), r);
+    if (!wait && r == 0x00000102) {
+        // still running
+        return self->return_code;
+    }
+    if (r == 0) {
+        // finished
+        DWORD exitcode = 0;
+        if (!GetExitCodeProcess(self->piProcInfo.hProcess, &exitcode))
+            zsys_error ("zproc_wait: [%d]\tfailed to get exit code", zproc_pid (self));
+        self->return_code = exitcode;
+        CloseHandle (self->piProcInfo.hProcess);
+        CloseHandle (self->piProcInfo.hThread);
+        return self->return_code;
+    }
     return -1;
 #else
     assert (self);
@@ -745,13 +782,8 @@ zproc_wait (zproc_t *self, bool wait) {
 bool
 zproc_running (zproc_t *self) {
     assert (self);
-#if defined (__WINDOWS__)
-    zsys_debug ("zproc_running not implemented on Windows");
-    return false;
-#else
-    assert (self->pid);
+    assert (zproc_pid (self));
     return zproc_wait (self, false) == ZPROC_RUNNING;
-#endif
 }
 
 void *
@@ -765,8 +797,15 @@ void
 zproc_kill (zproc_t *self, int signum) {
     assert (self);
 #if defined (__WINDOWS__)
-    zsys_debug ("zproc_kill not implemented on Windows");
-    return;
+    if (zproc_pid (self)) {
+        if (signum == SIGKILL) {
+            if (! TerminateProcess (self->piProcInfo.hProcess, 255))
+                zsys_error ("zproc_kill [%d]:\tTerminateProcess failed", zproc_pid (self));
+            zproc_wait (self, false);
+        } else {
+            zsys_error ("zproc_kill: [%d]:\tOnly SIGKILL is implemented on windows", zproc_pid (self));
+        }
+    }
 #else
     int r = kill (self->pid, signum);
     if (r != 0)
@@ -1029,16 +1068,6 @@ zproc_test (bool verbose)
 {
     printf (" * zproc: ");
 
-#if defined (__WINDOWS__)
-    printf ("Very limited (on Windows) ");
-    {
-        zproc_t *self = zproc_new ();
-        assert (self);
-        zproc_destroy (&self);
-    }
-    printf ("OK\n");
-    return;
-#endif
 #if ZMQ_VERSION_MAJOR < 4
     printf ("SKIPPED (on zmq pre-4)\n");
     return;
@@ -1056,42 +1085,47 @@ zproc_test (bool verbose)
         printf("\n");
     }
 
+#ifdef __WINDOWS__
+#  define ZSPBIN "zsp.exe"
+#else
+#  define ZSPBIN "zsp"
+#endif
     //  find the right binary for current build (in-tree, distcheck, etc.)
     char *file = NULL;
-    if (zsys_file_exists ("src/zsp") || zsys_file_exists ("./src/zsp"))
-        file = "./src/zsp";
+    if (zsys_file_exists ("src/" ZSPBIN) || zsys_file_exists ("./src/" ZSPBIN))
+        file = "./src/" ZSPBIN;
     else
-    if (zsys_file_exists ("../zsp"))
+    if (zsys_file_exists ("../" ZSPBIN))
     //  WHOA: zproc: zproc_test() : current working directory is
     //      /home/travis/build/username/czmq/czmq-4.0.3/_build/src/selftest-rw
         file = "../zsp";
     else
-    if (zsys_file_exists ("_build/../src/zsp"))
-        file = "_build/../src/zsp";
+    if (zsys_file_exists ("_build/../src/" ZSPBIN))
+        file = "_build/../src/" ZSPBIN;
     else
-    if (zsys_file_exists ("_build/src/zsp"))
-        file = "_build/src/zsp";
+    if (zsys_file_exists ("_build/src/" ZSPBIN))
+        file = "_build/src/" ZSPBIN;
     else
-    if (zsys_file_exists ("../_build/src/zsp"))
-        file = "../_build/src/zsp";
+    if (zsys_file_exists ("../_build/src/" ZSPBIN))
+        file = "../_build/src/" ZSPBIN;
     else
-    if (zsys_file_exists ("../../_build/src/zsp"))
-        file = "../../_build/src/zsp";
+    if (zsys_file_exists ("../../_build/src/" ZSPBIN))
+        file = "../../_build/src/" ZSPBIN;
     else
-    if (zsys_file_exists ("_build/sub/src/zsp"))
-        file = "_build/sub/src/zsp";
+    if (zsys_file_exists ("_build/sub/src/" ZSPBIN))
+        file = "_build/sub/src/" ZSPBIN;
     else
-    if (zsys_file_exists ("../_build/sub/src/zsp"))
-        file = "../_build/sub/src/zsp";
+    if (zsys_file_exists ("../_build/sub/src/" ZSPBIN))
+        file = "../_build/sub/src/" ZSPBIN;
     else
-    if (zsys_file_exists ("../../_build/sub/src/zsp"))
-        file = "../../_build/sub/src/zsp";
+    if (zsys_file_exists ("../../_build/sub/src/" ZSPBIN))
+        file = "../../_build/sub/src/" ZSPBIN;
     else
-    if (zsys_file_exists ("zsp") || zsys_file_exists ("./zsp"))
-        file = "./zsp";
+    if (zsys_file_exists ("" ZSPBIN) || zsys_file_exists ("./" ZSPBIN))
+        file = "./" ZSPBIN;
     else
-    if (zsys_file_exists ("../src/zsp"))
-        file = "../src/zsp";
+    if (zsys_file_exists ("../src/" ZSPBIN))
+        file = "../src/" ZSPBIN;
 
     if (file == NULL || !zsys_file_exists (file)) {
         zsys_warning ("cannot detect zsp binary, %s does not exist", file ? file : "<null>");
@@ -1110,9 +1144,29 @@ zproc_test (bool verbose)
 
     //  @selftest
 
-    //  variable zsp contains path to zsp executable:
-    //  static const char *zsp = "path/to/zsp";
+    //  variable file contains path to zsp executable:
+    //  char *file = "path/to/zsp";
 
+#if defined (__WINDOWS__)
+    printf ("Very limited (on Windows) ");
+    {
+        zsys_init ();
+        zproc_t *self = zproc_new ();
+        assert (self);
+
+        zproc_set_verbose (self, verbose);
+        zproc_set_argsx (self, file, "-v", NULL);
+        zproc_run (self);
+        zclock_sleep (100); // to let actor start the process
+        assert (zproc_pid (self));
+
+        zproc_kill (self, SIGKILL);
+        assert (zproc_returncode (self) == 255);
+        zproc_destroy (&self);
+    }
+    printf ("OK\n");
+    return;
+#endif
     // Test case #1: run command, wait until it ends and get the (stdandard) output
     zproc_t *self = zproc_new ();
     assert (self);
