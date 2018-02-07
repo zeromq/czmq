@@ -736,11 +736,18 @@ static int
 s_collect_level (char **start, int lineno)
 {
     char *readptr = *start;
-    while (*readptr == ' ')
+    int spaces = 0;
+    int tabs = 0;
+    while (*readptr == ' ' || *readptr == '\t') {
+        if (*readptr == ' ')
+            spaces++;
+        else
+            tabs++;
         readptr++;
-    ptrdiff_t level = (readptr - *start) / 4;
-    if (level * 4 != readptr - *start) {
-        zclock_log ("E (zconfig): (%d) indent 4 spaces at once", lineno);
+    }
+    ptrdiff_t level = (spaces + 4*tabs) / 4;
+    if (level * 4 != spaces + 4*tabs) {
+        zclock_log ("E (zconfig): (%d) indent 4 spaces at once or use tabs", lineno);
         level = -1;
     }
     *start = readptr;
