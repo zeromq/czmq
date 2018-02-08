@@ -337,7 +337,7 @@ zproc_set_stdin (zproc_t *self, void* socket) {
     zsys_error ("zproc_set_stdin not implemented for Windows");
     return;
 #else
-    if (self->stdinpipe [0] != 0)
+    if (self->stdinpipe [0] != -1)
         return;
     int r = pipe (self->stdinpipe);
     assert (r == 0);
@@ -545,7 +545,7 @@ s_zproc_execve (zproc_t *self)
     self->pid = fork ();
     if (self->pid == 0) {
         // Child
-        if (self->stdinpipe [0] != 0) {
+        if (self->stdinpipe [0] != -1) {
             int o_flags = fcntl (self->stdinpipe [0], F_GETFL);
             int n_flags = o_flags & (~O_NONBLOCK);
             fcntl (self->stdinpipe [0], F_SETFL, n_flags);
@@ -554,13 +554,13 @@ s_zproc_execve (zproc_t *self)
         }
 
         // redirect stdout if set_stdout was called
-        if (self->stdoutpipe [0] != 0) {
+        if (self->stdoutpipe [0] != -1) {
             close (self->stdoutpipe [0]);
             dup2 (self->stdoutpipe [1], STDOUT_FILENO);
         }
 
-        // redirect stdout if set_stderr was called
-        if (self->stderrpipe [0] != 0) {
+        // redirect stderr if set_stderr was called
+        if (self->stderrpipe [0] != -1) {
             close (self->stderrpipe [0]);
             dup2 (self->stderrpipe [1], STDERR_FILENO);
         }
