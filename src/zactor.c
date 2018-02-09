@@ -35,7 +35,7 @@
 
 //  zactor_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
-#define ZACTOR_TAG          0x0005cafe
+#define ZACTOR_TAG          0xcafe0005
 
 //  Structure of our class
 

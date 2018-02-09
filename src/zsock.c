@@ -28,7 +28,7 @@
 
 //  zsock_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
-#define ZSOCK_TAG           0x0004cafe
+#define ZSOCK_TAG           0xcafe0004
 
 //  This port range is defined by IANA for dynamic or private ports
 //  We use this when choosing a port for dynamic binding.

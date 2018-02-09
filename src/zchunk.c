@@ -23,7 +23,7 @@
 
 //  zchunk_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
-#define ZCHUNK_TAG              0x0001cafe
+#define ZCHUNK_TAG              0xcafe0001
 
 //  Structure of our class
 

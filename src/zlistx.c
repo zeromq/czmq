@@ -26,7 +26,7 @@
 
 #include "czmq_classes.h"
 
-#define NODE_TAG            0x0006cafe
+#define NODE_TAG            0xcafe0006
 
 //  List node, used internally only
 
