@@ -560,7 +560,7 @@ zproxy_test (bool verbose)
 	sink = zsock_new_sub(">inproc://backend", "whatever");
 #else
     // vagrant vms don't like using shared storage for ipc pipes..
-    if (streq(getenv("USER"), "vagrant"))
+    if (getenv("USER") && streq(getenv("USER"), "vagrant"))
         sink = zsock_new_sub (">ipc:///tmp/backend", "whatever");
     else
 	    sink = zsock_new_sub (">ipc://backend", "whatever");
@@ -571,7 +571,7 @@ zproxy_test (bool verbose)
 	zstr_sendx (proxy, "BACKEND", "XPUB", "inproc://backend", NULL);
 #else
     // vagrant vms don't like using shared storage for ipc pipes..
-    if (streq(getenv("USER"), "vagrant"))
+    if (getenv("USER") && streq(getenv("USER"), "vagrant"))
         zstr_sendx(proxy, "BACKEND", "XPUB", "ipc:///tmp/backend", NULL);
     else
         zstr_sendx(proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
