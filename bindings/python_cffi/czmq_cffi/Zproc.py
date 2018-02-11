@@ -31,7 +31,21 @@ class Zproc(object):
         Setup the command line arguments, the first item must be an (absolute) filename
         to run.
         """
+        foo = utils.to_strings (argv_p)
+        if foo is not None:
+            foo_p = utils.ffi.new("struct _zlist_t *[1]")
+            foo_p [0] = foo
+            utils.lib.dproto_set_argv(self._p, foo_p)
+            return
+
         utils.lib.zproc_set_args(self._p, args._p)
+
+    def set_argsx(self, args, ):
+        """
+        Setup the command line arguments, the first item must be an (absolute) filename
+        to run. Variadic function, must be NULL terminated.
+        """
+        utils.lib.zproc_set_argsx(self._p, utils.to_bytes(args), )
 
     def set_env(self, args):
         """

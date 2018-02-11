@@ -125,11 +125,6 @@ CZMQ_EXPORT void *
     zproc_actor (zproc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  SIGKILL is implemented on windows
-#if defined(__WINDOWS__) && ! defined(SIGKILL)
-#  define SIGKILL 9
-#endif
-//  *** Draft method, for development use, may change without warning ***
 //  send a signal to the subprocess
 CZMQ_EXPORT void
     zproc_kill (zproc_t *self, int signal);

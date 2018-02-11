@@ -2186,14 +2186,21 @@ my_zproc.destroy ()
 Methods:
 
 ```
-nothing my_zproc.setArgs (Zlistx)
+nothing my_zproc.setArgs (Zlist)
 ```
 
 Setup the command line arguments, the first item must be an (absolute) filename
 to run.
 
 ```
-nothing my_zproc.setEnv (Zhashx)
+nothing my_zproc.setArgsx (String)
+```
+
+Setup the command line arguments, the first item must be an (absolute) filename
+to run. Variadic function, must be NULL terminated.
+
+```
+nothing my_zproc.setEnv (Zhash)
 ```
 
 Setup the environment variables for the process.

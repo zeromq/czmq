@@ -30,10 +30,14 @@ public:
 public slots:
     //  Setup the command line arguments, the first item must be an (absolute) filename
     //  to run.
-    void setArgs (QmlZlistx *args);
+    void setArgs (QmlZlist *args);
+
+    //  Setup the command line arguments, the first item must be an (absolute) filename
+    //  to run. Variadic function, must be NULL terminated.
+    void setArgsx (const QString &args);
 
     //  Setup the environment variables for the process.
-    void setEnv (QmlZhashx *args);
+    void setEnv (QmlZhash *args);
 
     //  Connects process stdin with a readable ('>', connect) zeromq socket. If
     //  socket argument is NULL, zproc creates own managed pair of inproc

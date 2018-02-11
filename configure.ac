@@ -61,6 +61,11 @@ AC_C_BIGENDIAN
 # Optional project-local hook (acinclude.m4, add AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [whatever]) )
 AX_PROJECT_LOCAL_HOOK
 
+# See if cppcheck is in PATH; this variable unblocks the "cppcheck" recipe
+# (note that "make cppcheck.xml" can be used - and perhaps fail - regardless)
+AC_CHECK_PROG([WITH_CPPCHECK], [cppcheck], [true], [false])
+AM_CONDITIONAL(WITH_CPPCHECK, $WITH_CPPCHECK)
+
 # Code coverage
 AC_MSG_CHECKING([whether to enable GCov])
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
@@ -96,6 +101,19 @@ else
     AM_CONDITIONAL(ENABLE_ASAN, false)
     AC_MSG_RESULT([no])
 fi
+
+# See if clang-format is in PATH; the result unblocks the relevant recipes
+WITH_CLANG_FORMAT=""
+AS_IF([test x"$CLANG_FORMAT" = x],
+    [AC_PATH_PROG([CLANG_FORMAT], [clang-format], [])],
+    [AC_CHECK_PROG([WITH_CLANG_FORMAT], [$CLANG_FORMAT], [true], [fail])])
+AS_IF([test x"$CLANG_FORMAT" != x && test x"$WITH_CLANG_FORMAT" = x],
+    [AS_IF([test -x "$CLANG_FORMAT"],
+        [WITH_CLANG_FORMAT=true],
+        [AC_CHECK_PROG([WITH_CLANG_FORMAT], [$CLANG_FORMAT], [true], [false])])])
+AS_IF([test "$WITH_CLANG_FORMAT" = fail],
+    [AC_MSG_ERROR([Caller explicitly referenced CLANG_FORMAT=$CLANG_FORMAT which was not found])])
+AM_CONDITIONAL([WITH_CLANG_FORMAT], [$WITH_CLANG_FORMAT])
 
 # Set pkgconfigdir
 AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
@@ -853,6 +871,11 @@ echo "    - 'make memcheck'      run the project's selftest with valgrind to"
 echo "                           check for memory leaks"
 echo "    - 'make coverage'      generate project's selftest coverage report"
 echo "                           expects --with-gcov option for configure"
+echo "    - 'make clang-format-check'   check if project sources conform"
+echo "                           to style requirements"
+echo "    - 'make clang-format'         modify project sources to conform"
+echo "                           to style requirements"
+echo "    - 'make clang-format-diff'    modify as above and print 'git diff'"
 echo
 ])
 

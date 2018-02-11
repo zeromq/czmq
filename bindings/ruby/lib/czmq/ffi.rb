@@ -517,6 +517,7 @@ module CZMQ
       attach_function :zproc_new, [], :pointer, **opts
       attach_function :zproc_destroy, [:pointer], :void, **opts
       attach_function :zproc_set_args, [:pointer, :pointer], :void, **opts
+      attach_function :zproc_set_argsx, [:pointer, :string, :varargs], :void, **opts
       attach_function :zproc_set_env, [:pointer, :pointer], :void, **opts
       attach_function :zproc_set_stdin, [:pointer, :pointer], :void, **opts
       attach_function :zproc_set_stdout, [:pointer, :pointer], :void, **opts

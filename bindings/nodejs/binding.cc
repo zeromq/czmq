@@ -4214,6 +4214,7 @@ NAN_MODULE_INIT (Zproc::Init) {
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
     Nan::SetPrototypeMethod (tpl, "setArgs", _set_args);
+    Nan::SetPrototypeMethod (tpl, "setArgsx", _set_argsx);
     Nan::SetPrototypeMethod (tpl, "setEnv", _set_env);
     Nan::SetPrototypeMethod (tpl, "run", _run);
     Nan::SetPrototypeMethod (tpl, "returncode", _returncode);
@@ -4280,14 +4281,29 @@ NAN_METHOD (Zproc::defined) {
 
 NAN_METHOD (Zproc::_set_args) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    Zlistx *args = Nan::ObjectWrap::Unwrap<Zlistx>(info [0].As<Object>());
-    zproc_set_args (zproc->self, args->self);
+    Zlist *args = Nan::ObjectWrap::Unwrap<Zlist>(info [0].As<Object>());
+    zproc_set_args (zproc->self, &args->self);
+}
+
+NAN_METHOD (Zproc::_set_argsx) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    char *args;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `args`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`args` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String args_utf8 (info [0].As<String>());
+    args = *args_utf8;
+         //} //bjornw end
+    zproc_set_argsx (zproc->self, (const char *)args);
 }
 
 NAN_METHOD (Zproc::_set_env) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    Zhashx *args = Nan::ObjectWrap::Unwrap<Zhashx>(info [0].As<Object>());
-    zproc_set_env (zproc->self, args->self);
+    Zhash *args = Nan::ObjectWrap::Unwrap<Zhash>(info [0].As<Object>());
+    zproc_set_env (zproc->self, &args->self);
 }
 
 NAN_METHOD (Zproc::_run) {

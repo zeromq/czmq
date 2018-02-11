@@ -4817,9 +4817,11 @@ lib.zproc_new.argtypes = []
 lib.zproc_destroy.restype = None
 lib.zproc_destroy.argtypes = [POINTER(zproc_p)]
 lib.zproc_set_args.restype = None
-lib.zproc_set_args.argtypes = [zproc_p, zlistx_p]
+lib.zproc_set_args.argtypes = [zproc_p, POINTER(zlist_p)]
+lib.zproc_set_argsx.restype = None
+lib.zproc_set_argsx.argtypes = [zproc_p, c_char_p]
 lib.zproc_set_env.restype = None
-lib.zproc_set_env.argtypes = [zproc_p, zhashx_p]
+lib.zproc_set_env.argtypes = [zproc_p, POINTER(zhash_p)]
 lib.zproc_set_stdin.restype = None
 lib.zproc_set_stdin.argtypes = [zproc_p, c_void_p]
 lib.zproc_set_stdout.restype = None
@@ -4942,13 +4944,20 @@ returns NULL. Code needs to be ported there.
         Setup the command line arguments, the first item must be an (absolute) filename
 to run.
         """
-        return lib.zproc_set_args(self._as_parameter_, args)
+        return lib.zproc_set_args(self._as_parameter_, byref(zlist_p.from_param(args)))
+
+    def set_argsx(self, args, *args):
+        """
+        Setup the command line arguments, the first item must be an (absolute) filename
+to run. Variadic function, must be NULL terminated.
+        """
+        return lib.zproc_set_argsx(self._as_parameter_, args, *args)
 
     def set_env(self, args):
         """
         Setup the environment variables for the process.
         """
-        return lib.zproc_set_env(self._as_parameter_, args)
+        return lib.zproc_set_env(self._as_parameter_, byref(zhash_p.from_param(args)))
 
     def set_stdin(self, socket):
         """

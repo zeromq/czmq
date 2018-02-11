@@ -2254,11 +2254,16 @@ void
 // Setup the command line arguments, the first item must be an (absolute) filename
 // to run.
 void
-    zproc_set_args (zproc_t *self, zlistx_t *args);
+    zproc_set_args (zproc_t *self, zlist_t **args);
+
+// Setup the command line arguments, the first item must be an (absolute) filename
+// to run. Variadic function, must be NULL terminated.
+void
+    zproc_set_argsx (zproc_t *self, const char *args, ...);
 
 // Setup the environment variables for the process.
 void
-    zproc_set_env (zproc_t *self, zhashx_t *args);
+    zproc_set_env (zproc_t *self, zhash_t **args);
 
 // Connects process stdin with a readable ('>', connect) zeromq socket. If
 // socket argument is NULL, zproc creates own managed pair of inproc
