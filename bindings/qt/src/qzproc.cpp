@@ -170,40 +170,12 @@ void QZproc::setVerbose (bool verbose)
 }
 
 ///
-//  Returns CZMQ version as a single 6-digit integer encoding the major
-//  version (x 10000), the minor version (x 100) and the patch.
-int QZproc::czmqVersion ()
-{
-    int rv = zproc_czmq_version ();
-    return rv;
-}
-
-///
 //  Returns true if the process received a SIGINT or SIGTERM signal.
 //  It is good practice to use this method to exit any infinite loop
 //  processing messages.
 bool QZproc::interrupted ()
 {
     bool rv = zproc_interrupted ();
-    return rv;
-}
-
-///
-//  Returns true if the underlying libzmq supports CURVE security.
-bool QZproc::hasCurve ()
-{
-    bool rv = zproc_has_curve ();
-    return rv;
-}
-
-///
-//  Return current host name, for use in public tcp:// endpoints.
-//  If the host name is not resolvable, returns NULL.
-QString QZproc::hostname ()
-{
-    char *retStr_ = zproc_hostname ();
-    QString rv = QString (retStr_);
-    zstr_free (&retStr_);
     return rv;
 }
 

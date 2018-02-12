@@ -93,7 +93,7 @@ sub generate_manpage {
             $cat_text = "Program for ";
             last;
         }
-        elsif (/MAN3.*$name\.3/) {
+        elsif (/MAN3.*$outp_basename\.3/) {
             $source = "$rootsrcdir/src/$name.c";
             $header = "$rootsrcdir/include/$name.h";
             $cat = 3;

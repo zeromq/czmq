@@ -124,28 +124,11 @@ CZMQ_EXPORT int
     zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *const envp[]);
 -->
 
-    <method name = "czmq version" singleton = "1">
-        Returns CZMQ version as a single 6-digit integer encoding the major
-        version (x 10000), the minor version (x 100) and the patch.
-        <return type = "integer" />
-    </method>
-
     <method name = "interrupted" singleton = "1">
         Returns true if the process received a SIGINT or SIGTERM signal.
         It is good practice to use this method to exit any infinite loop
         processing messages.
         <return type = "boolean" />
-    </method>
-
-    <method name = "has curve" singleton = "1">
-        Returns true if the underlying libzmq supports CURVE security.
-        <return type = "boolean" />
-    </method>
-
-    <method name = "hostname" singleton = "1">
-        Return current host name, for use in public tcp:// endpoints.
-        If the host name is not resolvable, returns NULL.
-        <return type = "string" fresh = "1" />
     </method>
 
     <method name = "daemonize" singleton = "1">

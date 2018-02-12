@@ -4850,14 +4850,8 @@ lib.zproc_kill.restype = None
 lib.zproc_kill.argtypes = [zproc_p, c_int]
 lib.zproc_set_verbose.restype = None
 lib.zproc_set_verbose.argtypes = [zproc_p, c_bool]
-lib.zproc_czmq_version.restype = c_int
-lib.zproc_czmq_version.argtypes = []
 lib.zproc_interrupted.restype = c_bool
 lib.zproc_interrupted.argtypes = []
-lib.zproc_has_curve.restype = c_bool
-lib.zproc_has_curve.argtypes = []
-lib.zproc_hostname.restype = POINTER(c_char)
-lib.zproc_hostname.argtypes = []
 lib.zproc_daemonize.restype = None
 lib.zproc_daemonize.argtypes = [c_char_p]
 lib.zproc_run_as.restype = None
@@ -5053,14 +5047,6 @@ not initialized or external sockets.
         return lib.zproc_set_verbose(self._as_parameter_, verbose)
 
     @staticmethod
-    def czmq_version():
-        """
-        Returns CZMQ version as a single 6-digit integer encoding the major
-version (x 10000), the minor version (x 100) and the patch.
-        """
-        return lib.zproc_czmq_version()
-
-    @staticmethod
     def interrupted():
         """
         Returns true if the process received a SIGINT or SIGTERM signal.
@@ -5068,21 +5054,6 @@ It is good practice to use this method to exit any infinite loop
 processing messages.
         """
         return lib.zproc_interrupted()
-
-    @staticmethod
-    def has_curve():
-        """
-        Returns true if the underlying libzmq supports CURVE security.
-        """
-        return lib.zproc_has_curve()
-
-    @staticmethod
-    def hostname():
-        """
-        Return current host name, for use in public tcp:// endpoints.
-If the host name is not resolvable, returns NULL.
-        """
-        return return_fresh_string(lib.zproc_hostname())
 
     @staticmethod
     def daemonize(workdir):

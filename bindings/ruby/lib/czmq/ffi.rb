@@ -533,10 +533,7 @@ module CZMQ
       attach_function :zproc_actor, [:pointer], :pointer, **opts
       attach_function :zproc_kill, [:pointer, :int], :void, **opts
       attach_function :zproc_set_verbose, [:pointer, :bool], :void, **opts
-      attach_function :zproc_czmq_version, [], :int, **opts
       attach_function :zproc_interrupted, [], :bool, **opts
-      attach_function :zproc_has_curve, [], :bool, **opts
-      attach_function :zproc_hostname, [], :pointer, **opts
       attach_function :zproc_daemonize, [:string], :void, **opts
       attach_function :zproc_run_as, [:string, :string, :string], :void, **opts
       attach_function :zproc_set_io_threads, [:size_t], :void, **opts

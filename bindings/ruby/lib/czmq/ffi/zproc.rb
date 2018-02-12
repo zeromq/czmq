@@ -288,15 +288,6 @@ module CZMQ
         result
       end
 
-      # Returns CZMQ version as a single 6-digit integer encoding the major
-      # version (x 10000), the minor version (x 100) and the patch.
-      #
-      # @return [Integer]
-      def self.czmq_version()
-        result = ::CZMQ::FFI.zproc_czmq_version()
-        result
-      end
-
       # Returns true if the process received a SIGINT or SIGTERM signal.
       # It is good practice to use this method to exit any infinite loop
       # processing messages.
@@ -304,24 +295,6 @@ module CZMQ
       # @return [Boolean]
       def self.interrupted()
         result = ::CZMQ::FFI.zproc_interrupted()
-        result
-      end
-
-      # Returns true if the underlying libzmq supports CURVE security.
-      #
-      # @return [Boolean]
-      def self.has_curve()
-        result = ::CZMQ::FFI.zproc_has_curve()
-        result
-      end
-
-      # Return current host name, for use in public tcp:// endpoints.
-      # If the host name is not resolvable, returns NULL.
-      #
-      # @return [::FFI::AutoPointer]
-      def self.hostname()
-        result = ::CZMQ::FFI.zproc_hostname()
-        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 

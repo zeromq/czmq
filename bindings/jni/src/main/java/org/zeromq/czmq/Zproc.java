@@ -169,14 +169,6 @@ public class Zproc implements AutoCloseable{
         __setVerbose (self, verbose);
     }
     /*
-    Returns CZMQ version as a single 6-digit integer encoding the major
-    version (x 10000), the minor version (x 100) and the patch.
-    */
-    native static int __czmqVersion ();
-    public int czmqVersion () {
-        return __czmqVersion ();
-    }
-    /*
     Returns true if the process received a SIGINT or SIGTERM signal.
     It is good practice to use this method to exit any infinite loop
     processing messages.
@@ -184,21 +176,6 @@ public class Zproc implements AutoCloseable{
     native static boolean __interrupted ();
     public boolean interrupted () {
         return __interrupted ();
-    }
-    /*
-    Returns true if the underlying libzmq supports CURVE security.
-    */
-    native static boolean __hasCurve ();
-    public boolean hasCurve () {
-        return __hasCurve ();
-    }
-    /*
-    Return current host name, for use in public tcp:// endpoints.
-    If the host name is not resolvable, returns NULL.
-    */
-    native static String __hostname ();
-    public String hostname () {
-        return __hostname ();
     }
     /*
     Move the current process into the background. The precise effect

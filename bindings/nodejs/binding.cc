@@ -4223,10 +4223,7 @@ NAN_MODULE_INIT (Zproc::Init) {
     Nan::SetPrototypeMethod (tpl, "wait", _wait);
     Nan::SetPrototypeMethod (tpl, "kill", _kill);
     Nan::SetPrototypeMethod (tpl, "setVerbose", _set_verbose);
-    Nan::SetPrototypeMethod (tpl, "czmqVersion", _czmq_version);
     Nan::SetPrototypeMethod (tpl, "interrupted", _interrupted);
-    Nan::SetPrototypeMethod (tpl, "hasCurve", _has_curve);
-    Nan::SetPrototypeMethod (tpl, "hostname", _hostname);
     Nan::SetPrototypeMethod (tpl, "daemonize", _daemonize);
     Nan::SetPrototypeMethod (tpl, "runAs", _run_as);
     Nan::SetPrototypeMethod (tpl, "setIoThreads", _set_io_threads);
@@ -4385,24 +4382,9 @@ NAN_METHOD (Zproc::_set_verbose) {
     zproc_set_verbose (zproc->self, (bool) verbose);
 }
 
-NAN_METHOD (Zproc::_czmq_version) {
-    int result = zproc_czmq_version ();
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
 NAN_METHOD (Zproc::_interrupted) {
     bool result = zproc_interrupted ();
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
-}
-
-NAN_METHOD (Zproc::_has_curve) {
-    bool result = zproc_has_curve ();
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
-}
-
-NAN_METHOD (Zproc::_hostname) {
-    char *result = (char *) zproc_hostname ();
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zproc::_daemonize) {
