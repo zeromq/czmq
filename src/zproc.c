@@ -800,12 +800,12 @@ zproc_kill (zproc_t *self, int signum) {
     assert (self);
 #if defined (__WINDOWS__)
     if (zproc_pid (self)) {
-        if (signum == SIGKILL) {
+        if (signum == SIGTERM) {
             if (! TerminateProcess (self->piProcInfo.hProcess, 255))
                 zsys_error ("zproc_kill [%d]:\tTerminateProcess failed", zproc_pid (self));
             zproc_wait (self, false);
         } else {
-            zsys_error ("zproc_kill: [%d]:\tOnly SIGKILL is implemented on windows", zproc_pid (self));
+            zsys_error ("zproc_kill: [%d]:\tOnly SIGTERM is implemented on windows", zproc_pid (self));
         }
     }
 #else
@@ -1164,7 +1164,7 @@ zproc_test (bool verbose)
         zclock_sleep (100); // to let actor start the process
         assert (zproc_pid (self));
 
-        zproc_kill (self, SIGKILL);
+        zproc_kill (self, SIGTERM);
         assert (zproc_returncode (self) == 255);
         zproc_destroy (&self);
     }
