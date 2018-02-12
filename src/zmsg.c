@@ -25,7 +25,7 @@
 
 //  zmsg_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
-#define ZMSG_TAG            0x0003cafe
+#define ZMSG_TAG            0xcafe0003
 
 //  Structure of our class
 

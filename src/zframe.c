@@ -28,7 +28,7 @@
 
 //  zframe_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
-#define ZFRAME_TAG              0x0002cafe
+#define ZFRAME_TAG              0xcafe0002
 
 //  Structure of our class
 

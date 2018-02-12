@@ -1,6 +1,6 @@
 /*
-        NOTE: This file was customized after generation; regenerate its
-              zproject and merge differences carefully!
+        NOTE: This file was customized after generation regarding zsp (zproc
+        selftests); regenerate its zproject and merge differences carefully!
 
     czmq - The high-level C binding for 0MQ
 
@@ -56,6 +56,10 @@ pipeline {
             description: 'Attempt a build with docs in this run? (Note: corresponding tools are required in the build environment)',
             name: 'DO_BUILD_DOCS')
         booleanParam (
+            defaultValue: false,
+            description: 'Publish as an archive a "dist" tarball from a build with docs in this run? (Note: corresponding tools are required in the build environment; enabling this enforces DO_BUILD_DOCS too)',
+            name: 'DO_DIST_DOCS')
+        booleanParam (
             defaultValue: true,
             description: 'Attempt "make check" in this run?',
             name: 'DO_TEST_CHECK')
@@ -98,19 +102,6 @@ pipeline {
 // Note: your Jenkins setup may benefit from similar setup on side of agents:
 //        PATH="/usr/lib64/ccache:/usr/lib/ccache:/usr/bin:/bin:${PATH}"
     stages {
-        stage ('cppcheck') {
-                    when { expression { return ( params.DO_CPPCHECK ) } }
-                    steps {
-                        dir("tmp") {
-                            sh 'if [ -s Makefile ]; then make -k distclean || true ; fi'
-                            sh 'chmod -R u+w .'
-                            deleteDir()
-                        }
-                        sh 'cppcheck --std=c++11 --enable=all --inconclusive --xml --xml-version=2 . 2>cppcheck.xml'
-                        archiveArtifacts artifacts: '**/cppcheck.xml'
-                        sh 'rm -f cppcheck.xml'
-                    }
-        }
         stage ('prepare') {
                     steps {
                         dir("tmp") {
@@ -165,12 +156,19 @@ pipeline {
                     }
                 }
                 stage ('build with DOCS') {
-                    when { expression { return ( params.DO_BUILD_DOCS ) } }
+                    when { expression { return ( params.DO_BUILD_DOCS || params.DO_DIST_DOCS ) } }
                     steps {
                       dir("tmp/build-DOCS") {
                         deleteDir()
                         unstash 'prepped'
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; ./configure --enable-drafts=yes --with-docs=yes'
+                        script {
+                            if ( params.DO_DIST_DOCS ) {
+                                sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make dist-gzip || exit ; DISTFILE="`ls -1tc *.tar.gz | head -1`" && [ -n "$DISTFILE" ] && [ -s "$DISTFILE" ] || exit ; mv -f "$DISTFILE" __dist.tar.gz'
+                                archiveArtifacts artifacts: '__dist.tar.gz'
+                                sh "rm -f __dist.tar.gz"
+                            }
+                        }
                         sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make -k -j4 || make'
 //                        sh 'if test -x src/.libs/lt-zsp ; then rm -f src/zsp ; fi'
                         sh 'rm -f src/zsp'
@@ -195,6 +193,23 @@ pipeline {
         // the conflicts at all.
 //        stage ('check') {
 //            parallel {
+                stage ('cppcheck') {
+                    when { expression { return ( params.DO_CPPCHECK ) } }
+                    steps {
+                        dir("tmp/test-cppcheck") {
+                            deleteDir()
+                            unstash 'prepped'
+                            sh 'cppcheck --std=c++11 --enable=all --inconclusive --xml --xml-version=2 . 2>cppcheck.xml'
+                            archiveArtifacts artifacts: '**/cppcheck.xml'
+                            sh 'rm -f cppcheck.xml'
+                            script {
+                                if ( params.DO_CLEANUP_AFTER_BUILD ) {
+                                    deleteDir()
+                                }
+                            }
+                        }
+                    }
+                }
                 stage ('check with DRAFT') {
                     when { expression { return ( params.DO_BUILD_WITH_DRAFT_API && params.DO_TEST_CHECK ) } }
                     steps {
@@ -202,10 +217,22 @@ pipeline {
                       dir("tmp/build-withDRAFT") {
                         deleteDir()
                         unstash 'built-draft'
-                        retry(3) {
-                        timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                        script {
+                         def RETRY_NUMBER = 0
+                         retry(3) {
+                          RETRY_NUMBER++
+                          timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                           try {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" check'
-                        }
+                           }
+                           catch (Exception e) {
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let the verdict "improve"
+                            sh """D="`pwd`"; B="`basename "\$D"`" ; [ "${RETRY_NUMBER}" -gt 0 ] && T="_try-${RETRY_NUMBER}" || T="" ; tar czf "test-suite_${BUILD_TAG}_\${B}\${T}.tar.gz" `find . -name '*.trs'` `find . -name '*.log'`"""
+                            archiveArtifacts artifacts: "**/test-suite*.tar.gz", allowEmpty: true
+                            throw e
+                           }
+                          }
+                         }
                         }
                         sh 'echo "Are GitIgnores good after make check with drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         script {
@@ -223,10 +250,22 @@ pipeline {
                       dir("tmp/build-withoutDRAFT") {
                         deleteDir()
                         unstash 'built-nondraft'
-                        retry(3) {
-                        timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                        script {
+                         def RETRY_NUMBER = 0
+                         retry(3) {
+                          RETRY_NUMBER++
+                          timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                           try {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" check'
-                        }
+                           }
+                           catch (Exception e) {
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let the verdict "improve"
+                            sh """D="`pwd`"; B="`basename "\$D"`" ; [ "${RETRY_NUMBER}" -gt 0 ] && T="_try-${RETRY_NUMBER}" || T="" ; tar czf "test-suite_${BUILD_TAG}_\${B}\${T}.tar.gz" `find . -name '*.trs'` `find . -name '*.log'`"""
+                            archiveArtifacts artifacts: "**/test-suite*.tar.gz", allowEmpty: true
+                            throw e
+                           }
+                          }
+                         }
                         }
                         sh 'echo "Are GitIgnores good after make check without drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         script {
@@ -244,10 +283,22 @@ pipeline {
                       dir("tmp/build-withDRAFT") {
                         deleteDir()
                         unstash 'built-draft'
-                        retry(3) {
-                        timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                        script {
+                         def RETRY_NUMBER = 0
+                         retry(3) {
+                          RETRY_NUMBER++
+                          timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                           try {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" memcheck && exit 0 ; echo "Re-running failed ($?) memcheck with greater verbosity" >&2 ; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" VERBOSE=1 memcheck-verbose'
-                        }
+                           }
+                           catch (Exception e) {
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let the verdict "improve"
+                            sh """D="`pwd`"; B="`basename "\$D"`" ; [ "${RETRY_NUMBER}" -gt 0 ] && T="_try-${RETRY_NUMBER}" || T="" ; tar czf "test-suite_${BUILD_TAG}_\${B}\${T}.tar.gz" `find . -name '*.trs'` `find . -name '*.log'`"""
+                            archiveArtifacts artifacts: "**/test-suite*.tar.gz", allowEmpty: true
+                            throw e
+                           }
+                          }
+                         }
                         }
                         sh 'echo "Are GitIgnores good after make memcheck with drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         script {
@@ -265,10 +316,22 @@ pipeline {
                       dir("tmp/build-withoutDRAFT") {
                         deleteDir()
                         unstash 'built-nondraft'
-                        retry(3) {
-                        timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                        script {
+                         def RETRY_NUMBER = 0
+                         retry(3) {
+                          RETRY_NUMBER++
+                          timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                           try {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" memcheck && exit 0 ; echo "Re-running failed ($?) memcheck with greater verbosity" >&2 ; make LD_LIBRARY_PATH="$LD_LIBRARY_PATH" VERBOSE=1 memcheck-verbose'
-                        }
+                           }
+                           catch (Exception e) {
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let the verdict "improve"
+                            sh """D="`pwd`"; B="`basename "\$D"`" ; [ "${RETRY_NUMBER}" -gt 0 ] && T="_try-${RETRY_NUMBER}" || T="" ; tar czf "test-suite_${BUILD_TAG}_\${B}\${T}.tar.gz" `find . -name '*.trs'` `find . -name '*.log'`"""
+                            archiveArtifacts artifacts: "**/test-suite*.tar.gz", allowEmpty: true
+                            throw e
+                           }
+                          }
+                         }
                         }
                         sh 'echo "Are GitIgnores good after make memcheck without drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         script {
@@ -286,10 +349,22 @@ pipeline {
                       dir("tmp/build-withDRAFT") {
                         deleteDir()
                         unstash 'built-draft'
-                        retry(3) {
-                        timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                        script {
+                         def RETRY_NUMBER = 0
+                         retry(3) {
+                          RETRY_NUMBER++
+                          timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                           try {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=yes --with-docs=no" ; export DISTCHECK_CONFIGURE_FLAGS; make DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" distcheck'
-                        }
+                           }
+                           catch (Exception e) {
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let the verdict "improve"
+                            sh """D="`pwd`"; B="`basename "\$D"`" ; [ "${RETRY_NUMBER}" -gt 0 ] && T="_try-${RETRY_NUMBER}" || T="" ; tar czf "test-suite_${BUILD_TAG}_\${B}\${T}.tar.gz" `find . -name '*.trs'` `find . -name '*.log'`"""
+                            archiveArtifacts artifacts: "**/test-suite*.tar.gz", allowEmpty: true
+                            throw e
+                           }
+                          }
+                         }
                         }
                         sh 'echo "Are GitIgnores good after make distcheck with drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         script {
@@ -307,10 +382,22 @@ pipeline {
                       dir("tmp/build-withoutDRAFT") {
                         deleteDir()
                         unstash 'built-nondraft'
-                        retry(3) {
-                        timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                        script {
+                         def RETRY_NUMBER = 0
+                         retry(3) {
+                          RETRY_NUMBER++
+                          timeout (time: "${params.USE_TEST_TIMEOUT}".toInteger(), unit: 'MINUTES') {
+                           try {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; LD_LIBRARY_PATH="`pwd`/src/.libs:$LD_LIBRARY_PATH"; export LD_LIBRARY_PATH; DISTCHECK_CONFIGURE_FLAGS="--enable-drafts=no --with-docs=no" ; export DISTCHECK_CONFIGURE_FLAGS; make DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" distcheck'
-                        }
+                           }
+                           catch (Exception e) {
+                            currentBuild.result = 'UNSTABLE' // Jenkins should not let the verdict "improve"
+                            sh """D="`pwd`"; B="`basename "\$D"`" ; [ "${RETRY_NUMBER}" -gt 0 ] && T="_try-${RETRY_NUMBER}" || T="" ; tar czf "test-suite_${BUILD_TAG}_\${B}\${T}.tar.gz" `find . -name '*.trs'` `find . -name '*.log'`"""
+                            archiveArtifacts artifacts: "**/test-suite*.tar.gz", allowEmpty: true
+                            throw e
+                           }
+                          }
+                         }
                         }
                         sh 'echo "Are GitIgnores good after make distcheck without drafts? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
                         script {
@@ -402,10 +489,13 @@ pipeline {
                         if ( env.BRANCH_NAME =~ myDEPLOY_BRANCH_PATTERN ) {
                             def GIT_URL = sh(returnStdout: true, script: """git remote -v | egrep '^origin' | awk '{print \$2}' | head -1""").trim()
                             def GIT_COMMIT = sh(returnStdout: true, script: 'git rev-parse --verify HEAD').trim()
+                            def DIST_ARCHIVE = ""
+                            if ( params.DO_DIST_DOCS ) { DIST_ARCHIVE = env.BUILD_URL + "artifact/__dist.tar.gz" }
                             build job: "${myDEPLOY_JOB_NAME}", parameters: [
                                 string(name: 'DEPLOY_GIT_URL', value: "${GIT_URL}"),
                                 string(name: 'DEPLOY_GIT_BRANCH', value: env.BRANCH_NAME),
-                                string(name: 'DEPLOY_GIT_COMMIT', value: "${GIT_COMMIT}")
+                                string(name: 'DEPLOY_GIT_COMMIT', value: "${GIT_COMMIT}"),
+                                string(name: 'DEPLOY_DIST_ARCHIVE', value: "${DIST_ARCHIVE}")
                                 ], quietPeriod: 0, wait: myDEPLOY_REPORT_RESULT, propagate: myDEPLOY_REPORT_RESULT
                         } else {
                             echo "Not deploying because branch '${env.BRANCH_NAME}' did not match filter '${myDEPLOY_BRANCH_PATTERN}'"

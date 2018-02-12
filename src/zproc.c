@@ -337,7 +337,7 @@ zproc_set_stdin (zproc_t *self, void* socket) {
     zsys_error ("zproc_set_stdin not implemented for Windows");
     return;
 #else
-    if (self->stdinpipe [0] != 0)
+    if (self->stdinpipe [0] != -1)
         return;
     int r = pipe (self->stdinpipe);
     assert (r == 0);
@@ -544,8 +544,8 @@ s_zproc_execve (zproc_t *self)
     char *filename = (char*) zlist_first (self->args);
     self->pid = fork ();
     if (self->pid == 0) {
-
-        if (self->stdinpipe [0] != 0) {
+        // Child
+        if (self->stdinpipe [0] != -1) {
             int o_flags = fcntl (self->stdinpipe [0], F_GETFL);
             int n_flags = o_flags & (~O_NONBLOCK);
             fcntl (self->stdinpipe [0], F_SETFL, n_flags);
@@ -554,13 +554,13 @@ s_zproc_execve (zproc_t *self)
         }
 
         // redirect stdout if set_stdout was called
-        if (self->stdoutpipe [0] != 0) {
+        if (self->stdoutpipe [0] != -1) {
             close (self->stdoutpipe [0]);
             dup2 (self->stdoutpipe [1], STDOUT_FILENO);
         }
 
-        // redirect stdout if set_stderr was called
-        if (self->stderrpipe [0] != 0) {
+        // redirect stderr if set_stderr was called
+        if (self->stderrpipe [0] != -1) {
             close (self->stderrpipe [0]);
             dup2 (self->stderrpipe [1], STDERR_FILENO);
         }
@@ -607,10 +607,12 @@ s_zproc_execve (zproc_t *self)
     }
     else
     if (self->pid == -1) {
+        // Error (still in parent)
         zsys_error ("error fork: %s", strerror (errno));
         exit (EXIT_FAILURE);
     }
     else {
+        // Parent
         if (self->verbose)
             zsys_debug ("process %s with pid %d started", filename, self->pid);
 
@@ -622,12 +624,12 @@ s_zproc_execve (zproc_t *self)
         // add a handler for read end of stdout
         if (self->stdoutpipe [1] != -1) {
             s_zproc_addfd (self, self->stdoutpipe [0], zpair_write (self->stdoutpair), ZMQ_POLLIN);
-            close(self->stdoutpipe[1]);
+            close (self->stdoutpipe[1]);
         }
         // add a handler for read end of stderr
         if (self->stderrpipe [1] != -1) {
             s_zproc_addfd (self, self->stderrpipe [0], zpair_write (self->stderrpair), ZMQ_POLLIN);
-            close(self->stderrpipe[1]);
+            close (self->stderrpipe[1]);
         }
     }
 
@@ -807,10 +809,12 @@ zproc_kill (zproc_t *self, int signum) {
         }
     }
 #else
-    int r = kill (self->pid, signum);
-    if (r != 0)
-        zsys_error ("kill of pid=%d failed: %s", self->pid, strerror (errno));
-    zproc_wait (self, false);
+    if (zproc_pid (self) > 0) {
+        int r = kill (self->pid, signum);
+        if (r != 0)
+            zsys_error ("kill of pid=%d failed: %s", self->pid, strerror (errno));
+        zproc_wait (self, false);
+    }
 #endif
 }
 

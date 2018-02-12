@@ -81,7 +81,7 @@ struct _s_timer_t {
 
 //  As we pass void * to/from the caller for working with tickets, we
 //  check validity using an object tag. This value is unique in CZMQ.
-#define TICKET_TAG              0x0007cafe
+#define TICKET_TAG              0xcafe0007
 
 struct _s_ticket_t {
     uint32_t tag;               //  Object tag for runtime detection
