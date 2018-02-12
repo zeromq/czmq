@@ -42,24 +42,24 @@ public class Zproc implements AutoCloseable{
     Setup the command line arguments, the first item must be an (absolute) filename
     to run.
     */
-    native static void __setArgs (long self, long args);
-    public void setArgs (Zlist args) {
-        __setArgs (self, args.self);
+    native static void __setArgs (long self, long arguments);
+    public void setArgs (Zlist arguments) {
+        __setArgs (self, arguments.self);
     }
     /*
     Setup the command line arguments, the first item must be an (absolute) filename
     to run. Variadic function, must be NULL terminated.
     */
-    native static void __setArgsx (long self, String args);
-    public void setArgsx (String args []) {
-        __setArgsx (self, args [0]);
+    native static void __setArgsx (long self, String arguments);
+    public void setArgsx (String arguments []) {
+        __setArgsx (self, arguments [0]);
     }
     /*
     Setup the environment variables for the process.
     */
-    native static void __setEnv (long self, long args);
-    public void setEnv (Zhash args) {
-        __setEnv (self, args.self);
+    native static void __setEnv (long self, long arguments);
+    public void setEnv (Zhash arguments) {
+        __setEnv (self, arguments.self);
     }
     /*
     Connects process stdin with a readable ('>', connect) zeromq socket. If

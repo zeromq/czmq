@@ -95,38 +95,38 @@ module CZMQ
       # Setup the command line arguments, the first item must be an (absolute) filename
       # to run.
       #
-      # @param args [#__ptr_give_ref]
+      # @param arguments [#__ptr_give_ref]
       # @return [void]
-      def set_args(args)
+      def set_args(arguments)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        args = args.__ptr_give_ref
-        result = ::CZMQ::FFI.zproc_set_args(self_p, args)
+        arguments = arguments.__ptr_give_ref
+        result = ::CZMQ::FFI.zproc_set_args(self_p, arguments)
         result
       end
 
       # Setup the command line arguments, the first item must be an (absolute) filename
       # to run. Variadic function, must be NULL terminated.
       #
-      # @param args [String, #to_s, nil]
+      # @param arguments [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [void]
-      def set_argsx(args, *args)
+      def set_argsx(arguments, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        result = ::CZMQ::FFI.zproc_set_argsx(self_p, args, *args)
+        result = ::CZMQ::FFI.zproc_set_argsx(self_p, arguments, *args)
         result
       end
 
       # Setup the environment variables for the process.
       #
-      # @param args [#__ptr_give_ref]
+      # @param arguments [#__ptr_give_ref]
       # @return [void]
-      def set_env(args)
+      def set_env(arguments)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        args = args.__ptr_give_ref
-        result = ::CZMQ::FFI.zproc_set_env(self_p, args)
+        arguments = arguments.__ptr_give_ref
+        result = ::CZMQ::FFI.zproc_set_env(self_p, arguments)
         result
       end
 

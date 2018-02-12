@@ -27,10 +27,10 @@ public:
 
     //  Setup the command line arguments, the first item must be an (absolute) filename
     //  to run.
-    void setArgs (QZlist *args);
+    void setArgs (QZlist *arguments);
 
     //  Setup the environment variables for the process.
-    void setEnv (QZhash *args);
+    void setEnv (QZhash *arguments);
 
     //  Connects process stdin with a readable ('>', connect) zeromq socket. If
     //  socket argument is NULL, zproc creates own managed pair of inproc

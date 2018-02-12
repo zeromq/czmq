@@ -4933,25 +4933,25 @@ returns NULL. Code needs to be ported there.
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
-    def set_args(self, args):
+    def set_args(self, arguments):
         """
         Setup the command line arguments, the first item must be an (absolute) filename
 to run.
         """
-        return lib.zproc_set_args(self._as_parameter_, byref(zlist_p.from_param(args)))
+        return lib.zproc_set_args(self._as_parameter_, byref(zlist_p.from_param(arguments)))
 
-    def set_argsx(self, args, *args):
+    def set_argsx(self, arguments, *args):
         """
         Setup the command line arguments, the first item must be an (absolute) filename
 to run. Variadic function, must be NULL terminated.
         """
-        return lib.zproc_set_argsx(self._as_parameter_, args, *args)
+        return lib.zproc_set_argsx(self._as_parameter_, arguments, *args)
 
-    def set_env(self, args):
+    def set_env(self, arguments):
         """
         Setup the environment variables for the process.
         """
-        return lib.zproc_set_env(self._as_parameter_, byref(zhash_p.from_param(args)))
+        return lib.zproc_set_env(self._as_parameter_, byref(zhash_p.from_param(arguments)))
 
     def set_stdin(self, socket):
         """

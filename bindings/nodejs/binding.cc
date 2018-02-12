@@ -4278,29 +4278,29 @@ NAN_METHOD (Zproc::defined) {
 
 NAN_METHOD (Zproc::_set_args) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    Zlist *args = Nan::ObjectWrap::Unwrap<Zlist>(info [0].As<Object>());
-    zproc_set_args (zproc->self, &args->self);
+    Zlist *arguments = Nan::ObjectWrap::Unwrap<Zlist>(info [0].As<Object>());
+    zproc_set_args (zproc->self, &arguments->self);
 }
 
 NAN_METHOD (Zproc::_set_argsx) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    char *args;
+    char *arguments;
     if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `args`");
+        return Nan::ThrowTypeError ("method requires a `arguments`");
     else
     if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`args` must be a string");
+        return Nan::ThrowTypeError ("`arguments` must be a string");
     //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String args_utf8 (info [0].As<String>());
-    args = *args_utf8;
+    Nan::Utf8String arguments_utf8 (info [0].As<String>());
+    arguments = *arguments_utf8;
          //} //bjornw end
-    zproc_set_argsx (zproc->self, (const char *)args);
+    zproc_set_argsx (zproc->self, (const char *)arguments);
 }
 
 NAN_METHOD (Zproc::_set_env) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    Zhash *args = Nan::ObjectWrap::Unwrap<Zhash>(info [0].As<Object>());
-    zproc_set_env (zproc->self, &args->self);
+    Zhash *arguments = Nan::ObjectWrap::Unwrap<Zhash>(info [0].As<Object>());
+    zproc_set_env (zproc->self, &arguments->self);
 }
 
 NAN_METHOD (Zproc::_run) {

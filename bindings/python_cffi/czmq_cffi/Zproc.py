@@ -26,7 +26,7 @@ class Zproc(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zproc_destroy_py)
 
-    def set_args(self, args):
+    def set_args(self, arguments):
         """
         Setup the command line arguments, the first item must be an (absolute) filename
         to run.
@@ -38,20 +38,20 @@ class Zproc(object):
             utils.lib.dproto_set_argv(self._p, foo_p)
             return
 
-        utils.lib.zproc_set_args(self._p, args._p)
+        utils.lib.zproc_set_args(self._p, arguments._p)
 
-    def set_argsx(self, args, ):
+    def set_argsx(self, arguments, ):
         """
         Setup the command line arguments, the first item must be an (absolute) filename
         to run. Variadic function, must be NULL terminated.
         """
-        utils.lib.zproc_set_argsx(self._p, utils.to_bytes(args), )
+        utils.lib.zproc_set_argsx(self._p, utils.to_bytes(arguments), )
 
-    def set_env(self, args):
+    def set_env(self, arguments):
         """
         Setup the environment variables for the process.
         """
-        utils.lib.zproc_set_env(self._p, args._p)
+        utils.lib.zproc_set_env(self._p, arguments._p)
 
     def set_stdin(self, socket):
         """
