@@ -43,14 +43,22 @@ public class Zproc implements AutoCloseable{
     to run.
     */
     native static void __setArgs (long self, long args);
-    public void setArgs (Zlistx args) {
+    public void setArgs (Zlist args) {
         __setArgs (self, args.self);
+    }
+    /*
+    Setup the command line arguments, the first item must be an (absolute) filename
+    to run. Variadic function, must be NULL terminated.
+    */
+    native static void __setArgsx (long self, String args);
+    public void setArgsx (String args []) {
+        __setArgsx (self, args [0]);
     }
     /*
     Setup the environment variables for the process.
     */
     native static void __setEnv (long self, long args);
-    public void setEnv (Zhashx args) {
+    public void setEnv (Zhash args) {
         __setEnv (self, args.self);
     }
     /*

@@ -47,6 +47,10 @@ CMAKE_OPTS+=("-DCMAKE_PREFIX_PATH:PATH=${BUILD_PREFIX}")
 CMAKE_OPTS+=("-DCMAKE_LIBRARY_PATH:PATH=${BUILD_PREFIX}/lib")
 CMAKE_OPTS+=("-DCMAKE_INCLUDE_PATH:PATH=${BUILD_PREFIX}/include")
 
+if [ "$CLANG_FORMAT" != "" ] ; then
+    CMAKE_OPTS+=("-DCLANG_FORMAT=${CLANG_FORMAT}")
+fi
+
 # Clone and build dependencies
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
 if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1) || \
@@ -82,10 +86,15 @@ cd ../..
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of currently tested project..."
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
-PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" .
-$CI_TIME make all VERBOSE=1 -j4
-$CI_TIME ctest -V
-$CI_TIME make install
+if [ "$DO_CLANG_FORMAT_CHECK" -eq "1" ] ; then
+    PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" . \
+    && make clang-format-check || { make clang-format-diff && exit 1 ; }
+else
+    PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" .
+    $CI_TIME make all VERBOSE=1 -j4
+    $CI_TIME ctest -V
+    $CI_TIME make install
+fi
 [ -z "$CI_TIME" ] || echo "`date`: Builds completed without fatal errors!"
 
 echo "=== Are GitIgnores good after making the project '$BUILD_TYPE'? (should have no output below)"

@@ -34,17 +34,17 @@ QZproc::~QZproc ()
 ///
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
-void QZproc::setArgs (QZlistx *args)
+void QZproc::setArgs (QZlist *args)
 {
-    zproc_set_args (self, args->self);
+    zproc_set_args (self, &args->self);
 
 }
 
 ///
 //  Setup the environment variables for the process.
-void QZproc::setEnv (QZhashx *args)
+void QZproc::setEnv (QZhash *args)
 {
-    zproc_set_env (self, args->self);
+    zproc_set_env (self, &args->self);
 
 }
 

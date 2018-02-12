@@ -28,13 +28,21 @@ Java_org_zeromq_czmq_Zproc__1_1destroy (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zproc__1_1setArgs (JNIEnv *env, jclass c, jlong self, jlong args)
 {
-    zproc_set_args ((zproc_t *) (intptr_t) self, (zlistx_t *) (intptr_t) args);
+    zproc_set_args ((zproc_t *) (intptr_t) self, (zlist_t **) (intptr_t) &args);
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zproc__1_1setArgsx (JNIEnv *env, jclass c, jlong self, jstring args)
+{
+    char *args_ = (char *) (*env)->GetStringUTFChars (env, args, NULL);
+    zproc_set_argsx ((zproc_t *) (intptr_t) self, args_);
+    (*env)->ReleaseStringUTFChars (env, args, args_);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zproc__1_1setEnv (JNIEnv *env, jclass c, jlong self, jlong args)
 {
-    zproc_set_env ((zproc_t *) (intptr_t) self, (zhashx_t *) (intptr_t) args);
+    zproc_set_env ((zproc_t *) (intptr_t) self, (zhash_t **) (intptr_t) &args);
 }
 
 JNIEXPORT void JNICALL

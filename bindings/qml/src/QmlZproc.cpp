@@ -11,14 +11,21 @@
 ///
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
-void QmlZproc::setArgs (QmlZlistx *args) {
-    zproc_set_args (self, args->self);
+void QmlZproc::setArgs (QmlZlist *args) {
+    zproc_set_args (self, &args->self);
+};
+
+///
+//  Setup the command line arguments, the first item must be an (absolute) filename
+//  to run. Variadic function, must be NULL terminated.
+void QmlZproc::setArgsx (const QString &args) {
+    zproc_set_argsx (self, args.toUtf8().data());
 };
 
 ///
 //  Setup the environment variables for the process.
-void QmlZproc::setEnv (QmlZhashx *args) {
-    zproc_set_env (self, args->self);
+void QmlZproc::setEnv (QmlZhash *args) {
+    zproc_set_env (self, &args->self);
 };
 
 ///

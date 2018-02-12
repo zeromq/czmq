@@ -124,11 +124,16 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void *
     zproc_actor (zproc_t *self);
 
+// TODO- WORK-AROUND FOR: https://github.com/zeromq/czmq/pull/1850
+// https://github.com/zeromq/czmq/pull/1840
+// https://github.com/zeromq/zproject/blob/a7c75864064502de5fbc9fe2c996d03f7e4f0e20/zproject_vs20xx.gsl#L169 ?
+// https://github.com/zeromq/czmq/issues/1851
 //  *** Draft method, for development use, may change without warning ***
 //  SIGKILL is implemented on windows
 #if defined(__WINDOWS__) && ! defined(SIGKILL)
 #  define SIGKILL 9
 #endif
+
 //  *** Draft method, for development use, may change without warning ***
 //  send a signal to the subprocess
 CZMQ_EXPORT void

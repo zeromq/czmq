@@ -16,6 +16,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
 SET(CMAKE_C_FLAGS_RELEASE "-O3")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/Modules)
+
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
 
@@ -297,8 +299,8 @@ endif()
 IF (NOT MSVC)
   # avoid building everything twice for shared + static
   # only on *nix, as Windows needs different preprocessor defines in static builds
-  add_library (objects OBJECT ${czmq_sources})
-  set_property(TARGET objects PROPERTY POSITION_INDEPENDENT_CODE ON)
+  add_library (czmq_objects OBJECT ${czmq_sources})
+  set_property(TARGET czmq_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF (NOT MSVC)
 
 # shared
@@ -306,7 +308,7 @@ if (CZMQ_BUILD_SHARED)
   IF (MSVC)
     add_library(czmq SHARED ${czmq_sources})
   ELSE (MSVC)
-    add_library(czmq SHARED $<TARGET_OBJECTS:objects>)
+    add_library(czmq SHARED $<TARGET_OBJECTS:czmq_objects>)
   ENDIF (MSVC)
 
   set_target_properties (czmq PROPERTIES
@@ -339,7 +341,7 @@ if (CZMQ_BUILD_STATIC)
   IF (MSVC)
     add_library(czmq-static STATIC ${czmq_sources})
   ELSE (MSVC)
-    add_library(czmq-static STATIC $<TARGET_OBJECTS:objects>)
+    add_library(czmq-static STATIC $<TARGET_OBJECTS:czmq_objects>)
   ENDIF (MSVC)
 
   set_target_properties(czmq-static PROPERTIES
@@ -605,6 +607,8 @@ add_custom_command(
     ARGS    -rf CMakeTmp ${cmake_generated}
     TARGET  distclean
 )
+
+include(ClangFormat)
 
 ########################################################################
 # summary
