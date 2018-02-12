@@ -135,29 +135,11 @@ CZMQ_EXPORT void
     zproc_set_verbose (zproc_t *self, bool verbose);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Returns CZMQ version as a single 6-digit integer encoding the major
-//  version (x 10000), the minor version (x 100) and the patch.
-CZMQ_EXPORT int
-    zproc_czmq_version (void);
-
-//  *** Draft method, for development use, may change without warning ***
 //  Returns true if the process received a SIGINT or SIGTERM signal.
 //  It is good practice to use this method to exit any infinite loop
 //  processing messages.
 CZMQ_EXPORT bool
     zproc_interrupted (void);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Returns true if the underlying libzmq supports CURVE security.
-CZMQ_EXPORT bool
-    zproc_has_curve (void);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Return current host name, for use in public tcp:// endpoints.
-//  If the host name is not resolvable, returns NULL.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT char *
-    zproc_hostname (void);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Move the current process into the background. The precise effect

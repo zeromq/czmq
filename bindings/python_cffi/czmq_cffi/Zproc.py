@@ -146,13 +146,6 @@ class Zproc(object):
         """
         utils.lib.zproc_set_verbose(self._p, verbose)
 
-    def czmq_version():
-        """
-        Returns CZMQ version as a single 6-digit integer encoding the major
-        version (x 10000), the minor version (x 100) and the patch.
-        """
-        return utils.lib.zproc_czmq_version()
-
     def interrupted():
         """
         Returns true if the process received a SIGINT or SIGTERM signal.
@@ -160,19 +153,6 @@ class Zproc(object):
         processing messages.
         """
         return utils.lib.zproc_interrupted()
-
-    def has_curve():
-        """
-        Returns true if the underlying libzmq supports CURVE security.
-        """
-        return utils.lib.zproc_has_curve()
-
-    def hostname():
-        """
-        Return current host name, for use in public tcp:// endpoints.
-        If the host name is not resolvable, returns NULL.
-        """
-        return utils.lib.zproc_hostname()
 
     def daemonize(workdir):
         """

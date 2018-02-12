@@ -128,34 +128,11 @@ QObject* QmlZproc::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Returns CZMQ version as a single 6-digit integer encoding the major
-//  version (x 10000), the minor version (x 100) and the patch.
-int QmlZprocAttached::czmqVersion () {
-    return zproc_czmq_version ();
-};
-
-///
 //  Returns true if the process received a SIGINT or SIGTERM signal.
 //  It is good practice to use this method to exit any infinite loop
 //  processing messages.
 bool QmlZprocAttached::interrupted () {
     return zproc_interrupted ();
-};
-
-///
-//  Returns true if the underlying libzmq supports CURVE security.
-bool QmlZprocAttached::hasCurve () {
-    return zproc_has_curve ();
-};
-
-///
-//  Return current host name, for use in public tcp:// endpoints.
-//  If the host name is not resolvable, returns NULL.
-QString QmlZprocAttached::hostname () {
-    char *retStr_ = zproc_hostname ();
-    QString retQStr_ = QString (retStr_);
-    free (retStr_);
-    return retQStr_;
 };
 
 ///

@@ -2248,32 +2248,12 @@ nothing my_zproc.setVerbose (Boolean)
 set verbose mode
 
 ```
-integer my_zproc.czmqVersion ()
-```
-
-Returns CZMQ version as a single 6-digit integer encoding the major
-version (x 10000), the minor version (x 100) and the patch.
-
-```
 boolean my_zproc.interrupted ()
 ```
 
 Returns true if the process received a SIGINT or SIGTERM signal.
 It is good practice to use this method to exit any infinite loop
 processing messages.
-
-```
-boolean my_zproc.hasCurve ()
-```
-
-Returns true if the underlying libzmq supports CURVE security.
-
-```
-string my_zproc.hostname ()
-```
-
-Return current host name, for use in public tcp:// endpoints.
-If the host name is not resolvable, returns NULL.
 
 ```
 nothing my_zproc.daemonize (String)

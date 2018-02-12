@@ -102,21 +102,10 @@ public:
     };
 
 public slots:
-    //  Returns CZMQ version as a single 6-digit integer encoding the major
-    //  version (x 10000), the minor version (x 100) and the patch.
-    int czmqVersion ();
-
     //  Returns true if the process received a SIGINT or SIGTERM signal.
     //  It is good practice to use this method to exit any infinite loop
     //  processing messages.
     bool interrupted ();
-
-    //  Returns true if the underlying libzmq supports CURVE security.
-    bool hasCurve ();
-
-    //  Return current host name, for use in public tcp:// endpoints.
-    //  If the host name is not resolvable, returns NULL.
-    QString hostname ();
 
     //  Move the current process into the background. The precise effect
     //  depends on the operating system. On POSIX boxes, moves to a specified

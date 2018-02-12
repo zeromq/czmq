@@ -138,34 +138,11 @@ Java_org_zeromq_czmq_Zproc__1_1setVerbose (JNIEnv *env, jclass c, jlong self, jb
     zproc_set_verbose ((zproc_t *) (intptr_t) self, (bool) verbose);
 }
 
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zproc__1_1czmqVersion (JNIEnv *env, jclass c)
-{
-    jint czmq_version_ = (jint) zproc_czmq_version ();
-    return czmq_version_;
-}
-
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zproc__1_1interrupted (JNIEnv *env, jclass c)
 {
     jboolean interrupted_ = (jboolean) zproc_interrupted ();
     return interrupted_;
-}
-
-JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zproc__1_1hasCurve (JNIEnv *env, jclass c)
-{
-    jboolean has_curve_ = (jboolean) zproc_has_curve ();
-    return has_curve_;
-}
-
-JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zproc__1_1hostname (JNIEnv *env, jclass c)
-{
-    char *hostname_ = (char *) zproc_hostname ();
-    jstring return_string_ = (*env)->NewStringUTF (env, hostname_);
-    zstr_free (&hostname_);
-    return return_string_;
 }
 
 JNIEXPORT void JNICALL

@@ -12,49 +12,6 @@ endif
 lib_LTLIBRARIES += src/libczmq.la
 pkgconfig_DATA = src/libczmq.pc
 
-include_HEADERS = \
-    include/czmq_prelude.h \
-    include/czmq.h \
-    include/zactor.h \
-    include/zarmour.h \
-    include/zcert.h \
-    include/zcertstore.h \
-    include/zchunk.h \
-    include/zclock.h \
-    include/zconfig.h \
-    include/zdigest.h \
-    include/zdir.h \
-    include/zdir_patch.h \
-    include/zfile.h \
-    include/zframe.h \
-    include/zhash.h \
-    include/zhashx.h \
-    include/ziflist.h \
-    include/zlist.h \
-    include/zlistx.h \
-    include/zloop.h \
-    include/zmsg.h \
-    include/zpoller.h \
-    include/zsock.h \
-    include/zstr.h \
-    include/zsys.h \
-    include/zuuid.h \
-    include/zauth.h \
-    include/zbeacon.h \
-    include/zgossip.h \
-    include/zmonitor.h \
-    include/zproxy.h \
-    include/zrex.h \
-    include/czmq_library.h
-
-if ENABLE_DRAFTS
-include_HEADERS += \
-    include/zargs.h \
-    include/zproc.h \
-    include/ztimerset.h \
-    include/ztrie.h
-
-endif
 src_libczmq_la_SOURCES = \
     src/zactor.c \
     src/zarmour.c \
