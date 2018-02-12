@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="czmq"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="clang"/>
+		<Option virtualFolders="CMake Files\;CMake Files\src\;CMake Files\builds\;CMake Files\builds\cmake\;CMake Files\builds\cmake\Modules\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/strip">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 install/strip"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq_objects">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/czmq_objects.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq_objects"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq_objects/fast">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/czmq_objects.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq_objects/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/local">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 install/local"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="list_install_components">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 list_install_components"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="distclean">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 distclean"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq-static">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/libczmq.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_STATIC"/>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq-static"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq-static/fast">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/libczmq.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_STATIC"/>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq-static/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="clang-format-diff">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clang-format-diff"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="clang-format">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clang-format"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zsp">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/zsp" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 zsp"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zsp/fast">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/zsp" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 zsp/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zmakecert">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/zmakecert" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 zmakecert"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zmakecert/fast">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/zmakecert" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 zmakecert/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 install"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/libczmq.dylib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DDLL_EXPORT"/>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq/fast">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/libczmq.dylib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DDLL_EXPORT"/>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="copy-selftest-ro">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 copy-selftest-ro"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Continuous">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 Continuous"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq_selftest">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/czmq_selftest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq_selftest"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="czmq_selftest/fast">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/czmq_selftest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 czmq_selftest/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_randof">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/test_randof" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 test_randof"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_randof/fast">
+				<Option output="/Users/wes/Development/zmq/czmq/cmake-build-debug/test_randof" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCZMQ_BUILD_DRAFT_API"/>
+					<Add option="-DHAVE_UUID"/>
+					<Add directory="/usr/local/Cellar/zeromq/4.2.3/include"/>
+					<Add directory="/System/Library/Frameworks/Kernel.framework/Headers"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/src"/>
+					<Add directory="/Users/wes/Development/zmq/czmq/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 test_randof/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Experimental">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 Experimental"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="make-selftest-rw">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 make-selftest-rw"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="clang-format-check">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clang-format-check"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Nightly">
+				<Option working_dir="/Users/wes/Development/zmq/czmq/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 Nightly"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/wes/Development/zmq/czmq/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/czmq_private_selftest.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zactor.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zargs.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zarmour.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zauth.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zbeacon.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zcert.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zcertstore.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zchunk.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zclock.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zconfig.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zdigest.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zdir.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zdir_patch.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zfile.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zframe.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zgossip.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zgossip_msg.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zhash.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zhashx.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/ziflist.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zlist.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zlistx.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zloop.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zmonitor.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zmsg.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zpoller.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zproc.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zproxy.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zrex.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zsock.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zstr.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zsys.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/ztimerset.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/ztrie.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/cmake-build-debug/CMakeFiles/czmq_objects.dir/src/zuuid.c.o">
+			<Option target="czmq-static"/>
+			<Option target="czmq"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/czmq_private_selftest.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/czmq_selftest.c">
+			<Option target="czmq_selftest"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/test_randof.c">
+			<Option target="test_randof"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zactor.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zargs.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zarmour.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zauth.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zbeacon.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zcert.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zcertstore.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zchunk.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zclock.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zconfig.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zdigest.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zdir.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zdir_patch.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zfile.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zframe.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zgossip.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zgossip_msg.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zgossip_msg.h">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zhash.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zhashx.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/ziflist.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zlist.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zlistx.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zloop.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zmakecert.c">
+			<Option target="zmakecert"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zmonitor.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zmsg.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zpoller.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zproc.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zproxy.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zrex.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zsock.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zsp.c">
+			<Option target="zsp"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zstr.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zsys.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/ztimerset.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/ztrie.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/zuuid.c">
+			<Option target="czmq_objects"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/Findlibzmq.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/Finduuid.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/Findsystemd.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/Findlz4.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/platform.h.in">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/CMakeLists-local.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/src/libczmq.pc.in">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/builds/cmake/clang-format-check.sh.in">
+			<Option virtualFolder="CMake Files\builds\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/wes/Development/zmq/czmq/builds/cmake/Modules/ClangFormat.cmake">
+			<Option virtualFolder="CMake Files\builds\cmake\Modules\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
