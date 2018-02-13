@@ -117,11 +117,4 @@
         <argument name = "verbose" type = "boolean" />
     </method>
 
-<!--
-TODO: cannot express such method in zproto API model!!
-//  run the subprocess
-CZMQ_EXPORT int
-    zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *const envp[]);
--->
-
 </class>
