@@ -836,17 +836,6 @@ zproc_set_verbose (zproc_t *self, bool verbose) {
 }
 
 //  --------------------------------------------------------------------------
-//  Returns true if the process received a SIGINT or SIGTERM signal.
-//  It is good practice to use this method to exit any infinite loop
-//  processing messages.
-
-bool
-zproc_interrupted (void)
-{
-    return zsys_interrupted == 1;
-}
-
-//  --------------------------------------------------------------------------
 //  Self test of this class.
 
 void

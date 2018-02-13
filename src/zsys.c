@@ -1508,6 +1508,30 @@ zsys_max_msgsz (void)
 }
 
 
+#ifdef CZMQ_BUILD_DRAFT_API
+//  --------------------------------------------------------------------------
+//  *** Draft method, for development use, may change without warning ***
+//  Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+//  Does not work if ZSYS_SIGHANDLER is false and code does not call
+//  set interrupted on signal.
+CZMQ_EXPORT bool
+    zsys_is_interrupted (void)
+{
+    return zsys_interrupted != 0;
+}
+
+//  --------------------------------------------------------------------------
+//  *** Draft method, for development use, may change without warning ***
+//  Set interrupted flag. This is done by default signal handler, however
+//  this can be handy for language bindings or cases without default
+//  signal handler.
+CZMQ_EXPORT void
+    zsys_set_interrupted (void)
+{
+    zctx_interrupted = 1;
+    zsys_interrupted = 1;
+}
+
 //  --------------------------------------------------------------------------
 //  Configure the threshold value of filesystem object age per st_mtime
 //  that should elapse until we consider that object "stable" at the
@@ -1547,6 +1571,7 @@ int64_t
     return s_file_stable_age_msec;
 }
 
+#endif // CZMQ_BUILD_DRAFT_API
 
 //  --------------------------------------------------------------------------
 //  Configure the default linger timeout in msecs for new zsock instances.
@@ -1986,7 +2011,6 @@ zsys_debug (const char *format, ...)
     zstr_free (&string);
 }
 
-
 //  --------------------------------------------------------------------------
 //  Selftest
 
@@ -2018,10 +2042,12 @@ zsys_test (bool verbose)
         freen (hostname);
         zsys_info ("system limit is %zu ZeroMQ sockets", zsys_socket_limit ());
     }
+#ifdef CZMQ_BUILD_DRAFT_API
     zsys_set_file_stable_age_msec (5123);
     assert (zsys_file_stable_age_msec() == 5123);
     zsys_set_file_stable_age_msec (-1);
     assert (zsys_file_stable_age_msec() == 5123);
+#endif // CZMQ_BUILD_DRAFT_API
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);

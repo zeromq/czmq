@@ -404,6 +404,20 @@ CZMQ_EXPORT void
 
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
+//  Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+//  Does not work if ZSYS_SIGHANDLER is false and code does not call
+//  set interrupted on signal.
+CZMQ_EXPORT bool
+    zsys_is_interrupted (void);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set interrupted flag. This is done by default signal handler, however
+//  this can be handy for language bindings or cases without default
+//  signal handler.
+CZMQ_EXPORT void
+    zsys_set_interrupted (void);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Configure the threshold value of filesystem object age per st_mtime
 //  that should elapse until we consider that object "stable" at the
 //  current zclock_time() moment.

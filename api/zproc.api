@@ -124,11 +124,4 @@ CZMQ_EXPORT int
     zsubproc_run (zsubproc_t *self, const char *filename, char *const argv[], char *const envp[]);
 -->
 
-    <method name = "interrupted" singleton = "1">
-        Returns true if the process received a SIGINT or SIGTERM signal.
-        It is good practice to use this method to exit any infinite loop
-        processing messages.
-        <return type = "boolean" />
-    </method>
-
 </class>
