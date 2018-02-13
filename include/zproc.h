@@ -135,13 +135,6 @@ CZMQ_EXPORT void
     zproc_set_verbose (zproc_t *self, bool verbose);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Returns true if the process received a SIGINT or SIGTERM signal.
-//  It is good practice to use this method to exit any infinite loop
-//  processing messages.
-CZMQ_EXPORT bool
-    zproc_interrupted (void);
-
-//  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.
 CZMQ_EXPORT void
     zproc_test (bool verbose);

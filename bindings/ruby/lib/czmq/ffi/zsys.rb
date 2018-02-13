@@ -197,6 +197,26 @@ module CZMQ
         result
       end
 
+      # Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+      # Does not work if ZSYS_SIGHANDLER is false and code does not call
+      # set interrupted on signal.
+      #
+      # @return [Boolean]
+      def self.is_interrupted()
+        result = ::CZMQ::FFI.zsys_is_interrupted()
+        result
+      end
+
+      # Set interrupted flag. This is done by default signal handler, however
+      # this can be handy for language bindings or cases without default
+      # signal handler.
+      #
+      # @return [void]
+      def self.set_interrupted()
+        result = ::CZMQ::FFI.zsys_set_interrupted()
+        result
+      end
+
       # Return 1 if file exists, else zero
       #
       # @param filename [String, #to_s, nil]

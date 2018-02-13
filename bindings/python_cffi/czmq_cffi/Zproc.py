@@ -146,14 +146,6 @@ class Zproc(object):
         """
         utils.lib.zproc_set_verbose(self._p, verbose)
 
-    def interrupted():
-        """
-        Returns true if the process received a SIGINT or SIGTERM signal.
-        It is good practice to use this method to exit any infinite loop
-        processing messages.
-        """
-        return utils.lib.zproc_interrupted()
-
     def test(verbose):
         """
         Self test of this class.

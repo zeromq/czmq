@@ -87,6 +87,22 @@ class Zsys(object):
         """
         utils.lib.zsys_catch_interrupts()
 
+    def is_interrupted():
+        """
+        Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+        Does not work if ZSYS_SIGHANDLER is false and code does not call
+        set interrupted on signal.
+        """
+        return utils.lib.zsys_is_interrupted()
+
+    def set_interrupted():
+        """
+        Set interrupted flag. This is done by default signal handler, however
+        this can be handy for language bindings or cases without default
+        signal handler.
+        """
+        utils.lib.zsys_set_interrupted()
+
     def file_exists(filename):
         """
         Return 1 if file exists, else zero

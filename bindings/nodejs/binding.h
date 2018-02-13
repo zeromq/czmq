@@ -599,7 +599,6 @@ class Zproc: public Nan::ObjectWrap {
     static NAN_METHOD (_wait);
     static NAN_METHOD (_kill);
     static NAN_METHOD (_set_verbose);
-    static NAN_METHOD (_interrupted);
     static NAN_METHOD (_test);
 };
 
@@ -812,6 +811,8 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_create_pipe);
     static NAN_METHOD (_handler_reset);
     static NAN_METHOD (_catch_interrupts);
+    static NAN_METHOD (_is_interrupted);
+    static NAN_METHOD (_set_interrupted);
     static NAN_METHOD (_file_exists);
     static NAN_METHOD (_file_modified);
     static NAN_METHOD (_file_mode);

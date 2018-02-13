@@ -533,7 +533,6 @@ module CZMQ
       attach_function :zproc_actor, [:pointer], :pointer, **opts
       attach_function :zproc_kill, [:pointer, :int], :void, **opts
       attach_function :zproc_set_verbose, [:pointer, :bool], :void, **opts
-      attach_function :zproc_interrupted, [], :bool, **opts
       attach_function :zproc_test, [:bool], :void, **opts
 
       require_relative 'ffi/zproc'
@@ -748,6 +747,8 @@ module CZMQ
       attach_function :zsys_handler_set, [:pointer], :void, **opts
       attach_function :zsys_handler_reset, [], :void, **opts
       attach_function :zsys_catch_interrupts, [], :void, **opts
+      attach_function :zsys_is_interrupted, [], :bool, **opts
+      attach_function :zsys_set_interrupted, [], :void, **opts
       attach_function :zsys_file_exists, [:string], :bool, **opts
       attach_function :zsys_file_modified, [:string], :pointer, **opts
       attach_function :zsys_file_mode, [:string], :int, **opts

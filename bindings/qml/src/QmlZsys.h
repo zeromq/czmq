@@ -89,6 +89,16 @@ public slots:
     //  *** This is for CZMQ internal use only and may change arbitrarily ***
     void catchInterrupts ();
 
+    //  Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+    //  Does not work if ZSYS_SIGHANDLER is false and code does not call
+    //  set interrupted on signal.
+    bool isInterrupted ();
+
+    //  Set interrupted flag. This is done by default signal handler, however
+    //  this can be handy for language bindings or cases without default
+    //  signal handler.
+    void setInterrupted ();
+
     //  Return 1 if file exists, else zero
     bool fileExists (const QString &filename);
 

@@ -128,14 +128,6 @@ QObject* QmlZproc::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Returns true if the process received a SIGINT or SIGTERM signal.
-//  It is good practice to use this method to exit any infinite loop
-//  processing messages.
-bool QmlZprocAttached::interrupted () {
-    return zproc_interrupted ();
-};
-
-///
 //  Self test of this class.
 void QmlZprocAttached::test (bool verbose) {
     zproc_test (verbose);

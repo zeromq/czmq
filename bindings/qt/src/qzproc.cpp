@@ -170,16 +170,6 @@ void QZproc::setVerbose (bool verbose)
 }
 
 ///
-//  Returns true if the process received a SIGINT or SIGTERM signal.
-//  It is good practice to use this method to exit any infinite loop
-//  processing messages.
-bool QZproc::interrupted ()
-{
-    bool rv = zproc_interrupted ();
-    return rv;
-}
-
-///
 //  Self test of this class.
 void QZproc::test (bool verbose)
 {

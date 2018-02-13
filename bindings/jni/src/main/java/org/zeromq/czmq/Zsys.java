@@ -92,6 +92,24 @@ public class Zsys {
         __catchInterrupts ();
     }
     /*
+    Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+    Does not work if ZSYS_SIGHANDLER is false and code does not call
+    set interrupted on signal.
+    */
+    native static boolean __isInterrupted ();
+    public boolean isInterrupted () {
+        return __isInterrupted ();
+    }
+    /*
+    Set interrupted flag. This is done by default signal handler, however
+    this can be handy for language bindings or cases without default
+    signal handler.
+    */
+    native static void __setInterrupted ();
+    public void setInterrupted () {
+        __setInterrupted ();
+    }
+    /*
     Return 1 if file exists, else zero
     */
     native static boolean __fileExists (String filename);

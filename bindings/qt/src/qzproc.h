@@ -83,11 +83,6 @@ public:
     //  set verbose mode
     void setVerbose (bool verbose);
 
-    //  Returns true if the process received a SIGINT or SIGTERM signal.
-    //  It is good practice to use this method to exit any infinite loop
-    //  processing messages.
-    static bool interrupted ();
-
     //  Self test of this class.
     static void test (bool verbose);
 

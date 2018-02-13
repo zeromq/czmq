@@ -288,16 +288,6 @@ module CZMQ
         result
       end
 
-      # Returns true if the process received a SIGINT or SIGTERM signal.
-      # It is good practice to use this method to exit any infinite loop
-      # processing messages.
-      #
-      # @return [Boolean]
-      def self.interrupted()
-        result = ::CZMQ::FFI.zproc_interrupted()
-        result
-      end
-
       # Self test of this class.
       #
       # @param verbose [Boolean]

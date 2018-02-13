@@ -102,11 +102,6 @@ public:
     };
 
 public slots:
-    //  Returns true if the process received a SIGINT or SIGTERM signal.
-    //  It is good practice to use this method to exit any infinite loop
-    //  processing messages.
-    bool interrupted ();
-
     //  Self test of this class.
     void test (bool verbose);
 

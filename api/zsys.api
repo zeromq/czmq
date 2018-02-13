@@ -86,6 +86,19 @@
         *** This is for CZMQ internal use only and may change arbitrarily ***
     </method>
 
+    <method name = "is interrupted" singleton = "1" state = "draft">
+        Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+        Does not work if ZSYS_SIGHANDLER is false and code does not call
+        set interrupted on signal.
+        <return type = "boolean" />
+    </method>
+
+    <method name = "set interrupted" singleton = "1" state = "draft">
+        Set interrupted flag. This is done by default signal handler, however
+        this can be handy for language bindings or cases without default
+        signal handler.
+    </method>
+
     <method name = "file exists" singleton = "1">
         Return 1 if file exists, else zero
         <argument name = "filename" type = "string" />
