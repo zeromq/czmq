@@ -1508,7 +1508,6 @@ zsys_max_msgsz (void)
 }
 
 
-#ifdef CZMQ_BUILD_DRAFT_API
 //  --------------------------------------------------------------------------
 //  *** Draft method, for development use, may change without warning ***
 //  Check if default interrupt handler of Ctrl-C or SIGTERM was called.
@@ -1571,7 +1570,6 @@ int64_t
     return s_file_stable_age_msec;
 }
 
-#endif // CZMQ_BUILD_DRAFT_API
 
 //  --------------------------------------------------------------------------
 //  Configure the default linger timeout in msecs for new zsock instances.
