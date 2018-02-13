@@ -600,20 +600,6 @@ class Zproc: public Nan::ObjectWrap {
     static NAN_METHOD (_kill);
     static NAN_METHOD (_set_verbose);
     static NAN_METHOD (_interrupted);
-    static NAN_METHOD (_daemonize);
-    static NAN_METHOD (_run_as);
-    static NAN_METHOD (_set_io_threads);
-    static NAN_METHOD (_set_max_sockets);
-    static NAN_METHOD (_set_biface);
-    static NAN_METHOD (_biface);
-    static NAN_METHOD (_set_log_ident);
-    static NAN_METHOD (_set_log_sender);
-    static NAN_METHOD (_set_log_system);
-    static NAN_METHOD (_log_error);
-    static NAN_METHOD (_log_warning);
-    static NAN_METHOD (_log_notice);
-    static NAN_METHOD (_log_info);
-    static NAN_METHOD (_log_debug);
     static NAN_METHOD (_test);
 };
 

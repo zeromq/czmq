@@ -66,7 +66,7 @@ public slots:
     //  not initialized or external sockets.
     void *stderr ();
 
-    //  Starts the process.
+    //  Starts the process, return just before execve/CreateProcess.
     int run ();
 
     //  process exit code
@@ -106,79 +106,6 @@ public slots:
     //  It is good practice to use this method to exit any infinite loop
     //  processing messages.
     bool interrupted ();
-
-    //  Move the current process into the background. The precise effect
-    //  depends on the operating system. On POSIX boxes, moves to a specified
-    //  working directory (if specified), closes all file handles, reopens
-    //  stdin, stdout, and stderr to the null device, and sets the process to
-    //  ignore SIGHUP. On Windows, does nothing. Returns 0 if OK, -1 if there
-    //  was an error.
-    void daemonize (const QString &workdir);
-
-    //  Drop the process ID into the lockfile, with exclusive lock, and
-    //  switch the process to the specified group and/or user. Any of the
-    //  arguments may be null, indicating a no-op. Returns 0 on success,
-    //  -1 on failure. Note if you combine this with zsys_daemonize, run
-    //  after, not before that method, or the lockfile will hold the wrong
-    //  process ID.
-    void runAs (const QString &lockfile, const QString &group, const QString &user);
-
-    //  Configure the number of I/O threads that ZeroMQ will use. A good
-    //  rule of thumb is one thread per gigabit of traffic in or out. The
-    //  default is 1, sufficient for most applications. If the environment
-    //  variable ZSYS_IO_THREADS is defined, that provides the default.
-    //  Note that this method is valid only before any socket is created.
-    void setIoThreads (size_t ioThreads);
-
-    //  Configure the number of sockets that ZeroMQ will allow. The default
-    //  is 1024. The actual limit depends on the system, and you can query it
-    //  by using zsys_socket_limit (). A value of zero means "maximum".
-    //  Note that this method is valid only before any socket is created.
-    void setMaxSockets (size_t maxSockets);
-
-    //  Set network interface name to use for broadcasts, particularly zbeacon.
-    //  This lets the interface be configured for test environments where required.
-    //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
-    //  the default when there is no specified interface. If the environment
-    //  variable ZSYS_INTERFACE is set, use that as the default interface name.
-    //  Setting the interface to "*" means "use all available interfaces".
-    void setBiface (const QString &value);
-
-    //  Return network interface to use for broadcasts, or "" if none was set.
-    const QString biface ();
-
-    //  Set log identity, which is a string that prefixes all log messages sent
-    //  by this process. The log identity defaults to the environment variable
-    //  ZSYS_LOGIDENT, if that is set.
-    void setLogIdent (const QString &value);
-
-    //  Sends log output to a PUB socket bound to the specified endpoint. To
-    //  collect such log output, create a SUB socket, subscribe to the traffic
-    //  you care about, and connect to the endpoint. Log traffic is sent as a
-    //  single string frame, in the same format as when sent to stdout. The
-    //  log system supports a single sender; multiple calls to this method will
-    //  bind the same sender to multiple endpoints. To disable the sender, call
-    //  this method with a null argument.
-    void setLogSender (const QString &endpoint);
-
-    //  Enable or disable logging to the system facility (syslog on POSIX boxes,
-    //  event log on Windows). By default this is disabled.
-    void setLogSystem (bool logsystem);
-
-    //  Log error condition - highest priority
-    void logError (const QString &format);
-
-    //  Log warning condition - high priority
-    void logWarning (const QString &format);
-
-    //  Log normal, but significant, condition - normal priority
-    void logNotice (const QString &format);
-
-    //  Log informational message - low priority
-    void logInfo (const QString &format);
-
-    //  Log debug-level message - lowest priority
-    void logDebug (const QString &format);
 
     //  Self test of this class.
     void test (bool verbose);

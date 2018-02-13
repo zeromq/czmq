@@ -534,20 +534,6 @@ module CZMQ
       attach_function :zproc_kill, [:pointer, :int], :void, **opts
       attach_function :zproc_set_verbose, [:pointer, :bool], :void, **opts
       attach_function :zproc_interrupted, [], :bool, **opts
-      attach_function :zproc_daemonize, [:string], :void, **opts
-      attach_function :zproc_run_as, [:string, :string, :string], :void, **opts
-      attach_function :zproc_set_io_threads, [:size_t], :void, **opts
-      attach_function :zproc_set_max_sockets, [:size_t], :void, **opts
-      attach_function :zproc_set_biface, [:string], :void, **opts
-      attach_function :zproc_biface, [], :string, **opts
-      attach_function :zproc_set_log_ident, [:string], :void, **opts
-      attach_function :zproc_set_log_sender, [:string], :void, **opts
-      attach_function :zproc_set_log_system, [:bool], :void, **opts
-      attach_function :zproc_log_error, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_warning, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_notice, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_info, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_debug, [:string, :varargs], :void, **opts
       attach_function :zproc_test, [:bool], :void, **opts
 
       require_relative 'ffi/zproc'
