@@ -4224,20 +4224,6 @@ NAN_MODULE_INIT (Zproc::Init) {
     Nan::SetPrototypeMethod (tpl, "kill", _kill);
     Nan::SetPrototypeMethod (tpl, "setVerbose", _set_verbose);
     Nan::SetPrototypeMethod (tpl, "interrupted", _interrupted);
-    Nan::SetPrototypeMethod (tpl, "daemonize", _daemonize);
-    Nan::SetPrototypeMethod (tpl, "runAs", _run_as);
-    Nan::SetPrototypeMethod (tpl, "setIoThreads", _set_io_threads);
-    Nan::SetPrototypeMethod (tpl, "setMaxSockets", _set_max_sockets);
-    Nan::SetPrototypeMethod (tpl, "setBiface", _set_biface);
-    Nan::SetPrototypeMethod (tpl, "biface", _biface);
-    Nan::SetPrototypeMethod (tpl, "setLogIdent", _set_log_ident);
-    Nan::SetPrototypeMethod (tpl, "setLogSender", _set_log_sender);
-    Nan::SetPrototypeMethod (tpl, "setLogSystem", _set_log_system);
-    Nan::SetPrototypeMethod (tpl, "logError", _log_error);
-    Nan::SetPrototypeMethod (tpl, "logWarning", _log_warning);
-    Nan::SetPrototypeMethod (tpl, "logNotice", _log_notice);
-    Nan::SetPrototypeMethod (tpl, "logInfo", _log_info);
-    Nan::SetPrototypeMethod (tpl, "logDebug", _log_debug);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -4278,29 +4264,29 @@ NAN_METHOD (Zproc::defined) {
 
 NAN_METHOD (Zproc::_set_args) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    Zlist *args = Nan::ObjectWrap::Unwrap<Zlist>(info [0].As<Object>());
-    zproc_set_args (zproc->self, &args->self);
+    Zlist *arguments = Nan::ObjectWrap::Unwrap<Zlist>(info [0].As<Object>());
+    zproc_set_args (zproc->self, &arguments->self);
 }
 
 NAN_METHOD (Zproc::_set_argsx) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    char *args;
+    char *arguments;
     if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `args`");
+        return Nan::ThrowTypeError ("method requires a `arguments`");
     else
     if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`args` must be a string");
+        return Nan::ThrowTypeError ("`arguments` must be a string");
     //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String args_utf8 (info [0].As<String>());
-    args = *args_utf8;
+    Nan::Utf8String arguments_utf8 (info [0].As<String>());
+    arguments = *arguments_utf8;
          //} //bjornw end
-    zproc_set_argsx (zproc->self, (const char *)args);
+    zproc_set_argsx (zproc->self, (const char *)arguments);
 }
 
 NAN_METHOD (Zproc::_set_env) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
-    Zhash *args = Nan::ObjectWrap::Unwrap<Zhash>(info [0].As<Object>());
-    zproc_set_env (zproc->self, &args->self);
+    Zhash *arguments = Nan::ObjectWrap::Unwrap<Zhash>(info [0].As<Object>());
+    zproc_set_env (zproc->self, &arguments->self);
 }
 
 NAN_METHOD (Zproc::_run) {
@@ -4385,208 +4371,6 @@ NAN_METHOD (Zproc::_set_verbose) {
 NAN_METHOD (Zproc::_interrupted) {
     bool result = zproc_interrupted ();
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
-}
-
-NAN_METHOD (Zproc::_daemonize) {
-    char *workdir;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `workdir`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`workdir` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String workdir_utf8 (info [0].As<String>());
-    workdir = *workdir_utf8;
-         //} //bjornw end
-    zproc_daemonize ((const char *)workdir);
-}
-
-NAN_METHOD (Zproc::_run_as) {
-    char *lockfile;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `lockfile`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`lockfile` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String lockfile_utf8 (info [0].As<String>());
-    lockfile = *lockfile_utf8;
-         //} //bjornw end
-    char *group;
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `group`");
-    else
-    if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`group` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String group_utf8 (info [1].As<String>());
-    group = *group_utf8;
-         //} //bjornw end
-    char *user;
-    if (info [2]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `user`");
-    else
-    if (!info [2]->IsString ())
-        return Nan::ThrowTypeError ("`user` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String user_utf8 (info [2].As<String>());
-    user = *user_utf8;
-         //} //bjornw end
-    zproc_run_as ((const char *)lockfile, (const char *)group, (const char *)user);
-}
-
-NAN_METHOD (Zproc::_set_io_threads) {
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `io_threads`");
-    else
-    if (!info [0]->IsNumber ())
-        return Nan::ThrowTypeError ("`io_threads` must be a number");
-    size_t io_threads = Nan::To<int64_t>(info [0]).FromJust ();
-    zproc_set_io_threads ((size_t) io_threads);
-}
-
-NAN_METHOD (Zproc::_set_max_sockets) {
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `max_sockets`");
-    else
-    if (!info [0]->IsNumber ())
-        return Nan::ThrowTypeError ("`max_sockets` must be a number");
-    size_t max_sockets = Nan::To<int64_t>(info [0]).FromJust ();
-    zproc_set_max_sockets ((size_t) max_sockets);
-}
-
-NAN_METHOD (Zproc::_set_biface) {
-    char *value;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `value`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`value` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String value_utf8 (info [0].As<String>());
-    value = *value_utf8;
-         //} //bjornw end
-    zproc_set_biface ((const char *)value);
-}
-
-NAN_METHOD (Zproc::_biface) {
-    char *result = (char *) zproc_biface ();
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
-}
-
-NAN_METHOD (Zproc::_set_log_ident) {
-    char *value;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `value`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`value` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String value_utf8 (info [0].As<String>());
-    value = *value_utf8;
-         //} //bjornw end
-    zproc_set_log_ident ((const char *)value);
-}
-
-NAN_METHOD (Zproc::_set_log_sender) {
-    char *endpoint;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `endpoint`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`endpoint` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String endpoint_utf8 (info [0].As<String>());
-    endpoint = *endpoint_utf8;
-         //} //bjornw end
-    zproc_set_log_sender ((const char *)endpoint);
-}
-
-NAN_METHOD (Zproc::_set_log_system) {
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `logsystem`");
-
-    //bool logsystem; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
-    bool logsystem;
-
-
-    if (info [0]->IsBoolean ())
-    {
-          logsystem = Nan::To<bool>(info [0]).FromJust ();
-    }
-    else
-        return Nan::ThrowTypeError ("`logsystem` must be a Boolean");
-    zproc_set_log_system ((bool) logsystem);
-}
-
-NAN_METHOD (Zproc::_log_error) {
-    char *format;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `format`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`format` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String format_utf8 (info [0].As<String>());
-    format = *format_utf8;
-         //} //bjornw end
-    zproc_log_error ("%s", format);
-}
-
-NAN_METHOD (Zproc::_log_warning) {
-    char *format;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `format`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`format` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String format_utf8 (info [0].As<String>());
-    format = *format_utf8;
-         //} //bjornw end
-    zproc_log_warning ("%s", format);
-}
-
-NAN_METHOD (Zproc::_log_notice) {
-    char *format;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `format`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`format` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String format_utf8 (info [0].As<String>());
-    format = *format_utf8;
-         //} //bjornw end
-    zproc_log_notice ("%s", format);
-}
-
-NAN_METHOD (Zproc::_log_info) {
-    char *format;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `format`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`format` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String format_utf8 (info [0].As<String>());
-    format = *format_utf8;
-         //} //bjornw end
-    zproc_log_info ("%s", format);
-}
-
-NAN_METHOD (Zproc::_log_debug) {
-    char *format;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `format`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`format` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String format_utf8 (info [0].As<String>());
-    format = *format_utf8;
-         //} //bjornw end
-    zproc_log_debug ("%s", format);
 }
 
 NAN_METHOD (Zproc::_test) {

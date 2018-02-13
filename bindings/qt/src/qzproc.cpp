@@ -34,17 +34,17 @@ QZproc::~QZproc ()
 ///
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
-void QZproc::setArgs (QZlist *args)
+void QZproc::setArgs (QZlist *arguments)
 {
-    zproc_set_args (self, &args->self);
+    zproc_set_args (self, &arguments->self);
 
 }
 
 ///
 //  Setup the environment variables for the process.
-void QZproc::setEnv (QZhash *args)
+void QZproc::setEnv (QZhash *arguments)
 {
-    zproc_set_env (self, &args->self);
+    zproc_set_env (self, &arguments->self);
 
 }
 
@@ -106,7 +106,7 @@ void * QZproc::stderr ()
 }
 
 ///
-//  Starts the process.
+//  Starts the process, return just before execve/CreateProcess.
 int QZproc::run ()
 {
     int rv = zproc_run (self);
@@ -177,149 +177,6 @@ bool QZproc::interrupted ()
 {
     bool rv = zproc_interrupted ();
     return rv;
-}
-
-///
-//  Move the current process into the background. The precise effect
-//  depends on the operating system. On POSIX boxes, moves to a specified
-//  working directory (if specified), closes all file handles, reopens
-//  stdin, stdout, and stderr to the null device, and sets the process to
-//  ignore SIGHUP. On Windows, does nothing. Returns 0 if OK, -1 if there
-//  was an error.
-void QZproc::daemonize (const QString &workdir)
-{
-    zproc_daemonize (workdir.toUtf8().data());
-
-}
-
-///
-//  Drop the process ID into the lockfile, with exclusive lock, and
-//  switch the process to the specified group and/or user. Any of the
-//  arguments may be null, indicating a no-op. Returns 0 on success,
-//  -1 on failure. Note if you combine this with zsys_daemonize, run
-//  after, not before that method, or the lockfile will hold the wrong
-//  process ID.
-void QZproc::runAs (const QString &lockfile, const QString &group, const QString &user)
-{
-    zproc_run_as (lockfile.toUtf8().data(), group.toUtf8().data(), user.toUtf8().data());
-
-}
-
-///
-//  Configure the number of I/O threads that ZeroMQ will use. A good
-//  rule of thumb is one thread per gigabit of traffic in or out. The
-//  default is 1, sufficient for most applications. If the environment
-//  variable ZSYS_IO_THREADS is defined, that provides the default.
-//  Note that this method is valid only before any socket is created.
-void QZproc::setIoThreads (size_t ioThreads)
-{
-    zproc_set_io_threads (ioThreads);
-
-}
-
-///
-//  Configure the number of sockets that ZeroMQ will allow. The default
-//  is 1024. The actual limit depends on the system, and you can query it
-//  by using zsys_socket_limit (). A value of zero means "maximum".
-//  Note that this method is valid only before any socket is created.
-void QZproc::setMaxSockets (size_t maxSockets)
-{
-    zproc_set_max_sockets (maxSockets);
-
-}
-
-///
-//  Set network interface name to use for broadcasts, particularly zbeacon.
-//  This lets the interface be configured for test environments where required.
-//  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
-//  the default when there is no specified interface. If the environment
-//  variable ZSYS_INTERFACE is set, use that as the default interface name.
-//  Setting the interface to "*" means "use all available interfaces".
-void QZproc::setBiface (const QString &value)
-{
-    zproc_set_biface (value.toUtf8().data());
-
-}
-
-///
-//  Return network interface to use for broadcasts, or "" if none was set.
-const QString QZproc::biface ()
-{
-    const QString rv = QString (zproc_biface ());
-    return rv;
-}
-
-///
-//  Set log identity, which is a string that prefixes all log messages sent
-//  by this process. The log identity defaults to the environment variable
-//  ZSYS_LOGIDENT, if that is set.
-void QZproc::setLogIdent (const QString &value)
-{
-    zproc_set_log_ident (value.toUtf8().data());
-
-}
-
-///
-//  Sends log output to a PUB socket bound to the specified endpoint. To
-//  collect such log output, create a SUB socket, subscribe to the traffic
-//  you care about, and connect to the endpoint. Log traffic is sent as a
-//  single string frame, in the same format as when sent to stdout. The
-//  log system supports a single sender; multiple calls to this method will
-//  bind the same sender to multiple endpoints. To disable the sender, call
-//  this method with a null argument.
-void QZproc::setLogSender (const QString &endpoint)
-{
-    zproc_set_log_sender (endpoint.toUtf8().data());
-
-}
-
-///
-//  Enable or disable logging to the system facility (syslog on POSIX boxes,
-//  event log on Windows). By default this is disabled.
-void QZproc::setLogSystem (bool logsystem)
-{
-    zproc_set_log_system (logsystem);
-
-}
-
-///
-//  Log error condition - highest priority
-void QZproc::logError (const QString &param)
-{
-    zproc_log_error ("%s", param.toUtf8().data());
-
-}
-
-///
-//  Log warning condition - high priority
-void QZproc::logWarning (const QString &param)
-{
-    zproc_log_warning ("%s", param.toUtf8().data());
-
-}
-
-///
-//  Log normal, but significant, condition - normal priority
-void QZproc::logNotice (const QString &param)
-{
-    zproc_log_notice ("%s", param.toUtf8().data());
-
-}
-
-///
-//  Log informational message - low priority
-void QZproc::logInfo (const QString &param)
-{
-    zproc_log_info ("%s", param.toUtf8().data());
-
-}
-
-///
-//  Log debug-level message - lowest priority
-void QZproc::logDebug (const QString &param)
-{
-    zproc_log_debug ("%s", param.toUtf8().data());
-
 }
 
 ///

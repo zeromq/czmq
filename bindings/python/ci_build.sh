@@ -56,4 +56,7 @@ fi
 ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
 make VERBOSE=1 install
 
-LD_LIBRARY_PATH=$BUILD_PREFIX/lib python bindings/python/test.py
+# LD_LIBRARY_PATH/DYLD_LIBRARY_PATH do not work anymore on OSX, change directory instead
+BASE_PWD=${PWD}
+cd ${BUILD_PREFIX}/lib
+LD_LIBRARY_PATH=$BUILD_PREFIX/lib python ${BASE_PWD}/bindings/python/test.py
