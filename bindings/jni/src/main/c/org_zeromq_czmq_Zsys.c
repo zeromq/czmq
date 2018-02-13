@@ -69,6 +69,19 @@ Java_org_zeromq_czmq_Zsys__1_1catchInterrupts (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT jboolean JNICALL
+Java_org_zeromq_czmq_Zsys__1_1isInterrupted (JNIEnv *env, jclass c)
+{
+    jboolean is_interrupted_ = (jboolean) zsys_is_interrupted ();
+    return is_interrupted_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1setInterrupted (JNIEnv *env, jclass c)
+{
+    zsys_set_interrupted ();
+}
+
+JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zsys__1_1fileExists (JNIEnv *env, jclass c, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);

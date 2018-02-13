@@ -169,15 +169,6 @@ public class Zproc implements AutoCloseable{
         __setVerbose (self, verbose);
     }
     /*
-    Returns true if the process received a SIGINT or SIGTERM signal.
-    It is good practice to use this method to exit any infinite loop
-    processing messages.
-    */
-    native static boolean __interrupted ();
-    public boolean interrupted () {
-        return __interrupted ();
-    }
-    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

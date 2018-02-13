@@ -4223,7 +4223,6 @@ NAN_MODULE_INIT (Zproc::Init) {
     Nan::SetPrototypeMethod (tpl, "wait", _wait);
     Nan::SetPrototypeMethod (tpl, "kill", _kill);
     Nan::SetPrototypeMethod (tpl, "setVerbose", _set_verbose);
-    Nan::SetPrototypeMethod (tpl, "interrupted", _interrupted);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -4366,11 +4365,6 @@ NAN_METHOD (Zproc::_set_verbose) {
     else
         return Nan::ThrowTypeError ("`verbose` must be a Boolean");
     zproc_set_verbose (zproc->self, (bool) verbose);
-}
-
-NAN_METHOD (Zproc::_interrupted) {
-    bool result = zproc_interrupted ();
-    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zproc::_test) {
@@ -6833,6 +6827,8 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "createPipe", _create_pipe);
     Nan::SetPrototypeMethod (tpl, "handlerReset", _handler_reset);
     Nan::SetPrototypeMethod (tpl, "catchInterrupts", _catch_interrupts);
+    Nan::SetPrototypeMethod (tpl, "isInterrupted", _is_interrupted);
+    Nan::SetPrototypeMethod (tpl, "setInterrupted", _set_interrupted);
     Nan::SetPrototypeMethod (tpl, "fileExists", _file_exists);
     Nan::SetPrototypeMethod (tpl, "fileModified", _file_modified);
     Nan::SetPrototypeMethod (tpl, "fileMode", _file_mode);
@@ -6944,6 +6940,15 @@ NAN_METHOD (Zsys::_handler_reset) {
 
 NAN_METHOD (Zsys::_catch_interrupts) {
     zsys_catch_interrupts ();
+}
+
+NAN_METHOD (Zsys::_is_interrupted) {
+    bool result = zsys_is_interrupted ();
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zsys::_set_interrupted) {
+    zsys_set_interrupted ();
 }
 
 NAN_METHOD (Zsys::_file_exists) {

@@ -2248,14 +2248,6 @@ nothing my_zproc.setVerbose (Boolean)
 set verbose mode
 
 ```
-boolean my_zproc.interrupted ()
-```
-
-Returns true if the process received a SIGINT or SIGTERM signal.
-It is good practice to use this method to exit any infinite loop
-processing messages.
-
-```
 nothing my_zproc.test (Boolean)
 ```
 
@@ -3643,6 +3635,22 @@ Set default interrupt handler, so Ctrl-C or SIGTERM will set
 zsys_interrupted. Idempotent; safe to call multiple times.
 Can be supressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
+
+```
+boolean my_zsys.isInterrupted ()
+```
+
+Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+Does not work if ZSYS_SIGHANDLER is false and code does not call
+set interrupted on signal.
+
+```
+nothing my_zsys.setInterrupted ()
+```
+
+Set interrupted flag. This is done by default signal handler, however
+this can be handy for language bindings or cases without default
+signal handler.
 
 ```
 boolean my_zsys.fileExists (String)

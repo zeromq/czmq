@@ -2337,12 +2337,6 @@ void
 void
     zproc_set_verbose (zproc_t *self, bool verbose);
 
-// Returns true if the process received a SIGINT or SIGTERM signal.
-// It is good practice to use this method to exit any infinite loop
-// processing messages.
-bool
-    zproc_interrupted (void);
-
 // Self test of this class.
 void
     zproc_test (bool verbose);
@@ -3498,6 +3492,18 @@ void
 // *** This is for CZMQ internal use only and may change arbitrarily ***
 void
     zsys_catch_interrupts (void);
+
+// Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+// Does not work if ZSYS_SIGHANDLER is false and code does not call
+// set interrupted on signal.
+bool
+    zsys_is_interrupted (void);
+
+// Set interrupted flag. This is done by default signal handler, however
+// this can be handy for language bindings or cases without default
+// signal handler.
+void
+    zsys_set_interrupted (void);
 
 // Return 1 if file exists, else zero
 bool

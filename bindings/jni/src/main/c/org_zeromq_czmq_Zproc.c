@@ -138,13 +138,6 @@ Java_org_zeromq_czmq_Zproc__1_1setVerbose (JNIEnv *env, jclass c, jlong self, jb
     zproc_set_verbose ((zproc_t *) (intptr_t) self, (bool) verbose);
 }
 
-JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zproc__1_1interrupted (JNIEnv *env, jclass c)
-{
-    jboolean interrupted_ = (jboolean) zproc_interrupted ();
-    return interrupted_;
-}
-
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zproc__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {

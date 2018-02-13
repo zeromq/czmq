@@ -4850,8 +4850,6 @@ lib.zproc_kill.restype = None
 lib.zproc_kill.argtypes = [zproc_p, c_int]
 lib.zproc_set_verbose.restype = None
 lib.zproc_set_verbose.argtypes = [zproc_p, c_bool]
-lib.zproc_interrupted.restype = c_bool
-lib.zproc_interrupted.argtypes = []
 lib.zproc_test.restype = None
 lib.zproc_test.argtypes = [c_bool]
 
@@ -5017,15 +5015,6 @@ not initialized or external sockets.
         set verbose mode
         """
         return lib.zproc_set_verbose(self._as_parameter_, verbose)
-
-    @staticmethod
-    def interrupted():
-        """
-        Returns true if the process received a SIGINT or SIGTERM signal.
-It is good practice to use this method to exit any infinite loop
-processing messages.
-        """
-        return lib.zproc_interrupted()
 
     @staticmethod
     def test(verbose):
@@ -7028,6 +7017,10 @@ lib.zsys_handler_reset.restype = None
 lib.zsys_handler_reset.argtypes = []
 lib.zsys_catch_interrupts.restype = None
 lib.zsys_catch_interrupts.argtypes = []
+lib.zsys_is_interrupted.restype = c_bool
+lib.zsys_is_interrupted.argtypes = []
+lib.zsys_set_interrupted.restype = None
+lib.zsys_set_interrupted.argtypes = []
 lib.zsys_file_exists.restype = c_bool
 lib.zsys_file_exists.argtypes = [c_char_p]
 lib.zsys_file_modified.restype = c_int
@@ -7251,6 +7244,24 @@ Can be supressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
         """
         return lib.zsys_catch_interrupts()
+
+    @staticmethod
+    def is_interrupted():
+        """
+        Check if default interrupt handler of Ctrl-C or SIGTERM was called.
+Does not work if ZSYS_SIGHANDLER is false and code does not call
+set interrupted on signal.
+        """
+        return lib.zsys_is_interrupted()
+
+    @staticmethod
+    def set_interrupted():
+        """
+        Set interrupted flag. This is done by default signal handler, however
+this can be handy for language bindings or cases without default
+signal handler.
+        """
+        return lib.zsys_set_interrupted()
 
     @staticmethod
     def file_exists(filename):
