@@ -44,9 +44,13 @@ env:
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
     - BUILD_TYPE=cmake
+    - BUILD_TYPE=check_zproject
     - BUILD_TYPE=bindings BINDING=python
 
 matrix:
+  exclude:
+  - os: osx
+    env: BUILD_TYPE=check_zproject
   include:
   - env: BUILD_TYPE=valgrind
     os: linux
@@ -79,6 +83,7 @@ matrix:
         - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
           key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
         packages:
+        - zproject
         - libzmq3-dev
 # temporary disabled, does not work
 #  - env: BUILD_TYPE=docs
