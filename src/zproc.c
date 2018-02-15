@@ -513,7 +513,7 @@ s_zproc_execve (zproc_t *self)
 {
     assert (self);
 #if defined(__WINDOWS__)
-    STARTUPINFO siStartInfo;
+    STARTUPINFOA siStartInfo;
     ZeroMemory (&siStartInfo, sizeof (siStartInfo));
 
     char *commandline = strdup ((char *)zlist_first (self->args));
@@ -529,7 +529,7 @@ s_zproc_execve (zproc_t *self)
 
     siStartInfo.cb = sizeof (siStartInfo);
     zsock_signal (zpair_write (self->execpair), 0);
-    self->running = CreateProcess(
+    self->running = CreateProcessA(
         NULL,          // app name
         commandline,   // command line
         NULL,          // process security attributes
