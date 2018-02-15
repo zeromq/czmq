@@ -125,6 +125,9 @@ struct _server_t {
     char *secret_key;
 #ifdef CZMQ_BUILD_DRAFT_API
     char *zap_domain;
+    int heartbeat_ivl;
+    int heartbeat_timeout;
+    int heartbeat_ttl;
 #endif
 };
 
@@ -218,6 +221,19 @@ server_connect (server_t *self, const char *endpoint)
 {
     zsock_t *remote = zsock_new (ZMQ_DEALER);
     assert (remote);          //  No recovery if exhausted
+
+//    if (self->heartbeat_ivl)
+//        zsock_set_heartbeat_ivl(remote, self->heartbeat_ivl);
+//
+//    if (self->heartbbeat_timeout)
+//        zsock_set_heartbeat_timeout(remote, self->heartbbeat_timeout);
+//
+//    if (self->heartbeat_ttl)
+//        zsock_set_heartbeat_ttl(remote, self->heartbeat_ttl);
+
+    zsock_set_heartbeat_ivl(remote, 30000);
+    zsock_set_heartbeat_timeout(remote, 1000);
+    zsock_set_heartbeat_ttl(remote, 55000);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     if (public_key){
@@ -342,6 +358,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         zmsg_addstrf (reply, "%d", (int) zhashx_size (self->tuples));
     }
 #ifdef CZMQ_BUILD_DRAFT_API
+    // DRAFT-API: Security
     else
     if (streq (method, "SET PUBLICKEY")) {
         char *key = zmsg_popstr (msg);
@@ -363,6 +380,23 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         self->zap_domain = strdup(value);
         assert (self->zap_domain);
         zstr_free (&value);
+    }
+
+    // DRAFT-API: TTL
+    else
+    if (streq (method, "SET HEARTBEAT ILV")){
+      self->heartbeat_ivl = atoi(zmsg_popstr (msg));
+      assert (self->heartbeat_ivl);
+    }
+    else
+    if (streq (method, "SET HEARTBEAT TIMEOUT")){
+      self->heartbeat_timeout = atoi(zmsg_popstr (msg));
+      assert (self->heartbeat_timeout);
+    }
+    else
+    if (streq (method, "SET HEARTBEAT TTL")){
+      self->heartbeat_ivl = atoi(zmsg_popstr (msg));
+      assert (self->heartbeat_ttl);
     }
 #endif
     else
