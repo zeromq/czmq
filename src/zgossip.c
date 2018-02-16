@@ -123,6 +123,7 @@ struct _server_t {
 
     char *public_key;
     char *secret_key;
+
 #ifdef CZMQ_BUILD_DRAFT_API
     char *zap_domain;
     uint32_t heartbeat_ivl;
@@ -140,6 +141,7 @@ struct _client_t {
     //  and are set by the generated engine; do not modify them!
     server_t *server;           //  Reference to parent server
     zgossip_msg_t *message;     //  Message in and out
+    uint unique_id;             //  Client identifier counter
 };
 
 
@@ -177,6 +179,52 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument);
 
 #include "zgossip_engine.inc"
 
+static int
+server_publish (zloop_t *loop, int timer_id, void *arg)
+{
+    server_t *self = (server_t *) arg;
+
+    zsock_t *remote = (zsock_t *) zlistx_first (self->remotes);
+    while (remote) {
+
+        tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
+        while (tuple) {
+            zsys_info("%s | %s | %d", tuple->key, tuple->value, tuple->ttl);
+            zgossip_msg_t *gossip = zgossip_msg_new ();
+            zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
+            zgossip_msg_set_key (gossip, tuple->key);
+            zgossip_msg_set_value (gossip, tuple->value);
+            zgossip_msg_set_ttl (gossip, tuple->ttl);
+            zgossip_msg_send (gossip, remote);
+            zgossip_msg_destroy (&gossip);
+            tuple = (tuple_t *) zhashx_next (self->tuples);
+        }
+        remote = (zsock_t *) zlistx_next (self->remotes);
+    }
+
+    return 0;
+}
+
+static int
+server_tuple_cleanup (zloop_t *loop, int timer_id, void *arg)
+{
+    server_t *self = (server_t *) arg;
+
+    tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
+    while (tuple) {
+        if (tuple->expires_at < zclock_mono()) {
+            zsys_debug("purging: %s", tuple->key);
+            zhashx_delete(self->tuples, tuple->key);
+        }
+        else
+            zsys_info("nothing to purge...");
+        tuple = (tuple_t *) zhashx_next (self->tuples);
+    }
+
+    return 0;
+}
+
+
 //  Allocate properties and structures for a new server instance.
 //  Return 0 if OK, or -1 if there was an error.
 
@@ -185,7 +233,7 @@ server_initialize (server_t *self)
 {
     //  Default timeout for clients is one second; the caller can
     //  override this with a SET message.
-    engine_configure (self, "server/timeout", "30000");
+    engine_configure (self, "server/timeout", "60000");
     self->message = zgossip_msg_new ();
 
     self->remotes = zlistx_new ();
@@ -198,6 +246,8 @@ server_initialize (server_t *self)
 #ifdef CZMQ_BUILD_DRAFT_API
     self->zap_domain = strdup(CZMQ_ZGOSSIP_ZAP_DOMAIN);
 #endif
+
+    engine_set_monitor (self, 5000, server_tuple_cleanup);
     return 0;
 }
 
@@ -237,8 +287,8 @@ server_connect (server_t *self, const char *endpoint)
 //        zsock_set_heartbeat_ttl(remote, self->heartbeat_ttl);
 
 //    zsock_set_heartbeat_ivl(remote, 30000);
-//    zsock_set_heartbeat_timeout(remote, 1000);
-//    zsock_set_heartbeat_ttl(remote, 55000);
+//    zsock_set_heartbeat_timeout(remote, 5000);
+//    zsock_set_heartbeat_ttl(remote, 45000);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     if (public_key){
@@ -282,6 +332,10 @@ server_connect (server_t *self, const char *endpoint)
     zgossip_msg_destroy (&gossip);
     engine_handle_socket (self, remote, remote_handler);
     zlistx_add_end (self->remotes, remote);
+
+    //  Register with the engine a function that will be called
+    //  every second by the engine.
+    engine_set_monitor (self, 30000, server_publish);
 }
 
 
@@ -291,8 +345,10 @@ static void
 server_accept (server_t *self, const char *key, const char *value, uint32_t ttl)
 {
     tuple_t *tuple = (tuple_t *) zhashx_lookup (self->tuples, key);
-    if (tuple && streq (tuple->value, value))
-        return;                 //  Duplicate tuple, do nothing
+    if (tuple && streq (tuple->value, value)){
+        tuple->expires_at = zclock_mono() + ttl;
+        return;                 //  Duplicate tuple, update expire and do nothing
+    }
 
     //  Create new tuple
     tuple = (tuple_t *) zmalloc (sizeof (tuple_t));
@@ -301,8 +357,10 @@ server_accept (server_t *self, const char *key, const char *value, uint32_t ttl)
     tuple->key = strdup (key);
     tuple->value = strdup (value);
 
-    if (ttl)
+    if (ttl) {
+        tuple->ttl = ttl;
         tuple->expires_at = zclock_mono() + ttl;
+    }
 
     //  Store new tuple
     zhashx_update (tuple->container, key, tuple);
@@ -358,12 +416,10 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         char *key = zmsg_popstr (msg);
         char *value = zmsg_popstr (msg);
         char *ttl_s = zmsg_popstr (msg);
-        uint32_t ttl = 30000;
+        uint32_t ttl = 120000;
 
         if (ttl_s)
             ttl = atoi(ttl_s);
-
-        zsys_info ("%d", ttl);
 
         server_accept (self, key, value, ttl);
         zstr_free (&key);

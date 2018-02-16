@@ -1,0 +1,42 @@
+## Automatically generated from zgossip.xml by gsl
+digraph "zgossip" {
+
+ "start" [shape = "doublecircle"];
+ "start ping" [shape = "Mrecord" style = dashed label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">ping</font></td></tr><tr><td align="left" port="r3">send</td></tr></table>>];
+ "start" -> "start ping";
+ "start ping" -> "start";
+ "start *" [shape = "Mrecord" style = dashed label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">*</font></td></tr><tr><td align="left" port="r3">send</td></tr><tr><td align="left" port="r3">terminate</td></tr></table>>];
+ "start" -> "start *";
+ "start *" -> "start";
+ "start expired" [shape = "Mrecord" style = dashed label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">expired</font></td></tr><tr><td align="left" port="r3">terminate</td></tr></table>>];
+ "start" -> "start expired";
+ "start expired" -> "start";
+ "start hello" [shape = "Mrecord" style = solid label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">hello</font></td></tr><tr><td align="left" port="r3">get first tuple</td></tr></table>>];
+ "start" -> "start hello";
+ "start hello" -> "have tuple";
+
+ "have tuple" [shape = "doublecircle"];
+ "have tuple ok" [shape = "Mrecord" style = solid label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">ok</font></td></tr><tr><td align="left" port="r3">send</td></tr><tr><td align="left" port="r3">get next tuple</td></tr></table>>];
+ "have tuple" -> "have tuple ok";
+ "have tuple ok" -> "have tuple";
+ "have tuple finished" [shape = "Mrecord" style = solid label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">finished</font></td></tr></table>>];
+ "have tuple" -> "have tuple finished";
+ "have tuple finished" -> "connected";
+
+ "connected" [shape = "doublecircle"];
+ "connected ping" [shape = "Mrecord" style = dashed label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">ping</font></td></tr><tr><td align="left" port="r3">send</td></tr></table>>];
+ "connected" -> "connected ping";
+ "connected ping" -> "connected";
+ "connected *" [shape = "Mrecord" style = dashed label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">*</font></td></tr><tr><td align="left" port="r3">send</td></tr><tr><td align="left" port="r3">terminate</td></tr></table>>];
+ "connected" -> "connected *";
+ "connected *" -> "connected";
+ "connected expired" [shape = "Mrecord" style = dashed label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">expired</font></td></tr><tr><td align="left" port="r3">terminate</td></tr></table>>];
+ "connected" -> "connected expired";
+ "connected expired" -> "connected";
+ "connected publish" [shape = "Mrecord" style = solid label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">publish</font></td></tr><tr><td align="left" port="r3">store tuple if new</td></tr></table>>];
+ "connected" -> "connected publish";
+ "connected publish" -> "connected";
+ "connected forward" [shape = "Mrecord" style = solid label = <<table border="0" cellborder="0" cellpadding="3" bgcolor="white"><tr><td bgcolor="black" align="center" colspan="2"><font color="white">forward</font></td></tr><tr><td align="left" port="r3">get tuple to forward</td></tr><tr><td align="left" port="r3">send</td></tr></table>>];
+ "connected" -> "connected forward";
+ "connected forward" -> "connected";
+}

@@ -431,6 +431,7 @@ s_client_destroy (s_client_t **self_p)
             zloop_timer_end (self->server->loop, self->wakeup);
         if (self->ticket)
             zloop_ticket_delete (self->server->loop, self->ticket);
+
         zframe_destroy (&self->routing_id);
         //  Provide visual clue if application misuses client reference
         engine_set_log_prefix (&self->client, "*** TERMINATED ***");
@@ -707,6 +708,7 @@ s_client_execute (s_client_t *self, event_t event)
         }
         if (self->next_event == terminate_event) {
             //  Automatically calls s_client_destroy
+            zsys_info("DESTROY CLIENT: %s", self->hashkey);
             zhash_delete (self->server->clients, self->hashkey);
             break;
         }
@@ -788,7 +790,7 @@ s_server_new (zsock_t *pipe)
     self->loop = zloop_new ();
     srandom ((unsigned int) zclock_time ());
     self->client_id = randof (1000);
-    zloop_set_verbose (self->loop, true);
+    //zloop_set_verbose (self->loop, true);
     s_server_config_global (self);
 
     //  Initialize application server context
