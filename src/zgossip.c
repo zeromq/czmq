@@ -180,25 +180,17 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument);
 #include "zgossip_engine.inc"
 
 static int
-server_publish (zloop_t *loop, int timer_id, void *arg)
+server_ping (zloop_t *loop, int timer_id, void *arg)
 {
     server_t *self = (server_t *) arg;
 
     zsock_t *remote = (zsock_t *) zlistx_first (self->remotes);
     while (remote) {
-
-        tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
-        while (tuple) {
-            zsys_info("%s | %s | %d", tuple->key, tuple->value, tuple->ttl);
-            zgossip_msg_t *gossip = zgossip_msg_new ();
-            zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
-            zgossip_msg_set_key (gossip, tuple->key);
-            zgossip_msg_set_value (gossip, tuple->value);
-            zgossip_msg_set_ttl (gossip, tuple->ttl);
-            zgossip_msg_send (gossip, remote);
-            zgossip_msg_destroy (&gossip);
-            tuple = (tuple_t *) zhashx_next (self->tuples);
-        }
+        zgossip_msg_set_id (message, ZGOSSIP_MSG_PING);
+        zgossip_msg_send (message, client);
+        zgossip_msg_recv (message, client);
+        assert (zgossip_msg_id (message) == ZGOSSIP_MSG_PONG);
+        zgossip_msg_destroy (&message);
         remote = (zsock_t *) zlistx_next (self->remotes);
     }
 
@@ -335,7 +327,7 @@ server_connect (server_t *self, const char *endpoint)
 
     //  Register with the engine a function that will be called
     //  every second by the engine.
-    engine_set_monitor (self, 30000, server_publish);
+    engine_set_monitor (self, 30000, server_ping);
 }
 
 
