@@ -1513,7 +1513,7 @@ zsys_max_msgsz (void)
 //  Check if default interrupt handler of Ctrl-C or SIGTERM was called.
 //  Does not work if ZSYS_SIGHANDLER is false and code does not call
 //  set interrupted on signal.
-CZMQ_EXPORT bool
+bool
     zsys_is_interrupted (void)
 {
     return zsys_interrupted != 0;
@@ -1524,7 +1524,7 @@ CZMQ_EXPORT bool
 //  Set interrupted flag. This is done by default signal handler, however
 //  this can be handy for language bindings or cases without default
 //  signal handler.
-CZMQ_EXPORT void
+void
     zsys_set_interrupted (void)
 {
     zctx_interrupted = 1;
