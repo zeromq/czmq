@@ -376,6 +376,9 @@ s_client_new (s_server_t *server, zframe_t *routing_id)
     self->client.server = (server_t *) server;
     self->client.message = server->message;
 
+    server->timeout = 60000;
+    zsys_info("TIMEOUT: %d", server->timeout);
+
     //  If expiry timers are being used, create client ticket
     if (server->timeout)
         self->ticket = zloop_ticket (server->loop, s_client_handle_ticket, self);
