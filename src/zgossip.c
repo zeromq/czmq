@@ -185,7 +185,7 @@ server_initialize (server_t *self)
 {
     //  Default timeout for clients is one second; the caller can
     //  override this with a SET message.
-    engine_configure (self, "server/timeout", "1000");
+    engine_configure (self, "server/timeout", "30000");
     self->message = zgossip_msg_new ();
 
     self->remotes = zlistx_new ();
@@ -601,18 +601,16 @@ zgossip_test (bool verbose)
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
 
-    zsys_info("ONE");
     zactor_t *alpha = zactor_new (zgossip, "alpha");
     assert (alpha);
     zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
-    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", "30000", NULL);
-    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", "30000", NULL);
+    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
+    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
 
 
     zactor_t *beta = zactor_new (zgossip, "beta");
     assert (beta);
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
-    zsys_info("TWO");
 
     zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
     zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
