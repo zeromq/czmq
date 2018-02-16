@@ -232,8 +232,8 @@ server_connect (server_t *self, const char *endpoint)
 //        zsock_set_heartbeat_ttl(remote, self->heartbeat_ttl);
 
     zsock_set_heartbeat_ivl(remote, 30000);
-    zsock_set_heartbeat_timeout(remote, 1000);
-    zsock_set_heartbeat_ttl(remote, 55000);
+    zsock_set_heartbeat_timeout(remote, 5000);
+//    zsock_set_heartbeat_ttl(remote, 55000);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     if (public_key){
