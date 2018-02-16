@@ -33,7 +33,9 @@ typedef enum {
     start_state = 1,
     have_tuple_state = 2,
     connected_state = 3,
-    external_state = 4
+    external_state = 4,
+    //  Internal state to mark zombie clients
+    zombie_state_ = 5
 } state_t;
 
 typedef enum {
@@ -84,6 +86,7 @@ typedef struct {
     zloop_t *loop;              //  Reactor for server sockets
     zgossip_msg_t *message;     //  Message received or sent
     zhash_t *clients;           //  Clients we're connected to
+    zhash_t *zombies;           //  Zombie clients waiting to be free()d
     zconfig_t *config;          //  Configuration tree
     uint client_id;             //  Client identifier counter
     size_t timeout;             //  Default client expiry timeout
@@ -100,6 +103,7 @@ typedef struct {
 typedef struct {
     client_t client;            //  Application-level client context
     s_server_t *server;         //  Parent server context
+    size_t refcount;            //  Optional reference counter
     char *hashkey;              //  Key into server->clients hash
     zframe_t *routing_id;       //  Routing_id back to client
     uint unique_id;             //  Client identifier in server
@@ -134,6 +138,8 @@ static int
 static int
     s_client_handle_ticket (zloop_t *loop, int timer_id, void *argument);
 static void
+    s_client_finalize (s_client_t **self_p);
+static void
     get_first_tuple (client_t *self);
 static void
     get_next_tuple (client_t *self);
@@ -145,6 +151,31 @@ static void
 //  ---------------------------------------------------------------------------
 //  These methods are an internal API for actions
 
+//  Optional reference counting. The engine itself does not need this, but if
+//  the application wishes to delay the final destruction of a client, it
+//  can do so by using these functions
+static void engine_client_get (client_t *client)
+{
+    if (!client)
+        return;
+    s_client_t *self = (s_client_t *) client;
+    ++self->refcount;
+}
+
+//  Relese the application reference to client
+static void engine_client_put (client_t *client)
+{
+    if (!client)
+        return;
+    s_client_t *self = (s_client_t *) client;
+    if (--self->refcount == 0 && self->state == zombie_state_) {
+        zhash_delete (self->server->zombies, self->hashkey);
+        s_client_finalize (&self);
+    }
+}
+
+#define engine_client_is_valid(c) ((c) && ((s_client_t *)(c))->state != zombie_state_)
+
 //  Set the next event, needed in at least one action in an internal
 //  state; otherwise the state machine will wait for a message on the
 //  router socket and treat that as the event.
@@ -152,7 +183,7 @@ static void
 static void
 engine_set_next_event (client_t *client, event_t event)
 {
-    if (client) {
+    if (engine_client_is_valid (client)) {
         s_client_t *self = (s_client_t *) client;
         self->next_event = event;
     }
@@ -164,7 +195,7 @@ engine_set_next_event (client_t *client, event_t event)
 static void
 engine_set_exception (client_t *client, event_t event)
 {
-    if (client) {
+    if (engine_client_is_valid (client)) {
         s_client_t *self = (s_client_t *) client;
         self->exception = event;
     }
@@ -177,7 +208,7 @@ engine_set_exception (client_t *client, event_t event)
 static void
 engine_set_wakeup_event (client_t *client, size_t delay, event_t event)
 {
-    if (client) {
+    if (engine_client_is_valid (client)) {
         s_client_t *self = (s_client_t *) client;
         if (self->wakeup) {
             zloop_timer_end (self->server->loop, self->wakeup);
@@ -195,7 +226,7 @@ engine_set_wakeup_event (client_t *client, size_t delay, event_t event)
 static void
 engine_send_event (client_t *client, event_t event)
 {
-    if (client) {
+    if (engine_client_is_valid (client)) {
         s_client_t *self = (s_client_t *) client;
         s_client_execute (self, event);
     }
@@ -279,7 +310,7 @@ engine_cancel_monitor (server_t *server, int identifier)
 static void
 engine_set_log_prefix (client_t *client, const char *string)
 {
-    if (client) {
+    if (engine_client_is_valid (client)) {
         s_client_t *self = (s_client_t *) client;
         snprintf (self->log_prefix, sizeof (self->log_prefix),
             "%6d:%-33s", self->unique_id, string);
@@ -318,6 +349,8 @@ engine_verbose (server_t *server)
 static void
 s_satisfy_pedantic_compilers (void)
 {
+    engine_client_get (NULL);
+    engine_client_put (NULL);
     engine_set_next_event (NULL, NULL_event);
     engine_set_exception (NULL, NULL_event);
     engine_set_wakeup_event (NULL, 0, NULL_event);
@@ -375,9 +408,8 @@ s_client_new (s_server_t *server, zframe_t *routing_id)
 
     self->client.server = (server_t *) server;
     self->client.message = server->message;
-
-    server->timeout = 60000;
-    zsys_info("TIMEOUT: %d", server->timeout);
+    //  propagate client identifier
+    self->client.unique_id = self->unique_id;
 
     //  If expiry timers are being used, create client ticket
     if (server->timeout)
@@ -402,11 +434,23 @@ s_client_destroy (s_client_t **self_p)
         zframe_destroy (&self->routing_id);
         //  Provide visual clue if application misuses client reference
         engine_set_log_prefix (&self->client, "*** TERMINATED ***");
-        client_terminate (&self->client);
-        free (self->hashkey);
-        free (self);
-        *self_p = NULL;
+        if (!self->refcount) {
+            s_client_finalize (self_p);
+        } else {
+            zhash_insert (self->server->zombies, self->hashkey, self);
+            self->state = zombie_state_;
+        }
     }
+}
+
+static void
+s_client_finalize (s_client_t **self_p)
+{
+    s_client_t *self = *self_p;
+    free (self->hashkey);
+    client_terminate (&self->client);
+    free (self);
+    *self_p = NULL;
 }
 
 //  Callback when we remove client from 'clients' hash table
@@ -459,6 +503,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_PONG);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -480,6 +526,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_INVALID);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -500,6 +548,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send PUBLISH",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_PUBLISH);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -548,6 +598,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send PUBLISH",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_PUBLISH);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -560,6 +612,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_PONG);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -581,6 +635,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_INVALID);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -601,6 +657,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_PONG);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -622,6 +680,8 @@ s_client_execute (s_client_t *self, event_t event)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->server->message, ZGOSSIP_MSG_INVALID);
+                        zsys_debug ("%s: Send message to client", self->log_prefix);
+                        zgossip_msg_print (self->server->message);
                         zgossip_msg_set_routing_id (self->server->message, self->routing_id);
                         zgossip_msg_send (self->server->message, self->server->router);
                     }
@@ -633,6 +693,9 @@ s_client_execute (s_client_t *self, event_t event)
                     }
                 }
                 break;
+            case zombie_state_:
+                zsys_error ("%p: zombie client context used", self);
+                return;
         }
         //  If we had an exception event, interrupt normal programming
         if (self->exception) {
@@ -720,10 +783,12 @@ s_server_new (zsock_t *pipe)
     zsock_set_unbounded (self->router);
     self->message = zgossip_msg_new ();
     self->clients = zhash_new ();
+    self->zombies = zhash_new ();
     self->config = zconfig_new ("root", NULL);
     self->loop = zloop_new ();
     srandom ((unsigned int) zclock_time ());
     self->client_id = randof (1000);
+    zloop_set_verbose (self->loop, true);
     s_server_config_global (self);
 
     //  Initialize application server context
@@ -744,6 +809,13 @@ s_server_destroy (s_server_t **self_p)
         zgossip_msg_destroy (&self->message);
         //  Destroy clients before destroying the server
         zhash_destroy (&self->clients);
+        //  Forcibly destroy any zombie clients as we are shutting down
+        s_client_t *zombie = (s_client_t *)zhash_first (self->zombies);
+        while (zombie) {
+            s_client_finalize (&zombie);
+            zombie = (s_client_t *)zhash_next (self->zombies);
+        }
+        zhash_destroy (&self->zombies);
         server_terminate (&self->server);
         zsock_destroy (&self->router);
         zconfig_destroy (&self->config);
@@ -772,7 +844,8 @@ s_server_config_service (s_server_t *self)
         else
         if (streq (zconfig_name (section), "bind")) {
             char *endpoint = zconfig_get (section, "endpoint", "?");
-            if (zsock_bind (self->router, "%s", endpoint) == -1)
+            self->port = zsock_bind (self->router, "%s", endpoint);
+            if (self->port == -1)
                 zsys_warning ("could not bind to %s (%s)", endpoint, zmq_strerror (zmq_errno ()));
         }
 #if (ZMQ_VERSION_MAJOR >= 4)
@@ -780,32 +853,16 @@ s_server_config_service (s_server_t *self)
         if (streq (zconfig_name (section), "security")) {
             char *mechanism = zconfig_get (section, "mechanism", "null");
             char *domain = zconfig_get (section, "domain", NULL);
+            if (domain)
+                zsock_set_zap_domain (self->router, domain);
             if (streq (mechanism, "null")) {
                 zsys_notice ("server is using NULL security");
-                if (domain)
-                    zsock_set_zap_domain (self->router, NULL);
             }
             else
             if (streq (mechanism, "plain")) {
                 zsys_notice ("server is using PLAIN security");
                 zsock_set_plain_server (self->router, 1);
             }
-#ifdef CZMQ_BUILD_DRAFT_API
-            // TODO- zproto
-            // https://github.com/zeromq/zproto/blob/master/src/zproto_server_c.gsl#L883
-            else
-            if (streq (mechanism, "curve")) {
-                zsys_notice ("using CURVE security");
-                const char *keyfile = zconfig_get (section, "secret-key", NULL);
-                assert (keyfile);
-
-                zcert_t *server_cert = zcert_load(keyfile);
-                assert (server_cert);
-
-                zcert_apply (server_cert, self->router);
-                zsock_set_curve_server (self->router, 1);
-            }
-#endif
             else
                 zsys_warning ("mechanism=%s is not supported", mechanism);
         }
@@ -827,6 +884,9 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
     zmsg_t *msg = zmsg_recv (self->pipe);
     if (!msg)
         return -1;              //  Interrupted; exit zloop
+    zsys_debug ("API message:");
+    zmsg_print (msg);
+
     char *method = zmsg_popstr (msg);
     if (self->verbose)
         zsys_debug ("%s:     API command=%s", self->log_prefix, method);
@@ -844,26 +904,6 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
     if (streq (method, "BIND")) {
         //  Bind to a specified endpoint, which may use an ephemeral port
         char *endpoint = zmsg_popstr (msg);
-
-#ifdef CZMQ_BUILD_DRAFT_API
-        // TODO- expose self->router to application context ?
-        // Add secret|public|zap to gsl(?)
-        // move this block to custom server function when both keys are present
-        if (self->server.secret_key) {
-            zsock_set_zap_domain (self->router, self->server.zap_domain);
-            zcert_t *cert = zcert_new_from_txt(self->server.public_key, self->server.secret_key);
-            zcert_apply(cert, self->router);
-            zsock_set_curve_server (self->router, 1);
-            zcert_destroy(&cert);
-        }
-        // TODO- add this test in zproto_server_c.gsl
-#ifndef ZMQ_CURVE
-        // zmq legacy
-        bool ZMQ_CURVE = false;
-#endif
-        if (self->server.secret_key)
-            assert (zsock_mechanism (self->router) == ZMQ_CURVE);
-#endif
         self->port = zsock_bind (self->router, "%s", endpoint);
         if (self->port == -1)
             zsys_warning ("could not bind to %s", endpoint);
@@ -948,6 +988,8 @@ s_server_handle_protocol (zloop_t *loop, zsock_t *reader, void *argument)
             zhash_freefn (self->clients, hashkey, s_client_free);
         }
         free (hashkey);
+        zsys_debug ("%d: Client message", client->unique_id);
+        zgossip_msg_print (self->message);
         //  Any input from client counts as activity
         if (client->ticket)
             zloop_ticket_reset (self->loop, client->ticket);
