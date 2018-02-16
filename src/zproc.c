@@ -311,7 +311,7 @@ zproc_set_args (zproc_t *self, zlist_t **args_p) {
 
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run. Variadic function, must be NULL terminated.
-CZMQ_EXPORT void
+void
     zproc_set_argsx (zproc_t *self, const char *args, ...)
 {
     assert (self);
