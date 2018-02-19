@@ -409,7 +409,7 @@ zframe_set_group (zframe_t *self, const char *group)
     strcpy (self->group, group);
     return 0;
 #else
-    errno = EINVAL;
+    errno = ENOTSUP;
     return -1;
 #endif
 }

@@ -298,6 +298,7 @@ zsock_new_xpub_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;            //  Not implemented
 #endif
 }
@@ -321,6 +322,7 @@ zsock_new_xsub_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;            //  Not implemented
 #endif
 }
@@ -363,6 +365,7 @@ zsock_new_stream_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;            //  Not implemented
 #endif
 }
@@ -385,6 +388,7 @@ zsock_new_server_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -407,6 +411,7 @@ zsock_new_client_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -430,6 +435,7 @@ zsock_new_radio_checked (const char *endpoints, const char *filename, size_t lin
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -453,6 +459,7 @@ zsock_new_dish_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -476,6 +483,7 @@ zsock_new_gather_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -499,6 +507,7 @@ zsock_new_scatter_checked (const char *endpoints, const char *filename, size_t l
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -1736,7 +1745,7 @@ zsock_join (void *self, const char *group)
 #ifdef ZMQ_DISH
     return zmq_join (zsock_resolve (self), group);
 #else
-    errno = EINVAL;
+    errno = ENOTSUP;
     return -1;
 #endif
 }
@@ -1753,7 +1762,7 @@ zsock_leave (void *self, const char *group)
 #ifdef ZMQ_DISH
     return zmq_leave (zsock_resolve (self), group);
 #else
-    errno = EINVAL;
+    errno = ENOTSUP;
     return -1;
 #endif
 }
