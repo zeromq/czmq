@@ -2108,7 +2108,7 @@ zsock_test (bool verbose)
 #ifdef ZMQ_SERVER
 
     //  Test zsock_bsend/brecv pictures with binary encoding on SERVER and CLIENT sockets
-    server = zsock_new (ZMQ_SERVER);
+    zsock_t *server = zsock_new (ZMQ_SERVER);
     assert (server);
     port = zsock_bind (server, "tcp://127.0.0.1:*");
     assert (port != -1);
