@@ -1921,17 +1921,17 @@ zsock_test (bool verbose)
     assert (port >= 60000 && port <= 60500);
 
     //  Test zsock_attach method
-    zsock_t *server = zsock_new (ZMQ_DEALER);
-    assert (server);
-    rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:*,inproc://others", true);
+    zsock_t *dealer = zsock_new (ZMQ_DEALER);
+    assert (dealer);
+    rc = zsock_attach (dealer, "@inproc://myendpoint,tcp://127.0.0.1:*,inproc://others", true);
     assert (rc == 0);
-    rc = zsock_attach (server, "", false);
+    rc = zsock_attach (dealer, "", false);
     assert (rc == 0);
-    rc = zsock_attach (server, NULL, true);
+    rc = zsock_attach (dealer, NULL, true);
     assert (rc == 0);
-    rc = zsock_attach (server, ">a,@b, c,, ", false);
+    rc = zsock_attach (dealer, ">a,@b, c,, ", false);
     assert (rc == -1);
-    zsock_destroy (&server);
+    zsock_destroy (&dealer);
 
     //  Test zsock_endpoint method
     rc = zsock_bind (writer, "inproc://test.%s", "writer");
