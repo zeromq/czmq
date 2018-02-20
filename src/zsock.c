@@ -298,6 +298,7 @@ zsock_new_xpub_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
+    // errno = ENOTSUP;      // too late, stable API would be broken
     return NULL;            //  Not implemented
 #endif
 }
@@ -321,6 +322,7 @@ zsock_new_xsub_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
+    // errno = ENOTSUP;      // too late, stable API would be broken
     return NULL;            //  Not implemented
 #endif
 }
@@ -363,6 +365,7 @@ zsock_new_stream_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    // errno = ENOTSUP;      // too late, stable API would be broken
     return NULL;            //  Not implemented
 #endif
 }
@@ -385,6 +388,7 @@ zsock_new_server_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -407,6 +411,7 @@ zsock_new_client_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -430,6 +435,7 @@ zsock_new_radio_checked (const char *endpoints, const char *filename, size_t lin
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -453,6 +459,7 @@ zsock_new_dish_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -476,6 +483,7 @@ zsock_new_gather_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -499,6 +507,7 @@ zsock_new_scatter_checked (const char *endpoints, const char *filename, size_t l
         zsock_destroy (&sock);
     return sock;
 #else
+    errno = ENOTSUP;
     return NULL;
 #endif
 }
@@ -1736,7 +1745,7 @@ zsock_join (void *self, const char *group)
 #ifdef ZMQ_DISH
     return zmq_join (zsock_resolve (self), group);
 #else
-    errno = EINVAL;
+    errno = ENOTSUP;
     return -1;
 #endif
 }
@@ -1753,7 +1762,7 @@ zsock_leave (void *self, const char *group)
 #ifdef ZMQ_DISH
     return zmq_leave (zsock_resolve (self), group);
 #else
-    errno = EINVAL;
+    errno = ENOTSUP;
     return -1;
 #endif
 }
@@ -1912,17 +1921,17 @@ zsock_test (bool verbose)
     assert (port >= 60000 && port <= 60500);
 
     //  Test zsock_attach method
-    zsock_t *server = zsock_new (ZMQ_DEALER);
-    assert (server);
-    rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:*,inproc://others", true);
+    zsock_t *dealer = zsock_new (ZMQ_DEALER);
+    assert (dealer);
+    rc = zsock_attach (dealer, "@inproc://myendpoint,tcp://127.0.0.1:*,inproc://others", true);
     assert (rc == 0);
-    rc = zsock_attach (server, "", false);
+    rc = zsock_attach (dealer, "", false);
     assert (rc == 0);
-    rc = zsock_attach (server, NULL, true);
+    rc = zsock_attach (dealer, NULL, true);
     assert (rc == 0);
-    rc = zsock_attach (server, ">a,@b, c,, ", false);
+    rc = zsock_attach (dealer, ">a,@b, c,, ", false);
     assert (rc == -1);
-    zsock_destroy (&server);
+    zsock_destroy (&dealer);
 
     //  Test zsock_endpoint method
     rc = zsock_bind (writer, "inproc://test.%s", "writer");
@@ -2099,7 +2108,7 @@ zsock_test (bool verbose)
 #ifdef ZMQ_SERVER
 
     //  Test zsock_bsend/brecv pictures with binary encoding on SERVER and CLIENT sockets
-    server = zsock_new (ZMQ_SERVER);
+    zsock_t *server = zsock_new (ZMQ_SERVER);
     assert (server);
     port = zsock_bind (server, "tcp://127.0.0.1:*");
     assert (port != -1);
@@ -2165,6 +2174,16 @@ zsock_test (bool verbose)
     zsock_destroy (&client);
     zsock_destroy (&server);
 
+#else
+    errno = 0;
+    zsock_t* server = zsock_new_server (NULL);
+    assert(server == NULL);
+    assert(errno == ENOTSUP);
+
+    errno = 0;
+    zsock_t* client = zsock_new_client (NULL);
+    assert(client == NULL);
+    assert(errno == ENOTSUP);
 #endif
 
 #ifdef ZMQ_SCATTER
@@ -2184,7 +2203,39 @@ zsock_test (bool verbose)
 
     zsock_destroy (&gather);
     zsock_destroy (&scatter);
+#else
+    errno = 0;
+    zsock_t* scatter = zsock_new_scatter (NULL);
+    assert(scatter == NULL);
+    assert(errno == ENOTSUP);
 
+    errno = 0;
+    zsock_t* gather = zsock_new_gather (NULL);
+    assert(gather == NULL);
+    assert(errno == ENOTSUP);
+#endif
+
+#ifndef ZMQ_RADIO
+    errno = 0;
+    zsock_t* radio = zsock_new_radio (NULL);
+    assert(radio == NULL);
+    assert(errno == ENOTSUP);
+
+    errno = 0;
+    zsock_t* dish = zsock_new_dish (NULL);
+    assert(dish == NULL);
+    assert(errno == ENOTSUP);
+
+    errno = 0;
+    zsock_t* sock = zsock_new_req (NULL); // any supported socket type
+    rc = zsock_join (sock, "group1");
+    assert(rc == -1);
+    assert(errno == ENOTSUP);
+    errno = 0;
+    rc = zsock_leave (sock, "group1");
+    assert(rc == -1);
+    assert(errno == ENOTSUP);
+    zsock_destroy (&sock);
 #endif
 
     //  Check that we can send a zproto format message
