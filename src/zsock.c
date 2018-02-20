@@ -322,7 +322,7 @@ zsock_new_xsub_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
-    errno = ENOTSUP;
+    // errno = ENOTSUP;      // too late, stable API would be broken
     return NULL;            //  Not implemented
 #endif
 }
