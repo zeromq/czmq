@@ -2174,6 +2174,16 @@ zsock_test (bool verbose)
     zsock_destroy (&client);
     zsock_destroy (&server);
 
+#else
+    errno = 0;
+    zsock_t* server = zsock_new_server (NULL);
+    assert(server == NULL);
+    assert(errno == ENOTSUP);
+
+    errno = 0;
+    zsock_t* client = zsock_new_client (NULL);
+    assert(client == NULL);
+    assert(errno == ENOTSUP);
 #endif
 
 #ifdef ZMQ_SCATTER
@@ -2193,8 +2203,53 @@ zsock_test (bool verbose)
 
     zsock_destroy (&gather);
     zsock_destroy (&scatter);
+#else
+    errno = 0;
+    zsock_t* scatter = zsock_new_scatter (NULL);
+    assert(scatter == NULL);
+    assert(errno == ENOTSUP);
 
+    errno = 0;
+    zsock_t* gather = zsock_new_gather (NULL);
+    assert(gather == NULL);
+    assert(errno == ENOTSUP);
 #endif
+
+#ifndef ZMQ_RADIO
+    errno = 0;
+    zsock_t* radio = zsock_new_radio (NULL);
+    assert(radio == NULL);
+    assert(errno == ENOTSUP);
+
+    errno = 0;
+    zsock_t* dish = zsock_new_dish (NULL);
+    assert(dish == NULL);
+    assert(errno == ENOTSUP);
+
+    errno = 0;
+    zsock_t* sock = zsock_new_req (NULL); // any supported socket type
+    rc = zsock_join (sock, "group1");
+    assert(rc == -1);
+    assert(errno == ENOTSUP);
+    errno = 0;
+    rc = zsock_leave (sock, "group1");
+    assert(rc == -1);
+    assert(errno == ENOTSUP);
+    zsock_destroy (&sock);
+#endif
+
+#ifndef ZMQ_XPUB
+    errno = 0;
+    zsock_t* xpub = zsock_new_xpub (NULL);
+    assert(xpub == NULL);
+    assert(errno == ENOTSUP);
+
+    errno = 0;
+    zsock_t* xsub = zsock_new_xsub (NULL);
+    assert(xsub == NULL);
+    assert(errno == ENOTSUP);
+#endif
+
 
     //  Check that we can send a zproto format message
     zsock_bsend (writer, "1111sS4", 0xAA, 0xA0, 0x02, 0x01, "key", "value", 1234);

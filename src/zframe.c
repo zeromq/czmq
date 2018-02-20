@@ -745,6 +745,12 @@ zframe_test (bool verbose)
 
     zsock_destroy (&dish);
     zsock_destroy (&radio);
+#else
+    frame = zframe_new ("Hello", 5);
+    rc = zframe_set_group (frame, "World");
+    assert(rc == -1);
+    assert(errno == ENOTSUP);
+    zframe_destroy (&frame);
 #endif
 
 #if defined (__WINDOWS__)
