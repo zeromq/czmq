@@ -298,7 +298,7 @@ zsock_new_xpub_checked (const char *endpoints, const char *filename, size_t line
         zsock_destroy (&sock);
     return sock;
 #else
-    errno = ENOTSUP;
+    // errno = ENOTSUP;      // too late, stable API would be broken
     return NULL;            //  Not implemented
 #endif
 }
@@ -365,7 +365,7 @@ zsock_new_stream_checked (const char *endpoints, const char *filename, size_t li
         zsock_destroy (&sock);
     return sock;
 #else
-    errno = ENOTSUP;
+    // errno = ENOTSUP;      // too late, stable API would be broken
     return NULL;            //  Not implemented
 #endif
 }
@@ -2237,19 +2237,6 @@ zsock_test (bool verbose)
     assert(errno == ENOTSUP);
     zsock_destroy (&sock);
 #endif
-
-#ifndef ZMQ_XPUB
-    errno = 0;
-    zsock_t* xpub = zsock_new_xpub (NULL);
-    assert(xpub == NULL);
-    assert(errno == ENOTSUP);
-
-    errno = 0;
-    zsock_t* xsub = zsock_new_xsub (NULL);
-    assert(xsub == NULL);
-    assert(errno == ENOTSUP);
-#endif
-
 
     //  Check that we can send a zproto format message
     zsock_bsend (writer, "1111sS4", 0xAA, 0xA0, 0x02, 0x01, "key", "value", 1234);
