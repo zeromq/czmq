@@ -2251,6 +2251,11 @@ zproc_t *
 void
     zproc_destroy (zproc_t **self_p);
 
+// Return command line arguments (the first item is the executable) or
+// NULL if not set.
+zlist_t *
+    zproc_args (zproc_t *self);
+
 // Setup the command line arguments, the first item must be an (absolute) filename
 // to run.
 void

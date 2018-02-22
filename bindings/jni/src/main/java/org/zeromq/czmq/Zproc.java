@@ -39,6 +39,14 @@ public class Zproc implements AutoCloseable{
         self = 0;
     }
     /*
+    Return command line arguments (the first item is the executable) or
+    NULL if not set.
+    */
+    native static long __args (long self);
+    public Zlist args () {
+        return new Zlist (__args (self));
+    }
+    /*
     Setup the command line arguments, the first item must be an (absolute) filename
     to run.
     */

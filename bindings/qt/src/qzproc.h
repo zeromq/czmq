@@ -25,6 +25,10 @@ public:
     //  Destroy zproc, wait until process ends.
     ~QZproc ();
 
+    //  Return command line arguments (the first item is the executable) or
+    //  NULL if not set.
+    QZlist * args ();
+
     //  Setup the command line arguments, the first item must be an (absolute) filename
     //  to run.
     void setArgs (QZlist *arguments);

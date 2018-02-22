@@ -2186,6 +2186,13 @@ my_zproc.destroy ()
 Methods:
 
 ```
+zlist my_zproc.args ()
+```
+
+Return command line arguments (the first item is the executable) or
+NULL if not set.
+
+```
 nothing my_zproc.setArgs (Zlist)
 ```
 

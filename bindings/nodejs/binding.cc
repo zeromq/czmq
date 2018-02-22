@@ -4213,6 +4213,7 @@ NAN_MODULE_INIT (Zproc::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "args", _args);
     Nan::SetPrototypeMethod (tpl, "setArgs", _set_args);
     Nan::SetPrototypeMethod (tpl, "setArgsx", _set_argsx);
     Nan::SetPrototypeMethod (tpl, "setEnv", _set_env);
@@ -4259,6 +4260,18 @@ NAN_METHOD (Zproc::destroy) {
 NAN_METHOD (Zproc::defined) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zproc->self != NULL));
+}
+
+NAN_METHOD (Zproc::_args) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    zlist_t *result = zproc_args (zproc->self);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
 }
 
 NAN_METHOD (Zproc::_set_args) {

@@ -305,6 +305,17 @@ coverage: src/czmq_selftest
 	@exit 1
 endif
 
+# A series of tests that the codebase and recipes are pretty, easy
+# to maintain and with predictable behavior. These generally are not
+# expected to directly expose functional issues in the code, but
+# still - there can be many reasons for failing such tests, and
+# many lurking issues uncoverable by making code stylish again.
+CHECK_STYLE_DEPS = check-gitignore
+if WITH_CLANG_FORMAT
+CHECK_STYLE_DEPS += clang-format-check
+endif
+check-style: $(CHECK_STYLE_DEPS)
+
 if WITH_CLANG_FORMAT
 ALL_SOURCE_FILES = $(wildcard \
 	$(top_srcdir)/src/*.c \
@@ -372,6 +383,41 @@ cppcheck.xml:
 	@echo "Performing cppcheck static analysis..."
 	cppcheck --enable=all --inconclusive --xml --xml-version=2 . 2>"$@"
 	@echo "The cppcheck static analysis is done"
+
+# Note: this recipe tests that the Git-based workspace reports no changed
+# or untracked files - meaning there are no unexpected behaviors in the
+# recipes (when checking after a build), and nothing was missed while
+# updating the project structure (when checking in the midst of development
+# or after regenerating the zproject skeletons), for example. For best
+# results, developers are advised to also run this after executing their
+# tests, to make sure they are stateless and clean as well. Caller may
+# export envvar (or pass make argument) CI_REQUIRE_GOOD_GITIGNORE=false
+# to explicitly disable fatality of this check, while still logging it.
+
+# This recipe is "stateless" by itself, not causing any workspace changes:
+check-gitignore:
+	@(if which git >/dev/null 2>&1 ; then \
+	     RES=0; \
+	     echo "Checking for untracked and not-ignored files in the workspace (should have no output below)..."; \
+	     git status -s | egrep '^\?\? ' && RES=1 ; \
+	     echo "Checking for modified tracked files in the workspace (should have no output below)..."; \
+	     git status -s | egrep '^ *M ' && RES=1 && git diff | cat ; \
+	     if [ "$$RES" = 0 ]; then \
+	         echo "PASS: $@"; exit 0 ; \
+	     else \
+	         if [ x"$(CI_REQUIRE_GOOD_GITIGNORE)" = xfalse ] ; then \
+	             echo "WARNING: $@ found newly changed or untracked and not-ignored files (not a test failure due to CI_REQUIRE_GOOD_GITIGNORE==false)"; exit 0 ; \
+	         fi; \
+	         echo "FAIL: $@ (see workspace checks above)"; exit 1; \
+	     fi; \
+	   else \
+	     echo "SKIP: $@ (no git)"; exit 0 ; \
+	   fi )
+
+# This calls the recipe above after building the project products and
+# the selftest binary, and preparing the workspace for self-testing:
+check-gitignore-all: all src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$@$(MAKE) check-gitignore
 
 
 ################################################################################

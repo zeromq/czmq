@@ -4816,6 +4816,8 @@ lib.zproc_new.restype = zproc_p
 lib.zproc_new.argtypes = []
 lib.zproc_destroy.restype = None
 lib.zproc_destroy.argtypes = [POINTER(zproc_p)]
+lib.zproc_args.restype = zlist_p
+lib.zproc_args.argtypes = [zproc_p]
 lib.zproc_set_args.restype = None
 lib.zproc_set_args.argtypes = [zproc_p, POINTER(zlist_p)]
 lib.zproc_set_argsx.restype = None
@@ -4902,6 +4904,13 @@ returns NULL. Code needs to be ported there.
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    def args(self):
+        """
+        Return command line arguments (the first item is the executable) or
+NULL if not set.
+        """
+        return Zlist(lib.zproc_args(self._as_parameter_), True)
 
     def set_args(self, arguments):
         """
