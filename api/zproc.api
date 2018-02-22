@@ -20,6 +20,11 @@
         Destroy zproc, wait until process ends.
     </destructor>
 
+    <method name = "args" >
+        Return command line arguments, the first item is the executable.
+        <return type = "zlist" fresh = "1" />
+    </method>
+
     <method name = "set args" >
         Setup the command line arguments, the first item must be an (absolute) filename
         to run.
