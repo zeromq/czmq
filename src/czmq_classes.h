@@ -395,7 +395,7 @@ CZMQ_PRIVATE void
 
 //  Self test for private classes
 CZMQ_PRIVATE void
-    czmq_private_selftest (bool verbose);
+    czmq_private_selftest (bool verbose, const char *subtest);
 
 #endif // CZMQ_BUILD_DRAFT_API
 

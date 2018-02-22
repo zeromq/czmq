@@ -21,55 +21,64 @@
 
 #include "czmq_classes.h"
 
+#include <stdio.h>
+#include <string.h>
+
 typedef struct {
-    const char *testname;
-    void (*test) (bool);
+    const char *testname;           // test name, can be called from command line this way
+    void (*test) (bool);            // function to run the test (or NULL for private tests)
+    bool stable;                    // true if class is declared as stable
+    bool pub;                       // true if class is declared as public
+    const char *subtest;            // name of private subtest to run
 } test_item_t;
 
 static test_item_t
 all_tests [] = {
 // Tests for stable public classes:
-    { "zactor", zactor_test },
-    { "zarmour", zarmour_test },
-    { "zcert", zcert_test },
-    { "zcertstore", zcertstore_test },
-    { "zchunk", zchunk_test },
-    { "zclock", zclock_test },
-    { "zconfig", zconfig_test },
-    { "zdigest", zdigest_test },
-    { "zdir", zdir_test },
-    { "zdir_patch", zdir_patch_test },
-    { "zfile", zfile_test },
-    { "zframe", zframe_test },
-    { "zhash", zhash_test },
-    { "zhashx", zhashx_test },
-    { "ziflist", ziflist_test },
-    { "zlist", zlist_test },
-    { "zlistx", zlistx_test },
-    { "zloop", zloop_test },
-    { "zmsg", zmsg_test },
-    { "zpoller", zpoller_test },
-    { "zsock", zsock_test },
-    { "zstr", zstr_test },
-    { "zsys", zsys_test },
-    { "zuuid", zuuid_test },
-    { "zauth", zauth_test },
-    { "zbeacon", zbeacon_test },
-    { "zgossip", zgossip_test },
-    { "zmonitor", zmonitor_test },
-    { "zproxy", zproxy_test },
-    { "zrex", zrex_test },
+    { "zactor", zactor_test, true, true, NULL },
+    { "zarmour", zarmour_test, true, true, NULL },
+    { "zcert", zcert_test, true, true, NULL },
+    { "zcertstore", zcertstore_test, true, true, NULL },
+    { "zchunk", zchunk_test, true, true, NULL },
+    { "zclock", zclock_test, true, true, NULL },
+    { "zconfig", zconfig_test, true, true, NULL },
+    { "zdigest", zdigest_test, true, true, NULL },
+    { "zdir", zdir_test, true, true, NULL },
+    { "zdir_patch", zdir_patch_test, true, true, NULL },
+    { "zfile", zfile_test, true, true, NULL },
+    { "zframe", zframe_test, true, true, NULL },
+    { "zhash", zhash_test, true, true, NULL },
+    { "zhashx", zhashx_test, true, true, NULL },
+    { "ziflist", ziflist_test, true, true, NULL },
+    { "zlist", zlist_test, true, true, NULL },
+    { "zlistx", zlistx_test, true, true, NULL },
+    { "zloop", zloop_test, true, true, NULL },
+    { "zmsg", zmsg_test, true, true, NULL },
+    { "zpoller", zpoller_test, true, true, NULL },
+    { "zsock", zsock_test, true, true, NULL },
+    { "zstr", zstr_test, true, true, NULL },
+    { "zsys", zsys_test, true, true, NULL },
+    { "zuuid", zuuid_test, true, true, NULL },
+    { "zauth", zauth_test, true, true, NULL },
+    { "zbeacon", zbeacon_test, true, true, NULL },
+    { "zgossip", zgossip_test, true, true, NULL },
+    { "zmonitor", zmonitor_test, true, true, NULL },
+    { "zproxy", zproxy_test, true, true, NULL },
+    { "zrex", zrex_test, true, true, NULL },
 #ifdef CZMQ_BUILD_DRAFT_API
 // Tests for draft public classes:
-    { "zargs", zargs_test },
-    { "zproc", zproc_test },
-    { "ztimerset", ztimerset_test },
-    { "ztrie", ztrie_test },
+    { "zargs", zargs_test, false, true, NULL },
+    { "zproc", zproc_test, false, true, NULL },
+    { "ztimerset", ztimerset_test, false, true, NULL },
+    { "ztrie", ztrie_test, false, true, NULL },
 #endif // CZMQ_BUILD_DRAFT_API
 #ifdef CZMQ_BUILD_DRAFT_API
-    { "private_classes", czmq_private_selftest },
+// Tests for stable/draft private classes:
+// Now built only with --enable-drafts, so even stable builds are hidden behind the flag
+    { "zgossip_msg", NULL, true, false, "zgossip_msg_test" },
+    { "private_classes", NULL, false, false, "$ALL" }, // compat option for older projects
 #endif // CZMQ_BUILD_DRAFT_API
-    {0, 0}          //  Sentinel
+    {0, 0, 0}          //  Sentinel
 };
 
 //  -------------------------------------------------------------------------
@@ -81,8 +90,8 @@ test_item_t *
 test_available (const char *testname)
 {
     test_item_t *item;
-    for (item = all_tests; item->test; item++) {
-        if (streq (testname, item->testname))
+    for (item = all_tests; item->testname; item++) {
+        if (strcmp (testname, item->testname) == 0)
             return item;
     }
     return NULL;
@@ -97,10 +106,41 @@ test_runall (bool verbose)
 {
     test_item_t *item;
     printf ("Running czmq selftests...\n");
-    for (item = all_tests; item->test; item++)
-        item->test (verbose);
+    for (item = all_tests; item->testname; item++) {
+        if (strcmp (item->testname, "private_classes") == 0)
+            continue;
+        if (!item->subtest)
+            item->test (verbose);
+        else
+            czmq_private_selftest (verbose, item->subtest);
+    }
 
     printf ("Tests passed OK\n");
+}
+
+static void
+test_list (void)
+{
+    test_item_t *item;
+    puts ("Available tests:");
+    for (item = all_tests; item->testname; item++)
+        printf ("    %-40s - %s	%s\n",
+            item->testname,
+            item->stable ? "stable" : "draft",
+            item->pub ? "public" : "private"
+        );
+}
+
+static void
+test_number (void)
+{
+    int n = 0;
+    test_item_t *item;
+    for (item = all_tests; item->testname; item++) {
+        if (! strcmp (item->testname, "private_classes") == 0)
+            n++;
+    }
+    printf ("%d\n", n);
 }
 
 int
@@ -110,8 +150,8 @@ main (int argc, char **argv)
     test_item_t *test = 0;
     int argn;
     for (argn = 1; argn < argc; argn++) {
-        if (streq (argv [argn], "--help")
-        ||  streq (argv [argn], "-h")) {
+        if (strcmp (argv [argn], "--help") == 0
+        ||  strcmp (argv [argn], "-h") == 0) {
             puts ("czmq_selftest.c [options] ...");
             puts ("  --verbose / -v         verbose test output");
             puts ("  --number / -n          report number of tests");
@@ -120,59 +160,24 @@ main (int argc, char **argv)
             puts ("  --continue / -c        continue on exception (on Windows)");
             return 0;
         }
-        if (streq (argv [argn], "--verbose")
-        ||  streq (argv [argn], "-v"))
+        if (strcmp (argv [argn], "--verbose") == 0
+        ||  strcmp (argv [argn], "-v") == 0)
             verbose = true;
         else
-        if (streq (argv [argn], "--number")
-        ||  streq (argv [argn], "-n")) {
-            puts ("35");
+        if (strcmp (argv [argn], "--number") == 0
+        ||  strcmp (argv [argn], "-n") == 0) {
+            test_number ();
             return 0;
         }
         else
-        if (streq (argv [argn], "--list")
-        ||  streq (argv [argn], "-l")) {
-            puts ("Available tests:");
-            puts ("    zactor\t\t- stable");
-            puts ("    zargs\t\t- draft");
-            puts ("    zarmour\t\t- stable");
-            puts ("    zcert\t\t- stable");
-            puts ("    zcertstore\t\t- stable");
-            puts ("    zchunk\t\t- stable");
-            puts ("    zclock\t\t- stable");
-            puts ("    zconfig\t\t- stable");
-            puts ("    zdigest\t\t- stable");
-            puts ("    zdir\t\t- stable");
-            puts ("    zdir_patch\t\t- stable");
-            puts ("    zfile\t\t- stable");
-            puts ("    zframe\t\t- stable");
-            puts ("    zhash\t\t- stable");
-            puts ("    zhashx\t\t- stable");
-            puts ("    ziflist\t\t- stable");
-            puts ("    zlist\t\t- stable");
-            puts ("    zlistx\t\t- stable");
-            puts ("    zloop\t\t- stable");
-            puts ("    zmsg\t\t- stable");
-            puts ("    zpoller\t\t- stable");
-            puts ("    zproc\t\t- draft");
-            puts ("    zsock\t\t- stable");
-            puts ("    zstr\t\t- stable");
-            puts ("    zsys\t\t- stable");
-            puts ("    ztimerset\t\t- draft");
-            puts ("    ztrie\t\t- draft");
-            puts ("    zuuid\t\t- stable");
-            puts ("    zauth\t\t- stable");
-            puts ("    zbeacon\t\t- stable");
-            puts ("    zgossip\t\t- stable");
-            puts ("    zmonitor\t\t- stable");
-            puts ("    zproxy\t\t- stable");
-            puts ("    zrex\t\t- stable");
-            puts ("    private_classes\t- draft");
+        if (strcmp (argv [argn], "--list") == 0
+        ||  strcmp (argv [argn], "-l") == 0) {
+            test_list ();
             return 0;
         }
         else
-        if (streq (argv [argn], "--test")
-        ||  streq (argv [argn], "-t")) {
+        if (strcmp (argv [argn], "--test") == 0
+        ||  strcmp (argv [argn], "-t") == 0) {
             argn++;
             if (argn >= argc) {
                 fprintf (stderr, "--test needs an argument\n");
@@ -185,8 +190,8 @@ main (int argc, char **argv)
             }
         }
         else
-        if (streq (argv [argn], "--continue")
-        ||  streq (argv [argn], "-c")) {
+        if (strcmp (argv [argn], "--continue") == 0
+        ||  strcmp (argv [argn], "-c") == 0) {
 #ifdef _MSC_VER
             //  When receiving an abort signal, only print to stderr (no dialog)
             _set_abort_behavior (0, _WRITE_ABORT_MSG);
@@ -205,7 +210,10 @@ main (int argc, char **argv)
 
     if (test) {
         printf ("Running czmq test '%s'...\n", test->testname);
-        test->test (verbose);
+        if (!test->subtest)
+            test->test (verbose);
+        else
+            czmq_private_selftest (verbose, test->subtest);
     }
     else
         test_runall (verbose);
