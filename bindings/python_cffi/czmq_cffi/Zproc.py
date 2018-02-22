@@ -26,6 +26,13 @@ class Zproc(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zproc_destroy_py)
 
+    def args(self):
+        """
+        Return command line arguments (the first item is the executable) or
+        NULL if not set.
+        """
+        return utils.lib.zproc_args(self._p)
+
     def set_args(self, arguments):
         """
         Setup the command line arguments, the first item must be an (absolute) filename

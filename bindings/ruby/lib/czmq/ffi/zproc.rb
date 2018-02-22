@@ -92,6 +92,18 @@ module CZMQ
         result
       end
 
+      # Return command line arguments (the first item is the executable) or
+      # NULL if not set.
+      #
+      # @return [Zlist]
+      def args()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_args(self_p)
+        result = Zlist.__new result, true
+        result
+      end
+
       # Setup the command line arguments, the first item must be an (absolute) filename
       # to run.
       #

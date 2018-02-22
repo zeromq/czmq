@@ -28,6 +28,10 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZproc.cpp
 
 public slots:
+    //  Return command line arguments (the first item is the executable) or
+    //  NULL if not set.
+    QmlZlist *args ();
+
     //  Setup the command line arguments, the first item must be an (absolute) filename
     //  to run.
     void setArgs (QmlZlist *arguments);

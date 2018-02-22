@@ -9,6 +9,15 @@
 
 
 ///
+//  Return command line arguments (the first item is the executable) or
+//  NULL if not set.
+QmlZlist *QmlZproc::args () {
+    QmlZlist *retQ_ = new QmlZlist ();
+    retQ_->self = zproc_args (self);
+    return retQ_;
+};
+
+///
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
 void QmlZproc::setArgs (QmlZlist *arguments) {

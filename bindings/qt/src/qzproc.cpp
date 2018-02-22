@@ -32,6 +32,15 @@ QZproc::~QZproc ()
 }
 
 ///
+//  Return command line arguments (the first item is the executable) or
+//  NULL if not set.
+QZlist * QZproc::args ()
+{
+    QZlist *rv = new QZlist (zproc_args (self));
+    return rv;
+}
+
+///
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
 void QZproc::setArgs (QZlist *arguments)
