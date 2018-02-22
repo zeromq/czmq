@@ -39,7 +39,8 @@ CZMQ_EXPORT void
     zproc_destroy (zproc_t **self_p);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return command line arguments, the first item is the executable.
+//  Return command line arguments (the first item is the executable) or
+//  NULL if not set.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlist_t *
     zproc_args (zproc_t *self);

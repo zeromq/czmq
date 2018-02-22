@@ -21,7 +21,8 @@
     </destructor>
 
     <method name = "args" >
-        Return command line arguments, the first item is the executable.
+        Return command line arguments (the first item is the executable) or
+        NULL if not set.
         <return type = "zlist" fresh = "1" />
     </method>
 
