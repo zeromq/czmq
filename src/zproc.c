@@ -299,6 +299,24 @@ zproc_destroy (zproc_t **self_p) {
     }
 }
 
+//  --------------------------------------------------------------------------
+//  Return command line arguments (the first item is the executable) or
+//  NULL if not set.
+//  Caller owns return value and must destroy it when done.
+
+zlist_t *
+zproc_args (zproc_t *self)
+{
+    assert (self);
+    if (self->args) {
+        zlist_t *args_dup = zlist_dup (self->args);
+        assert (args_dup);
+        return args_dup;
+    }
+    return NULL;
+}
+
+
 void
 zproc_set_args (zproc_t *self, zlist_t **args_p) {
     assert (self);
