@@ -111,8 +111,10 @@ test_runall (bool verbose)
             continue;
         if (!item->subtest)
             item->test (verbose);
+#ifdef CZMQ_BUILD_DRAFT_API // selftest is still in draft
         else
             czmq_private_selftest (verbose, item->subtest);
+#endif // CZMQ_BUILD_DRAFT_API
     }
 
     printf ("Tests passed OK\n");
@@ -137,7 +139,7 @@ test_number (void)
     int n = 0;
     test_item_t *item;
     for (item = all_tests; item->testname; item++) {
-        if (! strcmp (item->testname, "private_classes") == 0)
+        if (strcmp (item->testname, "private_classes") == 0)
             n++;
     }
     printf ("%d\n", n);
@@ -212,8 +214,10 @@ main (int argc, char **argv)
         printf ("Running czmq test '%s'...\n", test->testname);
         if (!test->subtest)
             test->test (verbose);
+#ifdef CZMQ_BUILD_DRAFT_API // selftest is still in draft
         else
             czmq_private_selftest (verbose, test->subtest);
+#endif // CZMQ_BUILD_DRAFT_API
     }
     else
         test_runall (verbose);
