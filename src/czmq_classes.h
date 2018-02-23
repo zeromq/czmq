@@ -44,8 +44,8 @@ typedef struct _zgossip_msg_t zgossip_msg_t;
 //
 // An example - to send $KTHXBAI string
 //
-//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)
-//         zsock_wait (self->pipe);
+//     if (zstr_send (self, "$KTHXBAI") == 0)
+//         zsock_wait (self);
 typedef void (zactor_destructor_fn) (
     zactor_t *self);
 
