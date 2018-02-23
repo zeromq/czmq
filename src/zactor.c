@@ -300,8 +300,8 @@ KTHXBAI_actor (zsock_t *pipe, void *args) {
 static void
 KTHXBAI_destructor (zactor_t *self) {
     assert (self);
-    if (zstr_send (self->pipe, "$KTHXBAI") == 0)
-        zsock_wait (self->pipe);
+    if (zstr_send (self, "$KTHXBAI") == 0)
+        zsock_wait (self);
 }
 
 static void

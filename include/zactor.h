@@ -73,8 +73,8 @@ CZMQ_EXPORT void
 //
 // An example - to send $KTHXBAI string
 //
-//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)
-//         zsock_wait (self->pipe);
+//     if (zstr_send (pipe, "$KTHXBAI") == 0)
+//         zsock_wait (pipe);
 typedef void (zactor_destructor_fn) (
     zactor_t *self);
 
