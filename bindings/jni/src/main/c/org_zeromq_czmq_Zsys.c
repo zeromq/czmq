@@ -271,6 +271,19 @@ Java_org_zeromq_czmq_Zsys__1_1maxMsgsz (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1setZeroCopyRecv (JNIEnv *env, jclass c, jint zero_copy)
+{
+    zsys_set_zero_copy_recv ((int) zero_copy);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsys__1_1zeroCopyRecv (JNIEnv *env, jclass c)
+{
+    jint zero_copy_recv_ = (jint) zsys_zero_copy_recv ();
+    return zero_copy_recv_;
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsys__1_1setFileStableAgeMsec (JNIEnv *env, jclass c, jlong file_stable_age_msec)
 {
     zsys_set_file_stable_age_msec ((int64_t) file_stable_age_msec);

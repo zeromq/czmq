@@ -284,6 +284,18 @@ CZMQ_PRIVATE void
     zsys_set_interrupted (void);
 
 //  *** Draft method, defined for internal use only ***
+//  Configure whether to use zero copy strategy in libzmq. If the environment
+//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+//  Otherwise the default is 1.
+CZMQ_PRIVATE void
+    zsys_set_zero_copy_recv (int zero_copy);
+
+//  *** Draft method, defined for internal use only ***
+//  Return ZMQ_ZERO_COPY_RECV option.
+CZMQ_PRIVATE int
+    zsys_zero_copy_recv (void);
+
+//  *** Draft method, defined for internal use only ***
 //  Configure the threshold value of filesystem object age per st_mtime
 //  that should elapse until we consider that object "stable" at the
 //  current zclock_time() moment.

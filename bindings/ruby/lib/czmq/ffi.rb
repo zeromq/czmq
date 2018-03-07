@@ -779,6 +779,8 @@ module CZMQ
       attach_function :zsys_socket_limit, [], :size_t, **opts
       attach_function :zsys_set_max_msgsz, [:int], :void, **opts
       attach_function :zsys_max_msgsz, [], :int, **opts
+      attach_function :zsys_set_zero_copy_recv, [:int], :void, **opts
+      attach_function :zsys_zero_copy_recv, [], :int, **opts
       attach_function :zsys_set_file_stable_age_msec, [:pointer], :void, **opts
       attach_function :zsys_file_stable_age_msec, [], :pointer, **opts
       attach_function :zsys_set_linger, [:size_t], :void, **opts

@@ -6866,6 +6866,8 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "socketLimit", _socket_limit);
     Nan::SetPrototypeMethod (tpl, "setMaxMsgsz", _set_max_msgsz);
     Nan::SetPrototypeMethod (tpl, "maxMsgsz", _max_msgsz);
+    Nan::SetPrototypeMethod (tpl, "setZeroCopyRecv", _set_zero_copy_recv);
+    Nan::SetPrototypeMethod (tpl, "zeroCopyRecv", _zero_copy_recv);
     Nan::SetPrototypeMethod (tpl, "setFileStableAgeMsec", _set_file_stable_age_msec);
     Nan::SetPrototypeMethod (tpl, "fileStableAgeMsec", _file_stable_age_msec);
     Nan::SetPrototypeMethod (tpl, "setLinger", _set_linger);
@@ -7302,6 +7304,28 @@ NAN_METHOD (Zsys::_set_max_msgsz) {
 
 NAN_METHOD (Zsys::_max_msgsz) {
     int result = zsys_max_msgsz ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_zero_copy_recv) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `zero copy`");
+
+    //int zero_copy; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int zero_copy;
+
+
+    if (info [0]->IsNumber ())
+    {
+          zero_copy = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`zero copy` must be a number");
+    zsys_set_zero_copy_recv ((int) zero_copy);
+}
+
+NAN_METHOD (Zsys::_zero_copy_recv) {
+    int result = zsys_zero_copy_recv ();
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 

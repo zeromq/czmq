@@ -234,6 +234,14 @@ public slots:
     //  Return maximum message size.
     int maxMsgsz ();
 
+    //  Configure whether to use zero copy strategy in libzmq. If the environment
+    //  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+    //  Otherwise the default is 1.
+    void setZeroCopyRecv (int zeroCopy);
+
+    //  Return ZMQ_ZERO_COPY_RECV option.
+    int zeroCopyRecv ();
+
     //  Configure the threshold value of filesystem object age per st_mtime
     //  that should elapse until we consider that object "stable" at the
     //  current zclock_time() moment.

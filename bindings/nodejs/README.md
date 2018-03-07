@@ -3841,6 +3841,20 @@ integer my_zsys.maxMsgsz ()
 Return maximum message size.
 
 ```
+nothing my_zsys.setZeroCopyRecv (Number)
+```
+
+Configure whether to use zero copy strategy in libzmq. If the environment
+variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+Otherwise the default is 1.
+
+```
+integer my_zsys.zeroCopyRecv ()
+```
+
+Return ZMQ_ZERO_COPY_RECV option.
+
+```
 nothing my_zsys.setFileStableAgeMsec (Number)
 ```
 

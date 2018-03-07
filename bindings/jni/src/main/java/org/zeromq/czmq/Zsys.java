@@ -315,6 +315,22 @@ public class Zsys {
         return __maxMsgsz ();
     }
     /*
+    Configure whether to use zero copy strategy in libzmq. If the environment
+    variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+    Otherwise the default is 1.
+    */
+    native static void __setZeroCopyRecv (int zeroCopy);
+    public void setZeroCopyRecv (int zeroCopy) {
+        __setZeroCopyRecv (zeroCopy);
+    }
+    /*
+    Return ZMQ_ZERO_COPY_RECV option.
+    */
+    native static int __zeroCopyRecv ();
+    public int zeroCopyRecv () {
+        return __zeroCopyRecv ();
+    }
+    /*
     Configure the threshold value of filesystem object age per st_mtime
     that should elapse until we consider that object "stable" at the
     current zclock_time() moment.
