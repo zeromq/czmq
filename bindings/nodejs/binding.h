@@ -838,6 +838,8 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_socket_limit);
     static NAN_METHOD (_set_max_msgsz);
     static NAN_METHOD (_max_msgsz);
+    static NAN_METHOD (_set_zero_copy_recv);
+    static NAN_METHOD (_zero_copy_recv);
     static NAN_METHOD (_set_file_stable_age_msec);
     static NAN_METHOD (_file_stable_age_msec);
     static NAN_METHOD (_set_linger);

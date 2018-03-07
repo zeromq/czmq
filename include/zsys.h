@@ -253,17 +253,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zsys_max_msgsz (void);
 
-//  Configure whether to use zero copy strategy in libzmq. If the environment
-//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
-//  Otherwise the default is 1.
-CZMQ_EXPORT void
-    zsys_set_zero_copy_recv(int zero_copy);
-
-//  --------------------------------------------------------------------------
-//  Return whether the zero copy strategy in libzmq is tuened on.
-CZMQ_EXPORT int
-    zsys_zero_copy_recv();
-
 //  Configure the default linger timeout in msecs for new zsock instances.
 //  You can also set this separately on each zsock_t instance. The default
 //  linger time is zero, i.e. any pending messages will be dropped. If the
@@ -427,6 +416,18 @@ CZMQ_EXPORT bool
 //  signal handler.
 CZMQ_EXPORT void
     zsys_set_interrupted (void);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Configure whether to use zero copy strategy in libzmq. If the environment
+//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+//  Otherwise the default is 1.
+CZMQ_EXPORT void
+    zsys_set_zero_copy_recv (int zero_copy);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return ZMQ_ZERO_COPY_RECV option.
+CZMQ_EXPORT int
+    zsys_zero_copy_recv (void);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Configure the threshold value of filesystem object age per st_mtime

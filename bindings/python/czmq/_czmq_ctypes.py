@@ -7088,6 +7088,10 @@ lib.zsys_set_max_msgsz.restype = None
 lib.zsys_set_max_msgsz.argtypes = [c_int]
 lib.zsys_max_msgsz.restype = c_int
 lib.zsys_max_msgsz.argtypes = []
+lib.zsys_set_zero_copy_recv.restype = None
+lib.zsys_set_zero_copy_recv.argtypes = [c_int]
+lib.zsys_zero_copy_recv.restype = c_int
+lib.zsys_zero_copy_recv.argtypes = []
 lib.zsys_set_file_stable_age_msec.restype = None
 lib.zsys_set_file_stable_age_msec.argtypes = [msecs_p]
 lib.zsys_file_stable_age_msec.restype = msecs_p
@@ -7522,6 +7526,22 @@ The default is INT_MAX.
         Return maximum message size.
         """
         return lib.zsys_max_msgsz()
+
+    @staticmethod
+    def set_zero_copy_recv(zero_copy):
+        """
+        Configure whether to use zero copy strategy in libzmq. If the environment
+variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+Otherwise the default is 1.
+        """
+        return lib.zsys_set_zero_copy_recv(zero_copy)
+
+    @staticmethod
+    def zero_copy_recv():
+        """
+        Return ZMQ_ZERO_COPY_RECV option.
+        """
+        return lib.zsys_zero_copy_recv()
 
     @staticmethod
     def set_file_stable_age_msec(file_stable_age_msec):

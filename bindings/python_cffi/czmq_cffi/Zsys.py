@@ -325,6 +325,20 @@ class Zsys(object):
         """
         return utils.lib.zsys_max_msgsz()
 
+    def set_zero_copy_recv(zero_copy):
+        """
+        Configure whether to use zero copy strategy in libzmq. If the environment
+        variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+        Otherwise the default is 1.
+        """
+        utils.lib.zsys_set_zero_copy_recv(zero_copy)
+
+    def zero_copy_recv():
+        """
+        Return ZMQ_ZERO_COPY_RECV option.
+        """
+        return utils.lib.zsys_zero_copy_recv()
+
     def set_file_stable_age_msec(file_stable_age_msec):
         """
         Configure the threshold value of filesystem object age per st_mtime
