@@ -99,6 +99,7 @@ static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
 static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
 static zsock_t *s_logsender = NULL;    //  ZSYS_LOGSENDER=
+static int s_zero_copy_recv = 1;    // ZSYS_ZERO_COPY_RECV=1
 
 //  Track number of open sockets so we can zmq_term() safely
 static size_t s_open_sockets = 0;
@@ -156,6 +157,9 @@ zsys_init (void)
 
     if (getenv ("ZSYS_MAX_MSGSZ"))
         s_max_msgsz = atoi (getenv ("ZSYS_MAX_MSGSZ"));
+
+    if (getenv ("ZSYS_ZERO_COPY_RECV"))
+        s_zero_copy_recv = atoi (getenv ("ZSYS_ZERO_COPY_RECV"));
 
     if (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"))
         s_file_stable_age_msec = atoi (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"));
@@ -237,6 +241,10 @@ zsys_init (void)
         zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
 
     zsys_set_max_msgsz (s_max_msgsz);
+
+#if defined ZMQ_ZERO_COPY_RECV
+    zmq_ctx_set (s_process_ctx, ZMQ_ZERO_COPY_RECV, s_zero_copy_recv);
+#endif
 
     zsys_set_file_stable_age_msec (s_file_stable_age_msec);
 
@@ -1492,6 +1500,37 @@ zsys_set_max_msgsz (int max_msgsz)
     ZMUTEX_UNLOCK (s_mutex);
 }
 
+//  --------------------------------------------------------------------------
+//  Configure whether to use zero copy strategy in libzmq. If the environment
+//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+//  Otherwise the default is 1.
+
+void
+zsys_set_zero_copy_recv(int zero_copy)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_zero_copy_recv = zero_copy;
+#if defined (ZMQ_ZERO_COPY_RECV)
+    zmq_ctx_set (s_process_ctx, ZMQ_ZERO_COPY_RECV, s_zero_copy_recv);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+//  --------------------------------------------------------------------------
+//  Return ZMQ_ZERO_COPY_RECV option.
+int
+zsys_zero_copy_recv()
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+#if defined (ZMQ_ZERO_COPY_RECV)
+    s_zero_copy_recv = zmq_ctx_get (s_process_ctx, ZMQ_ZERO_COPY_RECV);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+    return s_zero_copy_recv;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return maximum message size.
@@ -2055,6 +2094,10 @@ zsys_test (bool verbose)
     zsys_set_ipv6 (0);
     zsys_set_thread_priority (-1);
     zsys_set_thread_sched_policy (-1);
+    zsys_set_zero_copy_recv(0);
+    assert (0 == zsys_zero_copy_recv());
+    zsys_set_zero_copy_recv(1);
+    assert (1 == zsys_zero_copy_recv());
 
     //  Test pipe creation
     zsock_t *pipe_back;
