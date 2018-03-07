@@ -213,15 +213,16 @@ zuuid_str_canonical (zuuid_t *self)
     if (!self->str_canonical)
         self->str_canonical = (char *) zmalloc (8 + 4 + 4 + 4 + 12 + 5);
     *self->str_canonical = 0;
-    strncat (self->str_canonical, self->str, 8);
-    strcat  (self->str_canonical, "-");
-    strncat (self->str_canonical, self->str + 8, 4);
-    strcat  (self->str_canonical, "-");
-    strncat (self->str_canonical, self->str + 12, 4);
-    strcat  (self->str_canonical, "-");
-    strncat (self->str_canonical, self->str + 16, 4);
-    strcat  (self->str_canonical, "-");
-    strncat (self->str_canonical, self->str + 20, 12);
+    memcpy (self->str_canonical, self->str, 8);
+    self->str_canonical[8] = '-';
+    memcpy (self->str_canonical + 9, self->str + 8, 4);
+    self->str_canonical[13] = '-';
+    memcpy (self->str_canonical + 14, self->str + 12, 4);
+    self->str_canonical[18] = '-';
+    memcpy (self->str_canonical + 19, self->str + 16, 4);
+    self->str_canonical[23] = '-';
+    memcpy (self->str_canonical + 24, self->str + 20, 12);
+    self->str_canonical[36] = '\0';
 
     int char_nbr;
     for (char_nbr = 0; char_nbr < 36; char_nbr++)
