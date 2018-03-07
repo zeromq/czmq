@@ -78,7 +78,7 @@ all_tests [] = {
     { "zgossip_msg", NULL, true, false, "zgossip_msg_test" },
     { "private_classes", NULL, false, false, "$ALL" }, // compat option for older projects
 #endif // CZMQ_BUILD_DRAFT_API
-    {0, 0, 0}          //  Sentinel
+    {NULL, NULL, 0, 0, NULL}          //  Sentinel
 };
 
 //  -------------------------------------------------------------------------
