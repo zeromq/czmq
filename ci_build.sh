@@ -213,7 +213,7 @@ default|default-Werror|default-with-docs|valgrind)
         echo ""
         echo "WARNING: Can not build prerequisite 'uuid'" >&2
         echo "because neither tarball nor repository sources are known for it," >&2
-        echo "and it was not isntalled as a package; this may cause the test to fail!" >&2
+        echo "and it was not installed as a package; this may cause the test to fail!" >&2
     else
         CONFIG_OPTS+=("--with-uuid=yes")
     fi
@@ -225,7 +225,7 @@ default|default-Werror|default-with-docs|valgrind)
         echo ""
         echo "WARNING: Can not build prerequisite 'systemd'" >&2
         echo "because neither tarball nor repository sources are known for it," >&2
-        echo "and it was not isntalled as a package; this may cause the test to fail!" >&2
+        echo "and it was not installed as a package; this may cause the test to fail!" >&2
     else
         CONFIG_OPTS+=("--with-libsystemd=yes")
     fi
@@ -237,7 +237,7 @@ default|default-Werror|default-with-docs|valgrind)
         echo ""
         echo "WARNING: Can not build prerequisite 'lz4'" >&2
         echo "because neither tarball nor repository sources are known for it," >&2
-        echo "and it was not isntalled as a package; this may cause the test to fail!" >&2
+        echo "and it was not installed as a package; this may cause the test to fail!" >&2
     else
         CONFIG_OPTS+=("--with-liblz4=yes")
     fi

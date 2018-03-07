@@ -205,7 +205,6 @@ zsys_init (void)
         return NULL;
     }
     srandom ((unsigned) time (NULL));
-    atexit (zsys_shutdown);
 
     assert (!s_process_ctx);
     //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
@@ -214,6 +213,8 @@ zsys_init (void)
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     s_initialized = true;
+
+    atexit (zsys_shutdown);
 
     //  The following functions call zsys_init(), so they MUST be called after
     //  s_initialized is set in order to avoid an infinite recursion
