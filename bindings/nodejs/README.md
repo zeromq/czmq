@@ -2512,6 +2512,48 @@ Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
 Returns 0 if OK, -1 if failed.
 
 ```
+integer my_zsock.gssapiPrincipalNametype ()
+```
+
+Get socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setGssapiPrincipalNametype (Number)
+```
+
+Set socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.gssapiServicePrincipalNametype ()
+```
+
+Get socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setGssapiServicePrincipalNametype (Number)
+```
+
+Set socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+string my_zsock.bindtodevice ()
+```
+
+Get socket option `bindtodevice`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setBindtodevice (String)
+```
+
+Set socket option `bindtodevice`.
+Available from libzmq 4.3.0.
+
+```
 integer my_zsock.heartbeatIvl ()
 ```
 

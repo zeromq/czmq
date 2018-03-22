@@ -914,6 +914,168 @@ module CZMQ
         result
       end
 
+      # Get socket option `gssapi_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def gssapi_principal_nametype()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_principal_nametype(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #gssapi_principal_nametype.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.gssapi_principal_nametype(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_gssapi_principal_nametype(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param gssapi_principal_nametype [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_gssapi_principal_nametype(gssapi_principal_nametype)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_principal_nametype = Integer(gssapi_principal_nametype)
+        result = ::CZMQ::FFI.zsock_set_gssapi_principal_nametype(self_p, gssapi_principal_nametype)
+        result
+      end
+
+      # Set socket option `gssapi_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_gssapi_principal_nametype.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param gssapi_principal_nametype [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_gssapi_principal_nametype(self_p, gssapi_principal_nametype)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        gssapi_principal_nametype = Integer(gssapi_principal_nametype)
+        result = ::CZMQ::FFI.zsock_set_gssapi_principal_nametype(self_p, gssapi_principal_nametype)
+        result
+      end
+
+      # Get socket option `gssapi_service_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def gssapi_service_principal_nametype()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_service_principal_nametype(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_service_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #gssapi_service_principal_nametype.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.gssapi_service_principal_nametype(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_gssapi_service_principal_nametype(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_service_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param gssapi_service_principal_nametype [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_gssapi_service_principal_nametype(gssapi_service_principal_nametype)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_service_principal_nametype = Integer(gssapi_service_principal_nametype)
+        result = ::CZMQ::FFI.zsock_set_gssapi_service_principal_nametype(self_p, gssapi_service_principal_nametype)
+        result
+      end
+
+      # Set socket option `gssapi_service_principal_nametype`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_gssapi_service_principal_nametype.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param gssapi_service_principal_nametype [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_gssapi_service_principal_nametype(self_p, gssapi_service_principal_nametype)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        gssapi_service_principal_nametype = Integer(gssapi_service_principal_nametype)
+        result = ::CZMQ::FFI.zsock_set_gssapi_service_principal_nametype(self_p, gssapi_service_principal_nametype)
+        result
+      end
+
+      # Get socket option `bindtodevice`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [::FFI::AutoPointer]
+      def bindtodevice()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_bindtodevice(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Get socket option `bindtodevice`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #bindtodevice.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [::FFI::AutoPointer]
+      def self.bindtodevice(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_bindtodevice(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Set socket option `bindtodevice`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param bindtodevice [String, #to_s, nil]
+      # @return [void]
+      def set_bindtodevice(bindtodevice)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_bindtodevice(self_p, bindtodevice)
+        result
+      end
+
+      # Set socket option `bindtodevice`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_bindtodevice.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param bindtodevice [String, #to_s, nil]
+      # @return [void]
+      def self.set_bindtodevice(self_p, bindtodevice)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_bindtodevice(self_p, bindtodevice)
+        result
+      end
+
       # Get socket option `heartbeat_ivl`.
       # Available from libzmq 4.2.0.
       #

@@ -4432,6 +4432,12 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "flush", _flush);
     Nan::SetPrototypeMethod (tpl, "join", _join);
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
+    Nan::SetPrototypeMethod (tpl, "gssapiPrincipalNametype", _gssapi_principal_nametype);
+    Nan::SetPrototypeMethod (tpl, "setGssapiPrincipalNametype", _set_gssapi_principal_nametype);
+    Nan::SetPrototypeMethod (tpl, "gssapiServicePrincipalNametype", _gssapi_service_principal_nametype);
+    Nan::SetPrototypeMethod (tpl, "setGssapiServicePrincipalNametype", _set_gssapi_service_principal_nametype);
+    Nan::SetPrototypeMethod (tpl, "bindtodevice", _bindtodevice);
+    Nan::SetPrototypeMethod (tpl, "setBindtodevice", _set_bindtodevice);
     Nan::SetPrototypeMethod (tpl, "heartbeatIvl", _heartbeat_ivl);
     Nan::SetPrototypeMethod (tpl, "setHeartbeatIvl", _set_heartbeat_ivl);
     Nan::SetPrototypeMethod (tpl, "heartbeatTtl", _heartbeat_ttl);
@@ -4922,6 +4928,75 @@ NAN_METHOD (Zsock::_leave) {
          //} //bjornw end
     int result = zsock_leave (zsock->self, (const char *)group);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_gssapi_principal_nametype) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_gssapi_principal_nametype (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_gssapi_principal_nametype) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `gssapi principal nametype`");
+
+    //int gssapi_principal_nametype; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int gssapi_principal_nametype;
+
+
+    if (info [0]->IsNumber ())
+    {
+          gssapi_principal_nametype = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`gssapi principal nametype` must be a number");
+    zsock_set_gssapi_principal_nametype (zsock->self, (int) gssapi_principal_nametype);
+}
+
+NAN_METHOD (Zsock::_gssapi_service_principal_nametype) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_gssapi_service_principal_nametype (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_gssapi_service_principal_nametype) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `gssapi service principal nametype`");
+
+    //int gssapi_service_principal_nametype; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int gssapi_service_principal_nametype;
+
+
+    if (info [0]->IsNumber ())
+    {
+          gssapi_service_principal_nametype = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`gssapi service principal nametype` must be a number");
+    zsock_set_gssapi_service_principal_nametype (zsock->self, (int) gssapi_service_principal_nametype);
+}
+
+NAN_METHOD (Zsock::_bindtodevice) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_bindtodevice (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_bindtodevice) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *bindtodevice;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `bindtodevice`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`bindtodevice` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String bindtodevice_utf8 (info [0].As<String>());
+    bindtodevice = *bindtodevice_utf8;
+         //} //bjornw end
+    zsock_set_bindtodevice (zsock->self, (const char *)bindtodevice);
 }
 
 NAN_METHOD (Zsock::_heartbeat_ivl) {

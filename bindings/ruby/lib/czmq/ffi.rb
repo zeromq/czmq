@@ -581,6 +581,12 @@ module CZMQ
       attach_function :zsock_leave, [:pointer, :string], :int, **opts
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
+      attach_function :zsock_gssapi_principal_nametype, [:pointer], :int, **opts
+      attach_function :zsock_set_gssapi_principal_nametype, [:pointer, :int], :void, **opts
+      attach_function :zsock_gssapi_service_principal_nametype, [:pointer], :int, **opts
+      attach_function :zsock_set_gssapi_service_principal_nametype, [:pointer, :int], :void, **opts
+      attach_function :zsock_bindtodevice, [:pointer], :pointer, **opts
+      attach_function :zsock_set_bindtodevice, [:pointer, :string], :void, **opts
       attach_function :zsock_heartbeat_ivl, [:pointer], :int, **opts
       attach_function :zsock_set_heartbeat_ivl, [:pointer, :int], :void, **opts
       attach_function :zsock_heartbeat_ttl, [:pointer], :int, **opts

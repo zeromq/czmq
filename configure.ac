@@ -7,7 +7,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 #
-AC_INIT([czmq],[4.1.1],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[4.2.0],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -31,12 +31,12 @@ AC_SUBST(PACKAGE_VERSION)
 #
 # Libtool -version-info (ABI version)
 #
-# Currently 5:1:1 ("stable"). Don't change this unless you
+# Currently 6:0:2 ("stable"). Don't change this unless you
 # know exactly what you're doing and have read and understand
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
 # libczmq -version-info
-LTVER="5:1:1"
+LTVER="6:0:2"
 AC_SUBST(LTVER)
 
 # building in a subdirectory?

@@ -358,6 +358,49 @@ Java_org_zeromq_czmq_Zsock__1_1resolve (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1gssapiPrincipalNametype (JNIEnv *env, jclass c, jlong self)
+{
+    jint gssapi_principal_nametype_ = (jint) zsock_gssapi_principal_nametype ((zsock_t *) (intptr_t) self);
+    return gssapi_principal_nametype_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setGssapiPrincipalNametype (JNIEnv *env, jclass c, jlong self, jint gssapi_principal_nametype)
+{
+    zsock_set_gssapi_principal_nametype ((zsock_t *) (intptr_t) self, (int) gssapi_principal_nametype);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1gssapiServicePrincipalNametype (JNIEnv *env, jclass c, jlong self)
+{
+    jint gssapi_service_principal_nametype_ = (jint) zsock_gssapi_service_principal_nametype ((zsock_t *) (intptr_t) self);
+    return gssapi_service_principal_nametype_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setGssapiServicePrincipalNametype (JNIEnv *env, jclass c, jlong self, jint gssapi_service_principal_nametype)
+{
+    zsock_set_gssapi_service_principal_nametype ((zsock_t *) (intptr_t) self, (int) gssapi_service_principal_nametype);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsock__1_1bindtodevice (JNIEnv *env, jclass c, jlong self)
+{
+    char *bindtodevice_ = (char *) zsock_bindtodevice ((zsock_t *) (intptr_t) self);
+    jstring return_string_ = (*env)->NewStringUTF (env, bindtodevice_);
+    zstr_free (&bindtodevice_);
+    return return_string_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setBindtodevice (JNIEnv *env, jclass c, jlong self, jstring bindtodevice)
+{
+    char *bindtodevice_ = (char *) (*env)->GetStringUTFChars (env, bindtodevice, NULL);
+    zsock_set_bindtodevice ((zsock_t *) (intptr_t) self, bindtodevice_);
+    (*env)->ReleaseStringUTFChars (env, bindtodevice, bindtodevice_);
+}
+
+JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1heartbeatIvl (JNIEnv *env, jclass c, jlong self)
 {
     jint heartbeat_ivl_ = (jint) zsock_heartbeat_ivl ((zsock_t *) (intptr_t) self);
