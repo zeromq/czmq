@@ -42,9 +42,9 @@ SUFFIXES=.txt .adoc .xml .xml7 .1 .3 .7
 	asciidoc -d manpage -b docbook -f $(srcdir)/asciidoc.conf \
         -aczmq_version=@PACKAGE_VERSION@ -o$@ $<
 .xml.1:
-	xmlto man $<
+	xmlto -o $(@D) man $<
 .xml.3:
-	xmlto man $<
+	xmlto -o $(@D) man $<
 
 # Special handling for project overview whose basename may collide
 # with a main or class name
@@ -52,7 +52,7 @@ SUFFIXES=.txt .adoc .xml .xml7 .1 .3 .7
 	asciidoc -d manpage -b docbook -f $(srcdir)/asciidoc.conf \
         -aczmq_version=@PACKAGE_VERSION@ -o$@ $<
 .xml7.7:
-	xmlto man $<
+	xmlto -o $(@D) man $<
 
 # List of *.txt and *.doc files generated during build from comments
 # in project program source files and further processed into manpages.
@@ -200,8 +200,12 @@ GENERATED_DOCS += zrex.txt zrex.doc
 zrex.txt: $(top_srcdir)/src/zrex.c
 	"$(srcdir)/mkman" "zrex" "$(builddir)/zrex.txt" "$(srcdir)/.."
 
+### Note: for mains, we keep the source name rather than flattened name:c
+### so that the manpages for binary programs match their name, at expense
+### of perhaps being built in a subdirectory under doc/.
 GENERATED_DOCS += zmakecert.txt zmakecert.doc
 zmakecert.txt: $(top_srcdir)/src/zmakecert.c
+	mkdir -p "$(builddir)/$(@D)"
 	"$(srcdir)/mkman" "zmakecert" "$(builddir)/zmakecert.txt" "$(srcdir)/.."
 
 

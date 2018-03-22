@@ -29,6 +29,10 @@ fi
 mkdir -p tmp
 BUILD_PREFIX=$PWD/tmp
 
+# Use tools from prerequisites we might have built
+PATH="${BUILD_PREFIX}/sbin:${BUILD_PREFIX}/bin:${PATH}"
+export PATH
+
 CONFIG_OPTS=()
 CONFIG_OPTS+=("CFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_OPTS+=("CPPFLAGS=-I${BUILD_PREFIX}/include")
