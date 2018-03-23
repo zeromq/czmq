@@ -247,13 +247,13 @@ const char *
     zargs_param_name (zargs_t *self);
 
 // Return value of named parameter, NULL if no given parameter has
-// been specified, or special value for wich zargs_param_empty ()
+// been specified, or special value for which zargs_param_empty ()
 // returns true.
 const char *
     zargs_param_lookup (zargs_t *self, const char *keys);
 
 // Return value of named parameter(s), NULL if no given parameter has
-// been specified, or special value for wich zargs_param_empty ()
+// been specified, or special value for which zargs_param_empty ()
 // returns true.
 const char *
     zargs_param_lookupx (zargs_t *self, const char *keys, ...);
@@ -968,7 +968,7 @@ void
 zfile_t *
     zfile_new (const char *path, const char *name);
 
-// Create new temporary file for writing via tmpfile. File is automaticaly
+// Create new temporary file for writing via tmpfile. File is automatically
 // deleted on destroy
 zfile_t *
     zfile_tmp (void);
@@ -2330,7 +2330,7 @@ bool
 int
     zproc_wait (zproc_t *self, bool hang);
 
-// return internal actor, usefull for the polling if process died
+// return internal actor, useful for the polling if process died
 void *
     zproc_actor (zproc_t *self);
 
@@ -2540,7 +2540,7 @@ int
 //     U = zuuid_t * (creates a zuuid with the data)
 //     h = zhashx_t ** (creates zhashx)
 //     p = void ** (stores pointer)
-//     m = zmsg_t ** (creates a zmsg with the remaing frames)
+//     m = zmsg_t ** (creates a zmsg with the remaining frames)
 //     z = null, asserts empty frame (0 arguments)
 //     u = uint * (stores unsigned integer, deprecated)
 //
@@ -3523,7 +3523,7 @@ void
 
 // Set default interrupt handler, so Ctrl-C or SIGTERM will set
 // zsys_interrupted. Idempotent; safe to call multiple times.
-// Can be supressed by ZSYS_SIGHANDLER=false
+// Can be suppressed by ZSYS_SIGHANDLER=false
 // *** This is for CZMQ internal use only and may change arbitrarily ***
 void
     zsys_catch_interrupts (void);

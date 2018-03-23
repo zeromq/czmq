@@ -137,7 +137,7 @@ class Zproc(object):
 
     def actor(self):
         """
-        return internal actor, usefull for the polling if process died
+        return internal actor, useful for the polling if process died
         """
         return utils.lib.zproc_actor(self._p)
 

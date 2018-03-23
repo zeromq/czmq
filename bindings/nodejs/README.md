@@ -53,7 +53,7 @@ It DOES:
 * provide easy to use CLASS compatible API for accessing argv
 * is platform independent
 * provide getopt_long style -- argument, which delimits parameters from arguments
-* makes parameters positon independent
+* makes parameters position independent
 
 It does NOT
 * change argv
@@ -128,7 +128,7 @@ string my_zargs.paramLookup (String)
 ```
 
 Return value of named parameter, NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
+been specified, or special value for which zargs_param_empty ()
 returns true.
 
 ```
@@ -136,7 +136,7 @@ string my_zargs.paramLookupx (String)
 ```
 
 Return value of named parameter(s), NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
+been specified, or special value for which zargs_param_empty ()
 returns true.
 
 ```
@@ -2397,7 +2397,7 @@ a series of pointers as provided by the caller:
     U = zuuid_t * (creates a zuuid with the data)
     h = zhashx_t ** (creates zhashx)
     p = void ** (stores pointer)
-    m = zmsg_t ** (creates a zmsg with the remaing frames)
+    m = zmsg_t ** (creates a zmsg with the remaining frames)
     z = null, asserts empty frame (0 arguments)
     u = uint * (stores unsigned integer, deprecated)
 
@@ -3682,7 +3682,7 @@ nothing my_zsys.catchInterrupts ()
 
 Set default interrupt handler, so Ctrl-C or SIGTERM will set
 zsys_interrupted. Idempotent; safe to call multiple times.
-Can be supressed by ZSYS_SIGHANDLER=false
+Can be suppressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
 
 ```

@@ -84,7 +84,7 @@ public class Zsys {
     /*
     Set default interrupt handler, so Ctrl-C or SIGTERM will set
     zsys_interrupted. Idempotent; safe to call multiple times.
-    Can be supressed by ZSYS_SIGHANDLER=false
+    Can be suppressed by ZSYS_SIGHANDLER=false
     *** This is for CZMQ internal use only and may change arbitrarily ***
     */
     native static void __catchInterrupts ();

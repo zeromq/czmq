@@ -55,7 +55,7 @@ const QString QmlZargs::paramName () {
 
 ///
 //  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()
+//  been specified, or special value for which zargs_param_empty ()
 //  returns true.
 const QString QmlZargs::paramLookup (const QString &keys) {
     return QString (zargs_param_lookup (self, keys.toUtf8().data()));
@@ -63,7 +63,7 @@ const QString QmlZargs::paramLookup (const QString &keys) {
 
 ///
 //  Return value of named parameter(s), NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()
+//  been specified, or special value for which zargs_param_empty ()
 //  returns true.
 const QString QmlZargs::paramLookupx (const QString &keys) {
     return QString (zargs_param_lookupx (self, keys.toUtf8().data()));

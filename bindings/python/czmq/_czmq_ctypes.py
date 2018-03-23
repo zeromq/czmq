@@ -401,7 +401,7 @@ It DOES:
 * provide easy to use CLASS compatible API for accessing argv
 * is platform independent
 * provide getopt_long style -- argument, which delimits parameters from arguments
-* makes parameters positon independent
+* makes parameters position independent
 
 It does NOT
 * change argv
@@ -503,7 +503,7 @@ parameters.
     def param_lookup(self, keys):
         """
         Return value of named parameter, NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
+been specified, or special value for which zargs_param_empty ()
 returns true.
         """
         return lib.zargs_param_lookup(self._as_parameter_, keys)
@@ -511,7 +511,7 @@ returns true.
     def param_lookupx(self, keys, *args):
         """
         Return value of named parameter(s), NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
+been specified, or special value for which zargs_param_empty ()
 returns true.
         """
         return lib.zargs_param_lookupx(self._as_parameter_, keys, *args)
@@ -2279,7 +2279,7 @@ may be NULL, in which case it is not used.
     @staticmethod
     def tmp():
         """
-        Create new temporary file for writing via tmpfile. File is automaticaly
+        Create new temporary file for writing via tmpfile. File is automatically
 deleted on destroy
         """
         return Zfile(lib.zfile_tmp(), True)
@@ -5009,7 +5009,7 @@ not initialized or external sockets.
 
     def actor(self):
         """
-        return internal actor, usefull for the polling if process died
+        return internal actor, useful for the polling if process died
         """
         return c_void_p(lib.zproc_actor(self._as_parameter_))
 
@@ -5718,7 +5718,7 @@ a series of pointers as provided by the caller:
     U = zuuid_t * (creates a zuuid with the data)
     h = zhashx_t ** (creates zhashx)
     p = void ** (stores pointer)
-    m = zmsg_t ** (creates a zmsg with the remaing frames)
+    m = zmsg_t ** (creates a zmsg with the remaining frames)
     z = null, asserts empty frame (0 arguments)
     u = uint * (stores unsigned integer, deprecated)
 
@@ -7307,7 +7307,7 @@ default SIGINT/SIGTERM handling in CZMQ.
         """
         Set default interrupt handler, so Ctrl-C or SIGTERM will set
 zsys_interrupted. Idempotent; safe to call multiple times.
-Can be supressed by ZSYS_SIGHANDLER=false
+Can be suppressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
         """
         return lib.zsys_catch_interrupts()

@@ -104,7 +104,7 @@ CZMQ_PRIVATE void
     zconfig_remove (zconfig_t **self_p);
 
 //  *** Draft method, defined for internal use only ***
-//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  Create new temporary file for writing via tmpfile. File is automatically
 //  deleted on destroy
 //  Caller owns return value and must destroy it when done.
 CZMQ_PRIVATE zfile_t *

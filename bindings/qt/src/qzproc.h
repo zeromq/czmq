@@ -78,7 +78,7 @@ public:
     //  wait or poll process status, return return code
     int wait (bool hang);
 
-    //  return internal actor, usefull for the polling if process died
+    //  return internal actor, useful for the polling if process died
     void * actor ();
 
     //  send a signal to the subprocess

@@ -155,7 +155,7 @@ int QZproc::wait (bool hang)
 }
 
 ///
-//  return internal actor, usefull for the polling if process died
+//  return internal actor, useful for the polling if process died
 void * QZproc::actor ()
 {
     void * rv = zproc_actor (self);
