@@ -439,6 +439,62 @@ void * QZsock::resolve (void *self)
 }
 
 ///
+//  Get socket option `gssapi_principal_nametype`.
+//  Available from libzmq 4.3.0.
+int QZsock::gssapiPrincipalNametype ()
+{
+    int rv = zsock_gssapi_principal_nametype (self);
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_principal_nametype`.
+//  Available from libzmq 4.3.0.
+void QZsock::setGssapiPrincipalNametype (int gssapiPrincipalNametype)
+{
+    zsock_set_gssapi_principal_nametype (self, gssapiPrincipalNametype);
+
+}
+
+///
+//  Get socket option `gssapi_service_principal_nametype`.
+//  Available from libzmq 4.3.0.
+int QZsock::gssapiServicePrincipalNametype ()
+{
+    int rv = zsock_gssapi_service_principal_nametype (self);
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_service_principal_nametype`.
+//  Available from libzmq 4.3.0.
+void QZsock::setGssapiServicePrincipalNametype (int gssapiServicePrincipalNametype)
+{
+    zsock_set_gssapi_service_principal_nametype (self, gssapiServicePrincipalNametype);
+
+}
+
+///
+//  Get socket option `bindtodevice`.
+//  Available from libzmq 4.3.0.
+QString QZsock::bindtodevice ()
+{
+    char *retStr_ = zsock_bindtodevice (self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
+    return rv;
+}
+
+///
+//  Set socket option `bindtodevice`.
+//  Available from libzmq 4.3.0.
+void QZsock::setBindtodevice (const QString &bindtodevice)
+{
+    zsock_set_bindtodevice (self, bindtodevice.toUtf8().data());
+
+}
+
+///
 //  Get socket option `heartbeat_ivl`.
 //  Available from libzmq 4.2.0.
 int QZsock::heartbeatIvl ()

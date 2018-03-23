@@ -634,6 +634,12 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_flush);
     static NAN_METHOD (_join);
     static NAN_METHOD (_leave);
+    static NAN_METHOD (_gssapi_principal_nametype);
+    static NAN_METHOD (_set_gssapi_principal_nametype);
+    static NAN_METHOD (_gssapi_service_principal_nametype);
+    static NAN_METHOD (_set_gssapi_service_principal_nametype);
+    static NAN_METHOD (_bindtodevice);
+    static NAN_METHOD (_set_bindtodevice);
     static NAN_METHOD (_heartbeat_ivl);
     static NAN_METHOD (_set_heartbeat_ivl);
     static NAN_METHOD (_heartbeat_ttl);

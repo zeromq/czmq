@@ -20,6 +20,148 @@
 */
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_GSSAPI_PRINCIPAL_NAMETYPE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_gssapi_principal_nametype (void *self, int gssapi_principal_nametype)
+{
+    assert (self);
+#   if defined (ZMQ_GSSAPI_PRINCIPAL_NAMETYPE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock gssapi_principal_nametype option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_GSSAPI_PRINCIPAL_NAMETYPE, &gssapi_principal_nametype, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_GSSAPI_PRINCIPAL_NAMETYPE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_gssapi_principal_nametype (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_GSSAPI_PRINCIPAL_NAMETYPE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock gssapi_principal_nametype option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int gssapi_principal_nametype;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_GSSAPI_PRINCIPAL_NAMETYPE, &gssapi_principal_nametype, &option_len);
+    return gssapi_principal_nametype;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_gssapi_service_principal_nametype (void *self, int gssapi_service_principal_nametype)
+{
+    assert (self);
+#   if defined (ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock gssapi_service_principal_nametype option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE, &gssapi_service_principal_nametype, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_gssapi_service_principal_nametype (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock gssapi_service_principal_nametype option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int gssapi_service_principal_nametype;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE, &gssapi_service_principal_nametype, &option_len);
+    return gssapi_service_principal_nametype;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_BINDTODEVICE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_bindtodevice (void *self, const char * bindtodevice)
+{
+    assert (self);
+#   if defined (ZMQ_BINDTODEVICE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock bindtodevice option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_BINDTODEVICE, bindtodevice, strlen (bindtodevice));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_BINDTODEVICE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char *
+zsock_bindtodevice (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_BINDTODEVICE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock bindtodevice option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    size_t option_len = 255;
+    char *bindtodevice = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_BINDTODEVICE, bindtodevice, &option_len);
+    return (char *) bindtodevice;
+#   else
+    return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_HEARTBEAT_IVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -3417,6 +3559,11 @@ zsock_option_test (bool verbose)
 
     //  @selftest
     zsock_t *self;
+#if (ZMQ_VERSION_MAJOR >= 4)
+#   if (ZMQ_VERSION_MINOR >= 3)
+#   endif
+#endif
+
 #if (ZMQ_VERSION_MAJOR >= 4)
 #   if (ZMQ_VERSION_MINOR >= 2)
 #     if defined (ZMQ_HEARTBEAT_IVL)

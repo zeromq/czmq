@@ -304,6 +304,39 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
+//  Get socket option `gssapi_principal_nametype`.
+//  Available from libzmq 4.3.0.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_gssapi_principal_nametype (void *self);
+
+//  Set socket option `gssapi_principal_nametype`.
+//  Available from libzmq 4.3.0.
+CZMQ_EXPORT void
+    zsock_set_gssapi_principal_nametype (void *self, int gssapi_principal_nametype);
+
+//  Get socket option `gssapi_service_principal_nametype`.
+//  Available from libzmq 4.3.0.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_gssapi_service_principal_nametype (void *self);
+
+//  Set socket option `gssapi_service_principal_nametype`.
+//  Available from libzmq 4.3.0.
+CZMQ_EXPORT void
+    zsock_set_gssapi_service_principal_nametype (void *self, int gssapi_service_principal_nametype);
+
+//  Get socket option `bindtodevice`.
+//  Available from libzmq 4.3.0.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zsock_bindtodevice (void *self);
+
+//  Set socket option `bindtodevice`.
+//  Available from libzmq 4.3.0.
+CZMQ_EXPORT void
+    zsock_set_bindtodevice (void *self, const char *bindtodevice);
+
 //  Get socket option `heartbeat_ivl`.
 //  Available from libzmq 4.2.0.
 //  Caller owns return value and must destroy it when done.

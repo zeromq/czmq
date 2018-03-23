@@ -5120,6 +5120,18 @@ lib.zsock_is.restype = c_bool
 lib.zsock_is.argtypes = [c_void_p]
 lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
+lib.zsock_gssapi_principal_nametype.restype = c_int
+lib.zsock_gssapi_principal_nametype.argtypes = [zsock_p]
+lib.zsock_set_gssapi_principal_nametype.restype = None
+lib.zsock_set_gssapi_principal_nametype.argtypes = [zsock_p, c_int]
+lib.zsock_gssapi_service_principal_nametype.restype = c_int
+lib.zsock_gssapi_service_principal_nametype.argtypes = [zsock_p]
+lib.zsock_set_gssapi_service_principal_nametype.restype = None
+lib.zsock_set_gssapi_service_principal_nametype.argtypes = [zsock_p, c_int]
+lib.zsock_bindtodevice.restype = POINTER(c_char)
+lib.zsock_bindtodevice.argtypes = [zsock_p]
+lib.zsock_set_bindtodevice.restype = None
+lib.zsock_set_bindtodevice.argtypes = [zsock_p, c_char_p]
 lib.zsock_heartbeat_ivl.restype = c_int
 lib.zsock_heartbeat_ivl.argtypes = [zsock_p]
 lib.zsock_set_heartbeat_ivl.restype = None
@@ -5857,6 +5869,48 @@ descriptor, return NULL; else if it looks like a libzmq socket handle,
 return the supplied value. Takes a polymorphic socket reference.
         """
         return c_void_p(lib.zsock_resolve(self))
+
+    def gssapi_principal_nametype(self):
+        """
+        Get socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_gssapi_principal_nametype(self._as_parameter_)
+
+    def set_gssapi_principal_nametype(self, gssapi_principal_nametype):
+        """
+        Set socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_gssapi_principal_nametype(self._as_parameter_, gssapi_principal_nametype)
+
+    def gssapi_service_principal_nametype(self):
+        """
+        Get socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_gssapi_service_principal_nametype(self._as_parameter_)
+
+    def set_gssapi_service_principal_nametype(self, gssapi_service_principal_nametype):
+        """
+        Set socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_gssapi_service_principal_nametype(self._as_parameter_, gssapi_service_principal_nametype)
+
+    def bindtodevice(self):
+        """
+        Get socket option `bindtodevice`.
+Available from libzmq 4.3.0.
+        """
+        return return_fresh_string(lib.zsock_bindtodevice(self._as_parameter_))
+
+    def set_bindtodevice(self, bindtodevice):
+        """
+        Set socket option `bindtodevice`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_bindtodevice(self._as_parameter_, bindtodevice)
 
     def heartbeat_ivl(self):
         """

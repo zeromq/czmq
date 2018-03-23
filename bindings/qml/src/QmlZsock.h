@@ -225,6 +225,30 @@ public slots:
     //  Returns 0 if OK, -1 if failed.
     int leave (const QString &group);
 
+    //  Get socket option `gssapi_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    int gssapiPrincipalNametype ();
+
+    //  Set socket option `gssapi_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    void setGssapiPrincipalNametype (int gssapiPrincipalNametype);
+
+    //  Get socket option `gssapi_service_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    int gssapiServicePrincipalNametype ();
+
+    //  Set socket option `gssapi_service_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    void setGssapiServicePrincipalNametype (int gssapiServicePrincipalNametype);
+
+    //  Get socket option `bindtodevice`.
+    //  Available from libzmq 4.3.0.
+    QString bindtodevice ();
+
+    //  Set socket option `bindtodevice`.
+    //  Available from libzmq 4.3.0.
+    void setBindtodevice (const QString &bindtodevice);
+
     //  Get socket option `heartbeat_ivl`.
     //  Available from libzmq 4.2.0.
     int heartbeatIvl ();
