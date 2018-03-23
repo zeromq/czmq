@@ -125,7 +125,7 @@ public slots:
     //      U = zuuid_t * (creates a zuuid with the data)
     //      h = zhashx_t ** (creates zhashx)
     //      p = void ** (stores pointer)
-    //      m = zmsg_t ** (creates a zmsg with the remaing frames)
+    //      m = zmsg_t ** (creates a zmsg with the remaining frames)
     //      z = null, asserts empty frame (0 arguments)
     //      u = uint * (stores unsigned integer, deprecated)
     //

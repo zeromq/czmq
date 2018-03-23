@@ -32,7 +32,7 @@ public class Zfile implements AutoCloseable{
         self = pointer;
     }
     /*
-    Create new temporary file for writing via tmpfile. File is automaticaly
+    Create new temporary file for writing via tmpfile. File is automatically
     deleted on destroy
     */
     native static long __tmp ();

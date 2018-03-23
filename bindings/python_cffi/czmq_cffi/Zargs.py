@@ -18,7 +18,7 @@ It DOES:
 * provide easy to use CLASS compatible API for accessing argv
 * is platform independent
 * provide getopt_long style -- argument, which delimits parameters from arguments
-* makes parameters positon independent
+* makes parameters position independent
 
 It does NOT
 * change argv
@@ -90,7 +90,7 @@ In future it SHALL
     def param_lookup(self, keys):
         """
         Return value of named parameter, NULL if no given parameter has
-        been specified, or special value for wich zargs_param_empty ()
+        been specified, or special value for which zargs_param_empty ()
         returns true.
         """
         return utils.lib.zargs_param_lookup(self._p, utils.to_bytes(keys))
@@ -98,7 +98,7 @@ In future it SHALL
     def param_lookupx(self, keys, ):
         """
         Return value of named parameter(s), NULL if no given parameter has
-        been specified, or special value for wich zargs_param_empty ()
+        been specified, or special value for which zargs_param_empty ()
         returns true.
         """
         return utils.lib.zargs_param_lookupx(self._p, utils.to_bytes(keys), )

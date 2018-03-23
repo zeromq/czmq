@@ -127,7 +127,7 @@ CZMQ_EXPORT int
     zproc_wait (zproc_t *self, bool hang);
 
 //  *** Draft method, for development use, may change without warning ***
-//  return internal actor, usefull for the polling if process died
+//  return internal actor, useful for the polling if process died
 CZMQ_EXPORT void *
     zproc_actor (zproc_t *self);
 

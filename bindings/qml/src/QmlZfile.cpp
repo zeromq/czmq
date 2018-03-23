@@ -182,7 +182,7 @@ QmlZfile *QmlZfileAttached::construct (const QString &path, const QString &name)
 };
 
 ///
-//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  Create new temporary file for writing via tmpfile. File is automatically
 //  deleted on destroy
 QmlZfile *QmlZfileAttached::tmp () {
     QmlZfile *qmlSelf = new QmlZfile ();

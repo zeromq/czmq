@@ -83,7 +83,7 @@ const QString QZargs::paramName ()
 
 ///
 //  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()
+//  been specified, or special value for which zargs_param_empty ()
 //  returns true.
 const QString QZargs::paramLookup (const QString &keys)
 {

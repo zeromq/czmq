@@ -16,7 +16,7 @@ module CZMQ
     # * provide easy to use CLASS compatible API for accessing argv
     # * is platform independent
     # * provide getopt_long style -- argument, which delimits parameters from arguments
-    # * makes parameters positon independent
+    # * makes parameters position independent
     #
     # It does NOT
     # * change argv
@@ -185,7 +185,7 @@ module CZMQ
       end
 
       # Return value of named parameter, NULL if no given parameter has
-      # been specified, or special value for wich zargs_param_empty ()
+      # been specified, or special value for which zargs_param_empty ()
       # returns true.
       #
       # @param keys [String, #to_s, nil]
@@ -198,7 +198,7 @@ module CZMQ
       end
 
       # Return value of named parameter(s), NULL if no given parameter has
-      # been specified, or special value for wich zargs_param_empty ()
+      # been specified, or special value for which zargs_param_empty ()
       # returns true.
       #
       # @param keys [String, #to_s, nil]

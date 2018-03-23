@@ -156,7 +156,7 @@ public class Zproc implements AutoCloseable{
         return __wait (self, hang);
     }
     /*
-    return internal actor, usefull for the polling if process died
+    return internal actor, useful for the polling if process died
     */
     native static long __actor (long self);
     public long actor () {

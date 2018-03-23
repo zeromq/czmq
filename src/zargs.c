@@ -180,7 +180,7 @@ zargs_param_name (zargs_t *self) {
 
 //  --------------------------------------------------------------------------
 //	Return value of named parameter, NULL if no given parameter has
-//	been specified, or special value for wich zargs_param_empty ()
+//	been specified, or special value for which zargs_param_empty ()
 //	returns true.
 
 const char *
@@ -194,7 +194,7 @@ zargs_param_lookup (zargs_t *self, const char *name) {
 
 //  --------------------------------------------------------------------------
 //	Return value of named parameter(s), NULL if no given parameter has
-//	been specified, or special value for wich zargs_param_empty ()
+//	been specified, or special value for which zargs_param_empty ()
 //	returns true.
 
 const char *

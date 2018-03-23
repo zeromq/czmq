@@ -266,7 +266,7 @@ module CZMQ
         result
       end
 
-      # return internal actor, usefull for the polling if process died
+      # return internal actor, useful for the polling if process died
       #
       # @return [::FFI::Pointer]
       def actor()

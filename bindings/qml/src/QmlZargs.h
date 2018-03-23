@@ -53,12 +53,12 @@ public slots:
     const QString paramName ();
 
     //  Return value of named parameter, NULL if no given parameter has
-    //  been specified, or special value for wich zargs_param_empty ()
+    //  been specified, or special value for which zargs_param_empty ()
     //  returns true.
     const QString paramLookup (const QString &keys);
 
     //  Return value of named parameter(s), NULL if no given parameter has
-    //  been specified, or special value for wich zargs_param_empty ()
+    //  been specified, or special value for which zargs_param_empty ()
     //  returns true.
     const QString paramLookupx (const QString &keys);
 
