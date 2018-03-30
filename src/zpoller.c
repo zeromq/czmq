@@ -227,7 +227,7 @@ zpoller_wait (zpoller_t *self, int timeout)
 
 #ifdef ZMQ_HAVE_POLLER
     zmq_poller_event_t event;
-    if (!zmq_poller_wait (self->zmq_poller, &event, timeout * ZMQ_POLL_MSEC))
+    if (!zmq_poller_wait (self->zmq_poller, &event, timeout))
         return event.user_data;
     else
     if (errno == ETIMEDOUT || errno == EAGAIN)
