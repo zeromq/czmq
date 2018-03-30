@@ -85,12 +85,23 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/
     cd "${BASE_PWD}"
 fi
 
-# Build and check this project
 cd ../..
+
+# always install custom builds from dist if the autotools chain exists
+# to make sure that `make dist` doesn't omit any files required to build & test
+if [ -z "$DO_CLANG_FORMAT_CHECK" -a -f configure.ac ]; then
+    $CI_TIME ./autogen.sh
+    $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+    $CI_TIME make -j5 dist-gzip
+    $CI_TIME tar -xzf czmq-4.2.0.tar.gz
+    cd czmq-4.2.0
+fi
+
+# Build and check this project
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of currently tested project..."
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
-if [ "$DO_CLANG_FORMAT_CHECK" -eq "1" ] ; then
+if [ "$DO_CLANG_FORMAT_CHECK" = "1" ] ; then
     PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" . \
     && make clang-format-check || { make clang-format-diff && exit 1 ; }
 else
