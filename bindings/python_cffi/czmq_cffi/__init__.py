@@ -5,12 +5,12 @@
 from . import utils
 from .Zactor import *
 from .Zargs import *
-MODE_BASE64_STD = 0 # Standard base 64
-MODE_BASE64_URL = 1 # URL and filename friendly base 64
-MODE_BASE32_STD = 2 # Standard base 32
-MODE_BASE32_HEX = 3 # Extended hex base 32
-MODE_BASE16 = 4 # Standard base 16
-MODE_Z85 = 5 # Z85 from ZeroMQ RFC 32
+MODE_BASE64_STD = 0 # standard base 64
+MODE_BASE64_URL = 1 # url and filename friendly base 64
+MODE_BASE32_STD = 2 # standard base 32
+MODE_BASE32_HEX = 3 # extended hex base 32
+MODE_BASE16 = 4 # standard base 16
+MODE_Z85 = 5 # z85 from zeromq rfc 32
 from .Zarmour import *
 from .Zcert import *
 from .Zcertstore import *
@@ -19,8 +19,8 @@ from .Zclock import *
 from .Zconfig import *
 from .Zdigest import *
 from .Zdir import *
-CREATE = 1 # Creates a new file
-DELETE = 2 # Delete a file
+CREATE = 1 # creates a new file
+DELETE = 2 # delete a file
 from .ZdirPatch import *
 from .Zfile import *
 MORE = 1 #

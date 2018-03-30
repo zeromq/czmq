@@ -42,6 +42,8 @@ EXTRA_DIST += \
     Findsystemd.cmake \
     Findlz4.cmake \
     src/CMakeLists-local.txt \
+    builds/cmake/Modules/ClangFormat.cmake \
+    builds/cmake/clang-format-check.sh.in \
     CMakeLists.txt
 endif
 
