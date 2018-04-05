@@ -721,8 +721,12 @@ zloop_start (zloop_t *self)
         }
         rc = zmq_poll (self->pollset, (int) self->poll_size, s_tickless (self));
         if (rc == -1 || (zsys_interrupted && !self->nonstop)) {
-            if (self->verbose)
-                zsys_debug ("zloop: interrupted");
+            if (self->verbose) {
+                if (rc == -1)
+                    zsys_debug ("zloop: interrupted: %s", strerror (errno));
+                else
+                    zsys_debug ("zloop: zsys_interrupted");
+            }
             rc = 0;
             break;              //  Context has been shut down
         }

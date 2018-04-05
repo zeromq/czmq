@@ -475,9 +475,13 @@ s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 }
 
 static int
-s_fd_out_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
+s_fd_out_handler (zloop_t *self, zsock_t *socket, void *fd_p)
 {
+    assert (self);
+    assert (socket);
+    assert (fd_p);
     ssize_t r = 1;
+    int fd = *(int*)fd_p;
 
     while (r > 0) {
 
@@ -488,34 +492,58 @@ s_fd_out_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
             break;
         }
 
-        r = write (item->fd, zframe_data (frame), zframe_size (frame));
+        r = write (fd, zframe_data (frame), zframe_size (frame));
         zframe_destroy (&frame);
 
         if (r == -1) {
-            zsys_error ("write to fd %d: %s", item->fd, strerror (errno));
+            zsys_error ("write to fd %d: %s", fd, strerror (errno));
             break;
         }
     }
     return 0;
 }
 
+// connect pipe (fd) with zeromq socket, so when data are signaled on `fd`, they are forwarded to `socket`
+// used for readable ends of pipesm like stdout/stderr
 static int
-s_zproc_addfd (zproc_t *self, int fd, void* socket, int flags) {
+s_zproc_readfd (zproc_t *self, int fd, void* socket) {
     assert (self);
 #if defined (__WINDOWS__)
-    zsys_error ("s_zproc_addfd not implemented for Windows");
+    zsys_error ("s_zproc_readfd not implemented for Windows");
     return -1;
 #else
-    zmq_pollitem_t it = {NULL, fd, flags, 0};
+    assert (socket);
+    assert (zsock_is (socket));
+    zmq_pollitem_t it = {NULL, fd, ZMQ_POLLIN, 0};
     return zloop_poller (
         self->loop_ref,
         &it,
-        flags == ZMQ_POLLIN ? s_fd_in_handler : s_fd_out_handler,
+        s_fd_in_handler,
         socket);
 #endif
 }
 
+// connect zeromq `socket` with writable end of pipe. When data are signaled on `fd`, they are forwarded to `fd`
+// used for writable ends of pipes like stdin
 static int
+s_zproc_readsocket (zproc_t *self, int* fd_p, void* socket) {
+    assert (self);
+#if defined (__WINDOWS__)
+    zsys_error ("s_zproc_readfd not implemented for Windows");
+    return -1;
+#else
+    assert (socket);
+    assert (zsock_is (socket));
+    return zloop_reader (
+        self->loop_ref,
+        (zsock_t*)socket,
+        s_fd_out_handler,
+        (void*)fd_p);
+#endif
+}
+
+
+    static int
 s_zproc_alive (zloop_t *loop, int timer_id, void *args)
 {
     zproc_t *self = (zproc_t*) args;
@@ -643,18 +671,18 @@ s_zproc_execve (zproc_t *self)
             zsys_debug ("process %s with pid %d started", filename, self->pid);
 
         if (self->stdinpipe [0] != -1) {
-            s_zproc_addfd (self, self->stdinpipe [1], zpair_read (self->stdinpair), ZMQ_POLLOUT);
+            s_zproc_readsocket (self, self->stdinpipe+1, zpair_read (self->stdinpair));
             close (self->stdinpipe [0]);
         }
 
         // add a handler for read end of stdout
         if (self->stdoutpipe [1] != -1) {
-            s_zproc_addfd (self, self->stdoutpipe [0], zpair_write (self->stdoutpair), ZMQ_POLLIN);
+            s_zproc_readfd (self, self->stdoutpipe [0], zpair_write (self->stdoutpair));
             close (self->stdoutpipe[1]);
         }
         // add a handler for read end of stderr
         if (self->stderrpipe [1] != -1) {
-            s_zproc_addfd (self, self->stderrpipe [0], zpair_write (self->stderrpair), ZMQ_POLLIN);
+            s_zproc_readfd (self, self->stderrpipe [0], zpair_write (self->stderrpair));
             close (self->stderrpipe[1]);
         }
     }
@@ -703,6 +731,7 @@ s_zproc_actor (zsock_t *pipe, void *args)
     zproc_t *self = (zproc_t*) args;
     zloop_t *loop = zloop_new ();
     assert (loop);
+    zloop_set_verbose (loop, self->verbose);
     self->loop_ref = loop;
     self->pipe = pipe;
 
@@ -998,6 +1027,9 @@ zproc_test (bool verbose)
     //  join stdout of the process to zeromq socket
     //  all data will be readable from zproc_stdout socket
     zproc_set_stdout (self, NULL);
+    //  older zproc instances used to hang, this is test to ensure this is no
+    //  longer the case
+    zproc_set_stdin (self, NULL);
 
     zlist_t *args = zlist_new ();
     zlist_autofree (args);
