@@ -1046,7 +1046,6 @@ zproc_test (bool verbose)
     zframe_destroy (&frame);
     zproc_destroy (&self);
     }
-    exit (EXIT_FAILURE);
 
     {
     // Test case #3: use never ending subprocess and poller to read data from it
