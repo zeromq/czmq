@@ -274,10 +274,10 @@ zproc_destroy (zproc_t **self_p) {
         zproc_wait (self, true);
         zactor_destroy (&self->actor);
 
-        if (self->stdinpipe [0] != -1) {
+        if (self->stdinpipe [0] != -1)
             close (self->stdinpipe [0]);
+        if (self->stdinpipe [1] != -1)
             close (self->stdinpipe [1]);
-        }
         if (self->stdoutpipe [0] != -1) {
             close (self->stdoutpipe [0]);
             close (self->stdoutpipe [1]);
@@ -483,22 +483,20 @@ s_fd_out_handler (zloop_t *self, zsock_t *socket, void *fd_p)
     ssize_t r = 1;
     int fd = *(int*)fd_p;
 
-    while (r > 0) {
-
-        zframe_t *frame;
-        r = zsock_brecv (socket, "f", &frame);
-        if (r == -1) {
-            zsys_error ("read from socket <%p>: %s", socket, strerror (errno));
-            break;
-        }
-
-        r = write (fd, zframe_data (frame), zframe_size (frame));
+    zframe_t *frame;
+    r = zsock_brecv (socket, "f", &frame);
+    if (r == -1) {
         zframe_destroy (&frame);
+        zsys_error ("read from socket <%p>: %s", socket, strerror (errno));
+        return -1;
+    }
 
-        if (r == -1) {
-            zsys_error ("write to fd %d: %s", fd, strerror (errno));
-            break;
-        }
+    r = write (fd, zframe_data (frame), zframe_size (frame));
+    zframe_destroy (&frame);
+
+    if (r == -1) {
+        zsys_error ("write to fd %d: %s", fd, strerror (errno));
+        return -1;
     }
     return 0;
 }
@@ -989,6 +987,7 @@ zproc_test (bool verbose)
     printf ("OK\n");
     return;
 #endif
+    {
     // Test case #1: run command, wait until it ends and get the (stdandard) output
     zproc_t *self = zproc_new ();
     assert (self);
@@ -1018,18 +1017,46 @@ zproc_test (bool verbose)
     r = zproc_wait (self, true);
     assert (r == 0);
     zproc_destroy (&self);
+    }
 
-    // Test case #2: use never ending subprocess and poller to read data from it
-    //  Create new zproc instance
-    self = zproc_new ();
-    zproc_set_verbose (self, verbose);
+    {
+    // Test case#2: run zsp helper with a content written on stdin, check if it was passed to stdout
+    zproc_t *self = zproc_new ();
     assert (self);
+    zproc_set_verbose (self, verbose);
+    //  forward input from stdin to stderr
+    zproc_set_argsx (self, file, "--stdin", "--stderr", NULL);
+    zproc_set_stdin (self, NULL);
+    zproc_set_stderr (self, NULL);
+    
+    int r = zproc_run (self);
+    assert (r == 0);
+    zclock_sleep (1000);
+    zframe_t *frame = zframe_new ("Lorem ipsum", strlen ("Lorem ipsum")+2);
+    assert (frame);
+    zsock_bsend (zproc_stdin (self), "f", frame);
+    zsock_brecv (zproc_stderr (self), "f", &frame);
+    assert (frame);
+    assert (zframe_data (frame));
+    if (verbose)
+        zframe_print (frame, "2:");
+    assert (!strncmp ((char*) zframe_data (frame), "Lorem ipsum", 11));
+    zproc_kill (self, SIGTERM);
+    zproc_wait (self, true);
+    zframe_destroy (&frame);
+    zproc_destroy (&self);
+    }
+    exit (EXIT_FAILURE);
+
+    {
+    // Test case #3: use never ending subprocess and poller to read data from it
+    //  Create new zproc instance
+    zproc_t *self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
     //  join stdout of the process to zeromq socket
     //  all data will be readable from zproc_stdout socket
     zproc_set_stdout (self, NULL);
-    //  older zproc instances used to hang, this is test to ensure this is no
-    //  longer the case
-    zproc_set_stdin (self, NULL);
 
     zlist_t *args = zlist_new ();
     zlist_autofree (args);
@@ -1121,6 +1148,7 @@ zproc_test (bool verbose)
     assert (stdout_read);
     zpoller_destroy (&poller);
     zproc_destroy (&self);
+    }
     //  @end
 
     // to have zpair print and arr print methods
