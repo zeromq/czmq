@@ -749,7 +749,14 @@ zproc_run (zproc_t *self)
     assert (!self->actor);
 
     if (!self->args || zlist_size (self->args) == 0) {
-        zsys_error ("No arguments, nothing to run. Call zproc_set_args before");
+        if (self->verbose)
+            zsys_error ("zproc: No arguments, nothing to run. Call zproc_set_args before");
+        return -1;
+    }
+    const char *filename = (const char*) zlist_first (self->args); 
+    if (!zfile_exists (filename)) {
+        if (self->verbose)
+            zsys_error ("zproc: '%s' does not exists", filename);
         return -1;
     }
 
@@ -987,6 +994,7 @@ zproc_test (bool verbose)
     printf ("OK\n");
     return;
 #endif
+    /*
     {
     // Test case #1: run command, wait until it ends and get the (stdandard) output
     zproc_t *self = zproc_new ();
@@ -1046,9 +1054,23 @@ zproc_test (bool verbose)
     zframe_destroy (&frame);
     zproc_destroy (&self);
     }
+    */
+    
+    {
+    // Test case#3: run non existing binary
+    zproc_t *self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
+    //  forward input from stdin to stderr
+    zproc_set_argsx (self, "/not/existing/file", NULL);
+    
+    int r = zproc_run (self);
+    assert (r == -1);
+    zproc_destroy (&self);
+    }
 
     {
-    // Test case #3: use never ending subprocess and poller to read data from it
+    // Test case #4: use never ending subprocess and poller to read data from it
     //  Create new zproc instance
     zproc_t *self = zproc_new ();
     assert (self);
