@@ -1031,10 +1031,10 @@ zproc_test (bool verbose)
     
     int r = zproc_run (self);
     assert (r == 0);
-    zclock_sleep (1000);
     zframe_t *frame = zframe_new ("Lorem ipsum", strlen ("Lorem ipsum")+2);
     assert (frame);
     zsock_bsend (zproc_stdin (self), "f", frame);
+    zframe_destroy (&frame);
     zsock_brecv (zproc_stderr (self), "f", &frame);
     assert (frame);
     assert (zframe_data (frame));
