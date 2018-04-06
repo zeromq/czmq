@@ -543,7 +543,7 @@ s_zproc_readsocket (zproc_t *self, int* fd_p, void* socket) {
 }
 
 
-    static int
+static int
 s_zproc_alive (zloop_t *loop, int timer_id, void *args)
 {
     zproc_t *self = (zproc_t*) args;
