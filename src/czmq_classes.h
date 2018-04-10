@@ -94,6 +94,14 @@ CZMQ_PRIVATE zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
 //  *** Draft method, defined for internal use only ***
+//  Create copy of zconfig, caller MUST free the value
+//  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+//  object. If config is null, or memory was exhausted, returns null.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zconfig_t *
+    zconfig_dup (zconfig_t *self);
+
+//  *** Draft method, defined for internal use only ***
 //  Destroy subtree (all children)
 CZMQ_PRIVATE void
     zconfig_remove_subtree (zconfig_t *self);
