@@ -169,6 +169,14 @@ CZMQ_EXPORT void
 
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
+//  Create copy of zconfig, caller MUST free the value
+//  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+//  object. If config is null, or memory was exhausted, returns null.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zconfig_t *
+    zconfig_dup (zconfig_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Destroy subtree (all children)
 CZMQ_EXPORT void
     zconfig_remove_subtree (zconfig_t *self);
