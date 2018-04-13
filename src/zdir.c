@@ -105,15 +105,9 @@ zdir_new (const char *path, const char *parent)
 {
     zdir_t *self = (zdir_t *) zmalloc (sizeof (zdir_t));
     assert (self);
-    assert (path);
-    assert (parent);
 
     if (parent) {
         if (streq (parent, "-")) {
-            if (streq (path, "")) {
-                zdir_destroy (&self);
-                return NULL;
-            }
             self->trimmed = true;
             self->path = strdup (path);
             if (!self->path) {
