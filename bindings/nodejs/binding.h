@@ -47,10 +47,10 @@ class Zargs: public Nan::ObjectWrap {
     static NAN_METHOD (_param_first);
     static NAN_METHOD (_param_next);
     static NAN_METHOD (_param_name);
-    static NAN_METHOD (_param_lookup);
-    static NAN_METHOD (_param_lookupx);
-    static NAN_METHOD (_has_help);
-    static NAN_METHOD (_param_empty);
+    static NAN_METHOD (_get);
+    static NAN_METHOD (_getx);
+    static NAN_METHOD (_has);
+    static NAN_METHOD (_hasx);
     static NAN_METHOD (_print);
     static NAN_METHOD (_test);
 };
@@ -201,6 +201,7 @@ class Zconfig: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_dup);
     static NAN_METHOD (_name);
     static NAN_METHOD (_value);
     static NAN_METHOD (_put);

@@ -54,6 +54,15 @@ public class Zconfig implements AutoCloseable{
         self = 0;
     }
     /*
+    Create copy of zconfig, caller MUST free the value
+    Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+    object. If config is null, or memory was exhausted, returns null.
+    */
+    native static long __dup (long self);
+    public Zconfig dup () {
+        return new Zconfig (__dup (self));
+    }
+    /*
     Return name of config item
     */
     native static String __name (long self);

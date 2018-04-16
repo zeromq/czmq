@@ -376,14 +376,14 @@ lib.zargs_param_next.restype = c_char_p
 lib.zargs_param_next.argtypes = [zargs_p]
 lib.zargs_param_name.restype = c_char_p
 lib.zargs_param_name.argtypes = [zargs_p]
-lib.zargs_param_lookup.restype = c_char_p
-lib.zargs_param_lookup.argtypes = [zargs_p, c_char_p]
-lib.zargs_param_lookupx.restype = c_char_p
-lib.zargs_param_lookupx.argtypes = [zargs_p, c_char_p]
-lib.zargs_has_help.restype = c_bool
-lib.zargs_has_help.argtypes = [zargs_p]
-lib.zargs_param_empty.restype = c_bool
-lib.zargs_param_empty.argtypes = [c_char_p]
+lib.zargs_get.restype = c_char_p
+lib.zargs_get.argtypes = [zargs_p, c_char_p]
+lib.zargs_getx.restype = c_char_p
+lib.zargs_getx.argtypes = [zargs_p, c_char_p]
+lib.zargs_has.restype = c_bool
+lib.zargs_has.argtypes = [zargs_p, c_char_p]
+lib.zargs_hasx.restype = c_bool
+lib.zargs_hasx.argtypes = [zargs_p, c_char_p]
 lib.zargs_print.restype = None
 lib.zargs_print.argtypes = [zargs_p]
 lib.zargs_test.restype = None
@@ -394,8 +394,11 @@ class Zargs(object):
     Platform independent command line argument parsing helpers
 
 There are two kind of elements provided by this class
-foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-zargs keeps poision only for arguments, parameters are to be accessed like hash.
+Named parameters, accessed by param_get and param_has methods
+  * --named-parameter
+  * --parameter with_value
+  * -a val
+Positional arguments, accessed by zargs_first, zargs_next
 
 It DOES:
 * provide easy to use CLASS compatible API for accessing argv
@@ -495,39 +498,33 @@ parameters, or value for which zargs_param_empty (arg) returns true.
 
     def param_name(self):
         """
-        Return current parameter name, or NULL if there are no named
-parameters.
+        Return current parameter name, or NULL if there are no named parameters.
         """
         return lib.zargs_param_name(self._as_parameter_)
 
-    def param_lookup(self, keys):
+    def get(self, name):
         """
-        Return value of named parameter, NULL if no given parameter has
-been specified, or special value for which zargs_param_empty ()
-returns true.
+        Return value of named parameter or NULL is it has no value (or was not specified)
         """
-        return lib.zargs_param_lookup(self._as_parameter_, keys)
+        return lib.zargs_get(self._as_parameter_, name)
 
-    def param_lookupx(self, keys, *args):
+    def getx(self, name, *args):
         """
-        Return value of named parameter(s), NULL if no given parameter has
-been specified, or special value for which zargs_param_empty ()
-returns true.
+        Return value of one of parameter(s) or NULL is it has no value (or was not specified)
         """
-        return lib.zargs_param_lookupx(self._as_parameter_, keys, *args)
+        return lib.zargs_getx(self._as_parameter_, name, *args)
 
-    def has_help(self):
+    def has(self, name):
         """
-        Returns true if there are --help -h arguments
+        Returns true if named parameter was specified on command line
         """
-        return lib.zargs_has_help(self._as_parameter_)
+        return lib.zargs_has(self._as_parameter_, name)
 
-    @staticmethod
-    def param_empty(arg):
+    def hasx(self, name, *args):
         """
-        Returns true if parameter did not have a value
+        Returns true if named parameter(s) was specified on command line
         """
-        return lib.zargs_param_empty(arg)
+        return lib.zargs_hasx(self._as_parameter_, name, *args)
 
     def print(self):
         """
@@ -1442,6 +1439,8 @@ lib.zconfig_load.restype = zconfig_p
 lib.zconfig_load.argtypes = [c_char_p]
 lib.zconfig_loadf.restype = zconfig_p
 lib.zconfig_loadf.argtypes = [c_char_p]
+lib.zconfig_dup.restype = zconfig_p
+lib.zconfig_dup.argtypes = [zconfig_p]
 lib.zconfig_name.restype = c_char_p
 lib.zconfig_name.argtypes = [zconfig_p]
 lib.zconfig_value.restype = c_char_p
@@ -1563,6 +1562,14 @@ if the file does not exist.
 filename.
         """
         return Zconfig(lib.zconfig_loadf(format, *args), True)
+
+    def dup(self):
+        """
+        Create copy of zconfig, caller MUST free the value
+Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+object. If config is null, or memory was exhausted, returns null.
+        """
+        return Zconfig(lib.zconfig_dup(self._as_parameter_), True)
 
     def name(self):
         """

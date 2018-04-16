@@ -131,6 +131,19 @@ module CZMQ
         result
       end
 
+      # Create copy of zconfig, caller MUST free the value
+      # Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+      # object. If config is null, or memory was exhausted, returns null.
+      #
+      # @return [Zconfig]
+      def dup()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zconfig_dup(self_p)
+        result = Zconfig.__new result, true
+        result
+      end
+
       # Return name of config item
       #
       # @return [::FFI::Pointer]

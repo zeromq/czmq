@@ -19,7 +19,7 @@ if("${CLANG_FORMAT}" STREQUAL "")
 endif()
 
 add_custom_target(
-        clang-format-czmq
+        clang-format
         COMMAND ${CLANG_FORMAT} -style=file -i ${ALL_SOURCE_FILES}
 )
 
@@ -31,14 +31,14 @@ endfunction()
 configure_file(builds/cmake/clang-format-check.sh.in clang-format-check.sh @ONLY)
 
 add_custom_target(
-        clang-format-czmq-check
+        clang-format-check
         COMMAND chmod +x clang-format-check.sh
         COMMAND ./clang-format-check.sh
         COMMENT "Checking correct formatting according to .clang-format file using ${CLANG_FORMAT}"
 )
 
 add_custom_target(
-        clang-format-czmq-diff
+        clang-format-diff
         COMMAND ${CLANG_FORMAT} -style=file -i ${ALL_SOURCE_FILES}
         COMMAND git diff ${ALL_SOURCE_FILES}
         COMMENT "Formatting with clang-format (using ${CLANG_FORMAT}) and showing differences with latest commit"

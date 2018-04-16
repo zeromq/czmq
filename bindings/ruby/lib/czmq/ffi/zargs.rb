@@ -9,8 +9,11 @@ module CZMQ
     # Platform independent command line argument parsing helpers
     #
     # There are two kind of elements provided by this class
-    # foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-    # zargs keeps poision only for arguments, parameters are to be accessed like hash.
+    # Named parameters, accessed by param_get and param_has methods
+    #   * --named-parameter
+    #   * --parameter with_value
+    #   * -a val
+    # Positional arguments, accessed by zargs_first, zargs_next
     #
     # It DOES:
     # * provide easy to use CLASS compatible API for accessing argv
@@ -173,8 +176,7 @@ module CZMQ
         result
       end
 
-      # Return current parameter name, or NULL if there are no named
-      # parameters.
+      # Return current parameter name, or NULL if there are no named parameters.
       #
       # @return [String]
       def param_name()
@@ -184,49 +186,49 @@ module CZMQ
         result
       end
 
-      # Return value of named parameter, NULL if no given parameter has
-      # been specified, or special value for which zargs_param_empty ()
-      # returns true.
+      # Return value of named parameter or NULL is it has no value (or was not specified)
       #
-      # @param keys [String, #to_s, nil]
+      # @param name [String, #to_s, nil]
       # @return [String]
-      def param_lookup(keys)
+      def get(name)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        result = ::CZMQ::FFI.zargs_param_lookup(self_p, keys)
+        result = ::CZMQ::FFI.zargs_get(self_p, name)
         result
       end
 
-      # Return value of named parameter(s), NULL if no given parameter has
-      # been specified, or special value for which zargs_param_empty ()
-      # returns true.
+      # Return value of one of parameter(s) or NULL is it has no value (or was not specified)
       #
-      # @param keys [String, #to_s, nil]
+      # @param name [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [String]
-      def param_lookupx(keys, *args)
+      def getx(name, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        result = ::CZMQ::FFI.zargs_param_lookupx(self_p, keys, *args)
+        result = ::CZMQ::FFI.zargs_getx(self_p, name, *args)
         result
       end
 
-      # Returns true if there are --help -h arguments
+      # Returns true if named parameter was specified on command line
       #
+      # @param name [String, #to_s, nil]
       # @return [Boolean]
-      def has_help()
+      def has(name)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        result = ::CZMQ::FFI.zargs_has_help(self_p)
+        result = ::CZMQ::FFI.zargs_has(self_p, name)
         result
       end
 
-      # Returns true if parameter did not have a value
+      # Returns true if named parameter(s) was specified on command line
       #
-      # @param arg [String, #to_s, nil]
+      # @param name [String, #to_s, nil]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Boolean]
-      def self.param_empty(arg)
-        result = ::CZMQ::FFI.zargs_param_empty(arg)
+      def hasx(name, *args)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zargs_hasx(self_p, name, *args)
         result
       end
 

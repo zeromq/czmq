@@ -241,30 +241,25 @@ const char *
 const char *
     zargs_param_next (zargs_t *self);
 
-// Return current parameter name, or NULL if there are no named
-// parameters.
+// Return current parameter name, or NULL if there are no named parameters.
 const char *
     zargs_param_name (zargs_t *self);
 
-// Return value of named parameter, NULL if no given parameter has
-// been specified, or special value for which zargs_param_empty ()
-// returns true.
+// Return value of named parameter or NULL is it has no value (or was not specified)
 const char *
-    zargs_param_lookup (zargs_t *self, const char *keys);
+    zargs_get (zargs_t *self, const char *name);
 
-// Return value of named parameter(s), NULL if no given parameter has
-// been specified, or special value for which zargs_param_empty ()
-// returns true.
+// Return value of one of parameter(s) or NULL is it has no value (or was not specified)
 const char *
-    zargs_param_lookupx (zargs_t *self, const char *keys, ...);
+    zargs_getx (zargs_t *self, const char *name, ...);
 
-// Returns true if there are --help -h arguments
+// Returns true if named parameter was specified on command line
 bool
-    zargs_has_help (zargs_t *self);
+    zargs_has (zargs_t *self, const char *name);
 
-// Returns true if parameter did not have a value
+// Returns true if named parameter(s) was specified on command line
 bool
-    zargs_param_empty (const char *arg);
+    zargs_hasx (zargs_t *self, const char *name, ...);
 
 // Print an instance of zargs.
 void
@@ -661,6 +656,12 @@ zconfig_t *
 // filename.
 zconfig_t *
     zconfig_loadf (const char *format, ...);
+
+// Create copy of zconfig, caller MUST free the value
+// Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+// object. If config is null, or memory was exhausted, returns null.
+zconfig_t *
+    zconfig_dup (zconfig_t *self);
 
 // Return name of config item
 char *
