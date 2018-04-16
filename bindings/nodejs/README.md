@@ -46,8 +46,11 @@ This is a wrapping of the native C libczmq library. See binding.cc for the code.
 ### The Zargs class - Platform independent command line argument parsing helpers
 
 There are two kind of elements provided by this class
-foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-zargs keeps poision only for arguments, parameters are to be accessed like hash.
+Named parameters, accessed by param_get and param_has methods
+  * --named-parameter
+  * --parameter with_value
+  * -a val
+Positional arguments, accessed by zargs_first, zargs_next
 
 It DOES:
 * provide easy to use CLASS compatible API for accessing argv
@@ -120,36 +123,31 @@ parameters, or value for which zargs_param_empty (arg) returns true.
 string my_zargs.paramName ()
 ```
 
-Return current parameter name, or NULL if there are no named
-parameters.
+Return current parameter name, or NULL if there are no named parameters.
 
 ```
-string my_zargs.paramLookup (String)
+string my_zargs.get (String)
 ```
 
-Return value of named parameter, NULL if no given parameter has
-been specified, or special value for which zargs_param_empty ()
-returns true.
+Return value of named parameter or NULL is it has no value (or was not specified)
 
 ```
-string my_zargs.paramLookupx (String)
+string my_zargs.getx (String)
 ```
 
-Return value of named parameter(s), NULL if no given parameter has
-been specified, or special value for which zargs_param_empty ()
-returns true.
+Return value of one of parameter(s) or NULL is it has no value (or was not specified)
 
 ```
-boolean my_zargs.hasHelp ()
+boolean my_zargs.has (String)
 ```
 
-Returns true if there are --help -h arguments
+Returns true if named parameter was specified on command line
 
 ```
-boolean my_zargs.paramEmpty (String)
+boolean my_zargs.hasx (String)
 ```
 
-Returns true if parameter did not have a value
+Returns true if named parameter(s) was specified on command line
 
 ```
 nothing my_zargs.print ()

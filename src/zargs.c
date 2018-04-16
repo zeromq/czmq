@@ -179,54 +179,62 @@ zargs_param_name (zargs_t *self) {
 }
 
 //  --------------------------------------------------------------------------
-//	Return value of named parameter, NULL if no given parameter has
-//	been specified, or special value for which zargs_param_empty ()
-//	returns true.
-
+//  Return current parameter name, or NULL if there are no named parameters.
 const char *
-zargs_param_lookup (zargs_t *self, const char *name) {
+zargs_get (zargs_t *self, const char *name) {
     assert (self);
     assert (name);
-    const char *ret = NULL;
-    ret = (const char*) zhash_lookup (self->parameters, name);
-    return ret;
+    const char *ret = (const char*) zhash_lookup (self->parameters, name);
+    return ret != ZARG_PARAM_EMPTY ? ret : NULL;
 }
 
 //  --------------------------------------------------------------------------
-//	Return value of named parameter(s), NULL if no given parameter has
-//	been specified, or special value for which zargs_param_empty ()
-//	returns true.
+//  Return value of one of parameter(s) or NULL is it has no value (or was not specified)
+CZMQ_EXPORT const char *
+    zargs_getx (zargs_t *self, const char *name, ...)
+{
+    assert (self);
+    assert (name);
+    va_list args;
+    va_start (args, name);
+    while (name) {
+        const char *ret = zargs_get (self, name);
+        if (ret)
+            return ret;
+        name = va_arg (args, const char*);
+    }
+    va_end (args);
+    return NULL;
+}
 
-const char *
-zargs_param_lookupx (zargs_t *self, const char *name, ...) {
+//  --------------------------------------------------------------------------
+//  Returns true if named parameter was specified on command line
+bool
+zargs_has (zargs_t *self, const char *name) {
+    assert (self);
+    assert (name);
+    const char *ret = (const char*) zhash_lookup (self->parameters, name);
+    return ret != NULL;
+}
+
+//  --------------------------------------------------------------------------
+//  Returns true if named parameter(s) was specified on command line
+bool
+zargs_hasx (zargs_t *self, const char *name, ...) {
     assert (self);
     const char *ret = NULL;
     va_list args;
     va_start (args, name);
     while (name) {
-        ret = zargs_param_lookup (self, name);
-	    if (ret)
-	        break;
-	    name = va_arg (args, const char *);
+        bool ret = zargs_has (self, name);
+        if (ret)
+            return true;
+        name = va_arg (args, const char *);
     }
     va_end (args);
-    return ret;
+    return NULL;
 }
 
-//  --------------------------------------------------------------------------
-
-bool
-zargs_has_help (zargs_t *self) {
-    return zargs_param_lookupx (self, "--help", "-h", NULL) != NULL;
-}
-
-//  --------------------------------------------------------------------------
-//  check if argument had a value or not
-
-bool
-zargs_param_empty (const char* arg) {
-    return arg && arg == ZARG_PARAM_EMPTY;
-}
 
 //  --------------------------------------------------------------------------
 //  Print the zargs instance
@@ -276,12 +284,16 @@ zargs_test (bool verbose)
     assert (streq (zargs_next (self), "positional"));
     assert (!zargs_next (self));
 
-    assert (zargs_param_empty (zargs_param_lookup (self, "--named1")));
-    assert (!zargs_param_empty (zargs_param_lookup (self, "-n1")));
-    assert (streq (zargs_param_lookupx (self, "--not at all", "-n1", NULL), "val1"));
-    // TODO: this does not look like an easy hack w/o allocating extra memory
-    //       ???
-    //assert (streq (zargs_param_lookup (self, "--with", NULL), "value2"));
+    assert (zargs_has (self, "--named1"));
+    assert (zargs_has (self, "-n1"));
+    assert (!zargs_has (self, "--not at all"));
+
+    assert (!(zargs_get (self, "--named1")));
+    assert (streq (zargs_get (self, "-n1"), "val1"));
+
+    // common usages - test for -h/--help
+    bool has_help = zargs_hasx (self, "--help", "-h", NULL);
+    assert (!has_help);
 
     zargs_destroy (&self);
     //  @end

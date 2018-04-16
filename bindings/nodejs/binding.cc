@@ -39,10 +39,10 @@ NAN_MODULE_INIT (Zargs::Init) {
     Nan::SetPrototypeMethod (tpl, "paramFirst", _param_first);
     Nan::SetPrototypeMethod (tpl, "paramNext", _param_next);
     Nan::SetPrototypeMethod (tpl, "paramName", _param_name);
-    Nan::SetPrototypeMethod (tpl, "paramLookup", _param_lookup);
-    Nan::SetPrototypeMethod (tpl, "paramLookupx", _param_lookupx);
-    Nan::SetPrototypeMethod (tpl, "hasHelp", _has_help);
-    Nan::SetPrototypeMethod (tpl, "paramEmpty", _param_empty);
+    Nan::SetPrototypeMethod (tpl, "get", _get);
+    Nan::SetPrototypeMethod (tpl, "getx", _getx);
+    Nan::SetPrototypeMethod (tpl, "has", _has);
+    Nan::SetPrototypeMethod (tpl, "hasx", _hasx);
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
@@ -147,56 +147,67 @@ NAN_METHOD (Zargs::_param_name) {
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
-NAN_METHOD (Zargs::_param_lookup) {
+NAN_METHOD (Zargs::_get) {
     Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
-    char *keys;
+    char *name;
     if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `keys`");
+        return Nan::ThrowTypeError ("method requires a `name`");
     else
     if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`keys` must be a string");
+        return Nan::ThrowTypeError ("`name` must be a string");
     //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String keys_utf8 (info [0].As<String>());
-    keys = *keys_utf8;
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
          //} //bjornw end
-    char *result = (char *) zargs_param_lookup (zargs->self, (const char *)keys);
+    char *result = (char *) zargs_get (zargs->self, (const char *)name);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
-NAN_METHOD (Zargs::_param_lookupx) {
+NAN_METHOD (Zargs::_getx) {
     Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
-    char *keys;
+    char *name;
     if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `keys`");
+        return Nan::ThrowTypeError ("method requires a `name`");
     else
     if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`keys` must be a string");
+        return Nan::ThrowTypeError ("`name` must be a string");
     //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String keys_utf8 (info [0].As<String>());
-    keys = *keys_utf8;
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
          //} //bjornw end
-    char *result = (char *) zargs_param_lookupx (zargs->self, (const char *)keys);
+    char *result = (char *) zargs_getx (zargs->self, (const char *)name);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
-NAN_METHOD (Zargs::_has_help) {
+NAN_METHOD (Zargs::_has) {
     Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
-    bool result = zargs_has_help (zargs->self);
+    char *name;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `name`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`name` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
+         //} //bjornw end
+    bool result = zargs_has (zargs->self, (const char *)name);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
-NAN_METHOD (Zargs::_param_empty) {
-    char *arg;
+NAN_METHOD (Zargs::_hasx) {
+    Zargs *zargs = Nan::ObjectWrap::Unwrap <Zargs> (info.Holder ());
+    char *name;
     if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `arg`");
+        return Nan::ThrowTypeError ("method requires a `name`");
     else
     if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`arg` must be a string");
+        return Nan::ThrowTypeError ("`name` must be a string");
     //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String arg_utf8 (info [0].As<String>());
-    arg = *arg_utf8;
+    Nan::Utf8String name_utf8 (info [0].As<String>());
+    name = *name_utf8;
          //} //bjornw end
-    bool result = zargs_param_empty ((const char *)arg);
+    bool result = zargs_hasx (zargs->self, (const char *)name);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 

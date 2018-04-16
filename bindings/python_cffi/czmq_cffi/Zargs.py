@@ -11,8 +11,11 @@ class Zargs(object):
     Platform independent command line argument parsing helpers
 
 There are two kind of elements provided by this class
-foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-zargs keeps poision only for arguments, parameters are to be accessed like hash.
+Named parameters, accessed by param_get and param_has methods
+  * --named-parameter
+  * --parameter with_value
+  * -a val
+Positional arguments, accessed by zargs_first, zargs_next
 
 It DOES:
 * provide easy to use CLASS compatible API for accessing argv
@@ -82,38 +85,33 @@ In future it SHALL
 
     def param_name(self):
         """
-        Return current parameter name, or NULL if there are no named
-        parameters.
+        Return current parameter name, or NULL if there are no named parameters.
         """
         return utils.lib.zargs_param_name(self._p)
 
-    def param_lookup(self, keys):
+    def get(self, name):
         """
-        Return value of named parameter, NULL if no given parameter has
-        been specified, or special value for which zargs_param_empty ()
-        returns true.
+        Return value of named parameter or NULL is it has no value (or was not specified)
         """
-        return utils.lib.zargs_param_lookup(self._p, utils.to_bytes(keys))
+        return utils.lib.zargs_get(self._p, utils.to_bytes(name))
 
-    def param_lookupx(self, keys, ):
+    def getx(self, name, ):
         """
-        Return value of named parameter(s), NULL if no given parameter has
-        been specified, or special value for which zargs_param_empty ()
-        returns true.
+        Return value of one of parameter(s) or NULL is it has no value (or was not specified)
         """
-        return utils.lib.zargs_param_lookupx(self._p, utils.to_bytes(keys), )
+        return utils.lib.zargs_getx(self._p, utils.to_bytes(name), )
 
-    def has_help(self):
+    def has(self, name):
         """
-        Returns true if there are --help -h arguments
+        Returns true if named parameter was specified on command line
         """
-        return utils.lib.zargs_has_help(self._p)
+        return utils.lib.zargs_has(self._p, utils.to_bytes(name))
 
-    def param_empty(arg):
+    def hasx(self, name, ):
         """
-        Returns true if parameter did not have a value
+        Returns true if named parameter(s) was specified on command line
         """
-        return utils.lib.zargs_param_empty(utils.to_bytes(arg))
+        return utils.lib.zargs_hasx(self._p, utils.to_bytes(name), )
 
     def print_py(self):
         """

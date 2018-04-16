@@ -74,10 +74,10 @@ module CZMQ
       attach_function :zargs_param_first, [:pointer], :string, **opts
       attach_function :zargs_param_next, [:pointer], :string, **opts
       attach_function :zargs_param_name, [:pointer], :string, **opts
-      attach_function :zargs_param_lookup, [:pointer, :string], :string, **opts
-      attach_function :zargs_param_lookupx, [:pointer, :string, :varargs], :string, **opts
-      attach_function :zargs_has_help, [:pointer], :bool, **opts
-      attach_function :zargs_param_empty, [:string], :bool, **opts
+      attach_function :zargs_get, [:pointer, :string], :string, **opts
+      attach_function :zargs_getx, [:pointer, :string, :varargs], :string, **opts
+      attach_function :zargs_has, [:pointer, :string], :bool, **opts
+      attach_function :zargs_hasx, [:pointer, :string, :varargs], :bool, **opts
       attach_function :zargs_print, [:pointer], :void, **opts
       attach_function :zargs_test, [:bool], :void, **opts
 

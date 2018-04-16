@@ -47,32 +47,33 @@ const QString QmlZargs::paramNext () {
 };
 
 ///
-//  Return current parameter name, or NULL if there are no named
-//  parameters.
+//  Return current parameter name, or NULL if there are no named parameters.
 const QString QmlZargs::paramName () {
     return QString (zargs_param_name (self));
 };
 
 ///
-//  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for which zargs_param_empty ()
-//  returns true.
-const QString QmlZargs::paramLookup (const QString &keys) {
-    return QString (zargs_param_lookup (self, keys.toUtf8().data()));
+//  Return value of named parameter or NULL is it has no value (or was not specified)
+const QString QmlZargs::get (const QString &name) {
+    return QString (zargs_get (self, name.toUtf8().data()));
 };
 
 ///
-//  Return value of named parameter(s), NULL if no given parameter has
-//  been specified, or special value for which zargs_param_empty ()
-//  returns true.
-const QString QmlZargs::paramLookupx (const QString &keys) {
-    return QString (zargs_param_lookupx (self, keys.toUtf8().data()));
+//  Return value of one of parameter(s) or NULL is it has no value (or was not specified)
+const QString QmlZargs::getx (const QString &name) {
+    return QString (zargs_getx (self, name.toUtf8().data()));
 };
 
 ///
-//  Returns true if there are --help -h arguments
-bool QmlZargs::hasHelp () {
-    return zargs_has_help (self);
+//  Returns true if named parameter was specified on command line
+bool QmlZargs::has (const QString &name) {
+    return zargs_has (self, name.toUtf8().data());
+};
+
+///
+//  Returns true if named parameter(s) was specified on command line
+bool QmlZargs::hasx (const QString &name) {
+    return zargs_hasx (self, name.toUtf8().data());
 };
 
 ///
@@ -86,12 +87,6 @@ QObject* QmlZargs::qmlAttachedProperties(QObject* object) {
     return new QmlZargsAttached(object);
 }
 
-
-///
-//  Returns true if parameter did not have a value
-bool QmlZargsAttached::paramEmpty (const QString &arg) {
-    return zargs_param_empty (arg.toUtf8().data());
-};
 
 ///
 //  Self test of this class.

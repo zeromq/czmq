@@ -48,22 +48,20 @@ public slots:
     //  parameters, or value for which zargs_param_empty (arg) returns true.
     const QString paramNext ();
 
-    //  Return current parameter name, or NULL if there are no named
-    //  parameters.
+    //  Return current parameter name, or NULL if there are no named parameters.
     const QString paramName ();
 
-    //  Return value of named parameter, NULL if no given parameter has
-    //  been specified, or special value for which zargs_param_empty ()
-    //  returns true.
-    const QString paramLookup (const QString &keys);
+    //  Return value of named parameter or NULL is it has no value (or was not specified)
+    const QString get (const QString &name);
 
-    //  Return value of named parameter(s), NULL if no given parameter has
-    //  been specified, or special value for which zargs_param_empty ()
-    //  returns true.
-    const QString paramLookupx (const QString &keys);
+    //  Return value of one of parameter(s) or NULL is it has no value (or was not specified)
+    const QString getx (const QString &name);
 
-    //  Returns true if there are --help -h arguments
-    bool hasHelp ();
+    //  Returns true if named parameter was specified on command line
+    bool has (const QString &name);
+
+    //  Returns true if named parameter(s) was specified on command line
+    bool hasx (const QString &name);
 
     //  Print an instance of zargs.
     void print ();
@@ -80,9 +78,6 @@ public:
     };
 
 public slots:
-    //  Returns true if parameter did not have a value
-    bool paramEmpty (const QString &arg);
-
     //  Self test of this class.
     void test (bool verbose);
 
