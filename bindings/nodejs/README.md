@@ -671,6 +671,14 @@ my_zconfig.destroy ()
 Methods:
 
 ```
+zconfig my_zconfig.dup ()
+```
+
+Create copy of zconfig, caller MUST free the value
+Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+object. If config is null, or memory was exhausted, returns null.
+
+```
 string my_zconfig.name ()
 ```
 

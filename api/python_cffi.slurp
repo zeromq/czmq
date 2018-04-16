@@ -660,6 +660,12 @@ zconfig_t *
 zconfig_t *
     zconfig_loadf (const char *format, ...);
 
+// Create copy of zconfig, caller MUST free the value
+// Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+// object. If config is null, or memory was exhausted, returns null.
+zconfig_t *
+    zconfig_dup (zconfig_t *self);
+
 // Return name of config item
 char *
     zconfig_name (zconfig_t *self);

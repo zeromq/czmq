@@ -47,6 +47,16 @@ QZconfig::~QZconfig ()
 }
 
 ///
+//  Create copy of zconfig, caller MUST free the value
+//  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+//  object. If config is null, or memory was exhausted, returns null.
+QZconfig * QZconfig::dup ()
+{
+    QZconfig *rv = new QZconfig (zconfig_dup (self));
+    return rv;
+}
+
+///
 //  Return name of config item
 const QString QZconfig::name ()
 {

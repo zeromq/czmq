@@ -45,6 +45,13 @@ Java_org_zeromq_czmq_Zconfig__1_1destroy (JNIEnv *env, jclass c, jlong self)
     zconfig_destroy ((zconfig_t **) &self);
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zconfig__1_1dup (JNIEnv *env, jclass c, jlong self)
+{
+    jlong dup_ = (jlong) (intptr_t) zconfig_dup ((zconfig_t *) (intptr_t) self);
+    return dup_;
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1name (JNIEnv *env, jclass c, jlong self)
 {

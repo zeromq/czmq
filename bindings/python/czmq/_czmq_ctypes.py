@@ -1442,6 +1442,8 @@ lib.zconfig_load.restype = zconfig_p
 lib.zconfig_load.argtypes = [c_char_p]
 lib.zconfig_loadf.restype = zconfig_p
 lib.zconfig_loadf.argtypes = [c_char_p]
+lib.zconfig_dup.restype = zconfig_p
+lib.zconfig_dup.argtypes = [zconfig_p]
 lib.zconfig_name.restype = c_char_p
 lib.zconfig_name.argtypes = [zconfig_p]
 lib.zconfig_value.restype = c_char_p
@@ -1563,6 +1565,14 @@ if the file does not exist.
 filename.
         """
         return Zconfig(lib.zconfig_loadf(format, *args), True)
+
+    def dup(self):
+        """
+        Create copy of zconfig, caller MUST free the value
+Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+object. If config is null, or memory was exhausted, returns null.
+        """
+        return Zconfig(lib.zconfig_dup(self._as_parameter_), True)
 
     def name(self):
         """

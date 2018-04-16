@@ -1248,6 +1248,7 @@ NAN_MODULE_INIT (Zconfig::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "name", _name);
     Nan::SetPrototypeMethod (tpl, "value", _value);
     Nan::SetPrototypeMethod (tpl, "put", _put);
@@ -1320,6 +1321,18 @@ NAN_METHOD (Zconfig::destroy) {
 NAN_METHOD (Zconfig::defined) {
     Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zconfig->self != NULL));
+}
+
+NAN_METHOD (Zconfig::_dup) {
+    Zconfig *zconfig = Nan::ObjectWrap::Unwrap <Zconfig> (info.Holder ());
+    zconfig_t *result = zconfig_dup (zconfig->self);
+    Zconfig *zconfig_result = new Zconfig (result);
+    if (zconfig_result) {
+    //  Don't yet know how to return a new object
+    //      zconfig->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
 }
 
 NAN_METHOD (Zconfig::_name) {

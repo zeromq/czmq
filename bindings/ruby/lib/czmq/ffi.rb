@@ -181,6 +181,7 @@ module CZMQ
       attach_function :zconfig_load, [:string], :pointer, **opts
       attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts
       attach_function :zconfig_destroy, [:pointer], :void, **opts
+      attach_function :zconfig_dup, [:pointer], :pointer, **opts
       attach_function :zconfig_name, [:pointer], :pointer, **opts
       attach_function :zconfig_value, [:pointer], :pointer, **opts
       attach_function :zconfig_put, [:pointer, :string, :string], :void, **opts

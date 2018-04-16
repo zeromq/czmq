@@ -201,6 +201,7 @@ class Zconfig: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_dup);
     static NAN_METHOD (_name);
     static NAN_METHOD (_value);
     static NAN_METHOD (_put);
