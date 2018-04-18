@@ -1038,7 +1038,7 @@ zproc_test (bool verbose)
     
     int r = zproc_run (self);
     assert (r == 0);
-    zframe_t *frame = zframe_new ("Lorem ipsum", strlen ("Lorem ipsum")+2);
+    zframe_t *frame = zframe_new ("Lorem ipsum\0\0", strlen ("Lorem ipsum")+2);
     assert (frame);
     zsock_bsend (zproc_stdin (self), "f", frame);
     zframe_destroy (&frame);
