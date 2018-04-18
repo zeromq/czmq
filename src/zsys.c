@@ -996,7 +996,7 @@ zsys_udp_new (bool routable)
     }
 
     //  On Windows, preventing sockets to be inherited by child processes.
-#if defined (__WINDOWS__) && defined (HANDLE_FLAG_INHERIT)
+#if defined (CZMQ_HAVE_WINDOWS) && defined (HANDLE_FLAG_INHERIT)
     BOOL brc = SetHandleInformation ((HANDLE) udpsock, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
 #endif
