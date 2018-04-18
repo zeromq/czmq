@@ -994,7 +994,6 @@ zproc_test (bool verbose)
     printf ("OK\n");
     return;
 #endif
-    /*
     {
     // Test case #1: run command, wait until it ends and get the (stdandard) output
     zproc_t *self = zproc_new ();
@@ -1039,7 +1038,7 @@ zproc_test (bool verbose)
     
     int r = zproc_run (self);
     assert (r == 0);
-    zframe_t *frame = zframe_new ("Lorem ipsum", strlen ("Lorem ipsum")+2);
+    zframe_t *frame = zframe_new ("Lorem ipsum\0\0", strlen ("Lorem ipsum")+2);
     assert (frame);
     zsock_bsend (zproc_stdin (self), "f", frame);
     zframe_destroy (&frame);
@@ -1054,7 +1053,6 @@ zproc_test (bool verbose)
     zframe_destroy (&frame);
     zproc_destroy (&self);
     }
-    */
     
     {
     // Test case#3: run non existing binary
