@@ -981,7 +981,7 @@ zsys_udp_new (bool routable)
     assert (!routable);
     SOCKET udpsock;
     int type = SOCK_DGRAM;
-#if defined ZMQ_HAVE_SOCK_CLOEXEC
+#if defined (SOCK_CLOEXEC)
     //  Ensure socket is closed by exec() functions.
     type |= SOCK_CLOEXEC;
 #endif
@@ -995,16 +995,8 @@ zsys_udp_new (bool routable)
         return INVALID_SOCKET;
     }
 
-    //  If there's no SOCK_CLOEXEC, let's try the second best option. Note that
-    //  race condition can cause socket not to be closed (if fork happens
-    //  between socket creation and this point).
-#if !defined ZMQ_HAVE_SOCK_CLOEXEC && defined FD_CLOEXEC
-    if (fcntl (udpsock, F_SETFD, FD_CLOEXEC) == SOCKET_ERROR)
-        zsys_socket_error ("fcntl (FD_CLOEXEC)");
-#endif
-
     //  On Windows, preventing sockets to be inherited by child processes.
-#if defined ZMQ_HAVE_WINDOWS && defined HANDLE_FLAG_INHERIT
+#if defined (__WINDOWS__) && defined (HANDLE_FLAG_INHERIT)
     BOOL brc = SetHandleInformation ((HANDLE) udpsock, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
 #endif
