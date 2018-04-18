@@ -980,14 +980,35 @@ zsys_udp_new (bool routable)
     //  We haven't implemented multicast yet
     assert (!routable);
     SOCKET udpsock;
+    int type = SOCK_DGRAM;
+#if defined ZMQ_HAVE_SOCK_CLOEXEC
+    //  Ensure socket is closed by exec() functions.
+    type |= SOCK_CLOEXEC;
+#endif
+
     if (zsys_ipv6 ())
-        udpsock = socket (AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+        udpsock = socket (AF_INET6, type, IPPROTO_UDP);
     else
-        udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        udpsock = socket (AF_INET, type, IPPROTO_UDP);
     if (udpsock == INVALID_SOCKET) {
         zsys_socket_error ("socket");
         return INVALID_SOCKET;
     }
+
+    //  If there's no SOCK_CLOEXEC, let's try the second best option. Note that
+    //  race condition can cause socket not to be closed (if fork happens
+    //  between socket creation and this point).
+#if !defined ZMQ_HAVE_SOCK_CLOEXEC && defined FD_CLOEXEC
+    if (fcntl (udpsock, F_SETFD, FD_CLOEXEC) == SOCKET_ERROR)
+        zsys_socket_error ("fcntl (FD_CLOEXEC)");
+#endif
+
+    //  On Windows, preventing sockets to be inherited by child processes.
+#if defined ZMQ_HAVE_WINDOWS && defined HANDLE_FLAG_INHERIT
+    BOOL brc = SetHandleInformation ((HANDLE) udpsock, HANDLE_FLAG_INHERIT, 0);
+    win_assert (brc);
+#endif
+
     //  Ask operating system for broadcast permissions on socket
     int on = 1;
     if (setsockopt (udpsock, SOL_SOCKET, SO_BROADCAST,
