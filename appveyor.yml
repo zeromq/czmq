@@ -30,20 +30,27 @@ init:
   - msbuild /version
   - cmd: reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
 
+cache:
+    - C:\projects\libzmq -> appveyor.yml
+
 install:
   - cmd: if "%Platform%"=="x64" set "CMAKE_GENERATOR=%CMAKE_GENERATOR% Win64"
   - cmd: echo "Generator='%CMAKE_GENERATOR%'"
   - cmd: echo "Platform='%Platform%'"
   - cmd: set LIBZMQ_SOURCEDIR=C:\projects\libzmq
-  - cmd: git clone --depth 1 --quiet https://github.com/zeromq/libzmq.git "%LIBZMQ_SOURCEDIR%"
-  - cmd: set LIBZMQ_BUILDDIR=C:\projects\build_libzmq
-  - cmd: md "%LIBZMQ_BUILDDIR%"
-  - cmd: cd "%LIBZMQ_BUILDDIR%"
-  - cmd: cmake -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
-  - cmd: msbuild /v:minimal /maxcpucount:%NUMBER_OF_PROCESSORS% /p:Configuration=%Configuration% libzmq.vcxproj
+  - cmd: set LIBZMQ_BUILDDIR=C:\projects\libzmq\build
   - cmd: set ZEROMQ_INCLUDE_DIR="%LIBZMQ_SOURCEDIR%\include"
   - cmd: set ZEROMQ_LIBRARY_DIR="%LIBZMQ_BUILDDIR%\lib\%Configuration%"
-  - cmd: move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
+  - if not exist C:\projects\libzmq (
+      git clone --depth 1 --quiet https://github.com/zeromq/libzmq.git "%LIBZMQ_SOURCEDIR%" &&
+      md "%LIBZMQ_BUILDDIR%" &&
+      cd "%LIBZMQ_BUILDDIR%" ) else (
+      cd "%LIBZMQ_SOURCEDIR%" &&
+      git pull &&
+      cd "%LIBZMQ_BUILDDIR%" )
+  - cmd: cmake -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
+  - cmd: msbuild /v:minimal /maxcpucount:%NUMBER_OF_PROCESSORS% /p:Configuration=%Configuration% libzmq.vcxproj
+  - ps: Copy-Item "C:\projects\libzmq\build\lib\${env:Configuration}\libzmq-*lib" -Destination "C:\projects\libzmq\build\lib\${env:Configuration}\zmq.lib"
 
 clone_folder: C:\projects\czmq
 
