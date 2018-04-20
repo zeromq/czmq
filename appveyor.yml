@@ -74,7 +74,7 @@ after_build:
   - cmd: ctest -C "%Configuration%" -V
   - cmd: cd "%Configuration%"
   - cmd: test_randof.exe -h | find "ZSYS"
-  - cmd: test_randof.exe -r 1000000 -i 30000000
+  - cmd: test_randof.exe -r 100000 -i 3000000
 
 test:
   none
