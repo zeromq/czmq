@@ -274,18 +274,12 @@ zproc_destroy (zproc_t **self_p) {
         zproc_wait (self, true);
         zactor_destroy (&self->actor);
 
-        if (self->stdinpipe [0] != -1)
-            close (self->stdinpipe [0]);
-        if (self->stdinpipe [1] != -1)
-            close (self->stdinpipe [1]);
-        if (self->stdoutpipe [0] != -1) {
-            close (self->stdoutpipe [0]);
-            close (self->stdoutpipe [1]);
-        }
-        if (self->stderrpipe [0] != -1) {
-            close (self->stderrpipe [0]);
-            close (self->stderrpipe [1]);
-        }
+        if (self->stdinpipe [0] != -1)  close (self->stdinpipe [0]);
+        if (self->stdinpipe [1] != -1)  close (self->stdinpipe [1]);
+        if (self->stdoutpipe [0] != -1) close (self->stdoutpipe [0]);
+        if (self->stdoutpipe [1] != -1) close (self->stdoutpipe [1]);
+        if (self->stderrpipe [0] != -1) close (self->stderrpipe [0]);
+        if (self->stderrpipe [1] != -1) close (self->stderrpipe [1]);
 
         zpair_destroy (&self->execpair);
         zpair_destroy (&self->stdinpair);
