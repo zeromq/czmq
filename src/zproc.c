@@ -95,9 +95,11 @@ struct _zpair_t {
 };
 
 static zpair_t*
-zpair_new (char* endpoint) {
+zpair_new (char *endpoint) {
     zpair_t *self = (zpair_t*) zmalloc (sizeof (zpair_t));
-    self->endpoint = endpoint;
+    if (self) {
+        self->endpoint = endpoint;
+    }
     return self;
 }
 
@@ -237,30 +239,44 @@ zproc_new ()
     }
 
     zproc_t *self = (zproc_t*) zmalloc (sizeof (zproc_t));
-    self->verbose = false;
+    if (self) {
+        self->verbose = false;
 
-    self->stdinpipe [0] = -1;
-    self->stdinpipe [1] = -1;
-    self->stdoutpipe [0] = -1;
-    self->stdoutpipe [1] = -1;
-    self->stderrpipe [0] = -1;
-    self->stderrpipe [1] = -1;
+        self->stdinpipe [0] = -1;
+        self->stdinpipe [1] = -1;
+        self->stdoutpipe [0] = -1;
+        self->stdoutpipe [1] = -1;
+        self->stderrpipe [0] = -1;
+        self->stderrpipe [1] = -1;
 
-    zuuid_t *uuid = zuuid_new ();
-    self->execpair = zpair_new (
-        zsys_sprintf ("#inproc://zproc-%s-exec", zuuid_str_canonical (uuid))
-    );
-    zpair_mkpair (self->execpair);
-    self->stdinpair = zpair_new (
-        zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
-    );
-    self->stdoutpair = zpair_new (
-        zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
-    );
-    self->stderrpair = zpair_new (
-        zsys_sprintf ("#inproc://zproc-%s-stderr", zuuid_str_canonical (uuid))
-    );
-    zuuid_destroy (&uuid);
+        zuuid_t *uuid = zuuid_new ();
+        if (!uuid) {
+            zproc_destroy (&self);
+            return NULL;
+        }
+        self->execpair = zpair_new (
+            zsys_sprintf ("#inproc://zproc-%s-exec", zuuid_str_canonical (uuid))
+        );
+        if (self->execpair) {
+            zpair_mkpair (self->execpair);
+            self->stdinpair = zpair_new (
+                zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
+            );
+        }
+        if (self->stdinpair) {
+            self->stdoutpair = zpair_new (
+                zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
+            );
+        }
+        if (self->stdoutpair) {
+            self->stderrpair = zpair_new (
+                zsys_sprintf ("#inproc://zproc-%s-stderr", zuuid_str_canonical (uuid))
+            );
+        } else {
+            zproc_destroy (&self);
+        }
+        zuuid_destroy (&uuid);
+    }
 
     return self;
 }
@@ -274,18 +290,12 @@ zproc_destroy (zproc_t **self_p) {
         zproc_wait (self, true);
         zactor_destroy (&self->actor);
 
-        if (self->stdinpipe [0] != -1)
-            close (self->stdinpipe [0]);
-        if (self->stdinpipe [1] != -1)
-            close (self->stdinpipe [1]);
-        if (self->stdoutpipe [0] != -1) {
-            close (self->stdoutpipe [0]);
-            close (self->stdoutpipe [1]);
-        }
-        if (self->stderrpipe [0] != -1) {
-            close (self->stderrpipe [0]);
-            close (self->stderrpipe [1]);
-        }
+        if (self->stdinpipe [0] != -1)  close (self->stdinpipe [0]);
+        if (self->stdinpipe [1] != -1)  close (self->stdinpipe [1]);
+        if (self->stdoutpipe [0] != -1) close (self->stdoutpipe [0]);
+        if (self->stdoutpipe [1] != -1) close (self->stdoutpipe [1]);
+        if (self->stderrpipe [0] != -1) close (self->stderrpipe [0]);
+        if (self->stderrpipe [1] != -1) close (self->stderrpipe [1]);
 
         zpair_destroy (&self->execpair);
         zpair_destroy (&self->stdinpair);
