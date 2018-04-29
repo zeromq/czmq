@@ -47,7 +47,7 @@ zuuid_new (void)
     assert (sizeof (uuid) == ZUUID_LEN);
     UuidCreate (&uuid);
     zuuid_set (self, (byte *) &uuid);
-#elif defined (HAVE_UUID) && !defined (__UTYPE_FREEBSD)
+#elif defined (HAVE_UUID)
     uuid_t uuid;
     assert (sizeof (uuid) == ZUUID_LEN);
     uuid_generate (uuid);
