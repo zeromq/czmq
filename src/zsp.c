@@ -29,6 +29,7 @@ int main (int argc, char *argv [])
     bool use_stdin  = false;
     bool use_stderr = false;
     bool use_stdout = false;
+    bool abrt = false;
 
     char *message = NULL;
 
@@ -41,6 +42,7 @@ int main (int argc, char *argv [])
 #endif
             puts ("  --stderr / -e          output on stderr");
             puts ("  --stdout / -o          output on stdout");
+            puts ("  --abrt / -a            crash with SIGABRT on start");
             puts ("  --verbose / -v         verbose mode");
             puts ("  --help / -h            this information");
             return 0;
@@ -61,6 +63,10 @@ int main (int argc, char *argv [])
         if (streq (argv [argn], "--verbose")
         ||  streq (argv [argn], "-v"))
             verbose = true;
+        else
+        if (streq (argv [argn], "--abrt")
+        ||  streq (argv [argn], "-a"))
+            abrt = true;
         else
         if (argv [argn][0] == '-') {
             printf ("Unknown option: %s\n", argv [argn]);
@@ -85,6 +91,16 @@ int main (int argc, char *argv [])
         stdinf = zfile_new ("/dev", "stdin");
         int r = zfile_input (stdinf);
         assert (r == 0);
+    }
+
+    if (abrt) {
+        if (verbose)
+            zsys_info ("Going to abort myself");
+#if defined (__WINDOWS__)
+        assert (false); // TODO: how to do kill myelf on Windows?
+#else
+        kill (getpid (), SIGABRT);
+#endif
     }
 
     //  Insert main code here
