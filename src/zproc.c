@@ -1078,7 +1078,30 @@ zproc_test (bool verbose)
     }
 
     {
-    // Test case #4: use never ending subprocess and poller to read data from it
+    // Test case #4: child abort itself
+    zproc_t *self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
+    zproc_set_argsx (self, file, "--verbose", "--abrt", NULL);
+    zproc_set_stdout (self, NULL);
+    zproc_set_stderr (self, NULL);
+    zproc_set_stdin (self, NULL);
+
+    int r = zproc_run (self);
+    zclock_sleep (100); // to let actor start the process
+    assert (r != -1);
+    zclock_sleep (100);
+    zframe_t *frame;
+    zsock_brecv (zproc_stdout (self), "f", &frame);
+    assert (zframe_is (frame));
+    assert (zframe_size (frame) > 0);
+    zframe_destroy (&frame);
+    assert (zproc_returncode (self) == -SIGABRT);
+    zproc_destroy (&self);
+    }
+
+    {
+    // Test case #5: use never ending subprocess and poller to read data from it
     //  Create new zproc instance
     zproc_t *self = zproc_new ();
     assert (self);
