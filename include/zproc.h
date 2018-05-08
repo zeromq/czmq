@@ -122,9 +122,10 @@ CZMQ_EXPORT bool
     zproc_running (zproc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  wait or poll process status, return return code
+//  wait or poll process status, return return code or ZPROC_RUNNING
+//  The timeout should be zero or greater, or -1 to wait indefinitely.
 CZMQ_EXPORT int
-    zproc_wait (zproc_t *self, bool hang);
+    zproc_wait (zproc_t *self, int timeout);
 
 //  *** Draft method, for development use, may change without warning ***
 //  return internal actor, useful for the polling if process died
@@ -135,6 +136,12 @@ CZMQ_EXPORT void *
 //  send a signal to the subprocess
 CZMQ_EXPORT void
     zproc_kill (zproc_t *self, int signal);
+
+//  *** Draft method, for development use, may change without warning ***
+//  send SIGTERM signal to the subprocess, wait for grace period and
+//  eventually send SIGKILL
+CZMQ_EXPORT void
+    zproc_shutdown (zproc_t *self, int timeout);
 
 //  *** Draft method, for development use, may change without warning ***
 //  set verbose mode
