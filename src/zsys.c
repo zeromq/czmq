@@ -981,7 +981,7 @@ zsys_udp_new (bool routable)
     assert (!routable);
     SOCKET udpsock;
     int type = SOCK_DGRAM;
-#if defined (SOCK_CLOEXEC)
+#ifdef CZMQ_HAVE_SOCK_CLOEXEC
     //  Ensure socket is closed by exec() functions.
     type |= SOCK_CLOEXEC;
 #endif
@@ -996,7 +996,7 @@ zsys_udp_new (bool routable)
     }
 
     //  On Windows, preventing sockets to be inherited by child processes.
-#if defined (CZMQ_HAVE_WINDOWS) && defined (HANDLE_FLAG_INHERIT)
+#if defined (__WINDOWS__) && defined (HANDLE_FLAG_INHERIT)
     BOOL brc = SetHandleInformation ((HANDLE) udpsock, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
 #endif
