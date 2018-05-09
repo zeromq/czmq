@@ -981,7 +981,7 @@ zsys_udp_new (bool routable)
     assert (!routable);
     SOCKET udpsock;
     int type = SOCK_DGRAM;
-#if defined (SOCK_CLOEXEC)
+#ifdef CZMQ_HAVE_SOCK_CLOEXEC
     //  Ensure socket is closed by exec() functions.
     type |= SOCK_CLOEXEC;
 #endif
