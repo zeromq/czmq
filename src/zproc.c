@@ -287,7 +287,7 @@ zproc_destroy (zproc_t **self_p) {
     assert (self_p);
     if (*self_p) {
         zproc_t *self = *self_p;
-        zproc_wait (self, true);
+        zproc_wait (self, -1);
         zactor_destroy (&self->actor);
 
         if (self->stdinpipe [0] != -1)  close (self->stdinpipe [0]);
@@ -440,7 +440,7 @@ int
 zproc_returncode (zproc_t *self) {
     assert (self);
     assert (zproc_pid(self));
-    zproc_wait (self, false);
+    zproc_wait (self, 0);
     return self->return_code;
 }
 
@@ -763,7 +763,7 @@ zproc_run (zproc_t *self)
             zsys_error ("zproc: No arguments, nothing to run. Call zproc_set_args before");
         return -1;
     }
-    const char *filename = (const char*) zlist_first (self->args); 
+    const char *filename = (const char*) zlist_first (self->args);
     if (!zfile_exists (filename)) {
         if (self->verbose)
             zsys_error ("zproc: '%s' does not exists", filename);
@@ -779,8 +779,11 @@ zproc_run (zproc_t *self)
     return 0;
 }
 
+static void
+s_empty_alarm_handler (int sig) { }
+
 int
-zproc_wait (zproc_t *self, bool wait) {
+zproc_wait (zproc_t *self, int timeout) {
 #if defined (__WINDOWS__)
     if (!self->running) {
         if (self->verbose)
@@ -788,10 +791,10 @@ zproc_wait (zproc_t *self, bool wait) {
         return self->return_code;
     }
 
-    uint32_t r = WaitForSingleObject (self->piProcInfo.hProcess, wait ? INFINITE : 0);
+    uint32_t r = WaitForSingleObject (self->piProcInfo.hProcess, timeout == -1 ? INFINITE : timeout);
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\twaitforsingleobject, r=%d", zproc_pid (self), r);
-    if (!wait && r == 0x00000102) {
+    if (timeout >= 0 && r == 0x00000102) {
         // still running
         return self->return_code;
     }
@@ -808,13 +811,13 @@ zproc_wait (zproc_t *self, bool wait) {
     return -1;
 #else
     assert (self);
+
     if (!self->pid)
         return 0;
 
     if (self->verbose)
-        zsys_debug ("zproc_wait [%d]: wait=%s", self->pid, wait ? "true" : "false");
+        zsys_debug ("zproc_wait [%d]: timeout=%d", self->pid, timeout);
     int status = -1;
-    int options = !wait ? WNOHANG : 0;
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\t!self->running=%s", self->pid, self->running ? "true" : "false");
     if (!self->running)
@@ -822,10 +825,41 @@ zproc_wait (zproc_t *self, bool wait) {
 
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\twaitpid", self->pid);
-    int r = waitpid (self->pid, &status, options);
+
+    int r = 0;
+    if (timeout < 0) {
+        // infinite
+        r = waitpid (self->pid, &status, 0);
+    }
+    else if (timeout == 0) {
+        // no hang
+        r = waitpid (self->pid, &status, WNOHANG);
+    } else {
+        // with timeout
+        // set sigalarm handler
+        struct sigaction myhandler;
+        struct sigaction oldhandler;
+
+        myhandler.sa_handler = s_empty_alarm_handler;
+        myhandler.sa_flags = 0;
+        sigemptyset (&myhandler.sa_mask);
+        sigaction (SIGALRM, &myhandler, &oldhandler);
+
+        // schedule signal and waitpid
+        unsigned int timeoutsec = timeout / 1000;
+        if (!timeoutsec) timeoutsec += 1;
+        alarm (timeoutsec);
+        r = waitpid (self->pid, &status, 0);
+        alarm (0);
+        if (r < 0 && errno == EINTR) r = 0;
+
+        // restore signal action
+        sigaction (SIGALRM, &oldhandler, NULL);
+    }
+
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\twaitpid, r=%d", self->pid, r);
-    if (!wait && r == 0)
+    if (timeout <= 0 && r == 0)
         return self->return_code;
 
     if (WIFEXITED(status)) {
@@ -858,7 +892,7 @@ bool
 zproc_running (zproc_t *self) {
     assert (self);
     assert (zproc_pid (self));
-    return zproc_wait (self, false) == ZPROC_RUNNING;
+    return zproc_wait (self, 0) == ZPROC_RUNNING;
 }
 
 void *
@@ -876,7 +910,7 @@ zproc_kill (zproc_t *self, int signum) {
         if (signum == SIGTERM) {
             if (! TerminateProcess (self->piProcInfo.hProcess, 255))
                 zsys_error ("zproc_kill [%d]:\tTerminateProcess failed", zproc_pid (self));
-            zproc_wait (self, false);
+            zproc_wait (self, 0);
         } else {
             zsys_error ("zproc_kill: [%d]:\tOnly SIGTERM is implemented on windows", zproc_pid (self));
         }
@@ -886,9 +920,23 @@ zproc_kill (zproc_t *self, int signum) {
         int r = kill (self->pid, signum);
         if (r != 0)
             zsys_error ("kill of pid=%d failed: %s", self->pid, strerror (errno));
-        zproc_wait (self, false);
+        zproc_wait (self, 0);
     }
 #endif
+}
+
+//  send SIGTERM signal to the subprocess, wait for grace period and KILL
+void
+zproc_shutdown (zproc_t *self, int timeout)
+{
+    assert (self);
+    if (timeout < 0) timeout = 0;
+
+    zproc_kill (self, SIGTERM);
+    zproc_wait (self, timeout);
+    if (zproc_running (self)) {
+        zproc_kill (self, SIGKILL);
+    }
 }
 
 void
@@ -1031,7 +1079,7 @@ zproc_test (bool verbose)
     if (verbose)
         zframe_print (frame, "1:");
     zframe_destroy (&frame);
-    r = zproc_wait (self, true);
+    r = zproc_wait (self, -1);
     assert (r == 0);
     zproc_destroy (&self);
     }
@@ -1045,7 +1093,7 @@ zproc_test (bool verbose)
     zproc_set_argsx (self, file, "--stdin", "--stderr", NULL);
     zproc_set_stdin (self, NULL);
     zproc_set_stderr (self, NULL);
-    
+
     int r = zproc_run (self);
     assert (r == 0);
     zframe_t *frame = zframe_new ("Lorem ipsum\0\0", strlen ("Lorem ipsum")+2);
@@ -1059,11 +1107,11 @@ zproc_test (bool verbose)
         zframe_print (frame, "2:");
     assert (!strncmp ((char*) zframe_data (frame), "Lorem ipsum", 11));
     zproc_kill (self, SIGTERM);
-    zproc_wait (self, true);
+    zproc_wait (self, -1);
     zframe_destroy (&frame);
     zproc_destroy (&self);
     }
-    
+
     {
     // Test case#3: run non existing binary
     zproc_t *self = zproc_new ();
@@ -1071,7 +1119,7 @@ zproc_test (bool verbose)
     zproc_set_verbose (self, verbose);
     //  forward input from stdin to stderr
     zproc_set_argsx (self, "/not/existing/file", NULL);
-    
+
     int r = zproc_run (self);
     assert (r == -1);
     zproc_destroy (&self);
@@ -1136,7 +1184,7 @@ zproc_test (bool verbose)
         zsys_debug("zproc_test() : sleeping 4000 msec to gather some output from helper");
     zclock_sleep (4000);
     zproc_kill (self, SIGTERM);
-    zproc_wait (self, true);
+    zproc_wait (self, -1);
 
     // read the content from zproc_stdout - use zpoller and a loop
     bool stdout_read = false;
@@ -1199,6 +1247,46 @@ zproc_test (bool verbose)
 
     assert (stdout_read);
     zpoller_destroy (&poller);
+    zproc_destroy (&self);
+    }
+    {
+    // testcase #6 wait for process that hangs, kill it
+    zproc_t *self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
+
+    zproc_set_argsx (self, file, NULL);
+
+    if (verbose)
+        zsys_debug("zproc_test() : launching helper '%s'", file);
+
+    int r = zproc_run (self);
+    assert (r == 0);
+    r = zproc_wait (self, 1000);
+    assert (r == ZPROC_RUNNING);
+    assert (zproc_running (self));
+    zproc_shutdown (self, 1000);
+    assert (!zproc_running (self));
+    zproc_destroy (&self);
+    }
+    {
+    // testcase #7 wait for process that exits earlier
+    zproc_t *self = zproc_new ();
+    assert (self);
+    zproc_set_verbose (self, verbose);
+
+    zproc_set_argsx (self, file, "--quit", "1", NULL);
+
+    if (verbose)
+        zsys_debug("zproc_test() : launching helper '%s' --quit 1", file);
+
+    int r = zproc_run (self);
+    assert (r == 0);
+    int t = zclock_mono ();
+    r = zproc_wait (self, 8000);
+    assert (r == 0);
+    t = zclock_mono () - t;
+    assert (t < 2000);
     zproc_destroy (&self);
     }
     //  @end
