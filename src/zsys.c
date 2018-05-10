@@ -997,8 +997,8 @@ zsys_udp_new (bool routable)
 
     //  On Windows, preventing sockets to be inherited by child processes.
 #if defined (__WINDOWS__) && defined (HANDLE_FLAG_INHERIT)
-    BOOL brc = SetHandleInformation ((HANDLE) udpsock, HANDLE_FLAG_INHERIT, 0);
-    win_assert (brc);
+    if (!SetHandleInformation ((HANDLE) udpsock, HANDLE_FLAG_INHERIT, 0))
+        zsys_socket_error ("SetHandleInformation (HANDLE_FLAG_INHERIT)");
 #endif
 
     //  Ask operating system for broadcast permissions on socket
