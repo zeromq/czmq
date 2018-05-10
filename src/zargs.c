@@ -222,7 +222,6 @@ zargs_has (zargs_t *self, const char *name) {
 bool
 zargs_hasx (zargs_t *self, const char *name, ...) {
     assert (self);
-    const char *ret = NULL;
     va_list args;
     va_start (args, name);
     while (name) {
