@@ -779,9 +779,6 @@ zproc_run (zproc_t *self)
     return 0;
 }
 
-static void
-s_empty_alarm_handler (int sig) { }
-
 int
 zproc_wait (zproc_t *self, int timeout) {
 #if defined (__WINDOWS__)
@@ -828,38 +825,26 @@ zproc_wait (zproc_t *self, int timeout) {
 
     int r = 0;
     if (timeout < 0) {
-        // infinite
+        // infinite wait
         r = waitpid (self->pid, &status, 0);
     }
     else if (timeout == 0) {
-        // no hang
+        // just check and continue
         r = waitpid (self->pid, &status, WNOHANG);
     } else {
-        // with timeout
-        // set sigalarm handler
-        struct sigaction myhandler;
-        struct sigaction oldhandler;
-
-        myhandler.sa_handler = s_empty_alarm_handler;
-        myhandler.sa_flags = 0;
-        sigemptyset (&myhandler.sa_mask);
-        sigaction (SIGALRM, &myhandler, &oldhandler);
-
-        // schedule signal and waitpid
-        unsigned int timeoutsec = timeout / 1000;
-        if (!timeoutsec) timeoutsec += 1;
-        alarm (timeoutsec);
-        r = waitpid (self->pid, &status, 0);
-        alarm (0);
-        if (r < 0 && errno == EINTR) r = 0;
-
-        // restore signal action
-        sigaction (SIGALRM, &oldhandler, NULL);
+        // wait up to timeout
+        int quit = zclock_mono () + timeout;
+        while (true) {
+            if (! self->running) break;
+            if (zclock_mono () >= quit) break;
+            zclock_sleep (500);
+        }
+        return self->return_code;
     }
 
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\twaitpid, r=%d", self->pid, r);
-    if (timeout <= 0 && r == 0)
+    if (r == 0)
         return self->return_code;
 
     if (WIFEXITED(status)) {
