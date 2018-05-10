@@ -919,9 +919,11 @@ zproc_shutdown (zproc_t *self, int timeout)
 
     zproc_kill (self, SIGTERM);
     zproc_wait (self, timeout);
+#if ! defined (__WINDOWS__)
     if (zproc_running (self)) {
         zproc_kill (self, SIGKILL);
     }
+#endif
 }
 
 void
