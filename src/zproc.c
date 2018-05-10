@@ -557,8 +557,19 @@ s_zproc_alive (zloop_t *loop, int timer_id, void *args)
     zproc_t *self = (zproc_t*) args;
     if (zsys_interrupted)
         return -1;
-    if (zproc_pid (self) && zproc_running (self))
+    if (zproc_pid (self)) {
+#if defined (__WINDOWS__)
+    if (zproc_running (self))
         return 0;
+#else
+    // calling waitpid several times leads to strange error
+    errno = 0;      // clear errno, we're not interested in value
+    int r = kill (self->pid, 0);
+    if (r == 0)
+        return 0;
+    errno = 0;      // clear errno, we're not interested in value
+#endif
+    }
     return -1;
 }
 
@@ -835,7 +846,8 @@ zproc_wait (zproc_t *self, int timeout) {
         // wait up to timeout
         int quit = zclock_mono () + timeout;
         while (true) {
-            if (! self->running) break;
+            if (! zproc_running (self))
+                break;
             if (zclock_mono () >= quit) break;
             zclock_sleep (500);
         }
