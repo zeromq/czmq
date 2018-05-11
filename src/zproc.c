@@ -578,6 +578,7 @@ s_zproc_alive (zloop_t *loop, int timer_id, void *args)
                 zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED, self->return_code=%d", self->pid, self->return_code);
             self->running = false;
         }
+        return -1;
     }
     return 0;
 #endif
