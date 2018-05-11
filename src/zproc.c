@@ -287,7 +287,7 @@ zproc_destroy (zproc_t **self_p) {
     assert (self_p);
     if (*self_p) {
         zproc_t *self = *self_p;
-        zproc_wait (self, -1);
+        zproc_shutdown (self, 5000);
         zactor_destroy (&self->actor);
 
         if (self->stdinpipe [0] != -1)  close (self->stdinpipe [0]);
@@ -885,7 +885,8 @@ zproc_wait (zproc_t *self, int timeout) {
 bool
 zproc_running (zproc_t *self) {
     assert (self);
-    assert (zproc_pid (self));
+    if (zproc_pid (self) == 0)
+        return false;
     return zproc_wait (self, 0) == ZPROC_RUNNING;
 }
 
