@@ -287,7 +287,7 @@ zproc_destroy (zproc_t **self_p) {
     assert (self_p);
     if (*self_p) {
         zproc_t *self = *self_p;
-        zproc_wait (self, -1);
+        zproc_shutdown (self, 5000);
         zactor_destroy (&self->actor);
 
         if (self->stdinpipe [0] != -1)  close (self->stdinpipe [0]);
@@ -464,22 +464,19 @@ s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
 #   define BUF_SIZE 65535
 #endif
     byte buf [BUF_SIZE];
-    ssize_t r = 1;
 
-    while (r > 0) {
-        memset (buf, '\0', BUF_SIZE);
-        r = read (item->fd, buf, BUF_SIZE);
-        if (r == -1) {
-            zsys_error ("read from fd %d: %s", item->fd, strerror (errno));
-            break;
-        }
-        else
-        if (r == 0)
-            break;
-        zframe_t *frame = zframe_new (buf, r);
-        zsock_bsend (socket, "f", frame, NULL);
-        zframe_destroy (&frame);
+    memset (buf, '\0', BUF_SIZE);
+    ssize_t r = read (item->fd, buf, BUF_SIZE);
+    if (r == -1) {
+        zsys_warning ("read from fd %d: %s", item->fd, strerror (errno));
+        return 0;
     }
+    else
+    if (r == 0)
+        return 0;
+    zframe_t *frame = zframe_new (buf, r);
+    zsock_bsend (socket, "f", frame, NULL);
+    zframe_destroy (&frame);
     return 0;
 #undef BUF_SIZE
 }
@@ -888,7 +885,8 @@ zproc_wait (zproc_t *self, int timeout) {
 bool
 zproc_running (zproc_t *self) {
     assert (self);
-    assert (zproc_pid (self));
+    if (zproc_pid (self) == 0)
+        return false;
     return zproc_wait (self, 0) == ZPROC_RUNNING;
 }
 
