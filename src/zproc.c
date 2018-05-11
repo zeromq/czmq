@@ -287,7 +287,7 @@ zproc_destroy (zproc_t **self_p) {
     assert (self_p);
     if (*self_p) {
         zproc_t *self = *self_p;
-        zproc_wait (self, -1);
+        zproc_shutdown (self, 5000);
         zactor_destroy (&self->actor);
 
         if (self->stdinpipe [0] != -1)  close (self->stdinpipe [0]);
@@ -917,6 +917,7 @@ zproc_shutdown (zproc_t *self, int timeout)
 #if ! defined (__WINDOWS__)
     if (zproc_running (self)) {
         zproc_kill (self, SIGKILL);
+        zproc_wait (self, timeout);
     }
 #endif
 }
