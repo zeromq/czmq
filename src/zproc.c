@@ -761,7 +761,7 @@ s_zproc_actor (zsock_t *pipe, void *args)
     zproc_t *self = (zproc_t*) args;
     zloop_t *loop = zloop_new ();
     assert (loop);
-    zloop_set_verbose (loop, self->verbose);
+    // zloop_set_verbose (loop, self->verbose);
     self->loop_ref = loop;
     self->pipe = pipe;
 
