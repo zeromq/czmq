@@ -254,15 +254,29 @@ module CZMQ
         result
       end
 
+      # The timeout should be zero or greater, or -1 to wait indefinitely.
       # wait or poll process status, return return code
       #
-      # @param hang [Boolean]
+      # @param timeout [Integer, #to_int, #to_i]
       # @return [Integer]
-      def wait(hang)
+      def wait(timeout)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        hang = !(0==hang||!hang) # boolean
-        result = ::CZMQ::FFI.zproc_wait(self_p, hang)
+        timeout = Integer(timeout)
+        result = ::CZMQ::FFI.zproc_wait(self_p, timeout)
+        result
+      end
+
+      # send SIGTERM signal to the subprocess, wait for grace period and
+      # eventually send SIGKILL
+      #
+      # @param timeout [Integer, #to_int, #to_i]
+      # @return [Integer]
+      def shutdown(timeout)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        timeout = Integer(timeout)
+        result = ::CZMQ::FFI.zproc_shutdown(self_p, timeout)
         result
       end
 

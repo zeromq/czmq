@@ -82,8 +82,13 @@ public slots:
     //  return true if process is running, false if not yet started or finished
     bool running ();
 
+    //  The timeout should be zero or greater, or -1 to wait indefinitely.
     //  wait or poll process status, return return code
-    int wait (bool hang);
+    int wait (int timeout);
+
+    //  send SIGTERM signal to the subprocess, wait for grace period and
+    //  eventually send SIGKILL
+    int shutdown (int timeout);
 
     //  return internal actor, useful for the polling if process died
     void *actor ();

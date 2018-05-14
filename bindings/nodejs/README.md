@@ -2243,10 +2243,18 @@ boolean my_zproc.running ()
 return true if process is running, false if not yet started or finished
 
 ```
-integer my_zproc.wait (Boolean)
+integer my_zproc.wait (Number)
 ```
 
+The timeout should be zero or greater, or -1 to wait indefinitely.
 wait or poll process status, return return code
+
+```
+integer my_zproc.shutdown (Number)
+```
+
+send SIGTERM signal to the subprocess, wait for grace period and
+eventually send SIGKILL
 
 ```
 nothing my_zproc.kill (Number)
