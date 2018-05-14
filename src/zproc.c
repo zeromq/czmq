@@ -215,7 +215,6 @@ struct _zproc_t {
     int stdoutpipe [2];     // stdout pipe
     int stderrpipe [2];     // stderr pipe
 
-    zpair_t *execpair;      // pair used to synchronize zproc_run with actor
     zpair_t *stdinpair;     // stdin socketpair
     zpair_t *stdoutpair;    // stdout socketpair
     zpair_t *stderrpair;    // stderr socketpair
@@ -239,44 +238,31 @@ zproc_new ()
     }
 
     zproc_t *self = (zproc_t*) zmalloc (sizeof (zproc_t));
-    if (self) {
-        self->verbose = false;
+    assert (self);
+    self->verbose = false;
 
-        self->stdinpipe [0] = -1;
-        self->stdinpipe [1] = -1;
-        self->stdoutpipe [0] = -1;
-        self->stdoutpipe [1] = -1;
-        self->stderrpipe [0] = -1;
-        self->stderrpipe [1] = -1;
+    self->stdinpipe [0] = -1;
+    self->stdinpipe [1] = -1;
+    self->stdoutpipe [0] = -1;
+    self->stdoutpipe [1] = -1;
+    self->stderrpipe [0] = -1;
+    self->stderrpipe [1] = -1;
 
-        zuuid_t *uuid = zuuid_new ();
-        if (!uuid) {
-            zproc_destroy (&self);
-            return NULL;
-        }
-        self->execpair = zpair_new (
-            zsys_sprintf ("#inproc://zproc-%s-exec", zuuid_str_canonical (uuid))
-        );
-        if (self->execpair) {
-            zpair_mkpair (self->execpair);
-            self->stdinpair = zpair_new (
-                zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
-            );
-        }
-        if (self->stdinpair) {
-            self->stdoutpair = zpair_new (
-                zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
-            );
-        }
-        if (self->stdoutpair) {
-            self->stderrpair = zpair_new (
-                zsys_sprintf ("#inproc://zproc-%s-stderr", zuuid_str_canonical (uuid))
-            );
-        } else {
-            zproc_destroy (&self);
-        }
-        zuuid_destroy (&uuid);
-    }
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
+    self->stdinpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
+    );
+    assert (self->stdinpair);
+    self->stdoutpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
+    );
+    assert (self->stdoutpair);
+    self->stderrpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stderr", zuuid_str_canonical (uuid))
+    );
+    assert (self->stderrpair);
+    zuuid_destroy (&uuid);
 
     return self;
 }
@@ -297,7 +283,6 @@ zproc_destroy (zproc_t **self_p) {
         if (self->stderrpipe [0] != -1) close (self->stderrpipe [0]);
         if (self->stderrpipe [1] != -1) close (self->stderrpipe [1]);
 
-        zpair_destroy (&self->execpair);
         zpair_destroy (&self->stdinpair);
         zpair_destroy (&self->stdoutpair);
         zpair_destroy (&self->stderrpair);
@@ -466,20 +451,18 @@ s_fd_in_handler (zloop_t *self, zmq_pollitem_t *item, void *socket)
     byte buf [BUF_SIZE];
     ssize_t r = 1;
 
-    while (r > 0) {
-        memset (buf, '\0', BUF_SIZE);
-        r = read (item->fd, buf, BUF_SIZE);
-        if (r == -1) {
-            zsys_error ("read from fd %d: %s", item->fd, strerror (errno));
-            break;
-        }
-        else
-        if (r == 0)
-            break;
-        zframe_t *frame = zframe_new (buf, r);
-        zsock_bsend (socket, "f", frame, NULL);
-        zframe_destroy (&frame);
+    memset (buf, '\0', BUF_SIZE);
+    r = read (item->fd, buf, BUF_SIZE);
+    if (r == -1) {
+        zsys_warning ("read from fd %d: %s", item->fd, strerror (errno));
+        return 0;
     }
+    else
+    if (r == 0)
+        return 0;
+    zframe_t *frame = zframe_new (buf, r);
+    zsock_bsend (socket, "f", frame, NULL);
+    zframe_destroy (&frame);
     return 0;
 #undef BUF_SIZE
 }
@@ -604,7 +587,6 @@ s_zproc_execve (zproc_t *self)
         zsys_debug ("zproc: command to start: %s", commandline);
 
     siStartInfo.cb = sizeof (siStartInfo);
-    zsock_signal (zpair_write (self->execpair), 0);
     self->running = CreateProcessA(
         NULL,          // app name
         commandline,   // command line
@@ -679,7 +661,6 @@ s_zproc_execve (zproc_t *self)
         else
             env = environ;
 
-        zsock_signal (zpair_write (self->execpair), 0);
         r = execve (filename, argv2, env);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
@@ -743,7 +724,7 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
         }
 
         s_zproc_execve (self);
-        zsock_wait (self->execpair);
+        zclock_sleep (10); // magic sleep, give execve a bit of time
         zsock_signal (pipe, 0);
     }
 
@@ -836,7 +817,6 @@ zproc_wait (zproc_t *self, int timeout) {
 
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]: timeout=%d", self->pid, timeout);
-    int status = -1;
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\t!self->running=%s", self->pid, self->running ? "true" : "false");
     if (!self->running)
@@ -845,10 +825,10 @@ zproc_wait (zproc_t *self, int timeout) {
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\twaitpid", self->pid);
 
-    int r = 0;
     if (timeout < 0) {
         // infinite wait
-        while (zproc_running (self)) zclock_sleep (200);
+        while (zproc_running (self))
+            zclock_sleep (200);
         return self->return_code;
     }
     else if (timeout == 0) {
