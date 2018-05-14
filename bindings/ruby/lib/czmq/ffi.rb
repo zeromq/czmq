@@ -532,7 +532,7 @@ module CZMQ
       attach_function :zproc_pid, [:pointer], :int, **opts
       attach_function :zproc_running, [:pointer], :bool, **opts
       attach_function :zproc_wait, [:pointer, :int], :int, **opts
-      attach_function :zproc_shutdown, [:pointer, :int], :int, **opts
+      attach_function :zproc_shutdown, [:pointer, :int], :void, **opts
       attach_function :zproc_actor, [:pointer], :pointer, **opts
       attach_function :zproc_kill, [:pointer, :int], :void, **opts
       attach_function :zproc_set_verbose, [:pointer, :bool], :void, **opts

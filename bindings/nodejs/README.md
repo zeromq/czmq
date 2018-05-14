@@ -2250,7 +2250,7 @@ The timeout should be zero or greater, or -1 to wait indefinitely.
 wait or poll process status, return return code
 
 ```
-integer my_zproc.shutdown (Number)
+nothing my_zproc.shutdown (Number)
 ```
 
 send SIGTERM signal to the subprocess, wait for grace period and

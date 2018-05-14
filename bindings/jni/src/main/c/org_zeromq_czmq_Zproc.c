@@ -126,11 +126,10 @@ Java_org_zeromq_czmq_Zproc__1_1wait (JNIEnv *env, jclass c, jlong self, jint tim
     return wait_;
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zproc__1_1shutdown (JNIEnv *env, jclass c, jlong self, jint timeout)
 {
-    jint shutdown_ = (jint) zproc_shutdown ((zproc_t *) (intptr_t) self, (int) timeout);
-    return shutdown_;
+    zproc_shutdown ((zproc_t *) (intptr_t) self, (int) timeout);
 }
 
 JNIEXPORT jlong JNICALL

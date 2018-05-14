@@ -113,7 +113,6 @@
         send SIGTERM signal to the subprocess, wait for grace period and
         eventually send SIGKILL
         <argument name = "timeout" type = "integer" />
-        <return type="integer" />
     </method>
 
     <method name = "actor">

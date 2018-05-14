@@ -141,7 +141,7 @@ class Zproc(object):
         send SIGTERM signal to the subprocess, wait for grace period and
         eventually send SIGKILL
         """
-        return utils.lib.zproc_shutdown(self._p, timeout)
+        utils.lib.zproc_shutdown(self._p, timeout)
 
     def actor(self):
         """

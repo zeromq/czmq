@@ -2334,7 +2334,7 @@ int
 
 // send SIGTERM signal to the subprocess, wait for grace period and
 // eventually send SIGKILL
-int
+void
     zproc_shutdown (zproc_t *self, int timeout);
 
 // return internal actor, useful for the polling if process died

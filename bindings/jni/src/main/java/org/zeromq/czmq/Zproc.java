@@ -160,9 +160,9 @@ public class Zproc implements AutoCloseable{
     send SIGTERM signal to the subprocess, wait for grace period and
     eventually send SIGKILL
     */
-    native static int __shutdown (long self, int timeout);
-    public int shutdown (int timeout) {
-        return __shutdown (self, timeout);
+    native static void __shutdown (long self, int timeout);
+    public void shutdown (int timeout) {
+        __shutdown (self, timeout);
     }
     /*
     return internal actor, useful for the polling if process died

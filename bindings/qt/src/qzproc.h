@@ -81,7 +81,7 @@ public:
 
     //  send SIGTERM signal to the subprocess, wait for grace period and
     //  eventually send SIGKILL
-    int shutdown (int timeout);
+    void shutdown (int timeout);
 
     //  return internal actor, useful for the polling if process died
     void * actor ();
