@@ -215,7 +215,6 @@ struct _zproc_t {
     int stdoutpipe [2];     // stdout pipe
     int stderrpipe [2];     // stderr pipe
 
-    zpair_t *execpair;      // pair used to synchronize zproc_run with actor
     zpair_t *stdinpair;     // stdin socketpair
     zpair_t *stdoutpair;    // stdout socketpair
     zpair_t *stderrpair;    // stderr socketpair
@@ -254,15 +253,9 @@ zproc_new ()
             zproc_destroy (&self);
             return NULL;
         }
-        self->execpair = zpair_new (
-            zsys_sprintf ("#inproc://zproc-%s-exec", zuuid_str_canonical (uuid))
+        self->stdinpair = zpair_new (
+            zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
         );
-        if (self->execpair) {
-            zpair_mkpair (self->execpair);
-            self->stdinpair = zpair_new (
-                zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
-            );
-        }
         if (self->stdinpair) {
             self->stdoutpair = zpair_new (
                 zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
@@ -297,7 +290,6 @@ zproc_destroy (zproc_t **self_p) {
         if (self->stderrpipe [0] != -1) close (self->stderrpipe [0]);
         if (self->stderrpipe [1] != -1) close (self->stderrpipe [1]);
 
-        zpair_destroy (&self->execpair);
         zpair_destroy (&self->stdinpair);
         zpair_destroy (&self->stdoutpair);
         zpair_destroy (&self->stderrpair);
@@ -602,7 +594,6 @@ s_zproc_execve (zproc_t *self)
         zsys_debug ("zproc: command to start: %s", commandline);
 
     siStartInfo.cb = sizeof (siStartInfo);
-    zsock_signal (zpair_write (self->execpair), 0);
     self->running = CreateProcessA(
         NULL,          // app name
         commandline,   // command line
@@ -677,7 +668,6 @@ s_zproc_execve (zproc_t *self)
         else
             env = environ;
 
-        zsock_signal (zpair_write (self->execpair), 0);
         r = execve (filename, argv2, env);
         if (r == -1) {
             zsys_error ("fail to run %s: %s", filename, strerror (errno));
@@ -741,7 +731,7 @@ s_pipe_handler (zloop_t *loop, zsock_t *pipe, void *args) {
         }
 
         s_zproc_execve (self);
-        zsock_wait (self->execpair);
+        zclock_sleep (10); // magic sleep, give execve a bit of time
         zsock_signal (pipe, 0);
     }
 
