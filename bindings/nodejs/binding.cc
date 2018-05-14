@@ -4384,8 +4384,7 @@ NAN_METHOD (Zproc::_shutdown) {
     }
     else
         return Nan::ThrowTypeError ("`timeout` must be a number");
-    int result = zproc_shutdown (zproc->self, (int) timeout);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
+    zproc_shutdown (zproc->self, (int) timeout);
 }
 
 NAN_METHOD (Zproc::_kill) {

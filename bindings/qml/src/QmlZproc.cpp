@@ -116,8 +116,8 @@ int QmlZproc::wait (int timeout) {
 ///
 //  send SIGTERM signal to the subprocess, wait for grace period and
 //  eventually send SIGKILL
-int QmlZproc::shutdown (int timeout) {
-    return zproc_shutdown (self, timeout);
+void QmlZproc::shutdown (int timeout) {
+    zproc_shutdown (self, timeout);
 };
 
 ///

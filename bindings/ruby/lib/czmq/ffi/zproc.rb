@@ -271,7 +271,7 @@ module CZMQ
       # eventually send SIGKILL
       #
       # @param timeout [Integer, #to_int, #to_i]
-      # @return [Integer]
+      # @return [void]
       def shutdown(timeout)
         raise DestroyedError unless @ptr
         self_p = @ptr

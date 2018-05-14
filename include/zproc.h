@@ -130,7 +130,7 @@ CZMQ_EXPORT int
 //  *** Draft method, for development use, may change without warning ***
 //  send SIGTERM signal to the subprocess, wait for grace period and
 //  eventually send SIGKILL
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zproc_shutdown (zproc_t *self, int timeout);
 
 //  *** Draft method, for development use, may change without warning ***
