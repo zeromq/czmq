@@ -238,38 +238,31 @@ zproc_new ()
     }
 
     zproc_t *self = (zproc_t*) zmalloc (sizeof (zproc_t));
-    if (self) {
-        self->verbose = false;
+    assert (self);
+    self->verbose = false;
 
-        self->stdinpipe [0] = -1;
-        self->stdinpipe [1] = -1;
-        self->stdoutpipe [0] = -1;
-        self->stdoutpipe [1] = -1;
-        self->stderrpipe [0] = -1;
-        self->stderrpipe [1] = -1;
+    self->stdinpipe [0] = -1;
+    self->stdinpipe [1] = -1;
+    self->stdoutpipe [0] = -1;
+    self->stdoutpipe [1] = -1;
+    self->stderrpipe [0] = -1;
+    self->stderrpipe [1] = -1;
 
-        zuuid_t *uuid = zuuid_new ();
-        if (!uuid) {
-            zproc_destroy (&self);
-            return NULL;
-        }
-        self->stdinpair = zpair_new (
-            zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
-        );
-        if (self->stdinpair) {
-            self->stdoutpair = zpair_new (
-                zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
-            );
-        }
-        if (self->stdoutpair) {
-            self->stderrpair = zpair_new (
-                zsys_sprintf ("#inproc://zproc-%s-stderr", zuuid_str_canonical (uuid))
-            );
-        } else {
-            zproc_destroy (&self);
-        }
-        zuuid_destroy (&uuid);
-    }
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
+    self->stdinpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stdin", zuuid_str_canonical (uuid))
+    );
+    assert (self->stdinpair);
+    self->stdoutpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stdout", zuuid_str_canonical (uuid))
+    );
+    assert (self->stdoutpair);
+    self->stderrpair = zpair_new (
+        zsys_sprintf ("#inproc://zproc-%s-stderr", zuuid_str_canonical (uuid))
+    );
+    assert (self->stderrpair);
+    zuuid_destroy (&uuid);
 
     return self;
 }
