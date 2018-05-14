@@ -287,7 +287,7 @@ zproc_destroy (zproc_t **self_p) {
     assert (self_p);
     if (*self_p) {
         zproc_t *self = *self_p;
-        zproc_wait (self, -1);
+        zproc_shutdown (self, 5000);
         zactor_destroy (&self->actor);
 
         if (self->stdinpipe [0] != -1)  close (self->stdinpipe [0]);
@@ -557,20 +557,31 @@ s_zproc_alive (zloop_t *loop, int timer_id, void *args)
     zproc_t *self = (zproc_t*) args;
     if (zsys_interrupted)
         return -1;
-    if (zproc_pid (self)) {
+    if (! zproc_running (self))
+        return 0;
 #if defined (__WINDOWS__)
     if (zproc_running (self))
         return 0;
 #else
-    // calling waitpid several times leads to strange error
-    errno = 0;      // clear errno, we're not interested in value
-    int r = kill (self->pid, 0);
-    if (r == 0)
-        return 0;
-    errno = 0;      // clear errno, we're not interested in value
-#endif
+    int status;
+    int r = waitpid (self->pid, &status, WNOHANG);
+    if (r > 0) {
+        if (WIFEXITED(status)) {
+            self->return_code = WEXITSTATUS(status);
+            if (self->verbose)
+                zsys_debug ("zproc_wait [%d]:\tWIFEXITED, self->return_code=%d", self->pid, self->return_code);
+            self->running = false;
+        }
+        else if (WIFSIGNALED(status)) {
+            self->return_code = - WTERMSIG(status);
+            if (self->verbose)
+                zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED, self->return_code=%d", self->pid, self->return_code);
+            self->running = false;
+        }
+        return -1;
     }
-    return -1;
+    return 0;
+#endif
 }
 
 static int
@@ -750,7 +761,7 @@ s_zproc_actor (zsock_t *pipe, void *args)
     zproc_t *self = (zproc_t*) args;
     zloop_t *loop = zloop_new ();
     assert (loop);
-    zloop_set_verbose (loop, self->verbose);
+    // zloop_set_verbose (loop, self->verbose);
     self->loop_ref = loop;
     self->pipe = pipe;
 
@@ -837,58 +848,31 @@ zproc_wait (zproc_t *self, int timeout) {
     int r = 0;
     if (timeout < 0) {
         // infinite wait
-        r = waitpid (self->pid, &status, 0);
+        while (zproc_running (self)) zclock_sleep (200);
+        return self->return_code;
     }
     else if (timeout == 0) {
         // just check and continue
-        r = waitpid (self->pid, &status, WNOHANG);
+        return self->return_code;
     } else {
         // wait up to timeout
         int quit = zclock_mono () + timeout;
         while (true) {
             if (! zproc_running (self))
                 break;
-            if (zclock_mono () >= quit) break;
-            zclock_sleep (500);
+            if (zclock_mono () >= quit)
+                break;
+            zclock_sleep (200);
         }
         return self->return_code;
     }
-
-    if (self->verbose)
-        zsys_debug ("zproc_wait [%d]:\twaitpid, r=%d", self->pid, r);
-    if (r == 0)
-        return self->return_code;
-
-    if (WIFEXITED(status)) {
-        self->running = false;
-        self->return_code = WEXITSTATUS(status);
-        if (self->verbose)
-            zsys_debug ("zproc_wait [%d]:\tWIFEXITED, self->return_code=%d", self->pid, self->return_code);
-        return self->return_code;
-    }
-    else if (WIFSIGNALED(status)) {
-        self->running = false;
-        self->return_code = - WTERMSIG(status);
-        if (self->verbose)
-            zsys_debug ("zproc_wait [%d]:\tWIFSIGNALED, self->return_code=%d", self->pid, self->return_code);
-        return self->return_code;
-
-        /*
-        if (WCOREDUMP(status)) {
-            self->core_dumped = true;
-        }
-        */
-    }
-    if (self->verbose)
-        zsys_debug ("zproc_wait [%d]: self->return_code=%d", self->pid, self->return_code);
-    return ZPROC_RUNNING;
 #endif
 }
 
 bool
 zproc_running (zproc_t *self) {
     assert (self);
-    assert (zproc_pid (self));
+    if (! zproc_pid (self)) return false;
     return zproc_wait (self, 0) == ZPROC_RUNNING;
 }
 
@@ -913,7 +897,7 @@ zproc_kill (zproc_t *self, int signum) {
         }
     }
 #else
-    if (zproc_pid (self) > 0) {
+    if (zproc_running (self)) {
         int r = kill (self->pid, signum);
         if (r != 0)
             zsys_error ("kill of pid=%d failed: %s", self->pid, strerror (errno));
@@ -934,6 +918,7 @@ zproc_shutdown (zproc_t *self, int timeout)
 #if ! defined (__WINDOWS__)
     if (zproc_running (self)) {
         zproc_kill (self, SIGKILL);
+        zproc_wait (self, timeout);
     }
 #endif
 }
@@ -1143,6 +1128,7 @@ zproc_test (bool verbose)
     assert (zframe_is (frame));
     assert (zframe_size (frame) > 0);
     zframe_destroy (&frame);
+    zproc_wait (self, -1);
     assert (zproc_returncode (self) == -SIGABRT);
     zproc_destroy (&self);
     }
