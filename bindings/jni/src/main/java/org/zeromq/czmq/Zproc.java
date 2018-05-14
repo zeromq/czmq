@@ -149,11 +149,20 @@ public class Zproc implements AutoCloseable{
         return __running (self);
     }
     /*
+    The timeout should be zero or greater, or -1 to wait indefinitely.
     wait or poll process status, return return code
     */
-    native static int __wait (long self, boolean hang);
-    public int Wait (boolean hang) {
-        return __wait (self, hang);
+    native static int __wait (long self, int timeout);
+    public int Wait (int timeout) {
+        return __wait (self, timeout);
+    }
+    /*
+    send SIGTERM signal to the subprocess, wait for grace period and
+    eventually send SIGKILL
+    */
+    native static int __shutdown (long self, int timeout);
+    public int shutdown (int timeout) {
+        return __shutdown (self, timeout);
     }
     /*
     return internal actor, useful for the polling if process died

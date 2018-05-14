@@ -4246,6 +4246,7 @@ NAN_MODULE_INIT (Zproc::Init) {
     Nan::SetPrototypeMethod (tpl, "pid", _pid);
     Nan::SetPrototypeMethod (tpl, "running", _running);
     Nan::SetPrototypeMethod (tpl, "wait", _wait);
+    Nan::SetPrototypeMethod (tpl, "shutdown", _shutdown);
     Nan::SetPrototypeMethod (tpl, "kill", _kill);
     Nan::SetPrototypeMethod (tpl, "setVerbose", _set_verbose);
     Nan::SetPrototypeMethod (tpl, "test", _test);
@@ -4352,19 +4353,38 @@ NAN_METHOD (Zproc::_running) {
 NAN_METHOD (Zproc::_wait) {
     Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
     if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `hang`");
+        return Nan::ThrowTypeError ("method requires a `timeout`");
 
-    //bool hang; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
-    bool hang;
+    //int timeout; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int timeout;
 
 
-    if (info [0]->IsBoolean ())
+    if (info [0]->IsNumber ())
     {
-          hang = Nan::To<bool>(info [0]).FromJust ();
+          timeout = Nan::To<int>(info [0]).FromJust ();
     }
     else
-        return Nan::ThrowTypeError ("`hang` must be a Boolean");
-    int result = zproc_wait (zproc->self, (bool) hang);
+        return Nan::ThrowTypeError ("`timeout` must be a number");
+    int result = zproc_wait (zproc->self, (int) timeout);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zproc::_shutdown) {
+    Zproc *zproc = Nan::ObjectWrap::Unwrap <Zproc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `timeout`");
+
+    //int timeout; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int timeout;
+
+
+    if (info [0]->IsNumber ())
+    {
+          timeout = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`timeout` must be a number");
+    int result = zproc_shutdown (zproc->self, (int) timeout);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 

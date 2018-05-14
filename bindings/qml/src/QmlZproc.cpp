@@ -107,9 +107,17 @@ bool QmlZproc::running () {
 };
 
 ///
+//  The timeout should be zero or greater, or -1 to wait indefinitely.
 //  wait or poll process status, return return code
-int QmlZproc::wait (bool hang) {
-    return zproc_wait (self, hang);
+int QmlZproc::wait (int timeout) {
+    return zproc_wait (self, timeout);
+};
+
+///
+//  send SIGTERM signal to the subprocess, wait for grace period and
+//  eventually send SIGKILL
+int QmlZproc::shutdown (int timeout) {
+    return zproc_shutdown (self, timeout);
 };
 
 ///

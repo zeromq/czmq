@@ -103,8 +103,16 @@
     </method>
 
     <method name = "wait">
+        The timeout should be zero or greater, or -1 to wait indefinitely.
         wait or poll process status, return return code
-        <argument name = "hang" type = "boolean" />
+        <argument name = "timeout" type = "integer" />
+        <return type="integer" />
+    </method>
+
+    <method name = "shutdown">
+        send SIGTERM signal to the subprocess, wait for grace period and
+        eventually send SIGKILL
+        <argument name = "timeout" type = "integer" />
         <return type="integer" />
     </method>
 

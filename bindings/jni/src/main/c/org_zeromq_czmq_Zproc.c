@@ -120,10 +120,17 @@ Java_org_zeromq_czmq_Zproc__1_1running (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zproc__1_1wait (JNIEnv *env, jclass c, jlong self, jboolean hang)
+Java_org_zeromq_czmq_Zproc__1_1wait (JNIEnv *env, jclass c, jlong self, jint timeout)
 {
-    jint wait_ = (jint) zproc_wait ((zproc_t *) (intptr_t) self, (bool) hang);
+    jint wait_ = (jint) zproc_wait ((zproc_t *) (intptr_t) self, (int) timeout);
     return wait_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zproc__1_1shutdown (JNIEnv *env, jclass c, jlong self, jint timeout)
+{
+    jint shutdown_ = (jint) zproc_shutdown ((zproc_t *) (intptr_t) self, (int) timeout);
+    return shutdown_;
 }
 
 JNIEXPORT jlong JNICALL

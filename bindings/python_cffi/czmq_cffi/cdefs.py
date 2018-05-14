@@ -2327,9 +2327,15 @@ int
 bool
     zproc_running (zproc_t *self);
 
+// The timeout should be zero or greater, or -1 to wait indefinitely.
 // wait or poll process status, return return code
 int
-    zproc_wait (zproc_t *self, bool hang);
+    zproc_wait (zproc_t *self, int timeout);
+
+// send SIGTERM signal to the subprocess, wait for grace period and
+// eventually send SIGKILL
+int
+    zproc_shutdown (zproc_t *self, int timeout);
 
 // return internal actor, useful for the polling if process died
 void *

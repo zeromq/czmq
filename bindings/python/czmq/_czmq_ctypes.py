@@ -4852,7 +4852,9 @@ lib.zproc_pid.argtypes = [zproc_p]
 lib.zproc_running.restype = c_bool
 lib.zproc_running.argtypes = [zproc_p]
 lib.zproc_wait.restype = c_int
-lib.zproc_wait.argtypes = [zproc_p, c_bool]
+lib.zproc_wait.argtypes = [zproc_p, c_int]
+lib.zproc_shutdown.restype = c_int
+lib.zproc_shutdown.argtypes = [zproc_p, c_int]
 lib.zproc_actor.restype = c_void_p
 lib.zproc_actor.argtypes = [zproc_p]
 lib.zproc_kill.restype = None
@@ -5008,11 +5010,19 @@ not initialized or external sockets.
         """
         return lib.zproc_running(self._as_parameter_)
 
-    def wait(self, hang):
+    def wait(self, timeout):
         """
-        wait or poll process status, return return code
+        The timeout should be zero or greater, or -1 to wait indefinitely.
+wait or poll process status, return return code
         """
-        return lib.zproc_wait(self._as_parameter_, hang)
+        return lib.zproc_wait(self._as_parameter_, timeout)
+
+    def shutdown(self, timeout):
+        """
+        send SIGTERM signal to the subprocess, wait for grace period and
+eventually send SIGKILL
+        """
+        return lib.zproc_shutdown(self._as_parameter_, timeout)
 
     def actor(self):
         """
