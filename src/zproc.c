@@ -834,7 +834,6 @@ zproc_wait (zproc_t *self, int timeout) {
 
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]: timeout=%d", self->pid, timeout);
-    int status = -1;
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\t!self->running=%s", self->pid, self->running ? "true" : "false");
     if (!self->running)
@@ -843,10 +842,10 @@ zproc_wait (zproc_t *self, int timeout) {
     if (self->verbose)
         zsys_debug ("zproc_wait [%d]:\twaitpid", self->pid);
 
-    int r = 0;
     if (timeout < 0) {
         // infinite wait
-        while (zproc_running (self)) zclock_sleep (200);
+        while (zproc_running (self))
+            zclock_sleep (200);
         return self->return_code;
     }
     else if (timeout == 0) {
