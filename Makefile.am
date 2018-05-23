@@ -41,6 +41,7 @@ EXTRA_DIST += \
     src/CMakeLists-local.txt \
     builds/cmake/Modules/ClangFormat.cmake \
     builds/cmake/clang-format-check.sh.in \
+    builds/cmake/Config.cmake.in \
     CMakeLists.txt
 endif
 
