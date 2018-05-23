@@ -667,11 +667,6 @@ AC_TYPE_UINT32_T
 AC_C_VOLATILE
 AC_C_BIGENDIAN
 
-# These options are GNU compiler specific.
-if test "x$GCC" = "xyes"; then
-    CPPFLAGS="-pedantic -Werror -Wall -Wc++-compat ${CPPFLAGS}"
-fi
-
 AM_CONDITIONAL(ENABLE_SHARED, test "x$enable_shared" = "xyes")
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
 AM_CONDITIONAL(ON_CYGWIN, test "x$czmq_on_cygwin" = "xyes")
@@ -774,26 +769,28 @@ fi
 
 AC_ARG_ENABLE([Werror],
     AS_HELP_STRING([--enable-Werror],
-        [Add -Wall -Werror to GCC/GXX arguments [default=no; default=auto if nothing specified]]),
+        [Add -Wall -Werror to GCC/GXX arguments [default=no; default=auto if nothing specified as the specific argument value]]),
     [AS_IF([test -n "$enableval"], [enable_Werror=$enableval], [enable_Werror=auto])],
     [enable_Werror=no])
 
+# These options are GNU compiler specific.
 AS_IF([test "x$enable_Werror" = "xyes" || test "x$enable_Werror" = "xauto"],
-    [AS_IF([test -n "$CC"],[AS_IF([$CC --version 2>&1 | grep 'Free Software Foundation' > /dev/null],
+    [AS_IF([test -n "$CC"],[AS_IF([$CC --version 2>&1 | grep 'Free Software Foundation' > /dev/null && test "x$GCC" = "xyes"],
         [AC_MSG_NOTICE([Enabling pedantic errors for GNU C])
-         CFLAGS="$CFLAGS -Wall -Werror"],
+         CFLAGS="$CFLAGS -pedantic -Wall -Werror -Werror=format-security"],
         [AC_MSG_NOTICE([Not enabling pedantic errors: compiler not supported by this recipe (not GNU C)])
          AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for C: $CC])])
         ])])
-     AS_IF([test -n "$CXX"],[AS_IF([$CXX --version 2>&1 | grep 'Free Software Foundation' > /dev/null],
+     AS_IF([test -n "$CXX"],[AS_IF([$CXX --version 2>&1 | grep 'Free Software Foundation' > /dev/null && test "x$GCC" = "xyes"],
         [AC_MSG_NOTICE([Enabling pedantic errors for GNU C++])
-         CXXFLAGS="$CXXFLAGS -Wall -Werror"],
+         CXXFLAGS="$CXXFLAGS -pedantic -Wall -Werror -Werror=format-security"],
         [AC_MSG_NOTICE([Not enabling pedantic errors: compiler not supported by this recipe (not GNU C++)])
          AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for C++: $CXX])])
         ])])
-     AS_IF([test -n "$CPP"],[AS_IF([$CPP --version 2>&1 | grep 'Free Software Foundation' > /dev/null],
+     AS_IF([test -n "$CPP"],[AS_IF([$CPP --version 2>&1 | grep 'Free Software Foundation' > /dev/null && test "x$GCC" = "xyes"],
         [AC_MSG_NOTICE([Enabling pedantic errors for GNU CPP preprocessor])
-         CPPFLAGS="$CPPFLAGS -Wall -Werror"],
+         CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"
+        ],
         [AC_MSG_NOTICE([Not enabling pedantic errors: preprocessor not supported by this recipe (not GNU CPP)])
          AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for CPP: $CPP])])
         ])])
