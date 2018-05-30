@@ -538,8 +538,6 @@ static int
 s_zproc_alive (zloop_t *loop, int timer_id, void *args)
 {
     zproc_t *self = (zproc_t*) args;
-    if (zsys_interrupted)
-        return -1;
     if (! zproc_running (self))
         return 0;
 #if defined (__WINDOWS__)
@@ -752,6 +750,10 @@ s_zproc_actor (zsock_t *pipe, void *args)
     zsock_signal (pipe, 0);
     zloop_start (loop);
     zloop_destroy (&loop);
+    while (zproc_running (self)) {
+        zclock_sleep (500);
+        s_zproc_alive (NULL, -1, self);
+    }
     zsock_signal (pipe, 0);
 }
 
