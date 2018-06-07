@@ -614,17 +614,20 @@ s_zproc_execve (zproc_t *self)
             fcntl (self->stdinpipe [0], F_SETFL, n_flags);
             dup2 (self->stdinpipe [0], STDIN_FILENO);
             close (self->stdinpipe [1]);
+            self->stdinpipe[1] = -1;
         }
 
         // redirect stdout if set_stdout was called
         if (self->stdoutpipe [0] != -1) {
             close (self->stdoutpipe [0]);
+            self->stdoutpipe [0] = -1;
             dup2 (self->stdoutpipe [1], STDOUT_FILENO);
         }
 
         // redirect stderr if set_stderr was called
         if (self->stderrpipe [0] != -1) {
             close (self->stderrpipe [0]);
+            self->stderrpipe [0] = -1;
             dup2 (self->stderrpipe [1], STDERR_FILENO);
         }
 
@@ -682,17 +685,20 @@ s_zproc_execve (zproc_t *self)
         if (self->stdinpipe [0] != -1) {
             s_zproc_readsocket (self, self->stdinpipe+1, zpair_read (self->stdinpair));
             close (self->stdinpipe [0]);
+            self->stdinpipe [0] = -1;
         }
 
         // add a handler for read end of stdout
         if (self->stdoutpipe [1] != -1) {
             s_zproc_readfd (self, self->stdoutpipe [0], zpair_write (self->stdoutpair));
             close (self->stdoutpipe[1]);
+            self->stdoutpipe [1] = -1;
         }
         // add a handler for read end of stderr
         if (self->stderrpipe [1] != -1) {
             s_zproc_readfd (self, self->stderrpipe [0], zpair_write (self->stderrpair));
             close (self->stderrpipe[1]);
+            self->stderrpipe [1] = -1;
         }
     }
 
