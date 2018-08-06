@@ -1063,20 +1063,41 @@ zproc_test (bool verbose)
     zproc_set_verbose (self, verbose);
     //  forward input from stdin to stderr
     zproc_set_argsx (self, file, "--stdin", "--stderr", NULL);
+    // FIXME: there is a BUG in zproc somewhere, you can't gen an output from both stdout/stderr
+    //zproc_set_argsx (self, file, "--stdin", "--stdout", "--stderr", NULL);
     zproc_set_stdin (self, NULL);
+    // FIXME: the bug
+    //zproc_set_stdout (self, NULL);
     zproc_set_stderr (self, NULL);
 
+    // send data to stdin
     int r = zproc_run (self);
     assert (r == 0);
     zframe_t *frame = zframe_new ("Lorem ipsum\0\0", strlen ("Lorem ipsum")+2);
     assert (frame);
     zsock_bsend (zproc_stdin (self), "f", frame);
     zframe_destroy (&frame);
+
+    // FIXME: the bug
+    //zproc_set_stdout (self, NULL);
+    // read data from stdout
+    /*
+    zsys_debug ("BAF1");
+    zsock_brecv (zproc_stdout (self), "f", &frame);
+    zsys_debug ("BAF2");
+    assert (frame);
+    assert (zframe_data (frame));
+    if (verbose)
+        zframe_print (frame, "2.stdout:");
+    assert (!strncmp ((char*) zframe_data (frame), "Lorem ipsum", 11));
+    */
+
+    // read data from stderr
     zsock_brecv (zproc_stderr (self), "f", &frame);
     assert (frame);
     assert (zframe_data (frame));
     if (verbose)
-        zframe_print (frame, "2:");
+        zframe_print (frame, "2.stderr:");
     assert (!strncmp ((char*) zframe_data (frame), "Lorem ipsum", 11));
     zproc_kill (self, SIGTERM);
     zproc_wait (self, -1);
