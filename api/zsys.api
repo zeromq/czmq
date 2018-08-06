@@ -457,6 +457,50 @@
         <return type = "integer" />
     </method>
 
+    <method name = "zprintf" singleton = "1">
+        Print formatted string. Format is specified by variable names
+        in Python-like format style
+
+        "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+        become
+        "key=value"
+
+        Returns freshly allocated string or NULL in a case of error.
+        Not enough memory, invalid format specifier, name not in args
+        <argument name = "format" type = "string" />
+        <argument name = "args" type = "zhash" />
+        <return type = "string" fresh = "1" />
+    </method>
+    <method name = "zprintf_error" singleton = "1">
+        Return error string for given format/args combination.
+
+        <argument name = "format" type = "string" />
+        <argument name = "args" type = "zhash" />
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "zplprintf" singleton = "1">
+        Print formatted string. Format is specified by variable names
+        in Python-like format style
+
+        "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+        become
+        "key=value"
+
+        Returns freshly allocated string or NULL in a case of error.
+        Not enough memory, invalid format specifier, name not in args
+        <argument name = "format" type = "string" />
+        <argument name = "args" type = "zconfig" />
+        <return type = "string" fresh = "1" />
+    </method>
+    <method name = "zplprintf_error" singleton = "1">
+        Return error string for given format/args combination.
+
+        <argument name = "format" type = "string" />
+        <argument name = "args" type = "zconfig" />
+        <return type = "string" fresh = "1" />
+    </method>
+
     <method name = "set logident" singleton = "1">
         Set log identity, which is a string that prefixes all log messages sent
         by this process. The log identity defaults to the environment variable
