@@ -74,10 +74,10 @@ module CZMQ
       attach_function :zargs_param_first, [:pointer], :string, **opts
       attach_function :zargs_param_next, [:pointer], :string, **opts
       attach_function :zargs_param_name, [:pointer], :string, **opts
-      attach_function :zargs_param_lookup, [:pointer, :string], :string, **opts
-      attach_function :zargs_param_lookupx, [:pointer, :string, :varargs], :string, **opts
-      attach_function :zargs_has_help, [:pointer], :bool, **opts
-      attach_function :zargs_param_empty, [:string], :bool, **opts
+      attach_function :zargs_get, [:pointer, :string], :string, **opts
+      attach_function :zargs_getx, [:pointer, :string, :varargs], :string, **opts
+      attach_function :zargs_has, [:pointer, :string], :bool, **opts
+      attach_function :zargs_hasx, [:pointer, :string, :varargs], :bool, **opts
       attach_function :zargs_print, [:pointer], :void, **opts
       attach_function :zargs_test, [:bool], :void, **opts
 
@@ -181,6 +181,7 @@ module CZMQ
       attach_function :zconfig_load, [:string], :pointer, **opts
       attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts
       attach_function :zconfig_destroy, [:pointer], :void, **opts
+      attach_function :zconfig_dup, [:pointer], :pointer, **opts
       attach_function :zconfig_name, [:pointer], :pointer, **opts
       attach_function :zconfig_value, [:pointer], :pointer, **opts
       attach_function :zconfig_put, [:pointer, :string, :string], :void, **opts
@@ -516,6 +517,7 @@ module CZMQ
 
       attach_function :zproc_new, [], :pointer, **opts
       attach_function :zproc_destroy, [:pointer], :void, **opts
+      attach_function :zproc_args, [:pointer], :pointer, **opts
       attach_function :zproc_set_args, [:pointer, :pointer], :void, **opts
       attach_function :zproc_set_argsx, [:pointer, :string, :varargs], :void, **opts
       attach_function :zproc_set_env, [:pointer, :pointer], :void, **opts
@@ -529,7 +531,8 @@ module CZMQ
       attach_function :zproc_returncode, [:pointer], :int, **opts
       attach_function :zproc_pid, [:pointer], :int, **opts
       attach_function :zproc_running, [:pointer], :bool, **opts
-      attach_function :zproc_wait, [:pointer, :bool], :int, **opts
+      attach_function :zproc_wait, [:pointer, :int], :int, **opts
+      attach_function :zproc_shutdown, [:pointer, :int], :void, **opts
       attach_function :zproc_actor, [:pointer], :pointer, **opts
       attach_function :zproc_kill, [:pointer, :int], :void, **opts
       attach_function :zproc_set_verbose, [:pointer, :bool], :void, **opts
@@ -580,6 +583,12 @@ module CZMQ
       attach_function :zsock_leave, [:pointer, :string], :int, **opts
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
+      attach_function :zsock_gssapi_principal_nametype, [:pointer], :int, **opts
+      attach_function :zsock_set_gssapi_principal_nametype, [:pointer, :int], :void, **opts
+      attach_function :zsock_gssapi_service_principal_nametype, [:pointer], :int, **opts
+      attach_function :zsock_set_gssapi_service_principal_nametype, [:pointer, :int], :void, **opts
+      attach_function :zsock_bindtodevice, [:pointer], :pointer, **opts
+      attach_function :zsock_set_bindtodevice, [:pointer, :string], :void, **opts
       attach_function :zsock_heartbeat_ivl, [:pointer], :int, **opts
       attach_function :zsock_set_heartbeat_ivl, [:pointer, :int], :void, **opts
       attach_function :zsock_heartbeat_ttl, [:pointer], :int, **opts
@@ -778,6 +787,8 @@ module CZMQ
       attach_function :zsys_socket_limit, [], :size_t, **opts
       attach_function :zsys_set_max_msgsz, [:int], :void, **opts
       attach_function :zsys_max_msgsz, [], :int, **opts
+      attach_function :zsys_set_zero_copy_recv, [:int], :void, **opts
+      attach_function :zsys_zero_copy_recv, [], :int, **opts
       attach_function :zsys_set_file_stable_age_msec, [:pointer], :void, **opts
       attach_function :zsys_file_stable_age_msec, [], :pointer, **opts
       attach_function :zsys_set_linger, [:size_t], :void, **opts

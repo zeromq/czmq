@@ -84,7 +84,7 @@ CZMQ_EXPORT void
 
 //  Set default interrupt handler, so Ctrl-C or SIGTERM will set
 //  zsys_interrupted. Idempotent; safe to call multiple times.
-//  Can be supressed by ZSYS_SIGHANDLER=false
+//  Can be suppressed by ZSYS_SIGHANDLER=false
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT void
     zsys_catch_interrupts (void);
@@ -416,6 +416,18 @@ CZMQ_EXPORT bool
 //  signal handler.
 CZMQ_EXPORT void
     zsys_set_interrupted (void);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Configure whether to use zero copy strategy in libzmq. If the environment
+//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+//  Otherwise the default is 1.
+CZMQ_EXPORT void
+    zsys_set_zero_copy_recv (int zero_copy);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return ZMQ_ZERO_COPY_RECV option.
+CZMQ_EXPORT int
+    zsys_zero_copy_recv (void);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Configure the threshold value of filesystem object age per st_mtime

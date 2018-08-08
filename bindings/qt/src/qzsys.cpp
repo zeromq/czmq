@@ -101,7 +101,7 @@ void QZsys::handlerReset ()
 ///
 //  Set default interrupt handler, so Ctrl-C or SIGTERM will set
 //  zsys_interrupted. Idempotent; safe to call multiple times.
-//  Can be supressed by ZSYS_SIGHANDLER=false
+//  Can be suppressed by ZSYS_SIGHANDLER=false
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 void QZsys::catchInterrupts ()
 {
@@ -379,6 +379,24 @@ void QZsys::setMaxMsgsz (int maxMsgsz)
 int QZsys::maxMsgsz ()
 {
     int rv = zsys_max_msgsz ();
+    return rv;
+}
+
+///
+//  Configure whether to use zero copy strategy in libzmq. If the environment
+//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+//  Otherwise the default is 1.
+void QZsys::setZeroCopyRecv (int zeroCopy)
+{
+    zsys_set_zero_copy_recv (zeroCopy);
+
+}
+
+///
+//  Return ZMQ_ZERO_COPY_RECV option.
+int QZsys::zeroCopyRecv ()
+{
+    int rv = zsys_zero_copy_recv ();
     return rv;
 }
 

@@ -29,6 +29,8 @@ int main (int argc, char *argv [])
     bool use_stdin  = false;
     bool use_stderr = false;
     bool use_stdout = false;
+    bool abrt = false;
+    int quit = 0;
 
     char *message = NULL;
 
@@ -41,7 +43,9 @@ int main (int argc, char *argv [])
 #endif
             puts ("  --stderr / -e          output on stderr");
             puts ("  --stdout / -o          output on stdout");
+            puts ("  --abrt / -a            crash with SIGABRT on start");
             puts ("  --verbose / -v         verbose mode");
+            puts ("  --quit / -q X          quit after X seconds");
             puts ("  --help / -h            this information");
             return 0;
         }
@@ -61,6 +65,16 @@ int main (int argc, char *argv [])
         if (streq (argv [argn], "--verbose")
         ||  streq (argv [argn], "-v"))
             verbose = true;
+        else
+        if (streq (argv [argn], "--abrt")
+        ||  streq (argv [argn], "-a"))
+            abrt = true;
+        else
+        if (streq (argv [argn], "--quit")
+        ||  streq (argv [argn], "-q")) {
+            quit = atoi (argv [argn + 1]) * 1000;
+            ++argn;
+        }
         else
         if (argv [argn][0] == '-') {
             printf ("Unknown option: %s\n", argv [argn]);
@@ -87,7 +101,18 @@ int main (int argc, char *argv [])
         assert (r == 0);
     }
 
+    if (abrt) {
+        if (verbose)
+            zsys_info ("Going to abort myself");
+#if defined (__WINDOWS__)
+        assert (false); // TODO: how to do kill myelf on Windows?
+#else
+        kill (getpid (), SIGABRT);
+#endif
+    }
+
     //  Insert main code here
+    int start = zclock_mono ();
     while (!zsys_interrupted) {
 #if ! defined (__WINDOWS__)
         if (use_stdin) {
@@ -110,6 +135,7 @@ int main (int argc, char *argv [])
             fprintf (stdout, "%s\n", message);
 
         zclock_sleep (50);
+        if (quit && zclock_mono () - start > quit) break;
     }
 
     zfile_destroy (&stdinf);

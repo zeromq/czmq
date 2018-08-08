@@ -61,8 +61,8 @@ typedef void (zactor_fn) (
 //
 // An example - to send $KTHXBAI string
 //
-//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)
-//         zsock_wait (self->pipe);
+//     if (zstr_send (self, "$KTHXBAI") == 0)
+//         zsock_wait (self);
 typedef void (zactor_destructor_fn) (
     zactor_t *self);
 
@@ -234,30 +234,25 @@ const char *
 const char *
     zargs_param_next (zargs_t *self);
 
-// Return current parameter name, or NULL if there are no named
-// parameters.
+// Return current parameter name, or NULL if there are no named parameters.
 const char *
     zargs_param_name (zargs_t *self);
 
-// Return value of named parameter, NULL if no given parameter has
-// been specified, or special value for wich zargs_param_empty ()
-// returns true.
+// Return value of named parameter or NULL is it has no value (or was not specified)
 const char *
-    zargs_param_lookup (zargs_t *self, const char *keys);
+    zargs_get (zargs_t *self, const char *name);
 
-// Return value of named parameter(s), NULL if no given parameter has
-// been specified, or special value for wich zargs_param_empty ()
-// returns true.
+// Return value of one of parameter(s) or NULL is it has no value (or was not specified)
 const char *
-    zargs_param_lookupx (zargs_t *self, const char *keys, ...);
+    zargs_getx (zargs_t *self, const char *name, ...);
 
-// Returns true if there are --help -h arguments
+// Returns true if named parameter was specified on command line
 bool
-    zargs_has_help (zargs_t *self);
+    zargs_has (zargs_t *self, const char *name);
 
-// Returns true if parameter did not have a value
+// Returns true if named parameter(s) was specified on command line
 bool
-    zargs_param_empty (const char *arg);
+    zargs_hasx (zargs_t *self, const char *name, ...);
 
 // Print an instance of zargs.
 void
@@ -655,6 +650,12 @@ zconfig_t *
 zconfig_t *
     zconfig_loadf (const char *format, ...);
 
+// Create copy of zconfig, caller MUST free the value
+// Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+// object. If config is null, or memory was exhausted, returns null.
+zconfig_t *
+    zconfig_dup (zconfig_t *self);
+
 // Return name of config item
 char *
     zconfig_name (zconfig_t *self);
@@ -961,7 +962,7 @@ void
 zfile_t *
     zfile_new (const char *path, const char *name);
 
-// Create new temporary file for writing via tmpfile. File is automaticaly
+// Create new temporary file for writing via tmpfile. File is automatically
 // deleted on destroy
 zfile_t *
     zfile_tmp (void);
@@ -2251,6 +2252,11 @@ zproc_t *
 void
     zproc_destroy (zproc_t **self_p);
 
+// Return command line arguments (the first item is the executable) or
+// NULL if not set.
+zlist_t *
+    zproc_args (zproc_t *self);
+
 // Setup the command line arguments, the first item must be an (absolute) filename
 // to run.
 void
@@ -2314,11 +2320,17 @@ int
 bool
     zproc_running (zproc_t *self);
 
+// The timeout should be zero or greater, or -1 to wait indefinitely.
 // wait or poll process status, return return code
 int
-    zproc_wait (zproc_t *self, bool hang);
+    zproc_wait (zproc_t *self, int timeout);
 
-// return internal actor, usefull for the polling if process died
+// send SIGTERM signal to the subprocess, wait for grace period and
+// eventually send SIGKILL
+void
+    zproc_shutdown (zproc_t *self, int timeout);
+
+// return internal actor, useful for the polling if process died
 void *
     zproc_actor (zproc_t *self);
 
@@ -2528,7 +2540,7 @@ int
 //     U = zuuid_t * (creates a zuuid with the data)
 //     h = zhashx_t ** (creates zhashx)
 //     p = void ** (stores pointer)
-//     m = zmsg_t ** (creates a zmsg with the remaing frames)
+//     m = zmsg_t ** (creates a zmsg with the remaining frames)
 //     z = null, asserts empty frame (0 arguments)
 //     u = uint * (stores unsigned integer, deprecated)
 //
@@ -2651,6 +2663,36 @@ bool
 // return the supplied value. Takes a polymorphic socket reference.
 void *
     zsock_resolve (void *self);
+
+// Get socket option `gssapi_principal_nametype`.
+// Available from libzmq 4.3.0.
+int
+    zsock_gssapi_principal_nametype (void *self);
+
+// Set socket option `gssapi_principal_nametype`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_gssapi_principal_nametype (void *self, int gssapi_principal_nametype);
+
+// Get socket option `gssapi_service_principal_nametype`.
+// Available from libzmq 4.3.0.
+int
+    zsock_gssapi_service_principal_nametype (void *self);
+
+// Set socket option `gssapi_service_principal_nametype`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_gssapi_service_principal_nametype (void *self, int gssapi_service_principal_nametype);
+
+// Get socket option `bindtodevice`.
+// Available from libzmq 4.3.0.
+char *
+    zsock_bindtodevice (void *self);
+
+// Set socket option `bindtodevice`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_bindtodevice (void *self, const char *bindtodevice);
 
 // Get socket option `heartbeat_ivl`.
 // Available from libzmq 4.2.0.
@@ -3481,7 +3523,7 @@ void
 
 // Set default interrupt handler, so Ctrl-C or SIGTERM will set
 // zsys_interrupted. Idempotent; safe to call multiple times.
-// Can be supressed by ZSYS_SIGHANDLER=false
+// Can be suppressed by ZSYS_SIGHANDLER=false
 // *** This is for CZMQ internal use only and may change arbitrarily ***
 void
     zsys_catch_interrupts (void);
@@ -3661,6 +3703,16 @@ void
 // Return maximum message size.
 int
     zsys_max_msgsz (void);
+
+// Configure whether to use zero copy strategy in libzmq. If the environment
+// variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+// Otherwise the default is 1.
+void
+    zsys_set_zero_copy_recv (int zero_copy);
+
+// Return ZMQ_ZERO_COPY_RECV option.
+int
+    zsys_zero_copy_recv (void);
 
 // Configure the threshold value of filesystem object age per st_mtime
 // that should elapse until we consider that object "stable" at the

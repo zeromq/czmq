@@ -137,6 +137,21 @@ zconfig_destroy (zconfig_t **self_p)
     }
 }
 
+//  --------------------------------------------------------------------------
+//  Create copy of zconfig, caller MUST free the value
+//  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+//  object. If config is null, or memory was exhausted, returns null.
+zconfig_t *
+zconfig_dup (zconfig_t *self) {
+    if (self) {
+        zchunk_t *chunk = zconfig_chunk_save (self);
+        zconfig_t *ret = zconfig_chunk_load (chunk);
+        zchunk_destroy (&chunk);
+        return ret;
+    }
+    else
+        return NULL;
+}
 
 //  --------------------------------------------------------------------------
 //  Destroy node and subtree (all children)
@@ -1123,6 +1138,11 @@ zconfig_test (bool verbose)
     assert (!c);
 
     assert (streq (zconfig_get (config, "server/verbose", NULL), "true"));
+
+    zconfig_t *dup = zconfig_dup (config);
+    assert (dup);
+    assert (streq (zconfig_get (dup, "server/verbose", NULL), "true"));
+    zconfig_destroy (&dup);
 
     zconfig_destroy (&config);
 

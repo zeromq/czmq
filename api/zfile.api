@@ -21,7 +21,7 @@
     </constructor>
 
     <constructor name="tmp" state="draft">
-        Create new temporary file for writing via tmpfile. File is automaticaly
+        Create new temporary file for writing via tmpfile. File is automatically
         deleted on destroy
     </constructor>
 

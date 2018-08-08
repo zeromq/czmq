@@ -26,6 +26,13 @@ class Zproc(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zproc_destroy_py)
 
+    def args(self):
+        """
+        Return command line arguments (the first item is the executable) or
+        NULL if not set.
+        """
+        return utils.lib.zproc_args(self._p)
+
     def set_args(self, arguments):
         """
         Setup the command line arguments, the first item must be an (absolute) filename
@@ -122,15 +129,23 @@ class Zproc(object):
         """
         return utils.lib.zproc_running(self._p)
 
-    def wait(self, hang):
+    def wait(self, timeout):
         """
+        The timeout should be zero or greater, or -1 to wait indefinitely.
         wait or poll process status, return return code
         """
-        return utils.lib.zproc_wait(self._p, hang)
+        return utils.lib.zproc_wait(self._p, timeout)
+
+    def shutdown(self, timeout):
+        """
+        send SIGTERM signal to the subprocess, wait for grace period and
+        eventually send SIGKILL
+        """
+        utils.lib.zproc_shutdown(self._p, timeout)
 
     def actor(self):
         """
-        return internal actor, usefull for the polling if process died
+        return internal actor, useful for the polling if process died
         """
         return utils.lib.zproc_actor(self._p)
 

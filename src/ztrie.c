@@ -739,7 +739,7 @@ ztrie_test (bool verbose)
     assert (ret == 0);
 
     //  There is a lot you can do with regular expression but matching routes
-    //  of arbitrary length wont work. Therefore we make use of the asterisk
+    //  of arbitrary length won't work. Therefore we make use of the asterisk
     //  operator. Just place it at the end of your route, e.g. '/config/bar/*'.
     ret = ztrie_insert_route (self, "/config/bar/*", NULL, NULL);
     assert (ret == 0);

@@ -44,9 +44,13 @@ env:
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-x
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq4-1
     - BUILD_TYPE=cmake
+    - BUILD_TYPE=check_zproject
     - BUILD_TYPE=bindings BINDING=python
 
 matrix:
+  exclude:
+  - os: osx
+    env: BUILD_TYPE=check_zproject
   include:
   - env: BUILD_TYPE=valgrind
     os: linux
@@ -83,6 +87,9 @@ matrix:
 # temporary disabled, does not work
 #  - env: BUILD_TYPE=docs
 #    os: linux
+  # until https://github.com/zeromq/zproject/issues/947 is solved
+  allow_failures:
+  - env: BUILD_TYPE=check_zproject
 
 addons:
   apt:
@@ -97,6 +104,8 @@ addons:
     - xmlto
     - libsodium-dev
     - libzmq3-dev
+    - generator-scripting-language
+    - zproject
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "android" ] ; then brew update; brew install binutils ; fi

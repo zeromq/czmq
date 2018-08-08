@@ -173,8 +173,24 @@ zdir_new (const char *path, const char *parent)
     }
 #else
     //  Remove any trailing slash
-    if (self->path [strlen (self->path) - 1] == '/')
-        self->path [strlen (self->path) - 1] = 0;
+    {
+        size_t l = strlen (self->path);
+
+        while (l > 0) {
+            if ( (l == 1) && self->path [0] == '/')
+                // The whole path is root, skip its trimming
+                break;
+
+            if (self->path [l - 1] == '/') {
+                self->path [l - 1] = '\0';
+            } else {
+                // Last char is not slash
+                break;
+            }
+            l--;
+        }
+        assert (l > 0); // path should not be empty
+    }
 
     DIR *handle = opendir (self->path);
     if (handle) {

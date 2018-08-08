@@ -1,6 +1,5 @@
 # This is a skeleton created by zproject.
 # You can add hand-written code here.
-
 save.xml
 # Object files
 *.o
@@ -23,24 +22,19 @@ save.xml
 
 # Executables
 src/czmq_selftest
-src/test_randof
 src/zmakecert
 src/zsp
+src/test_randof
 src/czmq_selftest
-./czmq_selftest
-./test_randof
-./zmakecert
-./zsp
-./czmq_selftest
 *.exe
 *.out
 *.app
 core
 
  # Distcheck workspace and archives
-czmq-4.0.3/
-czmq-4.0.3.tar.gz
-czmq-4.0.3.zip
+czmq-*/
+czmq-*.tar.gz
+czmq-*.zip
 
 # Man pages
 doc/*.1
@@ -82,7 +76,6 @@ Testing/
 
 # Repositories downloaded by CI integration scripts
 libzmq/
-*.git/
 
 # Travis build area
 tmp/

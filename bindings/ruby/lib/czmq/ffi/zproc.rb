@@ -92,6 +92,18 @@ module CZMQ
         result
       end
 
+      # Return command line arguments (the first item is the executable) or
+      # NULL if not set.
+      #
+      # @return [Zlist]
+      def args()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zproc_args(self_p)
+        result = Zlist.__new result, true
+        result
+      end
+
       # Setup the command line arguments, the first item must be an (absolute) filename
       # to run.
       #
@@ -242,19 +254,33 @@ module CZMQ
         result
       end
 
+      # The timeout should be zero or greater, or -1 to wait indefinitely.
       # wait or poll process status, return return code
       #
-      # @param hang [Boolean]
+      # @param timeout [Integer, #to_int, #to_i]
       # @return [Integer]
-      def wait(hang)
+      def wait(timeout)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        hang = !(0==hang||!hang) # boolean
-        result = ::CZMQ::FFI.zproc_wait(self_p, hang)
+        timeout = Integer(timeout)
+        result = ::CZMQ::FFI.zproc_wait(self_p, timeout)
         result
       end
 
-      # return internal actor, usefull for the polling if process died
+      # send SIGTERM signal to the subprocess, wait for grace period and
+      # eventually send SIGKILL
+      #
+      # @param timeout [Integer, #to_int, #to_i]
+      # @return [void]
+      def shutdown(timeout)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        timeout = Integer(timeout)
+        result = ::CZMQ::FFI.zproc_shutdown(self_p, timeout)
+        result
+      end
+
+      # return internal actor, useful for the polling if process died
       #
       # @return [::FFI::Pointer]
       def actor()

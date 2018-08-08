@@ -38,7 +38,7 @@ if (NOT CMAKE_BUILD_TYPE)
             OUTPUT_STRIP_TRAILING_WHITESPACE
         )
         message(STATUS "git workspace root [${git_result}]: ${git_root}")
-        if ( "${git_result}" == "0" )
+        if ( "${git_result}" STREQUAL "0" )
             set (CMAKE_BUILD_TYPE Debug)
         else ()
             set (CMAKE_BUILD_TYPE Release)
@@ -165,8 +165,8 @@ ENDIF (LZ4_FOUND)
 # version
 ########################################################################
 set(CZMQ_VERSION_MAJOR 4)
-set(CZMQ_VERSION_MINOR 1)
-set(CZMQ_VERSION_PATCH 1)
+set(CZMQ_VERSION_MINOR 2)
+set(CZMQ_VERSION_PATCH 0)
 set(CZMQ_VERSION "${CZMQ_VERSION_MAJOR}.${CZMQ_VERSION_MINOR}.${CZMQ_VERSION_PATCH}")
 message(STATUS "Detected CZMQ Version - ${CZMQ_VERSION}")
 
@@ -322,17 +322,20 @@ if (CZMQ_BUILD_SHARED)
   )
 
   target_link_libraries(czmq
-    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
+    PUBLIC ${MORE_LIBRARIES}
   )
 
   install(TARGETS czmq
+    EXPORT czmq-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
     RUNTIME DESTINATION bin                # .dll file
   )
 
   target_include_directories(czmq
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<INSTALL_INTERFACE:include>
   )
 endif()
 
@@ -352,17 +355,20 @@ if (CZMQ_BUILD_STATIC)
   )
 
   target_link_libraries(czmq-static
-    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
+    PUBLIC ${MORE_LIBRARIES}
   )
 
   install(TARGETS czmq-static
+    EXPORT czmq-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
     RUNTIME DESTINATION bin                # .dll file
   )
 
   target_include_directories(czmq-static
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<INSTALL_INTERFACE:include>
   )
   target_compile_definitions(czmq-static
     PUBLIC CZMQ_STATIC
@@ -376,7 +382,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project
 ########################################################################
 # pkgconfig
 ########################################################################
-set (VERSION "4.1.1")
+set (VERSION "4.2.0")
 set (prefix "${CMAKE_INSTALL_PREFIX}")
 set (exec_prefix "\${prefix}")
 set (libdir "\${prefix}/lib${LIB_SUFFIX}")
@@ -395,6 +401,34 @@ install(
     FILES "${SOURCE_DIR}/src/libczmq.pc"
     DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
 )
+
+########################################################################
+# installer
+########################################################################
+include(CMakePackageConfigHelpers)
+if (WIN32)
+  set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for czmqConfig.cmake")
+else()
+  # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
+  set(CMAKECONFIG_INSTALL_DIR "share/cmake/czmq" CACHE STRING "install path for czmqConfig.cmake")
+endif()
+
+if (NOT CMAKE_VERSION VERSION_LESS 3.0)
+  export(EXPORT czmq-targets
+         FILE "${CMAKE_CURRENT_BINARY_DIR}/czmqTargets.cmake")
+endif()
+configure_package_config_file(builds/cmake/Config.cmake.in
+                              "${CMAKE_CURRENT_BINARY_DIR}/czmqConfig.cmake"
+                              INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/czmqConfigVersion.cmake
+                                 VERSION ${CZMQ_VERSION}
+                                 COMPATIBILITY AnyNewerVersion)
+install(EXPORT czmq-targets
+        FILE czmqTargets.cmake
+        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/czmqConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/czmqConfigVersion.cmake
+              DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
 ########################################################################
 # executables
@@ -608,7 +642,7 @@ add_custom_command(
     TARGET  distclean
 )
 
-include(ClangFormat)
+include(ClangFormat OPTIONAL)
 
 ########################################################################
 # summary

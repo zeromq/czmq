@@ -82,7 +82,7 @@
     <method name = "catch interrupts" singleton = "1">
         Set default interrupt handler, so Ctrl-C or SIGTERM will set
         zsys_interrupted. Idempotent; safe to call multiple times.
-        Can be supressed by ZSYS_SIGHANDLER=false
+        Can be suppressed by ZSYS_SIGHANDLER=false
         *** This is for CZMQ internal use only and may change arbitrarily ***
     </method>
 
@@ -313,6 +313,18 @@
 
     <method name = "max msgsz" singleton = "1">
         Return maximum message size.
+        <return type = "integer" />
+    </method>
+
+    <method name = "set zero copy recv" singleton = "1" state = "draft" >
+        Configure whether to use zero copy strategy in libzmq. If the environment
+        variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+        Otherwise the default is 1.
+        <argument name = "zero copy" type = "integer" />
+    </method>
+
+    <method name = "zero copy recv" singleton = "1" state = "draft" >
+        Return ZMQ_ZERO_COPY_RECV option.
         <return type = "integer" />
     </method>
 

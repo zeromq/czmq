@@ -73,8 +73,7 @@ const QString QZargs::paramNext ()
 }
 
 ///
-//  Return current parameter name, or NULL if there are no named
-//  parameters.
+//  Return current parameter name, or NULL if there are no named parameters.
 const QString QZargs::paramName ()
 {
     const QString rv = QString (zargs_param_name (self));
@@ -82,28 +81,18 @@ const QString QZargs::paramName ()
 }
 
 ///
-//  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()
-//  returns true.
-const QString QZargs::paramLookup (const QString &keys)
+//  Return value of named parameter or NULL is it has no value (or was not specified)
+const QString QZargs::get (const QString &name)
 {
-    const QString rv = QString (zargs_param_lookup (self, keys.toUtf8().data()));
+    const QString rv = QString (zargs_get (self, name.toUtf8().data()));
     return rv;
 }
 
 ///
-//  Returns true if there are --help -h arguments
-bool QZargs::hasHelp ()
+//  Returns true if named parameter was specified on command line
+bool QZargs::has (const QString &name)
 {
-    bool rv = zargs_has_help (self);
-    return rv;
-}
-
-///
-//  Returns true if parameter did not have a value
-bool QZargs::paramEmpty (const QString &arg)
-{
-    bool rv = zargs_param_empty (arg.toUtf8().data());
+    bool rv = zargs_has (self, name.toUtf8().data());
     return rv;
 }
 

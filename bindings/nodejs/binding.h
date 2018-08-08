@@ -47,10 +47,10 @@ class Zargs: public Nan::ObjectWrap {
     static NAN_METHOD (_param_first);
     static NAN_METHOD (_param_next);
     static NAN_METHOD (_param_name);
-    static NAN_METHOD (_param_lookup);
-    static NAN_METHOD (_param_lookupx);
-    static NAN_METHOD (_has_help);
-    static NAN_METHOD (_param_empty);
+    static NAN_METHOD (_get);
+    static NAN_METHOD (_getx);
+    static NAN_METHOD (_has);
+    static NAN_METHOD (_hasx);
     static NAN_METHOD (_print);
     static NAN_METHOD (_test);
 };
@@ -201,6 +201,7 @@ class Zconfig: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_dup);
     static NAN_METHOD (_name);
     static NAN_METHOD (_value);
     static NAN_METHOD (_put);
@@ -589,6 +590,7 @@ class Zproc: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_args);
     static NAN_METHOD (_set_args);
     static NAN_METHOD (_set_argsx);
     static NAN_METHOD (_set_env);
@@ -597,6 +599,7 @@ class Zproc: public Nan::ObjectWrap {
     static NAN_METHOD (_pid);
     static NAN_METHOD (_running);
     static NAN_METHOD (_wait);
+    static NAN_METHOD (_shutdown);
     static NAN_METHOD (_kill);
     static NAN_METHOD (_set_verbose);
     static NAN_METHOD (_test);
@@ -633,6 +636,12 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_flush);
     static NAN_METHOD (_join);
     static NAN_METHOD (_leave);
+    static NAN_METHOD (_gssapi_principal_nametype);
+    static NAN_METHOD (_set_gssapi_principal_nametype);
+    static NAN_METHOD (_gssapi_service_principal_nametype);
+    static NAN_METHOD (_set_gssapi_service_principal_nametype);
+    static NAN_METHOD (_bindtodevice);
+    static NAN_METHOD (_set_bindtodevice);
     static NAN_METHOD (_heartbeat_ivl);
     static NAN_METHOD (_set_heartbeat_ivl);
     static NAN_METHOD (_heartbeat_ttl);
@@ -837,6 +846,8 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_socket_limit);
     static NAN_METHOD (_set_max_msgsz);
     static NAN_METHOD (_max_msgsz);
+    static NAN_METHOD (_set_zero_copy_recv);
+    static NAN_METHOD (_zero_copy_recv);
     static NAN_METHOD (_set_file_stable_age_msec);
     static NAN_METHOD (_file_stable_age_msec);
     static NAN_METHOD (_set_linger);

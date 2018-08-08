@@ -28,6 +28,11 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZconfig.cpp
 
 public slots:
+    //  Create copy of zconfig, caller MUST free the value
+    //  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+    //  object. If config is null, or memory was exhausted, returns null.
+    QmlZconfig *dup ();
+
     //  Return name of config item
     const QString name ();
 

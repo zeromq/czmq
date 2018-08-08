@@ -376,14 +376,14 @@ lib.zargs_param_next.restype = c_char_p
 lib.zargs_param_next.argtypes = [zargs_p]
 lib.zargs_param_name.restype = c_char_p
 lib.zargs_param_name.argtypes = [zargs_p]
-lib.zargs_param_lookup.restype = c_char_p
-lib.zargs_param_lookup.argtypes = [zargs_p, c_char_p]
-lib.zargs_param_lookupx.restype = c_char_p
-lib.zargs_param_lookupx.argtypes = [zargs_p, c_char_p]
-lib.zargs_has_help.restype = c_bool
-lib.zargs_has_help.argtypes = [zargs_p]
-lib.zargs_param_empty.restype = c_bool
-lib.zargs_param_empty.argtypes = [c_char_p]
+lib.zargs_get.restype = c_char_p
+lib.zargs_get.argtypes = [zargs_p, c_char_p]
+lib.zargs_getx.restype = c_char_p
+lib.zargs_getx.argtypes = [zargs_p, c_char_p]
+lib.zargs_has.restype = c_bool
+lib.zargs_has.argtypes = [zargs_p, c_char_p]
+lib.zargs_hasx.restype = c_bool
+lib.zargs_hasx.argtypes = [zargs_p, c_char_p]
 lib.zargs_print.restype = None
 lib.zargs_print.argtypes = [zargs_p]
 lib.zargs_test.restype = None
@@ -394,14 +394,17 @@ class Zargs(object):
     Platform independent command line argument parsing helpers
 
 There are two kind of elements provided by this class
-foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-zargs keeps poision only for arguments, parameters are to be accessed like hash.
+Named parameters, accessed by param_get and param_has methods
+  * --named-parameter
+  * --parameter with_value
+  * -a val
+Positional arguments, accessed by zargs_first, zargs_next
 
 It DOES:
 * provide easy to use CLASS compatible API for accessing argv
 * is platform independent
 * provide getopt_long style -- argument, which delimits parameters from arguments
-* makes parameters positon independent
+* makes parameters position independent
 
 It does NOT
 * change argv
@@ -495,39 +498,33 @@ parameters, or value for which zargs_param_empty (arg) returns true.
 
     def param_name(self):
         """
-        Return current parameter name, or NULL if there are no named
-parameters.
+        Return current parameter name, or NULL if there are no named parameters.
         """
         return lib.zargs_param_name(self._as_parameter_)
 
-    def param_lookup(self, keys):
+    def get(self, name):
         """
-        Return value of named parameter, NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
-returns true.
+        Return value of named parameter or NULL is it has no value (or was not specified)
         """
-        return lib.zargs_param_lookup(self._as_parameter_, keys)
+        return lib.zargs_get(self._as_parameter_, name)
 
-    def param_lookupx(self, keys, *args):
+    def getx(self, name, *args):
         """
-        Return value of named parameter(s), NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
-returns true.
+        Return value of one of parameter(s) or NULL is it has no value (or was not specified)
         """
-        return lib.zargs_param_lookupx(self._as_parameter_, keys, *args)
+        return lib.zargs_getx(self._as_parameter_, name, *args)
 
-    def has_help(self):
+    def has(self, name):
         """
-        Returns true if there are --help -h arguments
+        Returns true if named parameter was specified on command line
         """
-        return lib.zargs_has_help(self._as_parameter_)
+        return lib.zargs_has(self._as_parameter_, name)
 
-    @staticmethod
-    def param_empty(arg):
+    def hasx(self, name, *args):
         """
-        Returns true if parameter did not have a value
+        Returns true if named parameter(s) was specified on command line
         """
-        return lib.zargs_param_empty(arg)
+        return lib.zargs_hasx(self._as_parameter_, name, *args)
 
     def print(self):
         """
@@ -1442,6 +1439,8 @@ lib.zconfig_load.restype = zconfig_p
 lib.zconfig_load.argtypes = [c_char_p]
 lib.zconfig_loadf.restype = zconfig_p
 lib.zconfig_loadf.argtypes = [c_char_p]
+lib.zconfig_dup.restype = zconfig_p
+lib.zconfig_dup.argtypes = [zconfig_p]
 lib.zconfig_name.restype = c_char_p
 lib.zconfig_name.argtypes = [zconfig_p]
 lib.zconfig_value.restype = c_char_p
@@ -1563,6 +1562,14 @@ if the file does not exist.
 filename.
         """
         return Zconfig(lib.zconfig_loadf(format, *args), True)
+
+    def dup(self):
+        """
+        Create copy of zconfig, caller MUST free the value
+Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+object. If config is null, or memory was exhausted, returns null.
+        """
+        return Zconfig(lib.zconfig_dup(self._as_parameter_), True)
 
     def name(self):
         """
@@ -2279,7 +2286,7 @@ may be NULL, in which case it is not used.
     @staticmethod
     def tmp():
         """
-        Create new temporary file for writing via tmpfile. File is automaticaly
+        Create new temporary file for writing via tmpfile. File is automatically
 deleted on destroy
         """
         return Zfile(lib.zfile_tmp(), True)
@@ -4816,6 +4823,8 @@ lib.zproc_new.restype = zproc_p
 lib.zproc_new.argtypes = []
 lib.zproc_destroy.restype = None
 lib.zproc_destroy.argtypes = [POINTER(zproc_p)]
+lib.zproc_args.restype = zlist_p
+lib.zproc_args.argtypes = [zproc_p]
 lib.zproc_set_args.restype = None
 lib.zproc_set_args.argtypes = [zproc_p, POINTER(zlist_p)]
 lib.zproc_set_argsx.restype = None
@@ -4843,7 +4852,9 @@ lib.zproc_pid.argtypes = [zproc_p]
 lib.zproc_running.restype = c_bool
 lib.zproc_running.argtypes = [zproc_p]
 lib.zproc_wait.restype = c_int
-lib.zproc_wait.argtypes = [zproc_p, c_bool]
+lib.zproc_wait.argtypes = [zproc_p, c_int]
+lib.zproc_shutdown.restype = None
+lib.zproc_shutdown.argtypes = [zproc_p, c_int]
 lib.zproc_actor.restype = c_void_p
 lib.zproc_actor.argtypes = [zproc_p]
 lib.zproc_kill.restype = None
@@ -4902,6 +4913,13 @@ returns NULL. Code needs to be ported there.
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    def args(self):
+        """
+        Return command line arguments (the first item is the executable) or
+NULL if not set.
+        """
+        return Zlist(lib.zproc_args(self._as_parameter_), True)
 
     def set_args(self, arguments):
         """
@@ -4992,15 +5010,23 @@ not initialized or external sockets.
         """
         return lib.zproc_running(self._as_parameter_)
 
-    def wait(self, hang):
+    def wait(self, timeout):
         """
-        wait or poll process status, return return code
+        The timeout should be zero or greater, or -1 to wait indefinitely.
+wait or poll process status, return return code
         """
-        return lib.zproc_wait(self._as_parameter_, hang)
+        return lib.zproc_wait(self._as_parameter_, timeout)
+
+    def shutdown(self, timeout):
+        """
+        send SIGTERM signal to the subprocess, wait for grace period and
+eventually send SIGKILL
+        """
+        return lib.zproc_shutdown(self._as_parameter_, timeout)
 
     def actor(self):
         """
-        return internal actor, usefull for the polling if process died
+        return internal actor, useful for the polling if process died
         """
         return c_void_p(lib.zproc_actor(self._as_parameter_))
 
@@ -5111,6 +5137,18 @@ lib.zsock_is.restype = c_bool
 lib.zsock_is.argtypes = [c_void_p]
 lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
+lib.zsock_gssapi_principal_nametype.restype = c_int
+lib.zsock_gssapi_principal_nametype.argtypes = [zsock_p]
+lib.zsock_set_gssapi_principal_nametype.restype = None
+lib.zsock_set_gssapi_principal_nametype.argtypes = [zsock_p, c_int]
+lib.zsock_gssapi_service_principal_nametype.restype = c_int
+lib.zsock_gssapi_service_principal_nametype.argtypes = [zsock_p]
+lib.zsock_set_gssapi_service_principal_nametype.restype = None
+lib.zsock_set_gssapi_service_principal_nametype.argtypes = [zsock_p, c_int]
+lib.zsock_bindtodevice.restype = POINTER(c_char)
+lib.zsock_bindtodevice.argtypes = [zsock_p]
+lib.zsock_set_bindtodevice.restype = None
+lib.zsock_set_bindtodevice.argtypes = [zsock_p, c_char_p]
 lib.zsock_heartbeat_ivl.restype = c_int
 lib.zsock_heartbeat_ivl.argtypes = [zsock_p]
 lib.zsock_set_heartbeat_ivl.restype = None
@@ -5697,7 +5735,7 @@ a series of pointers as provided by the caller:
     U = zuuid_t * (creates a zuuid with the data)
     h = zhashx_t ** (creates zhashx)
     p = void ** (stores pointer)
-    m = zmsg_t ** (creates a zmsg with the remaing frames)
+    m = zmsg_t ** (creates a zmsg with the remaining frames)
     z = null, asserts empty frame (0 arguments)
     u = uint * (stores unsigned integer, deprecated)
 
@@ -5848,6 +5886,48 @@ descriptor, return NULL; else if it looks like a libzmq socket handle,
 return the supplied value. Takes a polymorphic socket reference.
         """
         return c_void_p(lib.zsock_resolve(self))
+
+    def gssapi_principal_nametype(self):
+        """
+        Get socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_gssapi_principal_nametype(self._as_parameter_)
+
+    def set_gssapi_principal_nametype(self, gssapi_principal_nametype):
+        """
+        Set socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_gssapi_principal_nametype(self._as_parameter_, gssapi_principal_nametype)
+
+    def gssapi_service_principal_nametype(self):
+        """
+        Get socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_gssapi_service_principal_nametype(self._as_parameter_)
+
+    def set_gssapi_service_principal_nametype(self, gssapi_service_principal_nametype):
+        """
+        Set socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_gssapi_service_principal_nametype(self._as_parameter_, gssapi_service_principal_nametype)
+
+    def bindtodevice(self):
+        """
+        Get socket option `bindtodevice`.
+Available from libzmq 4.3.0.
+        """
+        return return_fresh_string(lib.zsock_bindtodevice(self._as_parameter_))
+
+    def set_bindtodevice(self, bindtodevice):
+        """
+        Set socket option `bindtodevice`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_bindtodevice(self._as_parameter_, bindtodevice)
 
     def heartbeat_ivl(self):
         """
@@ -7079,6 +7159,10 @@ lib.zsys_set_max_msgsz.restype = None
 lib.zsys_set_max_msgsz.argtypes = [c_int]
 lib.zsys_max_msgsz.restype = c_int
 lib.zsys_max_msgsz.argtypes = []
+lib.zsys_set_zero_copy_recv.restype = None
+lib.zsys_set_zero_copy_recv.argtypes = [c_int]
+lib.zsys_zero_copy_recv.restype = c_int
+lib.zsys_zero_copy_recv.argtypes = []
 lib.zsys_set_file_stable_age_msec.restype = None
 lib.zsys_set_file_stable_age_msec.argtypes = [msecs_p]
 lib.zsys_file_stable_age_msec.restype = msecs_p
@@ -7240,7 +7324,7 @@ default SIGINT/SIGTERM handling in CZMQ.
         """
         Set default interrupt handler, so Ctrl-C or SIGTERM will set
 zsys_interrupted. Idempotent; safe to call multiple times.
-Can be supressed by ZSYS_SIGHANDLER=false
+Can be suppressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
         """
         return lib.zsys_catch_interrupts()
@@ -7513,6 +7597,22 @@ The default is INT_MAX.
         Return maximum message size.
         """
         return lib.zsys_max_msgsz()
+
+    @staticmethod
+    def set_zero_copy_recv(zero_copy):
+        """
+        Configure whether to use zero copy strategy in libzmq. If the environment
+variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+Otherwise the default is 1.
+        """
+        return lib.zsys_set_zero_copy_recv(zero_copy)
+
+    @staticmethod
+    def zero_copy_recv():
+        """
+        Return ZMQ_ZERO_COPY_RECV option.
+        """
+        return lib.zsys_zero_copy_recv()
 
     @staticmethod
     def set_file_stable_age_msec(file_stable_age_msec):

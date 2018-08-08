@@ -155,7 +155,7 @@ class Zsock(object):
             U = zuuid_t * (creates a zuuid with the data)
             h = zhashx_t ** (creates zhashx)
             p = void ** (stores pointer)
-            m = zmsg_t ** (creates a zmsg with the remaing frames)
+            m = zmsg_t ** (creates a zmsg with the remaining frames)
             z = null, asserts empty frame (0 arguments)
             u = uint * (stores unsigned integer, deprecated)
 
@@ -304,6 +304,48 @@ class Zsock(object):
         return the supplied value. Takes a polymorphic socket reference.
         """
         return utils.lib.zsock_resolve(self._p)
+
+    def gssapi_principal_nametype(self):
+        """
+        Get socket option `gssapi_principal_nametype`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_gssapi_principal_nametype(self._p)
+
+    def set_gssapi_principal_nametype(self, gssapi_principal_nametype):
+        """
+        Set socket option `gssapi_principal_nametype`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_gssapi_principal_nametype(self._p, gssapi_principal_nametype)
+
+    def gssapi_service_principal_nametype(self):
+        """
+        Get socket option `gssapi_service_principal_nametype`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_gssapi_service_principal_nametype(self._p)
+
+    def set_gssapi_service_principal_nametype(self, gssapi_service_principal_nametype):
+        """
+        Set socket option `gssapi_service_principal_nametype`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_gssapi_service_principal_nametype(self._p, gssapi_service_principal_nametype)
+
+    def bindtodevice(self):
+        """
+        Get socket option `bindtodevice`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_bindtodevice(self._p)
+
+    def set_bindtodevice(self, bindtodevice):
+        """
+        Set socket option `bindtodevice`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_bindtodevice(self._p, utils.to_bytes(bindtodevice))
 
     def heartbeat_ivl(self):
         """

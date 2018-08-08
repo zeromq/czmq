@@ -27,10 +27,11 @@
 //
 
 void
-czmq_private_selftest (bool verbose)
+czmq_private_selftest (bool verbose, const char *subtest)
 {
 // Tests for stable private classes:
-    zgossip_msg_test (verbose);
+    if (streq (subtest, "$ALL") || streq (subtest, "zgossip_msg_test"))
+        zgossip_msg_test (verbose);
 }
 /*
 ################################################################################

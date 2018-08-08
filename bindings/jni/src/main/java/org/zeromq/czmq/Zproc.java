@@ -39,6 +39,14 @@ public class Zproc implements AutoCloseable{
         self = 0;
     }
     /*
+    Return command line arguments (the first item is the executable) or
+    NULL if not set.
+    */
+    native static long __args (long self);
+    public Zlist args () {
+        return new Zlist (__args (self));
+    }
+    /*
     Setup the command line arguments, the first item must be an (absolute) filename
     to run.
     */
@@ -141,14 +149,23 @@ public class Zproc implements AutoCloseable{
         return __running (self);
     }
     /*
+    The timeout should be zero or greater, or -1 to wait indefinitely.
     wait or poll process status, return return code
     */
-    native static int __wait (long self, boolean hang);
-    public int Wait (boolean hang) {
-        return __wait (self, hang);
+    native static int __wait (long self, int timeout);
+    public int Wait (int timeout) {
+        return __wait (self, timeout);
     }
     /*
-    return internal actor, usefull for the polling if process died
+    send SIGTERM signal to the subprocess, wait for grace period and
+    eventually send SIGKILL
+    */
+    native static void __shutdown (long self, int timeout);
+    public void shutdown (int timeout) {
+        __shutdown (self, timeout);
+    }
+    /*
+    return internal actor, useful for the polling if process died
     */
     native static long __actor (long self);
     public long actor () {

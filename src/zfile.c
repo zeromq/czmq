@@ -114,7 +114,7 @@ zfile_new (const char *path, const char *name)
 
 //  --------------------------------------------------------------------------
 //  Constructor
-//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  Create new temporary file for writing via tmpfile. File is automatically
 //  deleted on destroy
 
 zfile_t *

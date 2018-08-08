@@ -82,7 +82,7 @@ class Zsys(object):
         """
         Set default interrupt handler, so Ctrl-C or SIGTERM will set
         zsys_interrupted. Idempotent; safe to call multiple times.
-        Can be supressed by ZSYS_SIGHANDLER=false
+        Can be suppressed by ZSYS_SIGHANDLER=false
         *** This is for CZMQ internal use only and may change arbitrarily ***
         """
         utils.lib.zsys_catch_interrupts()
@@ -324,6 +324,20 @@ class Zsys(object):
         Return maximum message size.
         """
         return utils.lib.zsys_max_msgsz()
+
+    def set_zero_copy_recv(zero_copy):
+        """
+        Configure whether to use zero copy strategy in libzmq. If the environment
+        variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+        Otherwise the default is 1.
+        """
+        utils.lib.zsys_set_zero_copy_recv(zero_copy)
+
+    def zero_copy_recv():
+        """
+        Return ZMQ_ZERO_COPY_RECV option.
+        """
+        return utils.lib.zsys_zero_copy_recv()
 
     def set_file_stable_age_msec(file_stable_age_msec):
         """

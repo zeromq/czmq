@@ -32,6 +32,15 @@ QZproc::~QZproc ()
 }
 
 ///
+//  Return command line arguments (the first item is the executable) or
+//  NULL if not set.
+QZlist * QZproc::args ()
+{
+    QZlist *rv = new QZlist (zproc_args (self));
+    return rv;
+}
+
+///
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
 void QZproc::setArgs (QZlist *arguments)
@@ -138,15 +147,25 @@ bool QZproc::running ()
 }
 
 ///
+//  The timeout should be zero or greater, or -1 to wait indefinitely.
 //  wait or poll process status, return return code
-int QZproc::wait (bool hang)
+int QZproc::wait (int timeout)
 {
-    int rv = zproc_wait (self, hang);
+    int rv = zproc_wait (self, timeout);
     return rv;
 }
 
 ///
-//  return internal actor, usefull for the polling if process died
+//  send SIGTERM signal to the subprocess, wait for grace period and
+//  eventually send SIGKILL
+void QZproc::shutdown (int timeout)
+{
+    zproc_shutdown (self, timeout);
+
+}
+
+///
+//  return internal actor, useful for the polling if process died
 void * QZproc::actor ()
 {
     void * rv = zproc_actor (self);

@@ -308,7 +308,7 @@ int QZsock::vsend (const QString &picture, va_list argptr)
 //      U = zuuid_t * (creates a zuuid with the data)
 //      h = zhashx_t ** (creates zhashx)
 //      p = void ** (stores pointer)
-//      m = zmsg_t ** (creates a zmsg with the remaing frames)
+//      m = zmsg_t ** (creates a zmsg with the remaining frames)
 //      z = null, asserts empty frame (0 arguments)
 //      u = uint * (stores unsigned integer, deprecated)
 //
@@ -436,6 +436,62 @@ void * QZsock::resolve (void *self)
 {
     void * rv = zsock_resolve (self);
     return rv;
+}
+
+///
+//  Get socket option `gssapi_principal_nametype`.
+//  Available from libzmq 4.3.0.
+int QZsock::gssapiPrincipalNametype ()
+{
+    int rv = zsock_gssapi_principal_nametype (self);
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_principal_nametype`.
+//  Available from libzmq 4.3.0.
+void QZsock::setGssapiPrincipalNametype (int gssapiPrincipalNametype)
+{
+    zsock_set_gssapi_principal_nametype (self, gssapiPrincipalNametype);
+
+}
+
+///
+//  Get socket option `gssapi_service_principal_nametype`.
+//  Available from libzmq 4.3.0.
+int QZsock::gssapiServicePrincipalNametype ()
+{
+    int rv = zsock_gssapi_service_principal_nametype (self);
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_service_principal_nametype`.
+//  Available from libzmq 4.3.0.
+void QZsock::setGssapiServicePrincipalNametype (int gssapiServicePrincipalNametype)
+{
+    zsock_set_gssapi_service_principal_nametype (self, gssapiServicePrincipalNametype);
+
+}
+
+///
+//  Get socket option `bindtodevice`.
+//  Available from libzmq 4.3.0.
+QString QZsock::bindtodevice ()
+{
+    char *retStr_ = zsock_bindtodevice (self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
+    return rv;
+}
+
+///
+//  Set socket option `bindtodevice`.
+//  Available from libzmq 4.3.0.
+void QZsock::setBindtodevice (const QString &bindtodevice)
+{
+    zsock_set_bindtodevice (self, bindtodevice.toUtf8().data());
+
 }
 
 ///

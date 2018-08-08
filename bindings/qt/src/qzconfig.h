@@ -32,6 +32,11 @@ public:
     //  Destroy a config item and all its children
     ~QZconfig ();
 
+    //  Create copy of zconfig, caller MUST free the value
+    //  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+    //  object. If config is null, or memory was exhausted, returns null.
+    QZconfig * dup ();
+
     //  Return name of config item
     const QString name ();
 
