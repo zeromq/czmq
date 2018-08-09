@@ -351,42 +351,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zsys_auto_use_fd (void);
 
-//  Print formatted string. Format is specified by variable names
-//  in Python-like format style
-//
-//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
-//  become
-//  "key=value"
-//
-//  Returns freshly allocated string or NULL in a case of error.
-//  Not enough memory, invalid format specifier, name not in args
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT char *
-    zsys_zprintf (const char *format, zhash_t *args);
-
-//  Return error string for given format/args combination.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT char *
-    zsys_zprintf_error (const char *format, zhash_t *args);
-
-//  Print formatted string. Format is specified by variable names
-//  in Python-like format style
-//
-//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
-//  become
-//  "key=value"
-//
-//  Returns freshly allocated string or NULL in a case of error.
-//  Not enough memory, invalid format specifier, name not in args
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT char *
-    zsys_zplprintf (const char *format, zconfig_t *args);
-
-//  Return error string for given format/args combination.
-//  Caller owns return value and must destroy it when done.
-CZMQ_EXPORT char *
-    zsys_zplprintf_error (const char *format, zconfig_t *args);
-
 //  Set log identity, which is a string that prefixes all log messages sent
 //  by this process. The log identity defaults to the environment variable
 //  ZSYS_LOGIDENT, if that is set.
@@ -480,6 +444,46 @@ CZMQ_EXPORT void
 //  before testing if a filesystem object is "stable" or not.
 CZMQ_EXPORT int64_t
     zsys_file_stable_age_msec (void);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Print formatted string. Format is specified by variable names
+//  in Python-like format style
+//
+//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+//  become
+//  "key=value"
+//
+//  Returns freshly allocated string or NULL in a case of error.
+//  Not enough memory, invalid format specifier, name not in args
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zsys_zprintf (const char *format, zhash_t *args);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return error string for given format/args combination.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zsys_zprintf_error (const char *format, zhash_t *args);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Print formatted string. Format is specified by variable names
+//  in Python-like format style
+//
+//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+//  become
+//  "key=value"
+//
+//  Returns freshly allocated string or NULL in a case of error.
+//  Not enough memory, invalid format specifier, name not in args
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zsys_zplprintf (const char *format, zconfig_t *args);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return error string for given format/args combination.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zsys_zplprintf_error (const char *format, zconfig_t *args);
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end

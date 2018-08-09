@@ -457,7 +457,7 @@
         <return type = "integer" />
     </method>
 
-    <method name = "zprintf" singleton = "1">
+    <method name = "zprintf" singleton = "1" state = "draft">
         Print formatted string. Format is specified by variable names
         in Python-like format style
 
@@ -471,7 +471,7 @@
         <argument name = "args" type = "zhash" />
         <return type = "string" fresh = "1" />
     </method>
-    <method name = "zprintf_error" singleton = "1">
+    <method name = "zprintf_error" singleton = "1" state = "draft">
         Return error string for given format/args combination.
 
         <argument name = "format" type = "string" />
@@ -479,7 +479,7 @@
         <return type = "string" fresh = "1" />
     </method>
 
-    <method name = "zplprintf" singleton = "1">
+    <method name = "zplprintf" singleton = "1" state = "draft">
         Print formatted string. Format is specified by variable names
         in Python-like format style
 
@@ -493,7 +493,8 @@
         <argument name = "args" type = "zconfig" />
         <return type = "string" fresh = "1" />
     </method>
-    <method name = "zplprintf_error" singleton = "1">
+
+    <method name = "zplprintf_error" singleton = "1" state = "draft">
         Return error string for given format/args combination.
 
         <argument name = "format" type = "string" />
