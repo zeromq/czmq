@@ -1872,7 +1872,7 @@ s_zsys_zprintf (const char *format, void *args, zsys_lookup_fn lookup_fn, bool v
                 {
 
                     //zsys_debug ("\tstate=FIND_PERCENT, format+%zu=%s", pos, format+pos);
-                    char *percent = strchr (format + pos, '%');
+                    char *percent = strchr ((char*)(format) + pos, '%');
 
                     if (!percent) {
                         //zsys_debug ("!percent");
@@ -1914,7 +1914,7 @@ s_zsys_zprintf (const char *format, void *args, zsys_lookup_fn lookup_fn, bool v
             case FIND_KEY:
                 {
                     //zsys_debug ("\tstate=FIND_KEY, format+%zu=%s", pos, format+pos);
-                    char *key_end = strchr (format+pos, ')');
+                    char *key_end = strchr ((char*)(format)+pos, ')');
                     if (!key_end) {
                         zchunk_extend (chunk, (format+pos), strlen (format) - pos);
                         state = END;
