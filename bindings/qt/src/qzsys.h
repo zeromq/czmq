@@ -302,6 +302,34 @@ public:
     //  Return use of automatic pre-allocated FDs for zsock instances.
     static int autoUseFd ();
 
+    //  Print formatted string. Format is specified by variable names
+    //  in Python-like format style
+    //
+    //  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+    //  become
+    //  "key=value"
+    //
+    //  Returns freshly allocated string or NULL in a case of error.
+    //  Not enough memory, invalid format specifier, name not in args
+    static QString zprintf (const QString &format, QZhash *args);
+
+    //  Return error string for given format/args combination.
+    static QString zprintfError (const QString &format, QZhash *args);
+
+    //  Print formatted string. Format is specified by variable names
+    //  in Python-like format style
+    //
+    //  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+    //  become
+    //  "key=value"
+    //
+    //  Returns freshly allocated string or NULL in a case of error.
+    //  Not enough memory, invalid format specifier, name not in args
+    static QString zplprintf (const QString &format, QZconfig *args);
+
+    //  Return error string for given format/args combination.
+    static QString zplprintfError (const QString &format, QZconfig *args);
+
     //  Set log identity, which is a string that prefixes all log messages sent
     //  by this process. The log identity defaults to the environment variable
     //  ZSYS_LOGIDENT, if that is set.

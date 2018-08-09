@@ -4057,6 +4057,46 @@ integer my_zsys.autoUseFd ()
 Return use of automatic pre-allocated FDs for zsock instances.
 
 ```
+string my_zsys.zprintf (String, Zhash)
+```
+
+Print formatted string. Format is specified by variable names
+in Python-like format style
+
+"%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+become
+"key=value"
+
+Returns freshly allocated string or NULL in a case of error.
+Not enough memory, invalid format specifier, name not in args
+
+```
+string my_zsys.zprintfError (String, Zhash)
+```
+
+Return error string for given format/args combination.
+
+```
+string my_zsys.zplprintf (String, Zconfig)
+```
+
+Print formatted string. Format is specified by variable names
+in Python-like format style
+
+"%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+become
+"key=value"
+
+Returns freshly allocated string or NULL in a case of error.
+Not enough memory, invalid format specifier, name not in args
+
+```
+string my_zsys.zplprintfError (String, Zconfig)
+```
+
+Return error string for given format/args combination.
+
+```
 nothing my_zsys.setLogident (String)
 ```
 

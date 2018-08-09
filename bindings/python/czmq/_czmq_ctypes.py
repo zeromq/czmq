@@ -7197,6 +7197,14 @@ lib.zsys_set_auto_use_fd.restype = None
 lib.zsys_set_auto_use_fd.argtypes = [c_int]
 lib.zsys_auto_use_fd.restype = c_int
 lib.zsys_auto_use_fd.argtypes = []
+lib.zsys_zprintf.restype = POINTER(c_char)
+lib.zsys_zprintf.argtypes = [c_char_p, zhash_p]
+lib.zsys_zprintf_error.restype = POINTER(c_char)
+lib.zsys_zprintf_error.argtypes = [c_char_p, zhash_p]
+lib.zsys_zplprintf.restype = POINTER(c_char)
+lib.zsys_zplprintf.argtypes = [c_char_p, zconfig_p]
+lib.zsys_zplprintf_error.restype = POINTER(c_char)
+lib.zsys_zplprintf_error.argtypes = [c_char_p, zconfig_p]
 lib.zsys_set_logident.restype = None
 lib.zsys_set_logident.argtypes = [c_char_p]
 lib.zsys_set_logstream.restype = None
@@ -7776,6 +7784,50 @@ instead of creating a new socket.
         Return use of automatic pre-allocated FDs for zsock instances.
         """
         return lib.zsys_auto_use_fd()
+
+    @staticmethod
+    def zprintf(format, args):
+        """
+        Print formatted string. Format is specified by variable names
+in Python-like format style
+
+"%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+become
+"key=value"
+
+Returns freshly allocated string or NULL in a case of error.
+Not enough memory, invalid format specifier, name not in args
+        """
+        return return_fresh_string(lib.zsys_zprintf(format, args))
+
+    @staticmethod
+    def zprintf_error(format, args):
+        """
+        Return error string for given format/args combination.
+        """
+        return return_fresh_string(lib.zsys_zprintf_error(format, args))
+
+    @staticmethod
+    def zplprintf(format, args):
+        """
+        Print formatted string. Format is specified by variable names
+in Python-like format style
+
+"%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+become
+"key=value"
+
+Returns freshly allocated string or NULL in a case of error.
+Not enough memory, invalid format specifier, name not in args
+        """
+        return return_fresh_string(lib.zsys_zplprintf(format, args))
+
+    @staticmethod
+    def zplprintf_error(format, args):
+        """
+        Return error string for given format/args combination.
+        """
+        return return_fresh_string(lib.zsys_zplprintf_error(format, args))
 
     @staticmethod
     def set_logident(value):

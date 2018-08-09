@@ -759,6 +759,70 @@ module CZMQ
         result
       end
 
+      # Print formatted string. Format is specified by variable names
+      # in Python-like format style
+      #
+      # "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+      # become
+      # "key=value"
+      #
+      # Returns freshly allocated string or NULL in a case of error.
+      # Not enough memory, invalid format specifier, name not in args
+      #
+      # @param format [String, #to_s, nil]
+      # @param args [Zhash, #__ptr]
+      # @return [::FFI::AutoPointer]
+      def self.zprintf(format, args)
+        args = args.__ptr if args
+        result = ::CZMQ::FFI.zsys_zprintf(format, args)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Return error string for given format/args combination.
+      #
+      # @param format [String, #to_s, nil]
+      # @param args [Zhash, #__ptr]
+      # @return [::FFI::AutoPointer]
+      def self.zprintf_error(format, args)
+        args = args.__ptr if args
+        result = ::CZMQ::FFI.zsys_zprintf_error(format, args)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Print formatted string. Format is specified by variable names
+      # in Python-like format style
+      #
+      # "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+      # become
+      # "key=value"
+      #
+      # Returns freshly allocated string or NULL in a case of error.
+      # Not enough memory, invalid format specifier, name not in args
+      #
+      # @param format [String, #to_s, nil]
+      # @param args [Zconfig, #__ptr]
+      # @return [::FFI::AutoPointer]
+      def self.zplprintf(format, args)
+        args = args.__ptr if args
+        result = ::CZMQ::FFI.zsys_zplprintf(format, args)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Return error string for given format/args combination.
+      #
+      # @param format [String, #to_s, nil]
+      # @param args [Zconfig, #__ptr]
+      # @return [::FFI::AutoPointer]
+      def self.zplprintf_error(format, args)
+        args = args.__ptr if args
+        result = ::CZMQ::FFI.zsys_zplprintf_error(format, args)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
       # Set log identity, which is a string that prefixes all log messages sent
       # by this process. The log identity defaults to the environment variable
       # ZSYS_LOGIDENT, if that is set.

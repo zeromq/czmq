@@ -34,6 +34,7 @@ typedef struct _zgossip_msg_t zgossip_msg_t;
 
 //  Internal API
 
+
 #include "zgossip_msg.h"
 
 //  *** To avoid double-definitions, only define if building without draft ***
@@ -318,6 +319,46 @@ CZMQ_PRIVATE void
 //  before testing if a filesystem object is "stable" or not.
 CZMQ_PRIVATE int64_t
     zsys_file_stable_age_msec (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Print formatted string. Format is specified by variable names
+//  in Python-like format style
+//
+//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+//  become
+//  "key=value"
+//
+//  Returns freshly allocated string or NULL in a case of error.
+//  Not enough memory, invalid format specifier, name not in args
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE char *
+    zsys_zprintf (const char *format, zhash_t *args);
+
+//  *** Draft method, defined for internal use only ***
+//  Return error string for given format/args combination.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE char *
+    zsys_zprintf_error (const char *format, zhash_t *args);
+
+//  *** Draft method, defined for internal use only ***
+//  Print formatted string. Format is specified by variable names
+//  in Python-like format style
+//
+//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+//  become
+//  "key=value"
+//
+//  Returns freshly allocated string or NULL in a case of error.
+//  Not enough memory, invalid format specifier, name not in args
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE char *
+    zsys_zplprintf (const char *format, zconfig_t *args);
+
+//  *** Draft method, defined for internal use only ***
+//  Return error string for given format/args combination.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE char *
+    zsys_zplprintf_error (const char *format, zconfig_t *args);
 
 //  *** Draft constants, defined for internal use only ***
 #define ZGOSSIP_MSG_HELLO 1                 //

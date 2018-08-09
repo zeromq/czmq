@@ -3831,6 +3831,38 @@ void
 int
     zsys_auto_use_fd (void);
 
+// Print formatted string. Format is specified by variable names
+// in Python-like format style
+//
+// "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+// become
+// "key=value"
+//
+// Returns freshly allocated string or NULL in a case of error.
+// Not enough memory, invalid format specifier, name not in args
+char *
+    zsys_zprintf (const char *format, zhash_t *args);
+
+// Return error string for given format/args combination.
+char *
+    zsys_zprintf_error (const char *format, zhash_t *args);
+
+// Print formatted string. Format is specified by variable names
+// in Python-like format style
+//
+// "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+// become
+// "key=value"
+//
+// Returns freshly allocated string or NULL in a case of error.
+// Not enough memory, invalid format specifier, name not in args
+char *
+    zsys_zplprintf (const char *format, zconfig_t *args);
+
+// Return error string for given format/args combination.
+char *
+    zsys_zplprintf_error (const char *format, zconfig_t *args);
+
 // Set log identity, which is a string that prefixes all log messages sent
 // by this process. The log identity defaults to the environment variable
 // ZSYS_LOGIDENT, if that is set.

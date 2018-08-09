@@ -485,6 +485,46 @@ class Zsys(object):
         """
         return utils.lib.zsys_auto_use_fd()
 
+    def zprintf(format, args):
+        """
+        Print formatted string. Format is specified by variable names
+        in Python-like format style
+
+        "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+        become
+        "key=value"
+
+        Returns freshly allocated string or NULL in a case of error.
+        Not enough memory, invalid format specifier, name not in args
+        """
+        return utils.lib.zsys_zprintf(utils.to_bytes(format), args._p)
+
+    def zprintf_error(format, args):
+        """
+        Return error string for given format/args combination.
+        """
+        return utils.lib.zsys_zprintf_error(utils.to_bytes(format), args._p)
+
+    def zplprintf(format, args):
+        """
+        Print formatted string. Format is specified by variable names
+        in Python-like format style
+
+        "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+        become
+        "key=value"
+
+        Returns freshly allocated string or NULL in a case of error.
+        Not enough memory, invalid format specifier, name not in args
+        """
+        return utils.lib.zsys_zplprintf(utils.to_bytes(format), args._p)
+
+    def zplprintf_error(format, args):
+        """
+        Return error string for given format/args combination.
+        """
+        return utils.lib.zsys_zplprintf_error(utils.to_bytes(format), args._p)
+
     def set_logident(value):
         """
         Set log identity, which is a string that prefixes all log messages sent

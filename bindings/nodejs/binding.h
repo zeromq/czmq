@@ -865,6 +865,10 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_ipv6_mcast_address);
     static NAN_METHOD (_set_auto_use_fd);
     static NAN_METHOD (_auto_use_fd);
+    static NAN_METHOD (_zprintf);
+    static NAN_METHOD (_zprintf_error);
+    static NAN_METHOD (_zplprintf);
+    static NAN_METHOD (_zplprintf_error);
     static NAN_METHOD (_set_logident);
     static NAN_METHOD (_set_logsender);
     static NAN_METHOD (_set_logsystem);

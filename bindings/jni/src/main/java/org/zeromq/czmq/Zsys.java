@@ -494,6 +494,50 @@ public class Zsys {
         return __autoUseFd ();
     }
     /*
+    Print formatted string. Format is specified by variable names
+    in Python-like format style
+
+    "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+    become
+    "key=value"
+
+    Returns freshly allocated string or NULL in a case of error.
+    Not enough memory, invalid format specifier, name not in args
+    */
+    native static String __zprintf (String format, long args);
+    public String zprintf (String format, Zhash args) {
+        return __zprintf (format, args.self);
+    }
+    /*
+    Return error string for given format/args combination.
+    */
+    native static String __zprintfError (String format, long args);
+    public String zprintfError (String format, Zhash args) {
+        return __zprintfError (format, args.self);
+    }
+    /*
+    Print formatted string. Format is specified by variable names
+    in Python-like format style
+
+    "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+    become
+    "key=value"
+
+    Returns freshly allocated string or NULL in a case of error.
+    Not enough memory, invalid format specifier, name not in args
+    */
+    native static String __zplprintf (String format, long args);
+    public String zplprintf (String format, Zconfig args) {
+        return __zplprintf (format, args.self);
+    }
+    /*
+    Return error string for given format/args combination.
+    */
+    native static String __zplprintfError (String format, long args);
+    public String zplprintfError (String format, Zconfig args) {
+        return __zplprintfError (format, args.self);
+    }
+    /*
     Set log identity, which is a string that prefixes all log messages sent
     by this process. The log identity defaults to the environment variable
     ZSYS_LOGIDENT, if that is set.
