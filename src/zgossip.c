@@ -93,6 +93,7 @@
 
 // TODO- project.xml?
 #ifdef CZMQ_BUILD_DRAFT_API
+//  DRAFT-API: Security
 #define CZMQ_ZGOSSIP_ZAP_DOMAIN "global"
 #endif
 
@@ -124,6 +125,7 @@ struct _server_t {
     char *public_key;
     char *secret_key;
 #ifdef CZMQ_BUILD_DRAFT_API
+    //  DRAFT-API: Security
     char *zap_domain;
 #endif
 };
@@ -204,6 +206,7 @@ server_terminate (server_t *self)
     zstr_free (&self->public_key);
     zstr_free (&self->secret_key);
 #ifdef CZMQ_BUILD_DRAFT_API
+    //  DRAFT-API: Security
     zstr_free (&self->zap_domain);
 #endif
 }
@@ -220,6 +223,7 @@ server_connect (server_t *self, const char *endpoint)
     assert (remote);          //  No recovery if exhausted
 
 #ifdef CZMQ_BUILD_DRAFT_API
+    //  DRAFT-API: Security
     if (public_key){
         zcert_t *cert = zcert_new_from_txt (self->public_key, self->secret_key);
         zcert_apply(cert, remote);
@@ -314,6 +318,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         char *endpoint = zmsg_popstr (msg);
         assert (endpoint);
 #ifdef CZMQ_BUILD_DRAFT_API
+        //  DRAFT-API: Security
         // leaving this in here for now because if/def changes the server_connect
         // function args. it doesn't look like server_connect is used anywhere else
         // but want to leave this in until we're sure this is stable..
@@ -342,6 +347,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         zmsg_addstrf (reply, "%d", (int) zhashx_size (self->tuples));
     }
 #ifdef CZMQ_BUILD_DRAFT_API
+    //  DRAFT-API: Security
     else
     if (streq (method, "SET PUBLICKEY")) {
         char *key = zmsg_popstr (msg);
@@ -602,6 +608,7 @@ zgossip_test (bool verbose)
     zactor_destroy (&beta);
 
 #ifdef CZMQ_BUILD_DRAFT_API
+    //  DRAFT-API: Security
     // curve
     if (zsys_has_curve()) {
         if (verbose)
