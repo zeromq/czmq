@@ -44,8 +44,8 @@ typedef struct _zgossip_msg_t zgossip_msg_t;
 //
 // An example - to send $KTHXBAI string
 //
-//     if (zstr_send (self->pipe, "$KTHXBAI") == 0)
-//         zsock_wait (self->pipe);
+//     if (zstr_send (self, "$KTHXBAI") == 0)
+//         zsock_wait (self);
 typedef void (zactor_destructor_fn) (
     zactor_t *self);
 
@@ -94,6 +94,14 @@ CZMQ_PRIVATE zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
 //  *** Draft method, defined for internal use only ***
+//  Create copy of zconfig, caller MUST free the value
+//  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+//  object. If config is null, or memory was exhausted, returns null.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zconfig_t *
+    zconfig_dup (zconfig_t *self);
+
+//  *** Draft method, defined for internal use only ***
 //  Destroy subtree (all children)
 CZMQ_PRIVATE void
     zconfig_remove_subtree (zconfig_t *self);
@@ -104,7 +112,7 @@ CZMQ_PRIVATE void
     zconfig_remove (zconfig_t **self_p);
 
 //  *** Draft method, defined for internal use only ***
-//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  Create new temporary file for writing via tmpfile. File is automatically
 //  deleted on destroy
 //  Caller owns return value and must destroy it when done.
 CZMQ_PRIVATE zfile_t *
@@ -284,6 +292,18 @@ CZMQ_PRIVATE void
     zsys_set_interrupted (void);
 
 //  *** Draft method, defined for internal use only ***
+//  Configure whether to use zero copy strategy in libzmq. If the environment
+//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+//  Otherwise the default is 1.
+CZMQ_PRIVATE void
+    zsys_set_zero_copy_recv (int zero_copy);
+
+//  *** Draft method, defined for internal use only ***
+//  Return ZMQ_ZERO_COPY_RECV option.
+CZMQ_PRIVATE int
+    zsys_zero_copy_recv (void);
+
+//  *** Draft method, defined for internal use only ***
 //  Configure the threshold value of filesystem object age per st_mtime
 //  that should elapse until we consider that object "stable" at the
 //  current zclock_time() moment.
@@ -395,7 +415,7 @@ CZMQ_PRIVATE void
 
 //  Self test for private classes
 CZMQ_PRIVATE void
-    czmq_private_selftest (bool verbose);
+    czmq_private_selftest (bool verbose, const char *subtest);
 
 #endif // CZMQ_BUILD_DRAFT_API
 

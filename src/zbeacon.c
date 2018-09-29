@@ -618,7 +618,7 @@ zbeacon_test (bool verbose)
         long timeout = (long) (stop_at - zclock_mono ());
         if (timeout < 0)
             timeout = 0;
-        void *which = zpoller_wait (poller, timeout * ZMQ_POLL_MSEC);
+        void *which = zpoller_wait (poller, timeout);
         if (which) {
             assert (which == node1);
             char *ipaddress, *received;

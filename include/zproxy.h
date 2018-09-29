@@ -45,6 +45,10 @@ extern "C" {
 //      zstr_sendx (proxy, "FRONTEND", "XSUB", endpoints, NULL);
 //      zsock_wait (proxy);
 //
+//  When the socket type is XSUB or SUB, topic(s) string(s) can be passed as
+//  additional arguments (NOTE: in DRAFT state) and the socket will subscribe
+//  using them.
+//
 //  Specify backend socket type -- see zsock_type_str () -- and attach to
 //  endpoints, see zsock_attach (). Note that a proxy socket is always
 //  serverish:

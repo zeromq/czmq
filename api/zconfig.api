@@ -27,6 +27,14 @@
         Destroy a config item and all its children
     </destructor>
 
+    <method name = "dup" state = "draft">
+        Create copy of zconfig, caller MUST free the value
+        Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+        object. If config is null, or memory was exhausted, returns null.
+        <return type = "zconfig" fresh = "1" />
+    </method>
+
+
     <method name = "name">
         Return name of config item
         <return type = "string" mutable = "1" />

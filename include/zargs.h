@@ -85,34 +85,29 @@ CZMQ_EXPORT const char *
     zargs_param_next (zargs_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return current parameter name, or NULL if there are no named
-//  parameters.
+//  Return current parameter name, or NULL if there are no named parameters.
 CZMQ_EXPORT const char *
     zargs_param_name (zargs_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return value of named parameter, NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()
-//  returns true.
+//  Return value of named parameter or NULL is it has no value (or was not specified)
 CZMQ_EXPORT const char *
-    zargs_param_lookup (zargs_t *self, const char *keys);
+    zargs_get (zargs_t *self, const char *name);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return value of named parameter(s), NULL if no given parameter has
-//  been specified, or special value for wich zargs_param_empty ()
-//  returns true.
+//  Return value of one of parameter(s) or NULL is it has no value (or was not specified)
 CZMQ_EXPORT const char *
-    zargs_param_lookupx (zargs_t *self, const char *keys, ...);
+    zargs_getx (zargs_t *self, const char *name, ...);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Returns true if there are --help -h arguments
+//  Returns true if named parameter was specified on command line
 CZMQ_EXPORT bool
-    zargs_has_help (zargs_t *self);
+    zargs_has (zargs_t *self, const char *name);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Returns true if parameter did not have a value
+//  Returns true if named parameter(s) was specified on command line
 CZMQ_EXPORT bool
-    zargs_param_empty (const char *arg);
+    zargs_hasx (zargs_t *self, const char *name, ...);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Print an instance of zargs.

@@ -27,8 +27,8 @@
 
 //  CZMQ version macros for compile-time API detection
 #define CZMQ_VERSION_MAJOR 4
-#define CZMQ_VERSION_MINOR 1
-#define CZMQ_VERSION_PATCH 1
+#define CZMQ_VERSION_MINOR 2
+#define CZMQ_VERSION_PATCH 0
 
 #define CZMQ_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
@@ -54,11 +54,12 @@
 #   define CZMQ_EXPORT
 #   define CZMQ_PRIVATE
 #else
-#   define CZMQ_EXPORT
 #   if (defined __GNUC__ && __GNUC__ >= 4) || defined __INTEL_COMPILER
 #       define CZMQ_PRIVATE __attribute__ ((visibility ("hidden")))
+#       define CZMQ_EXPORT __attribute__ ((visibility ("default")))
 #   else
 #       define CZMQ_PRIVATE
+#       define CZMQ_EXPORT
 #   endif
 #endif
 
@@ -176,9 +177,18 @@ typedef struct _ztrie_t ztrie_t;
 #endif // CZMQ_BUILD_DRAFT_API
 
 #ifdef CZMQ_BUILD_DRAFT_API
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //  Self test for private classes
 CZMQ_EXPORT void
-    czmq_private_selftest (bool verbose);
+    czmq_private_selftest (bool verbose, const char *subtest);
+
+#ifdef __cplusplus
+}
+#endif
 #endif // CZMQ_BUILD_DRAFT_API
 
 #endif

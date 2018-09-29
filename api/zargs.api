@@ -11,14 +11,17 @@
     Platform independent command line argument parsing helpers
 
     There are two kind of elements provided by this class
-    foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-    zargs keeps poision only for arguments, parameters are to be accessed like hash.
+    Named parameters, accessed by param_get and param_has methods
+      * --named-parameter
+      * --parameter with_value
+      * -a val
+    Positional arguments, accessed by zargs_first, zargs_next
 
     It DOES:
     * provide easy to use CLASS compatible API for accessing argv
     * is platform independent
     * provide getopt_long style -- argument, which delimits parameters from arguments
-    * makes parameters positon independent
+    * makes parameters position independent
 
     It does NOT
     * change argv
@@ -71,36 +74,31 @@
     </method>
 
     <method name = "param name" >
-	Return current parameter name, or NULL if there are no named
-        parameters.
+	Return current parameter name, or NULL if there are no named parameters.
         <return type = "string" />
     </method>
 
-    <method name = "param lookup">
-	Return value of named parameter, NULL if no given parameter has
-	been specified, or special value for wich zargs_param_empty ()
-	returns true.
-        <argument name = "keys" type = "string" />
+    <method name = "get">
+	Return value of named parameter or NULL is it has no value (or was not specified)
+        <argument name = "name" type = "string" />
         <return type="string" />
     </method>
 
-    <method name = "param lookupx">
-	Return value of named parameter(s), NULL if no given parameter has
-	been specified, or special value for wich zargs_param_empty ()
-	returns true.
-        <argument name = "keys" type = "string" variadic="1" />
+    <method name = "getx">
+	Return value of one of parameter(s) or NULL is it has no value (or was not specified)
+        <argument name = "name" type = "string" variadic = "1" />
         <return type="string" />
     </method>
 
-    <method name = "has help">
-        Returns true if there are --help -h arguments
+    <method name = "has">
+        Returns true if named parameter was specified on command line
+	<argument name ="name" type = "string" />
 	<return type="boolean" />
     </method>
 
-    <!-- helpers -->
-    <method name = "param empty" singleton = "1">
-        Returns true if parameter did not have a value
-	<argument name ="arg" type = "string" />
+    <method name = "hasx">
+        Returns true if named parameter(s) was specified on command line
+	<argument name ="name" type = "string" variadic = "1" />
 	<return type="boolean" />
     </method>
 

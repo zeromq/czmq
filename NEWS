@@ -1,3 +1,79 @@
+CZMQ version 4.2.0 stable, released on 20xx/xx/xx
+=================================================
+
+
+CZMQ version 4.1.1 stable, released on 2018/03/22
+=================================================
+
+* New DRAFT APIs have been added to the zsys class to get and set
+  the zsys_interrupted global variable:
+  - zsys_is_interrupted
+  - zsys_set_interrupted
+  The following DRAFT APIs wrap a new libzmq context API (minimum
+  libzmq version with DRAFTs enabled required: 4.2.4):
+  - zsys_set_zero_copy_recv
+  - zsys_zero_copy_recv
+  See zsys manpage for more info.
+
+* New DRAFT APIs have been added to the zproc class to set and get
+  the command line arguments string:
+  - zproc_args
+  - zproc_set_argsx
+  The zproc_set_args and zproc_set_env DRAFT APIs have had their
+  signature changed.
+  See the zproc manpage for more details.
+
+* Existing DRAFT APIs have been deleted from to the zproc class as they
+  are redundant and already offered by zsys:
+  - zproc_log_debug
+  - zproc_log_info
+  - zproc_log_notice
+  - zproc_log_warning
+  - zproc_log_error
+  - zproc_set_log_system
+  - zproc_set_log_sender
+  - zproc_set_log_ident
+  - zproc_biface
+  - zproc_set_biface
+  - zproc_set_max_sockets
+  - zproc_set_io_threads
+  - zproc_run_as
+  - zproc_daemonize
+  - zproc_hostname
+  - zproc_has_curve
+  - zproc_interrupted
+  - zproc_czmq_version
+
+* Exising DRAFT APIs to create DRAFT sockets will now return ENOTSUP
+  instead of EINVAL when libzmq does not support the socket type:
+  - zsock_new_server
+  - zsock_new_client
+  - zsock_new_radio
+  - zsock_new_dish
+  - zsock_new_scatter
+  - zsock_new_gather
+  - zsock_join
+  - zsock_leave
+
+* Fixed #1828 - fix build on GNU/Hurd
+
+* Fixed #1829 - fix build on FreeBSD 10.4 and 11.1
+
+* Fixed #1840 - implement basic zproc support for Windows
+
+* Fixed #1847 - fix test segfault when no USER env variable exists
+
+* Fixed #1848 - fix zsock_resolve when using many thousands of sockets
+
+* Fixed #1853 - use SIGTERM on Windows as SIGKILL does not exist
+
+* Fixed #1858 - fix build on MINGGW
+
+* Fixed #1875 - fix build with GCC 8
+
+* Fixed #1876 - fix crash in zsys_shutdown with libzmq 4.2.4 built with
+                Tweetnacl
+
 CZMQ version 4.1.0 stable, released on 2017/12/31
 =================================================
 

@@ -294,7 +294,7 @@ public class Zsock implements AutoCloseable{
         U = zuuid_t * (creates a zuuid with the data)
         h = zhashx_t ** (creates zhashx)
         p = void ** (stores pointer)
-        m = zmsg_t ** (creates a zmsg with the remaing frames)
+        m = zmsg_t ** (creates a zmsg with the remaining frames)
         z = null, asserts empty frame (0 arguments)
         u = uint * (stores unsigned integer, deprecated)
 
@@ -449,6 +449,54 @@ public class Zsock implements AutoCloseable{
     native static long __resolve (long self);
     public long resolve (long self) {
         return __resolve (self);
+    }
+    /*
+    Get socket option `gssapi_principal_nametype`.
+    Available from libzmq 4.3.0.
+    */
+    native static int __gssapiPrincipalNametype (long self);
+    public int gssapiPrincipalNametype () {
+        return __gssapiPrincipalNametype (self);
+    }
+    /*
+    Set socket option `gssapi_principal_nametype`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setGssapiPrincipalNametype (long self, int gssapiPrincipalNametype);
+    public void setGssapiPrincipalNametype (int gssapiPrincipalNametype) {
+        __setGssapiPrincipalNametype (self, gssapiPrincipalNametype);
+    }
+    /*
+    Get socket option `gssapi_service_principal_nametype`.
+    Available from libzmq 4.3.0.
+    */
+    native static int __gssapiServicePrincipalNametype (long self);
+    public int gssapiServicePrincipalNametype () {
+        return __gssapiServicePrincipalNametype (self);
+    }
+    /*
+    Set socket option `gssapi_service_principal_nametype`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setGssapiServicePrincipalNametype (long self, int gssapiServicePrincipalNametype);
+    public void setGssapiServicePrincipalNametype (int gssapiServicePrincipalNametype) {
+        __setGssapiServicePrincipalNametype (self, gssapiServicePrincipalNametype);
+    }
+    /*
+    Get socket option `bindtodevice`.
+    Available from libzmq 4.3.0.
+    */
+    native static String __bindtodevice (long self);
+    public String bindtodevice () {
+        return __bindtodevice (self);
+    }
+    /*
+    Set socket option `bindtodevice`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setBindtodevice (long self, String bindtodevice);
+    public void setBindtodevice (String bindtodevice) {
+        __setBindtodevice (self, bindtodevice);
     }
     /*
     Get socket option `heartbeat_ivl`.

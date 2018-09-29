@@ -300,8 +300,33 @@ KTHXBAI_actor (zsock_t *pipe, void *args) {
 static void
 KTHXBAI_destructor (zactor_t *self) {
     assert (self);
-    if (zstr_send (self->pipe, "$KTHXBAI") == 0)
-        zsock_wait (self->pipe);
+    if (zstr_send (self, "$KTHXBAI") == 0)
+        zsock_wait (self);
+}
+
+static void
+BSEND_actor (zsock_t *pipe, void *args) {
+
+    zsock_signal (pipe, 0);
+    while (!zsys_interrupted) {
+        char *str = NULL;
+        void *ptr = NULL;
+        int r = zsock_brecv (pipe, "s", &str, &ptr);
+        if (r == -1)
+            break;
+        int done = streq (str, "$TERM");
+        if (done)
+            break;
+    }
+}
+
+static void
+BSEND_destructor (zactor_t *self) {
+    assert (self);
+    const char *str = "$TERM";
+    const void *ptr = str;
+    if (zsock_bsend (self, "s", str, ptr) == 0)
+        zsock_wait (self);
 }
 
 //  --------------------------------------------------------------------------
@@ -329,6 +354,12 @@ zactor_test (bool verbose)
     zactor_set_destructor (KTHXBAI, KTHXBAI_destructor);
     zactor_destroy (&KTHXBAI);
 
+    // custom destructor
+    // destructor using bsend/brecv
+    zactor_t *BSEND = zactor_new (BSEND_actor, NULL);
+    assert (BSEND);
+    zactor_set_destructor (BSEND, BSEND_destructor);
+    zactor_destroy (&BSEND);
 #if defined (__WINDOWS__)
     zsys_shutdown();
 #endif

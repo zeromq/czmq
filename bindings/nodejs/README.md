@@ -46,14 +46,17 @@ This is a wrapping of the native C libczmq library. See binding.cc for the code.
 ### The Zargs class - Platform independent command line argument parsing helpers
 
 There are two kind of elements provided by this class
-foo --named-parameter --parameter with_value positional arguments -a gain-parameter
-zargs keeps poision only for arguments, parameters are to be accessed like hash.
+Named parameters, accessed by param_get and param_has methods
+  * --named-parameter
+  * --parameter with_value
+  * -a val
+Positional arguments, accessed by zargs_first, zargs_next
 
 It DOES:
 * provide easy to use CLASS compatible API for accessing argv
 * is platform independent
 * provide getopt_long style -- argument, which delimits parameters from arguments
-* makes parameters positon independent
+* makes parameters position independent
 
 It does NOT
 * change argv
@@ -120,36 +123,31 @@ parameters, or value for which zargs_param_empty (arg) returns true.
 string my_zargs.paramName ()
 ```
 
-Return current parameter name, or NULL if there are no named
-parameters.
+Return current parameter name, or NULL if there are no named parameters.
 
 ```
-string my_zargs.paramLookup (String)
+string my_zargs.get (String)
 ```
 
-Return value of named parameter, NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
-returns true.
+Return value of named parameter or NULL is it has no value (or was not specified)
 
 ```
-string my_zargs.paramLookupx (String)
+string my_zargs.getx (String)
 ```
 
-Return value of named parameter(s), NULL if no given parameter has
-been specified, or special value for wich zargs_param_empty ()
-returns true.
+Return value of one of parameter(s) or NULL is it has no value (or was not specified)
 
 ```
-boolean my_zargs.hasHelp ()
+boolean my_zargs.has (String)
 ```
 
-Returns true if there are --help -h arguments
+Returns true if named parameter was specified on command line
 
 ```
-boolean my_zargs.paramEmpty (String)
+boolean my_zargs.hasx (String)
 ```
 
-Returns true if parameter did not have a value
+Returns true if named parameter(s) was specified on command line
 
 ```
 nothing my_zargs.print ()
@@ -669,6 +667,14 @@ my_zconfig.destroy ()
 ```
 
 Methods:
+
+```
+zconfig my_zconfig.dup ()
+```
+
+Create copy of zconfig, caller MUST free the value
+Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+object. If config is null, or memory was exhausted, returns null.
 
 ```
 string my_zconfig.name ()
@@ -2186,6 +2192,13 @@ my_zproc.destroy ()
 Methods:
 
 ```
+zlist my_zproc.args ()
+```
+
+Return command line arguments (the first item is the executable) or
+NULL if not set.
+
+```
 nothing my_zproc.setArgs (Zlist)
 ```
 
@@ -2230,10 +2243,18 @@ boolean my_zproc.running ()
 return true if process is running, false if not yet started or finished
 
 ```
-integer my_zproc.wait (Boolean)
+integer my_zproc.wait (Number)
 ```
 
+The timeout should be zero or greater, or -1 to wait indefinitely.
 wait or poll process status, return return code
+
+```
+nothing my_zproc.shutdown (Number)
+```
+
+send SIGTERM signal to the subprocess, wait for grace period and
+eventually send SIGKILL
 
 ```
 nothing my_zproc.kill (Number)
@@ -2390,7 +2411,7 @@ a series of pointers as provided by the caller:
     U = zuuid_t * (creates a zuuid with the data)
     h = zhashx_t ** (creates zhashx)
     p = void ** (stores pointer)
-    m = zmsg_t ** (creates a zmsg with the remaing frames)
+    m = zmsg_t ** (creates a zmsg with the remaining frames)
     z = null, asserts empty frame (0 arguments)
     u = uint * (stores unsigned integer, deprecated)
 
@@ -2503,6 +2524,48 @@ integer my_zsock.leave (String)
 
 Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
 Returns 0 if OK, -1 if failed.
+
+```
+integer my_zsock.gssapiPrincipalNametype ()
+```
+
+Get socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setGssapiPrincipalNametype (Number)
+```
+
+Set socket option `gssapi_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.gssapiServicePrincipalNametype ()
+```
+
+Get socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setGssapiServicePrincipalNametype (Number)
+```
+
+Set socket option `gssapi_service_principal_nametype`.
+Available from libzmq 4.3.0.
+
+```
+string my_zsock.bindtodevice ()
+```
+
+Get socket option `bindtodevice`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setBindtodevice (String)
+```
+
+Set socket option `bindtodevice`.
+Available from libzmq 4.3.0.
 
 ```
 integer my_zsock.heartbeatIvl ()
@@ -3633,7 +3696,7 @@ nothing my_zsys.catchInterrupts ()
 
 Set default interrupt handler, so Ctrl-C or SIGTERM will set
 zsys_interrupted. Idempotent; safe to call multiple times.
-Can be supressed by ZSYS_SIGHANDLER=false
+Can be suppressed by ZSYS_SIGHANDLER=false
 *** This is for CZMQ internal use only and may change arbitrarily ***
 
 ```
@@ -3832,6 +3895,20 @@ integer my_zsys.maxMsgsz ()
 ```
 
 Return maximum message size.
+
+```
+nothing my_zsys.setZeroCopyRecv (Number)
+```
+
+Configure whether to use zero copy strategy in libzmq. If the environment
+variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+Otherwise the default is 1.
+
+```
+integer my_zsys.zeroCopyRecv ()
+```
+
+Return ZMQ_ZERO_COPY_RECV option.
 
 ```
 nothing my_zsys.setFileStableAgeMsec (Number)

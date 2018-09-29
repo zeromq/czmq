@@ -39,6 +39,13 @@ CZMQ_EXPORT void
     zproc_destroy (zproc_t **self_p);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Return command line arguments (the first item is the executable) or
+//  NULL if not set.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zlist_t *
+    zproc_args (zproc_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
 CZMQ_EXPORT void
@@ -115,12 +122,19 @@ CZMQ_EXPORT bool
     zproc_running (zproc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
+//  The timeout should be zero or greater, or -1 to wait indefinitely.
 //  wait or poll process status, return return code
 CZMQ_EXPORT int
-    zproc_wait (zproc_t *self, bool hang);
+    zproc_wait (zproc_t *self, int timeout);
 
 //  *** Draft method, for development use, may change without warning ***
-//  return internal actor, usefull for the polling if process died
+//  send SIGTERM signal to the subprocess, wait for grace period and
+//  eventually send SIGKILL
+CZMQ_EXPORT void
+    zproc_shutdown (zproc_t *self, int timeout);
+
+//  *** Draft method, for development use, may change without warning ***
+//  return internal actor, useful for the polling if process died
 CZMQ_EXPORT void *
     zproc_actor (zproc_t *self);
 

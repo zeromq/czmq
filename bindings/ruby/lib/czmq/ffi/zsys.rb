@@ -188,7 +188,7 @@ module CZMQ
 
       # Set default interrupt handler, so Ctrl-C or SIGTERM will set
       # zsys_interrupted. Idempotent; safe to call multiple times.
-      # Can be supressed by ZSYS_SIGHANDLER=false
+      # Can be suppressed by ZSYS_SIGHANDLER=false
       # *** This is for CZMQ internal use only and may change arbitrarily ***
       #
       # @return [void]
@@ -540,6 +540,26 @@ module CZMQ
       # @return [Integer]
       def self.max_msgsz()
         result = ::CZMQ::FFI.zsys_max_msgsz()
+        result
+      end
+
+      # Configure whether to use zero copy strategy in libzmq. If the environment
+      # variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+      # Otherwise the default is 1.
+      #
+      # @param zero_copy [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_zero_copy_recv(zero_copy)
+        zero_copy = Integer(zero_copy)
+        result = ::CZMQ::FFI.zsys_set_zero_copy_recv(zero_copy)
+        result
+      end
+
+      # Return ZMQ_ZERO_COPY_RECV option.
+      #
+      # @return [Integer]
+      def self.zero_copy_recv()
+        result = ::CZMQ::FFI.zsys_zero_copy_recv()
         result
       end
 

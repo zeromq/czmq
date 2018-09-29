@@ -99,6 +99,7 @@ static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
 static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
 static zsock_t *s_logsender = NULL;    //  ZSYS_LOGSENDER=
+static int s_zero_copy_recv = 1;    // ZSYS_ZERO_COPY_RECV=1
 
 //  Track number of open sockets so we can zmq_term() safely
 static size_t s_open_sockets = 0;
@@ -157,6 +158,9 @@ zsys_init (void)
     if (getenv ("ZSYS_MAX_MSGSZ"))
         s_max_msgsz = atoi (getenv ("ZSYS_MAX_MSGSZ"));
 
+    if (getenv ("ZSYS_ZERO_COPY_RECV"))
+        s_zero_copy_recv = atoi (getenv ("ZSYS_ZERO_COPY_RECV"));
+
     if (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"))
         s_file_stable_age_msec = atoi (getenv ("ZSYS_FILE_STABLE_AGE_MSEC"));
 
@@ -205,7 +209,6 @@ zsys_init (void)
         return NULL;
     }
     srandom ((unsigned) time (NULL));
-    atexit (zsys_shutdown);
 
     assert (!s_process_ctx);
     //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
@@ -214,6 +217,8 @@ zsys_init (void)
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     s_initialized = true;
+
+    atexit (zsys_shutdown);
 
     //  The following functions call zsys_init(), so they MUST be called after
     //  s_initialized is set in order to avoid an infinite recursion
@@ -236,6 +241,10 @@ zsys_init (void)
         zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
 
     zsys_set_max_msgsz (s_max_msgsz);
+
+#if defined ZMQ_ZERO_COPY_RECV
+    zmq_ctx_set (s_process_ctx, ZMQ_ZERO_COPY_RECV, s_zero_copy_recv);
+#endif
 
     zsys_set_file_stable_age_msec (s_file_stable_age_msec);
 
@@ -971,14 +980,27 @@ zsys_udp_new (bool routable)
     //  We haven't implemented multicast yet
     assert (!routable);
     SOCKET udpsock;
+    int type = SOCK_DGRAM;
+#ifdef CZMQ_HAVE_SOCK_CLOEXEC
+    //  Ensure socket is closed by exec() functions.
+    type |= SOCK_CLOEXEC;
+#endif
+
     if (zsys_ipv6 ())
-        udpsock = socket (AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+        udpsock = socket (AF_INET6, type, IPPROTO_UDP);
     else
-        udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        udpsock = socket (AF_INET, type, IPPROTO_UDP);
     if (udpsock == INVALID_SOCKET) {
         zsys_socket_error ("socket");
         return INVALID_SOCKET;
     }
+
+    //  On Windows, preventing sockets to be inherited by child processes.
+#if defined (__WINDOWS__) && defined (HANDLE_FLAG_INHERIT)
+    if (!SetHandleInformation ((HANDLE) udpsock, HANDLE_FLAG_INHERIT, 0))
+        zsys_socket_error ("SetHandleInformation (HANDLE_FLAG_INHERIT)");
+#endif
+
     //  Ask operating system for broadcast permissions on socket
     int on = 1;
     if (setsockopt (udpsock, SOL_SOCKET, SO_BROADCAST,
@@ -1491,6 +1513,37 @@ zsys_set_max_msgsz (int max_msgsz)
     ZMUTEX_UNLOCK (s_mutex);
 }
 
+//  --------------------------------------------------------------------------
+//  Configure whether to use zero copy strategy in libzmq. If the environment
+//  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+//  Otherwise the default is 1.
+
+void
+zsys_set_zero_copy_recv(int zero_copy)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_zero_copy_recv = zero_copy;
+#if defined (ZMQ_ZERO_COPY_RECV)
+    zmq_ctx_set (s_process_ctx, ZMQ_ZERO_COPY_RECV, s_zero_copy_recv);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+//  --------------------------------------------------------------------------
+//  Return ZMQ_ZERO_COPY_RECV option.
+int
+zsys_zero_copy_recv()
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+#if defined (ZMQ_ZERO_COPY_RECV)
+    s_zero_copy_recv = zmq_ctx_get (s_process_ctx, ZMQ_ZERO_COPY_RECV);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+    return s_zero_copy_recv;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return maximum message size.
@@ -1513,7 +1566,7 @@ zsys_max_msgsz (void)
 //  Check if default interrupt handler of Ctrl-C or SIGTERM was called.
 //  Does not work if ZSYS_SIGHANDLER is false and code does not call
 //  set interrupted on signal.
-CZMQ_EXPORT bool
+bool
     zsys_is_interrupted (void)
 {
     return zsys_interrupted != 0;
@@ -1524,7 +1577,7 @@ CZMQ_EXPORT bool
 //  Set interrupted flag. This is done by default signal handler, however
 //  this can be handy for language bindings or cases without default
 //  signal handler.
-CZMQ_EXPORT void
+void
     zsys_set_interrupted (void)
 {
     zctx_interrupted = 1;
@@ -2054,6 +2107,10 @@ zsys_test (bool verbose)
     zsys_set_ipv6 (0);
     zsys_set_thread_priority (-1);
     zsys_set_thread_sched_policy (-1);
+    zsys_set_zero_copy_recv(0);
+    assert (0 == zsys_zero_copy_recv());
+    zsys_set_zero_copy_recv(1);
+    assert (1 == zsys_zero_copy_recv());
 
     //  Test pipe creation
     zsock_t *pipe_back;

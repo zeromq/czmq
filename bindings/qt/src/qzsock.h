@@ -181,7 +181,7 @@ public:
     //      U = zuuid_t * (creates a zuuid with the data)
     //      h = zhashx_t ** (creates zhashx)
     //      p = void ** (stores pointer)
-    //      m = zmsg_t ** (creates a zmsg with the remaing frames)
+    //      m = zmsg_t ** (creates a zmsg with the remaining frames)
     //      z = null, asserts empty frame (0 arguments)
     //      u = uint * (stores unsigned integer, deprecated)
     //
@@ -248,6 +248,30 @@ public:
     //  descriptor, return NULL; else if it looks like a libzmq socket handle,
     //  return the supplied value. Takes a polymorphic socket reference.
     static void * resolve (void *self);
+
+    //  Get socket option `gssapi_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    int gssapiPrincipalNametype ();
+
+    //  Set socket option `gssapi_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    void setGssapiPrincipalNametype (int gssapiPrincipalNametype);
+
+    //  Get socket option `gssapi_service_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    int gssapiServicePrincipalNametype ();
+
+    //  Set socket option `gssapi_service_principal_nametype`.
+    //  Available from libzmq 4.3.0.
+    void setGssapiServicePrincipalNametype (int gssapiServicePrincipalNametype);
+
+    //  Get socket option `bindtodevice`.
+    //  Available from libzmq 4.3.0.
+    QString bindtodevice ();
+
+    //  Set socket option `bindtodevice`.
+    //  Available from libzmq 4.3.0.
+    void setBindtodevice (const QString &bindtodevice);
 
     //  Get socket option `heartbeat_ivl`.
     //  Available from libzmq 4.2.0.

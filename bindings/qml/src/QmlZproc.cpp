@@ -9,6 +9,15 @@
 
 
 ///
+//  Return command line arguments (the first item is the executable) or
+//  NULL if not set.
+QmlZlist *QmlZproc::args () {
+    QmlZlist *retQ_ = new QmlZlist ();
+    retQ_->self = zproc_args (self);
+    return retQ_;
+};
+
+///
 //  Setup the command line arguments, the first item must be an (absolute) filename
 //  to run.
 void QmlZproc::setArgs (QmlZlist *arguments) {
@@ -98,13 +107,21 @@ bool QmlZproc::running () {
 };
 
 ///
+//  The timeout should be zero or greater, or -1 to wait indefinitely.
 //  wait or poll process status, return return code
-int QmlZproc::wait (bool hang) {
-    return zproc_wait (self, hang);
+int QmlZproc::wait (int timeout) {
+    return zproc_wait (self, timeout);
 };
 
 ///
-//  return internal actor, usefull for the polling if process died
+//  send SIGTERM signal to the subprocess, wait for grace period and
+//  eventually send SIGKILL
+void QmlZproc::shutdown (int timeout) {
+    zproc_shutdown (self, timeout);
+};
+
+///
+//  return internal actor, useful for the polling if process died
 void *QmlZproc::actor () {
     return zproc_actor (self);
 };

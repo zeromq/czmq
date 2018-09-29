@@ -25,6 +25,13 @@ Java_org_zeromq_czmq_Zproc__1_1destroy (JNIEnv *env, jclass c, jlong self)
     zproc_destroy ((zproc_t **) &self);
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zproc__1_1args (JNIEnv *env, jclass c, jlong self)
+{
+    jlong args_ = (jlong) (intptr_t) zproc_args ((zproc_t *) (intptr_t) self);
+    return args_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zproc__1_1setArgs (JNIEnv *env, jclass c, jlong self, jlong arguments)
 {
@@ -113,10 +120,16 @@ Java_org_zeromq_czmq_Zproc__1_1running (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zproc__1_1wait (JNIEnv *env, jclass c, jlong self, jboolean hang)
+Java_org_zeromq_czmq_Zproc__1_1wait (JNIEnv *env, jclass c, jlong self, jint timeout)
 {
-    jint wait_ = (jint) zproc_wait ((zproc_t *) (intptr_t) self, (bool) hang);
+    jint wait_ = (jint) zproc_wait ((zproc_t *) (intptr_t) self, (int) timeout);
     return wait_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zproc__1_1shutdown (JNIEnv *env, jclass c, jlong self, jint timeout)
+{
+    zproc_shutdown ((zproc_t *) (intptr_t) self, (int) timeout);
 }
 
 JNIEXPORT jlong JNICALL

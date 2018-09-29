@@ -198,6 +198,17 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket 
     assert (*sock_p == NULL);
     *sock_p = s_self_create_socket (self, type_name, endpoints, selected_socket);
     assert (*sock_p);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    if (strcmp (type_name, "SUB") || strcmp (type_name, "XSUB")) {
+        char *topic;
+        while ((topic = zmsg_popstr (request)) != NULL) {
+            zsock_set_subscribe (*sock_p, topic);
+            zstr_free (&topic);
+        }
+    }
+#endif // CZMQ_BUILD_DRAFT_API
+
     zstr_free (&type_name);
     zstr_free (&endpoints);
 }
@@ -580,6 +591,44 @@ zproxy_test (bool verbose)
 
     zsock_destroy(&sink);
     zactor_destroy(&proxy);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+    //  Create and configure our proxy with PUB/SUB to test subscriptions
+    proxy = zactor_new (zproxy, NULL);
+    assert (proxy);
+    if (verbose) {
+        zstr_sendx (proxy, "VERBOSE", NULL);
+        zsock_wait (proxy);
+    }
+    zstr_sendx (proxy, "FRONTEND", "SUB", "inproc://frontend", "He", "b", NULL);
+    zsock_wait (proxy);
+    zstr_sendx (proxy, "BACKEND", "PUB", "inproc://backend", NULL);
+    zsock_wait (proxy);
+
+    //  Connect application sockets to proxy
+    faucet = zsock_new_pub (">inproc://frontend");
+    assert (faucet);
+    sink = zsock_new_sub (">inproc://backend", "");
+    assert (sink);
+
+    //  Send some messages and check they arrived
+    zstr_sendx (faucet, "Hello", "World", NULL);
+    // since SUB is binding, subscription might be lost see:
+    // https://github.com/zeromq/libzmq/issues/2267
+    zsock_set_rcvtimeo (sink, 100);
+    hello = zstr_recv (sink);
+    if (hello) {
+        assert (streq (hello, "Hello"));
+        world = zstr_recv (sink);
+        assert (streq (world, "World"));
+        zstr_free (&hello);
+        zstr_free (&world);
+    }
+
+    zsock_destroy (&faucet);
+    zsock_destroy (&sink);
+    zactor_destroy(&proxy);
+#endif // CZMQ_BUILD_DRAFT_API
 
 #if (ZMQ_VERSION_MAJOR == 4)
     // Test authentication functionality

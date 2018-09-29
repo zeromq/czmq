@@ -8,6 +8,16 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
+    <version major = "4" minor = "3" style = "macro">
+        <!-- Options that are new in 4.3 -->
+        <!-- We don't test these as libzmq doesn't always support GSSAPI -->
+        <option name = "gssapi_principal_nametype"  type = "int" mode = "rw" />
+        <option name = "gssapi_service_principal_nametype" type = "int" mode = "rw" />
+
+        <!-- We don't test this as it requires CAP_NET_RAW or root -->
+        <option name = "bindtodevice"      type = "string" mode = "rw" />
+    </version>
+
     <version major = "4" minor = "2" style = "macro">
         <!-- Options that are new in 4.2 -->
         <option name = "heartbeat_ivl"     type = "int"    mode = "rw" test = "DEALER"

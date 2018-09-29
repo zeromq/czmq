@@ -20,6 +20,12 @@
         Destroy zproc, wait until process ends.
     </destructor>
 
+    <method name = "args" >
+        Return command line arguments (the first item is the executable) or
+        NULL if not set.
+        <return type = "zlist" fresh = "1" />
+    </method>
+
     <method name = "set args" >
         Setup the command line arguments, the first item must be an (absolute) filename
         to run.
@@ -97,13 +103,20 @@
     </method>
 
     <method name = "wait">
+        The timeout should be zero or greater, or -1 to wait indefinitely.
         wait or poll process status, return return code
-        <argument name = "hang" type = "boolean" />
+        <argument name = "timeout" type = "integer" />
         <return type="integer" />
     </method>
 
+    <method name = "shutdown">
+        send SIGTERM signal to the subprocess, wait for grace period and
+        eventually send SIGKILL
+        <argument name = "timeout" type = "integer" />
+    </method>
+
     <method name = "actor">
-        return internal actor, usefull for the polling if process died
+        return internal actor, useful for the polling if process died
         <return type="anything" />
     </method>
 

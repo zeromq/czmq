@@ -24,6 +24,14 @@ class Zconfig(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zconfig_destroy_py)
 
+    def dup(self):
+        """
+        Create copy of zconfig, caller MUST free the value
+        Create copy of config, as new zconfig object. Returns a fresh zconfig_t
+        object. If config is null, or memory was exhausted, returns null.
+        """
+        return utils.lib.zconfig_dup(self._p)
+
     def name(self):
         """
         Return name of config item

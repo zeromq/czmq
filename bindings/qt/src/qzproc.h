@@ -25,6 +25,10 @@ public:
     //  Destroy zproc, wait until process ends.
     ~QZproc ();
 
+    //  Return command line arguments (the first item is the executable) or
+    //  NULL if not set.
+    QZlist * args ();
+
     //  Setup the command line arguments, the first item must be an (absolute) filename
     //  to run.
     void setArgs (QZlist *arguments);
@@ -71,10 +75,15 @@ public:
     //  return true if process is running, false if not yet started or finished
     bool running ();
 
+    //  The timeout should be zero or greater, or -1 to wait indefinitely.
     //  wait or poll process status, return return code
-    int wait (bool hang);
+    int wait (int timeout);
 
-    //  return internal actor, usefull for the polling if process died
+    //  send SIGTERM signal to the subprocess, wait for grace period and
+    //  eventually send SIGKILL
+    void shutdown (int timeout);
+
+    //  return internal actor, useful for the polling if process died
     void * actor ();
 
     //  send a signal to the subprocess

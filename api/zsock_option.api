@@ -8,6 +8,44 @@
 ******************************************************************
 -->
 
+<!-- The following socket options are available in libzmq from version 4.3.0 -->
+
+<method name = "gssapi principal nametype" polymorphic = "1">
+    Get socket option `gssapi_principal_nametype`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set gssapi principal nametype" polymorphic = "1">
+    Set socket option `gssapi_principal_nametype`.
+    Available from libzmq 4.3.0.
+    <argument name = "gssapi principal nametype" type = "integer" />
+</method>
+
+<method name = "gssapi service principal nametype" polymorphic = "1">
+    Get socket option `gssapi_service_principal_nametype`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set gssapi service principal nametype" polymorphic = "1">
+    Set socket option `gssapi_service_principal_nametype`.
+    Available from libzmq 4.3.0.
+    <argument name = "gssapi service principal nametype" type = "integer" />
+</method>
+
+<method name = "bindtodevice" polymorphic = "1">
+    Get socket option `bindtodevice`.
+    Available from libzmq 4.3.0.
+    <return type = "string" fresh = "1" />
+</method>
+
+<method name = "set bindtodevice" polymorphic = "1">
+    Set socket option `bindtodevice`.
+    Available from libzmq 4.3.0.
+    <argument name = "bindtodevice" type = "string" />
+</method>
+
 <!-- The following socket options are available in libzmq from version 4.2.0 -->
 
 <method name = "heartbeat ivl" polymorphic = "1">

@@ -62,7 +62,7 @@ public:
 
     //  Set default interrupt handler, so Ctrl-C or SIGTERM will set
     //  zsys_interrupted. Idempotent; safe to call multiple times.
-    //  Can be supressed by ZSYS_SIGHANDLER=false
+    //  Can be suppressed by ZSYS_SIGHANDLER=false
     //  *** This is for CZMQ internal use only and may change arbitrarily ***
     static void catchInterrupts ();
 
@@ -198,6 +198,14 @@ public:
 
     //  Return maximum message size.
     static int maxMsgsz ();
+
+    //  Configure whether to use zero copy strategy in libzmq. If the environment
+    //  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
+    //  Otherwise the default is 1.
+    static void setZeroCopyRecv (int zeroCopy);
+
+    //  Return ZMQ_ZERO_COPY_RECV option.
+    static int zeroCopyRecv ();
 
     //  Configure the threshold value of filesystem object age per st_mtime
     //  that should elapse until we consider that object "stable" at the

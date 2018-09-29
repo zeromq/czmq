@@ -146,7 +146,7 @@ CZMQ_EXPORT void
 
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
-//  Create new temporary file for writing via tmpfile. File is automaticaly
+//  Create new temporary file for writing via tmpfile. File is automatically
 //  deleted on destroy
 CZMQ_EXPORT zfile_t *
     zfile_tmp (void);
