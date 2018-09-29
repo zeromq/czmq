@@ -865,6 +865,26 @@ s_server_config_service (s_server_t *self)
                 zsys_notice ("server is using PLAIN security");
                 zsock_set_plain_server (self->router, 1);
             }
+<<<<<<< HEAD
+=======
+#ifdef CZMQ_BUILD_DRAFT_API
+            //  DRAFT-API: Security
+            // TODO- zproto
+            // https://github.com/zeromq/zproto/blob/master/src/zproto_server_c.gsl#L883
+            else
+            if (streq (mechanism, "curve")) {
+                zsys_notice ("using CURVE security");
+                const char *keyfile = zconfig_get (section, "secret-key", NULL);
+                assert (keyfile);
+
+                zcert_t *server_cert = zcert_load(keyfile);
+                assert (server_cert);
+
+                zcert_apply (server_cert, self->router);
+                zsock_set_curve_server (self->router, 1);
+            }
+#endif
+>>>>>>> master
             else
                 zsys_warning ("mechanism=%s is not supported", mechanism);
         }
@@ -906,6 +926,30 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
     if (streq (method, "BIND")) {
         //  Bind to a specified endpoint, which may use an ephemeral port
         char *endpoint = zmsg_popstr (msg);
+<<<<<<< HEAD
+=======
+
+#ifdef CZMQ_BUILD_DRAFT_API
+        //  DRAFT-API: Security
+        // TODO- expose self->router to application context ?
+        // Add secret|public|zap to gsl(?)
+        // move this block to custom server function when both keys are present
+        if (self->server.secret_key) {
+            zsock_set_zap_domain (self->router, self->server.zap_domain);
+            zcert_t *cert = zcert_new_from_txt(self->server.public_key, self->server.secret_key);
+            zcert_apply(cert, self->router);
+            zsock_set_curve_server (self->router, 1);
+            zcert_destroy(&cert);
+        }
+        // TODO- add this test in zproto_server_c.gsl
+#ifndef ZMQ_CURVE
+        // zmq legacy
+        bool ZMQ_CURVE = false;
+#endif
+        if (self->server.secret_key)
+            assert (zsock_mechanism (self->router) == ZMQ_CURVE);
+#endif
+>>>>>>> master
         self->port = zsock_bind (self->router, "%s", endpoint);
         if (self->port == -1)
             zsys_warning ("could not bind to %s", endpoint);

@@ -360,6 +360,7 @@ zcertstore_test (bool verbose)
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
 
 #ifdef CZMQ_BUILD_DRAFT_API
+    //  DRAFT-API: Security
     // Iterate through certs
     zlistx_t *certs = zcertstore_certs(certstore);
     cert = (zcert_t *) zlistx_first(certs);
