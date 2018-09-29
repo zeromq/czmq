@@ -401,6 +401,50 @@ Java_org_zeromq_czmq_Zsys__1_1autoUseFd (JNIEnv *env, jclass c)
     return auto_use_fd_;
 }
 
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsys__1_1zprintf (JNIEnv *env, jclass c, jstring format, jlong args)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    char *zprintf_ = (char *) zsys_zprintf (format_, (zhash_t *) (intptr_t) args);
+    jstring return_string_ = (*env)->NewStringUTF (env, zprintf_);
+    zstr_free (&zprintf_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return return_string_;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsys__1_1zprintfError (JNIEnv *env, jclass c, jstring format, jlong args)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    char *zprintf_error_ = (char *) zsys_zprintf_error (format_, (zhash_t *) (intptr_t) args);
+    jstring return_string_ = (*env)->NewStringUTF (env, zprintf_error_);
+    zstr_free (&zprintf_error_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return return_string_;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsys__1_1zplprintf (JNIEnv *env, jclass c, jstring format, jlong args)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    char *zplprintf_ = (char *) zsys_zplprintf (format_, (zconfig_t *) (intptr_t) args);
+    jstring return_string_ = (*env)->NewStringUTF (env, zplprintf_);
+    zstr_free (&zplprintf_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return return_string_;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsys__1_1zplprintfError (JNIEnv *env, jclass c, jstring format, jlong args)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    char *zplprintf_error_ = (char *) zsys_zplprintf_error (format_, (zconfig_t *) (intptr_t) args);
+    jstring return_string_ = (*env)->NewStringUTF (env, zplprintf_error_);
+    zstr_free (&zplprintf_error_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return return_string_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsys__1_1setLogident (JNIEnv *env, jclass c, jstring value)
 {

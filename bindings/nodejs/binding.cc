@@ -7003,6 +7003,10 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "ipv6McastAddress", _ipv6_mcast_address);
     Nan::SetPrototypeMethod (tpl, "setAutoUseFd", _set_auto_use_fd);
     Nan::SetPrototypeMethod (tpl, "autoUseFd", _auto_use_fd);
+    Nan::SetPrototypeMethod (tpl, "zprintf", _zprintf);
+    Nan::SetPrototypeMethod (tpl, "zprintfError", _zprintf_error);
+    Nan::SetPrototypeMethod (tpl, "zplprintf", _zplprintf);
+    Nan::SetPrototypeMethod (tpl, "zplprintfError", _zplprintf_error);
     Nan::SetPrototypeMethod (tpl, "setLogident", _set_logident);
     Nan::SetPrototypeMethod (tpl, "setLogsender", _set_logsender);
     Nan::SetPrototypeMethod (tpl, "setLogsystem", _set_logsystem);
@@ -7613,6 +7617,70 @@ NAN_METHOD (Zsys::_set_auto_use_fd) {
 NAN_METHOD (Zsys::_auto_use_fd) {
     int result = zsys_auto_use_fd ();
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_zprintf) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
+    Zhash *args = Nan::ObjectWrap::Unwrap<Zhash>(info [1].As<Object>());
+    char *result = (char *) zsys_zprintf ((const char *)format, args->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_zprintf_error) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
+    Zhash *args = Nan::ObjectWrap::Unwrap<Zhash>(info [1].As<Object>());
+    char *result = (char *) zsys_zprintf_error ((const char *)format, args->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_zplprintf) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
+    Zconfig *args = Nan::ObjectWrap::Unwrap<Zconfig>(info [1].As<Object>());
+    char *result = (char *) zsys_zplprintf ((const char *)format, args->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_zplprintf_error) {
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
+    Zconfig *args = Nan::ObjectWrap::Unwrap<Zconfig>(info [1].As<Object>());
+    char *result = (char *) zsys_zplprintf_error ((const char *)format, args->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zsys::_set_logident) {

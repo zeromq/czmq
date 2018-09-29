@@ -581,6 +581,62 @@ int QZsys::autoUseFd ()
 }
 
 ///
+//  Print formatted string. Format is specified by variable names
+//  in Python-like format style
+//
+//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+//  become
+//  "key=value"
+//
+//  Returns freshly allocated string or NULL in a case of error.
+//  Not enough memory, invalid format specifier, name not in args
+QString QZsys::zprintf (const QString &format, QZhash *args)
+{
+    char *retStr_ = zsys_zprintf (format.toUtf8().data(), args->self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
+    return rv;
+}
+
+///
+//  Return error string for given format/args combination.
+QString QZsys::zprintfError (const QString &format, QZhash *args)
+{
+    char *retStr_ = zsys_zprintf_error (format.toUtf8().data(), args->self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
+    return rv;
+}
+
+///
+//  Print formatted string. Format is specified by variable names
+//  in Python-like format style
+//
+//  "%(KEY)s=%(VALUE)s", KEY=key, VALUE=value
+//  become
+//  "key=value"
+//
+//  Returns freshly allocated string or NULL in a case of error.
+//  Not enough memory, invalid format specifier, name not in args
+QString QZsys::zplprintf (const QString &format, QZconfig *args)
+{
+    char *retStr_ = zsys_zplprintf (format.toUtf8().data(), args->self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
+    return rv;
+}
+
+///
+//  Return error string for given format/args combination.
+QString QZsys::zplprintfError (const QString &format, QZconfig *args)
+{
+    char *retStr_ = zsys_zplprintf_error (format.toUtf8().data(), args->self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
+    return rv;
+}
+
+///
 //  Set log identity, which is a string that prefixes all log messages sent
 //  by this process. The log identity defaults to the environment variable
 //  ZSYS_LOGIDENT, if that is set.

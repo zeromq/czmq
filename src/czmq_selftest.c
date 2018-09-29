@@ -21,9 +21,6 @@
 
 #include "czmq_classes.h"
 
-#include <stdio.h>
-#include <string.h>
-
 typedef struct {
     const char *testname;           // test name, can be called from command line this way
     void (*test) (bool);            // function to run the test (or NULL for private tests)
@@ -91,7 +88,7 @@ test_available (const char *testname)
 {
     test_item_t *item;
     for (item = all_tests; item->testname; item++) {
-        if (strcmp (testname, item->testname) == 0)
+        if (streq (testname, item->testname))
             return item;
     }
     return NULL;
@@ -107,7 +104,7 @@ test_runall (bool verbose)
     test_item_t *item;
     printf ("Running czmq selftests...\n");
     for (item = all_tests; item->testname; item++) {
-        if (strcmp (item->testname, "private_classes") == 0)
+        if (streq (item->testname, "private_classes"))
             continue;
         if (!item->subtest)
             item->test (verbose);
@@ -139,7 +136,7 @@ test_number (void)
     int n = 0;
     test_item_t *item;
     for (item = all_tests; item->testname; item++) {
-        if (strcmp (item->testname, "private_classes") == 0)
+        if (! streq (item->testname, "private_classes"))
             n++;
     }
     printf ("%d\n", n);
@@ -152,8 +149,8 @@ main (int argc, char **argv)
     test_item_t *test = 0;
     int argn;
     for (argn = 1; argn < argc; argn++) {
-        if (strcmp (argv [argn], "--help") == 0
-        ||  strcmp (argv [argn], "-h") == 0) {
+        if (streq (argv [argn], "--help")
+        ||  streq (argv [argn], "-h")) {
             puts ("czmq_selftest.c [options] ...");
             puts ("  --verbose / -v         verbose test output");
             puts ("  --number / -n          report number of tests");
@@ -162,24 +159,24 @@ main (int argc, char **argv)
             puts ("  --continue / -c        continue on exception (on Windows)");
             return 0;
         }
-        if (strcmp (argv [argn], "--verbose") == 0
-        ||  strcmp (argv [argn], "-v") == 0)
+        if (streq (argv [argn], "--verbose")
+        ||  streq (argv [argn], "-v"))
             verbose = true;
         else
-        if (strcmp (argv [argn], "--number") == 0
-        ||  strcmp (argv [argn], "-n") == 0) {
+        if (streq (argv [argn], "--number")
+        ||  streq (argv [argn], "-n")) {
             test_number ();
             return 0;
         }
         else
-        if (strcmp (argv [argn], "--list") == 0
-        ||  strcmp (argv [argn], "-l") == 0) {
+        if (streq (argv [argn], "--list")
+        ||  streq (argv [argn], "-l")) {
             test_list ();
             return 0;
         }
         else
-        if (strcmp (argv [argn], "--test") == 0
-        ||  strcmp (argv [argn], "-t") == 0) {
+        if (streq (argv [argn], "--test")
+        ||  streq (argv [argn], "-t")) {
             argn++;
             if (argn >= argc) {
                 fprintf (stderr, "--test needs an argument\n");
@@ -192,8 +189,8 @@ main (int argc, char **argv)
             }
         }
         else
-        if (strcmp (argv [argn], "--continue") == 0
-        ||  strcmp (argv [argn], "-c") == 0) {
+        if (streq (argv [argn], "--continue")
+        ||  streq (argv [argn], "-c")) {
 #ifdef _MSC_VER
             //  When receiving an abort signal, only print to stderr (no dialog)
             _set_abort_behavior (0, _WRITE_ABORT_MSG);

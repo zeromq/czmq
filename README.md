@@ -118,7 +118,7 @@ To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/
 
 To start with, you need at least these packages:
 
-* {{git-all}} -- git is how we share code with other people.
+* {{git}} -- git is how we share code with other people.
 
 * {{build-essential}}, {{libtool}}, {{pkg-config}} - the C compiler and related tools.
 
@@ -128,7 +128,7 @@ To start with, you need at least these packages:
 
 Plus some others:
 
-* {{uuid-dev}}, {{libpcre3-dev}} - utility libraries.
+* {{uuid-dev}}, {{libpcre3-dev}}, {{libsodium-dev}} - utility libraries.
 
 * {{valgrind}} - a useful tool for checking your code.
 
@@ -138,9 +138,9 @@ Which we install like this (using the Debian-style apt-get package manager):
 
     sudo apt-get update
     sudo apt-get install -y \
-        git-all build-essential libtool \
+        git build-essential libtool \
         pkg-config autotools-dev autoconf automake cmake \
-        uuid-dev libpcre3-dev valgrind
+        uuid-dev libpcre3-dev libsodium-dev valgrind
 
     # only execute this next line if interested in updating the man pages as well (adds to build time):
     sudo apt-get install -y asciidoc
