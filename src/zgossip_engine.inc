@@ -788,6 +788,7 @@ s_server_config_service (s_server_t *self)
                 zsock_set_plain_server (self->router, 1);
             }
 #ifdef CZMQ_BUILD_DRAFT_API
+            //  DRAFT-API: Security
             // TODO- zproto
             // https://github.com/zeromq/zproto/blob/master/src/zproto_server_c.gsl#L883
             else
@@ -843,6 +844,7 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
         char *endpoint = zmsg_popstr (msg);
 
 #ifdef CZMQ_BUILD_DRAFT_API
+        //  DRAFT-API: Security
         // TODO- expose self->router to application context ?
         // Add secret|public|zap to gsl(?)
         // move this block to custom server function when both keys are present
