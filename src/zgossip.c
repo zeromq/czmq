@@ -188,10 +188,11 @@ server_ping (zloop_t *loop, int timer_id, void *arg)
 
     zsock_t *remote = (zsock_t *) zlistx_first (self->remotes);
     while (remote) {
+        zgossip_msg_t *message = zgossip_msg_new ();
         zgossip_msg_set_id (message, ZGOSSIP_MSG_PING);
-        zgossip_msg_send (message, client);
-        zgossip_msg_recv (message, client);
-        assert (zgossip_msg_id (message) == ZGOSSIP_MSG_PONG);
+//        zgossip_msg_send (message, remote);
+//        zgossip_msg_recv (message, remote);
+//        assert (zgossip_msg_id (message) == ZGOSSIP_MSG_PONG);
         zgossip_msg_destroy (&message);
         remote = (zsock_t *) zlistx_next (self->remotes);
     }
@@ -206,7 +207,8 @@ server_tuple_cleanup (zloop_t *loop, int timer_id, void *arg)
 
     tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
     while (tuple) {
-        if (tuple->expires_at < zclock_mono()) {
+        zsys_debug("checkout expire: %d", tuple->expires_at);
+        if ((zclock_mono() + tuple->ttl) > tuple->expires_at) {
             zsys_debug("purging: %s", tuple->key);
             zhashx_delete(self->tuples, tuple->key);
         }
@@ -272,18 +274,18 @@ server_connect (server_t *self, const char *endpoint)
     zsock_t *remote = zsock_new (ZMQ_DEALER);
     assert (remote);          //  No recovery if exhausted
 
-//    if (self->heartbeat_ivl)
-//        zsock_set_heartbeat_ivl(remote, self->heartbeat_ivl);
-//
-//    if (self->heartbbeat_timeout)
-//        zsock_set_heartbeat_timeout(remote, self->heartbbeat_timeout);
-//
-//    if (self->heartbeat_ttl)
-//        zsock_set_heartbeat_ttl(remote, self->heartbeat_ttl);
+    if (self->heartbeat_ivl)
+        zsock_set_heartbeat_ivl(remote, self->heartbeat_ivl);
 
-//    zsock_set_heartbeat_ivl(remote, 30000);
-//    zsock_set_heartbeat_timeout(remote, 5000);
-//    zsock_set_heartbeat_ttl(remote, 45000);
+    if (self->heartbeat_timeout)
+        zsock_set_heartbeat_timeout(remote, self->heartbeat_timeout);
+
+    if (self->heartbeat_ttl)
+        zsock_set_heartbeat_ttl(remote, self->heartbeat_ttl);
+
+    zsock_set_heartbeat_ivl(remote, 30000);
+    zsock_set_heartbeat_timeout(remote, 5000);
+    zsock_set_heartbeat_ttl(remote, 45000);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     //  DRAFT-API: Security
@@ -354,6 +356,8 @@ server_accept (server_t *self, const char *key, const char *value, uint32_t ttl)
     tuple->value = strdup (value);
 
     if (ttl) {
+        zsys_info("TTL: %d", ttl);
+        zsys_info("ZCLOCK: %d", zclock_mono());
         tuple->ttl = ttl;
         tuple->expires_at = zclock_mono() + ttl;
     }
@@ -413,7 +417,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         char *key = zmsg_popstr (msg);
         char *value = zmsg_popstr (msg);
         char *ttl_s = zmsg_popstr (msg);
-        uint32_t ttl = 120000;
+        uint32_t ttl = 10000;
 
         if (ttl_s)
             ttl = atoi(ttl_s);
@@ -706,6 +710,8 @@ zgossip_test (bool verbose)
     zstr_free (&command);
     zstr_free (&key);
     zstr_free (&value);
+
+
 
     zstr_recvx (alpha, &command, &status, NULL);
     assert (streq (command, "STATUS"));
