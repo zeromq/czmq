@@ -128,9 +128,9 @@ struct _server_t {
 #ifdef CZMQ_BUILD_DRAFT_API
     //  DRAFT-API: Security
     char *zap_domain;
-    uint32_t heartbeat_ivl;
-    uint32_t heartbeat_timeout;
-    uint32_t heartbeat_ttl;
+    uint32_t heartbeat_ivl;     // heartbeat interval
+    uint32_t heartbeat_timeout; // heartbeat timeout
+    uint32_t heartbeat_ttl;     // heartbeat time to live
 #endif
 };
 

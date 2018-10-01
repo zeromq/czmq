@@ -865,8 +865,6 @@ s_server_config_service (s_server_t *self)
                 zsys_notice ("server is using PLAIN security");
                 zsock_set_plain_server (self->router, 1);
             }
-<<<<<<< HEAD
-=======
 #ifdef CZMQ_BUILD_DRAFT_API
             //  DRAFT-API: Security
             // TODO- zproto
@@ -884,7 +882,6 @@ s_server_config_service (s_server_t *self)
                 zsock_set_curve_server (self->router, 1);
             }
 #endif
->>>>>>> master
             else
                 zsys_warning ("mechanism=%s is not supported", mechanism);
         }
@@ -926,9 +923,6 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
     if (streq (method, "BIND")) {
         //  Bind to a specified endpoint, which may use an ephemeral port
         char *endpoint = zmsg_popstr (msg);
-<<<<<<< HEAD
-=======
-
 #ifdef CZMQ_BUILD_DRAFT_API
         //  DRAFT-API: Security
         // TODO- expose self->router to application context ?
@@ -949,7 +943,6 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
         if (self->server.secret_key)
             assert (zsock_mechanism (self->router) == ZMQ_CURVE);
 #endif
->>>>>>> master
         self->port = zsock_bind (self->router, "%s", endpoint);
         if (self->port == -1)
             zsys_warning ("could not bind to %s", endpoint);
