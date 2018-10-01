@@ -586,7 +586,7 @@ zframe_test (bool verbose)
     zframe_t* frame;
 
     //  @selftest
-    //  Create two PAIR sockets and connect over inproc
+    //  Create two PAIR sockets and connect over TCP
     zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
     int port = zsock_bind (output, "tcp://127.0.0.1:*");
