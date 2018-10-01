@@ -124,9 +124,13 @@ struct _server_t {
 
     char *public_key;
     char *secret_key;
+
 #ifdef CZMQ_BUILD_DRAFT_API
     //  DRAFT-API: Security
     char *zap_domain;
+    uint32_t heartbeat_ivl;     // heartbeat interval
+    uint32_t heartbeat_timeout; // heartbeat timeout
+    uint32_t heartbeat_ttl;     // heartbeat time to live
 #endif
 };
 
@@ -139,6 +143,7 @@ struct _client_t {
     //  and are set by the generated engine; do not modify them!
     server_t *server;           //  Reference to parent server
     zgossip_msg_t *message;     //  Message in and out
+    uint unique_id;             //  Client identifier counter
 };
 
 
@@ -149,6 +154,11 @@ struct _tuple_t {
     zhashx_t *container;         //  Hash table that holds this item
     char *key;                  //  Tuple key
     char *value;                //  Tuple value
+#ifdef CZMQ_BUILD_DRAFT_API
+    // DRAFT-API: ttl
+    uint32_t ttl;
+    uint64_t expires_at;
+#endif
 };
 
 //  Callback when we remove a tuple from its container
@@ -171,6 +181,46 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument);
 
 #include "zgossip_engine.inc"
 
+static int
+server_ping (zloop_t *loop, int timer_id, void *arg)
+{
+    server_t *self = (server_t *) arg;
+
+    zsock_t *remote = (zsock_t *) zlistx_first (self->remotes);
+    while (remote) {
+        zgossip_msg_t *message = zgossip_msg_new ();
+        zgossip_msg_set_id (message, ZGOSSIP_MSG_PING);
+//        zgossip_msg_send (message, remote);
+//        zgossip_msg_recv (message, remote);
+//        assert (zgossip_msg_id (message) == ZGOSSIP_MSG_PONG);
+        zgossip_msg_destroy (&message);
+        remote = (zsock_t *) zlistx_next (self->remotes);
+    }
+
+    return 0;
+}
+
+static int
+server_tuple_cleanup (zloop_t *loop, int timer_id, void *arg)
+{
+    server_t *self = (server_t *) arg;
+
+    tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
+    while (tuple) {
+        zsys_debug("checkout expire: %d", tuple->expires_at);
+        if ((zclock_mono() + tuple->ttl) > tuple->expires_at) {
+            zsys_debug("purging: %s", tuple->key);
+            zhashx_delete(self->tuples, tuple->key);
+        }
+        else
+            zsys_info("nothing to purge...");
+        tuple = (tuple_t *) zhashx_next (self->tuples);
+    }
+
+    return 0;
+}
+
+
 //  Allocate properties and structures for a new server instance.
 //  Return 0 if OK, or -1 if there was an error.
 
@@ -179,7 +229,7 @@ server_initialize (server_t *self)
 {
     //  Default timeout for clients is one second; the caller can
     //  override this with a SET message.
-    engine_configure (self, "server/timeout", "1000");
+    engine_configure (self, "server/timeout", "60000");
     self->message = zgossip_msg_new ();
 
     self->remotes = zlistx_new ();
@@ -192,6 +242,8 @@ server_initialize (server_t *self)
 #ifdef CZMQ_BUILD_DRAFT_API
     self->zap_domain = strdup(CZMQ_ZGOSSIP_ZAP_DOMAIN);
 #endif
+
+    engine_set_monitor (self, 5000, server_tuple_cleanup);
     return 0;
 }
 
@@ -221,6 +273,19 @@ server_connect (server_t *self, const char *endpoint)
 {
     zsock_t *remote = zsock_new (ZMQ_DEALER);
     assert (remote);          //  No recovery if exhausted
+
+    if (self->heartbeat_ivl)
+        zsock_set_heartbeat_ivl(remote, self->heartbeat_ivl);
+
+    if (self->heartbeat_timeout)
+        zsock_set_heartbeat_timeout(remote, self->heartbeat_timeout);
+
+    if (self->heartbeat_ttl)
+        zsock_set_heartbeat_ttl(remote, self->heartbeat_ttl);
+
+    zsock_set_heartbeat_ivl(remote, 30000);
+    zsock_set_heartbeat_timeout(remote, 5000);
+    zsock_set_heartbeat_ttl(remote, 45000);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     //  DRAFT-API: Security
@@ -257,6 +322,7 @@ server_connect (server_t *self, const char *endpoint)
         zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
         zgossip_msg_set_key (gossip, tuple->key);
         zgossip_msg_set_value (gossip, tuple->value);
+        zgossip_msg_set_ttl (gossip, tuple->ttl);
         zgossip_msg_send (gossip, remote);
         tuple = (tuple_t *) zhashx_next (self->tuples);
     }
@@ -264,17 +330,23 @@ server_connect (server_t *self, const char *endpoint)
     zgossip_msg_destroy (&gossip);
     engine_handle_socket (self, remote, remote_handler);
     zlistx_add_end (self->remotes, remote);
+
+    //  Register with the engine a function that will be called
+    //  every second by the engine.
+    engine_set_monitor (self, 30000, server_ping);
 }
 
 
 //  Process an incoming tuple on this server.
 
 static void
-server_accept (server_t *self, const char *key, const char *value)
+server_accept (server_t *self, const char *key, const char *value, uint32_t ttl)
 {
     tuple_t *tuple = (tuple_t *) zhashx_lookup (self->tuples, key);
-    if (tuple && streq (tuple->value, value))
-        return;                 //  Duplicate tuple, do nothing
+    if (tuple && streq (tuple->value, value)){
+        tuple->expires_at = zclock_mono() + ttl;
+        return;                 //  Duplicate tuple, update expire and do nothing
+    }
 
     //  Create new tuple
     tuple = (tuple_t *) zmalloc (sizeof (tuple_t));
@@ -282,6 +354,13 @@ server_accept (server_t *self, const char *key, const char *value)
     tuple->container = self->tuples;
     tuple->key = strdup (key);
     tuple->value = strdup (value);
+
+    if (ttl) {
+        zsys_info("TTL: %d", ttl);
+        zsys_info("ZCLOCK: %d", zclock_mono());
+        tuple->ttl = ttl;
+        tuple->expires_at = zclock_mono() + ttl;
+    }
 
     //  Store new tuple
     zhashx_update (tuple->container, key, tuple);
@@ -294,6 +373,8 @@ server_accept (server_t *self, const char *key, const char *value)
     self->cur_tuple = tuple;
     engine_broadcast_event (self, NULL, forward_event);
 
+    zsys_info("EXPIRES AT: %d", tuple->expires_at);
+
     //  Copy new tuple announcement to all remotes
     zgossip_msg_t *gossip = zgossip_msg_new ();
     zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
@@ -301,6 +382,7 @@ server_accept (server_t *self, const char *key, const char *value)
     while (remote) {
         zgossip_msg_set_key (gossip, tuple->key);
         zgossip_msg_set_value (gossip, tuple->value);
+        zgossip_msg_set_ttl (gossip, tuple->ttl);
         zgossip_msg_send (gossip, remote);
         remote = (zsock_t *) zlistx_next (self->remotes);
     }
@@ -334,7 +416,13 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     if (streq (method, "PUBLISH")) {
         char *key = zmsg_popstr (msg);
         char *value = zmsg_popstr (msg);
-        server_accept (self, key, value);
+        char *ttl_s = zmsg_popstr (msg);
+        uint32_t ttl = 10000;
+
+        if (ttl_s)
+            ttl = atoi(ttl_s);
+
+        server_accept (self, key, value, ttl);
         zstr_free (&key);
         zstr_free (&value);
     }
@@ -347,7 +435,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         zmsg_addstrf (reply, "%d", (int) zhashx_size (self->tuples));
     }
 #ifdef CZMQ_BUILD_DRAFT_API
-    //  DRAFT-API: Security
+    // DRAFT-API: Security
     else
     if (streq (method, "SET PUBLICKEY")) {
         char *key = zmsg_popstr (msg);
@@ -369,6 +457,23 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         self->zap_domain = strdup(value);
         assert (self->zap_domain);
         zstr_free (&value);
+    }
+
+    // DRAFT-API: TTL
+    else
+    if (streq (method, "SET HEARTBEAT ILV")){
+      self->heartbeat_ivl = atoi(zmsg_popstr (msg));
+      assert (self->heartbeat_ivl);
+    }
+    else
+    if (streq (method, "SET HEARTBEAT TIMEOUT")){
+      self->heartbeat_timeout = atoi(zmsg_popstr (msg));
+      assert (self->heartbeat_timeout);
+    }
+    else
+    if (streq (method, "SET HEARTBEAT TTL")){
+      self->heartbeat_ivl = atoi(zmsg_popstr (msg));
+      assert (self->heartbeat_ttl);
     }
 #endif
     else
@@ -417,6 +522,8 @@ get_first_tuple (client_t *self)
     if (tuple) {
         zgossip_msg_set_key (self->message, tuple->key);
         zgossip_msg_set_value (self->message, tuple->value);
+        if (tuple->ttl)
+            zgossip_msg_set_ttl (self->message, tuple->ttl);
         engine_set_next_event (self, ok_event);
     }
     else
@@ -435,6 +542,7 @@ get_next_tuple (client_t *self)
     if (tuple) {
         zgossip_msg_set_key (self->message, tuple->key);
         zgossip_msg_set_value (self->message, tuple->value);
+        zgossip_msg_set_ttl (self->message, tuple->ttl);
         engine_set_next_event (self, ok_event);
     }
     else
@@ -451,7 +559,8 @@ store_tuple_if_new (client_t *self)
 {
     server_accept (self->server,
                    zgossip_msg_key (self->message),
-                   zgossip_msg_value (self->message));
+                   zgossip_msg_value (self->message),
+                   zgossip_msg_ttl (self->message));
 }
 
 
@@ -468,6 +577,7 @@ get_tuple_to_forward (client_t *self)
     tuple_t *tuple = self->server->cur_tuple;
     zgossip_msg_set_key (self->message, tuple->key);
     zgossip_msg_set_value (self->message, tuple->value);
+    zgossip_msg_set_ttl (self->message, tuple->ttl);
 }
 
 
@@ -484,7 +594,8 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
     if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_PUBLISH)
         server_accept (self,
                        zgossip_msg_key (self->message),
-                       zgossip_msg_value (self->message));
+                       zgossip_msg_value (self->message),
+                       zgossip_msg_ttl (self->message));
     else
     if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_INVALID) {
         //  Connection was reset, so send HELLO again
@@ -553,9 +664,11 @@ zgossip_test (bool verbose)
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
 
+
     zactor_t *beta = zactor_new (zgossip, "beta");
     assert (beta);
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
+
     zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
     zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
 
@@ -563,12 +676,13 @@ zgossip_test (bool verbose)
     zclock_sleep (200);
 
     zstr_send (alpha, "STATUS");
-    char *command, *status, *key, *value;
+    char *command, *status, *key, *value, *ttl;
 
-    zstr_recvx (alpha, &command, &key, &value, NULL);
+    zstr_recvx (alpha, &command, &key, &value, &ttl, NULL);
     assert (streq (command, "DELIVER"));
     assert (streq (key, "inproc://alpha-1"));
     assert (streq (value, "service1"));
+    assert (streq (ttl, "3000"));
     zstr_free (&command);
     zstr_free (&key);
     zstr_free (&value);
@@ -596,6 +710,8 @@ zgossip_test (bool verbose)
     zstr_free (&command);
     zstr_free (&key);
     zstr_free (&value);
+
+
 
     zstr_recvx (alpha, &command, &status, NULL);
     assert (streq (command, "STATUS"));
