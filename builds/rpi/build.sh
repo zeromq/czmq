@@ -53,7 +53,16 @@ if [ $UPDATE ]; then
 fi
 
 # Cross build for the Raspberry Pi
-mkdir -p $PWD/tmp
+if [ -d "./tmp" ]; then
+    # Proto installation area for this project and its deps
+    rm -rf ./tmp
+fi
+if [ -d "./tmp-deps" ]; then
+    # Checkout/unpack and build area for dependencies
+    rm -rf ./tmp-deps
+fi
+mkdir -p tmp tmp-deps
+
 BUILD_PREFIX=$PWD/tmp
 TOOLCHAIN_HOST="arm-linux-gnueabihf"
 TOOLCHAIN_PATH="${PWD}/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin"
@@ -95,6 +104,8 @@ CONFIG_OPTS+=("RANLIB=${RANLIB}")
 
 if [ ! $INCREMENTAL ]; then
     # Clone and build dependencies
+    BASE_PWD=${PWD}
+    cd tmp-deps
     if [ ! -e libzmq ]; then
         $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
     fi
@@ -123,6 +134,7 @@ if [ ! $INCREMENTAL ]; then
         $CI_TIME make install
     ) || exit 1
     popd
+    cd ${BASE_PWD}
 
 fi
 

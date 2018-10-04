@@ -24,9 +24,14 @@ LC_ALL=C
 export LANG LC_ALL
 
 if [ -d "./tmp" ]; then
+    # Proto installation area for this project and its deps
     rm -rf ./tmp
 fi
-mkdir -p tmp
+if [ -d "./tmp-deps" ]; then
+    # Checkout/unpack and build area for dependencies
+    rm -rf ./tmp-deps
+fi
+mkdir -p tmp tmp-deps
 BUILD_PREFIX=$PWD/tmp
 
 # Use tools from prerequisites we might have built
@@ -59,8 +64,9 @@ fi
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
 if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1) || \
        (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1)); then
-    $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
     BASE_PWD=${PWD}
+    cd tmp-deps
+    $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
     cd libzmq
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
@@ -102,8 +108,8 @@ fi
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
 if [ "$DO_CLANG_FORMAT_CHECK" = "1" ] ; then
-    PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" . \
-    && make clang-format-check || { make clang-format-diff && exit 1 ; }
+    { PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" . \
+      && make clang-format-check-CI ; exit $? ; }
 else
     PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig $CI_TIME cmake "${CMAKE_OPTS[@]}" .
     $CI_TIME make all VERBOSE=1 -j4

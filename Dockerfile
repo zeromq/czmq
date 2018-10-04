@@ -10,9 +10,9 @@ RUN chmod 0440 /etc/sudoers.d/zmq
 
 USER zmq
 
-WORKDIR /home/zmq
+WORKDIR /home/zmq/tmp-deps
 RUN git clone --quiet https://github.com/zeromq/libzmq.git libzmq
-WORKDIR /home/zmq/libzmq
+WORKDIR /home/zmq/tmp-deps/libzmq
 RUN ./autogen.sh 2> /dev/null
 RUN ./configure --quiet --without-docs
 RUN make

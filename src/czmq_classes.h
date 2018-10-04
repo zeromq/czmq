@@ -34,7 +34,6 @@ typedef struct _zgossip_msg_t zgossip_msg_t;
 
 //  Internal API
 
-
 #include "zgossip_msg.h"
 
 //  *** To avoid double-definitions, only define if building without draft ***
