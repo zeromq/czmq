@@ -32,9 +32,14 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     export LANG LC_ALL
 
     if [ -d "./tmp" ]; then
+        # Proto installation area for this project and its deps
         rm -rf ./tmp
     fi
-    mkdir -p tmp
+    if [ -d "./tmp-deps" ]; then
+        # Checkout/unpack and build area for dependencies
+        rm -rf ./tmp-deps
+    fi
+    mkdir -p tmp tmp-deps
     BUILD_PREFIX=$PWD/tmp
 
     PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'`"
@@ -183,8 +188,9 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         echo ""
         BASE_PWD=${PWD}
         echo "`date`: INFO: Building prerequisite 'libzmq' from Git repository..." >&2
+        cd ./tmp-deps
         $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
-        cd libzmq
+        cd ./libzmq
         CCACHE_BASEDIR=${PWD}
         export CCACHE_BASEDIR
         git --no-pager log --oneline -n1

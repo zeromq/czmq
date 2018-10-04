@@ -15,7 +15,7 @@ SET target=%1
 if NOT "%target%" == "" set target=/t:%target%&set action=Cleaning
 
 SET solution=czmq.sln
-SET version=11
+SET version=15
 SET log=build.log
 SET tools=Microsoft Visual Studio %version%.0\VC\vcvarsall.bat
 if "%version%" == "15" SET tools=Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
@@ -24,32 +24,32 @@ IF NOT EXIST %environment% SET environment="%programfiles%\%tools%"
 IF NOT EXIST %environment% GOTO no_tools
 
 SET packages=
-IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2012\libzmq.import.props" (
-    COPY /Y "..\..\..\..\libzmq\builds/msvc/vs2012\libzmq.import.props" . > %log%
+IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2017\libzmq.import.props" (
+    COPY /Y "..\..\..\..\libzmq\builds/msvc/vs2017\libzmq.import.props" . > %log%
     IF errorlevel 1 GOTO error
 ) ELSE (
     ECHO Did not find libzmq, aborting.
     ECHO Please clone from https://github.com/zeromq/libzmq.git, and then build.
     GOTO error
 )
-IF EXIST "..\..\..\..\uuid\builds/msvc/vs2012\uuid.import.props" (
-    COPY /Y "..\..\..\..\uuid\builds/msvc/vs2012\uuid.import.props" . > %log%
+IF EXIST "..\..\..\..\uuid\builds/msvc/vs2017\uuid.import.props" (
+    COPY /Y "..\..\..\..\uuid\builds/msvc/vs2017\uuid.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_UUID=1
     ECHO Building with uuid
 ) ELSE (
     ECHO Building without uuid
 )
-IF EXIST "..\..\..\..\systemd\builds/msvc/vs2012\systemd.import.props" (
-    COPY /Y "..\..\..\..\systemd\builds/msvc/vs2012\systemd.import.props" . > %log%
+IF EXIST "..\..\..\..\systemd\builds/msvc/vs2017\systemd.import.props" (
+    COPY /Y "..\..\..\..\systemd\builds/msvc/vs2017\systemd.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_SYSTEMD=1
     ECHO Building with systemd
 ) ELSE (
     ECHO Building without systemd
 )
-IF EXIST "..\..\..\..\lz4\builds/msvc/vs2012\lz4.import.props" (
-    COPY /Y "..\..\..\..\lz4\builds/msvc/vs2012\lz4.import.props" . > %log%
+IF EXIST "..\..\..\..\lz4\builds/msvc/vs2017\lz4.import.props" (
+    COPY /Y "..\..\..\..\lz4\builds/msvc/vs2017\lz4.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_LZ4=1
     ECHO Building with lz4

@@ -38,6 +38,13 @@ add_custom_target(
 )
 
 add_custom_target(
+        clang-format-check-CI
+        COMMAND chmod +x clang-format-check.sh
+        COMMAND ./clang-format-check.sh --CI
+        COMMENT "Checking correct formatting according to .clang-format file using ${CLANG_FORMAT}"
+)
+
+add_custom_target(
         clang-format-diff
         COMMAND ${CLANG_FORMAT} -style=file -i ${ALL_SOURCE_FILES}
         COMMAND git diff ${ALL_SOURCE_FILES}

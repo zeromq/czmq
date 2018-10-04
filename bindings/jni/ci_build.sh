@@ -39,9 +39,13 @@ if [ -z "${CI_CONFIG_QUIET-}" ] || [ "${CI_CONFIG_QUIET-}" = yes ] || [ "${CI_CO
 fi
 
 pushd ../../..
+rm -rf tmp-deps
+mkdir -p tmp-deps
 
 # Clone and build dependencies
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
+BASE_PWD=${PWD}
+cd tmp-deps
 $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
 cd libzmq
 git --no-pager log --oneline -n1
@@ -62,7 +66,7 @@ fi
 $CI_TIME ./configure "${CONFIG_OPTS[@]}"
 $CI_TIME make -j4
 $CI_TIME make install
-cd ..
+cd ${BASE_PWD}
 
 popd
 pushd ../..
