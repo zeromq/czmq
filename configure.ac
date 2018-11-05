@@ -175,7 +175,6 @@ AS_IF([test x"${search_libzmq}" = xyes], [
     PRE_SEARCH_LIBS="${LIBS}"
 
     found_pkgconfig=""
-    found_linkname=""
     PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
     [
         PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libzmq_LIBS"
@@ -205,7 +204,6 @@ AS_IF([test x"${search_libzmq}" = xyes], [
             [
                 was_libzmq_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lzmq"
-                found_linkname="zmq"
             ],
             [AC_MSG_ERROR([cannot link with -lzmq, install libzmq])])
     ])
@@ -213,12 +211,12 @@ AS_IF([test x"${search_libzmq}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for libzmq
     AS_CASE(["x${was_libzmq_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_libzmq],[${found_pkgconfig}])
+                AC_SUBST([pkgconfig_name_libzmq],["${found_pkgconfig}"])
                 CFLAGS="${libzmq_CFLAGS} ${CFLAGS}"
                 LIBS="${libzmq_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_libzmq],[${found_linkname}])
+                AC_SUBST([pkgconfig_name_libzmq],[""])
                 CFLAGS="${libzmq_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${libzmq_synthetic_libs} ${LDFLAGS}"
                 LIBS="${libzmq_synthetic_libs} ${LIBS}"
@@ -227,7 +225,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libzmq
                 AC_SUBST([libzmq_LIBS],[${libzmq_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_libzmq],[libzmq])
+                AC_SUBST([pkgconfig_name_libzmq],[""])
             AC_MSG_ERROR([Cannot find pkg-config metadata for libzmq 0.0.0 or higher])
     ])
 ])
@@ -260,7 +258,6 @@ AS_IF([test x"${search_uuid}" = xyes], [
     PRE_SEARCH_LIBS="${LIBS}"
 
     found_pkgconfig=""
-    found_linkname=""
     PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
     [
         AC_DEFINE(HAVE_UUID, 1, [The optional uuid library is to be used])
@@ -291,7 +288,6 @@ AS_IF([test x"${search_uuid}" = xyes], [
             [
                 was_uuid_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -luuid"
-                found_linkname="uuid"
                 AC_DEFINE(HAVE_UUID, 1, [The optional uuid library is to be used (as -luuid)])
             ],
             [])
@@ -300,12 +296,12 @@ AS_IF([test x"${search_uuid}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for uuid
     AS_CASE(["x${was_uuid_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_uuid],[${found_pkgconfig}])
+                AC_SUBST([pkgconfig_name_uuid],["${found_pkgconfig}"])
                 CFLAGS="${uuid_CFLAGS} ${CFLAGS}"
                 LIBS="${uuid_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_uuid],[${found_linkname}])
+                AC_SUBST([pkgconfig_name_uuid],[""])
                 CFLAGS="${uuid_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${uuid_synthetic_libs} ${LDFLAGS}"
                 LIBS="${uuid_synthetic_libs} ${LIBS}"
@@ -314,7 +310,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for uuid
                 AC_SUBST([uuid_LIBS],[${uuid_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_uuid],[uuid])
+                AC_SUBST([pkgconfig_name_uuid],[""])
             AC_MSG_WARN([Cannot find pkg-config metadata for uuid 0.0.0 or higher])
     ])
 ])
@@ -347,7 +343,6 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
     PRE_SEARCH_LIBS="${LIBS}"
 
     found_pkgconfig=""
-    found_linkname=""
     PKG_CHECK_MODULES([systemd], [libsystemd >= 200.0.0],
     [
         AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The optional libsystemd library is to be used])
@@ -378,7 +373,6 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
             [
                 was_systemd_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lsystemd"
-                found_linkname="systemd"
                 AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The optional libsystemd library is to be used (as -lsystemd)])
             ],
             [])
@@ -387,12 +381,12 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
     AS_CASE(["x${was_systemd_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_libsystemd],[${found_pkgconfig}])
+                AC_SUBST([pkgconfig_name_libsystemd],["${found_pkgconfig} >= 200.0.0"])
                 CFLAGS="${systemd_CFLAGS} ${CFLAGS}"
                 LIBS="${systemd_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_libsystemd],[${found_linkname}])
+                AC_SUBST([pkgconfig_name_libsystemd],[""])
                 CFLAGS="${systemd_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${systemd_synthetic_libs} ${LDFLAGS}"
                 LIBS="${systemd_synthetic_libs} ${LIBS}"
@@ -401,7 +395,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
                 AC_SUBST([systemd_LIBS],[${systemd_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_libsystemd],[libsystemd])
+                AC_SUBST([pkgconfig_name_libsystemd],[""])
             AC_MSG_WARN([Cannot find pkg-config metadata for libsystemd 200.0.0 or higher])
     ])
 ])
@@ -434,7 +428,6 @@ AS_IF([test x"${search_liblz4}" = xyes], [
     PRE_SEARCH_LIBS="${LIBS}"
 
     found_pkgconfig=""
-    found_linkname=""
     PKG_CHECK_MODULES([lz4], [liblz4 >= 0.0.0],
     [
         AC_DEFINE(HAVE_LIBLZ4, 1, [The optional liblz4 library is to be used])
@@ -465,7 +458,6 @@ AS_IF([test x"${search_liblz4}" = xyes], [
             [
                 was_lz4_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -llz4"
-                found_linkname="lz4"
                 AC_DEFINE(HAVE_LIBLZ4, 1, [The optional liblz4 library is to be used (as -llz4)])
             ],
             [])
@@ -474,12 +466,12 @@ AS_IF([test x"${search_liblz4}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for liblz4
     AS_CASE(["x${was_lz4_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_liblz4],[${found_pkgconfig}])
+                AC_SUBST([pkgconfig_name_liblz4],["${found_pkgconfig}"])
                 CFLAGS="${lz4_CFLAGS} ${CFLAGS}"
                 LIBS="${lz4_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_liblz4],[${found_linkname}])
+                AC_SUBST([pkgconfig_name_liblz4],[""])
                 CFLAGS="${lz4_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${lz4_synthetic_libs} ${LDFLAGS}"
                 LIBS="${lz4_synthetic_libs} ${LIBS}"
@@ -488,7 +480,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for liblz4
                 AC_SUBST([lz4_LIBS],[${lz4_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_liblz4],[liblz4])
+                AC_SUBST([pkgconfig_name_liblz4],[""])
             AC_MSG_WARN([Cannot find pkg-config metadata for liblz4 0.0.0 or higher])
     ])
 ])
