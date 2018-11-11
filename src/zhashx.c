@@ -877,6 +877,9 @@ zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
     if (!self)
         return NULL;
 
+    //  Hash will free values in destructor
+    zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
+  
     assert (frame);
     if (zframe_size (frame) < 4)
         return self;            //  Arguable...
@@ -924,11 +927,9 @@ zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
             }
         }
     }
-    //  Hash will free values in destructor
-    if (self) {
-        zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
-        zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
-    }
+
+    if (self)
+        zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);    
 
     return self;
 }
