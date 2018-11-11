@@ -910,12 +910,14 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
             zframe_t *frame = zhashx_pack (hash);
             zmsg_append (msg, &frame);
         }
+#ifdef CZMQ_BUILD_DRAFT_API
         else
         if (*picture == 'l') {
             zlistx_t *list = va_arg (argptr, zlistx_t *);
             zframe_t *frame = zlistx_pack (list);
             zmsg_append (msg, &frame);
         }
+#endif	
         else
         if (*picture == 'm') {
             zframe_t *frame;
@@ -1144,6 +1146,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             }
             zframe_destroy (&frame);
         }
+#ifdef CZMQ_BUILD_DRAFT_API	
         else
         if (*picture == 'l') {
             zframe_t *frame = zmsg_pop (msg);
@@ -1156,6 +1159,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             }
 	    zframe_destroy (&frame);
         }
+#endif
         else
         if (*picture == 'm') {
             zmsg_t **zmsg_p = va_arg (argptr, zmsg_t **);

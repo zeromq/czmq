@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 // Destroy an item
 typedef void (zlistx_destructor_fn) (
     void **item);
@@ -38,12 +40,6 @@ typedef int (zlistx_comparator_fn) (
 //  Create a new, empty list.
 CZMQ_EXPORT zlistx_t *
     zlistx_new (void);
-
-//  Unpack binary frame into a new list. Packed data must follow format
-//  defined by zlistx_pack. List is set to autofree. An empty frame
-//  unpacks to an empty list.
-CZMQ_EXPORT zlistx_t *
-    zlistx_unpack (zframe_t *frame);
 
 //  Destroy a list. If an item destructor was specified, all items in the
 //  list are automatically destroyed as well.
@@ -197,6 +193,19 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator);
 
+//  Self test of this class.
+CZMQ_EXPORT void
+    zlistx_test (bool verbose);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Unpack binary frame into a new list. Packed data must follow format
+//  defined by zlistx_pack. List is set to autofree. An empty frame
+//  unpacks to an empty list.
+CZMQ_EXPORT zlistx_t *
+    zlistx_unpack (zframe_t *frame);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Serialize list to a binary frame that can be sent in a message.
 //  The packed format is compatible with the 'strings' type implemented by zproto:
 //
@@ -213,10 +222,7 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zframe_t *
     zlistx_pack (zlistx_t *self);
 
-//  Self test of this class.
-CZMQ_EXPORT void
-    zlistx_test (bool verbose);
-
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 

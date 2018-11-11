@@ -217,7 +217,7 @@
         <argument name = "comparator" type = "zlistx_comparator_fn" callback = "1" />
     </method>
 
-   <method name = "pack">
+   <method name = "pack" state = "draft">
         Serialize list to a binary frame that can be sent in a message.
         The packed format is compatible with the 'strings' type implemented by zproto:
 
@@ -234,7 +234,7 @@
         <return type = "zframe" fresh = "1" />
     </method>
 
-    <constructor name = "unpack">
+    <constructor name = "unpack" state = "draft">
         Unpack binary frame into a new list. Packed data must follow format
         defined by zlistx_pack. List is set to autofree. An empty frame
         unpacks to an empty list.

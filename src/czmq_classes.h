@@ -174,6 +174,31 @@ CZMQ_PRIVATE bool
     ziflist_is_ipv6 (ziflist_t *self);
 
 //  *** Draft method, defined for internal use only ***
+//  Serialize list to a binary frame that can be sent in a message.
+//  The packed format is compatible with the 'strings' type implemented by zproto:
+//
+//     ; A list of strings
+//     list            = list-count *longstr
+//     list-count      = number-4
+//
+//     ; Strings are always length + text contents
+//     longstr         = number-4 *VCHAR
+//
+//     ; Numbers are unsigned integers in network byte order
+//     number-4        = 4OCTET
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zframe_t *
+    zlistx_pack (zlistx_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Unpack binary frame into a new list. Packed data must follow format
+//  defined by zlistx_pack. List is set to autofree. An empty frame
+//  unpacks to an empty list.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zlistx_t *
+    zlistx_unpack (zframe_t *frame);
+
+//  *** Draft method, defined for internal use only ***
 //  Return message routing ID, if the message came from a ZMQ_SERVER socket.
 //  Else returns zero.
 CZMQ_PRIVATE uint32_t
