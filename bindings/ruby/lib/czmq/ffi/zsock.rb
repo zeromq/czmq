@@ -369,7 +369,7 @@ module CZMQ
       #     c = zchunk_t *
       #     f = zframe_t *
       #     h = zhashx_t *
-      #     l = zlistx_t *
+      #     l = zlistx_t * (DRAFT)
       #     U = zuuid_t *
       #     p = void * (sends the pointer value, only meaningful over inproc)
       #     m = zmsg_t * (sends all frames in the zmsg)
@@ -407,7 +407,7 @@ module CZMQ
       #     c = zchunk_t *
       #     f = zframe_t *
       #     h = zhashx_t *
-      #     l = zlistx_t *
+      #     l = zlistx_t * (DRAFT)
       #     U = zuuid_t *
       #     p = void * (sends the pointer value, only meaningful over inproc)
       #     m = zmsg_t * (sends all frames in the zmsg)
@@ -477,7 +477,7 @@ module CZMQ
       #     f = zframe_t ** (creates zframe)
       #     U = zuuid_t * (creates a zuuid with the data)
       #     h = zhashx_t ** (creates zhashx)
-      #     l = zlistx_t ** (creates zlistx)
+      #     l = zlistx_t ** (creates zlistx) (DRAFT)
       #     p = void ** (stores pointer)
       #     m = zmsg_t ** (creates a zmsg with the remaining frames)
       #     z = null, asserts empty frame (0 arguments)
@@ -515,7 +515,7 @@ module CZMQ
       #     f = zframe_t ** (creates zframe)
       #     U = zuuid_t * (creates a zuuid with the data)
       #     h = zhashx_t ** (creates zhashx)
-      #     l = zlistx_t ** (creates zlistx)
+      #     l = zlistx_t ** (creates zlistx) (DRAFT)
       #     p = void ** (stores pointer)
       #     m = zmsg_t ** (creates a zmsg with the remaining frames)
       #     z = null, asserts empty frame (0 arguments)
