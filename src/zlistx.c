@@ -632,6 +632,111 @@ zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator)
     self->comparator = comparator;
 }
 
+//  --------------------------------------------------------------------------
+//  Serialize list to a binary frame that can be sent in a message.
+//  The packed format is compatible with the 'strings' type implemented by zproto:
+//
+//     ; A list of strings
+//     list            = list-count *longstr
+//     list-count      = number-4
+//
+//     ; Strings are always length + text contents
+//     longstr         = number-4 *VCHAR
+//
+//     ; Numbers are unsigned integers in network byte order
+//     number-4        = 4OCTET
+//  Caller owns return value and must destroy it when done.
+zframe_t *
+zlistx_pack (zlistx_t *self) {
+    assert (self);
+
+    //  First, calculate the packed data size
+    size_t frame_size = 4;      // List size, number-4    
+    char* item = (char *) zlistx_first (self);
+
+    while (item) {
+        frame_size += 4 + strlen (item);
+        item = (char *) zlistx_next (self);
+    }
+
+    //  Now serialize items into the frame
+    zframe_t *frame = zframe_new (NULL, frame_size);
+    if (!frame)
+        return NULL;
+
+    byte *needle = zframe_data (frame);
+    *(uint32_t *) needle = htonl ((u_long) self->size);
+    needle += 4;
+
+    item = (char *) zlistx_first (self);
+    while (item) {
+        size_t length = strlen (item);
+        *(uint32_t *) needle = htonl ((u_long) length);
+        needle += 4;
+        memcpy (needle, item, length);
+        needle += length;
+
+        item = (char *) zlistx_next (self);
+    }
+
+    return frame;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Unpack binary frame into a new list. Packed data must follow format
+//  defined by zlistx_pack. List is set to autofree. An empty frame
+//  unpacks to an empty list.
+zlistx_t *
+zlistx_unpack (zframe_t *frame) {
+    zlistx_t *self = zlistx_new ();
+    if (!self)
+        return NULL;
+
+    //  List will free values in destructor
+    zlistx_set_destructor (self, (zlistx_destructor_fn *) zstr_free);
+
+    assert (frame);
+    if (zframe_size (frame) < 4)
+        return self;
+
+    byte *needle = zframe_data (frame);
+    byte *ceiling = needle + zframe_size (frame);
+    size_t nbr_items = ntohl (*(uint32_t *) needle);
+    needle +=4;
+    while (nbr_items && needle < ceiling) {
+        if (needle + 4 <= ceiling) {
+            size_t length = ntohl (*(uint32_t *)needle);
+            needle += 4;
+            // Be wary of malformed frames
+            if (needle + length <= ceiling) {
+                char * item = (char *) zmalloc (length + 1);
+                assert (item);
+                memcpy (item, needle, length);
+                item[length] = 0;
+                needle += length;
+
+                if (!zlistx_add_end (self, item)) {                        
+                    zlistx_destroy (&self);
+                    break;
+                }
+            } else {
+
+                zlistx_destroy (&self);
+                break;                
+            }
+        } else {
+            zlistx_destroy (&self);
+            break;            
+        }
+    }
+
+    if (self)
+    	zlistx_set_duplicator (self, (zlistx_duplicator_fn *) strdup);           
+ 
+    return self;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Runs selftest of class
@@ -740,6 +845,23 @@ zlistx_test (bool verbose)
     zlistx_delete (list, zlistx_cursor (list));
     string = (char *) zlistx_next (list);
     assert (streq (string, "four"));
+
+    //  Test pack/unpack methods
+    zframe_t *frame = zlistx_pack (list);                  
+    copy = zlistx_unpack (frame);
+    assert (copy);
+    zframe_destroy (&frame);
+    assert (zlistx_size (copy) == zlistx_size (list));
+
+    char *item_orig = (char *) zlistx_first (list);
+    char *item_copy = (char *) zlistx_first (copy);
+    while (item_orig) {
+        assert (strcmp(item_orig, item_copy) == 0);        
+        item_orig = (char *) zlistx_next (list);
+        item_copy = (char *) zlistx_next (copy);
+    }
+
+    zlistx_destroy (&copy);
 
     zlistx_purge (list);
     zlistx_destroy (&list);
