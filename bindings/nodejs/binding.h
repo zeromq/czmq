@@ -487,6 +487,7 @@ class Zlistx: public Nan::ObjectWrap {
     static NAN_METHOD (_purge);
     static NAN_METHOD (_sort);
     static NAN_METHOD (_dup);
+    static NAN_METHOD (_pack);
     static NAN_METHOD (_test);
 };
 

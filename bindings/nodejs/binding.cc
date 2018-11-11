@@ -3478,6 +3478,7 @@ NAN_MODULE_INIT (Zlistx::Init) {
     Nan::SetPrototypeMethod (tpl, "purge", _purge);
     Nan::SetPrototypeMethod (tpl, "sort", _sort);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "pack", _pack);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -3539,6 +3540,18 @@ NAN_METHOD (Zlistx::_dup) {
     if (zlistx_result) {
     //  Don't yet know how to return a new object
     //      zlistx->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zlistx::_pack) {
+    Zlistx *zlistx = Nan::ObjectWrap::Unwrap <Zlistx> (info.Holder ());
+    zframe_t *result = zlistx_pack (zlistx->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }

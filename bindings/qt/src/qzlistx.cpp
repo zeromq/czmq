@@ -23,6 +23,15 @@ QZlistx::QZlistx (QObject *qObjParent) : QObject (qObjParent)
 }
 
 ///
+//  Unpack binary frame into a new list. Packed data must follow format
+//  defined by zlistx_pack. List is set to autofree. An empty frame
+//  unpacks to an empty list.
+QZlistx* QZlistx::unpack (QZframe *frame, QObject *qObjParent)
+{
+    return new QZlistx (zlistx_unpack (frame->self), qObjParent);
+}
+
+///
 //  Destroy a list. If an item destructor was specified, all items in the
 //  list are automatically destroyed as well.
 QZlistx::~QZlistx ()
@@ -279,6 +288,25 @@ void QZlistx::setComparator (zlistx_comparator_fn comparator)
 {
     zlistx_set_comparator (self, comparator);
 
+}
+
+///
+//  Serialize list to a binary frame that can be sent in a message.
+//  The packed format is compatible with the 'strings' type implemented by zproto:
+//
+//     ; A list of strings
+//     list            = list-count *longstr
+//     list-count      = number-4
+//
+//     ; Strings are always length + text contents
+//     longstr         = number-4 *VCHAR
+//
+//     ; Numbers are unsigned integers in network byte order
+//     number-4        = 4OCTET
+QZframe * QZlistx::pack ()
+{
+    QZframe *rv = new QZframe (zlistx_pack (self));
+    return rv;
 }
 
 ///

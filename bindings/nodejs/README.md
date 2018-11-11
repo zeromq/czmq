@@ -1809,6 +1809,23 @@ for the list, otherwise not. Copying a null reference returns a null
 reference.
 
 ```
+zframe my_zlistx.pack ()
+```
+
+Serialize list to a binary frame that can be sent in a message.
+The packed format is compatible with the 'strings' type implemented by zproto:
+
+   ; A list of strings
+   list            = list-count *longstr
+   list-count      = number-4
+
+   ; Strings are always length + text contents
+   longstr         = number-4 *VCHAR
+
+   ; Numbers are unsigned integers in network byte order
+   number-4        = 4OCTET
+
+```
 nothing my_zlistx.test (Boolean)
 ```
 
@@ -2381,6 +2398,7 @@ of these characters, each corresponding to one or two arguments:
     c = zchunk_t *
     f = zframe_t *
     h = zhashx_t *
+    l = zlistx_t *
     U = zuuid_t *
     p = void * (sends the pointer value, only meaningful over inproc)
     m = zmsg_t * (sends all frames in the zmsg)
@@ -2410,6 +2428,7 @@ a series of pointers as provided by the caller:
     f = zframe_t ** (creates zframe)
     U = zuuid_t * (creates a zuuid with the data)
     h = zhashx_t ** (creates zhashx)
+    l = zlistx_t ** (creates zlistx)
     p = void ** (stores pointer)
     m = zmsg_t ** (creates a zmsg with the remaining frames)
     z = null, asserts empty frame (0 arguments)

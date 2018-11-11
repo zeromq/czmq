@@ -223,6 +223,23 @@ class Zlistx(object):
         """
         utils.lib.zlistx_set_comparator(self._p, comparator)
 
+    def pack(self):
+        """
+        Serialize list to a binary frame that can be sent in a message.
+        The packed format is compatible with the 'strings' type implemented by zproto:
+
+           ; A list of strings
+           list            = list-count *longstr
+           list-count      = number-4
+
+           ; Strings are always length + text contents
+           longstr         = number-4 *VCHAR
+
+           ; Numbers are unsigned integers in network byte order
+           number-4        = 4OCTET
+        """
+        return utils.lib.zlistx_pack(self._p)
+
     def test(verbose):
         """
         Self test of this class.

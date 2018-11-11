@@ -28,6 +28,15 @@ public class Zlistx implements AutoCloseable{
         self = pointer;
     }
     /*
+    Unpack binary frame into a new list. Packed data must follow format
+    defined by zlistx_pack. List is set to autofree. An empty frame
+    unpacks to an empty list.
+    */
+    native static long __unpack (long frame);
+    public static Zlistx unpack (Zframe frame) {
+        return new Zlistx (__unpack (frame.self));
+    }
+    /*
     Destroy a list. If an item destructor was specified, all items in the
     list are automatically destroyed as well.
     */
@@ -236,6 +245,24 @@ public class Zlistx implements AutoCloseable{
     native static long __dup (long self);
     public Zlistx dup () {
         return new Zlistx (__dup (self));
+    }
+    /*
+    Serialize list to a binary frame that can be sent in a message.
+    The packed format is compatible with the 'strings' type implemented by zproto:
+
+       ; A list of strings
+       list            = list-count *longstr
+       list-count      = number-4
+
+       ; Strings are always length + text contents
+       longstr         = number-4 *VCHAR
+
+       ; Numbers are unsigned integers in network byte order
+       number-4        = 4OCTET
+    */
+    native static long __pack (long self);
+    public Zframe pack () {
+        return new Zframe (__pack (self));
     }
     /*
     Self test of this class.
