@@ -1990,42 +1990,64 @@ zsock_test (bool verbose)
     assert (frame);
     zhashx_t *hash = zhashx_new ();
     assert (hash);
+#ifdef CZMQ_BUILD_DRAFT_API
     zlistx_t *list = zlistx_new ();
     assert (list);
+#endif
     zuuid_t *uuid = zuuid_new ();
     assert (uuid);
     zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
     zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
     zhashx_insert (hash, "1", "value A");
     zhashx_insert (hash, "2", "value B");
+#ifdef CZMQ_BUILD_DRAFT_API
     zlistx_set_destructor (list, (zlistx_destructor_fn *) zstr_free);
     zlistx_set_duplicator (list, (zlistx_duplicator_fn *) strdup);
     zlistx_add_end (list, "1");
     zlistx_add_end (list, "2");
+#endif
     char *original = "pointer";
 
     //  Test zsock_recv into each supported type
+#ifdef CZMQ_BUILD_DRAFT_API
     zsock_send (writer, "i124488zsbcfUhlp",
+#else
+    zsock_send (writer, "i124488zsbcfUhp",
+#endif
                 -12345, number1, number2, number4, number4_MAX,
                 number8, number8_MAX,
                 "This is a string", "ABCDE", 5,
+#ifdef CZMQ_BUILD_DRAFT_API
                 chunk, frame, uuid, hash, list, original);
+#else
+                chunk, frame, uuid, hash, original);
+#endif
     char *uuid_str = strdup (zuuid_str (uuid));
     zchunk_destroy (&chunk);
     zframe_destroy (&frame);
     zuuid_destroy (&uuid);
     zhashx_destroy (&hash);
+#ifdef CZMQ_BUILD_DRAFT_API
     zlistx_destroy (&list);
+#endif
 
     int integer;
     byte *data;
     size_t size;
     char *pointer;
     number8_MAX = number8 = number4_MAX = number4 = number2 = number1 = 0ULL;
+#ifdef CZMQ_BUILD_DRAFT_API
     rc = zsock_recv (reader, "i124488zsbcfUhlp",
+#else
+    rc = zsock_recv (reader, "i124488zsbcfUhp",
+#endif
                      &integer, &number1, &number2, &number4, &number4_MAX,
                      &number8, &number8_MAX, &string, &data, &size, &chunk,
+#ifdef CZMQ_BUILD_DRAFT_API
                      &frame, &uuid, &hash, &list, &pointer);
+#else
+                     &frame, &uuid, &hash, &pointer);
+#endif
     assert (rc == 0);
     assert (integer == -12345);
     assert (number1 == 123);
@@ -2046,10 +2068,12 @@ zsock_test (bool verbose)
     assert (streq (value, "value A"));
     value = (char *) zhashx_lookup (hash, "2");
     assert (streq (value, "value B"));
+#ifdef CZMQ_BUILD_DRAFT_API
     value = (char *) zlistx_first (list);
     assert (streq (value, "1"));
     value = (char *) zlistx_last (list);
     assert (streq (value, "2"));
+#endif
     assert (original == pointer);
     freen (string);
     freen (data);
@@ -2057,7 +2081,9 @@ zsock_test (bool verbose)
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhashx_destroy (&hash);
+#ifdef CZMQ_BUILD_DRAFT_API
     zlistx_destroy (&list);
+#endif
     zuuid_destroy (&uuid);
 
     //  Test zsock_recv of short message; this lets us return a failure
