@@ -205,7 +205,7 @@ void *
 zlistx_head (zlistx_t *self)
 {
     assert (self);
-    return self->head? self->head->item: NULL;
+    return self->head? self->head->next->item: NULL;
 }
 
 
@@ -752,6 +752,7 @@ zlistx_test (bool verbose)
     assert (zlistx_size (list) == 0);
 
     //  Test operations on an empty list
+    assert (zlistx_head (list) == NULL);
     assert (zlistx_first (list) == NULL);
     assert (zlistx_last (list) == NULL);
     assert (zlistx_next (list) == NULL);
@@ -773,6 +774,7 @@ zlistx_test (bool verbose)
     assert (zlistx_next (list) == NULL);
     zlistx_add_end (list, "world");
     assert (streq ((char *) zlistx_next (list), "world"));
+    assert (streq ((char *) zlistx_head (list), "world"));
     zlistx_add_end (list, "hello");
     assert (streq ((char *) zlistx_prev (list), "hello"));
     zlistx_sort (list);
