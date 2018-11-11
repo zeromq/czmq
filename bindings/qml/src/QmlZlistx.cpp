@@ -202,6 +202,25 @@ void QmlZlistx::setComparator (zlistx_comparator_fn comparator) {
     zlistx_set_comparator (self, comparator);
 };
 
+///
+//  Serialize list to a binary frame that can be sent in a message.
+//  The packed format is compatible with the 'strings' type implemented by zproto:
+//
+//     ; A list of strings
+//     list            = list-count *longstr
+//     list-count      = number-4
+//
+//     ; Strings are always length + text contents
+//     longstr         = number-4 *VCHAR
+//
+//     ; Numbers are unsigned integers in network byte order
+//     number-4        = 4OCTET
+QmlZframe *QmlZlistx::pack () {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zlistx_pack (self);
+    return retQ_;
+};
+
 
 QObject* QmlZlistx::qmlAttachedProperties(QObject* object) {
     return new QmlZlistxAttached(object);
@@ -226,6 +245,16 @@ void QmlZlistxAttached::test (bool verbose) {
 QmlZlistx *QmlZlistxAttached::construct () {
     QmlZlistx *qmlSelf = new QmlZlistx ();
     qmlSelf->self = zlistx_new ();
+    return qmlSelf;
+};
+
+///
+//  Unpack binary frame into a new list. Packed data must follow format
+//  defined by zlistx_pack. List is set to autofree. An empty frame
+//  unpacks to an empty list.
+QmlZlistx *QmlZlistxAttached::unpack (QmlZframe *frame) {
+    QmlZlistx *qmlSelf = new QmlZlistx ();
+    qmlSelf->self = zlistx_unpack (frame->self);
     return qmlSelf;
 };
 

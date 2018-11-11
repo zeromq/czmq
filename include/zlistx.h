@@ -39,6 +39,12 @@ typedef int (zlistx_comparator_fn) (
 CZMQ_EXPORT zlistx_t *
     zlistx_new (void);
 
+//  Unpack binary frame into a new list. Packed data must follow format
+//  defined by zlistx_pack. List is set to autofree. An empty frame
+//  unpacks to an empty list.
+CZMQ_EXPORT zlistx_t *
+    zlistx_unpack (zframe_t *frame);
+
 //  Destroy a list. If an item destructor was specified, all items in the
 //  list are automatically destroyed as well.
 CZMQ_EXPORT void
@@ -190,6 +196,22 @@ CZMQ_EXPORT void
 //  or greater than, item2.
 CZMQ_EXPORT void
     zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator);
+
+//  Serialize list to a binary frame that can be sent in a message.
+//  The packed format is compatible with the 'strings' type implemented by zproto:
+//
+//     ; A list of strings
+//     list            = list-count *longstr
+//     list-count      = number-4
+//
+//     ; Strings are always length + text contents
+//     longstr         = number-4 *VCHAR
+//
+//     ; Numbers are unsigned integers in network byte order
+//     number-4        = 4OCTET
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zframe_t *
+    zlistx_pack (zlistx_t *self);
 
 //  Self test of this class.
 CZMQ_EXPORT void

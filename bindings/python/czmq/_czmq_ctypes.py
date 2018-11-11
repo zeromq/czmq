@@ -3760,6 +3760,8 @@ lib.zlistx_new.restype = zlistx_p
 lib.zlistx_new.argtypes = []
 lib.zlistx_destroy.restype = None
 lib.zlistx_destroy.argtypes = [POINTER(zlistx_p)]
+lib.zlistx_unpack.restype = zlistx_p
+lib.zlistx_unpack.argtypes = [zframe_p]
 lib.zlistx_add_start.restype = c_void_p
 lib.zlistx_add_start.argtypes = [zlistx_p, c_void_p]
 lib.zlistx_add_end.restype = c_void_p
@@ -3812,6 +3814,8 @@ lib.zlistx_set_duplicator.restype = None
 lib.zlistx_set_duplicator.argtypes = [zlistx_p, zlistx_duplicator_fn]
 lib.zlistx_set_comparator.restype = None
 lib.zlistx_set_comparator.argtypes = [zlistx_p, zlistx_comparator_fn]
+lib.zlistx_pack.restype = zframe_p
+lib.zlistx_pack.argtypes = [zlistx_p]
 lib.zlistx_test.restype = None
 lib.zlistx_test.argtypes = [c_bool]
 
@@ -3863,6 +3867,15 @@ list are automatically destroyed as well.
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def unpack(frame):
+        """
+        Unpack binary frame into a new list. Packed data must follow format
+defined by zlistx_pack. List is set to autofree. An empty frame
+unpacks to an empty list.
+        """
+        return Zlistx(lib.zlistx_unpack(frame), True)
 
     def add_start(self, item):
         """
@@ -4063,6 +4076,23 @@ must return -1, 0, or 1 depending on whether item1 is less than, equal to,
 or greater than, item2.
         """
         return lib.zlistx_set_comparator(self._as_parameter_, comparator)
+
+    def pack(self):
+        """
+        Serialize list to a binary frame that can be sent in a message.
+The packed format is compatible with the 'strings' type implemented by zproto:
+
+   ; A list of strings
+   list            = list-count *longstr
+   list-count      = number-4
+
+   ; Strings are always length + text contents
+   longstr         = number-4 *VCHAR
+
+   ; Numbers are unsigned integers in network byte order
+   number-4        = 4OCTET
+        """
+        return Zframe(lib.zlistx_pack(self._as_parameter_), True)
 
     @staticmethod
     def test(verbose):
@@ -5697,6 +5727,7 @@ of these characters, each corresponding to one or two arguments:
     c = zchunk_t *
     f = zframe_t *
     h = zhashx_t *
+    l = zlistx_t *
     U = zuuid_t *
     p = void * (sends the pointer value, only meaningful over inproc)
     m = zmsg_t * (sends all frames in the zmsg)
@@ -5734,6 +5765,7 @@ a series of pointers as provided by the caller:
     f = zframe_t ** (creates zframe)
     U = zuuid_t * (creates a zuuid with the data)
     h = zhashx_t ** (creates zhashx)
+    l = zlistx_t ** (creates zlistx)
     p = void ** (stores pointer)
     m = zmsg_t ** (creates a zmsg with the remaining frames)
     z = null, asserts empty frame (0 arguments)

@@ -129,6 +129,17 @@ module CZMQ
         __new ptr
       end
 
+      # Unpack binary frame into a new list. Packed data must follow format
+      # defined by zlistx_pack. List is set to autofree. An empty frame
+      # unpacks to an empty list.
+      # @param frame [Zframe, #__ptr]
+      # @return [CZMQ::Zlistx]
+      def self.unpack(frame)
+        frame = frame.__ptr if frame
+        ptr = ::CZMQ::FFI.zlistx_unpack(frame)
+        __new ptr
+      end
+
       # Destroy a list. If an item destructor was specified, all items in the
       # list are automatically destroyed as well.
       #
@@ -456,6 +467,28 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zlistx_set_comparator(self_p, comparator)
+        result
+      end
+
+      # Serialize list to a binary frame that can be sent in a message.
+      # The packed format is compatible with the 'strings' type implemented by zproto:
+      #
+      #    ; A list of strings
+      #    list            = list-count *longstr
+      #    list-count      = number-4
+      #
+      #    ; Strings are always length + text contents
+      #    longstr         = number-4 *VCHAR
+      #
+      #    ; Numbers are unsigned integers in network byte order
+      #    number-4        = 4OCTET
+      #
+      # @return [Zframe]
+      def pack()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zlistx_pack(self_p)
+        result = Zframe.__new result, true
         result
       end
 

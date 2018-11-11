@@ -411,6 +411,7 @@ module CZMQ
       require_relative 'ffi/zlist'
 
       attach_function :zlistx_new, [], :pointer, **opts
+      attach_function :zlistx_unpack, [:pointer], :pointer, **opts
       attach_function :zlistx_destroy, [:pointer], :void, **opts
       attach_function :zlistx_add_start, [:pointer, :pointer], :pointer, **opts
       attach_function :zlistx_add_end, [:pointer, :pointer], :pointer, **opts
@@ -438,6 +439,7 @@ module CZMQ
       attach_function :zlistx_set_destructor, [:pointer, :pointer], :void, **opts
       attach_function :zlistx_set_duplicator, [:pointer, :pointer], :void, **opts
       attach_function :zlistx_set_comparator, [:pointer, :pointer], :void, **opts
+      attach_function :zlistx_pack, [:pointer], :pointer, **opts
       attach_function :zlistx_test, [:bool], :void, **opts
 
       require_relative 'ffi/zlistx'

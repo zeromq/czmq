@@ -818,6 +818,7 @@ zsock_type_str (zsock_t *self)
 //      c = zchunk_t *
 //      f = zframe_t *
 //      h = zhashx_t *
+//      l = zlistx_t *
 //      U = zuuid_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
 //      m = zmsg_t * (sends all frames in the zmsg)
@@ -910,6 +911,12 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
             zmsg_append (msg, &frame);
         }
         else
+        if (*picture == 'l') {
+            zlistx_t *list = va_arg (argptr, zlistx_t *);
+            zframe_t *frame = zlistx_pack (list);
+            zmsg_append (msg, &frame);
+        }
+        else
         if (*picture == 'm') {
             zframe_t *frame;
             zmsg_t *zmsg = va_arg (argptr, zmsg_t *);
@@ -952,6 +959,7 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
 //      h = zhashx_t ** (creates zhashx)
+//      l = zlistx_t ** (creates zlistx)
 //      U = zuuid_t * (creates a zuuid with the data)
 //      p = void ** (stores pointer)
 //      m = zmsg_t ** (creates a zmsg with the remaing frames)
@@ -1135,6 +1143,18 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
                     *hash_p = NULL;
             }
             zframe_destroy (&frame);
+        }
+        else
+        if (*picture == 'l') {
+            zframe_t *frame = zmsg_pop (msg);
+            zlistx_t **list_p = va_arg (argptr, zlistx_t **);
+            if (list_p) {
+                if (frame)
+                    *list_p = zlistx_unpack (frame);
+                else
+                    *list_p = NULL;
+            }
+	    zframe_destroy (&frame);
         }
         else
         if (*picture == 'm') {
@@ -1966,35 +1986,42 @@ zsock_test (bool verbose)
     assert (frame);
     zhashx_t *hash = zhashx_new ();
     assert (hash);
+    zlistx_t *list = zlistx_new ();
+    assert (list);
     zuuid_t *uuid = zuuid_new ();
     assert (uuid);
     zhashx_set_destructor (hash, (zhashx_destructor_fn *) zstr_free);
     zhashx_set_duplicator (hash, (zhashx_duplicator_fn *) strdup);
     zhashx_insert (hash, "1", "value A");
     zhashx_insert (hash, "2", "value B");
+    zlistx_set_destructor (list, (zlistx_destructor_fn *) zstr_free);
+    zlistx_set_duplicator (list, (zlistx_duplicator_fn *) strdup);
+    zlistx_add_end (list, "1");
+    zlistx_add_end (list, "2");
     char *original = "pointer";
 
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "i124488zsbcfUhp",
+    zsock_send (writer, "i124488zsbcfUhlp",
                 -12345, number1, number2, number4, number4_MAX,
                 number8, number8_MAX,
                 "This is a string", "ABCDE", 5,
-                chunk, frame, uuid, hash, original);
+                chunk, frame, uuid, hash, list, original);
     char *uuid_str = strdup (zuuid_str (uuid));
     zchunk_destroy (&chunk);
     zframe_destroy (&frame);
     zuuid_destroy (&uuid);
     zhashx_destroy (&hash);
+    zlistx_destroy (&list);
 
     int integer;
     byte *data;
     size_t size;
     char *pointer;
     number8_MAX = number8 = number4_MAX = number4 = number2 = number1 = 0ULL;
-    rc = zsock_recv (reader, "i124488zsbcfUhp",
+    rc = zsock_recv (reader, "i124488zsbcfUhlp",
                      &integer, &number1, &number2, &number4, &number4_MAX,
                      &number8, &number8_MAX, &string, &data, &size, &chunk,
-                     &frame, &uuid, &hash, &pointer);
+                     &frame, &uuid, &hash, &list, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (number1 == 123);
@@ -2015,6 +2042,10 @@ zsock_test (bool verbose)
     assert (streq (value, "value A"));
     value = (char *) zhashx_lookup (hash, "2");
     assert (streq (value, "value B"));
+    value = (char *) zlistx_first (list);
+    assert (streq (value, "1"));
+    value = (char *) zlistx_last (list);
+    assert (streq (value, "2"));
     assert (original == pointer);
     freen (string);
     freen (data);
@@ -2022,6 +2053,7 @@ zsock_test (bool verbose)
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhashx_destroy (&hash);
+    zlistx_destroy (&list);
     zuuid_destroy (&uuid);
 
     //  Test zsock_recv of short message; this lets us return a failure

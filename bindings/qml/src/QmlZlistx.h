@@ -144,6 +144,20 @@ public slots:
     //  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
     //  or greater than, item2.
     void setComparator (zlistx_comparator_fn comparator);
+
+    //  Serialize list to a binary frame that can be sent in a message.
+    //  The packed format is compatible with the 'strings' type implemented by zproto:
+    //
+    //     ; A list of strings
+    //     list            = list-count *longstr
+    //     list-count      = number-4
+    //
+    //     ; Strings are always length + text contents
+    //     longstr         = number-4 *VCHAR
+    //
+    //     ; Numbers are unsigned integers in network byte order
+    //     number-4        = 4OCTET
+    QmlZframe *pack ();
 };
 
 class QmlZlistxAttached : public QObject
@@ -166,6 +180,11 @@ public slots:
 
     //  Create a new, empty list.
     QmlZlistx *construct ();
+
+    //  Unpack binary frame into a new list. Packed data must follow format
+    //  defined by zlistx_pack. List is set to autofree. An empty frame
+    //  unpacks to an empty list.
+    QmlZlistx *unpack (QmlZframe *frame);
 
     //  Destroy a list. If an item destructor was specified, all items in the
     //  list are automatically destroyed as well.
