@@ -1,0 +1,39 @@
+<class name = "zhttp_client" state = "draft">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    Provides an http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+
+    <constructor>
+        Create a new http client
+	<argument name = "verbose" type = "boolean" />
+    </constructor>
+
+    <destructor>
+        Destroy an http client
+    </destructor>
+
+    <method name = "get">
+        Send a get request to the url, headers is optional.
+	Use userp to identify response when making multiple requests simultaneously.
+        <argument name = "url" type = "string" />
+        <argument name = "headers" type = "zlistx" />
+        <argument name = "userp" type = "anything" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "recv">
+        Receive the response for one of the requests. Blocks until a response is ready.
+	Use userp to identify the request.
+	<argument name = "response_code" type = "integer" by_reference= "1" />
+	<argument name = "data" type = "zchunk" by_reference = "1" />
+	<argument name = "userp" type = "anything" by_reference = "1" />
+        <return type = "integer"/>
+    </method>
+</class>
