@@ -66,6 +66,7 @@ set (czmqjni_sources
     ../src/main/c/org_zeromq_czmq_Ztimerset.c
     ../src/main/c/org_zeromq_czmq_Ztrie.c
     ../src/main/c/org_zeromq_czmq_Zuuid.c
+    ../src/main/c/org_zeromq_czmq_ZhttpClient.c
 )
 
 add_library (czmqjni SHARED ${czmqjni_sources})

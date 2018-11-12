@@ -58,6 +58,7 @@ typedef struct _zsys_t zsys_t;
 typedef struct _ztimerset_t ztimerset_t;
 typedef struct _ztrie_t ztrie_t;
 typedef struct _zuuid_t zuuid_t;
+typedef struct _zhttp_client_t zhttp_client_t;
 // Actors get a pipe and arguments from caller
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
@@ -4094,5 +4095,28 @@ zuuid_t *
 // Self test of this class.
 void
     zuuid_test (bool verbose);
+
+// CLASS: zhttp_client
+// Create a new http client
+zhttp_client_t *
+    zhttp_client_new (bool verbose);
+
+// Destroy an http client
+void
+    zhttp_client_destroy (zhttp_client_t **self_p);
+
+// Send a get request to the url, headers is optional.
+// Use userp to identify response when making multiple requests simultaneously.
+int
+    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, void *userp);
+
+// Receive the response for one of the requests. Blocks until a response is ready.
+// Use userp to identify the request.
+int
+    zhttp_client_recv (zhttp_client_t *self, int *response_code, zchunk_t **data, void **userp);
+
+// Self test of this class.
+void
+    zhttp_client_test (bool verbose);
 
 ''')

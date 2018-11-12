@@ -67,6 +67,8 @@ class QmlZtrie;
 class QmlZtrieAttached;
 class QmlZuuid;
 class QmlZuuidAttached;
+class QmlZhttpClient;
+class QmlZhttpClientAttached;
 
 #include "QmlZactor.h"
 #include "QmlZargs.h"
@@ -96,6 +98,7 @@ class QmlZuuidAttached;
 #include "QmlZtimerset.h"
 #include "QmlZtrie.h"
 #include "QmlZuuid.h"
+#include "QmlZhttpClient.h"
 
 class QmlCZMQPlugin : public QQmlExtensionPlugin
 {
@@ -161,6 +164,8 @@ public:
         qmlRegisterType<QmlZtrieAttached>();
         qmlRegisterType<QmlZuuid> (uri, 1, 0, "QmlZuuid");
         qmlRegisterType<QmlZuuidAttached>();
+        qmlRegisterType<QmlZhttpClient> (uri, 1, 0, "QmlZhttpClient");
+        qmlRegisterType<QmlZhttpClientAttached>();
     };
 };
 

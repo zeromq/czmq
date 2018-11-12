@@ -42,3 +42,4 @@ from .Zsys import *
 from .Ztimerset import *
 from .Ztrie import *
 from .Zuuid import *
+from .ZhttpClient import *

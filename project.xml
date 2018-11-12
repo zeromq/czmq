@@ -14,6 +14,7 @@
     <use project = "uuid" optional = "1" implied = "1" />
     <use project = "systemd" optional = "1" implied = "1" min_major = "200" />
     <use project = "lz4" optional = "1" implied = "1" />
+    <use project = "libcurl" optional = "1" implied = "1" />
     <target name = "*" />
 
     <!-- These classes have an API model -->
@@ -45,6 +46,7 @@
     <class name = "ztimerset" />
     <class name = "ztrie" />
     <class name = "zuuid" />
+    <class name = "zhttp_client" />
 
     <!-- These classes have no API model -->
     <class name = "zauth" state = "stable" />

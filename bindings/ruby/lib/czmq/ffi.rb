@@ -867,6 +867,14 @@ module CZMQ
       attach_function :zuuid_test, [:bool], :void, **opts
 
       require_relative 'ffi/zuuid'
+
+      attach_function :zhttp_client_new, [:bool], :pointer, **opts
+      attach_function :zhttp_client_destroy, [:pointer], :void, **opts
+      attach_function :zhttp_client_get, [:pointer, :string, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_client_recv, [:pointer, :pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_client_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zhttp_client'
     end
   end
 end

@@ -487,6 +487,91 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for liblz4
 dnl END of enabled attempts to search for liblz4
 
 
+was_libcurl_check_lib_detected=no
+
+search_libcurl="no"
+
+AC_ARG_WITH([libcurl],
+    [
+        AS_HELP_STRING([--with-libcurl],
+        [yes or no. Optionally specify libcurl prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_libcurl="yes"
+    ],
+    [
+        search_libcurl="yes"
+    ])
+AS_CASE([x"${with_libcurl}"],
+    [xyes], [search_libcurl="yes"],
+    [xno],  [search_libcurl="no"])
+
+
+AS_IF([test x"${search_libcurl}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    PKG_CHECK_MODULES([libcurl], [libcurl >= 0.0.0],
+    [
+        AC_DEFINE(HAVE_LIBCURL, 1, [The optional libcurl library is to be used])
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libcurl_LIBS"
+        was_libcurl_check_lib_detected=pkgcfg
+        found_pkgconfig="libcurl"
+    ],
+    [
+        AC_MSG_NOTICE([Package libcurl not found; falling back to defined compilability tests])
+
+        libcurl_synthetic_cflags=""
+        libcurl_synthetic_libs="-llibcurl"
+
+        if test -n "${with_libcurl}" && test x"${with_libcurl}" != xyes && test x"${with_libcurl}" != xno; then
+            if test -r "${with_libcurl}/include/curl/curl.h"; then
+                libcurl_synthetic_cflags="-I${with_libcurl}/include"
+                libcurl_synthetic_libs="-L${with_libcurl}/lib -llibcurl"
+            else
+            AC_MSG_WARN([Header file ${with_libcurl}/include/curl/curl.h was not found. Please check libcurl prefix])
+            fi
+        else
+            AC_CHECK_HEADER([curl/curl.h], [],
+            AC_MSG_WARN([Header file curl/curl.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([libcurl], [curl_easy_init],
+            [
+                was_libcurl_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -llibcurl"
+                AC_DEFINE(HAVE_LIBCURL, 1, [The optional libcurl library is to be used (as -llibcurl)])
+            ],
+            [])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for libcurl
+    AS_CASE(["x${was_libcurl_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_libcurl],["${found_pkgconfig}"])
+                CFLAGS="${libcurl_CFLAGS} ${CFLAGS}"
+                LIBS="${libcurl_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_libcurl],[""])
+                CFLAGS="${libcurl_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${libcurl_synthetic_libs} ${LDFLAGS}"
+                LIBS="${libcurl_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([libcurl_CFLAGS],[${libcurl_synthetic_cflags}])
+                AC_SUBST([libcurl_LIBS],[${libcurl_synthetic_libs}])
+            ],
+        [xno], [
+                AC_SUBST([pkgconfig_name_libcurl],[""])
+            AC_MSG_WARN([Cannot find pkg-config metadata for libcurl 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for libcurl
+
+
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
 

@@ -76,6 +76,7 @@ Testing/
 
 # Repositories downloaded by CI integration scripts
 libzmq/
+libcurl/
 
 # Travis build area
 tmp/

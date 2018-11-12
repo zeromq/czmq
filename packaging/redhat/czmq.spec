@@ -55,6 +55,7 @@ BuildRequires:  zeromq-devel
 BuildRequires:  libuuid-devel
 BuildRequires:  systemd-devel
 BuildRequires:  liblz4-devel
+BuildRequires:  libcurl-devel
 %if %{with python_cffi}
 BuildRequires:  python-cffi
 BuildRequires:  python-devel
@@ -92,6 +93,7 @@ Requires:       zeromq-devel
 Requires:       libuuid-devel
 Requires:       systemd-devel
 Requires:       liblz4-devel
+Requires:       libcurl-devel
 
 %description devel
 the high-level c binding for 0mq development tools
@@ -150,7 +152,7 @@ exit 1
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS} --with-uuid=yes --with-libsystemd=yes --with-liblz4=yes
+%{configure} --enable-drafts=%{DRAFTS} --with-uuid=yes --with-libsystemd=yes --with-liblz4=yes --with-libcurl=yes
 make %{_smp_mflags}
 %if %{with python_cffi}
 # Problem: we need pkg-config points to built and not yet installed copy of czmq

@@ -162,6 +162,18 @@ IF (LZ4_FOUND)
 ENDIF (LZ4_FOUND)
 
 ########################################################################
+# LIBCURL dependency
+########################################################################
+find_package(libcurl)
+IF (LIBCURL_FOUND)
+    include_directories(${LIBCURL_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${LIBCURL_LIBRARIES})
+    set(pkg_config_libs_private "${pkg_config_libs_private} -llibcurl")
+    add_definitions(-DHAVE_LIBCURL)
+    list(APPEND OPTIONAL_LIBRARIES ${LIBCURL_LIBRARIES})
+ENDIF (LIBCURL_FOUND)
+
+########################################################################
 # version
 ########################################################################
 set(CZMQ_VERSION_MAJOR 4)
@@ -225,6 +237,7 @@ IF (ENABLE_DRAFTS)
         include/zproc.h
         include/ztimerset.h
         include/ztrie.h
+        include/zhttp_client.h
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -277,6 +290,7 @@ IF (ENABLE_DRAFTS)
         src/zproc.c
         src/ztimerset.c
         src/ztrie.c
+        src/zhttp_client.c
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -569,6 +583,7 @@ IF (ENABLE_DRAFTS)
     zproc
     ztimerset
     ztrie
+    zhttp_client
     )
 ENDIF (ENABLE_DRAFTS)
 

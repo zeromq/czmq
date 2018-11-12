@@ -8313,6 +8313,91 @@ Nan::Persistent <Function> &Zuuid::constructor () {
 }
 
 
+NAN_MODULE_INIT (ZhttpClient::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("ZhttpClient").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("ZhttpClient").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+ZhttpClient::ZhttpClient (bool verbose) {
+    self = zhttp_client_new ((bool) verbose);
+}
+
+ZhttpClient::ZhttpClient (zhttp_client_t *self_) {
+    self = self_;
+}
+
+ZhttpClient::~ZhttpClient () {
+}
+
+NAN_METHOD (ZhttpClient::New) {
+    assert (info.IsConstructCall ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    ZhttpClient *zhttp_client = new ZhttpClient ((bool) verbose);
+    if (zhttp_client) {
+        zhttp_client->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (ZhttpClient::destroy) {
+    ZhttpClient *zhttp_client = Nan::ObjectWrap::Unwrap <ZhttpClient> (info.Holder ());
+    zhttp_client_destroy (&zhttp_client->self);
+}
+
+
+NAN_METHOD (ZhttpClient::defined) {
+    ZhttpClient *zhttp_client = Nan::ObjectWrap::Unwrap <ZhttpClient> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zhttp_client->self != NULL));
+}
+
+NAN_METHOD (ZhttpClient::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhttp_client_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &ZhttpClient::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
 extern "C" NAN_MODULE_INIT (czmq_initialize)
 {
     Zargs::Init (target);
@@ -8342,6 +8427,7 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     Ztimerset::Init (target);
     Ztrie::Init (target);
     Zuuid::Init (target);
+    ZhttpClient::Init (target);
 }
 
 NODE_MODULE (czmq, czmq_initialize)

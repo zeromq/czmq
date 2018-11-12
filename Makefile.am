@@ -11,9 +11,10 @@ AM_CPPFLAGS = \
     ${uuid_CFLAGS} \
     ${systemd_CFLAGS} \
     ${lz4_CFLAGS} \
+    ${libcurl_CFLAGS} \
     -I$(srcdir)/include
 
-project_libs = ${libzmq_LIBS} ${uuid_LIBS} ${systemd_LIBS} ${lz4_LIBS}
+project_libs = ${libzmq_LIBS} ${uuid_LIBS} ${systemd_LIBS} ${lz4_LIBS} ${libcurl_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -38,6 +39,7 @@ EXTRA_DIST += \
     Finduuid.cmake \
     Findsystemd.cmake \
     Findlz4.cmake \
+    Findlibcurl.cmake \
     src/CMakeLists-local.txt \
     builds/cmake/Modules/ClangFormat.cmake \
     builds/cmake/clang-format-check.sh.in \
