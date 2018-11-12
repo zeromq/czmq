@@ -513,7 +513,7 @@ AS_IF([test x"${search_libcurl}" = xyes], [
     PRE_SEARCH_LIBS="${LIBS}"
 
     found_pkgconfig=""
-    PKG_CHECK_MODULES([libcurl], [libcurl >= 0.0.0],
+    PKG_CHECK_MODULES([libcurl], [libcurl >= 7.28.0],
     [
         AC_DEFINE(HAVE_LIBCURL, 1, [The optional libcurl library is to be used])
         PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libcurl_LIBS"
@@ -521,7 +521,7 @@ AS_IF([test x"${search_libcurl}" = xyes], [
         found_pkgconfig="libcurl"
     ],
     [
-        AC_MSG_NOTICE([Package libcurl not found; falling back to defined compilability tests])
+        AC_MSG_NOTICE([Package libcurl not found with needed constraints; falling back to defined compilability tests])
 
         libcurl_synthetic_cflags=""
         libcurl_synthetic_libs="-llibcurl"
@@ -551,7 +551,7 @@ AS_IF([test x"${search_libcurl}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for libcurl
     AS_CASE(["x${was_libcurl_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_libcurl],["${found_pkgconfig}"])
+                AC_SUBST([pkgconfig_name_libcurl],["${found_pkgconfig} >= 7.28.0"])
                 CFLAGS="${libcurl_CFLAGS} ${CFLAGS}"
                 LIBS="${libcurl_LIBS} ${LIBS}"
             ],
@@ -566,7 +566,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libcurl
             ],
         [xno], [
                 AC_SUBST([pkgconfig_name_libcurl],[""])
-            AC_MSG_WARN([Cannot find pkg-config metadata for libcurl 0.0.0 or higher])
+            AC_MSG_WARN([Cannot find pkg-config metadata for libcurl 7.28.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for libcurl
