@@ -42,7 +42,8 @@ include_HEADERS += \
     zargs.h \
     zproc.h \
     ztimerset.h \
-    ztrie.h
+    ztrie.h \
+    zhttp_client.h
 
 endif
 

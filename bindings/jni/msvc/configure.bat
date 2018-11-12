@@ -62,6 +62,13 @@ IF EXIST "..\..\..\lz4" (
     ECHO Building without lz4
     ECHO #undef HAVE_LZ4>> platform.h
 )
+IF EXIST "..\..\..\libcurl" (
+    ECHO Building with libcurl
+    ECHO #define HAVE_LIBCURL 1>> platform.h
+) ELSE (
+    ECHO Building without libcurl
+    ECHO #undef HAVE_LIBCURL>> platform.h
+)
 
 :-  Check if we want to build the draft API
 if "%1" == "--enable-drafts" goto :with_draft

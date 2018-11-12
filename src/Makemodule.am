@@ -60,7 +60,8 @@ src_libczmq_la_SOURCES += \
     src/zargs.c \
     src/zproc.c \
     src/ztimerset.c \
-    src/ztrie.c
+    src/ztrie.c \
+    src/zhttp_client.c
 
 endif
 
@@ -151,6 +152,7 @@ dist_api_DATA = \
     api/ztimerset.api \
     api/ztrie.api \
     api/zuuid.api \
+    api/zhttp_client.api \
     api/zgossip_msg.api
 
 # define custom target for all products of /src

@@ -82,3 +82,6 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Ztrie.h GOTO HAVE_Ztrie
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zuuid.h GOTO HAVE_Zuuid
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zuuid
 :HAVE_Zuuid
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpClient.h GOTO HAVE_ZhttpClient
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpClient
+:HAVE_ZhttpClient

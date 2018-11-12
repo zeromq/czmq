@@ -38,7 +38,8 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzsys.h \
                      $$PWD/qztimerset.h \
                      $$PWD/qztrie.h \
-                     $$PWD/qzuuid.h
+                     $$PWD/qzuuid.h \
+                     $$PWD/qzhttpclient.h
 
     SOURCES       += \
                      $$PWD/qzactor.cpp \
@@ -68,7 +69,8 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzsys.cpp \
                      $$PWD/qztimerset.cpp \
                      $$PWD/qztrie.cpp \
-                     $$PWD/qzuuid.cpp
+                     $$PWD/qzuuid.cpp \
+                     $$PWD/qzhttpclient.cpp
 }
 
 win32 {

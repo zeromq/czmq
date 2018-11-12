@@ -88,6 +88,7 @@ kwargs = pkgconfig_kwargs ([
     "uuid",
     "libsystemd",
     "liblz4",
+    "libcurl",
     "libczmq"
 ])
 import cffi
@@ -183,6 +184,9 @@ void
 
 void
    zuuid_destroy_py (void *self);
+
+void
+   zhttp_client_destroy_py (void *self);
 
 ''')
 
@@ -336,6 +340,12 @@ void
 zuuid_destroy_py (void *self)
 {
    zuuid_destroy ((zuuid_t **) &self);
+}
+
+void
+zhttp_client_destroy_py (void *self)
+{
+   zhttp_client_destroy ((zhttp_client_t **) &self);
 }
 
 ''', **kwargs)

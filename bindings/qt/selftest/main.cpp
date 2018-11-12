@@ -45,6 +45,7 @@ int main(int argc, char **argv)
     QZtimerset::test (verbose);
     QZtrie::test (verbose);
     QZuuid::test (verbose);
+    QZhttpClient::test (verbose);
 
     qDebug() << "Tests passed OK\n";
     return 0;

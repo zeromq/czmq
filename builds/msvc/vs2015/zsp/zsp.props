@@ -32,6 +32,7 @@
     <Import Project="$(SolutionDir)uuid.import.props" Condition="'$(HAVE_UUID)'=='1'" />
     <Import Project="$(SolutionDir)systemd.import.props" Condition="'$(HAVE_SYSTEMD)'=='1'" />
     <Import Project="$(SolutionDir)lz4.import.props" Condition="'$(HAVE_LZ4)'=='1'" />
+    <Import Project="$(SolutionDir)libcurl.import.props" Condition="'$(HAVE_LIBCURL)'=='1'" />
   </ImportGroup>
 
   <PropertyGroup Condition="$(Configuration.IndexOf('DEXE')) != -1">
@@ -40,6 +41,7 @@
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">dynamic</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">dynamic</Linkage-systemd>
     <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">dynamic</Linkage-lz4>
+    <Linkage-libcurl Condition="'$(HAVE_LIBCURL)'=='1'">dynamic</Linkage-libcurl>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.IndexOf('LEXE')) != -1">
@@ -48,6 +50,7 @@
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">ltcg</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">ltcg</Linkage-systemd>
     <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">ltcg</Linkage-lz4>
+    <Linkage-libcurl Condition="'$(HAVE_LIBCURL)'=='1'">ltcg</Linkage-libcurl>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.IndexOf('SEXE')) != -1">
@@ -56,6 +59,7 @@
     <Linkage-uuid Condition="'$(HAVE_UUID)'=='1'">static</Linkage-uuid>
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">static</Linkage-systemd>
     <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">static</Linkage-lz4>
+    <Linkage-libcurl Condition="'$(HAVE_LIBCURL)'=='1'">static</Linkage-libcurl>
   </PropertyGroup>
 
   <!-- Messages -->
@@ -65,6 +69,7 @@
     <Message Text="Linkage-uuid: $(Linkage-uuid)" Importance="high" Condition="'$(HAVE_UUID)'=='1'" />
     <Message Text="Linkage-systemd: $(Linkage-systemd)" Importance="high" Condition="'$(HAVE_SYSTEMD)'=='1'" />
     <Message Text="Linkage-lz4: $(Linkage-lz4)" Importance="high" Condition="'$(HAVE_LZ4)'=='1'" />
+    <Message Text="Linkage-libcurl: $(Linkage-libcurl)" Importance="high" Condition="'$(HAVE_LIBCURL)'=='1'" />
   </Target>
 <!--
 ################################################################################

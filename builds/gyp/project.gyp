@@ -94,6 +94,8 @@
         '../../include/zhash.h',
         '../../src/zhashx.c',
         '../../include/zhashx.h',
+        '../../src/zhttp_client.c',
+        '../../include/zhttp_client.h',
         '../../src/ziflist.c',
         '../../include/ziflist.h',
         '../../src/zlist.c',

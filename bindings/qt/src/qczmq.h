@@ -56,6 +56,7 @@ class QZsys;
 class QZtimerset;
 class QZtrie;
 class QZuuid;
+class QZhttpClient;
 
 //  Public API classes
 #include "qzactor.h"
@@ -86,6 +87,7 @@ class QZuuid;
 #include "qztimerset.h"
 #include "qztrie.h"
 #include "qzuuid.h"
+#include "qzhttpclient.h"
 
 #endif //  Q_CZMQ_H
 /*

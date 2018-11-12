@@ -1,4 +1,5 @@
 libzmq
+libcurl
 raspbian-boot
 raspbian-root
 tmp/

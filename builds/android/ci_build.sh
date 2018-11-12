@@ -36,6 +36,9 @@ mkdir -p /tmp/tmp-deps
 export LIBZMQ_ROOT="/tmp/tmp-deps/libzmq"
 git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
 
+export LIBCURL_ROOT="/tmp/tmp-deps/libcurl"
+git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
+
 source ./build.sh
 
 ################################################################################

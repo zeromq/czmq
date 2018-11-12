@@ -950,4 +950,20 @@ class Zuuid: public Nan::ObjectWrap {
     static NAN_METHOD (_test);
 };
 
+class ZhttpClient: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit ZhttpClient (bool verbose);
+        explicit ZhttpClient (zhttp_client_t *self);
+        zhttp_client_t *self;
+    private:
+        ~ZhttpClient ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_test);
+};
+
 #endif

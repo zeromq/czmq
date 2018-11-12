@@ -4387,3 +4387,26 @@ nothing my_zuuid.test (Boolean)
 ```
 
 Self test of this class.
+
+### The ZhttpClient class - Provides an http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zhttp_client = new czmq.ZhttpClient (Boolean)
+```
+
+You *must* call the destructor on every ZhttpClient instance:
+
+```
+my_zhttp_client.destroy ()
+```
+
+Methods:
+
+```
+nothing my_zhttp_client.test (Boolean)
+```
+
+Self test of this class.
