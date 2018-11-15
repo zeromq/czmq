@@ -24,12 +24,6 @@
 #include <curl/curl.h>
 #endif
 
-//  Structure of our class
-
-struct _zhttp_client_t {
-    zactor_t *actor;
-};
-
 #ifdef HAVE_LIBCURL
 
 typedef struct {
@@ -197,10 +191,9 @@ static void handler (zsock_t *pipe, void *args) {
 zhttp_client_t *
 zhttp_client_new (bool verbose)
 {
-    zhttp_client_t *self = (zhttp_client_t *) zmalloc (sizeof (zhttp_client_t));
-    assert (self);
+    zhttp_client_t *self = NULL;
 #ifdef HAVE_LIBCURL
-    self->actor = zactor_new(handler, &verbose);
+    self = (zhttp_client_t *) zactor_new(handler, &verbose);
 #endif
     return self;
 }
@@ -212,16 +205,7 @@ zhttp_client_new (bool verbose)
 void
 zhttp_client_destroy (zhttp_client_t **self_p)
 {
-    assert (self_p);
-    if (*self_p) {
-        zhttp_client_t *self = *self_p;
-#ifdef HAVE_LIBCURL
-        zactor_destroy (&self->actor);
-#endif
-        //  Free object itself
-        free (self);
-        *self_p = NULL;
-    }
+    zactor_destroy ((zactor_t **)self_p);
 }
 
 
@@ -234,9 +218,9 @@ int
 zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, void *userp) {
 #ifdef HAVE_LIBCURL
     if (headers)
-        return zsock_send (self->actor, "sslp", "GET", url, headers, userp);
+        return zsock_send (self, "sslp", "GET", url, headers, userp);
     else
-        return zsock_send (self->actor, "sszp", "GET", url, userp);
+        return zsock_send (self, "sszp", "GET", url, userp);
 #else
     return -1;
 #endif
@@ -248,7 +232,7 @@ zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, void
 int
 zhttp_client_recv (zhttp_client_t *self, int *response_code, zchunk_t **data, void **userp) {
 #ifdef HAVE_LIBCURL
-    return zsock_recv (self->actor, "icp", response_code, data, userp);
+    return zsock_recv (self, "icp", response_code, data, userp);
 #else
     return -1;
 #endif
