@@ -6993,6 +6993,10 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "setIoThreads", _set_io_threads);
     Nan::SetPrototypeMethod (tpl, "setThreadSchedPolicy", _set_thread_sched_policy);
     Nan::SetPrototypeMethod (tpl, "setThreadPriority", _set_thread_priority);
+    Nan::SetPrototypeMethod (tpl, "setThreadNamePrefix", _set_thread_name_prefix);
+    Nan::SetPrototypeMethod (tpl, "threadNamePrefix", _thread_name_prefix);
+    Nan::SetPrototypeMethod (tpl, "threadAffinityCpuAdd", _thread_affinity_cpu_add);
+    Nan::SetPrototypeMethod (tpl, "threadAffinityCpuRemove", _thread_affinity_cpu_remove);
     Nan::SetPrototypeMethod (tpl, "setMaxSockets", _set_max_sockets);
     Nan::SetPrototypeMethod (tpl, "socketLimit", _socket_limit);
     Nan::SetPrototypeMethod (tpl, "setMaxMsgsz", _set_max_msgsz);
@@ -7403,6 +7407,62 @@ NAN_METHOD (Zsys::_set_thread_priority) {
     else
         return Nan::ThrowTypeError ("`priority` must be a number");
     zsys_set_thread_priority ((int) priority);
+}
+
+NAN_METHOD (Zsys::_set_thread_name_prefix) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `prefix`");
+
+    //int prefix; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int prefix;
+
+
+    if (info [0]->IsNumber ())
+    {
+          prefix = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`prefix` must be a number");
+    zsys_set_thread_name_prefix ((int) prefix);
+}
+
+NAN_METHOD (Zsys::_thread_name_prefix) {
+    int result = zsys_thread_name_prefix ();
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_thread_affinity_cpu_add) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `cpu`");
+
+    //int cpu; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int cpu;
+
+
+    if (info [0]->IsNumber ())
+    {
+          cpu = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`cpu` must be a number");
+    zsys_thread_affinity_cpu_add ((int) cpu);
+}
+
+NAN_METHOD (Zsys::_thread_affinity_cpu_remove) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `cpu`");
+
+    //int cpu; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int cpu;
+
+
+    if (info [0]->IsNumber ())
+    {
+          cpu = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`cpu` must be a number");
+    zsys_thread_affinity_cpu_remove ((int) cpu);
 }
 
 NAN_METHOD (Zsys::_set_max_sockets) {

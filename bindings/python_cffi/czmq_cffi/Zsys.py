@@ -297,6 +297,38 @@ class Zsys(object):
         """
         utils.lib.zsys_set_thread_priority(priority)
 
+    def set_thread_name_prefix(prefix):
+        """
+        Configure the numeric prefix to each thread created for the internal
+        context's thread pool. This option is only supported on Linux.
+        If the environment variable ZSYS_THREAD_NAME_PREFIX is defined, that
+        provides the default.
+        Note that this method is valid only before any socket is created.
+        """
+        utils.lib.zsys_set_thread_name_prefix(prefix)
+
+    def thread_name_prefix():
+        """
+        Return thread name prefix.
+        """
+        return utils.lib.zsys_thread_name_prefix()
+
+    def thread_affinity_cpu_add(cpu):
+        """
+        Adds a specific CPU to the affinity list of the ZMQ context thread pool.
+        This option is only supported on Linux.
+        Note that this method is valid only before any socket is created.
+        """
+        utils.lib.zsys_thread_affinity_cpu_add(cpu)
+
+    def thread_affinity_cpu_remove(cpu):
+        """
+        Removes a specific CPU to the affinity list of the ZMQ context thread pool.
+        This option is only supported on Linux.
+        Note that this method is valid only before any socket is created.
+        """
+        utils.lib.zsys_thread_affinity_cpu_remove(cpu)
+
     def set_max_sockets(max_sockets):
         """
         Configure the number of sockets that ZeroMQ will allow. The default

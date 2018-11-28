@@ -7187,6 +7187,14 @@ lib.zsys_set_thread_sched_policy.restype = None
 lib.zsys_set_thread_sched_policy.argtypes = [c_int]
 lib.zsys_set_thread_priority.restype = None
 lib.zsys_set_thread_priority.argtypes = [c_int]
+lib.zsys_set_thread_name_prefix.restype = None
+lib.zsys_set_thread_name_prefix.argtypes = [c_int]
+lib.zsys_thread_name_prefix.restype = c_int
+lib.zsys_thread_name_prefix.argtypes = []
+lib.zsys_thread_affinity_cpu_add.restype = None
+lib.zsys_thread_affinity_cpu_add.argtypes = [c_int]
+lib.zsys_thread_affinity_cpu_remove.restype = None
+lib.zsys_thread_affinity_cpu_remove.argtypes = [c_int]
 lib.zsys_set_max_sockets.restype = None
 lib.zsys_set_max_sockets.argtypes = [c_size_t]
 lib.zsys_socket_limit.restype = c_size_t
@@ -7609,6 +7617,42 @@ defined, that provides the default.
 Note that this method is valid only before any socket is created.
         """
         return lib.zsys_set_thread_priority(priority)
+
+    @staticmethod
+    def set_thread_name_prefix(prefix):
+        """
+        Configure the numeric prefix to each thread created for the internal
+context's thread pool. This option is only supported on Linux.
+If the environment variable ZSYS_THREAD_NAME_PREFIX is defined, that
+provides the default.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_set_thread_name_prefix(prefix)
+
+    @staticmethod
+    def thread_name_prefix():
+        """
+        Return thread name prefix.
+        """
+        return lib.zsys_thread_name_prefix()
+
+    @staticmethod
+    def thread_affinity_cpu_add(cpu):
+        """
+        Adds a specific CPU to the affinity list of the ZMQ context thread pool.
+This option is only supported on Linux.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_thread_affinity_cpu_add(cpu)
+
+    @staticmethod
+    def thread_affinity_cpu_remove(cpu):
+        """
+        Removes a specific CPU to the affinity list of the ZMQ context thread pool.
+This option is only supported on Linux.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_thread_affinity_cpu_remove(cpu)
 
     @staticmethod
     def set_max_sockets(max_sockets):

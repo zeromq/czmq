@@ -4,8 +4,8 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 */
-#ifndef Q_CZMQ_H
-#define Q_CZMQ_H
+#ifndef Q_QCZMQ_H
+#define Q_QCZMQ_H
 
 #include <QObject>
 #include <QString>
