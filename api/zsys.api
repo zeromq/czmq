@@ -292,6 +292,34 @@
         <argument name = "priority" type = "integer" />
     </method>
 
+    <method name = "set thread name prefix" singleton = "1">
+        Configure the numeric prefix to each thread created for the internal
+        context's thread pool. This option is only supported on Linux.
+        If the environment variable ZSYS_THREAD_NAME_PREFIX is defined, that
+        provides the default.
+        Note that this method is valid only before any socket is created.
+        <argument name = "prefix" type = "integer" />
+    </method>
+
+    <method name = "thread name prefix" singleton = "1">
+        Return thread name prefix.
+        <return type = "integer" />
+    </method>
+
+    <method name = "thread affinity cpu add" singleton = "1">
+        Adds a specific CPU to the affinity list of the ZMQ context thread pool.
+        This option is only supported on Linux.
+        Note that this method is valid only before any socket is created.
+        <argument name = "cpu" type = "integer" />
+    </method>
+
+    <method name = "thread affinity cpu remove" singleton = "1">
+        Removes a specific CPU to the affinity list of the ZMQ context thread pool.
+        This option is only supported on Linux.
+        Note that this method is valid only before any socket is created.
+        <argument name = "cpu" type = "integer" />
+    </method>
+
     <method name = "set max sockets" singleton = "1">
         Configure the number of sockets that ZeroMQ will allow. The default
         is 1024. The actual limit depends on the system, and you can query it

@@ -82,6 +82,7 @@ static bool s_initialized = false;
 static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
 static int s_thread_sched_policy = -1; //  ZSYS_THREAD_SCHED_POLICY=-1
 static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
+static int s_thread_name_prefix = -1;  //  ZSYS_THREAD_NAME_PREFIX=-1
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
 static int64_t s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
@@ -258,6 +259,11 @@ zsys_init (void)
     else
         zsys_set_thread_sched_policy (s_thread_sched_policy);
 
+    if (getenv ("ZSYS_THREAD_NAME_PREFIX"))
+        zsys_set_thread_name_prefix (atoi (getenv ("ZSYS_THREAD_NAME_PREFIX")));
+    else
+        zsys_set_thread_name_prefix (s_thread_name_prefix);
+
     return s_process_ctx;
 }
 
@@ -312,6 +318,7 @@ zsys_shutdown (void)
       s_io_threads = 1;
       s_thread_sched_policy = -1;
       s_thread_priority = -1;
+      s_thread_name_prefix = -1;
       s_max_sockets = 1024;
       s_max_msgsz = INT_MAX;
       s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
@@ -1417,6 +1424,98 @@ zsys_set_thread_sched_policy (int policy)
 
 
 //  --------------------------------------------------------------------------
+//  Configure the numeric prefix to each thread created for the internal
+//  context's thread pool. This option is only supported on Linux.
+//  If the environment variable ZSYS_THREAD_NAME_PREFIX is defined, that
+//  provides the default.
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_thread_name_prefix (int prefix)
+{
+    if (prefix < 0)
+        return;
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (s_open_sockets)
+        zsys_error ("zsys_set_thread_name_prefix() is not valid after"
+                " creating sockets");
+    assert (s_open_sockets == 0);
+    s_thread_name_prefix = prefix;
+#if defined (ZMQ_THREAD_NAME_PREFIX)
+    zmq_ctx_set (s_process_ctx, ZMQ_THREAD_NAME_PREFIX, s_thread_name_prefix);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+//  --------------------------------------------------------------------------
+//  Return ZMQ_THREAD_NAME_PREFIX option.
+int
+zsys_thread_name_prefix ()
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+#if defined (ZMQ_THREAD_NAME_PREFIX)
+    s_thread_name_prefix = zmq_ctx_get (s_process_ctx, ZMQ_THREAD_NAME_PREFIX);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+    return s_thread_name_prefix;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Adds a specific CPU to the affinity list of the ZMQ context thread pool.
+//  This option is only supported on Linux.
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_thread_affinity_cpu_add (int cpu)
+{
+    if (cpu < 0)
+        return;
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (s_open_sockets)
+        zsys_error ("zsys_set_thread_sched_policy() is not valid after"
+                " creating sockets");
+    assert (s_open_sockets == 0);
+#if defined (ZMQ_THREAD_AFFINITY_CPU_ADD)
+    zmq_ctx_set (s_process_ctx, ZMQ_THREAD_AFFINITY_CPU_ADD, cpu);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Removes a specific CPU to the affinity list of the ZMQ context thread pool.
+//  This option is only supported on Linux.
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_thread_affinity_cpu_remove (int cpu)
+{
+    if (cpu < 0)
+        return;
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (s_open_sockets)
+        zsys_error ("zsys_set_thread_sched_policy() is not valid after"
+                " creating sockets");
+    assert (s_open_sockets == 0);
+#if defined (ZMQ_THREAD_AFFINITY_CPU_REMOVE)
+    zmq_ctx_set (s_process_ctx, ZMQ_THREAD_AFFINITY_CPU_REMOVE, cpu);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Configure the scheduling priority of the ZMQ context thread pool.
 //  Not available on Windows. See the sched_setscheduler man page or sched.h
 //  for more information. If the environment variable ZSYS_THREAD_PRIORITY is
@@ -2286,6 +2385,10 @@ zsys_test (bool verbose)
     zsys_set_ipv6 (0);
     zsys_set_thread_priority (-1);
     zsys_set_thread_sched_policy (-1);
+    zsys_set_thread_name_prefix (0);
+    assert (0 == zsys_thread_name_prefix());
+    zsys_thread_affinity_cpu_add (0);
+    zsys_thread_affinity_cpu_remove (0);
     zsys_set_zero_copy_recv(0);
     assert (0 == zsys_zero_copy_recv());
     zsys_set_zero_copy_recv(1);
