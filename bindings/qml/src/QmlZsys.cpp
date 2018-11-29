@@ -305,6 +305,38 @@ void QmlZsysAttached::setThreadPriority (int priority) {
 };
 
 ///
+//  Configure the numeric prefix to each thread created for the internal
+//  context's thread pool. This option is only supported on Linux.
+//  If the environment variable ZSYS_THREAD_NAME_PREFIX is defined, that
+//  provides the default.
+//  Note that this method is valid only before any socket is created.
+void QmlZsysAttached::setThreadNamePrefix (int prefix) {
+    zsys_set_thread_name_prefix (prefix);
+};
+
+///
+//  Return thread name prefix.
+int QmlZsysAttached::threadNamePrefix () {
+    return zsys_thread_name_prefix ();
+};
+
+///
+//  Adds a specific CPU to the affinity list of the ZMQ context thread pool.
+//  This option is only supported on Linux.
+//  Note that this method is valid only before any socket is created.
+void QmlZsysAttached::threadAffinityCpuAdd (int cpu) {
+    zsys_thread_affinity_cpu_add (cpu);
+};
+
+///
+//  Removes a specific CPU to the affinity list of the ZMQ context thread pool.
+//  This option is only supported on Linux.
+//  Note that this method is valid only before any socket is created.
+void QmlZsysAttached::threadAffinityCpuRemove (int cpu) {
+    zsys_thread_affinity_cpu_remove (cpu);
+};
+
+///
 //  Configure the number of sockets that ZeroMQ will allow. The default
 //  is 1024. The actual limit depends on the system, and you can query it
 //  by using zsys_socket_limit (). A value of zero means "maximum".

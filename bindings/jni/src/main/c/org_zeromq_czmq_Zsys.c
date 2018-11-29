@@ -245,6 +245,31 @@ Java_org_zeromq_czmq_Zsys__1_1setThreadPriority (JNIEnv *env, jclass c, jint pri
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1setThreadNamePrefix (JNIEnv *env, jclass c, jint prefix)
+{
+    zsys_set_thread_name_prefix ((int) prefix);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsys__1_1threadNamePrefix (JNIEnv *env, jclass c)
+{
+    jint thread_name_prefix_ = (jint) zsys_thread_name_prefix ();
+    return thread_name_prefix_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1threadAffinityCpuAdd (JNIEnv *env, jclass c, jint cpu)
+{
+    zsys_thread_affinity_cpu_add ((int) cpu);
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1threadAffinityCpuRemove (JNIEnv *env, jclass c, jint cpu)
+{
+    zsys_thread_affinity_cpu_remove ((int) cpu);
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsys__1_1setMaxSockets (JNIEnv *env, jclass c, jlong max_sockets)
 {
     zsys_set_max_sockets ((size_t) max_sockets);

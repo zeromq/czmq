@@ -785,6 +785,10 @@ module CZMQ
       attach_function :zsys_set_io_threads, [:size_t], :void, **opts
       attach_function :zsys_set_thread_sched_policy, [:int], :void, **opts
       attach_function :zsys_set_thread_priority, [:int], :void, **opts
+      attach_function :zsys_set_thread_name_prefix, [:int], :void, **opts
+      attach_function :zsys_thread_name_prefix, [], :int, **opts
+      attach_function :zsys_thread_affinity_cpu_add, [:int], :void, **opts
+      attach_function :zsys_thread_affinity_cpu_remove, [:int], :void, **opts
       attach_function :zsys_set_max_sockets, [:size_t], :void, **opts
       attach_function :zsys_socket_limit, [], :size_t, **opts
       attach_function :zsys_set_max_msgsz, [:int], :void, **opts
