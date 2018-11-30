@@ -651,7 +651,7 @@ zlistx_pack (zlistx_t *self) {
     assert (self);
 
     //  First, calculate the packed data size
-    size_t frame_size = 4;      // List size, number-4    
+    size_t frame_size = 4;      // List size, number-4
     char* item = (char *) zlistx_first (self);
 
     while (item) {
@@ -671,7 +671,8 @@ zlistx_pack (zlistx_t *self) {
     item = (char *) zlistx_first (self);
     while (item) {
         size_t length = strlen (item);
-        *(uint32_t *) needle = htonl ((u_long) length);
+        uint32_t serialize = htonl ((u_long) length);
+        memcpy (needle, &serialize, 4);
         needle += 4;
         memcpy (needle, item, length);
         needle += length;
@@ -716,24 +717,24 @@ zlistx_unpack (zframe_t *frame) {
                 item[length] = 0;
                 needle += length;
 
-                if (!zlistx_add_end (self, item)) {                        
+                if (!zlistx_add_end (self, item)) {
                     zlistx_destroy (&self);
                     break;
                 }
             } else {
 
                 zlistx_destroy (&self);
-                break;                
+                break;
             }
         } else {
             zlistx_destroy (&self);
-            break;            
+            break;
         }
     }
 
     if (self)
-    	zlistx_set_duplicator (self, (zlistx_duplicator_fn *) strdup);           
- 
+    	zlistx_set_duplicator (self, (zlistx_duplicator_fn *) strdup);
+
     return self;
 }
 
@@ -849,7 +850,7 @@ zlistx_test (bool verbose)
     assert (streq (string, "four"));
 
     //  Test pack/unpack methods
-    zframe_t *frame = zlistx_pack (list);                  
+    zframe_t *frame = zlistx_pack (list);
     copy = zlistx_unpack (frame);
     assert (copy);
     zframe_destroy (&frame);
@@ -858,7 +859,7 @@ zlistx_test (bool verbose)
     char *item_orig = (char *) zlistx_first (list);
     char *item_copy = (char *) zlistx_first (copy);
     while (item_orig) {
-        assert (strcmp(item_orig, item_copy) == 0);        
+        assert (strcmp(item_orig, item_copy) == 0);
         item_orig = (char *) zlistx_next (list);
         item_copy = (char *) zlistx_next (copy);
     }
