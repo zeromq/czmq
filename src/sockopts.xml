@@ -10,6 +10,17 @@
     -->
     <version major = "4" minor = "3" style = "macro">
         <!-- Options that are new in 4.3 -->
+        <option name = "router_notify"     type = "int"    mode = "rw" test = "ROUTER"
+            test_value = "3" />
+        <option name = "multicast_loop"    type = "int"    mode = "rw" test = "RADIO"
+            test_value = "1" />
+        <option name = "metadata"          type = "string" mode = "rw" test = "DEALER"
+            test_value = "X-testkey:testvalue" />
+        <option name = "loopback_fastpath" type = "int"    mode = "rw" test = "DEALER"
+            test_value = "1" />
+        <option name = "zap_enforce_domain" type = "int"   mode = "rw" test = "DEALER"
+            test_value = "1" />
+
         <!-- We don't test these as libzmq doesn't always support GSSAPI -->
         <option name = "gssapi_principal_nametype"  type = "int" mode = "rw" />
         <option name = "gssapi_service_principal_nametype" type = "int" mode = "rw" />
