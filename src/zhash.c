@@ -685,7 +685,9 @@ zhash_pack (zhash_t *self)
     zframe_t *frame = zframe_new (NULL, frame_size);
     if (!frame)
         return NULL;
+
     byte *needle = zframe_data (frame);
+
     //  Store size as number-4
     *(uint32_t *) needle = htonl ((uint32_t) self->size);
     needle += 4;
@@ -693,16 +695,18 @@ zhash_pack (zhash_t *self)
         item_t *item = self->items [index];
         while (item) {
             //  Store key as string
-            *needle++ = (byte) strlen ((char *) item->key);
-            memcpy (needle, item->key, strlen ((char *) item->key));
-            needle += strlen ((char *) item->key);
+            size_t length = strlen ((char *) item->key);
+            *needle++ = (byte) length;
+            memcpy (needle, item->key, length);
+            needle += length;
 
             //  Store value as longstr
-            size_t length = strlen ((char *) item->value);
-            *(uint32_t *) needle = htonl ((u_long) length);
+            length = strlen (item->value);
+            uint32_t serialize = htonl ((uint32_t) length);
+            memcpy (needle, &serialize, 4);
             needle += 4;
-            memcpy (needle, (char *) item->value, strlen ((char *) item->value));
-            needle += strlen ((char *) item->value);
+            memcpy (needle, (char *) item->value, length);
+            needle += length;
             item = item->next;
         }
     }
