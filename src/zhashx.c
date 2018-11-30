@@ -813,16 +813,18 @@ zhashx_pack_own (zhashx_t *self, zhashx_serializer_fn serializer)
         item_t *item = self->items [index];
         while (item) {
             //  Store key as string
-            *needle++ = (byte) strlen ((char *) item->key);
-            memcpy (needle, item->key, strlen ((char *) item->key));
-            needle += strlen ((char *) item->key);
+            size_t length = strlen ((char *) item->key);
+            *needle++ = (byte) length;
+            memcpy (needle, item->key, length);
+            needle += length;
 
             //  Store value as longstr
-            size_t lenth = strlen (values [vindex]);
-            *(uint32_t *) needle = htonl ((u_long) lenth);
+            length = strlen (values [vindex]);
+            uint32_t serialize = htonl ((u_long) length);
+            memcpy (needle, &serialize, 4);
             needle += 4;
-            memcpy (needle, (char *) values [vindex], strlen ((char *) values [vindex]));
-            needle += strlen ((char *) values [vindex]);
+            memcpy (needle, values [vindex], length);
+            needle += length;
             item = item->next;
 
             //  Destroy serialized value
@@ -879,7 +881,7 @@ zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
 
     //  Hash will free values in destructor
     zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
-  
+
     assert (frame);
     if (zframe_size (frame) < 4)
         return self;            //  Arguable...
@@ -929,7 +931,7 @@ zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer)
     }
 
     if (self)
-        zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);    
+        zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
 
     return self;
 }
