@@ -701,7 +701,7 @@ zhash_pack (zhash_t *self)
             needle += length;
 
             //  Store value as longstr
-            length = strlen (item->value);
+            length = strlen ((char *) item->value);
             uint32_t serialize = htonl ((uint32_t) length);
             memcpy (needle, &serialize, 4);
             needle += 4;
