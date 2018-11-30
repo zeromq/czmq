@@ -10,6 +10,66 @@
 
 <!-- The following socket options are available in libzmq from version 4.3.0 -->
 
+<method name = "router notify" polymorphic = "1">
+    Get socket option `router_notify`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set router notify" polymorphic = "1">
+    Set socket option `router_notify`.
+    Available from libzmq 4.3.0.
+    <argument name = "router notify" type = "integer" />
+</method>
+
+<method name = "multicast loop" polymorphic = "1">
+    Get socket option `multicast_loop`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set multicast loop" polymorphic = "1">
+    Set socket option `multicast_loop`.
+    Available from libzmq 4.3.0.
+    <argument name = "multicast loop" type = "integer" />
+</method>
+
+<method name = "metadata" polymorphic = "1">
+    Get socket option `metadata`.
+    Available from libzmq 4.3.0.
+    <return type = "string" fresh = "1" />
+</method>
+
+<method name = "set metadata" polymorphic = "1">
+    Set socket option `metadata`.
+    Available from libzmq 4.3.0.
+    <argument name = "metadata" type = "string" />
+</method>
+
+<method name = "loopback fastpath" polymorphic = "1">
+    Get socket option `loopback_fastpath`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set loopback fastpath" polymorphic = "1">
+    Set socket option `loopback_fastpath`.
+    Available from libzmq 4.3.0.
+    <argument name = "loopback fastpath" type = "integer" />
+</method>
+
+<method name = "zap enforce domain" polymorphic = "1">
+    Get socket option `zap_enforce_domain`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set zap enforce domain" polymorphic = "1">
+    Set socket option `zap_enforce_domain`.
+    Available from libzmq 4.3.0.
+    <argument name = "zap enforce domain" type = "integer" />
+</method>
+
 <method name = "gssapi principal nametype" polymorphic = "1">
     Get socket option `gssapi_principal_nametype`.
     Available from libzmq 4.3.0.

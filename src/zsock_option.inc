@@ -20,6 +20,241 @@
 */
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_ROUTER_NOTIFY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_router_notify (void *self, int router_notify)
+{
+    assert (self);
+#   if defined (ZMQ_ROUTER_NOTIFY)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock router_notify option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ROUTER_NOTIFY, &router_notify, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_ROUTER_NOTIFY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_router_notify (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_ROUTER_NOTIFY)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock router_notify option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int router_notify;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_ROUTER_NOTIFY, &router_notify, &option_len);
+    return router_notify;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_MULTICAST_LOOP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_multicast_loop (void *self, int multicast_loop)
+{
+    assert (self);
+#   if defined (ZMQ_MULTICAST_LOOP)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock multicast_loop option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_MULTICAST_LOOP, &multicast_loop, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_MULTICAST_LOOP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_multicast_loop (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_MULTICAST_LOOP)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock multicast_loop option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int multicast_loop;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MULTICAST_LOOP, &multicast_loop, &option_len);
+    return multicast_loop;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_METADATA value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_metadata (void *self, const char * metadata)
+{
+    assert (self);
+#   if defined (ZMQ_METADATA)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock metadata option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_METADATA, metadata, strlen (metadata));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_METADATA value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char *
+zsock_metadata (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_METADATA)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock metadata option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    size_t option_len = 255;
+    char *metadata = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_METADATA, metadata, &option_len);
+    return (char *) metadata;
+#   else
+    return NULL;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_LOOPBACK_FASTPATH value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_loopback_fastpath (void *self, int loopback_fastpath)
+{
+    assert (self);
+#   if defined (ZMQ_LOOPBACK_FASTPATH)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock loopback_fastpath option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_LOOPBACK_FASTPATH, &loopback_fastpath, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_LOOPBACK_FASTPATH value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_loopback_fastpath (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_LOOPBACK_FASTPATH)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock loopback_fastpath option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int loopback_fastpath;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_LOOPBACK_FASTPATH, &loopback_fastpath, &option_len);
+    return loopback_fastpath;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_ZAP_ENFORCE_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_zap_enforce_domain (void *self, int zap_enforce_domain)
+{
+    assert (self);
+#   if defined (ZMQ_ZAP_ENFORCE_DOMAIN)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock zap_enforce_domain option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ZAP_ENFORCE_DOMAIN, &zap_enforce_domain, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_ZAP_ENFORCE_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_zap_enforce_domain (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_ZAP_ENFORCE_DOMAIN)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock zap_enforce_domain option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int zap_enforce_domain;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_ZAP_ENFORCE_DOMAIN, &zap_enforce_domain, &option_len);
+    return zap_enforce_domain;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_GSSAPI_PRINCIPAL_NAMETYPE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -3561,6 +3796,47 @@ zsock_option_test (bool verbose)
     zsock_t *self;
 #if (ZMQ_VERSION_MAJOR >= 4)
 #   if (ZMQ_VERSION_MINOR >= 3)
+#     if defined (ZMQ_ROUTER_NOTIFY)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_router_notify (self, 3);
+    assert (zsock_router_notify (self) == 3);
+    zsock_router_notify (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_MULTICAST_LOOP)
+    self = zsock_new (ZMQ_RADIO);
+    assert (self);
+    zsock_set_multicast_loop (self, 1);
+    assert (zsock_multicast_loop (self) == 1);
+    zsock_multicast_loop (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_METADATA)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_metadata (self, "X-testkey:testvalue");
+    char *metadata = zsock_metadata (self);
+    assert (metadata);
+    freen (metadata);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_LOOPBACK_FASTPATH)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_loopback_fastpath (self, 1);
+    assert (zsock_loopback_fastpath (self) == 1);
+    zsock_loopback_fastpath (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_ZAP_ENFORCE_DOMAIN)
+    self = zsock_new (ZMQ_DEALER);
+    assert (self);
+    zsock_set_zap_enforce_domain (self, 1);
+    assert (zsock_zap_enforce_domain (self) == 1);
+    zsock_zap_enforce_domain (self);
+    zsock_destroy (&self);
+#     endif
 #   endif
 #endif
 
