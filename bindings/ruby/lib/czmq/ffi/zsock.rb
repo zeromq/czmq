@@ -918,6 +918,276 @@ module CZMQ
         result
       end
 
+      # Get socket option `router_notify`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def router_notify()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_router_notify(self_p)
+        result
+      end
+
+      # Get socket option `router_notify`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #router_notify.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.router_notify(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_router_notify(self_p)
+        result
+      end
+
+      # Set socket option `router_notify`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param router_notify [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_router_notify(router_notify)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_notify = Integer(router_notify)
+        result = ::CZMQ::FFI.zsock_set_router_notify(self_p, router_notify)
+        result
+      end
+
+      # Set socket option `router_notify`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_router_notify.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param router_notify [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_router_notify(self_p, router_notify)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        router_notify = Integer(router_notify)
+        result = ::CZMQ::FFI.zsock_set_router_notify(self_p, router_notify)
+        result
+      end
+
+      # Get socket option `multicast_loop`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def multicast_loop()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_multicast_loop(self_p)
+        result
+      end
+
+      # Get socket option `multicast_loop`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #multicast_loop.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.multicast_loop(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_multicast_loop(self_p)
+        result
+      end
+
+      # Set socket option `multicast_loop`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param multicast_loop [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_multicast_loop(multicast_loop)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        multicast_loop = Integer(multicast_loop)
+        result = ::CZMQ::FFI.zsock_set_multicast_loop(self_p, multicast_loop)
+        result
+      end
+
+      # Set socket option `multicast_loop`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_multicast_loop.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param multicast_loop [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_multicast_loop(self_p, multicast_loop)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        multicast_loop = Integer(multicast_loop)
+        result = ::CZMQ::FFI.zsock_set_multicast_loop(self_p, multicast_loop)
+        result
+      end
+
+      # Get socket option `metadata`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [::FFI::AutoPointer]
+      def metadata()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_metadata(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Get socket option `metadata`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #metadata.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [::FFI::AutoPointer]
+      def self.metadata(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_metadata(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Set socket option `metadata`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param metadata [String, #to_s, nil]
+      # @return [void]
+      def set_metadata(metadata)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_metadata(self_p, metadata)
+        result
+      end
+
+      # Set socket option `metadata`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_metadata.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param metadata [String, #to_s, nil]
+      # @return [void]
+      def self.set_metadata(self_p, metadata)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_metadata(self_p, metadata)
+        result
+      end
+
+      # Get socket option `loopback_fastpath`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def loopback_fastpath()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_loopback_fastpath(self_p)
+        result
+      end
+
+      # Get socket option `loopback_fastpath`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #loopback_fastpath.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.loopback_fastpath(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_loopback_fastpath(self_p)
+        result
+      end
+
+      # Set socket option `loopback_fastpath`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param loopback_fastpath [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_loopback_fastpath(loopback_fastpath)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        loopback_fastpath = Integer(loopback_fastpath)
+        result = ::CZMQ::FFI.zsock_set_loopback_fastpath(self_p, loopback_fastpath)
+        result
+      end
+
+      # Set socket option `loopback_fastpath`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_loopback_fastpath.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param loopback_fastpath [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_loopback_fastpath(self_p, loopback_fastpath)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        loopback_fastpath = Integer(loopback_fastpath)
+        result = ::CZMQ::FFI.zsock_set_loopback_fastpath(self_p, loopback_fastpath)
+        result
+      end
+
+      # Get socket option `zap_enforce_domain`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def zap_enforce_domain()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_zap_enforce_domain(self_p)
+        result
+      end
+
+      # Get socket option `zap_enforce_domain`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #zap_enforce_domain.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.zap_enforce_domain(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_zap_enforce_domain(self_p)
+        result
+      end
+
+      # Set socket option `zap_enforce_domain`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param zap_enforce_domain [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_zap_enforce_domain(zap_enforce_domain)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        zap_enforce_domain = Integer(zap_enforce_domain)
+        result = ::CZMQ::FFI.zsock_set_zap_enforce_domain(self_p, zap_enforce_domain)
+        result
+      end
+
+      # Set socket option `zap_enforce_domain`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_zap_enforce_domain.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param zap_enforce_domain [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_zap_enforce_domain(self_p, zap_enforce_domain)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        zap_enforce_domain = Integer(zap_enforce_domain)
+        result = ::CZMQ::FFI.zsock_set_zap_enforce_domain(self_p, zap_enforce_domain)
+        result
+      end
+
       # Get socket option `gssapi_principal_nametype`.
       # Available from libzmq 4.3.0.
       #

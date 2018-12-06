@@ -585,6 +585,16 @@ module CZMQ
       attach_function :zsock_leave, [:pointer, :string], :int, **opts
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
+      attach_function :zsock_router_notify, [:pointer], :int, **opts
+      attach_function :zsock_set_router_notify, [:pointer, :int], :void, **opts
+      attach_function :zsock_multicast_loop, [:pointer], :int, **opts
+      attach_function :zsock_set_multicast_loop, [:pointer, :int], :void, **opts
+      attach_function :zsock_metadata, [:pointer], :pointer, **opts
+      attach_function :zsock_set_metadata, [:pointer, :string], :void, **opts
+      attach_function :zsock_loopback_fastpath, [:pointer], :int, **opts
+      attach_function :zsock_set_loopback_fastpath, [:pointer, :int], :void, **opts
+      attach_function :zsock_zap_enforce_domain, [:pointer], :int, **opts
+      attach_function :zsock_set_zap_enforce_domain, [:pointer, :int], :void, **opts
       attach_function :zsock_gssapi_principal_nametype, [:pointer], :int, **opts
       attach_function :zsock_set_gssapi_principal_nametype, [:pointer, :int], :void, **opts
       attach_function :zsock_gssapi_service_principal_nametype, [:pointer], :int, **opts

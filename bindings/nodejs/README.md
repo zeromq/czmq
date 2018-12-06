@@ -2545,6 +2545,76 @@ Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
 Returns 0 if OK, -1 if failed.
 
 ```
+integer my_zsock.routerNotify ()
+```
+
+Get socket option `router_notify`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setRouterNotify (Number)
+```
+
+Set socket option `router_notify`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.multicastLoop ()
+```
+
+Get socket option `multicast_loop`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setMulticastLoop (Number)
+```
+
+Set socket option `multicast_loop`.
+Available from libzmq 4.3.0.
+
+```
+string my_zsock.metadata ()
+```
+
+Get socket option `metadata`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setMetadata (String)
+```
+
+Set socket option `metadata`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.loopbackFastpath ()
+```
+
+Get socket option `loopback_fastpath`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setLoopbackFastpath (Number)
+```
+
+Set socket option `loopback_fastpath`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.zapEnforceDomain ()
+```
+
+Get socket option `zap_enforce_domain`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setZapEnforceDomain (Number)
+```
+
+Set socket option `zap_enforce_domain`.
+Available from libzmq 4.3.0.
+
+```
 integer my_zsock.gssapiPrincipalNametype ()
 ```
 

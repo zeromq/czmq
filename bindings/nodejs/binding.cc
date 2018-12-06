@@ -4488,6 +4488,16 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "flush", _flush);
     Nan::SetPrototypeMethod (tpl, "join", _join);
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
+    Nan::SetPrototypeMethod (tpl, "routerNotify", _router_notify);
+    Nan::SetPrototypeMethod (tpl, "setRouterNotify", _set_router_notify);
+    Nan::SetPrototypeMethod (tpl, "multicastLoop", _multicast_loop);
+    Nan::SetPrototypeMethod (tpl, "setMulticastLoop", _set_multicast_loop);
+    Nan::SetPrototypeMethod (tpl, "metadata", _metadata);
+    Nan::SetPrototypeMethod (tpl, "setMetadata", _set_metadata);
+    Nan::SetPrototypeMethod (tpl, "loopbackFastpath", _loopback_fastpath);
+    Nan::SetPrototypeMethod (tpl, "setLoopbackFastpath", _set_loopback_fastpath);
+    Nan::SetPrototypeMethod (tpl, "zapEnforceDomain", _zap_enforce_domain);
+    Nan::SetPrototypeMethod (tpl, "setZapEnforceDomain", _set_zap_enforce_domain);
     Nan::SetPrototypeMethod (tpl, "gssapiPrincipalNametype", _gssapi_principal_nametype);
     Nan::SetPrototypeMethod (tpl, "setGssapiPrincipalNametype", _set_gssapi_principal_nametype);
     Nan::SetPrototypeMethod (tpl, "gssapiServicePrincipalNametype", _gssapi_service_principal_nametype);
@@ -4984,6 +4994,123 @@ NAN_METHOD (Zsock::_leave) {
          //} //bjornw end
     int result = zsock_leave (zsock->self, (const char *)group);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_router_notify) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_router_notify (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_router_notify) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `router notify`");
+
+    //int router_notify; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int router_notify;
+
+
+    if (info [0]->IsNumber ())
+    {
+          router_notify = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`router notify` must be a number");
+    zsock_set_router_notify (zsock->self, (int) router_notify);
+}
+
+NAN_METHOD (Zsock::_multicast_loop) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_multicast_loop (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_multicast_loop) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `multicast loop`");
+
+    //int multicast_loop; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int multicast_loop;
+
+
+    if (info [0]->IsNumber ())
+    {
+          multicast_loop = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`multicast loop` must be a number");
+    zsock_set_multicast_loop (zsock->self, (int) multicast_loop);
+}
+
+NAN_METHOD (Zsock::_metadata) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_metadata (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_metadata) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *metadata;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `metadata`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`metadata` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String metadata_utf8 (info [0].As<String>());
+    metadata = *metadata_utf8;
+         //} //bjornw end
+    zsock_set_metadata (zsock->self, (const char *)metadata);
+}
+
+NAN_METHOD (Zsock::_loopback_fastpath) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_loopback_fastpath (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_loopback_fastpath) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `loopback fastpath`");
+
+    //int loopback_fastpath; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int loopback_fastpath;
+
+
+    if (info [0]->IsNumber ())
+    {
+          loopback_fastpath = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`loopback fastpath` must be a number");
+    zsock_set_loopback_fastpath (zsock->self, (int) loopback_fastpath);
+}
+
+NAN_METHOD (Zsock::_zap_enforce_domain) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_zap_enforce_domain (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_zap_enforce_domain) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `zap enforce domain`");
+
+    //int zap_enforce_domain; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int zap_enforce_domain;
+
+
+    if (info [0]->IsNumber ())
+    {
+          zap_enforce_domain = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`zap enforce domain` must be a number");
+    zsock_set_zap_enforce_domain (zsock->self, (int) zap_enforce_domain);
 }
 
 NAN_METHOD (Zsock::_gssapi_principal_nametype) {

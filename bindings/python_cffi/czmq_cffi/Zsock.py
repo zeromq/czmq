@@ -307,6 +307,76 @@ class Zsock(object):
         """
         return utils.lib.zsock_resolve(self._p)
 
+    def router_notify(self):
+        """
+        Get socket option `router_notify`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_router_notify(self._p)
+
+    def set_router_notify(self, router_notify):
+        """
+        Set socket option `router_notify`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_router_notify(self._p, router_notify)
+
+    def multicast_loop(self):
+        """
+        Get socket option `multicast_loop`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_multicast_loop(self._p)
+
+    def set_multicast_loop(self, multicast_loop):
+        """
+        Set socket option `multicast_loop`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_multicast_loop(self._p, multicast_loop)
+
+    def metadata(self):
+        """
+        Get socket option `metadata`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_metadata(self._p)
+
+    def set_metadata(self, metadata):
+        """
+        Set socket option `metadata`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_metadata(self._p, utils.to_bytes(metadata))
+
+    def loopback_fastpath(self):
+        """
+        Get socket option `loopback_fastpath`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_loopback_fastpath(self._p)
+
+    def set_loopback_fastpath(self, loopback_fastpath):
+        """
+        Set socket option `loopback_fastpath`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_loopback_fastpath(self._p, loopback_fastpath)
+
+    def zap_enforce_domain(self):
+        """
+        Get socket option `zap_enforce_domain`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_zap_enforce_domain(self._p)
+
+    def set_zap_enforce_domain(self, zap_enforce_domain):
+        """
+        Set socket option `zap_enforce_domain`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_zap_enforce_domain(self._p, zap_enforce_domain)
+
     def gssapi_principal_nametype(self):
         """
         Get socket option `gssapi_principal_nametype`.

@@ -5171,6 +5171,26 @@ lib.zsock_is.restype = c_bool
 lib.zsock_is.argtypes = [c_void_p]
 lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
+lib.zsock_router_notify.restype = c_int
+lib.zsock_router_notify.argtypes = [zsock_p]
+lib.zsock_set_router_notify.restype = None
+lib.zsock_set_router_notify.argtypes = [zsock_p, c_int]
+lib.zsock_multicast_loop.restype = c_int
+lib.zsock_multicast_loop.argtypes = [zsock_p]
+lib.zsock_set_multicast_loop.restype = None
+lib.zsock_set_multicast_loop.argtypes = [zsock_p, c_int]
+lib.zsock_metadata.restype = POINTER(c_char)
+lib.zsock_metadata.argtypes = [zsock_p]
+lib.zsock_set_metadata.restype = None
+lib.zsock_set_metadata.argtypes = [zsock_p, c_char_p]
+lib.zsock_loopback_fastpath.restype = c_int
+lib.zsock_loopback_fastpath.argtypes = [zsock_p]
+lib.zsock_set_loopback_fastpath.restype = None
+lib.zsock_set_loopback_fastpath.argtypes = [zsock_p, c_int]
+lib.zsock_zap_enforce_domain.restype = c_int
+lib.zsock_zap_enforce_domain.argtypes = [zsock_p]
+lib.zsock_set_zap_enforce_domain.restype = None
+lib.zsock_set_zap_enforce_domain.argtypes = [zsock_p, c_int]
 lib.zsock_gssapi_principal_nametype.restype = c_int
 lib.zsock_gssapi_principal_nametype.argtypes = [zsock_p]
 lib.zsock_set_gssapi_principal_nametype.restype = None
@@ -5922,6 +5942,76 @@ descriptor, return NULL; else if it looks like a libzmq socket handle,
 return the supplied value. Takes a polymorphic socket reference.
         """
         return c_void_p(lib.zsock_resolve(self))
+
+    def router_notify(self):
+        """
+        Get socket option `router_notify`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_router_notify(self._as_parameter_)
+
+    def set_router_notify(self, router_notify):
+        """
+        Set socket option `router_notify`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_router_notify(self._as_parameter_, router_notify)
+
+    def multicast_loop(self):
+        """
+        Get socket option `multicast_loop`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_multicast_loop(self._as_parameter_)
+
+    def set_multicast_loop(self, multicast_loop):
+        """
+        Set socket option `multicast_loop`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_multicast_loop(self._as_parameter_, multicast_loop)
+
+    def metadata(self):
+        """
+        Get socket option `metadata`.
+Available from libzmq 4.3.0.
+        """
+        return return_fresh_string(lib.zsock_metadata(self._as_parameter_))
+
+    def set_metadata(self, metadata):
+        """
+        Set socket option `metadata`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_metadata(self._as_parameter_, metadata)
+
+    def loopback_fastpath(self):
+        """
+        Get socket option `loopback_fastpath`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_loopback_fastpath(self._as_parameter_)
+
+    def set_loopback_fastpath(self, loopback_fastpath):
+        """
+        Set socket option `loopback_fastpath`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_loopback_fastpath(self._as_parameter_, loopback_fastpath)
+
+    def zap_enforce_domain(self):
+        """
+        Get socket option `zap_enforce_domain`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_zap_enforce_domain(self._as_parameter_)
+
+    def set_zap_enforce_domain(self, zap_enforce_domain):
+        """
+        Set socket option `zap_enforce_domain`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_zap_enforce_domain(self._as_parameter_, zap_enforce_domain)
 
     def gssapi_principal_nametype(self):
         """

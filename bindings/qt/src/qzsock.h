@@ -251,6 +251,46 @@ public:
     //  return the supplied value. Takes a polymorphic socket reference.
     static void * resolve (void *self);
 
+    //  Get socket option `router_notify`.
+    //  Available from libzmq 4.3.0.
+    int routerNotify ();
+
+    //  Set socket option `router_notify`.
+    //  Available from libzmq 4.3.0.
+    void setRouterNotify (int routerNotify);
+
+    //  Get socket option `multicast_loop`.
+    //  Available from libzmq 4.3.0.
+    int multicastLoop ();
+
+    //  Set socket option `multicast_loop`.
+    //  Available from libzmq 4.3.0.
+    void setMulticastLoop (int multicastLoop);
+
+    //  Get socket option `metadata`.
+    //  Available from libzmq 4.3.0.
+    QString metadata ();
+
+    //  Set socket option `metadata`.
+    //  Available from libzmq 4.3.0.
+    void setMetadata (const QString &metadata);
+
+    //  Get socket option `loopback_fastpath`.
+    //  Available from libzmq 4.3.0.
+    int loopbackFastpath ();
+
+    //  Set socket option `loopback_fastpath`.
+    //  Available from libzmq 4.3.0.
+    void setLoopbackFastpath (int loopbackFastpath);
+
+    //  Get socket option `zap_enforce_domain`.
+    //  Available from libzmq 4.3.0.
+    int zapEnforceDomain ();
+
+    //  Set socket option `zap_enforce_domain`.
+    //  Available from libzmq 4.3.0.
+    void setZapEnforceDomain (int zapEnforceDomain);
+
     //  Get socket option `gssapi_principal_nametype`.
     //  Available from libzmq 4.3.0.
     int gssapiPrincipalNametype ();

@@ -637,6 +637,16 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_flush);
     static NAN_METHOD (_join);
     static NAN_METHOD (_leave);
+    static NAN_METHOD (_router_notify);
+    static NAN_METHOD (_set_router_notify);
+    static NAN_METHOD (_multicast_loop);
+    static NAN_METHOD (_set_multicast_loop);
+    static NAN_METHOD (_metadata);
+    static NAN_METHOD (_set_metadata);
+    static NAN_METHOD (_loopback_fastpath);
+    static NAN_METHOD (_set_loopback_fastpath);
+    static NAN_METHOD (_zap_enforce_domain);
+    static NAN_METHOD (_set_zap_enforce_domain);
     static NAN_METHOD (_gssapi_principal_nametype);
     static NAN_METHOD (_set_gssapi_principal_nametype);
     static NAN_METHOD (_gssapi_service_principal_nametype);
