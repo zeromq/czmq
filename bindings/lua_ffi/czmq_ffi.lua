@@ -2688,6 +2688,56 @@ bool
 void *
     zsock_resolve (void *self);
 
+// Get socket option `router_notify`.
+// Available from libzmq 4.3.0.
+int
+    zsock_router_notify (void *self);
+
+// Set socket option `router_notify`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_router_notify (void *self, int router_notify);
+
+// Get socket option `multicast_loop`.
+// Available from libzmq 4.3.0.
+int
+    zsock_multicast_loop (void *self);
+
+// Set socket option `multicast_loop`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_multicast_loop (void *self, int multicast_loop);
+
+// Get socket option `metadata`.
+// Available from libzmq 4.3.0.
+char *
+    zsock_metadata (void *self);
+
+// Set socket option `metadata`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_metadata (void *self, const char *metadata);
+
+// Get socket option `loopback_fastpath`.
+// Available from libzmq 4.3.0.
+int
+    zsock_loopback_fastpath (void *self);
+
+// Set socket option `loopback_fastpath`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_loopback_fastpath (void *self, int loopback_fastpath);
+
+// Get socket option `zap_enforce_domain`.
+// Available from libzmq 4.3.0.
+int
+    zsock_zap_enforce_domain (void *self);
+
+// Set socket option `zap_enforce_domain`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_zap_enforce_domain (void *self, int zap_enforce_domain);
+
 // Get socket option `gssapi_principal_nametype`.
 // Available from libzmq 4.3.0.
 int

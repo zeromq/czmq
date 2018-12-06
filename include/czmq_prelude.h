@@ -689,22 +689,6 @@ char *if_indextoname (unsigned int ifindex, char *ifname);
 #   endif
 #endif
 
-#if defined (__WINDOWS__) && !defined (HAVE_UUID)
-#   define HAVE_UUID 1
-#endif
-#if defined (__UTYPE_OSX) && !defined (HAVE_UUID)
-#   define HAVE_UUID 1
-#endif
-#if defined (HAVE_UUID) || defined (__UTYPE_FREEBSD)
-#   if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD) || defined(__UTYPE_OPENBSD)
-#       include <uuid.h>
-#   elif defined __UTYPE_HPUX
-#       include <dce/uuid.h>
-#   elif defined (__UNIX__)
-#       include <uuid/uuid.h>
-#   endif
-#endif
-
 //  ZMQ compatibility macros
 
 #if ZMQ_VERSION_MAJOR == 4

@@ -441,6 +441,98 @@ void * QZsock::resolve (void *self)
 }
 
 ///
+//  Get socket option `router_notify`.
+//  Available from libzmq 4.3.0.
+int QZsock::routerNotify ()
+{
+    int rv = zsock_router_notify (self);
+    return rv;
+}
+
+///
+//  Set socket option `router_notify`.
+//  Available from libzmq 4.3.0.
+void QZsock::setRouterNotify (int routerNotify)
+{
+    zsock_set_router_notify (self, routerNotify);
+
+}
+
+///
+//  Get socket option `multicast_loop`.
+//  Available from libzmq 4.3.0.
+int QZsock::multicastLoop ()
+{
+    int rv = zsock_multicast_loop (self);
+    return rv;
+}
+
+///
+//  Set socket option `multicast_loop`.
+//  Available from libzmq 4.3.0.
+void QZsock::setMulticastLoop (int multicastLoop)
+{
+    zsock_set_multicast_loop (self, multicastLoop);
+
+}
+
+///
+//  Get socket option `metadata`.
+//  Available from libzmq 4.3.0.
+QString QZsock::metadata ()
+{
+    char *retStr_ = zsock_metadata (self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
+    return rv;
+}
+
+///
+//  Set socket option `metadata`.
+//  Available from libzmq 4.3.0.
+void QZsock::setMetadata (const QString &metadata)
+{
+    zsock_set_metadata (self, metadata.toUtf8().data());
+
+}
+
+///
+//  Get socket option `loopback_fastpath`.
+//  Available from libzmq 4.3.0.
+int QZsock::loopbackFastpath ()
+{
+    int rv = zsock_loopback_fastpath (self);
+    return rv;
+}
+
+///
+//  Set socket option `loopback_fastpath`.
+//  Available from libzmq 4.3.0.
+void QZsock::setLoopbackFastpath (int loopbackFastpath)
+{
+    zsock_set_loopback_fastpath (self, loopbackFastpath);
+
+}
+
+///
+//  Get socket option `zap_enforce_domain`.
+//  Available from libzmq 4.3.0.
+int QZsock::zapEnforceDomain ()
+{
+    int rv = zsock_zap_enforce_domain (self);
+    return rv;
+}
+
+///
+//  Set socket option `zap_enforce_domain`.
+//  Available from libzmq 4.3.0.
+void QZsock::setZapEnforceDomain (int zapEnforceDomain)
+{
+    zsock_set_zap_enforce_domain (self, zapEnforceDomain);
+
+}
+
+///
 //  Get socket option `gssapi_principal_nametype`.
 //  Available from libzmq 4.3.0.
 int QZsock::gssapiPrincipalNametype ()

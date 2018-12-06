@@ -358,6 +358,75 @@ Java_org_zeromq_czmq_Zsock__1_1resolve (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1routerNotify (JNIEnv *env, jclass c, jlong self)
+{
+    jint router_notify_ = (jint) zsock_router_notify ((zsock_t *) (intptr_t) self);
+    return router_notify_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setRouterNotify (JNIEnv *env, jclass c, jlong self, jint router_notify)
+{
+    zsock_set_router_notify ((zsock_t *) (intptr_t) self, (int) router_notify);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1multicastLoop (JNIEnv *env, jclass c, jlong self)
+{
+    jint multicast_loop_ = (jint) zsock_multicast_loop ((zsock_t *) (intptr_t) self);
+    return multicast_loop_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setMulticastLoop (JNIEnv *env, jclass c, jlong self, jint multicast_loop)
+{
+    zsock_set_multicast_loop ((zsock_t *) (intptr_t) self, (int) multicast_loop);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsock__1_1metadata (JNIEnv *env, jclass c, jlong self)
+{
+    char *metadata_ = (char *) zsock_metadata ((zsock_t *) (intptr_t) self);
+    jstring return_string_ = (*env)->NewStringUTF (env, metadata_);
+    zstr_free (&metadata_);
+    return return_string_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setMetadata (JNIEnv *env, jclass c, jlong self, jstring metadata)
+{
+    char *metadata_ = (char *) (*env)->GetStringUTFChars (env, metadata, NULL);
+    zsock_set_metadata ((zsock_t *) (intptr_t) self, metadata_);
+    (*env)->ReleaseStringUTFChars (env, metadata, metadata_);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1loopbackFastpath (JNIEnv *env, jclass c, jlong self)
+{
+    jint loopback_fastpath_ = (jint) zsock_loopback_fastpath ((zsock_t *) (intptr_t) self);
+    return loopback_fastpath_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setLoopbackFastpath (JNIEnv *env, jclass c, jlong self, jint loopback_fastpath)
+{
+    zsock_set_loopback_fastpath ((zsock_t *) (intptr_t) self, (int) loopback_fastpath);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1zapEnforceDomain (JNIEnv *env, jclass c, jlong self)
+{
+    jint zap_enforce_domain_ = (jint) zsock_zap_enforce_domain ((zsock_t *) (intptr_t) self);
+    return zap_enforce_domain_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setZapEnforceDomain (JNIEnv *env, jclass c, jlong self, jint zap_enforce_domain)
+{
+    zsock_set_zap_enforce_domain ((zsock_t *) (intptr_t) self, (int) zap_enforce_domain);
+}
+
+JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1gssapiPrincipalNametype (JNIEnv *env, jclass c, jlong self)
 {
     jint gssapi_principal_nametype_ = (jint) zsock_gssapi_principal_nametype ((zsock_t *) (intptr_t) self);
