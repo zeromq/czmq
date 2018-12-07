@@ -103,6 +103,7 @@ endif()
 if (UNIX AND NOT APPLE)
     list(APPEND MORE_LIBRARIES stdc++)
     list(APPEND MORE_LIBRARIES rt m)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 # required libraries for mingw
