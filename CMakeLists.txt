@@ -179,6 +179,21 @@ IF (LIBCURL_FOUND)
 ENDIF (LIBCURL_FOUND)
 
 ########################################################################
+# LIBSODIUM dependency
+########################################################################
+option(WITH_SODIUM OFF)
+IF (WITH_SODIUM)
+find_package(libsodium)
+    IF (LIBSODIUM_FOUND)
+        include_directories(${LIBSODIUM_INCLUDE_DIRS})
+        list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
+        set(pkg_config_libs_private "${pkg_config_libs_private} -llibsodium")
+        add_definitions(-DHAVE_LIBSODIUM)
+        list(APPEND OPTIONAL_LIBRARIES ${LIBSODIUM_LIBRARIES})
+    ENDIF (LIBSODIUM_FOUND)
+ENDIF()
+
+########################################################################
 # version
 ########################################################################
 set(CZMQ_VERSION_MAJOR 4)
