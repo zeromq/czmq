@@ -99,6 +99,11 @@ if( "${CMAKE_SYSTEM_NAME}" STREQUAL "WindowsStore" AND "${CMAKE_SYSTEM_VERSION}"
   ADD_DEFINITIONS(-D_WIN32_WINNT=_WIN32_WINNT_WIN10)
 endif()
 
+# required libraries for Linux
+if (UNIX AND NOT APPLE)
+    list(APPEND MORE_LIBRARIES stdc++)
+    list(APPEND MORE_LIBRARIES rt m)
+endif()
 
 # required libraries for mingw
 if (MINGW)
