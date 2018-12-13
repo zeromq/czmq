@@ -307,6 +307,16 @@ coverage: src/czmq_selftest
 	@exit 1
 endif
 
+bindings: python-bindings
+
+python-bindings:
+if ENABLE_BINDINGS_PYTHON
+	-( cd bindings/python && python setup.py install )
+else
+	@echo "Python Bindings not enabled or missing setup.py... skipping"
+
+endif
+
 # A series of tests that the codebase and recipes are pretty, easy
 # to maintain and with predictable behavior. These generally are not
 # expected to directly expose functional issues in the code, but

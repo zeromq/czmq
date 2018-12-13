@@ -4,6 +4,7 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 */
+import static org.apache.tools.ant.taskdefs.condition.Os.*
 
 plugins {
     id 'java'
@@ -20,10 +21,11 @@ repositories {
     jcenter()
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
+    compile 'org.scijava:native-lib-loader:2.3.2'
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
@@ -40,35 +42,35 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def appclasspath = configurations.runtime.files*.getAbsolutePath().join(":")
     def nativeIncludes = "src/native/include"
     def jniClasses = [
-            'org.zeromq.czmq.Zarmour',
-            'org.zeromq.czmq.Zcert',
-            'org.zeromq.czmq.Zcertstore',
-            'org.zeromq.czmq.Zchunk',
-            'org.zeromq.czmq.Zclock',
-            'org.zeromq.czmq.Zconfig',
-            'org.zeromq.czmq.Zdigest',
-            'org.zeromq.czmq.Zdir',
-            'org.zeromq.czmq.ZdirPatch',
-            'org.zeromq.czmq.Zfile',
-            'org.zeromq.czmq.Zframe',
-            'org.zeromq.czmq.Zhash',
-            'org.zeromq.czmq.Zhashx',
-            'org.zeromq.czmq.Ziflist',
-            'org.zeromq.czmq.Zlist',
-            'org.zeromq.czmq.Zlistx',
-            'org.zeromq.czmq.Zloop',
-            'org.zeromq.czmq.Zmsg',
-            'org.zeromq.czmq.Zpoller',
-            'org.zeromq.czmq.Zproc',
-            'org.zeromq.czmq.Zsock',
-            'org.zeromq.czmq.Zstr',
-            'org.zeromq.czmq.Zsys',
-            'org.zeromq.czmq.Ztimerset',
-            'org.zeromq.czmq.Ztrie',
-            'org.zeromq.czmq.Zuuid',
-            'org.zeromq.czmq.ZhttpClient'
+            'src/main/java/org/zeromq/czmq/Zarmour.java',
+            'src/main/java/org/zeromq/czmq/Zcert.java',
+            'src/main/java/org/zeromq/czmq/Zcertstore.java',
+            'src/main/java/org/zeromq/czmq/Zchunk.java',
+            'src/main/java/org/zeromq/czmq/Zclock.java',
+            'src/main/java/org/zeromq/czmq/Zconfig.java',
+            'src/main/java/org/zeromq/czmq/Zdigest.java',
+            'src/main/java/org/zeromq/czmq/Zdir.java',
+            'src/main/java/org/zeromq/czmq/ZdirPatch.java',
+            'src/main/java/org/zeromq/czmq/Zfile.java',
+            'src/main/java/org/zeromq/czmq/Zframe.java',
+            'src/main/java/org/zeromq/czmq/Zhash.java',
+            'src/main/java/org/zeromq/czmq/Zhashx.java',
+            'src/main/java/org/zeromq/czmq/Ziflist.java',
+            'src/main/java/org/zeromq/czmq/Zlist.java',
+            'src/main/java/org/zeromq/czmq/Zlistx.java',
+            'src/main/java/org/zeromq/czmq/Zloop.java',
+            'src/main/java/org/zeromq/czmq/Zmsg.java',
+            'src/main/java/org/zeromq/czmq/Zpoller.java',
+            'src/main/java/org/zeromq/czmq/Zproc.java',
+            'src/main/java/org/zeromq/czmq/Zsock.java',
+            'src/main/java/org/zeromq/czmq/Zstr.java',
+            'src/main/java/org/zeromq/czmq/Zsys.java',
+            'src/main/java/org/zeromq/czmq/Ztimerset.java',
+            'src/main/java/org/zeromq/czmq/Ztrie.java',
+            'src/main/java/org/zeromq/czmq/Zuuid.java',
+            'src/main/java/org/zeromq/czmq/ZhttpClient.java'
     ]
-    commandLine("javah", "-d", "$nativeIncludes", "-classpath", "$classpath:$appclasspath", *jniClasses)
+    commandLine("javac", "-h", "$nativeIncludes", "-classpath", "$classpath:$appclasspath", *jniClasses)
 }
 tasks.withType(Test) {
     systemProperty "java.library.path", "/usr/lib:/usr/local/lib:$projectDir"
@@ -81,6 +83,15 @@ task buildNative(type: Exec, dependsOn: 'initCMake') {
 }
 jar.dependsOn buildNative
 test.dependsOn buildNative
+
+jar {
+    String arch = "${OS_ARCH}".contains("64") ? "64" : "32"
+    String os = "${OS_NAME}".equals("mac") ? "osx" : "${OS_NAME}"
+    from(".") {
+        include("*.so")
+        into("/natives/${os}_${arch}")
+    }
+}
 
 //  ------------------------------------------------------------------
 //  Install and Publish section

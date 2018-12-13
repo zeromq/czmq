@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Zlistx implements AutoCloseable{
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);
@@ -140,7 +142,7 @@ public class Zlistx implements AutoCloseable{
     in handle is NULL. Asserts that the passed in handle points to a list element.
     */
     native static long __handleItem (long handle);
-    public long handleItem (long handle) {
+    public static long handleItem (long handle) {
         return __handleItem (handle);
     }
     /*

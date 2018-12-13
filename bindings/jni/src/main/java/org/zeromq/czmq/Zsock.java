@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Zsock implements AutoCloseable{
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);
@@ -439,7 +441,7 @@ public class Zsock implements AutoCloseable{
     Takes a polymorphic socket reference.
     */
     native static boolean __is (long self);
-    public boolean is (long self) {
+    public static boolean is (long self) {
         return __is (self);
     }
     /*
@@ -449,7 +451,7 @@ public class Zsock implements AutoCloseable{
     return the supplied value. Takes a polymorphic socket reference.
     */
     native static long __resolve (long self);
-    public long resolve (long self) {
+    public static long resolve (long self) {
         return __resolve (self);
     }
     /*

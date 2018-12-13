@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Zmsg implements AutoCloseable{
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);
@@ -71,9 +73,8 @@ public class Zmsg implements AutoCloseable{
     it is a destructor).
     */
     native static long __send (long self, long dest);
-    public int send (long dest) {
+    public void send (long dest) {
         self = __send (self, dest);
-        return 0;
     }
     /*
     Send message to destination socket as part of a multipart sequence, and
@@ -84,9 +85,8 @@ public class Zmsg implements AutoCloseable{
     it is a destructor).
     */
     native static long __sendm (long self, long dest);
-    public int sendm (long dest) {
+    public void sendm (long dest) {
         self = __sendm (self, dest);
-        return 0;
     }
     /*
     Return size of message, i.e. number of frames (0 or more).
@@ -295,7 +295,7 @@ public class Zmsg implements AutoCloseable{
     Probe the supplied object, and report if it looks like a zmsg_t.
     */
     native static boolean __is (long self);
-    public boolean is (long self) {
+    public static boolean is (long self) {
         return __is (self);
     }
     /*
