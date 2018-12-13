@@ -8,11 +8,12 @@ package org.zeromq.czmq;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.scijava.nativelib.NativeLoader;
 
 public class ZsysTest {
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);

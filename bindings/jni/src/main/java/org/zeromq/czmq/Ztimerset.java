@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Ztimerset implements AutoCloseable{
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);

@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Zframe implements AutoCloseable{
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);
@@ -66,9 +68,8 @@ public class Zframe implements AutoCloseable{
     Return -1 on error, 0 on success.
     */
     native static long __send (long self, long dest, int flags);
-    public int send (long dest, int flags) {
+    public void send (long dest, int flags) {
         self = __send (self, dest, flags);
-        return 0;
     }
     /*
     Return number of bytes in frame data
@@ -199,7 +200,7 @@ public class Zframe implements AutoCloseable{
     Probe the supplied object, and report if it looks like a zframe_t.
     */
     native static boolean __is (long self);
-    public boolean is (long self) {
+    public static boolean is (long self) {
         return __is (self);
     }
     /*

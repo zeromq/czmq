@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Zchunk implements AutoCloseable{
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);
@@ -123,7 +125,7 @@ public class Zchunk implements AutoCloseable{
     chunk containing the file data, or NULL if the file could not be read.
     */
     native static long __slurp (String filename, long maxsize);
-    public Zchunk slurp (String filename, long maxsize) {
+    public static Zchunk slurp (String filename, long maxsize) {
         return new Zchunk (__slurp (filename, maxsize));
     }
     /*
@@ -169,7 +171,7 @@ public class Zchunk implements AutoCloseable{
     Transform a zframe into a zchunk.
     */
     native static long __unpack (long frame);
-    public Zchunk unpack (Zframe frame) {
+    public static Zchunk unpack (Zframe frame) {
         return new Zchunk (__unpack (frame.self));
     }
     /*
@@ -191,7 +193,7 @@ public class Zchunk implements AutoCloseable{
     Probe the supplied object, and report if it looks like a zchunk_t.
     */
     native static boolean __is (long self);
-    public boolean is (long self) {
+    public static boolean is (long self) {
         return __is (self);
     }
     /*

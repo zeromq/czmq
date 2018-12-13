@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Zstr {
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);
@@ -22,7 +24,7 @@ public class Zstr {
     process was interrupted.
     */
     native static String __recv (long source);
-    public String recv (long source) {
+    public static String recv (long source) {
         return __recv (source);
     }
     /*
@@ -32,7 +34,7 @@ public class Zstr {
     context is being terminated or the process was interrupted.
     */
     native static String __recvCompress (long source);
-    public String recvCompress (long source) {
+    public static String recvCompress (long source) {
         return __recvCompress (source);
     }
     /*
@@ -42,7 +44,7 @@ public class Zstr {
     may be NULL, which is sent as "".
     */
     native static int __send (long dest, String string);
-    public int send (long dest, String string) {
+    public static int send (long dest, String string) {
         return __send (dest, string);
     }
     /*
@@ -50,7 +52,7 @@ public class Zstr {
     you can send further strings in the same multi-part message.
     */
     native static int __sendm (long dest, String string);
-    public int sendm (long dest, String string) {
+    public static int sendm (long dest, String string) {
         return __sendm (dest, string);
     }
     /*
@@ -59,7 +61,7 @@ public class Zstr {
     will create security holes).
     */
     native static int __sendf (long dest, String format);
-    public int sendf (long dest, String format) {
+    public static int sendf (long dest, String format) {
         return __sendf (dest, format);
     }
     /*
@@ -68,7 +70,7 @@ public class Zstr {
     message.
     */
     native static int __sendfm (long dest, String format);
-    public int sendfm (long dest, String format) {
+    public static int sendfm (long dest, String format) {
         return __sendfm (dest, format);
     }
     /*
@@ -76,7 +78,7 @@ public class Zstr {
     Returns 0 if the strings could be sent OK, or -1 on error.
     */
     native static int __sendx (long dest, String string);
-    public int sendx (long dest, String string []) {
+    public static int sendx (long dest, String string []) {
         return __sendx (dest, string [0]);
     }
     /*
@@ -87,7 +89,7 @@ public class Zstr {
     null terminator on the received string.
     */
     native static int __sendCompress (long dest, String string);
-    public int sendCompress (long dest, String string) {
+    public static int sendCompress (long dest, String string) {
         return __sendCompress (dest, string);
     }
     /*
@@ -96,7 +98,7 @@ public class Zstr {
     multi-part message.
     */
     native static int __sendmCompress (long dest, String string);
-    public int sendmCompress (long dest, String string) {
+    public static int sendmCompress (long dest, String string) {
         return __sendmCompress (dest, string);
     }
     /*
@@ -104,7 +106,7 @@ public class Zstr {
     is null, returns an empty string.
     */
     native static String __str (long source);
-    public String str (long source) {
+    public static String str (long source) {
         return __str (source);
     }
     /*

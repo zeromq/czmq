@@ -6,10 +6,12 @@
 */
 package org.zeromq.czmq;
 
+import org.scijava.nativelib.NativeLoader;
+
 public class Zdir implements AutoCloseable{
     static {
         try {
-            System.loadLibrary ("czmqjni");
+            NativeLoader.loadLibrary("czmqjni");
         }
         catch (Exception e) {
             System.exit (-1);
@@ -92,7 +94,7 @@ public class Zdir implements AutoCloseable{
     generates virtual filename (minus path, plus alias).
     */
     native static long __diff (long older, long newer, String alias);
-    public Zlist diff (Zdir older, Zdir newer, String alias) {
+    public static Zlist diff (Zdir older, Zdir newer, String alias) {
         return new Zlist (__diff (older.self, newer.self, alias));
     }
     /*
@@ -146,7 +148,7 @@ public class Zdir implements AutoCloseable{
         zlist_destroy (&patches);
     */
     native static void __watch (long pipe, long unused);
-    public void watch (Zsock pipe, long unused) {
+    public static void watch (Zsock pipe, long unused) {
         __watch (pipe.self, unused);
     }
     /*

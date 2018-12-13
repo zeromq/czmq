@@ -109,6 +109,23 @@ else
     AC_MSG_RESULT([no])
 fi
 
+# Install Python Bindings
+AC_MSG_CHECKING([whether to install Python bindings])
+
+AC_ARG_ENABLE([bindings-python],
+    AS_HELP_STRING([--enable-bindings-python=yes/no],
+        [Install Python Bindings [default=no]]),
+    [ZPROJECT_BINDINGS_PYTHON=$enableval],
+    [ZPROJECT_BINDINGS_PYTHON=no])
+
+if test "x$ZPROJECT_BINDINGS_PYTHON" == "xyes"; then
+    AM_CONDITIONAL(ENABLE_BINDINGS_PYTHON, true)
+    AC_MSG_RESULT([yes])
+else
+    AM_CONDITIONAL(ENABLE_BINDINGS_PYTHON, false)
+    AC_MSG_RESULT([no])
+fi
+
 # See if clang-format is in PATH; the result unblocks the relevant recipes
 WITH_CLANG_FORMAT=""
 AS_IF([test x"$CLANG_FORMAT" = x],
@@ -934,6 +951,7 @@ echo Build docs.................... : $czmq_build_doc
 echo Build host.................... : $BUILD_HOST
 echo Build user.................... : $USER
 echo Draft API..................... : $enable_drafts
+echo Python Bindings............... : $ZPROJECT_BINDINGS_PYTHON
 echo Install dir................... : $prefix
 echo Install man pages............. : $czmq_install_man
 
@@ -953,6 +971,7 @@ echo Configure complete! Now proceed with:
 echo "    - 'make'               compile the project"
 echo "    - 'make check'         run the project's selftest"
 echo "    - 'make install'       install the project to $prefix"
+echo "    - 'make bindings       install enabled language bindings (Python, etc)"
 echo
 echo Further options are:
 echo "    - 'make callcheck'     run the project's selftest with valgrind to"

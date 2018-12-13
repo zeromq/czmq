@@ -243,6 +243,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1remove (JNIEnv *env, jclass c, jlong self)
 {
     zconfig_remove ((zconfig_t **) &self);
+    return self;
 }
 
 JNIEXPORT void JNICALL
