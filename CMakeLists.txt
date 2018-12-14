@@ -20,6 +20,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/builds/cm
 
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
+set(pkg_config_names_private "")
 
 ########################################################################
 # options
@@ -112,6 +113,7 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 set(OPTIONAL_LIBRARIES)
+set(OPTIONAL_LIBRARIES_STATIC)
 
 ########################################################################
 # LIBZMQ dependency
@@ -120,7 +122,12 @@ find_package(libzmq REQUIRED)
 IF (LIBZMQ_FOUND)
     include_directories(${LIBZMQ_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
+  IF (PC_LIBZMQ_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} libzmq")
+      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+  ELSE (PC_LIBZMQ_FOUND)
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
+  ENDIF (PC_LIBZMQ_FOUND)
 ELSE (LIBZMQ_FOUND)
     message( FATAL_ERROR "libzmq not found." )
 ENDIF (LIBZMQ_FOUND)
@@ -132,7 +139,12 @@ find_package(uuid)
 IF (UUID_FOUND)
     include_directories(${UUID_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -luuid")
+  IF (PC_UUID_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} uuid")
+      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_UUID_STATIC_LDFLAGS})
+  ELSE (PC_UUID_FOUND)
+      set(pkg_config_libs_private "${pkg_config_libs_private} -luuid")
+  ENDIF (PC_UUID_FOUND)
     add_definitions(-DHAVE_UUID)
     list(APPEND OPTIONAL_LIBRARIES ${UUID_LIBRARIES})
 ENDIF (UUID_FOUND)
@@ -144,7 +156,12 @@ find_package(systemd)
 IF (SYSTEMD_FOUND)
     include_directories(${SYSTEMD_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${SYSTEMD_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -lsystemd")
+  IF (PC_SYSTEMD_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} libsystemd >= 200.0.0")
+      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_SYSTEMD_STATIC_LDFLAGS})
+  ELSE (PC_SYSTEMD_FOUND)
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lsystemd")
+  ENDIF (PC_SYSTEMD_FOUND)
     add_definitions(-DHAVE_LIBSYSTEMD)
     list(APPEND OPTIONAL_LIBRARIES ${SYSTEMD_LIBRARIES})
 ENDIF (SYSTEMD_FOUND)
@@ -156,7 +173,12 @@ find_package(lz4)
 IF (LZ4_FOUND)
     include_directories(${LZ4_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${LZ4_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -llz4")
+  IF (PC_LZ4_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} liblz4")
+      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_LZ4_STATIC_LDFLAGS})
+  ELSE (PC_LZ4_FOUND)
+      set(pkg_config_libs_private "${pkg_config_libs_private} -llz4")
+  ENDIF (PC_LZ4_FOUND)
     add_definitions(-DHAVE_LIBLZ4)
     list(APPEND OPTIONAL_LIBRARIES ${LZ4_LIBRARIES})
 ENDIF (LZ4_FOUND)
@@ -168,7 +190,12 @@ find_package(libcurl)
 IF (LIBCURL_FOUND)
     include_directories(${LIBCURL_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${LIBCURL_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -llibcurl")
+  IF (PC_LIBCURL_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} libcurl >= 7.28.0")
+      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_LIBCURL_STATIC_LDFLAGS})
+  ELSE (PC_LIBCURL_FOUND)
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lcurl")
+  ENDIF (PC_LIBCURL_FOUND)
     add_definitions(-DHAVE_LIBCURL)
     list(APPEND OPTIONAL_LIBRARIES ${LIBCURL_LIBRARIES})
 ENDIF (LIBCURL_FOUND)
@@ -465,6 +492,7 @@ target_link_libraries(
     czmq-static
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
+    ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
 install(TARGETS zmakecert
@@ -488,6 +516,7 @@ target_link_libraries(
     czmq-static
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
+    ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
 add_executable(
@@ -508,6 +537,7 @@ target_link_libraries(
     czmq-static
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
+    ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
 add_executable(
@@ -528,6 +558,7 @@ target_link_libraries(
     czmq-static
     ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
+    ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
 

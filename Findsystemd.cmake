@@ -6,9 +6,6 @@
 if (NOT MSVC)
     include(FindPkgConfig)
     pkg_check_modules(PC_SYSTEMD "libsystemd")
-    if (NOT PC_SYSTEMD_FOUND)
-        pkg_check_modules(PC_SYSTEMD "libsystemd")
-    endif (NOT PC_SYSTEMD_FOUND)
     if (PC_SYSTEMD_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
         add_definitions(${PC_SYSTEMD_CFLAGS} ${PC_SYSTEMD_CFLAGS_OTHER})
@@ -28,7 +25,7 @@ find_path (
 
 find_library (
     SYSTEMD_LIBRARIES
-    NAMES libsystemd
+    NAMES systemd
     HINTS ${PC_SYSTEMD_LIBRARY_HINTS}
 )
 

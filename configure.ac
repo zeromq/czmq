@@ -156,6 +156,7 @@ AS_IF([test -n "${pkgconfigdir}" -a -d "${pkgconfigdir}"],
 
 # Will be used to add flags to pkg-config useful when apps want to statically link
 PKGCFG_LIBS_PRIVATE=""
+PKGCFG_NAMES_PRIVATE=""
 
 # Archive user supplied flags
 PREVIOUS_CFLAGS="${CFLAGS}"
@@ -194,7 +195,6 @@ AS_IF([test x"${search_libzmq}" = xyes], [
     found_pkgconfig=""
     PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
     [
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libzmq_LIBS"
         was_libzmq_check_lib_detected=pkgcfg
         found_pkgconfig="libzmq"
     ],
@@ -228,12 +228,11 @@ AS_IF([test x"${search_libzmq}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for libzmq
     AS_CASE(["x${was_libzmq_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_libzmq],["${found_pkgconfig}"])
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
                 CFLAGS="${libzmq_CFLAGS} ${CFLAGS}"
                 LIBS="${libzmq_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_libzmq],[""])
                 CFLAGS="${libzmq_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${libzmq_synthetic_libs} ${LDFLAGS}"
                 LIBS="${libzmq_synthetic_libs} ${LIBS}"
@@ -242,7 +241,6 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libzmq
                 AC_SUBST([libzmq_LIBS],[${libzmq_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_libzmq],[""])
             AC_MSG_ERROR([Cannot find pkg-config metadata for libzmq 0.0.0 or higher])
     ])
 ])
@@ -278,7 +276,6 @@ AS_IF([test x"${search_uuid}" = xyes], [
     PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
     [
         AC_DEFINE(HAVE_UUID, 1, [The optional uuid library is to be used])
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $uuid_LIBS"
         was_uuid_check_lib_detected=pkgcfg
         found_pkgconfig="uuid"
     ],
@@ -313,12 +310,11 @@ AS_IF([test x"${search_uuid}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for uuid
     AS_CASE(["x${was_uuid_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_uuid],["${found_pkgconfig}"])
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
                 CFLAGS="${uuid_CFLAGS} ${CFLAGS}"
                 LIBS="${uuid_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_uuid],[""])
                 CFLAGS="${uuid_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${uuid_synthetic_libs} ${LDFLAGS}"
                 LIBS="${uuid_synthetic_libs} ${LIBS}"
@@ -327,7 +323,6 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for uuid
                 AC_SUBST([uuid_LIBS],[${uuid_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_uuid],[""])
             AC_MSG_WARN([Cannot find pkg-config metadata for uuid 0.0.0 or higher])
     ])
 ])
@@ -363,7 +358,6 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
     PKG_CHECK_MODULES([systemd], [libsystemd >= 200.0.0],
     [
         AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The optional libsystemd library is to be used])
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $systemd_LIBS"
         was_systemd_check_lib_detected=pkgcfg
         found_pkgconfig="libsystemd"
     ],
@@ -398,12 +392,11 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
     AS_CASE(["x${was_systemd_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_libsystemd],["${found_pkgconfig} >= 200.0.0"])
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig} >= 200.0.0"
                 CFLAGS="${systemd_CFLAGS} ${CFLAGS}"
                 LIBS="${systemd_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_libsystemd],[""])
                 CFLAGS="${systemd_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${systemd_synthetic_libs} ${LDFLAGS}"
                 LIBS="${systemd_synthetic_libs} ${LIBS}"
@@ -412,7 +405,6 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
                 AC_SUBST([systemd_LIBS],[${systemd_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_libsystemd],[""])
             AC_MSG_WARN([Cannot find pkg-config metadata for libsystemd 200.0.0 or higher])
     ])
 ])
@@ -448,7 +440,6 @@ AS_IF([test x"${search_liblz4}" = xyes], [
     PKG_CHECK_MODULES([lz4], [liblz4 >= 0.0.0],
     [
         AC_DEFINE(HAVE_LIBLZ4, 1, [The optional liblz4 library is to be used])
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $lz4_LIBS"
         was_lz4_check_lib_detected=pkgcfg
         found_pkgconfig="liblz4"
     ],
@@ -483,12 +474,11 @@ AS_IF([test x"${search_liblz4}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for liblz4
     AS_CASE(["x${was_lz4_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_liblz4],["${found_pkgconfig}"])
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
                 CFLAGS="${lz4_CFLAGS} ${CFLAGS}"
                 LIBS="${lz4_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_liblz4],[""])
                 CFLAGS="${lz4_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${lz4_synthetic_libs} ${LDFLAGS}"
                 LIBS="${lz4_synthetic_libs} ${LIBS}"
@@ -497,7 +487,6 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for liblz4
                 AC_SUBST([lz4_LIBS],[${lz4_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_liblz4],[""])
             AC_MSG_WARN([Cannot find pkg-config metadata for liblz4 0.0.0 or higher])
     ])
 ])
@@ -533,7 +522,6 @@ AS_IF([test x"${search_libcurl}" = xyes], [
     PKG_CHECK_MODULES([libcurl], [libcurl >= 7.28.0],
     [
         AC_DEFINE(HAVE_LIBCURL, 1, [The optional libcurl library is to be used])
-        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $libcurl_LIBS"
         was_libcurl_check_lib_detected=pkgcfg
         found_pkgconfig="libcurl"
     ],
@@ -541,12 +529,12 @@ AS_IF([test x"${search_libcurl}" = xyes], [
         AC_MSG_NOTICE([Package libcurl not found with needed constraints; falling back to defined compilability tests])
 
         libcurl_synthetic_cflags=""
-        libcurl_synthetic_libs="-llibcurl"
+        libcurl_synthetic_libs="-lcurl"
 
         if test -n "${with_libcurl}" && test x"${with_libcurl}" != xyes && test x"${with_libcurl}" != xno; then
             if test -r "${with_libcurl}/include/curl/curl.h"; then
                 libcurl_synthetic_cflags="-I${with_libcurl}/include"
-                libcurl_synthetic_libs="-L${with_libcurl}/lib -llibcurl"
+                libcurl_synthetic_libs="-L${with_libcurl}/lib -lcurl"
             else
             AC_MSG_WARN([Header file ${with_libcurl}/include/curl/curl.h was not found. Please check libcurl prefix])
             fi
@@ -556,11 +544,11 @@ AS_IF([test x"${search_libcurl}" = xyes], [
                 )
         fi
 
-        AC_CHECK_LIB([libcurl], [curl_easy_init],
+        AC_CHECK_LIB([curl], [curl_easy_init],
             [
                 was_libcurl_check_lib_detected=yes
-                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -llibcurl"
-                AC_DEFINE(HAVE_LIBCURL, 1, [The optional libcurl library is to be used (as -llibcurl)])
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lcurl"
+                AC_DEFINE(HAVE_LIBCURL, 1, [The optional libcurl library is to be used (as -lcurl)])
             ],
             [])
     ])
@@ -568,12 +556,11 @@ AS_IF([test x"${search_libcurl}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for libcurl
     AS_CASE(["x${was_libcurl_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_libcurl],["${found_pkgconfig} >= 7.28.0"])
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig} >= 7.28.0"
                 CFLAGS="${libcurl_CFLAGS} ${CFLAGS}"
                 LIBS="${libcurl_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_libcurl],[""])
                 CFLAGS="${libcurl_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${libcurl_synthetic_libs} ${LDFLAGS}"
                 LIBS="${libcurl_synthetic_libs} ${LIBS}"
@@ -582,7 +569,6 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libcurl
                 AC_SUBST([libcurl_LIBS],[${libcurl_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_libcurl],[""])
             AC_MSG_WARN([Cannot find pkg-config metadata for libcurl 7.28.0 or higher])
     ])
 ])
@@ -593,6 +579,7 @@ CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
 
 AC_SUBST(pkg_config_libs_private, $PKGCFG_LIBS_PRIVATE)
+AC_SUBST(pkg_config_names_private, $PKGCFG_NAMES_PRIVATE)
 
 # Platform specific checks
 czmq_on_mingw32="no"

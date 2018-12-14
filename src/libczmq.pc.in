@@ -12,8 +12,7 @@ Name: libczmq
 Description: The high-level C binding for 0MQ
 Version: @VERSION@
 
-Requires:@pkgconfig_name_libzmq@
-
+Requires.private: @pkg_config_names_private@
 Libs: -L${libdir} -lczmq
 Cflags: -I${includedir} @pkg_config_defines@
 Libs.private: @pkg_config_libs_private@

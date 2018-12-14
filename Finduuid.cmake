@@ -6,9 +6,6 @@
 if (NOT MSVC)
     include(FindPkgConfig)
     pkg_check_modules(PC_UUID "uuid")
-    if (NOT PC_UUID_FOUND)
-        pkg_check_modules(PC_UUID "uuid")
-    endif (NOT PC_UUID_FOUND)
     if (PC_UUID_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
         add_definitions(${PC_UUID_CFLAGS} ${PC_UUID_CFLAGS_OTHER})
