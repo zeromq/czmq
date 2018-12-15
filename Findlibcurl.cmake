@@ -6,9 +6,6 @@
 if (NOT MSVC)
     include(FindPkgConfig)
     pkg_check_modules(PC_LIBCURL "libcurl")
-    if (NOT PC_LIBCURL_FOUND)
-        pkg_check_modules(PC_LIBCURL "libcurl")
-    endif (NOT PC_LIBCURL_FOUND)
     if (PC_LIBCURL_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
         add_definitions(${PC_LIBCURL_CFLAGS} ${PC_LIBCURL_CFLAGS_OTHER})
@@ -28,7 +25,7 @@ find_path (
 
 find_library (
     LIBCURL_LIBRARIES
-    NAMES libcurl
+    NAMES curl
     HINTS ${PC_LIBCURL_LIBRARY_HINTS}
 )
 

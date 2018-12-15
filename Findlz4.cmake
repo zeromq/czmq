@@ -6,9 +6,6 @@
 if (NOT MSVC)
     include(FindPkgConfig)
     pkg_check_modules(PC_LZ4 "liblz4")
-    if (NOT PC_LZ4_FOUND)
-        pkg_check_modules(PC_LZ4 "liblz4")
-    endif (NOT PC_LZ4_FOUND)
     if (PC_LZ4_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
         add_definitions(${PC_LZ4_CFLAGS} ${PC_LZ4_CFLAGS_OTHER})

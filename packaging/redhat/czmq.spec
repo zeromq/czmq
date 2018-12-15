@@ -53,9 +53,9 @@ BuildRequires:  pkgconfig
 BuildRequires:  xmlto
 BuildRequires:  zeromq-devel
 BuildRequires:  libuuid-devel
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-devel (>= 200.0.0)
 BuildRequires:  liblz4-devel
-BuildRequires:  libcurl-devel
+BuildRequires:  libcurl-devel (>= 7.28.0)
 %if %{with python_cffi}
 BuildRequires:  python-cffi
 BuildRequires:  python-devel
@@ -91,9 +91,9 @@ Group:          System/Libraries
 Requires:       libczmq4 = %{version}
 Requires:       zeromq-devel
 Requires:       libuuid-devel
-Requires:       systemd-devel
+Requires:       systemd-devel >= 200.0.0
 Requires:       liblz4-devel
-Requires:       libcurl-devel
+Requires:       libcurl-devel >= 7.28.0
 
 %description devel
 the high-level c binding for 0mq development tools
