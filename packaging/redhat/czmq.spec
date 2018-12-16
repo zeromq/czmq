@@ -53,9 +53,9 @@ BuildRequires:  pkgconfig
 BuildRequires:  xmlto
 BuildRequires:  zeromq-devel
 BuildRequires:  libuuid-devel
-BuildRequires:  systemd-devel (>= 200.0.0)
+BuildRequires:  systemd-devel >= 200.0.0
 BuildRequires:  liblz4-devel
-BuildRequires:  libcurl-devel (>= 7.28.0)
+BuildRequires:  libcurl-devel >= 7.28.0
 %if %{with python_cffi}
 BuildRequires:  python-cffi
 BuildRequires:  python-devel
