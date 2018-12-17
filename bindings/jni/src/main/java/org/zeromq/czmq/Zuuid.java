@@ -10,11 +10,14 @@ import org.scijava.nativelib.NativeLoader;
 
 public class Zuuid implements AutoCloseable{
     static {
-        try {
-            NativeLoader.loadLibrary("czmqjni");
-        }
-        catch (Exception e) {
-            System.exit (-1);
+        if (System.getProperty("java.vm.vendor").contains("Android")) {
+            System.loadLibrary("czmqjni");
+        } else {
+            try {
+                NativeLoader.loadLibrary("czmqjni");
+            } catch (Exception e) {
+                System.exit (-1);
+            }
         }
     }
     public long self;
