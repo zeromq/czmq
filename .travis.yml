@@ -87,9 +87,6 @@ matrix:
 # temporary disabled, does not work
 #  - env: BUILD_TYPE=docs
 #    os: linux
-  # until https://github.com/zeromq/zproject/issues/947 is solved
-  allow_failures:
-  - env: BUILD_TYPE=check_zproject
 
 addons:
   apt:
