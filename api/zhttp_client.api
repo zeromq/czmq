@@ -29,8 +29,11 @@
     <method name = "get">
         Send a get request to the url, headers is optional.
 	    Use arg to identify response when making multiple requests simultaneously.
+	    Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
+
         <argument name = "url" type = "string" />
         <argument name = "headers" type = "zlistx" />
+        <argument name = "timeout" type = "integer" />
         <argument name = "handler" type = "zhttp_client_fn" callback="1" />
         <argument name = "arg" type = "anything" />
         <return type = "integer" />
@@ -39,9 +42,12 @@
     <method name = "post">
         Send a post request to the url, headers is optional.
         Use arg to identify response when making multiple requests simultaneously.
+        Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
+
         <argument name = "url" type = "string" />
         <argument name = "headers" type = "zlistx" />
         <argument name = "body" type = "zchunk" />
+        <argument name = "timeout" type = "integer" />
         <argument name = "handler" type = "zhttp_client_fn" callback="1" />
         <argument name = "arg" type = "anything" />
         <return type = "integer" />

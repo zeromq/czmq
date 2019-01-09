@@ -77,7 +77,6 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
     curl_share_setopt (share, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
 
     long verbose = (*(bool *) args) ? 1L : 0L;
-    long timeout = 30;
     CURLMcode code;
 
     SOCKET pipefd = zsock_fd (pipe);
@@ -108,9 +107,10 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
             else if (streq (command, "GET")) {
                 char *url;
                 zlistx_t *headers;
+                int timeout;
                 void *handler;
                 void *arg;
-                int rc = zsock_recv (pipe, "slpp", &url, &headers, &handler, &arg);
+                int rc = zsock_recv (pipe, "slipp", &url, &headers, &timeout, &handler, &arg);
                 assert (rc == 0);
 
                 zchunk_t *response = zchunk_new (NULL, 100);
@@ -127,7 +127,7 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 request->headers = curl_headers;
 
                 curl_easy_setopt (curl, CURLOPT_SHARE, share);
-                curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeout);
+                curl_easy_setopt (curl, CURLOPT_TIMEOUT_MS, (long)timeout);
                 curl_easy_setopt (curl, CURLOPT_VERBOSE, verbose);
                 curl_easy_setopt (curl, CURLOPT_HTTPHEADER, curl_headers);
                 curl_easy_setopt (curl, CURLOPT_URL, url);
@@ -144,9 +144,10 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 char *url;
                 zlistx_t *headers;
                 zchunk_t *body;
+                int timeout;
                 void *handler;
                 void *arg;
-                int rc = zsock_recv (pipe, "slcpp", &url, &headers, &body, &handler, &arg);
+                int rc = zsock_recv (pipe, "slcipp", &url, &headers, &body, &timeout, &handler, &arg);
                 assert (rc == 0);
 
                 zchunk_t *response = zchunk_new (NULL, 100);
@@ -163,11 +164,11 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 request->headers = curl_headers;
 
                 curl_easy_setopt (curl, CURLOPT_SHARE, share);
-                curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeout);
+                curl_easy_setopt (curl, CURLOPT_TIMEOUT_MS, (long)timeout);
                 curl_easy_setopt (curl, CURLOPT_VERBOSE, verbose);
-                curl_easy_setopt (curl, CURLOPT_HTTPHEADER, curl_headers);
                 curl_easy_setopt (curl, CURLOPT_POSTFIELDS, zchunk_data (body));
                 curl_easy_setopt (curl, CURLOPT_POSTFIELDSIZE, zchunk_size (body));
+                curl_easy_setopt (curl, CURLOPT_HTTPHEADER, curl_headers);
                 curl_easy_setopt (curl, CURLOPT_URL, url);
                 curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, write_data);
                 curl_easy_setopt (curl, CURLOPT_WRITEDATA, response);
@@ -200,6 +201,9 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 long response_code_long;
                 curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &response_code_long);
                 int response_code = (int) response_code_long;
+
+                if (response_code == 0 && msg->data.result == CURLE_OPERATION_TIMEDOUT)
+                    response_code = -1;
 
                 int rc = zsock_send (pipe, "icpp", response_code, request->response, request->handler, request->arg);
                 assert (rc == 0);
@@ -253,12 +257,15 @@ zhttp_client_destroy (zhttp_client_t **self_p) {
 
 
 int
-zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, zhttp_client_fn handler, void *arg) {
+zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, int timeout, zhttp_client_fn handler, void *arg) {
 #ifdef HAVE_LIBCURL
+    if (timeout == -1)
+        timeout = 0;
+
     if (headers)
-        return zsock_send (self, "sslpp", "GET", url, headers, handler, arg);
+        return zsock_send (self, "sslipp", "GET", url, headers, timeout, handler, arg);
     else
-        return zsock_send (self, "sszpp", "GET", url, handler, arg);
+        return zsock_send (self, "sszipp", "GET", url, timeout, handler, arg);
 #else
     return -1;
 #endif
@@ -270,18 +277,21 @@ zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, zhtt
 //  Use arg to identify response when making multiple requests simultaneously.
 
 int
-zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, zhttp_client_fn handler,
+zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, int timeout, zhttp_client_fn handler,
                    void *arg) {
 #ifdef HAVE_LIBCURL
 
+    if (timeout == -1)
+        timeout = 0;
+
     if (headers && body)
-        return zsock_send (self, "sslcpp", "POST", url, headers, body, handler, arg);
+        return zsock_send (self, "sslcipp", "POST", url, headers, body, timeout, handler, arg);
     else if (headers && !body)
-        return zsock_send (self, "sslzpp", "POST", url, headers, handler, arg);
+        return zsock_send (self, "sslzipp", "POST", url, headers, timeout, handler, arg);
     else if (!headers && body)
-        return zsock_send (self, "sszcpp", "POST", url, body, handler, arg);
+        return zsock_send (self, "sszcipp", "POST", url, body, timeout, handler, arg);
     else
-        return zsock_send (self, "sszzpp", "POST", url, handler, arg);
+        return zsock_send (self, "sszzipp", "POST", url, timeout, handler, arg);
 #else
     return -1;
 #endif
@@ -359,9 +369,27 @@ test_handler (void *arg, int response_code, zchunk_t *data) {
     bool *event = (bool *) arg;
     *event = true;
 
+    if (response_code == 200)
     assert (zchunk_streq (data, "Hello"));
 
     zchunk_destroy (&data);
+}
+
+static zchunk_t *
+recv_http_request(void* server) {
+    zchunk_t *routing_id;
+    char *request;
+    int rc = zsock_recv (server, "cs", &routing_id, &request);
+    assert (rc == 0);
+
+    while (strlen (request) == 0) {
+        zsock_recv (server, "cs", &routing_id, &request);
+        assert (rc == 0);
+    }
+
+    zstr_free (&request);
+
+    return routing_id;
 }
 
 void
@@ -382,23 +410,19 @@ zhttp_client_test (bool verbose) {
     bool event = false;
     zlistx_t *headers = zlistx_new ();
     zlistx_add_end (headers, "Host: zeromq.org");
-    zhttp_client_get (self, url, headers, test_handler, &event);
+    zhttp_client_get (self, url, headers, -1, test_handler, &event);
     zlistx_destroy (&headers);
 
     //  Receive request on the server
-    zchunk_t *routing_id;
-    char *request;
-    int rc = zsock_recv (server, "cs", &routing_id, &request);
-    assert (rc == 0);
+    zchunk_t *routing_id = recv_http_request (server);
 
     //  Send the response
     char* response = "HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nHello";
     zsock_send (server, "cs", routing_id, response);
     zchunk_destroy (&routing_id);
-    zstr_free (&request);
 
     //  Receive the response on the http client
-    rc = zhttp_client_wait (self, -1);
+    int rc = zhttp_client_wait (self, -1);
     assert (rc == 0);
     zhttp_client_execute (self);
     assert (event);
@@ -406,16 +430,14 @@ zhttp_client_test (bool verbose) {
     // Send a POST request
     event = false;
     zchunk_t *body = zchunk_new ("World", 5);
-    zhttp_client_post (self, url, NULL, body, test_handler, &event);
+    zhttp_client_post (self, url, NULL, body, -1, test_handler, &event);
 
     //  Receive request on the server
-    rc = zsock_recv (server, "cs", &routing_id, &request);
-    assert (rc == 0);
+    routing_id = recv_http_request (server);
 
     //  Send the response
     zsock_send (server, "cs", routing_id, response);
     zchunk_destroy (&routing_id);
-    zstr_free (&request);
 
     //  Receive the response on the http client
     rc = zhttp_client_wait (self, -1);
@@ -423,13 +445,19 @@ zhttp_client_test (bool verbose) {
     zhttp_client_execute (self);
     assert (event);
 
+    //  Timeout check
+    event = false;
+    zhttp_client_get (self, url, NULL, 1000, test_handler, &event);
+    rc = zhttp_client_wait (self, 1200);
+    assert (rc == 0);
+    zhttp_client_execute (self);
+    assert (event);
+
     //  Sending another request, without being answer
     //  Checking the client ability to stop while request are inprogres
-    zhttp_client_get (self, url, NULL, test_handler, NULL);
+    zhttp_client_get (self, url, NULL, -1, test_handler, NULL);
 
     zchunk_destroy (&body);
-    zchunk_destroy (&routing_id);
-    zstr_free (&request);
     zhttp_client_destroy (&self);
     zsock_destroy (&server);
 

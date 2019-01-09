@@ -42,14 +42,16 @@ CZMQ_EXPORT void
 //  *** Draft method, for development use, may change without warning ***
 //  Send a get request to the url, headers is optional.
 //      Use arg to identify response when making multiple requests simultaneously.
+//      Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
 CZMQ_EXPORT int
-    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, zhttp_client_fn handler, void *arg);
+    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, int timeout, zhttp_client_fn handler, void *arg);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Send a post request to the url, headers is optional.
 //  Use arg to identify response when making multiple requests simultaneously.
+//  Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
 CZMQ_EXPORT int
-    zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, zhttp_client_fn handler, void *arg);
+    zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, int timeout, zhttp_client_fn handler, void *arg);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Invoke callback function for received responses.
