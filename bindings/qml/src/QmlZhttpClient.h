@@ -29,12 +29,27 @@ public:
 
 public slots:
     //  Send a get request to the url, headers is optional.
-    //  Use userp to identify response when making multiple requests simultaneously.
-    int get (const QString &url, QmlZlistx *headers, void *userp);
+    //      Use arg to identify response when making multiple requests simultaneously.
+    //      Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
+    int get (const QString &url, QmlZlistx *headers, int timeout, zhttp_client_fn handler, void *arg);
 
-    //  Receive the response for one of the requests. Blocks until a response is ready.
-    //  Use userp to identify the request.
-    int recv (int *responseCode, QmlZchunk *data, void **userp);
+    //  Send a post request to the url, headers is optional.
+    //  Use arg to identify response when making multiple requests simultaneously.
+    //  Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
+    int post (const QString &url, QmlZlistx *headers, QmlZchunk *body, int timeout, zhttp_client_fn handler, void *arg);
+
+    //  Invoke callback function for received responses.
+    //  Should be call after zpoller wait method.
+    //  Returns 0 if OK, -1 on failure.
+    int execute ();
+
+    //  Wait until a response is ready to be consumed.
+    //  Use when you need a synchronize response.
+    //
+    //  The timeout should be zero or greater, or -1 to wait indefinitely.
+    //
+    //  Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
+    int wait (int timeout);
 };
 
 class QmlZhttpClientAttached : public QObject

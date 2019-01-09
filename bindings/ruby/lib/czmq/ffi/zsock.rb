@@ -918,6 +918,29 @@ module CZMQ
         result
       end
 
+      # Check whether the socket has available message to read.
+      #
+      # @return [Boolean]
+      def has_in()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_has_in(self_p)
+        result
+      end
+
+      # Check whether the socket has available message to read.
+      #
+      # This is the polymorphic version of #has_in.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Boolean]
+      def self.has_in(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_has_in(self_p)
+        result
+      end
+
       # Get socket option `router_notify`.
       # Available from libzmq 4.3.0.
       #

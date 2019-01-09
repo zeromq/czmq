@@ -164,6 +164,10 @@ typedef void (ztimerset_fn) (
 typedef void (ztrie_destroy_data_fn) (
     void **data);
 
+// Callback function for http response.
+typedef void (zhttp_client_fn) (
+    void *arg, int response_code, zchunk_t *data);
+
 // CLASS: zactor
 // Create a new actor passing arbitrary arguments reference.
 zactor_t *
@@ -2695,6 +2699,10 @@ bool
 void *
     zsock_resolve (void *self);
 
+// Check whether the socket has available message to read.
+bool
+    zsock_has_in (void *self);
+
 // Get socket option `router_notify`.
 // Available from libzmq 4.3.0.
 int
@@ -4182,14 +4190,31 @@ void
     zhttp_client_destroy (zhttp_client_t **self_p);
 
 // Send a get request to the url, headers is optional.
-// Use userp to identify response when making multiple requests simultaneously.
+//     Use arg to identify response when making multiple requests simultaneously.
+//     Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
 int
-    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, void *userp);
+    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, int timeout, zhttp_client_fn handler, void *arg);
 
-// Receive the response for one of the requests. Blocks until a response is ready.
-// Use userp to identify the request.
+// Send a post request to the url, headers is optional.
+// Use arg to identify response when making multiple requests simultaneously.
+// Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
 int
-    zhttp_client_recv (zhttp_client_t *self, int *response_code, zchunk_t **data, void **userp);
+    zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, int timeout, zhttp_client_fn handler, void *arg);
+
+// Invoke callback function for received responses.
+// Should be call after zpoller wait method.
+// Returns 0 if OK, -1 on failure.
+int
+    zhttp_client_execute (zhttp_client_t *self);
+
+// Wait until a response is ready to be consumed.
+// Use when you need a synchronize response.
+//
+// The timeout should be zero or greater, or -1 to wait indefinitely.
+//
+// Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
+int
+    zhttp_client_wait (zhttp_client_t *self, int timeout);
 
 // Self test of this class.
 void

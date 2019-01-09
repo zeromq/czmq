@@ -251,6 +251,9 @@ public:
     //  return the supplied value. Takes a polymorphic socket reference.
     static void * resolve (void *self);
 
+    //  Check whether the socket has available message to read.
+    bool hasIn ();
+
     //  Get socket option `router_notify`.
     //  Available from libzmq 4.3.0.
     int routerNotify ();

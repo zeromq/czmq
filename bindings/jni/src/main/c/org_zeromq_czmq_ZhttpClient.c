@@ -26,19 +26,17 @@ Java_org_zeromq_czmq_ZhttpClient__1_1destroy (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_ZhttpClient__1_1get (JNIEnv *env, jclass c, jlong self, jstring url, jlong headers, jlong userp)
+Java_org_zeromq_czmq_ZhttpClient__1_1execute (JNIEnv *env, jclass c, jlong self)
 {
-    char *url_ = (char *) (*env)->GetStringUTFChars (env, url, NULL);
-    jint get_ = (jint) zhttp_client_get ((zhttp_client_t *) (intptr_t) self, url_, (zlistx_t *) (intptr_t) headers, (void *) (intptr_t) userp);
-    (*env)->ReleaseStringUTFChars (env, url, url_);
-    return get_;
+    jint execute_ = (jint) zhttp_client_execute ((zhttp_client_t *) (intptr_t) self);
+    return execute_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_ZhttpClient__1_1recv (JNIEnv *env, jclass c, jlong self, jint response_code, jlong data, jlong userp)
+Java_org_zeromq_czmq_ZhttpClient__1_1wait (JNIEnv *env, jclass c, jlong self, jint timeout)
 {
-    jint recv_ = (jint) zhttp_client_recv ((zhttp_client_t *) (intptr_t) self, (int *) (intptr_t) &response_code, (zchunk_t **) (intptr_t) &data, (void **) (intptr_t) &userp);
-    return recv_;
+    jint wait_ = (jint) zhttp_client_wait ((zhttp_client_t *) (intptr_t) self, (int) timeout);
+    return wait_;
 }
 
 JNIEXPORT void JNICALL

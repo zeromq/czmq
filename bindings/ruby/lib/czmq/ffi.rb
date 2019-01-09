@@ -585,6 +585,7 @@ module CZMQ
       attach_function :zsock_leave, [:pointer, :string], :int, **opts
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
+      attach_function :zsock_has_in, [:pointer], :bool, **opts
       attach_function :zsock_router_notify, [:pointer], :int, **opts
       attach_function :zsock_set_router_notify, [:pointer, :int], :void, **opts
       attach_function :zsock_multicast_loop, [:pointer], :int, **opts
@@ -884,8 +885,10 @@ module CZMQ
 
       attach_function :zhttp_client_new, [:bool], :pointer, **opts
       attach_function :zhttp_client_destroy, [:pointer], :void, **opts
-      attach_function :zhttp_client_get, [:pointer, :string, :pointer, :pointer], :int, **opts
-      attach_function :zhttp_client_recv, [:pointer, :pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_client_get, [:pointer, :string, :pointer, :int, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_client_post, [:pointer, :string, :pointer, :pointer, :int, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_client_execute, [:pointer], :int, **opts
+      attach_function :zhttp_client_wait, [:pointer, :int], :int, **opts
       attach_function :zhttp_client_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhttp_client'

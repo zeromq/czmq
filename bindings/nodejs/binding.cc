@@ -4488,6 +4488,7 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "flush", _flush);
     Nan::SetPrototypeMethod (tpl, "join", _join);
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
+    Nan::SetPrototypeMethod (tpl, "hasIn", _has_in);
     Nan::SetPrototypeMethod (tpl, "routerNotify", _router_notify);
     Nan::SetPrototypeMethod (tpl, "setRouterNotify", _set_router_notify);
     Nan::SetPrototypeMethod (tpl, "multicastLoop", _multicast_loop);
@@ -4994,6 +4995,12 @@ NAN_METHOD (Zsock::_leave) {
          //} //bjornw end
     int result = zsock_leave (zsock->self, (const char *)group);
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_has_in) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    bool result = zsock_has_in (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zsock::_router_notify) {
@@ -8511,6 +8518,8 @@ NAN_MODULE_INIT (ZhttpClient::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "execute", _execute);
+    Nan::SetPrototypeMethod (tpl, "wait", _wait);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -8560,6 +8569,31 @@ NAN_METHOD (ZhttpClient::destroy) {
 NAN_METHOD (ZhttpClient::defined) {
     ZhttpClient *zhttp_client = Nan::ObjectWrap::Unwrap <ZhttpClient> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zhttp_client->self != NULL));
+}
+
+NAN_METHOD (ZhttpClient::_execute) {
+    ZhttpClient *zhttp_client = Nan::ObjectWrap::Unwrap <ZhttpClient> (info.Holder ());
+    int result = zhttp_client_execute (zhttp_client->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZhttpClient::_wait) {
+    ZhttpClient *zhttp_client = Nan::ObjectWrap::Unwrap <ZhttpClient> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `timeout`");
+
+    //int timeout; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int timeout;
+
+
+    if (info [0]->IsNumber ())
+    {
+          timeout = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`timeout` must be a number");
+    int result = zhttp_client_wait (zhttp_client->self, (int) timeout);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (ZhttpClient::_test) {

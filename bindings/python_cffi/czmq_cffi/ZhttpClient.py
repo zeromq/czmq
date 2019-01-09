@@ -24,19 +24,40 @@ class ZhttpClient(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zhttp_client_destroy_py)
 
-    def get(self, url, headers, userp):
+    def get(self, url, headers, timeout, handler, arg):
         """
         Send a get request to the url, headers is optional.
-        Use userp to identify response when making multiple requests simultaneously.
+            Use arg to identify response when making multiple requests simultaneously.
+            Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
         """
-        return utils.lib.zhttp_client_get(self._p, utils.to_bytes(url), headers._p, userp._p)
+        return utils.lib.zhttp_client_get(self._p, utils.to_bytes(url), headers._p, timeout, handler, arg._p)
 
-    def recv(self, response_code, data, userp):
+    def post(self, url, headers, body, timeout, handler, arg):
         """
-        Receive the response for one of the requests. Blocks until a response is ready.
-        Use userp to identify the request.
+        Send a post request to the url, headers is optional.
+        Use arg to identify response when making multiple requests simultaneously.
+        Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
         """
-        return utils.lib.zhttp_client_recv(self._p, response_code, data._p, userp._p)
+        return utils.lib.zhttp_client_post(self._p, utils.to_bytes(url), headers._p, body._p, timeout, handler, arg._p)
+
+    def execute(self):
+        """
+        Invoke callback function for received responses.
+        Should be call after zpoller wait method.
+        Returns 0 if OK, -1 on failure.
+        """
+        return utils.lib.zhttp_client_execute(self._p)
+
+    def wait(self, timeout):
+        """
+        Wait until a response is ready to be consumed.
+        Use when you need a synchronize response.
+
+        The timeout should be zero or greater, or -1 to wait indefinitely.
+
+        Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
+        """
+        return utils.lib.zhttp_client_wait(self._p, timeout)
 
     def test(verbose):
         """

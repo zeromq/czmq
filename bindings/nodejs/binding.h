@@ -637,6 +637,7 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_flush);
     static NAN_METHOD (_join);
     static NAN_METHOD (_leave);
+    static NAN_METHOD (_has_in);
     static NAN_METHOD (_router_notify);
     static NAN_METHOD (_set_router_notify);
     static NAN_METHOD (_multicast_loop);
@@ -977,6 +978,8 @@ class ZhttpClient: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
+    static NAN_METHOD (_execute);
+    static NAN_METHOD (_wait);
     static NAN_METHOD (_test);
 };
 
