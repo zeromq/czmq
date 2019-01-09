@@ -34,6 +34,7 @@ typedef struct {
     zchunk_t *response;
     CURL *curl;
     struct curl_slist *headers;
+    zchunk_t *body;
 } http_request;
 
 size_t write_data (void *buffer, size_t size, size_t nmemb, void *userp) {
@@ -62,6 +63,7 @@ static void curl_destructor (CURL **curlp) {
     curl_easy_getinfo (curl, CURLINFO_PRIVATE, &request);
 
     zchunk_destroy (&request->response);
+    zchunk_destroy (&request->body);
     curl_slist_free_all (request->headers);
     curl_easy_cleanup (curl);
     free (request);
@@ -125,6 +127,7 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 request->curl = curl;
                 request->response = response;
                 request->headers = curl_headers;
+                request->body = NULL;
 
                 curl_easy_setopt (curl, CURLOPT_SHARE, share);
                 curl_easy_setopt (curl, CURLOPT_TIMEOUT_MS, (long)timeout);
@@ -162,6 +165,7 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 request->curl = curl;
                 request->response = response;
                 request->headers = curl_headers;
+                request->body = body;
 
                 curl_easy_setopt (curl, CURLOPT_SHARE, share);
                 curl_easy_setopt (curl, CURLOPT_TIMEOUT_MS, (long)timeout);
@@ -345,8 +349,10 @@ zhttp_client_wait (zhttp_client_t *self, int timeout) {
     zpoller_t *poller = zpoller_new (self, NULL);
     void* sock = zpoller_wait (poller, timeout);
 
-    if (sock)
+    if (sock) {
+        zpoller_destroy (&poller);
         return 0;
+    }
 
     if (zpoller_expired (poller))
         errno = EAGAIN;
@@ -383,6 +389,8 @@ recv_http_request(void* server) {
     assert (rc == 0);
 
     while (strlen (request) == 0) {
+        zchunk_destroy (&routing_id);
+        zstr_free (&request);
         zsock_recv (server, "cs", &routing_id, &request);
         assert (rc == 0);
     }
