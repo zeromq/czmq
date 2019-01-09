@@ -46,6 +46,12 @@ CZMQ_EXPORT int
     zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, zhttp_client_fn handler, void *arg);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Send a post request to the url, headers is optional.
+//  Use arg to identify response when making multiple requests simultaneously.
+CZMQ_EXPORT int
+    zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, zhttp_client_fn handler, void *arg);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Invoke callback function for received responses.
 //  Should be call after zpoller wait method.
 //  Returns 0 if OK, -1 on failure.

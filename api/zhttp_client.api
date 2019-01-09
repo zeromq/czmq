@@ -36,6 +36,18 @@
         <return type = "integer" />
     </method>
 
+    <method name = "post">
+        Send a post request to the url, headers is optional.
+        Use arg to identify response when making multiple requests simultaneously.
+        <argument name = "url" type = "string" />
+        <argument name = "headers" type = "zlistx" />
+        <argument name = "body" type = "zchunk" />
+        <argument name = "handler" type = "zhttp_client_fn" callback="1" />
+        <argument name = "arg" type = "anything" />
+        <return type = "integer" />
+    </method>
+
+
     <method name = "execute">
         Invoke callback function for received responses.
         Should be call after zpoller wait method.
