@@ -1846,6 +1846,16 @@ zsock_resolve (void *self)
 }
 
 
+//  --------------------------------------------------------------------------
+//  Check whether the socket has available message to read.
+
+bool
+zsock_has_in (void *self) {
+    int events = zsock_events (self);
+    return (events & ZMQ_POLLIN) != 0;
+}
+
+
 //  We use the gossip messages for some test cases
 #include "zgossip_msg.h"
 

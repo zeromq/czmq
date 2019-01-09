@@ -410,5 +410,10 @@
         <return type = "anything" />
     </method>
 
+    <method name = "has_in" state = "draft" polymorphic = "1">
+        Check whether the socket has available message to read.
+        <return type = "boolean" />
+    </method>
+
     <include filename = "zsock_option.api" />
 </class>

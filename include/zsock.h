@@ -1205,6 +1205,11 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_leave (void *self, const char *group);
 
+//  *** Draft method, for development use, may change without warning ***
+//  Check whether the socket has available message to read.
+CZMQ_EXPORT bool
+    zsock_has_in (void *self);
+
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
