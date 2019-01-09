@@ -25,6 +25,10 @@ extern "C" {
 //  stable builds by default. If you use this in applications, please ask
 //  for it to be pushed to stable state. Use --enable-drafts to enable.
 #ifdef CZMQ_BUILD_DRAFT_API
+// Callback function for http response.
+typedef void (zhttp_client_fn) (
+    void *arg, int response_code, zchunk_t *data);
+
 //  *** Draft method, for development use, may change without warning ***
 //  Create a new http client
 CZMQ_EXPORT zhttp_client_t *
@@ -37,15 +41,26 @@ CZMQ_EXPORT void
 
 //  *** Draft method, for development use, may change without warning ***
 //  Send a get request to the url, headers is optional.
-//  Use userp to identify response when making multiple requests simultaneously.
+//      Use arg to identify response when making multiple requests simultaneously.
 CZMQ_EXPORT int
-    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, void *userp);
+    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, zhttp_client_fn handler, void *arg);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Receive the response for one of the requests. Blocks until a response is ready.
-//  Use userp to identify the request.
+//  Invoke callback function for received responses.
+//  Should be call after zpoller wait method.
+//  Returns 0 if OK, -1 on failure.
 CZMQ_EXPORT int
-    zhttp_client_recv (zhttp_client_t *self, int *response_code, zchunk_t **data, void **userp);
+    zhttp_client_execute (zhttp_client_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Wait until a response is ready to be consumed.
+//  Use when you need a synchronize response.
+//
+//  The timeout should be zero or greater, or -1 to wait indefinitely.
+//
+//  Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
+CZMQ_EXPORT int
+    zhttp_client_wait (zhttp_client_t *self, int timeout);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.
