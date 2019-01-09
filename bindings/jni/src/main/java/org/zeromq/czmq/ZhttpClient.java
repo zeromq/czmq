@@ -42,20 +42,25 @@ public class ZhttpClient implements AutoCloseable{
         self = 0;
     }
     /*
-    Send a get request to the url, headers is optional.
-    Use userp to identify response when making multiple requests simultaneously.
+    Invoke callback function for received responses.
+    Should be call after zpoller wait method.
+    Returns 0 if OK, -1 on failure.
     */
-    native static int __get (long self, String url, long headers, long userp);
-    public int get (String url, Zlistx headers, long userp) {
-        return __get (self, url, headers.self, userp);
+    native static int __execute (long self);
+    public int execute () {
+        return __execute (self);
     }
     /*
-    Receive the response for one of the requests. Blocks until a response is ready.
-    Use userp to identify the request.
+    Wait until a response is ready to be consumed.
+    Use when you need a synchronize response.
+
+    The timeout should be zero or greater, or -1 to wait indefinitely.
+
+    Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
     */
-    native static int __recv (long self, int responseCode, long data, long userp);
-    public int recv (int responseCode, Zchunk data, long userp) {
-        return __recv (self, responseCode, data.self, userp);
+    native static int __wait (long self, int timeout);
+    public int Wait (int timeout) {
+        return __wait (self, timeout);
     }
     /*
     Self test of this class.

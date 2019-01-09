@@ -441,6 +441,14 @@ void * QZsock::resolve (void *self)
 }
 
 ///
+//  Check whether the socket has available message to read.
+bool QZsock::hasIn ()
+{
+    bool rv = zsock_has_in (self);
+    return rv;
+}
+
+///
 //  Get socket option `router_notify`.
 //  Available from libzmq 4.3.0.
 int QZsock::routerNotify ()

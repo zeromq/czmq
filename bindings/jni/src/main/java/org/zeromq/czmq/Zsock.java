@@ -458,6 +458,13 @@ public class Zsock implements AutoCloseable{
         return __resolve (self);
     }
     /*
+    Check whether the socket has available message to read.
+    */
+    native static boolean __hasIn (long self);
+    public boolean hasIn () {
+        return __hasIn (self);
+    }
+    /*
     Get socket option `router_notify`.
     Available from libzmq 4.3.0.
     */

@@ -85,6 +85,7 @@ type
 
     // Actors get a pipe and arguments from caller
   TZactorFn = procedure(Pipe: PZsock; Args: Pointer); stdcall;
+  PZactorFn = ^TZactorFn;
 
     // Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
     //
@@ -93,6 +94,7 @@ type
     //     if (zstr_send (self, "$KTHXBAI") == 0)
     //         zsock_wait (self);
   TZactorDestructorFn = procedure(This: PZactor); stdcall;
+  PZactorDestructorFn = ^TZactorDestructorFn;
 
   // Create a new actor passing arbitrary arguments reference.
   function zactor_new(Task: TZactorFn; Args: Pointer): PZactor; cdecl; external lib_czmq;
@@ -263,9 +265,11 @@ type
 
     // Loaders retrieve certificates from an arbitrary source.
   TZcertstoreLoader = procedure(This: PZcertstore); stdcall;
+  PZcertstoreLoader = ^TZcertstoreLoader;
 
     // Destructor for loader state.
   TZcertstoreDestructor = procedure(SelfP: PByte); stdcall;
+  PZcertstoreDestructor = ^TZcertstoreDestructor;
 
   // Create a new certificate store from a disk directory, loading and
   // indexing all certificates in that location. The directory itself may be
@@ -439,6 +443,7 @@ type
 
     //
   TZconfigFct = function(This: PZconfig; Arg: Pointer; Level: Integer): Integer; stdcall;
+  PZconfigFct = ^TZconfigFct;
 
   // Create new config item
   function zconfig_new(Name: PAnsiChar; Parent: PZconfig): PZconfig; cdecl; external lib_czmq;
@@ -904,6 +909,7 @@ type
 
     // Callback function for zhash_freefn method
   TZhashFreeFn = procedure(Data: Pointer); stdcall;
+  PZhashFreeFn = ^TZhashFreeFn;
 
   // Create a new, empty hash container
   function zhash_new: PZhash; cdecl; external lib_czmq;
@@ -1032,26 +1038,33 @@ type
 
     // Destroy an item
   TZhashxDestructorFn = procedure(var Item: Pointer); stdcall;
+  PZhashxDestructorFn = ^TZhashxDestructorFn;
 
     // Duplicate an item
   TZhashxDuplicatorFn = function(Item: Pointer): Pointer; stdcall;
+  PZhashxDuplicatorFn = ^TZhashxDuplicatorFn;
 
     // Compare two items, for sorting
   TZhashxComparatorFn = function(Item1: Pointer; Item2: Pointer): Integer; stdcall;
+  PZhashxComparatorFn = ^TZhashxComparatorFn;
 
     // Destroy an item.
   TZhashxFreeFn = procedure(Data: Pointer); stdcall;
+  PZhashxFreeFn = ^TZhashxFreeFn;
 
     // Hash function for keys.
   TZhashxHashFn = function(Key: Pointer): NativeUInt; stdcall;
+  PZhashxHashFn = ^TZhashxHashFn;
 
     // Serializes an item to a longstr.
     // The caller takes ownership of the newly created object.
   TZhashxSerializerFn = function(Item: Pointer): PAnsiChar; stdcall;
+  PZhashxSerializerFn = ^TZhashxSerializerFn;
 
     // Deserializes a longstr into an item.
     // The caller takes ownership of the newly created object.
   TZhashxDeserializerFn = function(ItemStr: PAnsiChar): Pointer; stdcall;
+  PZhashxDeserializerFn = ^TZhashxDeserializerFn;
 
   // Create a new, empty hash container
   function zhashx_new: PZhashx; cdecl; external lib_czmq;
@@ -1277,9 +1290,11 @@ type
 
     // Comparison function e.g. for sorting and removing.
   TZlistCompareFn = function(Item1: Pointer; Item2: Pointer): Integer; stdcall;
+  PZlistCompareFn = ^TZlistCompareFn;
 
     // Callback function for zlist_freefn method
   TZlistFreeFn = procedure(Data: Pointer); stdcall;
+  PZlistFreeFn = ^TZlistFreeFn;
 
   // Create a new list container
   function zlist_new: PZlist; cdecl; external lib_czmq;
@@ -1382,12 +1397,15 @@ type
 
     // Destroy an item
   TZlistxDestructorFn = procedure(var Item: Pointer); stdcall;
+  PZlistxDestructorFn = ^TZlistxDestructorFn;
 
     // Duplicate an item
   TZlistxDuplicatorFn = function(Item: Pointer): Pointer; stdcall;
+  PZlistxDuplicatorFn = ^TZlistxDuplicatorFn;
 
     // Compare two items, for sorting
   TZlistxComparatorFn = function(Item1: Pointer; Item2: Pointer): Integer; stdcall;
+  PZlistxComparatorFn = ^TZlistxComparatorFn;
 
   // Create a new, empty list.
   function zlistx_new: PZlistx; cdecl; external lib_czmq;
@@ -1545,12 +1563,15 @@ type
 
     // Callback function for reactor socket activity
   TZloopReaderFn = function(Loop: PZloop; Reader: PZsock; Arg: Pointer): Integer; stdcall;
+  PZloopReaderFn = ^TZloopReaderFn;
 
     // Callback function for reactor events (low-level)
   TZloopFn = function(Loop: PZloop; Item: Pointer; Arg: Pointer): Integer; stdcall;
+  PZloopFn = ^TZloopFn;
 
     // Callback for reactor timer events
   TZloopTimerFn = function(Loop: PZloop; TimerId: Integer; Arg: Pointer): Integer; stdcall;
+  PZloopTimerFn = ^TZloopTimerFn;
 
   // Create a new zloop reactor
   function zloop_new: PZloop; cdecl; external lib_czmq;
@@ -2132,6 +2153,9 @@ type
   // descriptor, return NULL; else if it looks like a libzmq socket handle,
   // return the supplied value. Takes a polymorphic socket reference.
   function zsock_resolve(This: Pointer): Pointer; cdecl; external lib_czmq;
+
+  // Check whether the socket has available message to read.
+  function zsock_has_in(self: PZsock): Boolean; cdecl; external lib_czmq;
 
   // Get socket option `router_notify`.
   // Available from libzmq 4.3.0.
@@ -2828,6 +2852,7 @@ type
 
     // Callback for interrupt signal handler
   TZsysHandlerFn = procedure(SignalValue: Integer); stdcall;
+  PZsysHandlerFn = ^TZsysHandlerFn;
 
   // Initialize CZMQ zsys layer; this happens automatically when you create
   // a socket or an actor; however this call lets you force initialization
@@ -2867,7 +2892,7 @@ type
   // zsys_handler_reset () can restore them. If you call this multiple times
   // then the last handler will take affect. If handler_fn is NULL, disables
   // default SIGINT/SIGTERM handling in CZMQ.
-  procedure zsys_handler_set(var HandlerFn: TZsysHandlerFn); cdecl; external lib_czmq;
+  procedure zsys_handler_set(HandlerFn: PZsysHandlerFn); cdecl; external lib_czmq;
 
   // Reset interrupt handler, call this at exit if needed
   procedure zsys_handler_reset; cdecl; external lib_czmq;

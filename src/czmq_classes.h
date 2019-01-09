@@ -271,6 +271,11 @@ CZMQ_PRIVATE int
     zsock_leave (void *self, const char *group);
 
 //  *** Draft method, defined for internal use only ***
+//  Check whether the socket has available message to read.
+CZMQ_PRIVATE bool
+    zsock_has_in (void *self);
+
+//  *** Draft method, defined for internal use only ***
 //  De-compress and receive C string from socket, received as a message
 //  with two frames: size of the uncompressed string, and the string itself.
 //  Caller must free returned string using zstr_free(). Returns NULL if the

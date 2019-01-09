@@ -2545,6 +2545,12 @@ Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
 Returns 0 if OK, -1 if failed.
 
 ```
+boolean my_zsock.hasIn ()
+```
+
+Check whether the socket has available message to read.
+
+```
 integer my_zsock.routerNotify ()
 ```
 
@@ -4506,6 +4512,25 @@ my_zhttp_client.destroy ()
 ```
 
 Methods:
+
+```
+integer my_zhttp_client.execute ()
+```
+
+Invoke callback function for received responses.
+Should be call after zpoller wait method.
+Returns 0 if OK, -1 on failure.
+
+```
+integer my_zhttp_client.wait (Number)
+```
+
+Wait until a response is ready to be consumed.
+Use when you need a synchronize response.
+
+The timeout should be zero or greater, or -1 to wait indefinitely.
+
+Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
 
 ```
 nothing my_zhttp_client.test (Boolean)

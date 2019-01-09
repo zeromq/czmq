@@ -357,6 +357,13 @@ Java_org_zeromq_czmq_Zsock__1_1resolve (JNIEnv *env, jclass c, jlong self)
     return resolve_;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_org_zeromq_czmq_Zsock__1_1hasIn (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean has_in_ = (jboolean) zsock_has_in ((zsock_t *) (intptr_t) self);
+    return has_in_;
+}
+
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1routerNotify (JNIEnv *env, jclass c, jlong self)
 {

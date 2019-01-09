@@ -307,6 +307,12 @@ class Zsock(object):
         """
         return utils.lib.zsock_resolve(self._p)
 
+    def has_in(self):
+        """
+        Check whether the socket has available message to read.
+        """
+        return utils.lib.zsock_has_in(self._p)
+
     def router_notify(self):
         """
         Get socket option `router_notify`.

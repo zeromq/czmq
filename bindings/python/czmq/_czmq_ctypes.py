@@ -5171,6 +5171,8 @@ lib.zsock_is.restype = c_bool
 lib.zsock_is.argtypes = [c_void_p]
 lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
+lib.zsock_has_in.restype = c_bool
+lib.zsock_has_in.argtypes = [zsock_p]
 lib.zsock_router_notify.restype = c_int
 lib.zsock_router_notify.argtypes = [zsock_p]
 lib.zsock_set_router_notify.restype = None
@@ -5942,6 +5944,12 @@ descriptor, return NULL; else if it looks like a libzmq socket handle,
 return the supplied value. Takes a polymorphic socket reference.
         """
         return c_void_p(lib.zsock_resolve(self))
+
+    def has_in(self):
+        """
+        Check whether the socket has available message to read.
+        """
+        return lib.zsock_has_in(self._as_parameter_)
 
     def router_notify(self):
         """
@@ -8496,14 +8504,19 @@ returns null.
 
 
 # zhttp_client
+zhttp_client_fn = CFUNCTYPE(None, c_void_p, c_int, zchunk_p)
 lib.zhttp_client_new.restype = zhttp_client_p
 lib.zhttp_client_new.argtypes = [c_bool]
 lib.zhttp_client_destroy.restype = None
 lib.zhttp_client_destroy.argtypes = [POINTER(zhttp_client_p)]
 lib.zhttp_client_get.restype = c_int
-lib.zhttp_client_get.argtypes = [zhttp_client_p, c_char_p, zlistx_p, c_void_p]
-lib.zhttp_client_recv.restype = c_int
-lib.zhttp_client_recv.argtypes = [zhttp_client_p, POINTER(c_int), POINTER(zchunk_p), POINTER(c_void_p)]
+lib.zhttp_client_get.argtypes = [zhttp_client_p, c_char_p, zlistx_p, c_int, zhttp_client_fn, c_void_p]
+lib.zhttp_client_post.restype = c_int
+lib.zhttp_client_post.argtypes = [zhttp_client_p, c_char_p, zlistx_p, zchunk_p, c_int, zhttp_client_fn, c_void_p]
+lib.zhttp_client_execute.restype = c_int
+lib.zhttp_client_execute.argtypes = [zhttp_client_p]
+lib.zhttp_client_wait.restype = c_int
+lib.zhttp_client_wait.argtypes = [zhttp_client_p, c_int]
 lib.zhttp_client_test.restype = None
 lib.zhttp_client_test.argtypes = [c_bool]
 
@@ -8555,19 +8568,40 @@ class ZhttpClient(object):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
-    def get(self, url, headers, userp):
+    def get(self, url, headers, timeout, handler, arg):
         """
         Send a get request to the url, headers is optional.
-Use userp to identify response when making multiple requests simultaneously.
+    Use arg to identify response when making multiple requests simultaneously.
+    Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
         """
-        return lib.zhttp_client_get(self._as_parameter_, url, headers, userp)
+        return lib.zhttp_client_get(self._as_parameter_, url, headers, timeout, handler, arg)
 
-    def recv(self, response_code, data, userp):
+    def post(self, url, headers, body, timeout, handler, arg):
         """
-        Receive the response for one of the requests. Blocks until a response is ready.
-Use userp to identify the request.
+        Send a post request to the url, headers is optional.
+Use arg to identify response when making multiple requests simultaneously.
+Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
         """
-        return lib.zhttp_client_recv(self._as_parameter_, byref(c_int.from_param(response_code)), byref(zchunk_p.from_param(data)), byref(c_void_p.from_param(userp)))
+        return lib.zhttp_client_post(self._as_parameter_, url, headers, body, timeout, handler, arg)
+
+    def execute(self):
+        """
+        Invoke callback function for received responses.
+Should be call after zpoller wait method.
+Returns 0 if OK, -1 on failure.
+        """
+        return lib.zhttp_client_execute(self._as_parameter_)
+
+    def wait(self, timeout):
+        """
+        Wait until a response is ready to be consumed.
+Use when you need a synchronize response.
+
+The timeout should be zero or greater, or -1 to wait indefinitely.
+
+Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
+        """
+        return lib.zhttp_client_wait(self._as_parameter_, timeout)
 
     @staticmethod
     def test(verbose):

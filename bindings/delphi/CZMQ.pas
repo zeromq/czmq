@@ -62,18 +62,18 @@ uses
     // Encode a stream of bytes into an armoured string. Returns the armoured
     // string, or NULL if there was insufficient memory available to allocate
     // a new string.
-    function Encode(Data: PByte; Size: NativeUInt): String;
+    function Encode(Data: PByte; Size: NativeUInt): string;
 
     // Decode an armoured string into a chunk. The decoded output is
     // null-terminated, so it may be treated as a string, if that's what
     // it was prior to encoding.
-    function Decode(const Data: String): IZchunk;
+    function Decode(const Data: string): IZchunk;
 
     // Get the mode property.
     function Mode: Integer;
 
     // Get printable string for mode.
-    function ModeStr: String;
+    function ModeStr: string;
 
     // Set the mode property.
     procedure SetMode(Mode: Integer);
@@ -116,20 +116,20 @@ uses
     function SecretKey: PByte;
 
     // Return public part of key pair as Z85 armored string
-    function PublicTxt: String;
+    function PublicTxt: string;
 
     // Return secret part of key pair as Z85 armored string
-    function SecretTxt: String;
+    function SecretTxt: string;
 
     // Set certificate metadata from formatted string.
-    procedure SetMeta(const Name: String; const Format: String);
+    procedure SetMeta(const Name: string; const Format: string);
 
     // Unset certificate metadata.
-    procedure UnsetMeta(const Name: String);
+    procedure UnsetMeta(const Name: string);
 
     // Get metadata value from certificate; if the metadata value doesn't
     // exist, returns NULL.
-    function Meta(const Name: String): String;
+    function Meta(const Name: string): string;
 
     // Get list of metadata fields from certificate. Caller is responsible for
     // destroying list. Caller should not modify the values of list items.
@@ -137,13 +137,13 @@ uses
 
     // Save full certificate (public + secret) to file for persistent storage
     // This creates one public file and one secret file (filename + "_secret").
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Save public certificate only to file for persistent storage
-    function SavePublic(const Filename: String): Integer;
+    function SavePublic(const Filename: string): Integer;
 
     // Save secret certificate only to file for persistent storage
-    function SaveSecret(const Filename: String): Integer;
+    function SaveSecret(const Filename: string): Integer;
 
     // Apply certificate to socket, i.e. use for CURVE security on socket.
     // If certificate was loaded from public file, the secret key will be
@@ -169,7 +169,7 @@ uses
 
     // Look up certificate by public key, returns zcert_t object if found,
     // else returns NULL. The public key is provided in Z85 text format.
-    function Lookup(const PublicKey: String): IZcert;
+    function Lookup(const PublicKey: string): IZcert;
 
     // Insert certificate into certificate store in memory. Note that this
     // does not save the certificate to disk. To do that, use zcert_save()
@@ -241,20 +241,20 @@ uses
 
     // Return chunk data encoded as printable hex string. Caller must free
     // string when finished with it.
-    function Strhex: String;
+    function Strhex: string;
 
     // Return chunk data copied into freshly allocated string
     // Caller must free string when finished with it.
-    function Strdup: String;
+    function Strdup: string;
 
     // Return TRUE if chunk body is equal to string, excluding terminator
-    function Streq(const &String: String): Boolean;
+    function Streq(const &String: string): Boolean;
 
     // Transform zchunk into a zframe that can be sent in a message.
     function Pack: IZframe;
 
     // Calculate SHA1 digest for chunk, using zdigest class.
-    function Digest: String;
+    function Digest: string;
 
     // Dump chunk to FILE stream, for debugging and tracing.
     procedure Fprint(&File: Pointer);
@@ -273,30 +273,30 @@ uses
     function Dup: IZconfig;
 
     // Return name of config item
-    function Name: String;
+    function Name: string;
 
     // Return value of config item
-    function Value: String;
+    function Value: string;
 
     // Insert or update configuration key with value
-    procedure Put(const Path: String; const Value: String);
+    procedure Put(const Path: string; const Value: string);
 
     // Equivalent to zconfig_put, accepting a format specifier and variable
     // argument list, instead of a single string value.
-    procedure Putf(const Path: String; const Format: String);
+    procedure Putf(const Path: string; const Format: string);
 
     // Get value for config item into a string value; leading slash is optional
     // and ignored.
-    function Get(const Path: String; const DefaultValue: String): String;
+    function Get(const Path: string; const DefaultValue: string): string;
 
     // Set config item name, name may be NULL
-    procedure SetName(const Name: String);
+    procedure SetName(const Name: string);
 
     // Set new value for config item. The new value may be a string, a printf
     // format, or NULL. Note that if string may possibly contain '%', or if it
     // comes from an insecure source, you must use '%s' as the format, followed
     // by the string.
-    procedure SetValue(const Format: String);
+    procedure SetValue(const Format: string);
 
     // Find our first child, if any
     function Child: IZconfig;
@@ -305,7 +305,7 @@ uses
     function Next: IZconfig;
 
     // Find a config item along a path; leading slash is optional and ignored.
-    function Locate(const Path: String): IZconfig;
+    function Locate(const Path: string): IZconfig;
 
     // Locate the last config item at a specified depth
     function AtDepth(Level: Integer): IZconfig;
@@ -317,27 +317,27 @@ uses
     // Add comment to config item before saving to disk. You can add as many
     // comment lines as you like. If you use a null format, all comments are
     // deleted.
-    procedure SetComment(const Format: String);
+    procedure SetComment(const Format: string);
 
     // Return comments of config item, as zlist.
     function Comments: IZlist;
 
     // Save a config tree to a specified ZPL text file, where a filename
     // "-" means dump to standard output.
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Equivalent to zconfig_save, taking a format string instead of a fixed
     // filename.
-    function Savef(const Format: String): Integer;
+    function Savef(const Format: string): Integer;
 
     // Report filename used during zconfig_load, or NULL if none
-    function Filename: String;
+    function Filename: string;
 
     // Save a config tree to a new memory chunk
     function ChunkSave: IZchunk;
 
     // Save a config tree to a new null terminated string
-    function StrSave: String;
+    function StrSave: string;
 
     // Return true if a configuration tree was loaded from a file and that
     // file has changed in since the tree was loaded.
@@ -369,14 +369,14 @@ uses
     // Return digest as printable hex string; caller should not modify nor
     // free this string. After calling this, you may not use zdigest_update()
     // on the same digest. If built without crypto support, returns NULL.
-    function &String: String;
+    function &String: string;
   end;
 
   // work with file-system directories
   IZdir = interface
 
     // Return directory path
-    function Path: String;
+    function Path: string;
 
     // Return last modification time for directory.
     function Modified: Int64;
@@ -399,7 +399,7 @@ uses
     procedure Remove(Force: Boolean);
 
     // Return full contents of directory as a zdir_patch list.
-    function Resync(const Alias: String): IZlist;
+    function Resync(const Alias: string): IZlist;
 
     // Load directory cache; returns a hash table containing the SHA-1 digests
     // of every file in the tree. The cache is saved between runs in .cache.
@@ -420,7 +420,7 @@ uses
     function Dup: IZdirPatch;
 
     // Return patch file directory path
-    function Path: String;
+    function Path: string;
 
     // Return patch file item
     function &File: IZfile;
@@ -429,13 +429,13 @@ uses
     function Op: Integer;
 
     // Return patch virtual file path
-    function Vpath: String;
+    function Vpath: string;
 
     // Calculate hash digest for file (create only)
     procedure DigestSet;
 
     // Return hash digest for patch file
-    function Digest: String;
+    function Digest: string;
   end;
 
   // helper functions for working with files.
@@ -446,7 +446,7 @@ uses
     function Dup: IZfile;
 
     // Return file name, remove path if provided
-    function Filename(const Path: String): String;
+    function Filename(const Path: string): string;
 
     // Refresh file properties from disk; this is not done automatically
     // on access methods, otherwise it is not possible to compare directory
@@ -512,7 +512,7 @@ uses
 
     // Read next line of text from file. Returns a pointer to the text line,
     // or NULL if there was nothing more to read from the file.
-    function Readln: String;
+    function Readln: string;
 
     // Close file, if open
     procedure Close;
@@ -521,7 +521,7 @@ uses
     function Handle: Pointer;
 
     // Calculate SHA1 digest for file, using zdigest class.
-    function Digest: String;
+    function Digest: string;
   end;
 
   // working with single message frames
@@ -536,7 +536,7 @@ uses
     // Return meta data property for frame
     // The caller shall not modify or free the returned value, which shall be
     // owned by the message.
-    function Meta(const &Property: String): String;
+    function Meta(const &Property: string): string;
 
     // Create a new frame that duplicates an existing frame. If frame is null,
     // or memory was exhausted, returns null.
@@ -544,14 +544,14 @@ uses
 
     // Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
     // Caller must free string when finished with it.
-    function Strhex: String;
+    function Strhex: string;
 
     // Return frame data copied into freshly allocated string
     // Caller must free string when finished with it.
-    function Strdup: String;
+    function Strdup: string;
 
     // Return TRUE if frame body is equal to string, excluding terminator
-    function Streq(const &String: String): Boolean;
+    function Streq(const &String: string): Boolean;
 
     // Return frame MORE indicator (1 or 0), set when reading frame from socket
     // or by the zframe_set_more() method
@@ -570,12 +570,12 @@ uses
     procedure SetRoutingId(RoutingId: Cardinal);
 
     // Return frame group of radio-dish pattern.
-    function Group: String;
+    function Group: string;
 
     // Set group on frame. This is used if/when the frame is sent to a
     // ZMQ_RADIO socket.
     // Return -1 on error, 0 on success.
-    function SetGroup(const Group: String): Integer;
+    function SetGroup(const Group: string): Integer;
 
     // Return TRUE if two frames have identical size and data
     // If either frame is NULL, equality is always false.
@@ -586,7 +586,7 @@ uses
 
     // Send message to zsys log sink (may be stdout, or system facility as
     // configured by zsys_set_logstream). Prefix shows before frame, if not null.
-    procedure Print(const Prefix: String);
+    procedure Print(const Prefix: string);
   end;
 
   // generic type-free hash container (simple)
@@ -595,30 +595,30 @@ uses
     // Insert item into hash table with specified key and item.
     // If key is already present returns -1 and leaves existing item unchanged
     // Returns 0 on success.
-    function Insert(const Key: String; Item: Pointer): Integer;
+    function Insert(const Key: string; Item: Pointer): Integer;
 
     // Update item into hash table with specified key and item.
     // If key is already present, destroys old item and inserts new one.
     // Use free_fn method to ensure deallocator is properly called on item.
-    procedure Update(const Key: String; Item: Pointer);
+    procedure Update(const Key: string; Item: Pointer);
 
     // Remove an item specified by key from the hash table. If there was no such
     // item, this function does nothing.
-    procedure Delete(const Key: String);
+    procedure Delete(const Key: string);
 
     // Return the item at the specified key, or null
-    function Lookup(const Key: String): Pointer;
+    function Lookup(const Key: string): Pointer;
 
     // Reindexes an item from an old key to a new key. If there was no such
     // item, does nothing. Returns 0 if successful, else -1.
-    function Rename(const OldKey: String; const NewKey: String): Integer;
+    function Rename(const OldKey: string; const NewKey: string): Integer;
 
     // Set a free function for the specified hash table item. When the item is
     // destroyed, the free function, if any, is called on that item.
     // Use this when hash items are dynamically allocated, to ensure that
     // you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
     // Returns the item, or NULL if there is no such item.
-    function Freefn(const Key: String; FreeFn: TZhashFreeFn): Pointer;
+    function Freefn(const Key: string; FreeFn: TZhashFreeFn): Pointer;
 
     // Return the number of keys/items in the hash table
     function Size: NativeUInt;
@@ -650,12 +650,12 @@ uses
     // was returned. This is a constant string that you may not modify or
     // deallocate, and which lasts as long as the item in the hash. After an
     // unsuccessful first/next, returns NULL.
-    function Cursor: String;
+    function Cursor: string;
 
     // Add a comment to hash table before saving to disk. You can add as many
     // comment lines as you like. These comment lines are discarded when loading
     // the file. If you use a null format, all comments are deleted.
-    procedure Comment(const Format: String);
+    procedure Comment(const Format: string);
 
     // Serialize hash table to a binary frame that can be sent in a message.
     // The packed format is compatible with the 'dictionary' type defined in
@@ -682,12 +682,12 @@ uses
     // Save hash table to a text file in name=value format. Hash values must be
     // printable strings; keys may not contain '=' character. Returns 0 if OK,
     // else -1 if a file error occurred.
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Load hash table from a text file in name=value format; hash table must
     // already exist. Hash values must printable strings; keys may not contain
     // '=' character. Returns 0 if OK, else -1 if a file was not readable.
-    function Load(const Filename: String): Integer;
+    function Load(const Filename: string): Integer;
 
     // When a hash table was loaded from a file by zhash_load, this method will
     // reload the file if it has been modified since, and is "stable", i.e. not
@@ -774,17 +774,17 @@ uses
     // Add a comment to hash table before saving to disk. You can add as many
     // comment lines as you like. These comment lines are discarded when loading
     // the file. If you use a null format, all comments are deleted.
-    procedure Comment(const Format: String);
+    procedure Comment(const Format: string);
 
     // Save hash table to a text file in name=value format. Hash values must be
     // printable strings; keys may not contain '=' character. Returns 0 if OK,
     // else -1 if a file error occurred.
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Load hash table from a text file in name=value format; hash table must
     // already exist. Hash values must printable strings; keys may not contain
     // '=' character. Returns 0 if OK, else -1 if a file was not readable.
-    function Load(const Filename: String): Integer;
+    function Load(const Filename: string): Integer;
 
     // When a hash table was loaded from a file by zhashx_load, this method will
     // reload the file if it has been modified since, and is "stable", i.e. not
@@ -868,19 +868,19 @@ uses
     function Size: NativeUInt;
 
     // Get first network interface, return NULL if there are none
-    function First: String;
+    function First: string;
 
     // Get next network interface, return NULL if we hit the last one
-    function Next: String;
+    function Next: string;
 
     // Return the current interface IP address as a printable string
-    function Address: String;
+    function Address: string;
 
     // Return the current interface broadcast address as a printable string
-    function Broadcast: String;
+    function Broadcast: string;
 
     // Return the current interface network mask as a printable string
-    function Netmask: String;
+    function Netmask: string;
 
     // Return the list of interfaces.
     procedure Print;
@@ -1250,23 +1250,23 @@ uses
 
     // Push string as new frame to front of message.
     // Returns 0 on success, -1 on error.
-    function Pushstr(const &String: String): Integer;
+    function Pushstr(const &String: string): Integer;
 
     // Push string as new frame to end of message.
     // Returns 0 on success, -1 on error.
-    function Addstr(const &String: String): Integer;
+    function Addstr(const &String: string): Integer;
 
     // Push formatted string as new frame to front of message.
     // Returns 0 on success, -1 on error.
-    function Pushstrf(const Format: String): Integer;
+    function Pushstrf(const Format: string): Integer;
 
     // Push formatted string as new frame to end of message.
     // Returns 0 on success, -1 on error.
-    function Addstrf(const Format: String): Integer;
+    function Addstrf(const Format: string): Integer;
 
     // Pop frame off front of message, return as fresh string. If there were
     // no more frames in the message, returns NULL.
-    function Popstr: String;
+    function Popstr: string;
 
     // Push encoded message as a new frame. Message takes ownership of
     // submessage, so the original is destroyed in this call. Returns 0 on
@@ -1382,24 +1382,24 @@ uses
     // ephemeral ports, a port may be reused by different services without
     // clients being aware. Protocols that run on ephemeral ports should take
     // this into account.
-    function Bind(const Format: String): Integer;
+    function Bind(const Format: string): Integer;
 
     // Returns last bound endpoint, if any.
-    function Endpoint: String;
+    function Endpoint: string;
 
     // Unbind a socket from a formatted endpoint.
     // Returns 0 if OK, -1 if the endpoint was invalid or the function
     // isn't supported.
-    function Unbind(const Format: String): Integer;
+    function Unbind(const Format: string): Integer;
 
     // Connect a socket to a formatted endpoint
     // Returns 0 if OK, -1 if the endpoint was invalid.
-    function Connect(const Format: String): Integer;
+    function Connect(const Format: string): Integer;
 
     // Disconnect a socket from a formatted endpoint
     // Returns 0 if OK, -1 if the endpoint was invalid or the function
     // isn't supported.
-    function Disconnect(const Format: String): Integer;
+    function Disconnect(const Format: string): Integer;
 
     // Attach a socket to zero or more endpoints. If endpoints is not null,
     // parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
@@ -1407,10 +1407,10 @@ uses
     // endpoints were valid, or -1 if there was a syntax error. If the endpoint
     // does not start with '@' or '>', the serverish argument defines whether
     // it is used to bind (serverish = true) or connect (serverish = false).
-    function Attach(const Endpoints: String; Serverish: Boolean): Integer;
+    function Attach(const Endpoints: string; Serverish: Boolean): Integer;
 
     // Returns socket type as printable constant string.
-    function TypeStr: String;
+    function TypeStr: string;
 
     // Send a 'picture' message to the socket (or actor). The picture is a
     // string that defines the type of each frame. This makes it easy to send
@@ -1439,12 +1439,12 @@ uses
     // have data in a zchunk or zframe. Does not change or take ownership of
     // any arguments. Returns 0 if successful, -1 if sending failed for any
     // reason.
-    function Send(const Picture: String): Integer;
+    function Send(const Picture: string): Integer;
 
     // Send a 'picture' message to the socket (or actor). This is a va_list
     // version of zsock_send (), so please consult its documentation for the
     // details.
-    function Vsend(const Picture: String; Argptr: va_list): Integer;
+    function Vsend(const Picture: string; Argptr: va_list): Integer;
 
     // Receive a 'picture' message to the socket (or actor). See zsock_send for
     // the format and meaning of the picture. Returns the picture elements into
@@ -1473,12 +1473,12 @@ uses
     // If an argument pointer is NULL, does not store any value (skips it).
     // An 'n' picture matches an empty frame; if the message does not match,
     // the method will return -1.
-    function Recv(const Picture: String): Integer;
+    function Recv(const Picture: string): Integer;
 
     // Receive a 'picture' message from the socket (or actor). This is a
     // va_list version of zsock_recv (), so please consult its documentation
     // for the details.
-    function Vrecv(const Picture: String; Argptr: va_list): Integer;
+    function Vrecv(const Picture: string; Argptr: va_list): Integer;
 
     // Send a binary encoded 'picture' message to the socket (or actor). This
     // method is similar to zsock_send, except the arguments are encoded in a
@@ -1501,7 +1501,7 @@ uses
     //
     // Does not change or take ownership of any arguments. Returns 0 if
     // successful, -1 if sending failed for any reason.
-    function Bsend(const Picture: String): Integer;
+    function Bsend(const Picture: string): Integer;
 
     // Receive a binary encoded 'picture' message from the socket (or actor).
     // This method is similar to zsock_recv, except the arguments are encoded
@@ -1520,7 +1520,7 @@ uses
     // depending on the object as zsock_brecv will create new objects.
     // For type p the caller must coordinate with the sender, as it is just a
     // pointer value being passed.
-    function Brecv(const Picture: String): Integer;
+    function Brecv(const Picture: string): Integer;
 
     // Return socket routing ID if any. This returns 0 if the socket is not
     // of type ZMQ_SERVER or if no request was already received on it.
@@ -1555,11 +1555,14 @@ uses
 
     // Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
     // Returns 0 if OK, -1 if failed.
-    function Join(const Group: String): Integer;
+    function Join(const Group: string): Integer;
 
     // Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
     // Returns 0 if OK, -1 if failed.
-    function Leave(const Group: String): Integer;
+    function Leave(const Group: string): Integer;
+
+    // Check whether the socket has available message to read.
+    function HasIn: Boolean;
 
     // Get socket option `router_notify`.
     // Available from libzmq 4.3.0.
@@ -1579,11 +1582,11 @@ uses
 
     // Get socket option `metadata`.
     // Available from libzmq 4.3.0.
-    function Metadata: String;
+    function Metadata: string;
 
     // Set socket option `metadata`.
     // Available from libzmq 4.3.0.
-    procedure SetMetadata(const Metadata: String);
+    procedure SetMetadata(const Metadata: string);
 
     // Get socket option `loopback_fastpath`.
     // Available from libzmq 4.3.0.
@@ -1619,11 +1622,11 @@ uses
 
     // Get socket option `bindtodevice`.
     // Available from libzmq 4.3.0.
-    function Bindtodevice: String;
+    function Bindtodevice: string;
 
     // Set socket option `bindtodevice`.
     // Available from libzmq 4.3.0.
-    procedure SetBindtodevice(const Bindtodevice: String);
+    procedure SetBindtodevice(const Bindtodevice: string);
 
     // Get socket option `heartbeat_ivl`.
     // Available from libzmq 4.2.0.
@@ -1663,7 +1666,7 @@ uses
 
     // Set socket option `xpub_welcome_msg`.
     // Available from libzmq 4.2.0.
-    procedure SetXpubWelcomeMsg(const XpubWelcomeMsg: String);
+    procedure SetXpubWelcomeMsg(const XpubWelcomeMsg: string);
 
     // Set socket option `stream_notify`.
     // Available from libzmq 4.2.0.
@@ -1755,7 +1758,7 @@ uses
 
     // Set socket option `connect_rid`.
     // Available from libzmq 4.1.0.
-    procedure SetConnectRid(const ConnectRid: String);
+    procedure SetConnectRid(const ConnectRid: string);
 
     // Set socket option `connect_rid` from 32-octet binary
     // Available from libzmq 4.1.0.
@@ -1771,11 +1774,11 @@ uses
 
     // Get socket option `socks_proxy`.
     // Available from libzmq 4.1.0.
-    function SocksProxy: String;
+    function SocksProxy: string;
 
     // Set socket option `socks_proxy`.
     // Available from libzmq 4.1.0.
-    procedure SetSocksProxy(const SocksProxy: String);
+    procedure SetSocksProxy(const SocksProxy: string);
 
     // Set socket option `xpub_nodrop`.
     // Available from libzmq 4.1.0.
@@ -1803,11 +1806,11 @@ uses
 
     // Get socket option `zap_domain`.
     // Available from libzmq 4.0.0.
-    function ZapDomain: String;
+    function ZapDomain: string;
 
     // Set socket option `zap_domain`.
     // Available from libzmq 4.0.0.
-    procedure SetZapDomain(const ZapDomain: String);
+    procedure SetZapDomain(const ZapDomain: string);
 
     // Get socket option `mechanism`.
     // Available from libzmq 4.0.0.
@@ -1823,19 +1826,19 @@ uses
 
     // Get socket option `plain_username`.
     // Available from libzmq 4.0.0.
-    function PlainUsername: String;
+    function PlainUsername: string;
 
     // Set socket option `plain_username`.
     // Available from libzmq 4.0.0.
-    procedure SetPlainUsername(const PlainUsername: String);
+    procedure SetPlainUsername(const PlainUsername: string);
 
     // Get socket option `plain_password`.
     // Available from libzmq 4.0.0.
-    function PlainPassword: String;
+    function PlainPassword: string;
 
     // Set socket option `plain_password`.
     // Available from libzmq 4.0.0.
-    procedure SetPlainPassword(const PlainPassword: String);
+    procedure SetPlainPassword(const PlainPassword: string);
 
     // Get socket option `curve_server`.
     // Available from libzmq 4.0.0.
@@ -1847,11 +1850,11 @@ uses
 
     // Get socket option `curve_publickey`.
     // Available from libzmq 4.0.0.
-    function CurvePublickey: String;
+    function CurvePublickey: string;
 
     // Set socket option `curve_publickey`.
     // Available from libzmq 4.0.0.
-    procedure SetCurvePublickey(const CurvePublickey: String);
+    procedure SetCurvePublickey(const CurvePublickey: string);
 
     // Set socket option `curve_publickey` from 32-octet binary
     // Available from libzmq 4.0.0.
@@ -1859,11 +1862,11 @@ uses
 
     // Get socket option `curve_secretkey`.
     // Available from libzmq 4.0.0.
-    function CurveSecretkey: String;
+    function CurveSecretkey: string;
 
     // Set socket option `curve_secretkey`.
     // Available from libzmq 4.0.0.
-    procedure SetCurveSecretkey(const CurveSecretkey: String);
+    procedure SetCurveSecretkey(const CurveSecretkey: string);
 
     // Set socket option `curve_secretkey` from 32-octet binary
     // Available from libzmq 4.0.0.
@@ -1871,11 +1874,11 @@ uses
 
     // Get socket option `curve_serverkey`.
     // Available from libzmq 4.0.0.
-    function CurveServerkey: String;
+    function CurveServerkey: string;
 
     // Set socket option `curve_serverkey`.
     // Available from libzmq 4.0.0.
-    procedure SetCurveServerkey(const CurveServerkey: String);
+    procedure SetCurveServerkey(const CurveServerkey: string);
 
     // Set socket option `curve_serverkey` from 32-octet binary
     // Available from libzmq 4.0.0.
@@ -1899,19 +1902,19 @@ uses
 
     // Get socket option `gssapi_principal`.
     // Available from libzmq 4.0.0.
-    function GssapiPrincipal: String;
+    function GssapiPrincipal: string;
 
     // Set socket option `gssapi_principal`.
     // Available from libzmq 4.0.0.
-    procedure SetGssapiPrincipal(const GssapiPrincipal: String);
+    procedure SetGssapiPrincipal(const GssapiPrincipal: string);
 
     // Get socket option `gssapi_service_principal`.
     // Available from libzmq 4.0.0.
-    function GssapiServicePrincipal: String;
+    function GssapiServicePrincipal: string;
 
     // Set socket option `gssapi_service_principal`.
     // Available from libzmq 4.0.0.
-    procedure SetGssapiServicePrincipal(const GssapiServicePrincipal: String);
+    procedure SetGssapiServicePrincipal(const GssapiServicePrincipal: string);
 
     // Get socket option `ipv6`.
     // Available from libzmq 4.0.0.
@@ -1999,15 +2002,15 @@ uses
 
     // Get socket option `tcp_accept_filter`.
     // Available from libzmq 3.0.0.
-    function TcpAcceptFilter: String;
+    function TcpAcceptFilter: string;
 
     // Set socket option `tcp_accept_filter`.
     // Available from libzmq 3.0.0.
-    procedure SetTcpAcceptFilter(const TcpAcceptFilter: String);
+    procedure SetTcpAcceptFilter(const TcpAcceptFilter: string);
 
     // Get socket option `last_endpoint`.
     // Available from libzmq 3.0.0.
-    function LastEndpoint: String;
+    function LastEndpoint: string;
 
     // Set socket option `router_raw`.
     // Available from libzmq 3.0.0.
@@ -2051,11 +2054,11 @@ uses
 
     // Get socket option `identity`.
     // Available from libzmq 2.0.0.
-    function Identity: String;
+    function Identity: string;
 
     // Set socket option `identity`.
     // Available from libzmq 2.0.0.
-    procedure SetIdentity(const Identity: String);
+    procedure SetIdentity(const Identity: string);
 
     // Get socket option `rate`.
     // Available from libzmq 2.0.0.
@@ -2155,11 +2158,11 @@ uses
 
     // Set socket option `subscribe`.
     // Available from libzmq 2.0.0.
-    procedure SetSubscribe(const Subscribe: String);
+    procedure SetSubscribe(const Subscribe: string);
 
     // Set socket option `unsubscribe`.
     // Available from libzmq 2.0.0.
-    procedure SetUnsubscribe(const Unsubscribe: String);
+    procedure SetUnsubscribe(const Unsubscribe: string);
 
     // Get socket option `type`.
     // Available from libzmq 2.0.0.
@@ -2186,7 +2189,7 @@ uses
 
     // Set UUID to new supplied string value skipping '-' and '{' '}'
     // optional delimiters. Return 0 if OK, else returns -1.
-    function SetStr(const Source: String): Integer;
+    function SetStr(const Source: string): Integer;
 
     // Return UUID binary data.
     function Data: PByte;
@@ -2195,12 +2198,12 @@ uses
     function Size: NativeUInt;
 
     // Returns UUID as string
-    function Str: String;
+    function Str: string;
 
     // Return UUID in the canonical string format: 8-4-4-4-12, in lower
     // case. Caller does not modify or free returned value. See
     // http://en.wikipedia.org/wiki/Universally_unique_identifier
-    function StrCanonical: String;
+    function StrCanonical: string;
 
     // Store UUID blob in target array
     procedure Export(Target: PByte);
@@ -2286,18 +2289,18 @@ uses
     // Encode a stream of bytes into an armoured string. Returns the armoured
     // string, or NULL if there was insufficient memory available to allocate
     // a new string.
-    function Encode(Data: PByte; Size: NativeUInt): String;
+    function Encode(Data: PByte; Size: NativeUInt): string;
 
     // Decode an armoured string into a chunk. The decoded output is
     // null-terminated, so it may be treated as a string, if that's what
     // it was prior to encoding.
-    function Decode(const Data: String): IZchunk;
+    function Decode(const Data: string): IZchunk;
 
     // Get the mode property.
     function Mode: Integer;
 
     // Get printable string for mode.
-    function ModeStr: String;
+    function ModeStr: string;
 
     // Set the mode property.
     procedure SetMode(Mode: Integer);
@@ -2345,10 +2348,10 @@ uses
     constructor NewFrom(PublicKey: PByte; SecretKey: PByte);
 
     // Accepts public/secret key text pair from caller
-    constructor NewFromTxt(const PublicTxt: String; const SecretTxt: String);
+    constructor NewFromTxt(const PublicTxt: string; const SecretTxt: string);
 
     // Load certificate from file
-    constructor Load(const Filename: String);
+    constructor Load(const Filename: string);
 
     // Destroy a certificate in memory
     destructor Destroy; override;
@@ -2367,20 +2370,20 @@ uses
     function SecretKey: PByte;
 
     // Return public part of key pair as Z85 armored string
-    function PublicTxt: String;
+    function PublicTxt: string;
 
     // Return secret part of key pair as Z85 armored string
-    function SecretTxt: String;
+    function SecretTxt: string;
 
     // Set certificate metadata from formatted string.
-    procedure SetMeta(const Name: String; const Format: String);
+    procedure SetMeta(const Name: string; const Format: string);
 
     // Unset certificate metadata.
-    procedure UnsetMeta(const Name: String);
+    procedure UnsetMeta(const Name: string);
 
     // Get metadata value from certificate; if the metadata value doesn't
     // exist, returns NULL.
-    function Meta(const Name: String): String;
+    function Meta(const Name: string): string;
 
     // Get list of metadata fields from certificate. Caller is responsible for
     // destroying list. Caller should not modify the values of list items.
@@ -2388,13 +2391,13 @@ uses
 
     // Save full certificate (public + secret) to file for persistent storage
     // This creates one public file and one secret file (filename + "_secret").
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Save public certificate only to file for persistent storage
-    function SavePublic(const Filename: String): Integer;
+    function SavePublic(const Filename: string): Integer;
 
     // Save secret certificate only to file for persistent storage
-    function SaveSecret(const Filename: String): Integer;
+    function SaveSecret(const Filename: string): Integer;
 
     // Apply certificate to socket, i.e. use for CURVE security on socket.
     // If certificate was loaded from public file, the secret key will be
@@ -2426,7 +2429,7 @@ uses
     // is automatically refreshed on any zcertstore_lookup() call. If the
     // location is specified as NULL, creates a pure-memory store, which you
     // can work with by inserting certificates at runtime.
-    constructor New(const Location: String);
+    constructor New(const Location: string);
 
     // Destroy a certificate store object in memory. Does not affect anything
     // stored on disk.
@@ -2444,7 +2447,7 @@ uses
 
     // Look up certificate by public key, returns zcert_t object if found,
     // else returns NULL. The public key is provided in Z85 text format.
-    function Lookup(const PublicKey: String): IZcert;
+    function Lookup(const PublicKey: string): IZcert;
 
     // Insert certificate into certificate store in memory. Note that this
     // does not save the certificate to disk. To do that, use zcert_save()
@@ -2488,7 +2491,7 @@ uses
     // the file. If maxsize is 0, will attempt to read the entire file and
     // fail with an assertion if that cannot fit into memory. Returns a new
     // chunk containing the file data, or NULL if the file could not be read.
-    class function Slurp(const Filename: String; Maxsize: NativeUInt): IZchunk;
+    class function Slurp(const Filename: string; Maxsize: NativeUInt): IZchunk;
 
     // Transform a zframe into a zchunk.
     class function Unpack(const Frame: IZframe): IZchunk;
@@ -2551,20 +2554,20 @@ uses
 
     // Return chunk data encoded as printable hex string. Caller must free
     // string when finished with it.
-    function Strhex: String;
+    function Strhex: string;
 
     // Return chunk data copied into freshly allocated string
     // Caller must free string when finished with it.
-    function Strdup: String;
+    function Strdup: string;
 
     // Return TRUE if chunk body is equal to string, excluding terminator
-    function Streq(const &String: String): Boolean;
+    function Streq(const &String: string): Boolean;
 
     // Transform zchunk into a zframe that can be sent in a message.
     function Pack: IZframe;
 
     // Calculate SHA1 digest for chunk, using zdigest class.
-    function Digest: String;
+    function Digest: string;
 
     // Dump chunk to FILE stream, for debugging and tracing.
     procedure Fprint(&File: Pointer);
@@ -2597,7 +2600,7 @@ uses
     class function Usecs: Int64;
 
     // Return formatted date/time as fresh string. Free using zstr_free().
-    class function Timestr: String;
+    class function Timestr: string;
 
     // Self test of this class.
     class procedure Test(Verbose: Boolean);
@@ -2612,16 +2615,16 @@ uses
   public
 
     // Create new config item
-    constructor New(const Name: String; const Parent: IZconfig);
+    constructor New(const Name: string; const Parent: IZconfig);
 
     // Load a config tree from a specified ZPL text file; returns a zconfig_t
     // reference for the root, if the file exists and is readable. Returns NULL
     // if the file does not exist.
-    constructor Load(const Filename: String);
+    constructor Load(const Filename: string);
 
     // Equivalent to zconfig_load, taking a format string instead of a fixed
     // filename.
-    constructor Loadf(const Format: String);
+    constructor Loadf(const Format: string);
 
     // Destroy a config item and all its children
     destructor Destroy; override;
@@ -2635,7 +2638,7 @@ uses
     class function ChunkLoad(const Chunk: IZchunk): IZconfig;
 
     // Load a config tree from a null-terminated string
-    class function StrLoad(const &String: String): IZconfig;
+    class function StrLoad(const &String: string): IZconfig;
 
     // Destroy node and subtree (all children)
     class procedure Remove(var SelfP: IZconfig);
@@ -2653,30 +2656,30 @@ uses
     function Dup: IZconfig;
 
     // Return name of config item
-    function Name: String;
+    function Name: string;
 
     // Return value of config item
-    function Value: String;
+    function Value: string;
 
     // Insert or update configuration key with value
-    procedure Put(const Path: String; const Value: String);
+    procedure Put(const Path: string; const Value: string);
 
     // Equivalent to zconfig_put, accepting a format specifier and variable
     // argument list, instead of a single string value.
-    procedure Putf(const Path: String; const Format: String);
+    procedure Putf(const Path: string; const Format: string);
 
     // Get value for config item into a string value; leading slash is optional
     // and ignored.
-    function Get(const Path: String; const DefaultValue: String): String;
+    function Get(const Path: string; const DefaultValue: string): string;
 
     // Set config item name, name may be NULL
-    procedure SetName(const Name: String);
+    procedure SetName(const Name: string);
 
     // Set new value for config item. The new value may be a string, a printf
     // format, or NULL. Note that if string may possibly contain '%', or if it
     // comes from an insecure source, you must use '%s' as the format, followed
     // by the string.
-    procedure SetValue(const Format: String);
+    procedure SetValue(const Format: string);
 
     // Find our first child, if any
     function Child: IZconfig;
@@ -2685,7 +2688,7 @@ uses
     function Next: IZconfig;
 
     // Find a config item along a path; leading slash is optional and ignored.
-    function Locate(const Path: String): IZconfig;
+    function Locate(const Path: string): IZconfig;
 
     // Locate the last config item at a specified depth
     function AtDepth(Level: Integer): IZconfig;
@@ -2697,27 +2700,27 @@ uses
     // Add comment to config item before saving to disk. You can add as many
     // comment lines as you like. If you use a null format, all comments are
     // deleted.
-    procedure SetComment(const Format: String);
+    procedure SetComment(const Format: string);
 
     // Return comments of config item, as zlist.
     function Comments: IZlist;
 
     // Save a config tree to a specified ZPL text file, where a filename
     // "-" means dump to standard output.
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Equivalent to zconfig_save, taking a format string instead of a fixed
     // filename.
-    function Savef(const Format: String): Integer;
+    function Savef(const Format: string): Integer;
 
     // Report filename used during zconfig_load, or NULL if none
-    function Filename: String;
+    function Filename: string;
 
     // Save a config tree to a new memory chunk
     function ChunkSave: IZchunk;
 
     // Save a config tree to a new null terminated string
-    function StrSave: String;
+    function StrSave: string;
 
     // Return true if a configuration tree was loaded from a file and that
     // file has changed in since the tree was loaded.
@@ -2768,7 +2771,7 @@ uses
     // Return digest as printable hex string; caller should not modify nor
     // free this string. After calling this, you may not use zdigest_update()
     // on the same digest. If built without crypto support, returns NULL.
-    function &String: String;
+    function &String: string;
   end;
 
   // work with file-system directories
@@ -2782,7 +2785,7 @@ uses
     // Create a new directory item that loads in the full tree of the specified
     // path, optionally located under some parent path. If parent is "-", then
     // loads only the top-level directory, and does not use parent as a path.
-    constructor New(const Path: String; const Parent: String);
+    constructor New(const Path: string; const Parent: string);
 
     // Destroy a directory tree and all children it contains.
     destructor Destroy; override;
@@ -2791,7 +2794,7 @@ uses
     // Returns a list of zdir_patch_t patches. Either older or newer may
     // be null, indicating the directory is empty/absent. If alias is set,
     // generates virtual filename (minus path, plus alias).
-    class function Diff(const Older: IZdir; const Newer: IZdir; const Alias: String): IZlist;
+    class function Diff(const Older: IZdir; const Newer: IZdir; const Alias: string): IZlist;
 
     // Create a new zdir_watch actor instance:
     //
@@ -2829,7 +2832,7 @@ uses
   protected
 
     // Return directory path
-    function Path: String;
+    function Path: string;
 
     // Return last modification time for directory.
     function Modified: Int64;
@@ -2852,7 +2855,7 @@ uses
     procedure Remove(Force: Boolean);
 
     // Return full contents of directory as a zdir_patch list.
-    function Resync(const Alias: String): IZlist;
+    function Resync(const Alias: string): IZlist;
 
     // Load directory cache; returns a hash table containing the SHA-1 digests
     // of every file in the tree. The cache is saved between runs in .cache.
@@ -2874,7 +2877,7 @@ uses
   public
 
     // Create new patch
-    constructor New(const Path: String; const &File: IZfile; Op: Integer; const Alias: String);
+    constructor New(const Path: string; const &File: IZfile; Op: Integer; const Alias: string);
 
     // Destroy a patch
     destructor Destroy; override;
@@ -2891,7 +2894,7 @@ uses
     function Dup: IZdirPatch;
 
     // Return patch file directory path
-    function Path: String;
+    function Path: string;
 
     // Return patch file item
     function &File: IZfile;
@@ -2900,13 +2903,13 @@ uses
     function Op: Integer;
 
     // Return patch virtual file path
-    function Vpath: String;
+    function Vpath: string;
 
     // Calculate hash digest for file (create only)
     procedure DigestSet;
 
     // Return hash digest for patch file
-    function Digest: String;
+    function Digest: string;
   end;
 
   // helper functions for working with files.
@@ -2922,7 +2925,7 @@ uses
     // text file containing one line, the filename of a target file. Reading
     // data from the symbolic link actually reads from the target file. Path
     // may be NULL, in which case it is not used.
-    constructor New(const Path: String; const Name: String);
+    constructor New(const Path: string; const Name: string);
 
     // Create new temporary file for writing via tmpfile. File is automatically
     // deleted on destroy
@@ -2943,7 +2946,7 @@ uses
     function Dup: IZfile;
 
     // Return file name, remove path if provided
-    function Filename(const Path: String): String;
+    function Filename(const Path: string): string;
 
     // Refresh file properties from disk; this is not done automatically
     // on access methods, otherwise it is not possible to compare directory
@@ -3009,7 +3012,7 @@ uses
 
     // Read next line of text from file. Returns a pointer to the text line,
     // or NULL if there was nothing more to read from the file.
-    function Readln: String;
+    function Readln: string;
 
     // Close file, if open
     procedure Close;
@@ -3018,7 +3021,7 @@ uses
     function Handle: Pointer;
 
     // Calculate SHA1 digest for file, using zdigest class.
-    function Digest: String;
+    function Digest: string;
   end;
 
   // working with single message frames
@@ -3038,7 +3041,7 @@ uses
     constructor NewEmpty;
 
     // Create a frame with a specified string content.
-    constructor From(const &String: String);
+    constructor From(const &String: string);
 
     // Receive frame from socket, returns zframe_t object or NULL if the recv
     // was interrupted. Does a blocking recv, if you want to not block then use
@@ -3071,7 +3074,7 @@ uses
     // Return meta data property for frame
     // The caller shall not modify or free the returned value, which shall be
     // owned by the message.
-    function Meta(const &Property: String): String;
+    function Meta(const &Property: string): string;
 
     // Create a new frame that duplicates an existing frame. If frame is null,
     // or memory was exhausted, returns null.
@@ -3079,14 +3082,14 @@ uses
 
     // Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
     // Caller must free string when finished with it.
-    function Strhex: String;
+    function Strhex: string;
 
     // Return frame data copied into freshly allocated string
     // Caller must free string when finished with it.
-    function Strdup: String;
+    function Strdup: string;
 
     // Return TRUE if frame body is equal to string, excluding terminator
-    function Streq(const &String: String): Boolean;
+    function Streq(const &String: string): Boolean;
 
     // Return frame MORE indicator (1 or 0), set when reading frame from socket
     // or by the zframe_set_more() method
@@ -3105,12 +3108,12 @@ uses
     procedure SetRoutingId(RoutingId: Cardinal);
 
     // Return frame group of radio-dish pattern.
-    function Group: String;
+    function Group: string;
 
     // Set group on frame. This is used if/when the frame is sent to a
     // ZMQ_RADIO socket.
     // Return -1 on error, 0 on success.
-    function SetGroup(const Group: String): Integer;
+    function SetGroup(const Group: string): Integer;
 
     // Return TRUE if two frames have identical size and data
     // If either frame is NULL, equality is always false.
@@ -3121,7 +3124,7 @@ uses
 
     // Send message to zsys log sink (may be stdout, or system facility as
     // configured by zsys_set_logstream). Prefix shows before frame, if not null.
-    procedure Print(const Prefix: String);
+    procedure Print(const Prefix: string);
   end;
 
   // generic type-free hash container (simple)
@@ -3153,30 +3156,30 @@ uses
     // Insert item into hash table with specified key and item.
     // If key is already present returns -1 and leaves existing item unchanged
     // Returns 0 on success.
-    function Insert(const Key: String; Item: Pointer): Integer;
+    function Insert(const Key: string; Item: Pointer): Integer;
 
     // Update item into hash table with specified key and item.
     // If key is already present, destroys old item and inserts new one.
     // Use free_fn method to ensure deallocator is properly called on item.
-    procedure Update(const Key: String; Item: Pointer);
+    procedure Update(const Key: string; Item: Pointer);
 
     // Remove an item specified by key from the hash table. If there was no such
     // item, this function does nothing.
-    procedure Delete(const Key: String);
+    procedure Delete(const Key: string);
 
     // Return the item at the specified key, or null
-    function Lookup(const Key: String): Pointer;
+    function Lookup(const Key: string): Pointer;
 
     // Reindexes an item from an old key to a new key. If there was no such
     // item, does nothing. Returns 0 if successful, else -1.
-    function Rename(const OldKey: String; const NewKey: String): Integer;
+    function Rename(const OldKey: string; const NewKey: string): Integer;
 
     // Set a free function for the specified hash table item. When the item is
     // destroyed, the free function, if any, is called on that item.
     // Use this when hash items are dynamically allocated, to ensure that
     // you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
     // Returns the item, or NULL if there is no such item.
-    function Freefn(const Key: String; FreeFn: TZhashFreeFn): Pointer;
+    function Freefn(const Key: string; FreeFn: TZhashFreeFn): Pointer;
 
     // Return the number of keys/items in the hash table
     function Size: NativeUInt;
@@ -3208,12 +3211,12 @@ uses
     // was returned. This is a constant string that you may not modify or
     // deallocate, and which lasts as long as the item in the hash. After an
     // unsuccessful first/next, returns NULL.
-    function Cursor: String;
+    function Cursor: string;
 
     // Add a comment to hash table before saving to disk. You can add as many
     // comment lines as you like. These comment lines are discarded when loading
     // the file. If you use a null format, all comments are deleted.
-    procedure Comment(const Format: String);
+    procedure Comment(const Format: string);
 
     // Serialize hash table to a binary frame that can be sent in a message.
     // The packed format is compatible with the 'dictionary' type defined in
@@ -3240,12 +3243,12 @@ uses
     // Save hash table to a text file in name=value format. Hash values must be
     // printable strings; keys may not contain '=' character. Returns 0 if OK,
     // else -1 if a file error occurred.
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Load hash table from a text file in name=value format; hash table must
     // already exist. Hash values must printable strings; keys may not contain
     // '=' character. Returns 0 if OK, else -1 if a file was not readable.
-    function Load(const Filename: String): Integer;
+    function Load(const Filename: string): Integer;
 
     // When a hash table was loaded from a file by zhash_load, this method will
     // reload the file if it has been modified since, and is "stable", i.e. not
@@ -3359,17 +3362,17 @@ uses
     // Add a comment to hash table before saving to disk. You can add as many
     // comment lines as you like. These comment lines are discarded when loading
     // the file. If you use a null format, all comments are deleted.
-    procedure Comment(const Format: String);
+    procedure Comment(const Format: string);
 
     // Save hash table to a text file in name=value format. Hash values must be
     // printable strings; keys may not contain '=' character. Returns 0 if OK,
     // else -1 if a file error occurred.
-    function Save(const Filename: String): Integer;
+    function Save(const Filename: string): Integer;
 
     // Load hash table from a text file in name=value format; hash table must
     // already exist. Hash values must printable strings; keys may not contain
     // '=' character. Returns 0 if OK, else -1 if a file was not readable.
-    function Load(const Filename: String): Integer;
+    function Load(const Filename: string): Integer;
 
     // When a hash table was loaded from a file by zhashx_load, this method will
     // reload the file if it has been modified since, and is "stable", i.e. not
@@ -3475,19 +3478,19 @@ uses
     function Size: NativeUInt;
 
     // Get first network interface, return NULL if there are none
-    function First: String;
+    function First: string;
 
     // Get next network interface, return NULL if we hit the last one
-    function Next: String;
+    function Next: string;
 
     // Return the current interface IP address as a printable string
-    function Address: String;
+    function Address: string;
 
     // Return the current interface broadcast address as a printable string
-    function Broadcast: String;
+    function Broadcast: string;
 
     // Return the current interface network mask as a printable string
-    function Netmask: String;
+    function Netmask: string;
 
     // Return the list of interfaces.
     procedure Print;
@@ -3976,23 +3979,23 @@ uses
 
     // Push string as new frame to front of message.
     // Returns 0 on success, -1 on error.
-    function Pushstr(const &String: String): Integer;
+    function Pushstr(const &String: string): Integer;
 
     // Push string as new frame to end of message.
     // Returns 0 on success, -1 on error.
-    function Addstr(const &String: String): Integer;
+    function Addstr(const &String: string): Integer;
 
     // Push formatted string as new frame to front of message.
     // Returns 0 on success, -1 on error.
-    function Pushstrf(const Format: String): Integer;
+    function Pushstrf(const Format: string): Integer;
 
     // Push formatted string as new frame to end of message.
     // Returns 0 on success, -1 on error.
-    function Addstrf(const Format: String): Integer;
+    function Addstrf(const Format: string): Integer;
 
     // Pop frame off front of message, return as fresh string. If there were
     // no more frames in the message, returns NULL.
-    function Popstr: String;
+    function Popstr: string;
 
     // Push encoded message as a new frame. Message takes ownership of
     // submessage, so the original is destroyed in this call. Returns 0 on
@@ -4122,59 +4125,59 @@ uses
     constructor New(&Type: Integer);
 
     // Create a PUB socket. Default action is bind.
-    constructor NewPub(const Endpoint: String);
+    constructor NewPub(const Endpoint: string);
 
     // Create a SUB socket, and optionally subscribe to some prefix string. Default
     // action is connect.
-    constructor NewSub(const Endpoint: String; const Subscribe: String);
+    constructor NewSub(const Endpoint: string; const Subscribe: string);
 
     // Create a REQ socket. Default action is connect.
-    constructor NewReq(const Endpoint: String);
+    constructor NewReq(const Endpoint: string);
 
     // Create a REP socket. Default action is bind.
-    constructor NewRep(const Endpoint: String);
+    constructor NewRep(const Endpoint: string);
 
     // Create a DEALER socket. Default action is connect.
-    constructor NewDealer(const Endpoint: String);
+    constructor NewDealer(const Endpoint: string);
 
     // Create a ROUTER socket. Default action is bind.
-    constructor NewRouter(const Endpoint: String);
+    constructor NewRouter(const Endpoint: string);
 
     // Create a PUSH socket. Default action is connect.
-    constructor NewPush(const Endpoint: String);
+    constructor NewPush(const Endpoint: string);
 
     // Create a PULL socket. Default action is bind.
-    constructor NewPull(const Endpoint: String);
+    constructor NewPull(const Endpoint: string);
 
     // Create an XPUB socket. Default action is bind.
-    constructor NewXpub(const Endpoint: String);
+    constructor NewXpub(const Endpoint: string);
 
     // Create an XSUB socket. Default action is connect.
-    constructor NewXsub(const Endpoint: String);
+    constructor NewXsub(const Endpoint: string);
 
     // Create a PAIR socket. Default action is connect.
-    constructor NewPair(const Endpoint: String);
+    constructor NewPair(const Endpoint: string);
 
     // Create a STREAM socket. Default action is connect.
-    constructor NewStream(const Endpoint: String);
+    constructor NewStream(const Endpoint: string);
 
     // Create a SERVER socket. Default action is bind.
-    constructor NewServer(const Endpoint: String);
+    constructor NewServer(const Endpoint: string);
 
     // Create a CLIENT socket. Default action is connect.
-    constructor NewClient(const Endpoint: String);
+    constructor NewClient(const Endpoint: string);
 
     // Create a RADIO socket. Default action is bind.
-    constructor NewRadio(const Endpoint: String);
+    constructor NewRadio(const Endpoint: string);
 
     // Create a DISH socket. Default action is connect.
-    constructor NewDish(const Endpoint: String);
+    constructor NewDish(const Endpoint: string);
 
     // Create a GATHER socket. Default action is bind.
-    constructor NewGather(const Endpoint: String);
+    constructor NewGather(const Endpoint: string);
 
     // Create a SCATTER socket. Default action is connect.
-    constructor NewScatter(const Endpoint: String);
+    constructor NewScatter(const Endpoint: string);
 
     // Destroy the socket. You must use this for any socket created via the
     // zsock_new method.
@@ -4217,24 +4220,24 @@ uses
     // ephemeral ports, a port may be reused by different services without
     // clients being aware. Protocols that run on ephemeral ports should take
     // this into account.
-    function Bind(const Format: String): Integer;
+    function Bind(const Format: string): Integer;
 
     // Returns last bound endpoint, if any.
-    function Endpoint: String;
+    function Endpoint: string;
 
     // Unbind a socket from a formatted endpoint.
     // Returns 0 if OK, -1 if the endpoint was invalid or the function
     // isn't supported.
-    function Unbind(const Format: String): Integer;
+    function Unbind(const Format: string): Integer;
 
     // Connect a socket to a formatted endpoint
     // Returns 0 if OK, -1 if the endpoint was invalid.
-    function Connect(const Format: String): Integer;
+    function Connect(const Format: string): Integer;
 
     // Disconnect a socket from a formatted endpoint
     // Returns 0 if OK, -1 if the endpoint was invalid or the function
     // isn't supported.
-    function Disconnect(const Format: String): Integer;
+    function Disconnect(const Format: string): Integer;
 
     // Attach a socket to zero or more endpoints. If endpoints is not null,
     // parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
@@ -4242,10 +4245,10 @@ uses
     // endpoints were valid, or -1 if there was a syntax error. If the endpoint
     // does not start with '@' or '>', the serverish argument defines whether
     // it is used to bind (serverish = true) or connect (serverish = false).
-    function Attach(const Endpoints: String; Serverish: Boolean): Integer;
+    function Attach(const Endpoints: string; Serverish: Boolean): Integer;
 
     // Returns socket type as printable constant string.
-    function TypeStr: String;
+    function TypeStr: string;
 
     // Send a 'picture' message to the socket (or actor). The picture is a
     // string that defines the type of each frame. This makes it easy to send
@@ -4274,12 +4277,12 @@ uses
     // have data in a zchunk or zframe. Does not change or take ownership of
     // any arguments. Returns 0 if successful, -1 if sending failed for any
     // reason.
-    function Send(const Picture: String): Integer;
+    function Send(const Picture: string): Integer;
 
     // Send a 'picture' message to the socket (or actor). This is a va_list
     // version of zsock_send (), so please consult its documentation for the
     // details.
-    function Vsend(const Picture: String; Argptr: va_list): Integer;
+    function Vsend(const Picture: string; Argptr: va_list): Integer;
 
     // Receive a 'picture' message to the socket (or actor). See zsock_send for
     // the format and meaning of the picture. Returns the picture elements into
@@ -4308,12 +4311,12 @@ uses
     // If an argument pointer is NULL, does not store any value (skips it).
     // An 'n' picture matches an empty frame; if the message does not match,
     // the method will return -1.
-    function Recv(const Picture: String): Integer;
+    function Recv(const Picture: string): Integer;
 
     // Receive a 'picture' message from the socket (or actor). This is a
     // va_list version of zsock_recv (), so please consult its documentation
     // for the details.
-    function Vrecv(const Picture: String; Argptr: va_list): Integer;
+    function Vrecv(const Picture: string; Argptr: va_list): Integer;
 
     // Send a binary encoded 'picture' message to the socket (or actor). This
     // method is similar to zsock_send, except the arguments are encoded in a
@@ -4336,7 +4339,7 @@ uses
     //
     // Does not change or take ownership of any arguments. Returns 0 if
     // successful, -1 if sending failed for any reason.
-    function Bsend(const Picture: String): Integer;
+    function Bsend(const Picture: string): Integer;
 
     // Receive a binary encoded 'picture' message from the socket (or actor).
     // This method is similar to zsock_recv, except the arguments are encoded
@@ -4355,7 +4358,7 @@ uses
     // depending on the object as zsock_brecv will create new objects.
     // For type p the caller must coordinate with the sender, as it is just a
     // pointer value being passed.
-    function Brecv(const Picture: String): Integer;
+    function Brecv(const Picture: string): Integer;
 
     // Return socket routing ID if any. This returns 0 if the socket is not
     // of type ZMQ_SERVER or if no request was already received on it.
@@ -4390,11 +4393,14 @@ uses
 
     // Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
     // Returns 0 if OK, -1 if failed.
-    function Join(const Group: String): Integer;
+    function Join(const Group: string): Integer;
 
     // Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
     // Returns 0 if OK, -1 if failed.
-    function Leave(const Group: String): Integer;
+    function Leave(const Group: string): Integer;
+
+    // Check whether the socket has available message to read.
+    function HasIn: Boolean;
 
     // Get socket option `router_notify`.
     // Available from libzmq 4.3.0.
@@ -4414,11 +4420,11 @@ uses
 
     // Get socket option `metadata`.
     // Available from libzmq 4.3.0.
-    function Metadata: String;
+    function Metadata: string;
 
     // Set socket option `metadata`.
     // Available from libzmq 4.3.0.
-    procedure SetMetadata(const Metadata: String);
+    procedure SetMetadata(const Metadata: string);
 
     // Get socket option `loopback_fastpath`.
     // Available from libzmq 4.3.0.
@@ -4454,11 +4460,11 @@ uses
 
     // Get socket option `bindtodevice`.
     // Available from libzmq 4.3.0.
-    function Bindtodevice: String;
+    function Bindtodevice: string;
 
     // Set socket option `bindtodevice`.
     // Available from libzmq 4.3.0.
-    procedure SetBindtodevice(const Bindtodevice: String);
+    procedure SetBindtodevice(const Bindtodevice: string);
 
     // Get socket option `heartbeat_ivl`.
     // Available from libzmq 4.2.0.
@@ -4498,7 +4504,7 @@ uses
 
     // Set socket option `xpub_welcome_msg`.
     // Available from libzmq 4.2.0.
-    procedure SetXpubWelcomeMsg(const XpubWelcomeMsg: String);
+    procedure SetXpubWelcomeMsg(const XpubWelcomeMsg: string);
 
     // Set socket option `stream_notify`.
     // Available from libzmq 4.2.0.
@@ -4590,7 +4596,7 @@ uses
 
     // Set socket option `connect_rid`.
     // Available from libzmq 4.1.0.
-    procedure SetConnectRid(const ConnectRid: String);
+    procedure SetConnectRid(const ConnectRid: string);
 
     // Set socket option `connect_rid` from 32-octet binary
     // Available from libzmq 4.1.0.
@@ -4606,11 +4612,11 @@ uses
 
     // Get socket option `socks_proxy`.
     // Available from libzmq 4.1.0.
-    function SocksProxy: String;
+    function SocksProxy: string;
 
     // Set socket option `socks_proxy`.
     // Available from libzmq 4.1.0.
-    procedure SetSocksProxy(const SocksProxy: String);
+    procedure SetSocksProxy(const SocksProxy: string);
 
     // Set socket option `xpub_nodrop`.
     // Available from libzmq 4.1.0.
@@ -4638,11 +4644,11 @@ uses
 
     // Get socket option `zap_domain`.
     // Available from libzmq 4.0.0.
-    function ZapDomain: String;
+    function ZapDomain: string;
 
     // Set socket option `zap_domain`.
     // Available from libzmq 4.0.0.
-    procedure SetZapDomain(const ZapDomain: String);
+    procedure SetZapDomain(const ZapDomain: string);
 
     // Get socket option `mechanism`.
     // Available from libzmq 4.0.0.
@@ -4658,19 +4664,19 @@ uses
 
     // Get socket option `plain_username`.
     // Available from libzmq 4.0.0.
-    function PlainUsername: String;
+    function PlainUsername: string;
 
     // Set socket option `plain_username`.
     // Available from libzmq 4.0.0.
-    procedure SetPlainUsername(const PlainUsername: String);
+    procedure SetPlainUsername(const PlainUsername: string);
 
     // Get socket option `plain_password`.
     // Available from libzmq 4.0.0.
-    function PlainPassword: String;
+    function PlainPassword: string;
 
     // Set socket option `plain_password`.
     // Available from libzmq 4.0.0.
-    procedure SetPlainPassword(const PlainPassword: String);
+    procedure SetPlainPassword(const PlainPassword: string);
 
     // Get socket option `curve_server`.
     // Available from libzmq 4.0.0.
@@ -4682,11 +4688,11 @@ uses
 
     // Get socket option `curve_publickey`.
     // Available from libzmq 4.0.0.
-    function CurvePublickey: String;
+    function CurvePublickey: string;
 
     // Set socket option `curve_publickey`.
     // Available from libzmq 4.0.0.
-    procedure SetCurvePublickey(const CurvePublickey: String);
+    procedure SetCurvePublickey(const CurvePublickey: string);
 
     // Set socket option `curve_publickey` from 32-octet binary
     // Available from libzmq 4.0.0.
@@ -4694,11 +4700,11 @@ uses
 
     // Get socket option `curve_secretkey`.
     // Available from libzmq 4.0.0.
-    function CurveSecretkey: String;
+    function CurveSecretkey: string;
 
     // Set socket option `curve_secretkey`.
     // Available from libzmq 4.0.0.
-    procedure SetCurveSecretkey(const CurveSecretkey: String);
+    procedure SetCurveSecretkey(const CurveSecretkey: string);
 
     // Set socket option `curve_secretkey` from 32-octet binary
     // Available from libzmq 4.0.0.
@@ -4706,11 +4712,11 @@ uses
 
     // Get socket option `curve_serverkey`.
     // Available from libzmq 4.0.0.
-    function CurveServerkey: String;
+    function CurveServerkey: string;
 
     // Set socket option `curve_serverkey`.
     // Available from libzmq 4.0.0.
-    procedure SetCurveServerkey(const CurveServerkey: String);
+    procedure SetCurveServerkey(const CurveServerkey: string);
 
     // Set socket option `curve_serverkey` from 32-octet binary
     // Available from libzmq 4.0.0.
@@ -4734,19 +4740,19 @@ uses
 
     // Get socket option `gssapi_principal`.
     // Available from libzmq 4.0.0.
-    function GssapiPrincipal: String;
+    function GssapiPrincipal: string;
 
     // Set socket option `gssapi_principal`.
     // Available from libzmq 4.0.0.
-    procedure SetGssapiPrincipal(const GssapiPrincipal: String);
+    procedure SetGssapiPrincipal(const GssapiPrincipal: string);
 
     // Get socket option `gssapi_service_principal`.
     // Available from libzmq 4.0.0.
-    function GssapiServicePrincipal: String;
+    function GssapiServicePrincipal: string;
 
     // Set socket option `gssapi_service_principal`.
     // Available from libzmq 4.0.0.
-    procedure SetGssapiServicePrincipal(const GssapiServicePrincipal: String);
+    procedure SetGssapiServicePrincipal(const GssapiServicePrincipal: string);
 
     // Get socket option `ipv6`.
     // Available from libzmq 4.0.0.
@@ -4834,15 +4840,15 @@ uses
 
     // Get socket option `tcp_accept_filter`.
     // Available from libzmq 3.0.0.
-    function TcpAcceptFilter: String;
+    function TcpAcceptFilter: string;
 
     // Set socket option `tcp_accept_filter`.
     // Available from libzmq 3.0.0.
-    procedure SetTcpAcceptFilter(const TcpAcceptFilter: String);
+    procedure SetTcpAcceptFilter(const TcpAcceptFilter: string);
 
     // Get socket option `last_endpoint`.
     // Available from libzmq 3.0.0.
-    function LastEndpoint: String;
+    function LastEndpoint: string;
 
     // Set socket option `router_raw`.
     // Available from libzmq 3.0.0.
@@ -4886,11 +4892,11 @@ uses
 
     // Get socket option `identity`.
     // Available from libzmq 2.0.0.
-    function Identity: String;
+    function Identity: string;
 
     // Set socket option `identity`.
     // Available from libzmq 2.0.0.
-    procedure SetIdentity(const Identity: String);
+    procedure SetIdentity(const Identity: string);
 
     // Get socket option `rate`.
     // Available from libzmq 2.0.0.
@@ -4990,11 +4996,11 @@ uses
 
     // Set socket option `subscribe`.
     // Available from libzmq 2.0.0.
-    procedure SetSubscribe(const Subscribe: String);
+    procedure SetSubscribe(const Subscribe: string);
 
     // Set socket option `unsubscribe`.
     // Available from libzmq 2.0.0.
-    procedure SetUnsubscribe(const Unsubscribe: String);
+    procedure SetUnsubscribe(const Unsubscribe: string);
 
     // Get socket option `type`.
     // Available from libzmq 2.0.0.
@@ -5020,53 +5026,53 @@ uses
     // Receive C string from socket. Caller must free returned string using
     // zstr_free(). Returns NULL if the context is being terminated or the
     // process was interrupted.
-    class function Recv(const Source: IZSock): String;
+    class function Recv(const Source: IZSock): string;
 
     // De-compress and receive C string from socket, received as a message
     // with two frames: size of the uncompressed string, and the string itself.
     // Caller must free returned string using zstr_free(). Returns NULL if the
     // context is being terminated or the process was interrupted.
-    class function RecvCompress(const Source: IZSock): String;
+    class function RecvCompress(const Source: IZSock): string;
 
     // Send a C string to a socket, as a frame. The string is sent without
     // trailing null byte; to read this you can use zstr_recv, or a similar
     // method that adds a null terminator on the received string. String
     // may be NULL, which is sent as "".
-    class function Send(const Dest: IZSock; const &String: String): Integer;
+    class function Send(const Dest: IZSock; const &String: string): Integer;
 
     // Send a C string to a socket, as zstr_send(), with a MORE flag, so that
     // you can send further strings in the same multi-part message.
-    class function Sendm(const Dest: IZSock; const &String: String): Integer;
+    class function Sendm(const Dest: IZSock; const &String: string): Integer;
 
     // Send a formatted string to a socket. Note that you should NOT use
     // user-supplied strings in the format (they may contain '%' which
     // will create security holes).
-    class function Sendf(const Dest: IZSock; const Format: String): Integer;
+    class function Sendf(const Dest: IZSock; const Format: string): Integer;
 
     // Send a formatted string to a socket, as for zstr_sendf(), with a
     // MORE flag, so that you can send further strings in the same multi-part
     // message.
-    class function Sendfm(const Dest: IZSock; const Format: String): Integer;
+    class function Sendfm(const Dest: IZSock; const Format: string): Integer;
 
     // Send a series of strings (until NULL) as multipart data
     // Returns 0 if the strings could be sent OK, or -1 on error.
-    class function Sendx(const Dest: IZSock; const &String: String): Integer;
+    class function Sendx(const Dest: IZSock; const &String: string): Integer;
 
     // Compress and send a C string to a socket, as a message with two frames:
     // size of the uncompressed string, and the string itself. The string is
     // sent without trailing null byte; to read this you can use
     // zstr_recv_compress, or a similar method that de-compresses and adds a
     // null terminator on the received string.
-    class function SendCompress(const Dest: IZSock; const &String: String): Integer;
+    class function SendCompress(const Dest: IZSock; const &String: string): Integer;
 
     // Compress and send a C string to a socket, as zstr_send_compress(),
     // with a MORE flag, so that you can send further strings in the same
     // multi-part message.
-    class function SendmCompress(const Dest: IZSock; const &String: String): Integer;
+    class function SendmCompress(const Dest: IZSock; const &String: string): Integer;
 
     // Accepts a void pointer and returns a fresh character string. If source
     // is null, returns an empty string.
-    class function Str(const Source: IZSock): String;
+    class function Str(const Source: IZSock): string;
 
     // Self test of this class.
     class procedure Test(Verbose: Boolean);
@@ -5094,16 +5100,16 @@ uses
     // before process exits, to avoid a ZMQ deadlock. Note: you should not use
     // this method in CZMQ apps, use zsock_new() instead.
     // *** This is for CZMQ internal use only and may change arbitrarily ***
-    class function Socket(&Type: Integer; const Filename: String; LineNbr: NativeUInt): Pointer;
+    class function Socket(&Type: Integer; const Filename: string; LineNbr: NativeUInt): Pointer;
 
     // Destroy/close a ZMQ socket. You should call this for every socket you
     // create using zsys_socket().
     // *** This is for CZMQ internal use only and may change arbitrarily ***
-    class function Close(Handle: Pointer; const Filename: String; LineNbr: NativeUInt): Integer;
+    class function Close(Handle: Pointer; const Filename: string; LineNbr: NativeUInt): Integer;
 
     // Return ZMQ socket name for socket type
     // *** This is for CZMQ internal use only and may change arbitrarily ***
-    class function Sockname(Socktype: Integer): String;
+    class function Sockname(Socktype: Integer): string;
 
     // Create a pipe, which consists of two PAIR sockets connected over inproc.
     // The pipe is configured to use the zsys_pipehwm setting. Returns the
@@ -5114,7 +5120,7 @@ uses
     // zsys_handler_reset () can restore them. If you call this multiple times
     // then the last handler will take affect. If handler_fn is NULL, disables
     // default SIGINT/SIGTERM handling in CZMQ.
-    class procedure HandlerSet(var HandlerFn: TZsysHandlerFn);
+    class procedure HandlerSet(HandlerFn: PZsysHandlerFn);
 
     // Reset interrupt handler, call this at exit if needed
     class procedure HandlerReset;
@@ -5136,31 +5142,31 @@ uses
     class procedure SetInterrupted;
 
     // Return 1 if file exists, else zero
-    class function FileExists(const Filename: String): Boolean;
+    class function FileExists(const Filename: string): Boolean;
 
     // Return file modification time. Returns 0 if the file does not exist.
-    class function FileModified(const Filename: String): Int64;
+    class function FileModified(const Filename: string): Int64;
 
     // Return file mode; provides at least support for the POSIX S_ISREG(m)
     // and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
     // Returns a mode_t cast to int, or -1 in case of error.
-    class function FileMode(const Filename: String): Integer;
+    class function FileMode(const Filename: string): Integer;
 
     // Delete file. Does not complain if the file is absent
-    class function FileDelete(const Filename: String): Integer;
+    class function FileDelete(const Filename: string): Integer;
 
     // Check if file is 'stable'
-    class function FileStable(const Filename: String): Boolean;
+    class function FileStable(const Filename: string): Boolean;
 
     // Create a file path if it doesn't exist. The file path is treated as
     // printf format.
-    class function DirCreate(const Pathname: String): Integer;
+    class function DirCreate(const Pathname: string): Integer;
 
     // Remove a file path if empty; the pathname is treated as printf format.
-    class function DirDelete(const Pathname: String): Integer;
+    class function DirDelete(const Pathname: string): Integer;
 
     // Move to a specified working directory. Returns 0 if OK, -1 if this failed.
-    class function DirChange(const Pathname: String): Integer;
+    class function DirChange(const Pathname: string): Integer;
 
     // Set private file creation mode; all files created from here will be
     // readable/writable by the owner only.
@@ -5177,12 +5183,12 @@ uses
     // Format a string using printf formatting, returning a freshly allocated
     // buffer. If there was insufficient memory, returns NULL. Free the returned
     // string using zstr_free().
-    class function Sprintf(const Format: String): String;
+    class function Sprintf(const Format: string): string;
 
     // Format a string with a va_list argument, returning a freshly allocated
     // buffer. If there was insufficient memory, returns NULL. Free the returned
     // string using zstr_free().
-    class function Vprintf(const Format: String; Argptr: va_list): String;
+    class function Vprintf(const Format: string; Argptr: va_list): string;
 
     // Create UDP beacon socket; if the routable option is true, uses
     // multicast (not yet implemented), else uses broadcast. This method
@@ -5203,31 +5209,31 @@ uses
     // The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
     // NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
     // *** This is for CZMQ internal use only and may change arbitrarily ***
-    class function UdpRecv(Udpsock: TSocket; const Peername: String; Peerlen: Integer): IZframe;
+    class function UdpRecv(Udpsock: TSocket; const Peername: string; Peerlen: Integer): IZframe;
 
     // Handle an I/O error on some socket operation; will report and die on
     // fatal errors, and continue silently on "try again" errors.
     // *** This is for CZMQ internal use only and may change arbitrarily ***
-    class procedure SocketError(const Reason: String);
+    class procedure SocketError(const Reason: string);
 
     // Return current host name, for use in public tcp:// endpoints. Caller gets
     // a freshly allocated string, should free it using zstr_free(). If the host
     // name is not resolvable, returns NULL.
-    class function Hostname: String;
+    class function Hostname: string;
 
     // Move the current process into the background. The precise effect depends
     // on the operating system. On POSIX boxes, moves to a specified working
     // directory (if specified), closes all file handles, reopens stdin, stdout,
     // and stderr to the null device, and sets the process to ignore SIGHUP. On
     // Windows, does nothing. Returns 0 if OK, -1 if there was an error.
-    class function Daemonize(const Workdir: String): Integer;
+    class function Daemonize(const Workdir: string): Integer;
 
     // Drop the process ID into the lockfile, with exclusive lock, and switch
     // the process to the specified group and/or user. Any of the arguments
     // may be null, indicating a no-op. Returns 0 on success, -1 on failure.
     // Note if you combine this with zsys_daemonize, run after, not before
     // that method, or the lockfile will hold the wrong process ID.
-    class function RunAs(const Lockfile: String; const Group: String; const User: String): Integer;
+    class function RunAs(const Lockfile: string; const Group: string; const User: string): Integer;
 
     // Returns true if the underlying libzmq supports CURVE security.
     // Uses a heuristic probe according to the version of libzmq being used.
@@ -5358,29 +5364,29 @@ uses
     // the default when there is no specified interface. If the environment
     // variable ZSYS_INTERFACE is set, use that as the default interface name.
     // Setting the interface to "*" means "use all available interfaces".
-    class procedure SetInterface(const Value: String);
+    class procedure SetInterface(const Value: string);
 
     // Return network interface to use for broadcasts, or "" if none was set.
-    class function &Interface: String;
+    class function &Interface: string;
 
     // Set IPv6 address to use zbeacon socket, particularly for receiving zbeacon.
     // This needs to be set IPv6 is enabled as IPv6 can have multiple addresses
     // on a given interface. If the environment variable ZSYS_IPV6_ADDRESS is set,
     // use that as the default IPv6 address.
-    class procedure SetIpv6Address(const Value: String);
+    class procedure SetIpv6Address(const Value: string);
 
     // Return IPv6 address to use for zbeacon reception, or "" if none was set.
-    class function Ipv6Address: String;
+    class function Ipv6Address: string;
 
     // Set IPv6 milticast address to use for sending zbeacon messages. This needs
     // to be set if IPv6 is enabled. If the environment variable
     // ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
     // address.
-    class procedure SetIpv6McastAddress(const Value: String);
+    class procedure SetIpv6McastAddress(const Value: string);
 
     // Return IPv6 multicast address to use for sending zbeacon, or "" if none was
     // set.
-    class function Ipv6McastAddress: String;
+    class function Ipv6McastAddress: string;
 
     // Configure the automatic use of pre-allocated FDs when creating new sockets.
     // If 0 (default), nothing will happen. Else, when a new socket is bound, the
@@ -5402,10 +5408,10 @@ uses
     //
     // Returns freshly allocated string or NULL in a case of error.
     // Not enough memory, invalid format specifier, name not in args
-    class function Zprintf(const Format: String; const Args: IZhash): String;
+    class function Zprintf(const Format: string; const Args: IZhash): string;
 
     // Return error string for given format/args combination.
-    class function ZprintfError(const Format: String; const Args: IZhash): String;
+    class function ZprintfError(const Format: string; const Args: IZhash): string;
 
     // Print formatted string. Format is specified by variable names
     // in Python-like format style
@@ -5416,15 +5422,15 @@ uses
     //
     // Returns freshly allocated string or NULL in a case of error.
     // Not enough memory, invalid format specifier, name not in args
-    class function Zplprintf(const Format: String; const Args: IZconfig): String;
+    class function Zplprintf(const Format: string; const Args: IZconfig): string;
 
     // Return error string for given format/args combination.
-    class function ZplprintfError(const Format: String; const Args: IZconfig): String;
+    class function ZplprintfError(const Format: string; const Args: IZconfig): string;
 
     // Set log identity, which is a string that prefixes all log messages sent
     // by this process. The log identity defaults to the environment variable
     // ZSYS_LOGIDENT, if that is set.
-    class procedure SetLogident(const Value: String);
+    class procedure SetLogident(const Value: string);
 
     // Set stream to receive log traffic. By default, log traffic is sent to
     // stdout. If you set the stream to NULL, no stream will receive the log
@@ -5438,26 +5444,26 @@ uses
     // log system supports a single sender; multiple calls to this method will
     // bind the same sender to multiple endpoints. To disable the sender, call
     // this method with a null argument.
-    class procedure SetLogsender(const Endpoint: String);
+    class procedure SetLogsender(const Endpoint: string);
 
     // Enable or disable logging to the system facility (syslog on POSIX boxes,
     // event log on Windows). By default this is disabled.
     class procedure SetLogsystem(Logsystem: Boolean);
 
     // Log error condition - highest priority
-    class procedure Error(const Format: String);
+    class procedure Error(const Format: string);
 
     // Log warning condition - high priority
-    class procedure Warning(const Format: String);
+    class procedure Warning(const Format: string);
 
     // Log normal, but significant, condition - normal priority
-    class procedure Notice(const Format: String);
+    class procedure Notice(const Format: string);
 
     // Log informational message - low priority
-    class procedure Info(const Format: String);
+    class procedure Info(const Format: string);
 
     // Log debug-level message - lowest priority
-    class procedure Debug(const Format: String);
+    class procedure Debug(const Format: string);
 
     // Self test of this class.
     class procedure Test(Verbose: Boolean);
@@ -5492,7 +5498,7 @@ uses
 
     // Set UUID to new supplied string value skipping '-' and '{' '}'
     // optional delimiters. Return 0 if OK, else returns -1.
-    function SetStr(const Source: String): Integer;
+    function SetStr(const Source: string): Integer;
 
     // Return UUID binary data.
     function Data: PByte;
@@ -5501,12 +5507,12 @@ uses
     function Size: NativeUInt;
 
     // Returns UUID as string
-    function Str: String;
+    function Str: string;
 
     // Return UUID in the canonical string format: 8-4-4-4-12, in lower
     // case. Caller does not modify or free returned value. See
     // http://en.wikipedia.org/wiki/Universally_unique_identifier
-    function StrCanonical: String;
+    function StrCanonical: string;
 
     // Store UUID blob in target array
     procedure Export(Target: PByte);
@@ -5570,18 +5576,18 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-function ZFreeString(const str: PansiCHar): String;
+function ZFreeString(const str: PAnsiChar): string;
 
 implementation
 
 uses
   System.SysUtils;
 
-function ZFreeString(const str: PansiCHar): String;
+function ZFreeString(const str: PAnsiChar): string;
 var
   p: PAnsiChar;
 begin
-  Result := String(UTF8String(str));
+  Result := string(UTF8String(str));
   p := str;
   zstr_free(p);
 end;
@@ -5686,12 +5692,12 @@ end;
     zarmour_test(Verbose);
   end;
 
-  function TZarmour.Encode(Data: PByte; Size: NativeUInt): String;
+  function TZarmour.Encode(Data: PByte; Size: NativeUInt): string;
   begin
     Result := ZFreeString(zarmour_encode(FHandle, Data, Size));
   end;
 
-  function TZarmour.Decode(const Data: String): IZchunk;
+  function TZarmour.Decode(const Data: string): IZchunk;
   var
     __Data__: UTF8String;
   begin
@@ -5704,9 +5710,9 @@ end;
     Result := zarmour_mode(FHandle);
   end;
 
-  function TZarmour.ModeStr: String;
+  function TZarmour.ModeStr: string;
   begin
-    Result := String(UTF8String(zarmour_mode_str(FHandle)));
+    Result := string(UTF8String(zarmour_mode_str(FHandle)));
   end;
 
   procedure TZarmour.SetMode(Mode: Integer);
@@ -5771,7 +5777,7 @@ end;
     Create(zcert_new_from(PublicKey, SecretKey), True);
   end;
 
-  constructor TZcert.NewFromTxt(const PublicTxt: String; const SecretTxt: String);
+  constructor TZcert.NewFromTxt(const PublicTxt: string; const SecretTxt: string);
   var
     __PublicTxt__: UTF8String;
     __SecretTxt__: UTF8String;
@@ -5781,7 +5787,7 @@ end;
     Create(zcert_new_from_txt(PAnsiChar(__PublicTxt__), PAnsiChar(__SecretTxt__)), True);
   end;
 
-  constructor TZcert.Load(const Filename: String);
+  constructor TZcert.Load(const Filename: string);
   var
     __Filename__: UTF8String;
   begin
@@ -5826,17 +5832,17 @@ end;
     Result := zcert_secret_key(FHandle);
   end;
 
-  function TZcert.PublicTxt: String;
+  function TZcert.PublicTxt: string;
   begin
-    Result := String(UTF8String(zcert_public_txt(FHandle)));
+    Result := string(UTF8String(zcert_public_txt(FHandle)));
   end;
 
-  function TZcert.SecretTxt: String;
+  function TZcert.SecretTxt: string;
   begin
-    Result := String(UTF8String(zcert_secret_txt(FHandle)));
+    Result := string(UTF8String(zcert_secret_txt(FHandle)));
   end;
 
-  procedure TZcert.SetMeta(const Name: String; const Format: String);
+  procedure TZcert.SetMeta(const Name: string; const Format: string);
   var
     __Name__: UTF8String;
     __Format__: UTF8String;
@@ -5846,7 +5852,7 @@ end;
     zcert_set_meta(FHandle, PAnsiChar(__Name__), PAnsiChar(__Format__));
   end;
 
-  procedure TZcert.UnsetMeta(const Name: String);
+  procedure TZcert.UnsetMeta(const Name: string);
   var
     __Name__: UTF8String;
   begin
@@ -5854,12 +5860,12 @@ end;
     zcert_unset_meta(FHandle, PAnsiChar(__Name__));
   end;
 
-  function TZcert.Meta(const Name: String): String;
+  function TZcert.Meta(const Name: string): string;
   var
     __Name__: UTF8String;
   begin
     __Name__ := UTF8String(Name);
-    Result := String(UTF8String(zcert_meta(FHandle, PAnsiChar(__Name__))));
+    Result := string(UTF8String(zcert_meta(FHandle, PAnsiChar(__Name__))));
   end;
 
   function TZcert.MetaKeys: IZlist;
@@ -5867,7 +5873,7 @@ end;
     Result := TZlist.Wrap(zcert_meta_keys(FHandle), false);
   end;
 
-  function TZcert.Save(const Filename: String): Integer;
+  function TZcert.Save(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -5875,7 +5881,7 @@ end;
     Result := zcert_save(FHandle, PAnsiChar(__Filename__));
   end;
 
-  function TZcert.SavePublic(const Filename: String): Integer;
+  function TZcert.SavePublic(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -5883,7 +5889,7 @@ end;
     Result := zcert_save_public(FHandle, PAnsiChar(__Filename__));
   end;
 
-  function TZcert.SaveSecret(const Filename: String): Integer;
+  function TZcert.SaveSecret(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -5913,7 +5919,7 @@ end;
 
  (* TZcertstore *)
 
-  constructor TZcertstore.New(const Location: String);
+  constructor TZcertstore.New(const Location: string);
   var
     __Location__: UTF8String;
   begin
@@ -5953,7 +5959,7 @@ end;
     zcertstore_set_loader(FHandle, Loader, &Destructor, State);
   end;
 
-  function TZcertstore.Lookup(const PublicKey: String): IZcert;
+  function TZcertstore.Lookup(const PublicKey: string): IZcert;
   var
     __PublicKey__: UTF8String;
   begin
@@ -6017,7 +6023,7 @@ end;
     Result := TZchunk.Wrap(zchunk_read(Handle, Bytes), true);
   end;
 
-  class function TZchunk.Slurp(const Filename: String; Maxsize: NativeUInt): IZchunk;
+  class function TZchunk.Slurp(const Filename: string; Maxsize: NativeUInt): IZchunk;
   var
     __Filename__: UTF8String;
   begin
@@ -6100,17 +6106,17 @@ end;
     Result := TZchunk.Wrap(zchunk_dup(FHandle), true);
   end;
 
-  function TZchunk.Strhex: String;
+  function TZchunk.Strhex: string;
   begin
     Result := ZFreeString(zchunk_strhex(FHandle));
   end;
 
-  function TZchunk.Strdup: String;
+  function TZchunk.Strdup: string;
   begin
     Result := ZFreeString(zchunk_strdup(FHandle));
   end;
 
-  function TZchunk.Streq(const &String: String): Boolean;
+  function TZchunk.Streq(const &String: string): Boolean;
   var
     __String__: UTF8String;
   begin
@@ -6123,9 +6129,9 @@ end;
     Result := TZframe.Wrap(zchunk_pack(FHandle), true);
   end;
 
-  function TZchunk.Digest: String;
+  function TZchunk.Digest: string;
   begin
-    Result := String(UTF8String(zchunk_digest(FHandle)));
+    Result := string(UTF8String(zchunk_digest(FHandle)));
   end;
 
   procedure TZchunk.Fprint(&File: Pointer);
@@ -6160,7 +6166,7 @@ end;
     Result := zclock_usecs;
   end;
 
-  class function TZclock.Timestr: String;
+  class function TZclock.Timestr: string;
   begin
     Result := ZFreeString(zclock_timestr);
   end;
@@ -6172,7 +6178,7 @@ end;
 
  (* TZconfig *)
 
-  constructor TZconfig.New(const Name: String; const Parent: IZconfig);
+  constructor TZconfig.New(const Name: string; const Parent: IZconfig);
   var
     __Name__: UTF8String;
   begin
@@ -6180,7 +6186,7 @@ end;
     Create(zconfig_new(PAnsiChar(__Name__), TZconfig.UnWrap(Parent)), True);
   end;
 
-  constructor TZconfig.Load(const Filename: String);
+  constructor TZconfig.Load(const Filename: string);
   var
     __Filename__: UTF8String;
   begin
@@ -6188,7 +6194,7 @@ end;
     Create(zconfig_load(PAnsiChar(__Filename__)), True);
   end;
 
-  constructor TZconfig.Loadf(const Format: String);
+  constructor TZconfig.Loadf(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -6230,7 +6236,7 @@ end;
     Result := TZconfig.Wrap(zconfig_chunk_load(TZchunk.UnWrap(Chunk)), false);
   end;
 
-  class function TZconfig.StrLoad(const &String: String): IZconfig;
+  class function TZconfig.StrLoad(const &String: string): IZconfig;
   var
     __String__: UTF8String;
   begin
@@ -6255,17 +6261,17 @@ end;
     Result := TZconfig.Wrap(zconfig_dup(FHandle), true);
   end;
 
-  function TZconfig.Name: String;
+  function TZconfig.Name: string;
   begin
-    Result := String(UTF8String(zconfig_name(FHandle)));
+    Result := string(UTF8String(zconfig_name(FHandle)));
   end;
 
-  function TZconfig.Value: String;
+  function TZconfig.Value: string;
   begin
-    Result := String(UTF8String(zconfig_value(FHandle)));
+    Result := string(UTF8String(zconfig_value(FHandle)));
   end;
 
-  procedure TZconfig.Put(const Path: String; const Value: String);
+  procedure TZconfig.Put(const Path: string; const Value: string);
   var
     __Path__: UTF8String;
     __Value__: UTF8String;
@@ -6275,7 +6281,7 @@ end;
     zconfig_put(FHandle, PAnsiChar(__Path__), PAnsiChar(__Value__));
   end;
 
-  procedure TZconfig.Putf(const Path: String; const Format: String);
+  procedure TZconfig.Putf(const Path: string; const Format: string);
   var
     __Path__: UTF8String;
     __Format__: UTF8String;
@@ -6285,17 +6291,17 @@ end;
     zconfig_putf(FHandle, PAnsiChar(__Path__), PAnsiChar(__Format__));
   end;
 
-  function TZconfig.Get(const Path: String; const DefaultValue: String): String;
+  function TZconfig.Get(const Path: string; const DefaultValue: string): string;
   var
     __Path__: UTF8String;
     __DefaultValue__: UTF8String;
   begin
     __Path__ := UTF8String(Path);
     __DefaultValue__ := UTF8String(DefaultValue);
-    Result := String(UTF8String(zconfig_get(FHandle, PAnsiChar(__Path__), PAnsiChar(__DefaultValue__))));
+    Result := string(UTF8String(zconfig_get(FHandle, PAnsiChar(__Path__), PAnsiChar(__DefaultValue__))));
   end;
 
-  procedure TZconfig.SetName(const Name: String);
+  procedure TZconfig.SetName(const Name: string);
   var
     __Name__: UTF8String;
   begin
@@ -6303,7 +6309,7 @@ end;
     zconfig_set_name(FHandle, PAnsiChar(__Name__));
   end;
 
-  procedure TZconfig.SetValue(const Format: String);
+  procedure TZconfig.SetValue(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -6321,7 +6327,7 @@ end;
     Result := TZconfig.Wrap(zconfig_next(FHandle), false);
   end;
 
-  function TZconfig.Locate(const Path: String): IZconfig;
+  function TZconfig.Locate(const Path: string): IZconfig;
   var
     __Path__: UTF8String;
   begin
@@ -6339,7 +6345,7 @@ end;
     Result := zconfig_execute(FHandle, Handler, Arg);
   end;
 
-  procedure TZconfig.SetComment(const Format: String);
+  procedure TZconfig.SetComment(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -6352,7 +6358,7 @@ end;
     Result := TZlist.Wrap(zconfig_comments(FHandle), false);
   end;
 
-  function TZconfig.Save(const Filename: String): Integer;
+  function TZconfig.Save(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -6360,7 +6366,7 @@ end;
     Result := zconfig_save(FHandle, PAnsiChar(__Filename__));
   end;
 
-  function TZconfig.Savef(const Format: String): Integer;
+  function TZconfig.Savef(const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -6368,9 +6374,9 @@ end;
     Result := zconfig_savef(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZconfig.Filename: String;
+  function TZconfig.Filename: string;
   begin
-    Result := String(UTF8String(zconfig_filename(FHandle)));
+    Result := string(UTF8String(zconfig_filename(FHandle)));
   end;
 
   function TZconfig.ChunkSave: IZchunk;
@@ -6378,7 +6384,7 @@ end;
     Result := TZchunk.Wrap(zconfig_chunk_save(FHandle), false);
   end;
 
-  function TZconfig.StrSave: String;
+  function TZconfig.StrSave: string;
   begin
     Result := ZFreeString(zconfig_str_save(FHandle));
   end;
@@ -6452,14 +6458,14 @@ end;
     Result := zdigest_size(FHandle);
   end;
 
-  function TZdigest.&String: String;
+  function TZdigest.&String: string;
   begin
-    Result := String(UTF8String(zdigest_string(FHandle)));
+    Result := string(UTF8String(zdigest_string(FHandle)));
   end;
 
  (* TZdir *)
 
-  constructor TZdir.New(const Path: String; const Parent: String);
+  constructor TZdir.New(const Path: string; const Parent: string);
   var
     __Path__: UTF8String;
     __Parent__: UTF8String;
@@ -6491,7 +6497,7 @@ end;
       zdir_destroy(FHandle);
   end;
 
-  class function TZdir.Diff(const Older: IZdir; const Newer: IZdir; const Alias: String): IZlist;
+  class function TZdir.Diff(const Older: IZdir; const Newer: IZdir; const Alias: string): IZlist;
   var
     __Alias__: UTF8String;
   begin
@@ -6509,9 +6515,9 @@ end;
     zdir_test(Verbose);
   end;
 
-  function TZdir.Path: String;
+  function TZdir.Path: string;
   begin
-    Result := String(UTF8String(zdir_path(FHandle)));
+    Result := string(UTF8String(zdir_path(FHandle)));
   end;
 
   function TZdir.Modified: Int64;
@@ -6539,7 +6545,7 @@ end;
     zdir_remove(FHandle, Force);
   end;
 
-  function TZdir.Resync(const Alias: String): IZlist;
+  function TZdir.Resync(const Alias: string): IZlist;
   var
     __Alias__: UTF8String;
   begin
@@ -6564,7 +6570,7 @@ end;
 
  (* TZdirPatch *)
 
-  constructor TZdirPatch.New(const Path: String; const &File: IZfile; Op: Integer; const Alias: String);
+  constructor TZdirPatch.New(const Path: string; const &File: IZfile; Op: Integer; const Alias: string);
   var
     __Path__: UTF8String;
     __Alias__: UTF8String;
@@ -6606,9 +6612,9 @@ end;
     Result := TZdirPatch.Wrap(zdir_patch_dup(FHandle), true);
   end;
 
-  function TZdirPatch.Path: String;
+  function TZdirPatch.Path: string;
   begin
-    Result := String(UTF8String(zdir_patch_path(FHandle)));
+    Result := string(UTF8String(zdir_patch_path(FHandle)));
   end;
 
   function TZdirPatch.&File: IZfile;
@@ -6621,9 +6627,9 @@ end;
     Result := zdir_patch_op(FHandle);
   end;
 
-  function TZdirPatch.Vpath: String;
+  function TZdirPatch.Vpath: string;
   begin
-    Result := String(UTF8String(zdir_patch_vpath(FHandle)));
+    Result := string(UTF8String(zdir_patch_vpath(FHandle)));
   end;
 
   procedure TZdirPatch.DigestSet;
@@ -6631,14 +6637,14 @@ end;
     zdir_patch_digest_set(FHandle);
   end;
 
-  function TZdirPatch.Digest: String;
+  function TZdirPatch.Digest: string;
   begin
-    Result := String(UTF8String(zdir_patch_digest(FHandle)));
+    Result := string(UTF8String(zdir_patch_digest(FHandle)));
   end;
 
  (* TZfile *)
 
-  constructor TZfile.New(const Path: String; const Name: String);
+  constructor TZfile.New(const Path: string; const Name: string);
   var
     __Path__: UTF8String;
     __Name__: UTF8String;
@@ -6685,12 +6691,12 @@ end;
     Result := TZfile.Wrap(zfile_dup(FHandle), true);
   end;
 
-  function TZfile.Filename(const Path: String): String;
+  function TZfile.Filename(const Path: string): string;
   var
     __Path__: UTF8String;
   begin
     __Path__ := UTF8String(Path);
-    Result := String(UTF8String(zfile_filename(FHandle, PAnsiChar(__Path__))));
+    Result := string(UTF8String(zfile_filename(FHandle, PAnsiChar(__Path__))));
   end;
 
   procedure TZfile.Restat;
@@ -6768,9 +6774,9 @@ end;
     Result := zfile_write(FHandle, TZchunk.UnWrap(Chunk), Offset);
   end;
 
-  function TZfile.Readln: String;
+  function TZfile.Readln: string;
   begin
-    Result := String(UTF8String(zfile_readln(FHandle)));
+    Result := string(UTF8String(zfile_readln(FHandle)));
   end;
 
   procedure TZfile.Close;
@@ -6783,9 +6789,9 @@ end;
     Result := zfile_handle(FHandle);
   end;
 
-  function TZfile.Digest: String;
+  function TZfile.Digest: string;
   begin
-    Result := String(UTF8String(zfile_digest(FHandle)));
+    Result := string(UTF8String(zfile_digest(FHandle)));
   end;
 
  (* TZframe *)
@@ -6800,7 +6806,7 @@ end;
     Create(zframe_new_empty, True);
   end;
 
-  constructor TZframe.From(const &String: String);
+  constructor TZframe.From(const &String: string);
   var
     __String__: UTF8String;
   begin
@@ -6862,12 +6868,12 @@ end;
     Result := zframe_data(FHandle);
   end;
 
-  function TZframe.Meta(const &Property: String): String;
+  function TZframe.Meta(const &Property: string): string;
   var
     __Property__: UTF8String;
   begin
     __Property__ := UTF8String(&Property);
-    Result := String(UTF8String(zframe_meta(FHandle, PAnsiChar(__Property__))));
+    Result := string(UTF8String(zframe_meta(FHandle, PAnsiChar(__Property__))));
   end;
 
   function TZframe.Dup: IZframe;
@@ -6875,17 +6881,17 @@ end;
     Result := TZframe.Wrap(zframe_dup(FHandle), true);
   end;
 
-  function TZframe.Strhex: String;
+  function TZframe.Strhex: string;
   begin
     Result := ZFreeString(zframe_strhex(FHandle));
   end;
 
-  function TZframe.Strdup: String;
+  function TZframe.Strdup: string;
   begin
     Result := ZFreeString(zframe_strdup(FHandle));
   end;
 
-  function TZframe.Streq(const &String: String): Boolean;
+  function TZframe.Streq(const &String: string): Boolean;
   var
     __String__: UTF8String;
   begin
@@ -6913,12 +6919,12 @@ end;
     zframe_set_routing_id(FHandle, RoutingId);
   end;
 
-  function TZframe.Group: String;
+  function TZframe.Group: string;
   begin
-    Result := String(UTF8String(zframe_group(FHandle)));
+    Result := string(UTF8String(zframe_group(FHandle)));
   end;
 
-  function TZframe.SetGroup(const Group: String): Integer;
+  function TZframe.SetGroup(const Group: string): Integer;
   var
     __Group__: UTF8String;
   begin
@@ -6936,7 +6942,7 @@ end;
     zframe_reset(FHandle, Data, Size);
   end;
 
-  procedure TZframe.Print(const Prefix: String);
+  procedure TZframe.Print(const Prefix: string);
   var
     __Prefix__: UTF8String;
   begin
@@ -6983,7 +6989,7 @@ end;
     zhash_test(Verbose);
   end;
 
-  function TZhash.Insert(const Key: String; Item: Pointer): Integer;
+  function TZhash.Insert(const Key: string; Item: Pointer): Integer;
   var
     __Key__: UTF8String;
   begin
@@ -6991,7 +6997,7 @@ end;
     Result := zhash_insert(FHandle, PAnsiChar(__Key__), Item);
   end;
 
-  procedure TZhash.Update(const Key: String; Item: Pointer);
+  procedure TZhash.Update(const Key: string; Item: Pointer);
   var
     __Key__: UTF8String;
   begin
@@ -6999,7 +7005,7 @@ end;
     zhash_update(FHandle, PAnsiChar(__Key__), Item);
   end;
 
-  procedure TZhash.Delete(const Key: String);
+  procedure TZhash.Delete(const Key: string);
   var
     __Key__: UTF8String;
   begin
@@ -7007,7 +7013,7 @@ end;
     zhash_delete(FHandle, PAnsiChar(__Key__));
   end;
 
-  function TZhash.Lookup(const Key: String): Pointer;
+  function TZhash.Lookup(const Key: string): Pointer;
   var
     __Key__: UTF8String;
   begin
@@ -7015,7 +7021,7 @@ end;
     Result := zhash_lookup(FHandle, PAnsiChar(__Key__));
   end;
 
-  function TZhash.Rename(const OldKey: String; const NewKey: String): Integer;
+  function TZhash.Rename(const OldKey: string; const NewKey: string): Integer;
   var
     __OldKey__: UTF8String;
     __NewKey__: UTF8String;
@@ -7025,7 +7031,7 @@ end;
     Result := zhash_rename(FHandle, PAnsiChar(__OldKey__), PAnsiChar(__NewKey__));
   end;
 
-  function TZhash.Freefn(const Key: String; FreeFn: TZhashFreeFn): Pointer;
+  function TZhash.Freefn(const Key: string; FreeFn: TZhashFreeFn): Pointer;
   var
     __Key__: UTF8String;
   begin
@@ -7058,12 +7064,12 @@ end;
     Result := zhash_next(FHandle);
   end;
 
-  function TZhash.Cursor: String;
+  function TZhash.Cursor: string;
   begin
-    Result := String(UTF8String(zhash_cursor(FHandle)));
+    Result := string(UTF8String(zhash_cursor(FHandle)));
   end;
 
-  procedure TZhash.Comment(const Format: String);
+  procedure TZhash.Comment(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -7076,7 +7082,7 @@ end;
     Result := TZframe.Wrap(zhash_pack(FHandle), true);
   end;
 
-  function TZhash.Save(const Filename: String): Integer;
+  function TZhash.Save(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -7084,7 +7090,7 @@ end;
     Result := zhash_save(FHandle, PAnsiChar(__Filename__));
   end;
 
-  function TZhash.Load(const Filename: String): Integer;
+  function TZhash.Load(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -7211,7 +7217,7 @@ end;
     Result := zhashx_cursor(FHandle);
   end;
 
-  procedure TZhashx.Comment(const Format: String);
+  procedure TZhashx.Comment(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -7219,7 +7225,7 @@ end;
     zhashx_comment(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZhashx.Save(const Filename: String): Integer;
+  function TZhashx.Save(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -7227,7 +7233,7 @@ end;
     Result := zhashx_save(FHandle, PAnsiChar(__Filename__));
   end;
 
-  function TZhashx.Load(const Filename: String): Integer;
+  function TZhashx.Load(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -7339,29 +7345,29 @@ end;
     Result := ziflist_size(FHandle);
   end;
 
-  function TZiflist.First: String;
+  function TZiflist.First: string;
   begin
-    Result := String(UTF8String(ziflist_first(FHandle)));
+    Result := string(UTF8String(ziflist_first(FHandle)));
   end;
 
-  function TZiflist.Next: String;
+  function TZiflist.Next: string;
   begin
-    Result := String(UTF8String(ziflist_next(FHandle)));
+    Result := string(UTF8String(ziflist_next(FHandle)));
   end;
 
-  function TZiflist.Address: String;
+  function TZiflist.Address: string;
   begin
-    Result := String(UTF8String(ziflist_address(FHandle)));
+    Result := string(UTF8String(ziflist_address(FHandle)));
   end;
 
-  function TZiflist.Broadcast: String;
+  function TZiflist.Broadcast: string;
   begin
-    Result := String(UTF8String(ziflist_broadcast(FHandle)));
+    Result := string(UTF8String(ziflist_broadcast(FHandle)));
   end;
 
-  function TZiflist.Netmask: String;
+  function TZiflist.Netmask: string;
   begin
-    Result := String(UTF8String(ziflist_netmask(FHandle)));
+    Result := string(UTF8String(ziflist_netmask(FHandle)));
   end;
 
   procedure TZiflist.Print;
@@ -7913,7 +7919,7 @@ end;
     Result := zmsg_addmem(FHandle, Data, Size);
   end;
 
-  function TZmsg.Pushstr(const &String: String): Integer;
+  function TZmsg.Pushstr(const &String: string): Integer;
   var
     __String__: UTF8String;
   begin
@@ -7921,7 +7927,7 @@ end;
     Result := zmsg_pushstr(FHandle, PAnsiChar(__String__));
   end;
 
-  function TZmsg.Addstr(const &String: String): Integer;
+  function TZmsg.Addstr(const &String: string): Integer;
   var
     __String__: UTF8String;
   begin
@@ -7929,7 +7935,7 @@ end;
     Result := zmsg_addstr(FHandle, PAnsiChar(__String__));
   end;
 
-  function TZmsg.Pushstrf(const Format: String): Integer;
+  function TZmsg.Pushstrf(const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -7937,7 +7943,7 @@ end;
     Result := zmsg_pushstrf(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZmsg.Addstrf(const Format: String): Integer;
+  function TZmsg.Addstrf(const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -7945,7 +7951,7 @@ end;
     Result := zmsg_addstrf(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZmsg.Popstr: String;
+  function TZmsg.Popstr: string;
   begin
     Result := ZFreeString(zmsg_popstr(FHandle));
   end;
@@ -8083,7 +8089,7 @@ end;
     Create(zsock_new(&Type), True);
   end;
 
-  constructor TZsock.NewPub(const Endpoint: String);
+  constructor TZsock.NewPub(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8091,7 +8097,7 @@ end;
     Create(zsock_new_pub(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewSub(const Endpoint: String; const Subscribe: String);
+  constructor TZsock.NewSub(const Endpoint: string; const Subscribe: string);
   var
     __Endpoint__: UTF8String;
     __Subscribe__: UTF8String;
@@ -8101,7 +8107,7 @@ end;
     Create(zsock_new_sub(PAnsiChar(__Endpoint__), PAnsiChar(__Subscribe__)), True);
   end;
 
-  constructor TZsock.NewReq(const Endpoint: String);
+  constructor TZsock.NewReq(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8109,7 +8115,7 @@ end;
     Create(zsock_new_req(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewRep(const Endpoint: String);
+  constructor TZsock.NewRep(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8117,7 +8123,7 @@ end;
     Create(zsock_new_rep(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewDealer(const Endpoint: String);
+  constructor TZsock.NewDealer(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8125,7 +8131,7 @@ end;
     Create(zsock_new_dealer(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewRouter(const Endpoint: String);
+  constructor TZsock.NewRouter(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8133,7 +8139,7 @@ end;
     Create(zsock_new_router(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewPush(const Endpoint: String);
+  constructor TZsock.NewPush(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8141,7 +8147,7 @@ end;
     Create(zsock_new_push(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewPull(const Endpoint: String);
+  constructor TZsock.NewPull(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8149,7 +8155,7 @@ end;
     Create(zsock_new_pull(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewXpub(const Endpoint: String);
+  constructor TZsock.NewXpub(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8157,7 +8163,7 @@ end;
     Create(zsock_new_xpub(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewXsub(const Endpoint: String);
+  constructor TZsock.NewXsub(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8165,7 +8171,7 @@ end;
     Create(zsock_new_xsub(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewPair(const Endpoint: String);
+  constructor TZsock.NewPair(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8173,7 +8179,7 @@ end;
     Create(zsock_new_pair(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewStream(const Endpoint: String);
+  constructor TZsock.NewStream(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8181,7 +8187,7 @@ end;
     Create(zsock_new_stream(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewServer(const Endpoint: String);
+  constructor TZsock.NewServer(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8189,7 +8195,7 @@ end;
     Create(zsock_new_server(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewClient(const Endpoint: String);
+  constructor TZsock.NewClient(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8197,7 +8203,7 @@ end;
     Create(zsock_new_client(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewRadio(const Endpoint: String);
+  constructor TZsock.NewRadio(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8205,7 +8211,7 @@ end;
     Create(zsock_new_radio(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewDish(const Endpoint: String);
+  constructor TZsock.NewDish(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8213,7 +8219,7 @@ end;
     Create(zsock_new_dish(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewGather(const Endpoint: String);
+  constructor TZsock.NewGather(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8221,7 +8227,7 @@ end;
     Create(zsock_new_gather(PAnsiChar(__Endpoint__)), True);
   end;
 
-  constructor TZsock.NewScatter(const Endpoint: String);
+  constructor TZsock.NewScatter(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -8266,7 +8272,7 @@ end;
     zsock_test(Verbose);
   end;
 
-  function TZsock.Bind(const Format: String): Integer;
+  function TZsock.Bind(const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -8274,12 +8280,12 @@ end;
     Result := zsock_bind(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZsock.Endpoint: String;
+  function TZsock.Endpoint: string;
   begin
-    Result := String(UTF8String(zsock_endpoint(FHandle)));
+    Result := string(UTF8String(zsock_endpoint(FHandle)));
   end;
 
-  function TZsock.Unbind(const Format: String): Integer;
+  function TZsock.Unbind(const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -8287,7 +8293,7 @@ end;
     Result := zsock_unbind(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZsock.Connect(const Format: String): Integer;
+  function TZsock.Connect(const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -8295,7 +8301,7 @@ end;
     Result := zsock_connect(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZsock.Disconnect(const Format: String): Integer;
+  function TZsock.Disconnect(const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -8303,7 +8309,7 @@ end;
     Result := zsock_disconnect(FHandle, PAnsiChar(__Format__));
   end;
 
-  function TZsock.Attach(const Endpoints: String; Serverish: Boolean): Integer;
+  function TZsock.Attach(const Endpoints: string; Serverish: Boolean): Integer;
   var
     __Endpoints__: UTF8String;
   begin
@@ -8311,12 +8317,12 @@ end;
     Result := zsock_attach(FHandle, PAnsiChar(__Endpoints__), Serverish);
   end;
 
-  function TZsock.TypeStr: String;
+  function TZsock.TypeStr: string;
   begin
-    Result := String(UTF8String(zsock_type_str(FHandle)));
+    Result := string(UTF8String(zsock_type_str(FHandle)));
   end;
 
-  function TZsock.Send(const Picture: String): Integer;
+  function TZsock.Send(const Picture: string): Integer;
   var
     __Picture__: UTF8String;
   begin
@@ -8324,7 +8330,7 @@ end;
     Result := zsock_send(FHandle, PAnsiChar(__Picture__));
   end;
 
-  function TZsock.Vsend(const Picture: String; Argptr: va_list): Integer;
+  function TZsock.Vsend(const Picture: string; Argptr: va_list): Integer;
   var
     __Picture__: UTF8String;
   begin
@@ -8332,7 +8338,7 @@ end;
     Result := zsock_vsend(FHandle, PAnsiChar(__Picture__), Argptr);
   end;
 
-  function TZsock.Recv(const Picture: String): Integer;
+  function TZsock.Recv(const Picture: string): Integer;
   var
     __Picture__: UTF8String;
   begin
@@ -8340,7 +8346,7 @@ end;
     Result := zsock_recv(FHandle, PAnsiChar(__Picture__));
   end;
 
-  function TZsock.Vrecv(const Picture: String; Argptr: va_list): Integer;
+  function TZsock.Vrecv(const Picture: string; Argptr: va_list): Integer;
   var
     __Picture__: UTF8String;
   begin
@@ -8348,7 +8354,7 @@ end;
     Result := zsock_vrecv(FHandle, PAnsiChar(__Picture__), Argptr);
   end;
 
-  function TZsock.Bsend(const Picture: String): Integer;
+  function TZsock.Bsend(const Picture: string): Integer;
   var
     __Picture__: UTF8String;
   begin
@@ -8356,7 +8362,7 @@ end;
     Result := zsock_bsend(FHandle, PAnsiChar(__Picture__));
   end;
 
-  function TZsock.Brecv(const Picture: String): Integer;
+  function TZsock.Brecv(const Picture: string): Integer;
   var
     __Picture__: UTF8String;
   begin
@@ -8394,7 +8400,7 @@ end;
     zsock_flush(FHandle);
   end;
 
-  function TZsock.Join(const Group: String): Integer;
+  function TZsock.Join(const Group: string): Integer;
   var
     __Group__: UTF8String;
   begin
@@ -8402,12 +8408,17 @@ end;
     Result := zsock_join(FHandle, PAnsiChar(__Group__));
   end;
 
-  function TZsock.Leave(const Group: String): Integer;
+  function TZsock.Leave(const Group: string): Integer;
   var
     __Group__: UTF8String;
   begin
     __Group__ := UTF8String(Group);
     Result := zsock_leave(FHandle, PAnsiChar(__Group__));
+  end;
+
+  function TZsock.HasIn: Boolean;
+  begin
+    Result := zsock_has_in(FHandle);
   end;
 
   function TZsock.RouterNotify: Integer;
@@ -8430,12 +8441,12 @@ end;
     zsock_set_multicast_loop(FHandle, MulticastLoop);
   end;
 
-  function TZsock.Metadata: String;
+  function TZsock.Metadata: string;
   begin
     Result := ZFreeString(zsock_metadata(FHandle));
   end;
 
-  procedure TZsock.SetMetadata(const Metadata: String);
+  procedure TZsock.SetMetadata(const Metadata: string);
   var
     __Metadata__: UTF8String;
   begin
@@ -8483,12 +8494,12 @@ end;
     zsock_set_gssapi_service_principal_nametype(FHandle, GssapiServicePrincipalNametype);
   end;
 
-  function TZsock.Bindtodevice: String;
+  function TZsock.Bindtodevice: string;
   begin
     Result := ZFreeString(zsock_bindtodevice(FHandle));
   end;
 
-  procedure TZsock.SetBindtodevice(const Bindtodevice: String);
+  procedure TZsock.SetBindtodevice(const Bindtodevice: string);
   var
     __Bindtodevice__: UTF8String;
   begin
@@ -8541,7 +8552,7 @@ end;
     zsock_set_xpub_manual(FHandle, XpubManual);
   end;
 
-  procedure TZsock.SetXpubWelcomeMsg(const XpubWelcomeMsg: String);
+  procedure TZsock.SetXpubWelcomeMsg(const XpubWelcomeMsg: string);
   var
     __XpubWelcomeMsg__: UTF8String;
   begin
@@ -8659,7 +8670,7 @@ end;
     zsock_set_router_handover(FHandle, RouterHandover);
   end;
 
-  procedure TZsock.SetConnectRid(const ConnectRid: String);
+  procedure TZsock.SetConnectRid(const ConnectRid: string);
   var
     __ConnectRid__: UTF8String;
   begin
@@ -8682,12 +8693,12 @@ end;
     zsock_set_handshake_ivl(FHandle, HandshakeIvl);
   end;
 
-  function TZsock.SocksProxy: String;
+  function TZsock.SocksProxy: string;
   begin
     Result := ZFreeString(zsock_socks_proxy(FHandle));
   end;
 
-  procedure TZsock.SetSocksProxy(const SocksProxy: String);
+  procedure TZsock.SetSocksProxy(const SocksProxy: string);
   var
     __SocksProxy__: UTF8String;
   begin
@@ -8725,12 +8736,12 @@ end;
     zsock_set_conflate(FHandle, Conflate);
   end;
 
-  function TZsock.ZapDomain: String;
+  function TZsock.ZapDomain: string;
   begin
     Result := ZFreeString(zsock_zap_domain(FHandle));
   end;
 
-  procedure TZsock.SetZapDomain(const ZapDomain: String);
+  procedure TZsock.SetZapDomain(const ZapDomain: string);
   var
     __ZapDomain__: UTF8String;
   begin
@@ -8753,12 +8764,12 @@ end;
     zsock_set_plain_server(FHandle, PlainServer);
   end;
 
-  function TZsock.PlainUsername: String;
+  function TZsock.PlainUsername: string;
   begin
     Result := ZFreeString(zsock_plain_username(FHandle));
   end;
 
-  procedure TZsock.SetPlainUsername(const PlainUsername: String);
+  procedure TZsock.SetPlainUsername(const PlainUsername: string);
   var
     __PlainUsername__: UTF8String;
   begin
@@ -8766,12 +8777,12 @@ end;
     zsock_set_plain_username(FHandle, PAnsiChar(__PlainUsername__));
   end;
 
-  function TZsock.PlainPassword: String;
+  function TZsock.PlainPassword: string;
   begin
     Result := ZFreeString(zsock_plain_password(FHandle));
   end;
 
-  procedure TZsock.SetPlainPassword(const PlainPassword: String);
+  procedure TZsock.SetPlainPassword(const PlainPassword: string);
   var
     __PlainPassword__: UTF8String;
   begin
@@ -8789,12 +8800,12 @@ end;
     zsock_set_curve_server(FHandle, CurveServer);
   end;
 
-  function TZsock.CurvePublickey: String;
+  function TZsock.CurvePublickey: string;
   begin
     Result := ZFreeString(zsock_curve_publickey(FHandle));
   end;
 
-  procedure TZsock.SetCurvePublickey(const CurvePublickey: String);
+  procedure TZsock.SetCurvePublickey(const CurvePublickey: string);
   var
     __CurvePublickey__: UTF8String;
   begin
@@ -8807,12 +8818,12 @@ end;
     zsock_set_curve_publickey_bin(FHandle, CurvePublickey);
   end;
 
-  function TZsock.CurveSecretkey: String;
+  function TZsock.CurveSecretkey: string;
   begin
     Result := ZFreeString(zsock_curve_secretkey(FHandle));
   end;
 
-  procedure TZsock.SetCurveSecretkey(const CurveSecretkey: String);
+  procedure TZsock.SetCurveSecretkey(const CurveSecretkey: string);
   var
     __CurveSecretkey__: UTF8String;
   begin
@@ -8825,12 +8836,12 @@ end;
     zsock_set_curve_secretkey_bin(FHandle, CurveSecretkey);
   end;
 
-  function TZsock.CurveServerkey: String;
+  function TZsock.CurveServerkey: string;
   begin
     Result := ZFreeString(zsock_curve_serverkey(FHandle));
   end;
 
-  procedure TZsock.SetCurveServerkey(const CurveServerkey: String);
+  procedure TZsock.SetCurveServerkey(const CurveServerkey: string);
   var
     __CurveServerkey__: UTF8String;
   begin
@@ -8863,12 +8874,12 @@ end;
     zsock_set_gssapi_plaintext(FHandle, GssapiPlaintext);
   end;
 
-  function TZsock.GssapiPrincipal: String;
+  function TZsock.GssapiPrincipal: string;
   begin
     Result := ZFreeString(zsock_gssapi_principal(FHandle));
   end;
 
-  procedure TZsock.SetGssapiPrincipal(const GssapiPrincipal: String);
+  procedure TZsock.SetGssapiPrincipal(const GssapiPrincipal: string);
   var
     __GssapiPrincipal__: UTF8String;
   begin
@@ -8876,12 +8887,12 @@ end;
     zsock_set_gssapi_principal(FHandle, PAnsiChar(__GssapiPrincipal__));
   end;
 
-  function TZsock.GssapiServicePrincipal: String;
+  function TZsock.GssapiServicePrincipal: string;
   begin
     Result := ZFreeString(zsock_gssapi_service_principal(FHandle));
   end;
 
-  procedure TZsock.SetGssapiServicePrincipal(const GssapiServicePrincipal: String);
+  procedure TZsock.SetGssapiServicePrincipal(const GssapiServicePrincipal: string);
   var
     __GssapiServicePrincipal__: UTF8String;
   begin
@@ -8994,12 +9005,12 @@ end;
     zsock_set_tcp_keepalive_intvl(FHandle, TcpKeepaliveIntvl);
   end;
 
-  function TZsock.TcpAcceptFilter: String;
+  function TZsock.TcpAcceptFilter: string;
   begin
     Result := ZFreeString(zsock_tcp_accept_filter(FHandle));
   end;
 
-  procedure TZsock.SetTcpAcceptFilter(const TcpAcceptFilter: String);
+  procedure TZsock.SetTcpAcceptFilter(const TcpAcceptFilter: string);
   var
     __TcpAcceptFilter__: UTF8String;
   begin
@@ -9007,7 +9018,7 @@ end;
     zsock_set_tcp_accept_filter(FHandle, PAnsiChar(__TcpAcceptFilter__));
   end;
 
-  function TZsock.LastEndpoint: String;
+  function TZsock.LastEndpoint: string;
   begin
     Result := ZFreeString(zsock_last_endpoint(FHandle));
   end;
@@ -9062,12 +9073,12 @@ end;
     zsock_set_affinity(FHandle, Affinity);
   end;
 
-  function TZsock.Identity: String;
+  function TZsock.Identity: string;
   begin
     Result := ZFreeString(zsock_identity(FHandle));
   end;
 
-  procedure TZsock.SetIdentity(const Identity: String);
+  procedure TZsock.SetIdentity(const Identity: string);
   var
     __Identity__: UTF8String;
   begin
@@ -9195,7 +9206,7 @@ end;
     zsock_set_backlog(FHandle, Backlog);
   end;
 
-  procedure TZsock.SetSubscribe(const Subscribe: String);
+  procedure TZsock.SetSubscribe(const Subscribe: string);
   var
     __Subscribe__: UTF8String;
   begin
@@ -9203,7 +9214,7 @@ end;
     zsock_set_subscribe(FHandle, PAnsiChar(__Subscribe__));
   end;
 
-  procedure TZsock.SetUnsubscribe(const Unsubscribe: String);
+  procedure TZsock.SetUnsubscribe(const Unsubscribe: string);
   var
     __Unsubscribe__: UTF8String;
   begin
@@ -9233,17 +9244,17 @@ end;
 
  (* TZstr *)
 
-  class function TZstr.Recv(const Source: IZSock): String;
+  class function TZstr.Recv(const Source: IZSock): string;
   begin
     Result := ZFreeString(zstr_recv(TZsock.UnWrap(Source)));
   end;
 
-  class function TZstr.RecvCompress(const Source: IZSock): String;
+  class function TZstr.RecvCompress(const Source: IZSock): string;
   begin
     Result := ZFreeString(zstr_recv_compress(TZsock.UnWrap(Source)));
   end;
 
-  class function TZstr.Send(const Dest: IZSock; const &String: String): Integer;
+  class function TZstr.Send(const Dest: IZSock; const &String: string): Integer;
   var
     __String__: UTF8String;
   begin
@@ -9251,7 +9262,7 @@ end;
     Result := zstr_send(TZsock.UnWrap(Dest), PAnsiChar(__String__));
   end;
 
-  class function TZstr.Sendm(const Dest: IZSock; const &String: String): Integer;
+  class function TZstr.Sendm(const Dest: IZSock; const &String: string): Integer;
   var
     __String__: UTF8String;
   begin
@@ -9259,7 +9270,7 @@ end;
     Result := zstr_sendm(TZsock.UnWrap(Dest), PAnsiChar(__String__));
   end;
 
-  class function TZstr.Sendf(const Dest: IZSock; const Format: String): Integer;
+  class function TZstr.Sendf(const Dest: IZSock; const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -9267,7 +9278,7 @@ end;
     Result := zstr_sendf(TZsock.UnWrap(Dest), PAnsiChar(__Format__));
   end;
 
-  class function TZstr.Sendfm(const Dest: IZSock; const Format: String): Integer;
+  class function TZstr.Sendfm(const Dest: IZSock; const Format: string): Integer;
   var
     __Format__: UTF8String;
   begin
@@ -9275,7 +9286,7 @@ end;
     Result := zstr_sendfm(TZsock.UnWrap(Dest), PAnsiChar(__Format__));
   end;
 
-  class function TZstr.Sendx(const Dest: IZSock; const &String: String): Integer;
+  class function TZstr.Sendx(const Dest: IZSock; const &String: string): Integer;
   var
     __String__: UTF8String;
   begin
@@ -9283,7 +9294,7 @@ end;
     Result := zstr_sendx(TZsock.UnWrap(Dest), PAnsiChar(__String__));
   end;
 
-  class function TZstr.SendCompress(const Dest: IZSock; const &String: String): Integer;
+  class function TZstr.SendCompress(const Dest: IZSock; const &String: string): Integer;
   var
     __String__: UTF8String;
   begin
@@ -9291,7 +9302,7 @@ end;
     Result := zstr_send_compress(TZsock.UnWrap(Dest), PAnsiChar(__String__));
   end;
 
-  class function TZstr.SendmCompress(const Dest: IZSock; const &String: String): Integer;
+  class function TZstr.SendmCompress(const Dest: IZSock; const &String: string): Integer;
   var
     __String__: UTF8String;
   begin
@@ -9299,7 +9310,7 @@ end;
     Result := zstr_sendm_compress(TZsock.UnWrap(Dest), PAnsiChar(__String__));
   end;
 
-  class function TZstr.Str(const Source: IZSock): String;
+  class function TZstr.Str(const Source: IZSock): string;
   begin
     Result := ZFreeString(zstr_str(TZsock.UnWrap(Source)));
   end;
@@ -9321,7 +9332,7 @@ end;
     zsys_shutdown;
   end;
 
-  class function TZsys.Socket(&Type: Integer; const Filename: String; LineNbr: NativeUInt): Pointer;
+  class function TZsys.Socket(&Type: Integer; const Filename: string; LineNbr: NativeUInt): Pointer;
   var
     __Filename__: UTF8String;
   begin
@@ -9329,7 +9340,7 @@ end;
     Result := zsys_socket(&Type, PAnsiChar(__Filename__), LineNbr);
   end;
 
-  class function TZsys.Close(Handle: Pointer; const Filename: String; LineNbr: NativeUInt): Integer;
+  class function TZsys.Close(Handle: Pointer; const Filename: string; LineNbr: NativeUInt): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -9337,9 +9348,9 @@ end;
     Result := zsys_close(Handle, PAnsiChar(__Filename__), LineNbr);
   end;
 
-  class function TZsys.Sockname(Socktype: Integer): String;
+  class function TZsys.Sockname(Socktype: Integer): string;
   begin
-    Result := String(UTF8String(zsys_sockname(Socktype)));
+    Result := string(UTF8String(zsys_sockname(Socktype)));
   end;
 
   class function TZsys.CreatePipe(var BackendP: IZsock): IZsock;
@@ -9349,7 +9360,7 @@ end;
       BackendP := nil;
   end;
 
-  class procedure TZsys.HandlerSet(var HandlerFn: TZsysHandlerFn);
+  class procedure TZsys.HandlerSet(HandlerFn: PZsysHandlerFn);
   begin
     zsys_handler_set(HandlerFn);
   end;
@@ -9374,7 +9385,7 @@ end;
     zsys_set_interrupted;
   end;
 
-  class function TZsys.FileExists(const Filename: String): Boolean;
+  class function TZsys.FileExists(const Filename: string): Boolean;
   var
     __Filename__: UTF8String;
   begin
@@ -9382,7 +9393,7 @@ end;
     Result := zsys_file_exists(PAnsiChar(__Filename__));
   end;
 
-  class function TZsys.FileModified(const Filename: String): Int64;
+  class function TZsys.FileModified(const Filename: string): Int64;
   var
     __Filename__: UTF8String;
   begin
@@ -9390,7 +9401,7 @@ end;
     Result := zsys_file_modified(PAnsiChar(__Filename__));
   end;
 
-  class function TZsys.FileMode(const Filename: String): Integer;
+  class function TZsys.FileMode(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -9398,7 +9409,7 @@ end;
     Result := zsys_file_mode(PAnsiChar(__Filename__));
   end;
 
-  class function TZsys.FileDelete(const Filename: String): Integer;
+  class function TZsys.FileDelete(const Filename: string): Integer;
   var
     __Filename__: UTF8String;
   begin
@@ -9406,7 +9417,7 @@ end;
     Result := zsys_file_delete(PAnsiChar(__Filename__));
   end;
 
-  class function TZsys.FileStable(const Filename: String): Boolean;
+  class function TZsys.FileStable(const Filename: string): Boolean;
   var
     __Filename__: UTF8String;
   begin
@@ -9414,7 +9425,7 @@ end;
     Result := zsys_file_stable(PAnsiChar(__Filename__));
   end;
 
-  class function TZsys.DirCreate(const Pathname: String): Integer;
+  class function TZsys.DirCreate(const Pathname: string): Integer;
   var
     __Pathname__: UTF8String;
   begin
@@ -9422,7 +9433,7 @@ end;
     Result := zsys_dir_create(PAnsiChar(__Pathname__));
   end;
 
-  class function TZsys.DirDelete(const Pathname: String): Integer;
+  class function TZsys.DirDelete(const Pathname: string): Integer;
   var
     __Pathname__: UTF8String;
   begin
@@ -9430,7 +9441,7 @@ end;
     Result := zsys_dir_delete(PAnsiChar(__Pathname__));
   end;
 
-  class function TZsys.DirChange(const Pathname: String): Integer;
+  class function TZsys.DirChange(const Pathname: string): Integer;
   var
     __Pathname__: UTF8String;
   begin
@@ -9453,20 +9464,20 @@ end;
     zsys_version(Major, Minor, Patch);
   end;
 
-  class function TZsys.Sprintf(const Format: String): String;
+  class function TZsys.Sprintf(const Format: string): string;
   var
     __Format__: UTF8String;
   begin
     __Format__ := UTF8String(Format);
-    Result := String(UTF8String(zsys_sprintf(PAnsiChar(__Format__))));
+    Result := string(UTF8String(zsys_sprintf(PAnsiChar(__Format__))));
   end;
 
-  class function TZsys.Vprintf(const Format: String; Argptr: va_list): String;
+  class function TZsys.Vprintf(const Format: string; Argptr: va_list): string;
   var
     __Format__: UTF8String;
   begin
     __Format__ := UTF8String(Format);
-    Result := String(UTF8String(zsys_vprintf(PAnsiChar(__Format__), Argptr)));
+    Result := string(UTF8String(zsys_vprintf(PAnsiChar(__Format__), Argptr)));
   end;
 
   class function TZsys.UdpNew(Routable: Boolean): TSocket;
@@ -9484,7 +9495,7 @@ end;
     Result := zsys_udp_send(Udpsock, TZframe.UnWrap(Frame), Address, Addrlen);
   end;
 
-  class function TZsys.UdpRecv(Udpsock: TSocket; const Peername: String; Peerlen: Integer): IZframe;
+  class function TZsys.UdpRecv(Udpsock: TSocket; const Peername: string; Peerlen: Integer): IZframe;
   var
     __Peername__: UTF8String;
   begin
@@ -9492,7 +9503,7 @@ end;
     Result := TZframe.Wrap(zsys_udp_recv(Udpsock, PAnsiChar(__Peername__), Peerlen), false);
   end;
 
-  class procedure TZsys.SocketError(const Reason: String);
+  class procedure TZsys.SocketError(const Reason: string);
   var
     __Reason__: UTF8String;
   begin
@@ -9500,12 +9511,12 @@ end;
     zsys_socket_error(PAnsiChar(__Reason__));
   end;
 
-  class function TZsys.Hostname: String;
+  class function TZsys.Hostname: string;
   begin
-    Result := String(UTF8String(zsys_hostname));
+    Result := string(UTF8String(zsys_hostname));
   end;
 
-  class function TZsys.Daemonize(const Workdir: String): Integer;
+  class function TZsys.Daemonize(const Workdir: string): Integer;
   var
     __Workdir__: UTF8String;
   begin
@@ -9513,7 +9524,7 @@ end;
     Result := zsys_daemonize(PAnsiChar(__Workdir__));
   end;
 
-  class function TZsys.RunAs(const Lockfile: String; const Group: String; const User: String): Integer;
+  class function TZsys.RunAs(const Lockfile: string; const Group: string; const User: string): Integer;
   var
     __Lockfile__: UTF8String;
     __Group__: UTF8String;
@@ -9640,7 +9651,7 @@ end;
     Result := zsys_ipv6;
   end;
 
-  class procedure TZsys.SetInterface(const Value: String);
+  class procedure TZsys.SetInterface(const Value: string);
   var
     __Value__: UTF8String;
   begin
@@ -9648,12 +9659,12 @@ end;
     zsys_set_interface(PAnsiChar(__Value__));
   end;
 
-  class function TZsys.&Interface: String;
+  class function TZsys.&Interface: string;
   begin
-    Result := String(UTF8String(zsys_interface));
+    Result := string(UTF8String(zsys_interface));
   end;
 
-  class procedure TZsys.SetIpv6Address(const Value: String);
+  class procedure TZsys.SetIpv6Address(const Value: string);
   var
     __Value__: UTF8String;
   begin
@@ -9661,12 +9672,12 @@ end;
     zsys_set_ipv6_address(PAnsiChar(__Value__));
   end;
 
-  class function TZsys.Ipv6Address: String;
+  class function TZsys.Ipv6Address: string;
   begin
-    Result := String(UTF8String(zsys_ipv6_address));
+    Result := string(UTF8String(zsys_ipv6_address));
   end;
 
-  class procedure TZsys.SetIpv6McastAddress(const Value: String);
+  class procedure TZsys.SetIpv6McastAddress(const Value: string);
   var
     __Value__: UTF8String;
   begin
@@ -9674,9 +9685,9 @@ end;
     zsys_set_ipv6_mcast_address(PAnsiChar(__Value__));
   end;
 
-  class function TZsys.Ipv6McastAddress: String;
+  class function TZsys.Ipv6McastAddress: string;
   begin
-    Result := String(UTF8String(zsys_ipv6_mcast_address));
+    Result := string(UTF8String(zsys_ipv6_mcast_address));
   end;
 
   class procedure TZsys.SetAutoUseFd(AutoUseFd: Integer);
@@ -9689,7 +9700,7 @@ end;
     Result := zsys_auto_use_fd;
   end;
 
-  class function TZsys.Zprintf(const Format: String; const Args: IZhash): String;
+  class function TZsys.Zprintf(const Format: string; const Args: IZhash): string;
   var
     __Format__: UTF8String;
   begin
@@ -9697,7 +9708,7 @@ end;
     Result := ZFreeString(zsys_zprintf(PAnsiChar(__Format__), TZhash.UnWrap(Args)));
   end;
 
-  class function TZsys.ZprintfError(const Format: String; const Args: IZhash): String;
+  class function TZsys.ZprintfError(const Format: string; const Args: IZhash): string;
   var
     __Format__: UTF8String;
   begin
@@ -9705,7 +9716,7 @@ end;
     Result := ZFreeString(zsys_zprintf_error(PAnsiChar(__Format__), TZhash.UnWrap(Args)));
   end;
 
-  class function TZsys.Zplprintf(const Format: String; const Args: IZconfig): String;
+  class function TZsys.Zplprintf(const Format: string; const Args: IZconfig): string;
   var
     __Format__: UTF8String;
   begin
@@ -9713,7 +9724,7 @@ end;
     Result := ZFreeString(zsys_zplprintf(PAnsiChar(__Format__), TZconfig.UnWrap(Args)));
   end;
 
-  class function TZsys.ZplprintfError(const Format: String; const Args: IZconfig): String;
+  class function TZsys.ZplprintfError(const Format: string; const Args: IZconfig): string;
   var
     __Format__: UTF8String;
   begin
@@ -9721,7 +9732,7 @@ end;
     Result := ZFreeString(zsys_zplprintf_error(PAnsiChar(__Format__), TZconfig.UnWrap(Args)));
   end;
 
-  class procedure TZsys.SetLogident(const Value: String);
+  class procedure TZsys.SetLogident(const Value: string);
   var
     __Value__: UTF8String;
   begin
@@ -9734,7 +9745,7 @@ end;
     zsys_set_logstream(Stream);
   end;
 
-  class procedure TZsys.SetLogsender(const Endpoint: String);
+  class procedure TZsys.SetLogsender(const Endpoint: string);
   var
     __Endpoint__: UTF8String;
   begin
@@ -9747,7 +9758,7 @@ end;
     zsys_set_logsystem(Logsystem);
   end;
 
-  class procedure TZsys.Error(const Format: String);
+  class procedure TZsys.Error(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -9755,7 +9766,7 @@ end;
     zsys_error(PAnsiChar(__Format__));
   end;
 
-  class procedure TZsys.Warning(const Format: String);
+  class procedure TZsys.Warning(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -9763,7 +9774,7 @@ end;
     zsys_warning(PAnsiChar(__Format__));
   end;
 
-  class procedure TZsys.Notice(const Format: String);
+  class procedure TZsys.Notice(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -9771,7 +9782,7 @@ end;
     zsys_notice(PAnsiChar(__Format__));
   end;
 
-  class procedure TZsys.Info(const Format: String);
+  class procedure TZsys.Info(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -9779,7 +9790,7 @@ end;
     zsys_info(PAnsiChar(__Format__));
   end;
 
-  class procedure TZsys.Debug(const Format: String);
+  class procedure TZsys.Debug(const Format: string);
   var
     __Format__: UTF8String;
   begin
@@ -9836,7 +9847,7 @@ end;
     zuuid_set(FHandle, Source);
   end;
 
-  function TZuuid.SetStr(const Source: String): Integer;
+  function TZuuid.SetStr(const Source: string): Integer;
   var
     __Source__: UTF8String;
   begin
@@ -9854,14 +9865,14 @@ end;
     Result := zuuid_size(FHandle);
   end;
 
-  function TZuuid.Str: String;
+  function TZuuid.Str: string;
   begin
-    Result := String(UTF8String(zuuid_str(FHandle)));
+    Result := string(UTF8String(zuuid_str(FHandle)));
   end;
 
-  function TZuuid.StrCanonical: String;
+  function TZuuid.StrCanonical: string;
   begin
-    Result := String(UTF8String(zuuid_str_canonical(FHandle)));
+    Result := string(UTF8String(zuuid_str_canonical(FHandle)));
   end;
 
   procedure TZuuid.Export(Target: PByte);

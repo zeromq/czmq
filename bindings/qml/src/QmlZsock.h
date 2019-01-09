@@ -227,6 +227,9 @@ public slots:
     //  Returns 0 if OK, -1 if failed.
     int leave (const QString &group);
 
+    //  Check whether the socket has available message to read.
+    bool hasIn ();
+
     //  Get socket option `router_notify`.
     //  Available from libzmq 4.3.0.
     int routerNotify ();

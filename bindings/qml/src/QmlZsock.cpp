@@ -271,6 +271,12 @@ int QmlZsock::leave (const QString &group) {
 };
 
 ///
+//  Check whether the socket has available message to read.
+bool QmlZsock::hasIn () {
+    return zsock_has_in (self);
+};
+
+///
 //  Get socket option `router_notify`.
 //  Available from libzmq 4.3.0.
 int QmlZsock::routerNotify () {
