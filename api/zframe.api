@@ -14,6 +14,12 @@
     <constant name = "reuse" value = "2" />
     <constant name = "dontwait" value = "4" />
 
+    <callback_type name = "destructor_fn" state = "draft">
+        Destroy an item
+        <argument name = "hint" type = "anything" />
+        <argument name = "item" type = "buffer" by_reference = "1" />
+    </callback_type>
+
     <constructor>
         Create a new frame. If size is not null, allocates the frame data
         to the specified size. If additionally, data is not null, copies
@@ -33,6 +39,15 @@
     <constructor name = "from">
         Create a frame with a specified string content.
         <argument name = "string" type = "string" />
+    </constructor>
+
+    <constructor name = "frommem" state = "draft">
+        Create a new frame from memory. Take ownership of the memory and calling the destructor
+        on destroy.
+        <argument name = "data_p" type = "buffer" by_reference = "1" />
+        <argument name = "size" type = "size" />
+        <argument name = "destructor" type = "zframe_destructor_fn" callback = "1" />
+        <argument name = "hint" type = "anything" />
     </constructor>
 
     <constructor name = "recv">
