@@ -140,6 +140,7 @@ module CZMQ
       require_relative 'ffi/zcertstore'
 
       attach_function :zchunk_new, [:pointer, :size_t], :pointer, **opts
+      attach_function :zchunk_frommem, [:pointer, :size_t, :pointer, :pointer], :pointer, **opts
       attach_function :zchunk_destroy, [:pointer], :void, **opts
       attach_function :zchunk_resize, [:pointer, :size_t], :void, **opts
       attach_function :zchunk_size, [:pointer], :size_t, **opts
@@ -159,6 +160,7 @@ module CZMQ
       attach_function :zchunk_strdup, [:pointer], :pointer, **opts
       attach_function :zchunk_streq, [:pointer, :string], :bool, **opts
       attach_function :zchunk_pack, [:pointer], :pointer, **opts
+      attach_function :zchunk_packx, [:pointer], :pointer, **opts
       attach_function :zchunk_unpack, [:pointer], :pointer, **opts
       attach_function :zchunk_digest, [:pointer], :string, **opts
       attach_function :zchunk_fprint, [:pointer, :pointer], :void, **opts
@@ -285,6 +287,7 @@ module CZMQ
       attach_function :zframe_new, [:pointer, :size_t], :pointer, **opts
       attach_function :zframe_new_empty, [], :pointer, **opts
       attach_function :zframe_from, [:string], :pointer, **opts
+      attach_function :zframe_frommem, [:pointer, :size_t, :pointer, :pointer], :pointer, **opts
       attach_function :zframe_recv, [:pointer], :pointer, **opts
       attach_function :zframe_destroy, [:pointer], :void, **opts
       attach_function :zframe_send, [:pointer, :pointer, :int], :int, **opts

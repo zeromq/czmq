@@ -40,6 +40,8 @@ struct _zframe_t {
 #ifdef ZMQ_GROUP_MAX_LENGTH
     char group[ZMQ_GROUP_MAX_LENGTH + 1];
 #endif
+    zframe_destructor_fn *destructor;   //  Destructor for memory
+    void * hint;                        //  Hint for destroying the memory
 };
 
 //  --------------------------------------------------------------------------
@@ -109,6 +111,38 @@ zframe_t *
 zframe_from (const char *string)
 {
     return zframe_new (string, strlen (string));
+}
+
+
+static void zmq_msg_destructor (void *data, void *hint) {
+    zframe_t *frame = (zframe_t *)hint;
+    frame->destructor (frame->hint, (byte **) &data);
+}
+
+//  --------------------------------------------------------------------------
+//  Create a new frame from memory. Taking ownership of the memory and calling the destructor
+//  on destroy.
+
+zframe_t *
+zframe_frommem (byte **data_p, size_t size, zframe_destructor_fn destructor, void *hint) {
+    assert (data_p);
+    assert (*data_p);
+
+    zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
+    assert (self);
+    self->tag = ZFRAME_TAG;
+    self->destructor = destructor;
+    self->hint = hint;
+
+    //  Catch heap exhaustion in this specific case
+    if (zmq_msg_init_data (&self->zmsg, *data_p, size, zmq_msg_destructor, self)) {
+        zframe_destroy (&self);
+        return NULL;
+    }
+
+    *data_p = NULL;
+
+    return self;
 }
 
 
@@ -578,6 +612,13 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
 //  --------------------------------------------------------------------------
 //  Selftest
 
+static void
+mem_destructor (void *hint, byte **data) {
+    strcpy ((char*)hint, "world");
+    *data = NULL;
+}
+
+
 void
 zframe_test (bool verbose)
 {
@@ -752,6 +793,17 @@ zframe_test (bool verbose)
     assert(errno == ENOTSUP);
     zframe_destroy (&frame);
 #endif
+
+    char str[] = "hello";
+    char *str_copy = str;
+    frame = zframe_frommem ((byte **) &str_copy, 5, mem_destructor, str);
+    assert (frame);
+    assert (str_copy == NULL);
+    zframe_destroy (&frame);
+
+    //  The destructor doesn't free the memory, only changing the strid,
+    //  so we can check if the destructor was invoked
+    assert (streq (str, "world"));
 
 #if defined (__WINDOWS__)
     zsys_shutdown();

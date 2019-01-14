@@ -82,6 +82,22 @@ module CZMQ
         @finalizer = nil
       end
 
+      # Create a new callback of the following type:
+      # Destroy an item
+      #     typedef void (zframe_destructor_fn) (
+      #         void *hint, byte **item);
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.destructor_fn
+        ::FFI::Function.new :void, [:pointer, :pointer], blocking: true do |hint, item|
+          result = yield hint, item
+          result
+        end
+      end
+
       # Create a new frame. If size is not null, allocates the frame data
       # to the specified size. If additionally, data is not null, copies
       # size octets from the specified data into the frame body.
@@ -106,6 +122,19 @@ module CZMQ
       # @return [CZMQ::Zframe]
       def self.from(string)
         ptr = ::CZMQ::FFI.zframe_from(string)
+        __new ptr
+      end
+
+      # Create a new frame from memory. Take ownership of the memory and calling the destructor
+      # on destroy.
+      # @param data_p [::FFI::Pointer, #to_ptr]
+      # @param size [Integer, #to_int, #to_i]
+      # @param destructor [::FFI::Pointer, #to_ptr]
+      # @param hint [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Zframe]
+      def self.frommem(data_p, size, destructor, hint)
+        size = Integer(size)
+        ptr = ::CZMQ::FFI.zframe_frommem(data_p, size, destructor, hint)
         __new ptr
       end
 

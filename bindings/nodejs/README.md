@@ -574,6 +574,13 @@ zframe my_zchunk.pack ()
 Transform zchunk into a zframe that can be sent in a message.
 
 ```
+zframe my_zchunk.packx (Zchunk)
+```
+
+Transform zchunk into a zframe that can be sent in a message.
+Take ownership of the chunk.
+
+```
 zchunk my_zchunk.unpack (Zframe)
 ```
 

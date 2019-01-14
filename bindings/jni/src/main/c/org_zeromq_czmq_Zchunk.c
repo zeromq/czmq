@@ -156,6 +156,13 @@ Java_org_zeromq_czmq_Zchunk__1_1pack (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zchunk__1_1packx (JNIEnv *env, jclass c, jlong self)
+{
+    jlong packx_ = (jlong) (intptr_t) zchunk_packx ((zchunk_t **) &self);
+    return packx_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zchunk__1_1unpack (JNIEnv *env, jclass c, jlong frame)
 {
     jlong unpack_ = (jlong) (intptr_t) zchunk_unpack ((zframe_t *) (intptr_t) frame);

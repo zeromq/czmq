@@ -122,6 +122,10 @@ public slots:
     //  Create a frame with a specified string content.
     QmlZframe *from (const QString &string);
 
+    //  Create a new frame from memory. Take ownership of the memory and calling the destructor
+    //  on destroy.
+    QmlZframe *frommem (byte **dataP, size_t size, zframe_destructor_fn destructor, void *hint);
+
     //  Receive frame from socket, returns zframe_t object or NULL if the recv
     //  was interrupted. Does a blocking recv, if you want to not block then use
     //  zpoller or zloop.

@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  Create a new chunk of the specified size. If you specify the data, it
 //  is copied into the chunk. If you do not specify the data, the chunk is
 //  allocated and left empty, and you can then add data using zchunk_append.
@@ -152,6 +154,25 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zchunk_test (bool verbose);
 
+#ifdef CZMQ_BUILD_DRAFT_API
+// Destroy an item
+typedef void (zchunk_destructor_fn) (
+    void *hint, byte **item);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Create a new chunk from memory. Take ownership of the memory and calling the destructor
+//  on destroy.
+CZMQ_EXPORT zchunk_t *
+    zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, void *hint);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Transform zchunk into a zframe that can be sent in a message.
+//  Take ownership of the chunk.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT zframe_t *
+    zchunk_packx (zchunk_t **self_p);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 

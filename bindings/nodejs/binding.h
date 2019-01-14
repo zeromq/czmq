@@ -165,6 +165,7 @@ class Zchunk: public Nan::ObjectWrap {
     static NAN_METHOD (_strdup);
     static NAN_METHOD (_streq);
     static NAN_METHOD (_pack);
+    static NAN_METHOD (_packx);
     static NAN_METHOD (_unpack);
     static NAN_METHOD (_digest);
     static NAN_METHOD (_print);

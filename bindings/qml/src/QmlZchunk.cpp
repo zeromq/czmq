@@ -171,6 +171,15 @@ QmlZchunk *QmlZchunkAttached::slurp (const QString &filename, size_t maxsize) {
 };
 
 ///
+//  Transform zchunk into a zframe that can be sent in a message.
+//  Take ownership of the chunk.
+QmlZframe *QmlZchunkAttached::packx (QmlZchunk *selfP) {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zchunk_packx (&selfP->self);
+    return retQ_;
+};
+
+///
 //  Transform a zframe into a zchunk.
 QmlZchunk *QmlZchunkAttached::unpack (QmlZframe *frame) {
     QmlZchunk *retQ_ = new QmlZchunk ();
@@ -197,6 +206,15 @@ void QmlZchunkAttached::test (bool verbose) {
 QmlZchunk *QmlZchunkAttached::construct (const void *data, size_t size) {
     QmlZchunk *qmlSelf = new QmlZchunk ();
     qmlSelf->self = zchunk_new (data, size);
+    return qmlSelf;
+};
+
+///
+//  Create a new chunk from memory. Take ownership of the memory and calling the destructor
+//  on destroy.
+QmlZchunk *QmlZchunkAttached::frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint) {
+    QmlZchunk *qmlSelf = new QmlZchunk ();
+    qmlSelf->self = zchunk_frommem (dataP, size, destructor, hint);
     return qmlSelf;
 };
 

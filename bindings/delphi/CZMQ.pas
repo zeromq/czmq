@@ -2481,6 +2481,10 @@ uses
     // allocated and left empty, and you can then add data using zchunk_append.
     constructor New(Data: PByte; Size: NativeUInt);
 
+    // Create a new chunk from memory. Take ownership of the memory and calling the destructor
+    // on destroy.
+    constructor Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer);
+
     // Destroy a chunk
     destructor Destroy; override;
 
@@ -2492,6 +2496,10 @@ uses
     // fail with an assertion if that cannot fit into memory. Returns a new
     // chunk containing the file data, or NULL if the file could not be read.
     class function Slurp(const Filename: string; Maxsize: NativeUInt): IZchunk;
+
+    // Transform zchunk into a zframe that can be sent in a message.
+    // Take ownership of the chunk.
+    class function Packx(var SelfP: IZchunk): IZframe;
 
     // Transform a zframe into a zchunk.
     class function Unpack(const Frame: IZframe): IZchunk;
@@ -3042,6 +3050,10 @@ uses
 
     // Create a frame with a specified string content.
     constructor From(const &String: string);
+
+    // Create a new frame from memory. Take ownership of the memory and calling the destructor
+    // on destroy.
+    constructor Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer);
 
     // Receive frame from socket, returns zframe_t object or NULL if the recv
     // was interrupted. Does a blocking recv, if you want to not block then use
@@ -5996,6 +6008,11 @@ end;
     Create(zchunk_new(Data, Size), True);
   end;
 
+  constructor TZchunk.Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer);
+  begin
+    Create(zchunk_frommem(DataP, Size, &Destructor, Hint), True);
+  end;
+
   constructor TZchunk.Create(handle: PZchunk; owned: Boolean);
   begin
     FHandle := handle;
@@ -6029,6 +6046,13 @@ end;
   begin
     __Filename__ := UTF8String(Filename);
     Result := TZchunk.Wrap(zchunk_slurp(PAnsiChar(__Filename__), Maxsize), true);
+  end;
+
+  class function TZchunk.Packx(var SelfP: IZchunk): IZframe;
+  begin
+    Result := TZframe.Wrap(zchunk_packx(TZchunk(SelfP).FHandle), true);
+    if TZchunk(SelfP).FHandle = nil then
+      SelfP := nil;
   end;
 
   class function TZchunk.Unpack(const Frame: IZframe): IZchunk;
@@ -6812,6 +6836,11 @@ end;
   begin
     __String__ := UTF8String(&String);
     Create(zframe_from(PAnsiChar(__String__)), True);
+  end;
+
+  constructor TZframe.Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer);
+  begin
+    Create(zframe_frommem(DataP, Size, &Destructor, Hint), True);
   end;
 
   constructor TZframe.Recv(const Source: IZSock);

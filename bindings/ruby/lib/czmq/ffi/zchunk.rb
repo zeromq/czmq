@@ -73,6 +73,22 @@ module CZMQ
         @finalizer = nil
       end
 
+      # Create a new callback of the following type:
+      # Destroy an item
+      #     typedef void (zchunk_destructor_fn) (
+      #         void *hint, byte **item);
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.destructor_fn
+        ::FFI::Function.new :void, [:pointer, :pointer], blocking: true do |hint, item|
+          result = yield hint, item
+          result
+        end
+      end
+
       # Create a new chunk of the specified size. If you specify the data, it
       # is copied into the chunk. If you do not specify the data, the chunk is
       # allocated and left empty, and you can then add data using zchunk_append.
@@ -82,6 +98,19 @@ module CZMQ
       def self.new(data, size)
         size = Integer(size)
         ptr = ::CZMQ::FFI.zchunk_new(data, size)
+        __new ptr
+      end
+
+      # Create a new chunk from memory. Take ownership of the memory and calling the destructor
+      # on destroy.
+      # @param data_p [::FFI::Pointer, #to_ptr]
+      # @param size [Integer, #to_int, #to_i]
+      # @param destructor [::FFI::Pointer, #to_ptr]
+      # @param hint [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Zchunk]
+      def self.frommem(data_p, size, destructor, hint)
+        size = Integer(size)
+        ptr = ::CZMQ::FFI.zchunk_frommem(data_p, size, destructor, hint)
         __new ptr
       end
 
@@ -313,6 +342,18 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zchunk_pack(self_p)
+        result = Zframe.__new result, true
+        result
+      end
+
+      # Transform zchunk into a zframe that can be sent in a message.
+      # Take ownership of the chunk.
+      #
+      # @param self_p [#__ptr_give_ref]
+      # @return [Zframe]
+      def self.packx(self_p)
+        self_p = self_p.__ptr_give_ref
+        result = ::CZMQ::FFI.zchunk_packx(self_p)
         result = Zframe.__new result, true
         result
       end

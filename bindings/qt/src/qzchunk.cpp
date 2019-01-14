@@ -25,6 +25,14 @@ QZchunk::QZchunk (const void *data, size_t size, QObject *qObjParent) : QObject 
 }
 
 ///
+//  Create a new chunk from memory. Take ownership of the memory and calling the destructor
+//  on destroy.
+QZchunk* QZchunk::frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint, QObject *qObjParent)
+{
+    return new QZchunk (zchunk_frommem (dataP, size, destructor, hint), qObjParent);
+}
+
+///
 //  Destroy a chunk
 QZchunk::~QZchunk ()
 {
@@ -191,6 +199,15 @@ bool QZchunk::streqNoConflict (const QString &string)
 QZframe * QZchunk::pack ()
 {
     QZframe *rv = new QZframe (zchunk_pack (self));
+    return rv;
+}
+
+///
+//  Transform zchunk into a zframe that can be sent in a message.
+//  Take ownership of the chunk.
+QZframe * QZchunk::packx ()
+{
+    QZframe *rv = new QZframe (zchunk_packx (&self));
     return rv;
 }
 
