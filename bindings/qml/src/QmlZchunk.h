@@ -119,6 +119,10 @@ public slots:
     //  chunk containing the file data, or NULL if the file could not be read.
     QmlZchunk *slurp (const QString &filename, size_t maxsize);
 
+    //  Transform zchunk into a zframe that can be sent in a message.
+    //  Take ownership of the chunk.
+    QmlZframe *packx (QmlZchunk *selfP);
+
     //  Transform a zframe into a zchunk.
     QmlZchunk *unpack (QmlZframe *frame);
 
@@ -132,6 +136,10 @@ public slots:
     //  is copied into the chunk. If you do not specify the data, the chunk is
     //  allocated and left empty, and you can then add data using zchunk_append.
     QmlZchunk *construct (const void *data, size_t size);
+
+    //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
+    //  on destroy.
+    QmlZchunk *frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint);
 
     //  Destroy a chunk
     void destruct (QmlZchunk *qmlSelf);

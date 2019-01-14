@@ -1075,10 +1075,13 @@ objects.
 
 
 # zchunk
+zchunk_destructor_fn = CFUNCTYPE(None, c_void_p, POINTER(c_void_p))
 lib.zchunk_new.restype = zchunk_p
 lib.zchunk_new.argtypes = [c_void_p, c_size_t]
 lib.zchunk_destroy.restype = None
 lib.zchunk_destroy.argtypes = [POINTER(zchunk_p)]
+lib.zchunk_frommem.restype = zchunk_p
+lib.zchunk_frommem.argtypes = [POINTER(c_void_p), c_size_t, zchunk_destructor_fn, c_void_p]
 lib.zchunk_resize.restype = None
 lib.zchunk_resize.argtypes = [zchunk_p, c_size_t]
 lib.zchunk_size.restype = c_size_t
@@ -1115,6 +1118,8 @@ lib.zchunk_streq.restype = c_bool
 lib.zchunk_streq.argtypes = [zchunk_p, c_char_p]
 lib.zchunk_pack.restype = zframe_p
 lib.zchunk_pack.argtypes = [zchunk_p]
+lib.zchunk_packx.restype = zframe_p
+lib.zchunk_packx.argtypes = [POINTER(zchunk_p)]
 lib.zchunk_unpack.restype = zchunk_p
 lib.zchunk_unpack.argtypes = [zframe_p]
 lib.zchunk_digest.restype = c_char_p
@@ -1177,6 +1182,14 @@ allocated and left empty, and you can then add data using zchunk_append.
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def frommem(data_p, size, destructor, hint):
+        """
+        Create a new chunk from memory. Take ownership of the memory and calling the destructor
+on destroy.
+        """
+        return Zchunk(lib.zchunk_frommem(byref(c_void_p.from_param(data_p)), size, destructor, hint), True)
 
     def resize(self, size):
         """
@@ -1302,6 +1315,14 @@ Caller must free string when finished with it.
         Transform zchunk into a zframe that can be sent in a message.
         """
         return Zframe(lib.zchunk_pack(self._as_parameter_), True)
+
+    @staticmethod
+    def packx(self_p):
+        """
+        Transform zchunk into a zframe that can be sent in a message.
+Take ownership of the chunk.
+        """
+        return Zframe(lib.zchunk_packx(byref(zchunk_p.from_param(self_p))), True)
 
     @staticmethod
     def unpack(frame):
@@ -2449,6 +2470,7 @@ or NULL if there was nothing more to read from the file.
 
 
 # zframe
+zframe_destructor_fn = CFUNCTYPE(None, c_void_p, POINTER(c_void_p))
 lib.zframe_new.restype = zframe_p
 lib.zframe_new.argtypes = [c_void_p, c_size_t]
 lib.zframe_destroy.restype = None
@@ -2457,6 +2479,8 @@ lib.zframe_new_empty.restype = zframe_p
 lib.zframe_new_empty.argtypes = []
 lib.zframe_from.restype = zframe_p
 lib.zframe_from.argtypes = [c_char_p]
+lib.zframe_frommem.restype = zframe_p
+lib.zframe_frommem.argtypes = [POINTER(c_void_p), c_size_t, zframe_destructor_fn, c_void_p]
 lib.zframe_recv.restype = zframe_p
 lib.zframe_recv.argtypes = [c_void_p]
 lib.zframe_send.restype = c_int
@@ -2564,6 +2588,14 @@ size octets from the specified data into the frame body.
         Create a frame with a specified string content.
         """
         return Zframe(lib.zframe_from(string), True)
+
+    @staticmethod
+    def frommem(data_p, size, destructor, hint):
+        """
+        Create a new frame from memory. Take ownership of the memory and calling the destructor
+on destroy.
+        """
+        return Zframe(lib.zframe_frommem(byref(c_void_p.from_param(data_p)), size, destructor, hint), True)
 
     @staticmethod
     def recv(source):

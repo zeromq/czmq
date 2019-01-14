@@ -80,9 +80,17 @@ typedef void (zcertstore_loader) (
 typedef void (zcertstore_destructor) (
     void **self_p);
 
+// Destroy an item
+typedef void (zchunk_destructor_fn) (
+    void *hint, byte **item);
+
 //
 typedef int (zconfig_fct) (
     zconfig_t *self, void *arg, int level);
+
+// Destroy an item
+typedef void (zframe_destructor_fn) (
+    void *hint, byte **item);
 
 // Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (
@@ -493,6 +501,11 @@ void
 zchunk_t *
     zchunk_new (const void *data, size_t size);
 
+// Create a new chunk from memory. Take ownership of the memory and calling the destructor
+// on destroy.
+zchunk_t *
+    zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, void *hint);
+
 // Destroy a chunk
 void
     zchunk_destroy (zchunk_t **self_p);
@@ -583,6 +596,11 @@ bool
 // Transform zchunk into a zframe that can be sent in a message.
 zframe_t *
     zchunk_pack (zchunk_t *self);
+
+// Transform zchunk into a zframe that can be sent in a message.
+// Take ownership of the chunk.
+zframe_t *
+    zchunk_packx (zchunk_t **self_p);
 
 // Transform a zframe into a zchunk.
 zchunk_t *
@@ -1106,6 +1124,11 @@ zframe_t *
 // Create a frame with a specified string content.
 zframe_t *
     zframe_from (const char *string);
+
+// Create a new frame from memory. Take ownership of the memory and calling the destructor
+// on destroy.
+zframe_t *
+    zframe_frommem (byte **data_p, size_t size, zframe_destructor_fn destructor, void *hint);
 
 // Receive frame from socket, returns zframe_t object or NULL if the recv
 // was interrupted. Does a blocking recv, if you want to not block then use

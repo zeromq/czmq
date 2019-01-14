@@ -22,6 +22,10 @@ public:
     //  allocated and left empty, and you can then add data using zchunk_append.
     explicit QZchunk (const void *data, size_t size, QObject *qObjParent = 0);
 
+    //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
+    //  on destroy.
+    static QZchunk* frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint, QObject *qObjParent = 0);
+
     //  Destroy a chunk
     ~QZchunk ();
 
@@ -93,6 +97,10 @@ public:
 
     //  Transform zchunk into a zframe that can be sent in a message.
     QZframe * pack ();
+
+    //  Transform zchunk into a zframe that can be sent in a message.
+    //  Take ownership of the chunk.
+    QZframe * packx ();
 
     //  Transform a zframe into a zchunk.
     static QZchunk * unpack (QZframe *frame);

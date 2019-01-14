@@ -149,6 +149,13 @@ class Zchunk(object):
         """
         return utils.lib.zchunk_pack(self._p)
 
+    def packx(self_p):
+        """
+        Transform zchunk into a zframe that can be sent in a message.
+        Take ownership of the chunk.
+        """
+        return utils.lib.zchunk_packx(self_p._p)
+
     def unpack(frame):
         """
         Transform a zframe into a zchunk.

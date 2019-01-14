@@ -313,11 +313,20 @@ type
 
 (* Zchunk *)
 (* work with memory chunks *)
+type
+
+    // Destroy an item
+  TZchunkDestructorFn = procedure(Hint: Pointer; var Item: PByte); stdcall;
+  PZchunkDestructorFn = ^TZchunkDestructorFn;
 
   // Create a new chunk of the specified size. If you specify the data, it
   // is copied into the chunk. If you do not specify the data, the chunk is
   // allocated and left empty, and you can then add data using zchunk_append.
   function zchunk_new(Data: PByte; Size: NativeUInt): PZchunk; cdecl; external lib_czmq;
+
+  // Create a new chunk from memory. Take ownership of the memory and calling the destructor
+  // on destroy.
+  function zchunk_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer): PZchunk; cdecl; external lib_czmq;
 
   // Destroy a chunk
   procedure zchunk_destroy(var self: PZchunk); cdecl; external lib_czmq;
@@ -390,6 +399,10 @@ type
 
   // Transform zchunk into a zframe that can be sent in a message.
   function zchunk_pack(self: PZchunk): PZframe; cdecl; external lib_czmq;
+
+  // Transform zchunk into a zframe that can be sent in a message.
+  // Take ownership of the chunk.
+  function zchunk_packx(var SelfP: PZchunk): PZframe; cdecl; external lib_czmq;
 
   // Transform a zframe into a zchunk.
   function zchunk_unpack(Frame: PZframe): PZchunk; cdecl; external lib_czmq;
@@ -812,6 +825,11 @@ type
 
 (* Zframe *)
 (* working with single message frames *)
+type
+
+    // Destroy an item
+  TZframeDestructorFn = procedure(Hint: Pointer; var Item: PByte); stdcall;
+  PZframeDestructorFn = ^TZframeDestructorFn;
 
   // Create a new frame. If size is not null, allocates the frame data
   // to the specified size. If additionally, data is not null, copies
@@ -823,6 +841,10 @@ type
 
   // Create a frame with a specified string content.
   function zframe_from(&String: PAnsiChar): PZframe; cdecl; external lib_czmq;
+
+  // Create a new frame from memory. Take ownership of the memory and calling the destructor
+  // on destroy.
+  function zframe_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer): PZframe; cdecl; external lib_czmq;
 
   // Receive frame from socket, returns zframe_t object or NULL if the recv
   // was interrupted. Does a blocking recv, if you want to not block then use

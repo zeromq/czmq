@@ -93,6 +93,25 @@ CZMQ_PRIVATE void
 CZMQ_PRIVATE zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
+//  *** Draft callbacks, defined for internal use only ***
+// Destroy an item
+typedef void (zchunk_destructor_fn) (
+    void *hint, byte **item);
+
+//  *** Draft method, defined for internal use only ***
+//  Create a new chunk from memory. Take ownership of the memory and calling the destructor
+//  on destroy.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zchunk_t *
+    zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, void *hint);
+
+//  *** Draft method, defined for internal use only ***
+//  Transform zchunk into a zframe that can be sent in a message.
+//  Take ownership of the chunk.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zframe_t *
+    zchunk_packx (zchunk_t **self_p);
+
 //  *** Draft method, defined for internal use only ***
 //  Create copy of zconfig, caller MUST free the value
 //  Create copy of config, as new zconfig object. Returns a fresh zconfig_t
@@ -117,6 +136,18 @@ CZMQ_PRIVATE void
 //  Caller owns return value and must destroy it when done.
 CZMQ_PRIVATE zfile_t *
     zfile_tmp (void);
+
+//  *** Draft callbacks, defined for internal use only ***
+// Destroy an item
+typedef void (zframe_destructor_fn) (
+    void *hint, byte **item);
+
+//  *** Draft method, defined for internal use only ***
+//  Create a new frame from memory. Take ownership of the memory and calling the destructor
+//  on destroy.
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zframe_t *
+    zframe_frommem (byte **data_p, size_t size, zframe_destructor_fn destructor, void *hint);
 
 //  *** Draft method, defined for internal use only ***
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.

@@ -171,6 +171,14 @@ public class Zchunk implements AutoCloseable{
         return new Zframe (__pack (self));
     }
     /*
+    Transform zchunk into a zframe that can be sent in a message.
+    Take ownership of the chunk.
+    */
+    native static long __packx (long self);
+    public void packx () {
+        self = __packx (self);
+    }
+    /*
     Transform a zframe into a zchunk.
     */
     native static long __unpack (long frame);

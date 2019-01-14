@@ -906,6 +906,7 @@ NAN_MODULE_INIT (Zchunk::Init) {
     Nan::SetPrototypeMethod (tpl, "strdup", _strdup);
     Nan::SetPrototypeMethod (tpl, "streq", _streq);
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
+    Nan::SetPrototypeMethod (tpl, "packx", _packx);
     Nan::SetPrototypeMethod (tpl, "unpack", _unpack);
     Nan::SetPrototypeMethod (tpl, "digest", _digest);
     Nan::SetPrototypeMethod (tpl, "print", _print);
@@ -1097,6 +1098,18 @@ NAN_METHOD (Zchunk::_streq) {
 NAN_METHOD (Zchunk::_pack) {
     Zchunk *zchunk = Nan::ObjectWrap::Unwrap <Zchunk> (info.Holder ());
     zframe_t *result = zchunk_pack (zchunk->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zchunk::_packx) {
+    Zchunk *self_p = Nan::ObjectWrap::Unwrap<Zchunk>(info [0].As<Object>());
+    zframe_t *result = zchunk_packx (&self_p->self);
     Zframe *zframe_result = new Zframe (result);
     if (zframe_result) {
     //  Don't yet know how to return a new object
