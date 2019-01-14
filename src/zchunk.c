@@ -28,12 +28,14 @@
 //  Structure of our class
 
 struct _zchunk_t {
-    uint32_t tag;               //  Object tag for runtime detection
-    size_t size;                //  Current size of data part
-    size_t max_size;            //  Maximum allocated size
-    size_t consumed;            //  Amount already consumed
-    zdigest_t *digest;          //  Chunk digest, if known
-    byte *data;                 //  Data part follows here
+    uint32_t tag;                       //  Object tag for runtime detection
+    size_t size;                        //  Current size of data part
+    size_t max_size;                    //  Maximum allocated size
+    size_t consumed;                    //  Amount already consumed
+    zdigest_t *digest;                  //  Chunk digest, if known
+    byte *data;                         //  Data part follows here
+    zchunk_destructor_fn *destructor;   //  Destructor for memory
+    void * hint;                        //  Hint for destroying the memory
 };
 
 
@@ -55,6 +57,8 @@ zchunk_new (const void *data, size_t size)
         self->consumed = 0;
         self->data = (byte *) self + sizeof (zchunk_t);
         self->digest = NULL;
+        self->destructor = NULL;
+        self->hint = NULL;
         if (data) {
             self->size = size;
             memcpy (self->data, data, self->size);
@@ -75,6 +79,12 @@ zchunk_destroy (zchunk_t **self_p)
         zchunk_t *self = *self_p;
         assert (zchunk_is (self));
         //  If data was reallocated independently, free it independently
+        if (self->destructor) {
+            self->destructor (self->hint, &self->data);
+            self->destructor = NULL;
+            self->hint = NULL;
+        }
+        else
         if (self->data != (byte *) self + sizeof (zchunk_t))
             freen (self->data);
         self->tag = 0xDeadBeef;
@@ -82,6 +92,32 @@ zchunk_destroy (zchunk_t **self_p)
         freen (self);
         *self_p = NULL;
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a new chunk from memory. Taking ownership of the memory and calling the destructor
+//  on destroy.
+
+zchunk_t *
+zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, void *hint) {
+    assert (data_p);
+    assert (*data_p);
+
+    zchunk_t *self = (zchunk_t *) zmalloc (sizeof (zchunk_t));
+    assert (self);
+
+    self->tag = ZCHUNK_TAG;
+    self->size = size;
+    self->max_size = size;
+    self->consumed = 0;
+    self->data = *data_p;
+    self->digest = NULL;
+    self->destructor = destructor;
+    self->hint = hint;
+    *data_p = NULL;
+
+    return self;
 }
 
 
@@ -99,6 +135,14 @@ zchunk_resize (zchunk_t *self, size_t size)
     self->max_size = size;
     self->size = 0;             //  TODO: this is a bit annoying, is it needed?
 
+    //  If external allocated, free it first and reallocate
+    if (self->destructor) {
+        self->destructor (self->hint, &self->data);
+        self->destructor = NULL;
+        self->hint = NULL;
+        self->data = (byte *) malloc (self->max_size);
+    }
+    else
     //  We can't realloc the chunk itself, as the caller's reference
     //  won't change. So we modify self->data only, depending on whether
     //  it was already reallocated, or not.
@@ -217,6 +261,18 @@ zchunk_extend (zchunk_t *self, const void *data, size_t size)
     if (self->size + size > self->max_size) {
         self->max_size = (self->size + size) * 2;
 
+        //  If data was externally allocated, destroy it
+        if (self->destructor) {
+            byte *old_data = self->data;
+            self->data = (byte *) malloc (self->max_size);
+            memcpy (self->data, old_data, self->size);
+
+            //  Release the old data
+            self->destructor (self->hint, &old_data);
+            self->destructor = NULL;
+            self->hint = NULL;
+        }
+        else
         //  We can't realloc the chunk itself, as the caller's reference
         //  won't change. So we modify self->data only, depending on whether
         //  it was already reallocated, or not.
@@ -439,6 +495,30 @@ zchunk_unpack (zframe_t *frame)
 }
 
 
+void zchunk_destructor (void *hint, byte **data) {
+    zchunk_t *self = (zchunk_t *) hint;
+    zchunk_destroy (&self);
+    *data = NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Transform zchunk into a zframe that can be sent in a message.
+//  Take ownership of the chunk.
+//  Caller owns return value and must destroy it when done.
+
+zframe_t *
+zchunk_packx (zchunk_t **self_p) {
+    assert (self_p);
+    assert (*self_p);
+    zchunk_t *self = *self_p;
+    *self_p = NULL;
+    byte *data = self->data;
+
+    return zframe_frommem (&data, self->max_size, zchunk_destructor, self);
+}
+
+
 //  --------------------------------------------------------------------------
 //  Calculate SHA1 digest for chunk, using zdigest class. Caller should not
 //  modify digest.
@@ -529,6 +609,14 @@ zchunk_is (void *self)
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
+
+static void
+mem_destructor (void *hint, byte **data) {
+    strcpy ((char*)hint, "world");
+    *data = NULL;
+}
+
+
 void
 zchunk_test (bool verbose)
 {
@@ -598,6 +686,28 @@ zchunk_test (bool verbose)
     assert (zchunk_size (chunk) == 4);
     assert (memcmp (zchunk_data (chunk), "ghij", 4) == 0);
     zchunk_destroy (&copy);
+    zchunk_destroy (&chunk);
+
+    char str[] = "hello";
+    char *str_copy = str;
+    chunk = zchunk_frommem ((byte **) &str_copy, 5, mem_destructor, str);
+    assert (chunk);
+    assert (str_copy == NULL);
+    zchunk_destroy (&chunk);
+
+    //  The destructor doesn't free the memory, only changing the strid,
+    //  so we can check if the destructor was invoked
+    assert (streq (str, "world"));
+
+    chunk = zchunk_new ("1234567890", 10);
+    frame = zchunk_packx (&chunk);
+    assert (frame);
+    assert (chunk == NULL);
+
+    chunk = zchunk_unpack (frame);
+    assert (chunk);
+    assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
+    zframe_destroy (&frame);
     zchunk_destroy (&chunk);
 
 #if defined (__WINDOWS__)

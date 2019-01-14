@@ -9,6 +9,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
     work with memory chunks
+
+    <callback_type name = "destructor_fn" state = "draft">
+        Destroy an item
+        <argument name = "hint" type = "anything" />
+        <argument name = "item" type = "buffer" by_reference = "1" />
+    </callback_type>
     
     <constructor>
         Create a new chunk of the specified size. If you specify the data, it
@@ -17,6 +23,16 @@
         <argument name = "data" type = "buffer" c_type = "const void *" />
         <argument name = "size" type = "size" />
     </constructor>
+
+    <constructor name = "frommem" state = "draft">
+        Create a new chunk from memory. Take ownership of the memory and calling the destructor
+        on destroy.
+        <argument name = "data_p" type = "buffer" by_reference = "1" />
+        <argument name = "size" type = "size" />
+        <argument name = "destructor" type = "zchunk_destructor_fn" callback = "1" />
+        <argument name = "hint" type = "anything" />
+    </constructor>
+
 
     <destructor>
         Destroy a chunk
@@ -139,6 +155,13 @@
 
     <method name = "pack">
         Transform zchunk into a zframe that can be sent in a message.
+        <return type = "zframe" fresh = "1" />
+    </method>
+
+    <method name = "packx" state = "draft" singleton = "1">
+        Transform zchunk into a zframe that can be sent in a message.
+        Take ownership of the chunk.
+        <argument name = "self_p" type = "zchunk" by_reference = "1" />
         <return type = "zframe" fresh = "1" />
     </method>
 
