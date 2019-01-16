@@ -90,7 +90,7 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/
     $CI_TIME make install
     cd "${BASE_PWD}"
 fi
-if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libcurl4-openssl-dev >/dev/null 2>&1) || \
+if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libcurl4-nss-dev >/dev/null 2>&1) || \
        (command -v brew >/dev/null 2>&1 && brew ls --versions libcurl >/dev/null 2>&1)); then
     BASE_PWD=${PWD}
     cd tmp-deps

@@ -251,7 +251,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     fi
 
     # Start of recipe for dependency: libcurl
-    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libcurl4-openssl-dev >/dev/null 2>&1) || \
+    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libcurl4-nss-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions libcurl >/dev/null 2>&1) \
     ; then
         echo ""
