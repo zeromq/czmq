@@ -20,7 +20,7 @@ Build-Depends: debhelper (>= 9),
     uuid-dev,
     libsystemd-dev (>= 200.0.0),
     liblz4-dev,
-    libcurl4-openssl-dev (>= 7.28.0),
+    libcurl4-nss-dev (>= 7.28.0),
     dh-python,
     python-all-dev, python-cffi, python-setuptools,
     python3-all-dev, python3-cffi, python3-setuptools,
@@ -43,7 +43,7 @@ Depends:
     uuid-dev,
     libsystemd-dev (>= 200.0.0),
     liblz4-dev,
-    libcurl4-openssl-dev (>= 7.28.0),
+    libcurl4-nss-dev (>= 7.28.0),
     libczmq4 (= ${binary:Version})
 Description: czmq development tools
  This package contains development files for czmq:
