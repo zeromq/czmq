@@ -112,7 +112,7 @@ int main (int argc, char *argv [])
     }
 
     //  Insert main code here
-    int start = zclock_mono ();
+    int64_t start = zclock_mono ();
     while (!zsys_interrupted) {
 #if ! defined (__WINDOWS__)
         if (use_stdin) {
