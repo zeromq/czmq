@@ -120,7 +120,7 @@ addons:
     - libzmq3-dev
     - generator-scripting-language
     - zproject
-    - libcurl4-openssl-dev
+    - libcurl4-nss-dev
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "android" ] ; then brew update; brew install binutils ; fi
