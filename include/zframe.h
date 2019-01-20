@@ -129,13 +129,13 @@ CZMQ_EXPORT void
 #ifdef CZMQ_BUILD_DRAFT_API
 // Destroy an item
 typedef void (zframe_destructor_fn) (
-    void *hint, byte **item);
+    void **hint);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Create a new frame from memory. Take ownership of the memory and calling the destructor
 //  on destroy.
 CZMQ_EXPORT zframe_t *
-    zframe_frommem (byte **data_p, size_t size, zframe_destructor_fn destructor, void *hint);
+    zframe_frommem (void *data, size_t size, zframe_destructor_fn destructor, void *hint);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.

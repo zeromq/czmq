@@ -80,9 +80,8 @@ zchunk_destroy (zchunk_t **self_p)
         assert (zchunk_is (self));
         //  If data was reallocated independently, free it independently
         if (self->destructor) {
-            self->destructor (self->hint, &self->data);
+            self->destructor (&self->hint);
             self->destructor = NULL;
-            self->hint = NULL;
         }
         else
         if (self->data != (byte *) self + sizeof (zchunk_t))
@@ -100,9 +99,8 @@ zchunk_destroy (zchunk_t **self_p)
 //  on destroy.
 
 zchunk_t *
-zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, void *hint) {
-    assert (data_p);
-    assert (*data_p);
+zchunk_frommem (void *data, size_t size, zchunk_destructor_fn destructor, void *hint) {
+    assert (data);
 
     zchunk_t *self = (zchunk_t *) zmalloc (sizeof (zchunk_t));
     assert (self);
@@ -111,11 +109,10 @@ zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, voi
     self->size = size;
     self->max_size = size;
     self->consumed = 0;
-    self->data = *data_p;
+    self->data = (byte *)data;
     self->digest = NULL;
     self->destructor = destructor;
     self->hint = hint;
-    *data_p = NULL;
 
     return self;
 }
@@ -137,9 +134,8 @@ zchunk_resize (zchunk_t *self, size_t size)
 
     //  If external allocated, free it first and reallocate
     if (self->destructor) {
-        self->destructor (self->hint, &self->data);
+        self->destructor (&self->hint);
         self->destructor = NULL;
-        self->hint = NULL;
         self->data = (byte *) malloc (self->max_size);
     }
     else
@@ -268,9 +264,8 @@ zchunk_extend (zchunk_t *self, const void *data, size_t size)
             memcpy (self->data, old_data, self->size);
 
             //  Release the old data
-            self->destructor (self->hint, &old_data);
+            self->destructor (&self->hint);
             self->destructor = NULL;
-            self->hint = NULL;
         }
         else
         //  We can't realloc the chunk itself, as the caller's reference
@@ -495,13 +490,6 @@ zchunk_unpack (zframe_t *frame)
 }
 
 
-void zchunk_destructor (void *hint, byte **data) {
-    zchunk_t *self = (zchunk_t *) hint;
-    zchunk_destroy (&self);
-    *data = NULL;
-}
-
-
 //  --------------------------------------------------------------------------
 //  Transform zchunk into a zframe that can be sent in a message.
 //  Take ownership of the chunk.
@@ -513,9 +501,8 @@ zchunk_packx (zchunk_t **self_p) {
     assert (*self_p);
     zchunk_t *self = *self_p;
     *self_p = NULL;
-    byte *data = self->data;
 
-    return zframe_frommem (&data, self->max_size, zchunk_destructor, self);
+    return zframe_frommem (self->data, self->max_size, (zchunk_destructor_fn *) zchunk_destroy, self);
 }
 
 
@@ -611,9 +598,8 @@ zchunk_is (void *self)
 
 
 static void
-mem_destructor (void *hint, byte **data) {
-    strcpy ((char*)hint, "world");
-    *data = NULL;
+mem_destructor (void **hint) {
+    strcpy ((char*)*hint, "world");
 }
 
 
@@ -689,10 +675,8 @@ zchunk_test (bool verbose)
     zchunk_destroy (&chunk);
 
     char str[] = "hello";
-    char *str_copy = str;
-    chunk = zchunk_frommem ((byte **) &str_copy, 5, mem_destructor, str);
+    chunk = zchunk_frommem (str, 5, mem_destructor, str);
     assert (chunk);
-    assert (str_copy == NULL);
     zchunk_destroy (&chunk);
 
     //  The destructor doesn't free the memory, only changing the strid,

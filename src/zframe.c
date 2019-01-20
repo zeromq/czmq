@@ -116,7 +116,7 @@ zframe_from (const char *string)
 
 static void zmq_msg_destructor (void *data, void *hint) {
     zframe_t *frame = (zframe_t *)hint;
-    frame->destructor (frame->hint, (byte **) &data);
+    frame->destructor (&frame->hint);
 }
 
 //  --------------------------------------------------------------------------
@@ -124,9 +124,8 @@ static void zmq_msg_destructor (void *data, void *hint) {
 //  on destroy.
 
 zframe_t *
-zframe_frommem (byte **data_p, size_t size, zframe_destructor_fn destructor, void *hint) {
-    assert (data_p);
-    assert (*data_p);
+zframe_frommem (void *data, size_t size, zframe_destructor_fn destructor, void *hint) {
+    assert (data);
 
     zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
     assert (self);
@@ -135,12 +134,10 @@ zframe_frommem (byte **data_p, size_t size, zframe_destructor_fn destructor, voi
     self->hint = hint;
 
     //  Catch heap exhaustion in this specific case
-    if (zmq_msg_init_data (&self->zmsg, *data_p, size, zmq_msg_destructor, self)) {
+    if (zmq_msg_init_data (&self->zmsg, data, size, zmq_msg_destructor, self)) {
         zframe_destroy (&self);
         return NULL;
     }
-
-    *data_p = NULL;
 
     return self;
 }
@@ -613,9 +610,8 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
 //  Selftest
 
 static void
-mem_destructor (void *hint, byte **data) {
-    strcpy ((char*)hint, "world");
-    *data = NULL;
+mem_destructor (void **hint) {
+    strcpy ((char*)*hint, "world");
 }
 
 
@@ -795,10 +791,8 @@ zframe_test (bool verbose)
 #endif
 
     char str[] = "hello";
-    char *str_copy = str;
-    frame = zframe_frommem ((byte **) &str_copy, 5, mem_destructor, str);
+    frame = zframe_frommem (str, 5, mem_destructor, str);
     assert (frame);
-    assert (str_copy == NULL);
     zframe_destroy (&frame);
 
     //  The destructor doesn't free the memory, only changing the strid,

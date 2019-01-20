@@ -16,8 +16,7 @@
 
     <callback_type name = "destructor_fn" state = "draft">
         Destroy an item
-        <argument name = "hint" type = "anything" />
-        <argument name = "item" type = "buffer" by_reference = "1" />
+        <argument name = "hint" type = "anything" by_reference = "1" />
     </callback_type>
 
     <constructor>
@@ -44,7 +43,7 @@
     <constructor name = "frommem" state = "draft">
         Create a new frame from memory. Take ownership of the memory and calling the destructor
         on destroy.
-        <argument name = "data_p" type = "buffer" by_reference = "1" />
+        <argument name = "data" type = "buffer" c_type = "void *" />
         <argument name = "size" type = "size" />
         <argument name = "destructor" type = "zframe_destructor_fn" callback = "1" />
         <argument name = "hint" type = "anything" />
