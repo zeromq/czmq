@@ -84,6 +84,23 @@ matrix:
           key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
         packages:
         - libzmq3-dev
+  - env: BUILD_TYPE=abi-compliance-checker
+    os: linux
+    dist: xenial
+    addons:
+      apt:
+        sources:
+        - sourceline: 'deb http://ppa.launchpad.net/hnakamur/universal-ctags/ubuntu bionic main'
+          key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x60D954A11017341E'
+        packages:
+        - libzmq3-dev
+        - libsystemd-dev
+        - liblz4-dev
+        - uuid-dev
+        - libcurl4-nss-dev
+        - universal-ctags
+        - abi-dumper
+        - abi-compliance-checker
 # temporary disabled, does not work
 #  - env: BUILD_TYPE=docs
 #    os: linux
@@ -103,7 +120,7 @@ addons:
     - libzmq3-dev
     - generator-scripting-language
     - zproject
-    - libcurl4-openssl-dev
+    - libcurl4-nss-dev
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "osx" -a $BUILD_TYPE == "android" ] ; then brew update; brew install binutils ; fi
