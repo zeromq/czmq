@@ -1,6 +1,84 @@
 CZMQ version 4.2.0 stable, released on 20xx/xx/xx
 =================================================
 
+* Note for packagers: as pkg-config's Requires.private is now used to properly
+  propagate dependencies for static builds, the libczmq*-dev or cmq-devel or
+  equivalent package should now depend on the libfoo-dev or foo-devel packages
+  of all the libraries that czmq is linked against, or pkg-config --libs libczmq
+  will fail due to missing dependencies on end users machines.
+
+* New STABLE APIs have been added to wrap new libzmq context
+  options:
+  - zsys_thread_name_prefix, zsys_set_thread_name_prefix
+  - zsys_thread_affinity_cpu_add, zsys_thread_affinity_cpu_remove
+  See zsys manpage for more details.
+
+* New STABLE zsock API to match libzmq's 4.3.0 stable socket options:
+  - zsock_bindtodevice, zsock_set_bindtodevice
+  - zsock_gssapi_service_principal_nametype, zsock_set_gssapi_service_principal_nametype
+  - zsock_gssapi_principal_nametype, zsock_set_gssapi_principal_nametype
+  See zsock manpage for more details.
+
+* New DRAFT zsock API to match libzmq's 4.3.0 stable socket options:
+  - zsock_router_notify, zsock_set_router_notify
+  - zsock_multicast_loop, zsock_set_multicast_loop
+  - zsock_metadata, zsock_set_metadata
+  - zsock_loopback_fastpath, zsock_set_loopback_fastpath
+  - zsock_zap_enforce_domain, zsock_set_zap_enforce_domain
+  See zsock manpage for more details.
+
+* New DRAFT zconfig API to duplicate a zconfig instance:
+  - zconfig_dup
+  See zconfig manpage for more details.
+
+* New DRAFT zproxy functionality to let SUB/XSUB subscribe to topics by appending
+  additional strings to the FRONTEND/BACKEND control messages.
+  See zproxy manpage for more details.
+
+* New DRAFT zsys APIs to print python-like formatted strings:
+  - zsys_zprintf
+  - zsys_zprintf_error
+  - zsys_zplprintf
+  - zsys_zplprintf_error
+  See zsys manpage for more details.
+
+* New DRAFT zgossip API to unpublish to stop sending a key/value pair to the
+  cluster. Use the UNPUBLISH keyword string as a command.
+  See zconfig manpage for more details.
+
+* New DRAFT zlistx API to pack and unpack zframes:
+  - zlistx_pack, zlistx_unpack
+  zlistx are now supported by the zsock_send/receive APIs with type "l".
+  See zlistx manpage for more details.
+
+* New DRAFT zlistx API to pack and unpack zframes:
+  - zlistx_pack, zlistx_unpack
+  zlistx are now supported by the zsock_send/receive APIs with type "l".
+  See zlistx manpage for more details.
+
+* New DRAFT zhttp_client class to get/post HTTP messages. Requires linking with
+  libcurl.
+  See zhttp_client manpage for more details.
+
+* New DRAFT zchunk API to create zero-copy chunks:
+  - zchunk_frommem
+  - zchunk_packx
+  See zchunk manpage for more details.
+
+* Many fixes and improvements to the zproc and zargs DRAFT classes.
+
+* Fixed #1825 - zbeacon_test and zpoller_test hang indefinitely with libzmq 2.x.
+
+* Fixed #1899 - zsys_udp_new leaks file descriptor when process is exec'd.
+
+* Fixed #1907 - build fails on debian/kfreebsd.
+
+* Fixed #1948 - zlistx_head always returns NULL.
+
+* Fixed #1959 - zhash_pack crash on armv7 due to unaligned pointer access.
+
+* Fixed #1961 - unnecessary uuid includes in public headers break builds without
+                libuuid.
 
 CZMQ version 4.1.1 stable, released on 2018/03/22
 =================================================
