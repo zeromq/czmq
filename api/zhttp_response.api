@@ -1,0 +1,100 @@
+<class name = "zhttp_response" state = "draft">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    Http response that can be received from zhttp_client or sent to zhttp_server.
+    Class can be reused between send & recv calls.
+    Headers and Content is being destroyed after every send call.
+
+    <constructor>
+    </constructor>
+
+    <destructor>
+    </destructor>
+
+    <method name = "send">
+        Send a response to a request.
+        Returns 0 if successful and -1 otherwise.
+
+        <argument name = "sock" type = "zsock" />
+        <argument name = "connection" type = "zhttp_server_connection" by_reference = "1" />
+
+        <return type = "integer" />
+    </method>
+
+    <method name = "recv">
+        Receive a response from zhttp_client.
+        On success return 0, -1 otherwise.
+
+        Recv returns the two user arguments which was provided with the request.
+        The reason for two, is to be able to pass around the server connection when forwarding requests or both a callback function and an argument.
+
+        <argument name = "client" type = "zhttp_client" />
+        <argument name = "arg" type = "anything" by_reference = "1" />
+        <argument name = "arg2" type = "anything" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "content_type">
+        Get the response content type
+        <return type = "string" />
+    </method>
+
+    <method name = "set_content_type">
+        Set the content type of the response.
+        <argument name = "value" type = "string" />
+    </method>
+
+    <method name = "status_code">
+        Get the status code of the response.
+        <return type = "number" size = "4" />
+    </method>
+
+    <method name = "set_status_code">
+        Set the status code of the response.
+        <argument name = "status_code" type = "number" size = "4" />
+    </method>
+
+    <method name = "headers">
+        Get the headers of the response.
+        <return type = "zhash" />
+    </method>
+
+    <method name = "content_length">
+        Get the content length of the response
+        <return type = "size" />
+    </method>
+
+    <method name = "content">
+        Get the content of the response.
+        <return type = "string" />
+    </method>
+
+    <method name = "get content">
+        Get the content of the response.
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "set content">
+        Set the content of the response.
+        Content must by dynamically allocated string.
+        Takes ownership of the content.
+        <argument name = "content" type = "string" by_reference = "1" />
+    </method>
+
+    <method name = "set content const">
+        Set the content of the response.
+        The content is assumed to be constant-memory and will therefore not be copied or deallocated in any way.
+        <argument name = "content" type = "string" />
+    </method>
+
+    <method name = "reset content">
+        Set the content to NULL
+    </method>
+</class>

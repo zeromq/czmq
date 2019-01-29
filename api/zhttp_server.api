@@ -1,0 +1,35 @@
+<class name = "zhttp_server" state = "draft">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    Simple http server.
+    To start handling requests:
+    1. Create a dealer socket
+    2. Connect the socket to the server backend address provided in the options.
+    3. Create a zhttp_request.
+    4. Call zhttp_request_recv to accept a new request.
+    5. Call zhttp_response_send to send a response.
+
+    You can connect as many dealers as you want.
+    The Server is using simple dealer socket to route the requests.
+
+    <constructor>
+        Create a new http server
+	    <argument name = "options" type = "zhttp_server_options" />
+    </constructor>
+
+    <destructor>
+        Destroy an http server
+    </destructor>
+
+    <method name = "port">
+        Return the port the server is listening on.
+        <return type = "integer" />
+    </method>
+</class>
