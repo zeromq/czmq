@@ -141,6 +141,14 @@ CZMQ_EXPORT void
 
 //  Format a string using printf formatting, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free(). The hinted version allows to optimize by using
+//  a larger starting buffer size (known to/assumed by the developer) and so
+//  avoid reallocations.
+CZMQ_EXPORT char *
+    zsys_sprintf_hint (int hint, const char *format, ...);
+
+//  Format a string using printf formatting, returning a freshly allocated
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
 CZMQ_EXPORT char *
     zsys_sprintf (const char *format, ...);
