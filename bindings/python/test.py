@@ -42,7 +42,7 @@ class TestCZMQ(unittest.TestCase):
 
         if self.verbose:
             watch.sock().send(b"s", b"VERBOSE")
-            self.assertEqual(watch.wait(), 0)
+            self.assertEqual(watch.sock().wait(), 0)
 
         # need to create a file in the test directory we're watching
         # in order to ensure the directory exists
@@ -528,8 +528,8 @@ class TestCZMQ(unittest.TestCase):
     def test_zloop(self):
         def _cancel_timer_event(loop, timer_id, arg):
             # We are handling timer 2, and will cancel timer 1
-            cancel_timer_id = POINTER(c_int)(c_int(arg)).contents
-            return Zloop(loop, False).timer_end(cancel_timer_id)
+            self.assertIsInstance(arg, int)
+            return Zloop(loop, False).timer_end(arg)
         cancel_timer_event = zloop_timer_fn(_cancel_timer_event)
 
         def _timer_event(loop, timer_id, arg):
@@ -559,8 +559,8 @@ class TestCZMQ(unittest.TestCase):
         loop.set_verbose(self.verbose)
 
         # Create a timer that will be cancelled
-        timer_id = c_int(loop.timer(1000, 1, timer_event, None))
-        loop.timer(5, 1, cancel_timer_event, byref(timer_id))
+        timer_id = loop.timer(1000, 1, timer_event, None)
+        loop.timer(5, 1, cancel_timer_event, timer_id)
 
         # After 20 msecs, send a ping message to output3
         loop.timer(20, 1, timer_event, output)
