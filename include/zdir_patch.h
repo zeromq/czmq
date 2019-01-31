@@ -27,8 +27,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-#define ZDIR_PATCH_CREATE 1                 // Creates a new file
-#define ZDIR_PATCH_DELETE 2                 // Delete a file
+#define ZDIR_PATCH_CREATE 1                  // Creates a new file
+#define ZDIR_PATCH_DELETE 2                  // Delete a file
 
 //  Create new patch
 CZMQ_EXPORT zdir_patch_t *

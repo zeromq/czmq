@@ -9,6 +9,10 @@
 
 unit libczmq;
 
+{$if defined(MSWINDOWS)}
+  {$warn SYMBOL_PLATFORM off}
+{$ifend}
+
 interface
 
 uses
@@ -81,193 +85,195 @@ type
 
 (* Zactor *)
 (* provides a simple actor framework *)
+
 type
 
-    // Actors get a pipe and arguments from caller
+  // Actors get a pipe and arguments from caller
   TZactorFn = procedure(Pipe: PZsock; Args: Pointer); stdcall;
   PZactorFn = ^TZactorFn;
 
-    // Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
-    //
-    // An example - to send $KTHXBAI string
-    //
-    //     if (zstr_send (self, "$KTHXBAI") == 0)
-    //         zsock_wait (self);
+  // Function to be called on zactor_destroy. Default behavior is to send zmsg_t with string "$TERM" in a first frame.
+  //
+  // An example - to send $KTHXBAI string
+  //
+  //     if (zstr_send (self, "$KTHXBAI") == 0)
+  //         zsock_wait (self);
   TZactorDestructorFn = procedure(This: PZactor); stdcall;
   PZactorDestructorFn = ^TZactorDestructorFn;
 
   // Create a new actor passing arbitrary arguments reference.
-  function zactor_new(Task: TZactorFn; Args: Pointer): PZactor; cdecl; external lib_czmq;
+  function zactor_new(Task: TZactorFn; Args: Pointer): PZactor; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy an actor.
-  procedure zactor_destroy(var self: PZactor); cdecl; external lib_czmq;
+  procedure zactor_destroy(var self: PZactor); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a zmsg message to the actor, take ownership of the message
   // and destroy when it has been sent.
-  function zactor_send(self: PZactor; var MsgP: PZmsg): Integer; cdecl; external lib_czmq;
+  function zactor_send(self: PZactor; var MsgP: PZmsg): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive a zmsg message from the actor. Returns NULL if the actor
   // was interrupted before the message could be received, or if there
   // was a timeout on the actor.
-  function zactor_recv(self: PZactor): PZmsg; cdecl; external lib_czmq;
+  function zactor_recv(self: PZactor): PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied object, and report if it looks like a zactor_t.
-  function zactor_is(This: Pointer): Boolean; cdecl; external lib_czmq;
+  function zactor_is(This: Pointer): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied reference. If it looks like a zactor_t instance,
   // return the underlying libzmq actor handle; else if it looks like
   // a libzmq actor handle, return the supplied value.
-  function zactor_resolve(This: Pointer): Pointer; cdecl; external lib_czmq;
+  function zactor_resolve(This: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the actor's zsock handle. Use this when you absolutely need
   // to work with the zsock instance rather than the actor.
-  function zactor_sock(self: PZactor): PZsock; cdecl; external lib_czmq;
+  function zactor_sock(self: PZactor): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Change default destructor by custom function. Actor MUST be able to handle new message instead of default $TERM.
-  procedure zactor_set_destructor(self: PZactor; &Destructor: TZactorDestructorFn); cdecl; external lib_czmq;
+  procedure zactor_set_destructor(self: PZactor; &Destructor: TZactorDestructorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zactor_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zactor_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zarmour *)
 (* armoured text encoding and decoding *)
 
   // Create a new zarmour
-  function zarmour_new: PZarmour; cdecl; external lib_czmq;
+  function zarmour_new: PZarmour; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy the zarmour
-  procedure zarmour_destroy(var self: PZarmour); cdecl; external lib_czmq;
+  procedure zarmour_destroy(var self: PZarmour); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Encode a stream of bytes into an armoured string. Returns the armoured
   // string, or NULL if there was insufficient memory available to allocate
   // a new string.
-  function zarmour_encode(self: PZarmour; Data: PByte; Size: NativeUInt): PAnsiChar; cdecl; external lib_czmq;
+  function zarmour_encode(self: PZarmour; Data: PByte; Size: NativeUInt): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Decode an armoured string into a chunk. The decoded output is
   // null-terminated, so it may be treated as a string, if that's what
   // it was prior to encoding.
-  function zarmour_decode(self: PZarmour; Data: PAnsiChar): PZchunk; cdecl; external lib_czmq;
+  function zarmour_decode(self: PZarmour; Data: PAnsiChar): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get the mode property.
-  function zarmour_mode(self: PZarmour): Integer; cdecl; external lib_czmq;
+  function zarmour_mode(self: PZarmour): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get printable string for mode.
-  function zarmour_mode_str(self: PZarmour): PAnsiChar; cdecl; external lib_czmq;
+  function zarmour_mode_str(self: PZarmour): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set the mode property.
-  procedure zarmour_set_mode(self: PZarmour; Mode: Integer); cdecl; external lib_czmq;
+  procedure zarmour_set_mode(self: PZarmour; Mode: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if padding is turned on.
-  function zarmour_pad(self: PZarmour): Boolean; cdecl; external lib_czmq;
+  function zarmour_pad(self: PZarmour): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Turn padding on or off. Default is on.
-  procedure zarmour_set_pad(self: PZarmour; Pad: Boolean); cdecl; external lib_czmq;
+  procedure zarmour_set_pad(self: PZarmour; Pad: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get the padding character.
-  function zarmour_pad_char(self: PZarmour): AnsiChar; cdecl; external lib_czmq;
+  function zarmour_pad_char(self: PZarmour): AnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set the padding character.
-  procedure zarmour_set_pad_char(self: PZarmour; PadChar: AnsiChar); cdecl; external lib_czmq;
+  procedure zarmour_set_pad_char(self: PZarmour; PadChar: AnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return if splitting output into lines is turned on. Default is off.
-  function zarmour_line_breaks(self: PZarmour): Boolean; cdecl; external lib_czmq;
+  function zarmour_line_breaks(self: PZarmour): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Turn splitting output into lines on or off.
-  procedure zarmour_set_line_breaks(self: PZarmour; LineBreaks: Boolean); cdecl; external lib_czmq;
+  procedure zarmour_set_line_breaks(self: PZarmour; LineBreaks: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get the line length used for splitting lines.
-  function zarmour_line_length(self: PZarmour): NativeUInt; cdecl; external lib_czmq;
+  function zarmour_line_length(self: PZarmour): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set the line length used for splitting lines.
-  procedure zarmour_set_line_length(self: PZarmour; LineLength: NativeUInt); cdecl; external lib_czmq;
+  procedure zarmour_set_line_length(self: PZarmour; LineLength: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print properties of object
-  procedure zarmour_print(self: PZarmour); cdecl; external lib_czmq;
+  procedure zarmour_print(self: PZarmour); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zarmour_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zarmour_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zcert *)
 (* work with CURVE security certificates *)
 
   // Create and initialize a new certificate in memory
-  function zcert_new: PZcert; cdecl; external lib_czmq;
+  function zcert_new: PZcert; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Accepts public/secret key pair from caller
-  function zcert_new_from(PublicKey: PByte; SecretKey: PByte): PZcert; cdecl; external lib_czmq;
+  function zcert_new_from(PublicKey: PByte; SecretKey: PByte): PZcert; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Accepts public/secret key text pair from caller
-  function zcert_new_from_txt(PublicTxt: PAnsiChar; SecretTxt: PAnsiChar): PZcert; cdecl; external lib_czmq;
+  function zcert_new_from_txt(PublicTxt: PAnsiChar; SecretTxt: PAnsiChar): PZcert; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load certificate from file
-  function zcert_load(Filename: PAnsiChar): PZcert; cdecl; external lib_czmq;
+  function zcert_load(Filename: PAnsiChar): PZcert; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a certificate in memory
-  procedure zcert_destroy(var self: PZcert); cdecl; external lib_czmq;
+  procedure zcert_destroy(var self: PZcert); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return public part of key pair as 32-byte binary string
-  function zcert_public_key(self: PZcert): PByte; cdecl; external lib_czmq;
+  function zcert_public_key(self: PZcert): PByte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return secret part of key pair as 32-byte binary string
-  function zcert_secret_key(self: PZcert): PByte; cdecl; external lib_czmq;
+  function zcert_secret_key(self: PZcert): PByte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return public part of key pair as Z85 armored string
-  function zcert_public_txt(self: PZcert): PAnsiChar; cdecl; external lib_czmq;
+  function zcert_public_txt(self: PZcert): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return secret part of key pair as Z85 armored string
-  function zcert_secret_txt(self: PZcert): PAnsiChar; cdecl; external lib_czmq;
+  function zcert_secret_txt(self: PZcert): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set certificate metadata from formatted string.
-  procedure zcert_set_meta(self: PZcert; Name: PAnsiChar; Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zcert_set_meta(self: PZcert; Name: PAnsiChar; Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Unset certificate metadata.
-  procedure zcert_unset_meta(self: PZcert; Name: PAnsiChar); cdecl; external lib_czmq;
+  procedure zcert_unset_meta(self: PZcert; Name: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get metadata value from certificate; if the metadata value doesn't
   // exist, returns NULL.
-  function zcert_meta(self: PZcert; Name: PAnsiChar): PAnsiChar; cdecl; external lib_czmq;
+  function zcert_meta(self: PZcert; Name: PAnsiChar): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get list of metadata fields from certificate. Caller is responsible for
   // destroying list. Caller should not modify the values of list items.
-  function zcert_meta_keys(self: PZcert): PZlist; cdecl; external lib_czmq;
+  function zcert_meta_keys(self: PZcert): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save full certificate (public + secret) to file for persistent storage
   // This creates one public file and one secret file (filename + "_secret").
-  function zcert_save(self: PZcert; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zcert_save(self: PZcert; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save public certificate only to file for persistent storage
-  function zcert_save_public(self: PZcert; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zcert_save_public(self: PZcert; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save secret certificate only to file for persistent storage
-  function zcert_save_secret(self: PZcert; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zcert_save_secret(self: PZcert; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Apply certificate to socket, i.e. use for CURVE security on socket.
   // If certificate was loaded from public file, the secret key will be
   // undefined, and this certificate will not work successfully.
-  procedure zcert_apply(self: PZcert; Socket: PZSock); cdecl; external lib_czmq;
+  procedure zcert_apply(self: PZcert; Socket: PZSock); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return copy of certificate; if certificate is NULL or we exhausted
   // heap memory, returns NULL.
-  function zcert_dup(self: PZcert): PZcert; cdecl; external lib_czmq;
+  function zcert_dup(self: PZcert): PZcert; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if two certificates have the same keys
-  function zcert_eq(self: PZcert; Compare: PZcert): Boolean; cdecl; external lib_czmq;
+  function zcert_eq(self: PZcert; Compare: PZcert): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print certificate contents to stdout
-  procedure zcert_print(self: PZcert); cdecl; external lib_czmq;
+  procedure zcert_print(self: PZcert); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class
-  procedure zcert_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zcert_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zcertstore *)
 (* work with CURVE security certificate stores *)
+
 type
 
-    // Loaders retrieve certificates from an arbitrary source.
+  // Loaders retrieve certificates from an arbitrary source.
   TZcertstoreLoader = procedure(This: PZcertstore); stdcall;
   PZcertstoreLoader = ^TZcertstoreLoader;
 
-    // Destructor for loader state.
+  // Destructor for loader state.
   TZcertstoreDestructor = procedure(SelfP: PByte); stdcall;
   PZcertstoreDestructor = ^TZcertstoreDestructor;
 
@@ -277,331 +283,333 @@ type
   // is automatically refreshed on any zcertstore_lookup() call. If the
   // location is specified as NULL, creates a pure-memory store, which you
   // can work with by inserting certificates at runtime.
-  function zcertstore_new(Location: PAnsiChar): PZcertstore; cdecl; external lib_czmq;
+  function zcertstore_new(Location: PAnsiChar): PZcertstore; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a certificate store object in memory. Does not affect anything
   // stored on disk.
-  procedure zcertstore_destroy(var self: PZcertstore); cdecl; external lib_czmq;
+  procedure zcertstore_destroy(var self: PZcertstore); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Override the default disk loader with a custom loader fn.
-  procedure zcertstore_set_loader(self: PZcertstore; Loader: TZcertstoreLoader; &Destructor: TZcertstoreDestructor; State: PByte); cdecl; external lib_czmq;
+  procedure zcertstore_set_loader(self: PZcertstore; Loader: TZcertstoreLoader; &Destructor: TZcertstoreDestructor; State: PByte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Look up certificate by public key, returns zcert_t object if found,
   // else returns NULL. The public key is provided in Z85 text format.
-  function zcertstore_lookup(self: PZcertstore; PublicKey: PAnsiChar): PZcert; cdecl; external lib_czmq;
+  function zcertstore_lookup(self: PZcertstore; PublicKey: PAnsiChar): PZcert; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Insert certificate into certificate store in memory. Note that this
   // does not save the certificate to disk. To do that, use zcert_save()
   // directly on the certificate. Takes ownership of zcert_t object.
-  procedure zcertstore_insert(self: PZcertstore; var CertP: PZcert); cdecl; external lib_czmq;
+  procedure zcertstore_insert(self: PZcertstore; var CertP: PZcert); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Empty certificate hashtable. This wrapper exists to be friendly to bindings,
   // which don't usually have access to struct internals.
-  procedure zcertstore_empty(self: PZcertstore); cdecl; external lib_czmq;
+  procedure zcertstore_empty(self: PZcertstore); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print list of certificates in store to logging facility
-  procedure zcertstore_print(self: PZcertstore); cdecl; external lib_czmq;
+  procedure zcertstore_print(self: PZcertstore); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return a list of all the certificates in the store.
   // The caller takes ownership of the zlistx_t object and is responsible
   // for destroying it.  The caller does not take ownership of the zcert_t
   // objects.
-  function zcertstore_certs(self: PZcertstore): PZlistx; cdecl; external lib_czmq;
+  function zcertstore_certs(self: PZcertstore): PZlistx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class
-  procedure zcertstore_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zcertstore_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zchunk *)
 (* work with memory chunks *)
+
 type
 
-    // Destroy an item
+  // Destroy an item
   TZchunkDestructorFn = procedure(Hint: Pointer; var Item: PByte); stdcall;
   PZchunkDestructorFn = ^TZchunkDestructorFn;
 
   // Create a new chunk of the specified size. If you specify the data, it
   // is copied into the chunk. If you do not specify the data, the chunk is
   // allocated and left empty, and you can then add data using zchunk_append.
-  function zchunk_new(Data: PByte; Size: NativeUInt): PZchunk; cdecl; external lib_czmq;
+  function zchunk_new(Data: PByte; Size: NativeUInt): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a new chunk from memory. Take ownership of the memory and calling the destructor
   // on destroy.
-  function zchunk_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer): PZchunk; cdecl; external lib_czmq;
+  function zchunk_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a chunk
-  procedure zchunk_destroy(var self: PZchunk); cdecl; external lib_czmq;
+  procedure zchunk_destroy(var self: PZchunk); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Resizes chunk max_size as requested; chunk_cur size is set to zero
-  procedure zchunk_resize(self: PZchunk; Size: NativeUInt); cdecl; external lib_czmq;
+  procedure zchunk_resize(self: PZchunk; Size: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return chunk cur size
-  function zchunk_size(self: PZchunk): NativeUInt; cdecl; external lib_czmq;
+  function zchunk_size(self: PZchunk): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return chunk max size
-  function zchunk_max_size(self: PZchunk): NativeUInt; cdecl; external lib_czmq;
+  function zchunk_max_size(self: PZchunk): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return chunk data
-  function zchunk_data(self: PZchunk): PByte; cdecl; external lib_czmq;
+  function zchunk_data(self: PZchunk): PByte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set chunk data from user-supplied data; truncate if too large. Data may
   // be null. Returns actual size of chunk
-  function zchunk_set(self: PZchunk; Data: PByte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq;
+  function zchunk_set(self: PZchunk; Data: PByte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Fill chunk data from user-supplied octet
-  function zchunk_fill(self: PZchunk; Filler: Byte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq;
+  function zchunk_fill(self: PZchunk; Filler: Byte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Append user-supplied data to chunk, return resulting chunk size. If the
   // data would exceeded the available space, it is truncated. If you want to
   // grow the chunk to accommodate new data, use the zchunk_extend method.
-  function zchunk_append(self: PZchunk; Data: PByte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq;
+  function zchunk_append(self: PZchunk; Data: PByte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Append user-supplied data to chunk, return resulting chunk size. If the
   // data would exceeded the available space, the chunk grows in size.
-  function zchunk_extend(self: PZchunk; Data: PByte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq;
+  function zchunk_extend(self: PZchunk; Data: PByte; Size: NativeUInt): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Copy as much data from 'source' into the chunk as possible; returns the
   // new size of chunk. If all data from 'source' is used, returns exhausted
   // on the source chunk. Source can be consumed as many times as needed until
   // it is exhausted. If source was already exhausted, does not change chunk.
-  function zchunk_consume(self: PZchunk; Source: PZchunk): NativeUInt; cdecl; external lib_czmq;
+  function zchunk_consume(self: PZchunk; Source: PZchunk): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns true if the chunk was exhausted by consume methods, or if the
   // chunk has a size of zero.
-  function zchunk_exhausted(self: PZchunk): Boolean; cdecl; external lib_czmq;
+  function zchunk_exhausted(self: PZchunk): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Read chunk from an open file descriptor
-  function zchunk_read(Handle: Pointer; Bytes: NativeUInt): PZchunk; cdecl; external lib_czmq;
+  function zchunk_read(Handle: Pointer; Bytes: NativeUInt): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Write chunk to an open file descriptor
-  function zchunk_write(self: PZchunk; Handle: Pointer): Integer; cdecl; external lib_czmq;
+  function zchunk_write(self: PZchunk; Handle: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Try to slurp an entire file into a chunk. Will read up to maxsize of
   // the file. If maxsize is 0, will attempt to read the entire file and
   // fail with an assertion if that cannot fit into memory. Returns a new
   // chunk containing the file data, or NULL if the file could not be read.
-  function zchunk_slurp(Filename: PAnsiChar; Maxsize: NativeUInt): PZchunk; cdecl; external lib_czmq;
+  function zchunk_slurp(Filename: PAnsiChar; Maxsize: NativeUInt): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
   // object, or null if there was not enough heap memory. If chunk is null,
   // returns null.
-  function zchunk_dup(self: PZchunk): PZchunk; cdecl; external lib_czmq;
+  function zchunk_dup(self: PZchunk): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return chunk data encoded as printable hex string. Caller must free
   // string when finished with it.
-  function zchunk_strhex(self: PZchunk): PAnsiChar; cdecl; external lib_czmq;
+  function zchunk_strhex(self: PZchunk): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return chunk data copied into freshly allocated string
   // Caller must free string when finished with it.
-  function zchunk_strdup(self: PZchunk): PAnsiChar; cdecl; external lib_czmq;
+  function zchunk_strdup(self: PZchunk): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return TRUE if chunk body is equal to string, excluding terminator
-  function zchunk_streq(self: PZchunk; &String: PAnsiChar): Boolean; cdecl; external lib_czmq;
+  function zchunk_streq(self: PZchunk; &String: PAnsiChar): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Transform zchunk into a zframe that can be sent in a message.
-  function zchunk_pack(self: PZchunk): PZframe; cdecl; external lib_czmq;
+  function zchunk_pack(self: PZchunk): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Transform zchunk into a zframe that can be sent in a message.
   // Take ownership of the chunk.
-  function zchunk_packx(var SelfP: PZchunk): PZframe; cdecl; external lib_czmq;
+  function zchunk_packx(var SelfP: PZchunk): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Transform a zframe into a zchunk.
-  function zchunk_unpack(Frame: PZframe): PZchunk; cdecl; external lib_czmq;
+  function zchunk_unpack(Frame: PZframe): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Calculate SHA1 digest for chunk, using zdigest class.
-  function zchunk_digest(self: PZchunk): PAnsiChar; cdecl; external lib_czmq;
+  function zchunk_digest(self: PZchunk): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Dump chunk to FILE stream, for debugging and tracing.
-  procedure zchunk_fprint(self: PZchunk; &File: Pointer); cdecl; external lib_czmq;
+  procedure zchunk_fprint(self: PZchunk; &File: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Dump message to stderr, for debugging and tracing.
   // See zchunk_fprint for details
-  procedure zchunk_print(self: PZchunk); cdecl; external lib_czmq;
+  procedure zchunk_print(self: PZchunk); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied object, and report if it looks like a zchunk_t.
-  function zchunk_is(This: Pointer): Boolean; cdecl; external lib_czmq;
+  function zchunk_is(This: Pointer): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zchunk_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zchunk_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zclock *)
 (* millisecond clocks and delays *)
 
   // Sleep for a number of milliseconds
-  procedure zclock_sleep(Msecs: Integer); cdecl; external lib_czmq;
+  procedure zclock_sleep(Msecs: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return current system clock as milliseconds. Note that this clock can
   // jump backwards (if the system clock is changed) so is unsafe to use for
   // timers and time offsets. Use zclock_mono for that instead.
-  function zclock_time: Int64; cdecl; external lib_czmq;
+  function zclock_time: Int64; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return current monotonic clock in milliseconds. Use this when you compute
   // time offsets. The monotonic clock is not affected by system changes and
   // so will never be reset backwards, unlike a system clock.
-  function zclock_mono: Int64; cdecl; external lib_czmq;
+  function zclock_mono: Int64; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return current monotonic clock in microseconds. Use this when you compute
   // time offsets. The monotonic clock is not affected by system changes and
   // so will never be reset backwards, unlike a system clock.
-  function zclock_usecs: Int64; cdecl; external lib_czmq;
+  function zclock_usecs: Int64; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return formatted date/time as fresh string. Free using zstr_free().
-  function zclock_timestr: PAnsiChar; cdecl; external lib_czmq;
+  function zclock_timestr: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zclock_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zclock_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zconfig *)
 (* work with config files written in rfc.zeromq.org/spec:4/ZPL. *)
+
 type
 
-    //
+  //
   TZconfigFct = function(This: PZconfig; Arg: Pointer; Level: Integer): Integer; stdcall;
   PZconfigFct = ^TZconfigFct;
 
   // Create new config item
-  function zconfig_new(Name: PAnsiChar; Parent: PZconfig): PZconfig; cdecl; external lib_czmq;
+  function zconfig_new(Name: PAnsiChar; Parent: PZconfig): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load a config tree from a specified ZPL text file; returns a zconfig_t
   // reference for the root, if the file exists and is readable. Returns NULL
   // if the file does not exist.
-  function zconfig_load(Filename: PAnsiChar): PZconfig; cdecl; external lib_czmq;
+  function zconfig_load(Filename: PAnsiChar): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Equivalent to zconfig_load, taking a format string instead of a fixed
   // filename.
-  function zconfig_loadf(Format: PAnsiChar): PZconfig; cdecl; varargs; external lib_czmq;
+  function zconfig_loadf(Format: PAnsiChar): PZconfig; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a config item and all its children
-  procedure zconfig_destroy(var self: PZconfig); cdecl; external lib_czmq;
+  procedure zconfig_destroy(var self: PZconfig); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create copy of zconfig, caller MUST free the value
   // Create copy of config, as new zconfig object. Returns a fresh zconfig_t
   // object. If config is null, or memory was exhausted, returns null.
-  function zconfig_dup(self: PZconfig): PZconfig; cdecl; external lib_czmq;
+  function zconfig_dup(self: PZconfig): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return name of config item
-  function zconfig_name(self: PZconfig): PAnsiChar; cdecl; external lib_czmq;
+  function zconfig_name(self: PZconfig): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return value of config item
-  function zconfig_value(self: PZconfig): PAnsiChar; cdecl; external lib_czmq;
+  function zconfig_value(self: PZconfig): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Insert or update configuration key with value
-  procedure zconfig_put(self: PZconfig; Path: PAnsiChar; Value: PAnsiChar); cdecl; external lib_czmq;
+  procedure zconfig_put(self: PZconfig; Path: PAnsiChar; Value: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Equivalent to zconfig_put, accepting a format specifier and variable
   // argument list, instead of a single string value.
-  procedure zconfig_putf(self: PZconfig; Path: PAnsiChar; Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zconfig_putf(self: PZconfig; Path: PAnsiChar; Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get value for config item into a string value; leading slash is optional
   // and ignored.
-  function zconfig_get(self: PZconfig; Path: PAnsiChar; DefaultValue: PAnsiChar): PAnsiChar; cdecl; external lib_czmq;
+  function zconfig_get(self: PZconfig; Path: PAnsiChar; DefaultValue: PAnsiChar): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set config item name, name may be NULL
-  procedure zconfig_set_name(self: PZconfig; Name: PAnsiChar); cdecl; external lib_czmq;
+  procedure zconfig_set_name(self: PZconfig; Name: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set new value for config item. The new value may be a string, a printf
   // format, or NULL. Note that if string may possibly contain '%', or if it
   // comes from an insecure source, you must use '%s' as the format, followed
   // by the string.
-  procedure zconfig_set_value(self: PZconfig; Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zconfig_set_value(self: PZconfig; Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Find our first child, if any
-  function zconfig_child(self: PZconfig): PZconfig; cdecl; external lib_czmq;
+  function zconfig_child(self: PZconfig): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Find our first sibling, if any
-  function zconfig_next(self: PZconfig): PZconfig; cdecl; external lib_czmq;
+  function zconfig_next(self: PZconfig): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Find a config item along a path; leading slash is optional and ignored.
-  function zconfig_locate(self: PZconfig; Path: PAnsiChar): PZconfig; cdecl; external lib_czmq;
+  function zconfig_locate(self: PZconfig; Path: PAnsiChar): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Locate the last config item at a specified depth
-  function zconfig_at_depth(self: PZconfig; Level: Integer): PZconfig; cdecl; external lib_czmq;
+  function zconfig_at_depth(self: PZconfig; Level: Integer): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Execute a callback for each config item in the tree; returns zero if
   // successful, else -1.
-  function zconfig_execute(self: PZconfig; Handler: TZconfigFct; Arg: Pointer): Integer; cdecl; external lib_czmq;
+  function zconfig_execute(self: PZconfig; Handler: TZconfigFct; Arg: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add comment to config item before saving to disk. You can add as many
   // comment lines as you like. If you use a null format, all comments are
   // deleted.
-  procedure zconfig_set_comment(self: PZconfig; Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zconfig_set_comment(self: PZconfig; Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return comments of config item, as zlist.
-  function zconfig_comments(self: PZconfig): PZlist; cdecl; external lib_czmq;
+  function zconfig_comments(self: PZconfig): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save a config tree to a specified ZPL text file, where a filename
   // "-" means dump to standard output.
-  function zconfig_save(self: PZconfig; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zconfig_save(self: PZconfig; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Equivalent to zconfig_save, taking a format string instead of a fixed
   // filename.
-  function zconfig_savef(self: PZconfig; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zconfig_savef(self: PZconfig; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Report filename used during zconfig_load, or NULL if none
-  function zconfig_filename(self: PZconfig): PAnsiChar; cdecl; external lib_czmq;
+  function zconfig_filename(self: PZconfig): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reload config tree from same file that it was previously loaded from.
   // Returns 0 if OK, -1 if there was an error (and then does not change
   // existing data).
-  function zconfig_reload(var SelfP: PZconfig): Integer; cdecl; external lib_czmq;
+  function zconfig_reload(var SelfP: PZconfig): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load a config tree from a memory chunk
-  function zconfig_chunk_load(Chunk: PZchunk): PZconfig; cdecl; external lib_czmq;
+  function zconfig_chunk_load(Chunk: PZchunk): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save a config tree to a new memory chunk
-  function zconfig_chunk_save(self: PZconfig): PZchunk; cdecl; external lib_czmq;
+  function zconfig_chunk_save(self: PZconfig): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load a config tree from a null-terminated string
-  function zconfig_str_load(&String: PAnsiChar): PZconfig; cdecl; external lib_czmq;
+  function zconfig_str_load(&String: PAnsiChar): PZconfig; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save a config tree to a new null terminated string
-  function zconfig_str_save(self: PZconfig): PAnsiChar; cdecl; external lib_czmq;
+  function zconfig_str_save(self: PZconfig): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if a configuration tree was loaded from a file and that
   // file has changed in since the tree was loaded.
-  function zconfig_has_changed(self: PZconfig): Boolean; cdecl; external lib_czmq;
+  function zconfig_has_changed(self: PZconfig): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy subtree (all children)
-  procedure zconfig_remove_subtree(self: PZconfig); cdecl; external lib_czmq;
+  procedure zconfig_remove_subtree(self: PZconfig); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy node and subtree (all children)
-  procedure zconfig_remove(var SelfP: PZconfig); cdecl; external lib_czmq;
+  procedure zconfig_remove(var SelfP: PZconfig); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print the config file to open stream
-  procedure zconfig_fprint(self: PZconfig; &File: Pointer); cdecl; external lib_czmq;
+  procedure zconfig_fprint(self: PZconfig; &File: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print properties of object
-  procedure zconfig_print(self: PZconfig); cdecl; external lib_czmq;
+  procedure zconfig_print(self: PZconfig); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class
-  procedure zconfig_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zconfig_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zdigest *)
 (* provides hashing functions (SHA-1 at present) *)
 
   // Constructor - creates new digest object, which you use to build up a
   // digest by repeatedly calling zdigest_update() on chunks of data.
-  function zdigest_new: PZdigest; cdecl; external lib_czmq;
+  function zdigest_new: PZdigest; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a digest object
-  procedure zdigest_destroy(var self: PZdigest); cdecl; external lib_czmq;
+  procedure zdigest_destroy(var self: PZdigest); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add buffer into digest calculation
-  procedure zdigest_update(self: PZdigest; Buffer: PByte; Length: NativeUInt); cdecl; external lib_czmq;
+  procedure zdigest_update(self: PZdigest; Buffer: PByte; Length: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return final digest hash data. If built without crypto support,
   // returns NULL.
-  function zdigest_data(self: PZdigest): PByte; cdecl; external lib_czmq;
+  function zdigest_data(self: PZdigest): PByte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return final digest hash size
-  function zdigest_size(self: PZdigest): NativeUInt; cdecl; external lib_czmq;
+  function zdigest_size(self: PZdigest): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return digest as printable hex string; caller should not modify nor
   // free this string. After calling this, you may not use zdigest_update()
   // on the same digest. If built without crypto support, returns NULL.
-  function zdigest_string(self: PZdigest): PAnsiChar; cdecl; external lib_czmq;
+  function zdigest_string(self: PZdigest): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zdigest_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zdigest_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zdir *)
 (* work with file-system directories *)
@@ -609,52 +617,52 @@ type
   // Create a new directory item that loads in the full tree of the specified
   // path, optionally located under some parent path. If parent is "-", then
   // loads only the top-level directory, and does not use parent as a path.
-  function zdir_new(Path: PAnsiChar; Parent: PAnsiChar): PZdir; cdecl; external lib_czmq;
+  function zdir_new(Path: PAnsiChar; Parent: PAnsiChar): PZdir; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a directory tree and all children it contains.
-  procedure zdir_destroy(var self: PZdir); cdecl; external lib_czmq;
+  procedure zdir_destroy(var self: PZdir); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return directory path
-  function zdir_path(self: PZdir): PAnsiChar; cdecl; external lib_czmq;
+  function zdir_path(self: PZdir): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return last modification time for directory.
-  function zdir_modified(self: PZdir): Int64; cdecl; external lib_czmq;
+  function zdir_modified(self: PZdir): Int64; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return total hierarchy size, in bytes of data contained in all files
   // in the directory tree.
-  function zdir_cursize(self: PZdir): Longint; cdecl; external lib_czmq;
+  function zdir_cursize(self: PZdir): Longint; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return directory count
-  function zdir_count(self: PZdir): NativeUInt; cdecl; external lib_czmq;
+  function zdir_count(self: PZdir): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns a sorted list of zfile objects; Each entry in the list is a pointer
   // to a zfile_t item already allocated in the zdir tree. Do not destroy the
   // original zdir tree until you are done with this list.
-  function zdir_list(self: PZdir): PZlist; cdecl; external lib_czmq;
+  function zdir_list(self: PZdir): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove directory, optionally including all files that it contains, at
   // all levels. If force is false, will only remove the directory if empty.
   // If force is true, will remove all files and all subdirectories.
-  procedure zdir_remove(self: PZdir; Force: Boolean); cdecl; external lib_czmq;
+  procedure zdir_remove(self: PZdir; Force: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Calculate differences between two versions of a directory tree.
   // Returns a list of zdir_patch_t patches. Either older or newer may
   // be null, indicating the directory is empty/absent. If alias is set,
   // generates virtual filename (minus path, plus alias).
-  function zdir_diff(Older: PZdir; Newer: PZdir; Alias: PAnsiChar): PZlist; cdecl; external lib_czmq;
+  function zdir_diff(Older: PZdir; Newer: PZdir; Alias: PAnsiChar): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return full contents of directory as a zdir_patch list.
-  function zdir_resync(self: PZdir; Alias: PAnsiChar): PZlist; cdecl; external lib_czmq;
+  function zdir_resync(self: PZdir; Alias: PAnsiChar): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load directory cache; returns a hash table containing the SHA-1 digests
   // of every file in the tree. The cache is saved between runs in .cache.
-  function zdir_cache(self: PZdir): PZhash; cdecl; external lib_czmq;
+  function zdir_cache(self: PZdir): PZhash; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print contents of directory to open stream
-  procedure zdir_fprint(self: PZdir; &File: Pointer; Indent: Integer); cdecl; external lib_czmq;
+  procedure zdir_fprint(self: PZdir; &File: Pointer; Indent: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print contents of directory to stdout
-  procedure zdir_print(self: PZdir; Indent: Integer); cdecl; external lib_czmq;
+  procedure zdir_print(self: PZdir; Indent: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a new zdir_watch actor instance:
   //
@@ -682,44 +690,44 @@ type
   //     // Delete the received data.
   //     free (path);
   //     zlist_destroy (&patches);
-  procedure zdir_watch(Pipe: PZsock; Unused: Pointer); cdecl; external lib_czmq;
+  procedure zdir_watch(Pipe: PZsock; Unused: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zdir_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zdir_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* ZdirPatch *)
 (* work with directory patches *)
 
   // Create new patch
-  function zdir_patch_new(Path: PAnsiChar; &File: PZfile; Op: Integer; Alias: PAnsiChar): PZdirPatch; cdecl; external lib_czmq;
+  function zdir_patch_new(Path: PAnsiChar; &File: PZfile; Op: Integer; Alias: PAnsiChar): PZdirPatch; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a patch
-  procedure zdir_patch_destroy(var self: PZdirPatch); cdecl; external lib_czmq;
+  procedure zdir_patch_destroy(var self: PZdirPatch); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create copy of a patch. If the patch is null, or memory was exhausted,
   // returns null.
-  function zdir_patch_dup(self: PZdirPatch): PZdirPatch; cdecl; external lib_czmq;
+  function zdir_patch_dup(self: PZdirPatch): PZdirPatch; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return patch file directory path
-  function zdir_patch_path(self: PZdirPatch): PAnsiChar; cdecl; external lib_czmq;
+  function zdir_patch_path(self: PZdirPatch): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return patch file item
-  function zdir_patch_file(self: PZdirPatch): PZfile; cdecl; external lib_czmq;
+  function zdir_patch_file(self: PZdirPatch): PZfile; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return operation
-  function zdir_patch_op(self: PZdirPatch): Integer; cdecl; external lib_czmq;
+  function zdir_patch_op(self: PZdirPatch): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return patch virtual file path
-  function zdir_patch_vpath(self: PZdirPatch): PAnsiChar; cdecl; external lib_czmq;
+  function zdir_patch_vpath(self: PZdirPatch): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Calculate hash digest for file (create only)
-  procedure zdir_patch_digest_set(self: PZdirPatch); cdecl; external lib_czmq;
+  procedure zdir_patch_digest_set(self: PZdirPatch); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return hash digest for patch file
-  function zdir_patch_digest(self: PZdirPatch): PAnsiChar; cdecl; external lib_czmq;
+  function zdir_patch_digest(self: PZdirPatch): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zdir_patch_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zdir_patch_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zfile *)
 (* helper functions for working with files. *)
@@ -729,266 +737,268 @@ type
   // text file containing one line, the filename of a target file. Reading
   // data from the symbolic link actually reads from the target file. Path
   // may be NULL, in which case it is not used.
-  function zfile_new(Path: PAnsiChar; Name: PAnsiChar): PZfile; cdecl; external lib_czmq;
+  function zfile_new(Path: PAnsiChar; Name: PAnsiChar): PZfile; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create new temporary file for writing via tmpfile. File is automatically
   // deleted on destroy
-  function zfile_tmp: PZfile; cdecl; external lib_czmq;
+  function zfile_tmp: PZfile; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a file item
-  procedure zfile_destroy(var self: PZfile); cdecl; external lib_czmq;
+  procedure zfile_destroy(var self: PZfile); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Duplicate a file item, returns a newly constructed item. If the file
   // is null, or memory was exhausted, returns null.
-  function zfile_dup(self: PZfile): PZfile; cdecl; external lib_czmq;
+  function zfile_dup(self: PZfile): PZfile; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return file name, remove path if provided
-  function zfile_filename(self: PZfile; Path: PAnsiChar): PAnsiChar; cdecl; external lib_czmq;
+  function zfile_filename(self: PZfile; Path: PAnsiChar): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Refresh file properties from disk; this is not done automatically
   // on access methods, otherwise it is not possible to compare directory
   // snapshots.
-  procedure zfile_restat(self: PZfile); cdecl; external lib_czmq;
+  procedure zfile_restat(self: PZfile); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return when the file was last modified. If you want this to reflect the
   // current situation, call zfile_restat before checking this property.
-  function zfile_modified(self: PZfile): Int64; cdecl; external lib_czmq;
+  function zfile_modified(self: PZfile): Int64; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the last-known size of the file. If you want this to reflect the
   // current situation, call zfile_restat before checking this property.
-  function zfile_cursize(self: PZfile): Longint; cdecl; external lib_czmq;
+  function zfile_cursize(self: PZfile): Longint; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the file is a directory. If you want this to reflect
   // any external changes, call zfile_restat before checking this property.
-  function zfile_is_directory(self: PZfile): Boolean; cdecl; external lib_czmq;
+  function zfile_is_directory(self: PZfile): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the file is a regular file. If you want this to reflect
   // any external changes, call zfile_restat before checking this property.
-  function zfile_is_regular(self: PZfile): Boolean; cdecl; external lib_czmq;
+  function zfile_is_regular(self: PZfile): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the file is readable by this process. If you want this to
   // reflect any external changes, call zfile_restat before checking this
   // property.
-  function zfile_is_readable(self: PZfile): Boolean; cdecl; external lib_czmq;
+  function zfile_is_readable(self: PZfile): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the file is writeable by this process. If you want this
   // to reflect any external changes, call zfile_restat before checking this
   // property.
-  function zfile_is_writeable(self: PZfile): Boolean; cdecl; external lib_czmq;
+  function zfile_is_writeable(self: PZfile): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Check if file has stopped changing and can be safely processed.
   // Updates the file statistics from disk at every call.
-  function zfile_is_stable(self: PZfile): Boolean; cdecl; external lib_czmq;
+  function zfile_is_stable(self: PZfile): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the file was changed on disk since the zfile_t object
   // was created, or the last zfile_restat() call made on it.
-  function zfile_has_changed(self: PZfile): Boolean; cdecl; external lib_czmq;
+  function zfile_has_changed(self: PZfile): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove the file from disk
-  procedure zfile_remove(self: PZfile); cdecl; external lib_czmq;
+  procedure zfile_remove(self: PZfile); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Open file for reading
   // Returns 0 if OK, -1 if not found or not accessible
-  function zfile_input(self: PZfile): Integer; cdecl; external lib_czmq;
+  function zfile_input(self: PZfile): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Open file for writing, creating directory if needed
   // File is created if necessary; chunks can be written to file at any
   // location. Returns 0 if OK, -1 if error.
-  function zfile_output(self: PZfile): Integer; cdecl; external lib_czmq;
+  function zfile_output(self: PZfile): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Read chunk from file at specified position. If this was the last chunk,
   // sets the eof property. Returns a null chunk in case of error.
-  function zfile_read(self: PZfile; Bytes: NativeUInt; Offset: Longint): PZchunk; cdecl; external lib_czmq;
+  function zfile_read(self: PZfile; Bytes: NativeUInt; Offset: Longint): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns true if zfile_read() just read the last chunk in the file.
-  function zfile_eof(self: PZfile): Boolean; cdecl; external lib_czmq;
+  function zfile_eof(self: PZfile): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Write chunk to file at specified position
   // Return 0 if OK, else -1
-  function zfile_write(self: PZfile; Chunk: PZchunk; Offset: Longint): Integer; cdecl; external lib_czmq;
+  function zfile_write(self: PZfile; Chunk: PZchunk; Offset: Longint): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Read next line of text from file. Returns a pointer to the text line,
   // or NULL if there was nothing more to read from the file.
-  function zfile_readln(self: PZfile): PAnsiChar; cdecl; external lib_czmq;
+  function zfile_readln(self: PZfile): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Close file, if open
-  procedure zfile_close(self: PZfile); cdecl; external lib_czmq;
+  procedure zfile_close(self: PZfile); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return file handle, if opened
-  function zfile_handle(self: PZfile): Pointer; cdecl; external lib_czmq;
+  function zfile_handle(self: PZfile): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Calculate SHA1 digest for file, using zdigest class.
-  function zfile_digest(self: PZfile): PAnsiChar; cdecl; external lib_czmq;
+  function zfile_digest(self: PZfile): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zfile_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zfile_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zframe *)
 (* working with single message frames *)
+
 type
 
-    // Destroy an item
+  // Destroy an item
   TZframeDestructorFn = procedure(Hint: Pointer; var Item: PByte); stdcall;
   PZframeDestructorFn = ^TZframeDestructorFn;
 
   // Create a new frame. If size is not null, allocates the frame data
   // to the specified size. If additionally, data is not null, copies
   // size octets from the specified data into the frame body.
-  function zframe_new(Data: PByte; Size: NativeUInt): PZframe; cdecl; external lib_czmq;
+  function zframe_new(Data: PByte; Size: NativeUInt): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create an empty (zero-sized) frame
-  function zframe_new_empty: PZframe; cdecl; external lib_czmq;
+  function zframe_new_empty: PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a frame with a specified string content.
-  function zframe_from(&String: PAnsiChar): PZframe; cdecl; external lib_czmq;
+  function zframe_from(&String: PAnsiChar): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a new frame from memory. Take ownership of the memory and calling the destructor
   // on destroy.
-  function zframe_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer): PZframe; cdecl; external lib_czmq;
+  function zframe_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive frame from socket, returns zframe_t object or NULL if the recv
   // was interrupted. Does a blocking recv, if you want to not block then use
   // zpoller or zloop.
-  function zframe_recv(Source: PZSock): PZframe; cdecl; external lib_czmq;
+  function zframe_recv(Source: PZSock): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a frame
-  procedure zframe_destroy(var self: PZframe); cdecl; external lib_czmq;
+  procedure zframe_destroy(var self: PZframe); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a frame to a socket, destroy frame after sending.
   // Return -1 on error, 0 on success.
-  function zframe_send(var SelfP: PZframe; Dest: PZSock; Flags: Integer): Integer; cdecl; external lib_czmq;
+  function zframe_send(var SelfP: PZframe; Dest: PZSock; Flags: Integer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return number of bytes in frame data
-  function zframe_size(self: PZframe): NativeUInt; cdecl; external lib_czmq;
+  function zframe_size(self: PZframe): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return address of frame data
-  function zframe_data(self: PZframe): PByte; cdecl; external lib_czmq;
+  function zframe_data(self: PZframe): PByte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return meta data property for frame
   // The caller shall not modify or free the returned value, which shall be
   // owned by the message.
-  function zframe_meta(self: PZframe; &Property: PAnsiChar): PAnsiChar; cdecl; external lib_czmq;
+  function zframe_meta(self: PZframe; &Property: PAnsiChar): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a new frame that duplicates an existing frame. If frame is null,
   // or memory was exhausted, returns null.
-  function zframe_dup(self: PZframe): PZframe; cdecl; external lib_czmq;
+  function zframe_dup(self: PZframe): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
   // Caller must free string when finished with it.
-  function zframe_strhex(self: PZframe): PAnsiChar; cdecl; external lib_czmq;
+  function zframe_strhex(self: PZframe): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return frame data copied into freshly allocated string
   // Caller must free string when finished with it.
-  function zframe_strdup(self: PZframe): PAnsiChar; cdecl; external lib_czmq;
+  function zframe_strdup(self: PZframe): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return TRUE if frame body is equal to string, excluding terminator
-  function zframe_streq(self: PZframe; &String: PAnsiChar): Boolean; cdecl; external lib_czmq;
+  function zframe_streq(self: PZframe; &String: PAnsiChar): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return frame MORE indicator (1 or 0), set when reading frame from socket
   // or by the zframe_set_more() method
-  function zframe_more(self: PZframe): Integer; cdecl; external lib_czmq;
+  function zframe_more(self: PZframe): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set frame MORE indicator (1 or 0). Note this is NOT used when sending
   // frame to socket, you have to specify flag explicitly.
-  procedure zframe_set_more(self: PZframe; More: Integer); cdecl; external lib_czmq;
+  procedure zframe_set_more(self: PZframe; More: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
   // Else returns zero.
-  function zframe_routing_id(self: PZframe): Cardinal; cdecl; external lib_czmq;
+  function zframe_routing_id(self: PZframe): Cardinal; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set routing ID on frame. This is used if/when the frame is sent to a
   // ZMQ_SERVER socket.
-  procedure zframe_set_routing_id(self: PZframe; RoutingId: Cardinal); cdecl; external lib_czmq;
+  procedure zframe_set_routing_id(self: PZframe; RoutingId: Cardinal); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return frame group of radio-dish pattern.
-  function zframe_group(self: PZframe): PAnsiChar; cdecl; external lib_czmq;
+  function zframe_group(self: PZframe): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set group on frame. This is used if/when the frame is sent to a
   // ZMQ_RADIO socket.
   // Return -1 on error, 0 on success.
-  function zframe_set_group(self: PZframe; Group: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zframe_set_group(self: PZframe; Group: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return TRUE if two frames have identical size and data
   // If either frame is NULL, equality is always false.
-  function zframe_eq(self: PZframe; Other: PZframe): Boolean; cdecl; external lib_czmq;
+  function zframe_eq(self: PZframe; Other: PZframe): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set new contents for frame
-  procedure zframe_reset(self: PZframe; Data: PByte; Size: NativeUInt); cdecl; external lib_czmq;
+  procedure zframe_reset(self: PZframe; Data: PByte; Size: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send message to zsys log sink (may be stdout, or system facility as
   // configured by zsys_set_logstream). Prefix shows before frame, if not null.
-  procedure zframe_print(self: PZframe; Prefix: PAnsiChar); cdecl; external lib_czmq;
+  procedure zframe_print(self: PZframe; Prefix: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied object, and report if it looks like a zframe_t.
-  function zframe_is(This: Pointer): Boolean; cdecl; external lib_czmq;
+  function zframe_is(This: Pointer): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zframe_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zframe_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zhash *)
 (* generic type-free hash container (simple) *)
+
 type
 
-    // Callback function for zhash_freefn method
+  // Callback function for zhash_freefn method
   TZhashFreeFn = procedure(Data: Pointer); stdcall;
   PZhashFreeFn = ^TZhashFreeFn;
 
   // Create a new, empty hash container
-  function zhash_new: PZhash; cdecl; external lib_czmq;
+  function zhash_new: PZhash; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Unpack binary frame into a new hash table. Packed data must follow format
   // defined by zhash_pack. Hash table is set to autofree. An empty frame
   // unpacks to an empty hash table.
-  function zhash_unpack(Frame: PZframe): PZhash; cdecl; external lib_czmq;
+  function zhash_unpack(Frame: PZframe): PZhash; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a hash container and all items in it
-  procedure zhash_destroy(var self: PZhash); cdecl; external lib_czmq;
+  procedure zhash_destroy(var self: PZhash); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Insert item into hash table with specified key and item.
   // If key is already present returns -1 and leaves existing item unchanged
   // Returns 0 on success.
-  function zhash_insert(self: PZhash; Key: PAnsiChar; Item: Pointer): Integer; cdecl; external lib_czmq;
+  function zhash_insert(self: PZhash; Key: PAnsiChar; Item: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Update item into hash table with specified key and item.
   // If key is already present, destroys old item and inserts new one.
   // Use free_fn method to ensure deallocator is properly called on item.
-  procedure zhash_update(self: PZhash; Key: PAnsiChar; Item: Pointer); cdecl; external lib_czmq;
+  procedure zhash_update(self: PZhash; Key: PAnsiChar; Item: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove an item specified by key from the hash table. If there was no such
   // item, this function does nothing.
-  procedure zhash_delete(self: PZhash; Key: PAnsiChar); cdecl; external lib_czmq;
+  procedure zhash_delete(self: PZhash; Key: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the item at the specified key, or null
-  function zhash_lookup(self: PZhash; Key: PAnsiChar): Pointer; cdecl; external lib_czmq;
+  function zhash_lookup(self: PZhash; Key: PAnsiChar): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reindexes an item from an old key to a new key. If there was no such
   // item, does nothing. Returns 0 if successful, else -1.
-  function zhash_rename(self: PZhash; OldKey: PAnsiChar; NewKey: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zhash_rename(self: PZhash; OldKey: PAnsiChar; NewKey: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a free function for the specified hash table item. When the item is
   // destroyed, the free function, if any, is called on that item.
   // Use this when hash items are dynamically allocated, to ensure that
   // you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
   // Returns the item, or NULL if there is no such item.
-  function zhash_freefn(self: PZhash; Key: PAnsiChar; FreeFn: TZhashFreeFn): Pointer; cdecl; external lib_czmq;
+  function zhash_freefn(self: PZhash; Key: PAnsiChar; FreeFn: TZhashFreeFn): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the number of keys/items in the hash table
-  function zhash_size(self: PZhash): NativeUInt; cdecl; external lib_czmq;
+  function zhash_size(self: PZhash): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Make copy of hash table; if supplied table is null, returns null.
   // Does not copy items themselves. Rebuilds new table so may be slow on
   // very large tables. NOTE: only works with item values that are strings
   // since there's no other way to know how to duplicate the item value.
-  function zhash_dup(self: PZhash): PZhash; cdecl; external lib_czmq;
+  function zhash_dup(self: PZhash): PZhash; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return keys for items in table
-  function zhash_keys(self: PZhash): PZlist; cdecl; external lib_czmq;
+  function zhash_keys(self: PZhash): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Simple iterator; returns first item in hash table, in no given order,
   // or NULL if the table is empty. This method is simpler to use than the
   // foreach() method, which is deprecated. To access the key for this item
   // use zhash_cursor(). NOTE: do NOT modify the table while iterating.
-  function zhash_first(self: PZhash): Pointer; cdecl; external lib_czmq;
+  function zhash_first(self: PZhash): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Simple iterator; returns next item in hash table, in no given order,
   // or NULL if the last item was already returned. Use this together with
@@ -996,18 +1006,18 @@ type
   // items in sorted order, use zhash_keys() and then zlist_sort(). To
   // access the key for this item use zhash_cursor(). NOTE: do NOT modify
   // the table while iterating.
-  function zhash_next(self: PZhash): Pointer; cdecl; external lib_czmq;
+  function zhash_next(self: PZhash): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // After a successful first/next method, returns the key for the item that
   // was returned. This is a constant string that you may not modify or
   // deallocate, and which lasts as long as the item in the hash. After an
   // unsuccessful first/next, returns NULL.
-  function zhash_cursor(self: PZhash): PAnsiChar; cdecl; external lib_czmq;
+  function zhash_cursor(self: PZhash): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add a comment to hash table before saving to disk. You can add as many
   // comment lines as you like. These comment lines are discarded when loading
   // the file. If you use a null format, all comments are deleted.
-  procedure zhash_comment(self: PZhash; Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zhash_comment(self: PZhash; Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Serialize hash table to a binary frame that can be sent in a message.
   // The packed format is compatible with the 'dictionary' type defined in
@@ -1029,133 +1039,134 @@ type
   //
   // Comments are not included in the packed data. Item values MUST be
   // strings.
-  function zhash_pack(self: PZhash): PZframe; cdecl; external lib_czmq;
+  function zhash_pack(self: PZhash): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save hash table to a text file in name=value format. Hash values must be
   // printable strings; keys may not contain '=' character. Returns 0 if OK,
   // else -1 if a file error occurred.
-  function zhash_save(self: PZhash; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zhash_save(self: PZhash; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load hash table from a text file in name=value format; hash table must
   // already exist. Hash values must printable strings; keys may not contain
   // '=' character. Returns 0 if OK, else -1 if a file was not readable.
-  function zhash_load(self: PZhash; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zhash_load(self: PZhash; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // When a hash table was loaded from a file by zhash_load, this method will
   // reload the file if it has been modified since, and is "stable", i.e. not
   // still changing. Returns 0 if OK, -1 if there was an error reloading the
   // file.
-  function zhash_refresh(self: PZhash): Integer; cdecl; external lib_czmq;
+  function zhash_refresh(self: PZhash): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set hash for automatic value destruction. Note that this assumes that
   // values are NULL-terminated strings. Do not use with different types.
-  procedure zhash_autofree(self: PZhash); cdecl; external lib_czmq;
+  procedure zhash_autofree(self: PZhash); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zhash_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zhash_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zhashx *)
 (* extended generic type-free hash container *)
+
 type
 
-    // Destroy an item
+  // Destroy an item
   TZhashxDestructorFn = procedure(var Item: Pointer); stdcall;
   PZhashxDestructorFn = ^TZhashxDestructorFn;
 
-    // Duplicate an item
+  // Duplicate an item
   TZhashxDuplicatorFn = function(Item: Pointer): Pointer; stdcall;
   PZhashxDuplicatorFn = ^TZhashxDuplicatorFn;
 
-    // Compare two items, for sorting
+  // Compare two items, for sorting
   TZhashxComparatorFn = function(Item1: Pointer; Item2: Pointer): Integer; stdcall;
   PZhashxComparatorFn = ^TZhashxComparatorFn;
 
-    // Destroy an item.
+  // Destroy an item.
   TZhashxFreeFn = procedure(Data: Pointer); stdcall;
   PZhashxFreeFn = ^TZhashxFreeFn;
 
-    // Hash function for keys.
+  // Hash function for keys.
   TZhashxHashFn = function(Key: Pointer): NativeUInt; stdcall;
   PZhashxHashFn = ^TZhashxHashFn;
 
-    // Serializes an item to a longstr.
-    // The caller takes ownership of the newly created object.
+  // Serializes an item to a longstr.
+  // The caller takes ownership of the newly created object.
   TZhashxSerializerFn = function(Item: Pointer): PAnsiChar; stdcall;
   PZhashxSerializerFn = ^TZhashxSerializerFn;
 
-    // Deserializes a longstr into an item.
-    // The caller takes ownership of the newly created object.
+  // Deserializes a longstr into an item.
+  // The caller takes ownership of the newly created object.
   TZhashxDeserializerFn = function(ItemStr: PAnsiChar): Pointer; stdcall;
   PZhashxDeserializerFn = ^TZhashxDeserializerFn;
 
   // Create a new, empty hash container
-  function zhashx_new: PZhashx; cdecl; external lib_czmq;
+  function zhashx_new: PZhashx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Unpack binary frame into a new hash table. Packed data must follow format
   // defined by zhashx_pack. Hash table is set to autofree. An empty frame
   // unpacks to an empty hash table.
-  function zhashx_unpack(Frame: PZframe): PZhashx; cdecl; external lib_czmq;
+  function zhashx_unpack(Frame: PZframe): PZhashx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Same as unpack but uses a user-defined deserializer function to convert
   // a longstr back into item format.
-  function zhashx_unpack_own(Frame: PZframe; Deserializer: TZhashxDeserializerFn): PZhashx; cdecl; external lib_czmq;
+  function zhashx_unpack_own(Frame: PZframe; Deserializer: TZhashxDeserializerFn): PZhashx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a hash container and all items in it
-  procedure zhashx_destroy(var self: PZhashx); cdecl; external lib_czmq;
+  procedure zhashx_destroy(var self: PZhashx); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Insert item into hash table with specified key and item.
   // If key is already present returns -1 and leaves existing item unchanged
   // Returns 0 on success.
-  function zhashx_insert(self: PZhashx; Key: Pointer; Item: Pointer): Integer; cdecl; external lib_czmq;
+  function zhashx_insert(self: PZhashx; Key: Pointer; Item: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Update or insert item into hash table with specified key and item. If the
   // key is already present, destroys old item and inserts new one. If you set
   // a container item destructor, this is called on the old value. If the key
   // was not already present, inserts a new item. Sets the hash cursor to the
   // new item.
-  procedure zhashx_update(self: PZhashx; Key: Pointer; Item: Pointer); cdecl; external lib_czmq;
+  procedure zhashx_update(self: PZhashx; Key: Pointer; Item: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove an item specified by key from the hash table. If there was no such
   // item, this function does nothing.
-  procedure zhashx_delete(self: PZhashx; Key: Pointer); cdecl; external lib_czmq;
+  procedure zhashx_delete(self: PZhashx; Key: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Delete all items from the hash table. If the key destructor is
   // set, calls it on every key. If the item destructor is set, calls
   // it on every item.
-  procedure zhashx_purge(self: PZhashx); cdecl; external lib_czmq;
+  procedure zhashx_purge(self: PZhashx); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the item at the specified key, or null
-  function zhashx_lookup(self: PZhashx; Key: Pointer): Pointer; cdecl; external lib_czmq;
+  function zhashx_lookup(self: PZhashx; Key: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reindexes an item from an old key to a new key. If there was no such
   // item, does nothing. Returns 0 if successful, else -1.
-  function zhashx_rename(self: PZhashx; OldKey: Pointer; NewKey: Pointer): Integer; cdecl; external lib_czmq;
+  function zhashx_rename(self: PZhashx; OldKey: Pointer; NewKey: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a free function for the specified hash table item. When the item is
   // destroyed, the free function, if any, is called on that item.
   // Use this when hash items are dynamically allocated, to ensure that
   // you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
   // Returns the item, or NULL if there is no such item.
-  function zhashx_freefn(self: PZhashx; Key: Pointer; FreeFn: TZhashxFreeFn): Pointer; cdecl; external lib_czmq;
+  function zhashx_freefn(self: PZhashx; Key: Pointer; FreeFn: TZhashxFreeFn): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the number of keys/items in the hash table
-  function zhashx_size(self: PZhashx): NativeUInt; cdecl; external lib_czmq;
+  function zhashx_size(self: PZhashx): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return a zlistx_t containing the keys for the items in the
   // table. Uses the key_duplicator to duplicate all keys and sets the
   // key_destructor as destructor for the list.
-  function zhashx_keys(self: PZhashx): PZlistx; cdecl; external lib_czmq;
+  function zhashx_keys(self: PZhashx): PZlistx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return a zlistx_t containing the values for the items in the
   // table. Uses the duplicator to duplicate all items and sets the
   // destructor as destructor for the list.
-  function zhashx_values(self: PZhashx): PZlistx; cdecl; external lib_czmq;
+  function zhashx_values(self: PZhashx): PZlistx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Simple iterator; returns first item in hash table, in no given order,
   // or NULL if the table is empty. This method is simpler to use than the
   // foreach() method, which is deprecated. To access the key for this item
   // use zhashx_cursor(). NOTE: do NOT modify the table while iterating.
-  function zhashx_first(self: PZhashx): Pointer; cdecl; external lib_czmq;
+  function zhashx_first(self: PZhashx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Simple iterator; returns next item in hash table, in no given order,
   // or NULL if the last item was already returned. Use this together with
@@ -1163,34 +1174,34 @@ type
   // items in sorted order, use zhashx_keys() and then zlistx_sort(). To
   // access the key for this item use zhashx_cursor(). NOTE: do NOT modify
   // the table while iterating.
-  function zhashx_next(self: PZhashx): Pointer; cdecl; external lib_czmq;
+  function zhashx_next(self: PZhashx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // After a successful first/next method, returns the key for the item that
   // was returned. This is a constant string that you may not modify or
   // deallocate, and which lasts as long as the item in the hash. After an
   // unsuccessful first/next, returns NULL.
-  function zhashx_cursor(self: PZhashx): Pointer; cdecl; external lib_czmq;
+  function zhashx_cursor(self: PZhashx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add a comment to hash table before saving to disk. You can add as many
   // comment lines as you like. These comment lines are discarded when loading
   // the file. If you use a null format, all comments are deleted.
-  procedure zhashx_comment(self: PZhashx; Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zhashx_comment(self: PZhashx; Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save hash table to a text file in name=value format. Hash values must be
   // printable strings; keys may not contain '=' character. Returns 0 if OK,
   // else -1 if a file error occurred.
-  function zhashx_save(self: PZhashx; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zhashx_save(self: PZhashx; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load hash table from a text file in name=value format; hash table must
   // already exist. Hash values must printable strings; keys may not contain
   // '=' character. Returns 0 if OK, else -1 if a file was not readable.
-  function zhashx_load(self: PZhashx; Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zhashx_load(self: PZhashx; Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // When a hash table was loaded from a file by zhashx_load, this method will
   // reload the file if it has been modified since, and is "stable", i.e. not
   // still changing. Returns 0 if OK, -1 if there was an error reloading the
   // file.
-  function zhashx_refresh(self: PZhashx): Integer; cdecl; external lib_czmq;
+  function zhashx_refresh(self: PZhashx): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Serialize hash table to a binary frame that can be sent in a message.
   // The packed format is compatible with the 'dictionary' type defined in
@@ -1212,179 +1223,180 @@ type
   //
   // Comments are not included in the packed data. Item values MUST be
   // strings.
-  function zhashx_pack(self: PZhashx): PZframe; cdecl; external lib_czmq;
+  function zhashx_pack(self: PZhashx): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Same as pack but uses a user-defined serializer function to convert items
   // into longstr.
-  function zhashx_pack_own(self: PZhashx; Serializer: TZhashxSerializerFn): PZframe; cdecl; external lib_czmq;
+  function zhashx_pack_own(self: PZhashx; Serializer: TZhashxSerializerFn): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Make a copy of the list; items are duplicated if you set a duplicator
   // for the list, otherwise not. Copying a null reference returns a null
   // reference. Note that this method's behavior changed slightly for CZMQ
   // v3.x, as it does not set nor respect autofree. It does however let you
   // duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
-  function zhashx_dup(self: PZhashx): PZhashx; cdecl; external lib_czmq;
+  function zhashx_dup(self: PZhashx): PZhashx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined deallocator for hash items; by default items are not
   // freed when the hash is destroyed.
-  procedure zhashx_set_destructor(self: PZhashx; &Destructor: TZhashxDestructorFn); cdecl; external lib_czmq;
+  procedure zhashx_set_destructor(self: PZhashx; &Destructor: TZhashxDestructorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined duplicator for hash items; by default items are not
   // copied when the hash is duplicated.
-  procedure zhashx_set_duplicator(self: PZhashx; Duplicator: TZhashxDuplicatorFn); cdecl; external lib_czmq;
+  procedure zhashx_set_duplicator(self: PZhashx; Duplicator: TZhashxDuplicatorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined deallocator for keys; by default keys are freed
   // when the hash is destroyed using free().
-  procedure zhashx_set_key_destructor(self: PZhashx; &Destructor: TZhashxDestructorFn); cdecl; external lib_czmq;
+  procedure zhashx_set_key_destructor(self: PZhashx; &Destructor: TZhashxDestructorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined duplicator for keys; by default keys are duplicated
   // using strdup.
-  procedure zhashx_set_key_duplicator(self: PZhashx; Duplicator: TZhashxDuplicatorFn); cdecl; external lib_czmq;
+  procedure zhashx_set_key_duplicator(self: PZhashx; Duplicator: TZhashxDuplicatorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined comparator for keys; by default keys are
   // compared using strcmp.
   // The callback function should return zero (0) on matching
   // items.
-  procedure zhashx_set_key_comparator(self: PZhashx; Comparator: TZhashxComparatorFn); cdecl; external lib_czmq;
+  procedure zhashx_set_key_comparator(self: PZhashx; Comparator: TZhashxComparatorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined hash function for keys; by default keys are
   // hashed by a modified Bernstein hashing function.
-  procedure zhashx_set_key_hasher(self: PZhashx; Hasher: TZhashxHashFn); cdecl; external lib_czmq;
+  procedure zhashx_set_key_hasher(self: PZhashx; Hasher: TZhashxHashFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Make copy of hash table; if supplied table is null, returns null.
   // Does not copy items themselves. Rebuilds new table so may be slow on
   // very large tables. NOTE: only works with item values that are strings
   // since there's no other way to know how to duplicate the item value.
-  function zhashx_dup_v2(self: PZhashx): PZhashx; cdecl; external lib_czmq;
+  function zhashx_dup_v2(self: PZhashx): PZhashx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zhashx_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zhashx_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Ziflist *)
 (* List of network interfaces available on system *)
 
   // Get a list of network interfaces currently defined on the system
-  function ziflist_new: PZiflist; cdecl; external lib_czmq;
+  function ziflist_new: PZiflist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a ziflist instance
-  procedure ziflist_destroy(var self: PZiflist); cdecl; external lib_czmq;
+  procedure ziflist_destroy(var self: PZiflist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reload network interfaces from system
-  procedure ziflist_reload(self: PZiflist); cdecl; external lib_czmq;
+  procedure ziflist_reload(self: PZiflist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the number of network interfaces on system
-  function ziflist_size(self: PZiflist): NativeUInt; cdecl; external lib_czmq;
+  function ziflist_size(self: PZiflist): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get first network interface, return NULL if there are none
-  function ziflist_first(self: PZiflist): PAnsiChar; cdecl; external lib_czmq;
+  function ziflist_first(self: PZiflist): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get next network interface, return NULL if we hit the last one
-  function ziflist_next(self: PZiflist): PAnsiChar; cdecl; external lib_czmq;
+  function ziflist_next(self: PZiflist): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the current interface IP address as a printable string
-  function ziflist_address(self: PZiflist): PAnsiChar; cdecl; external lib_czmq;
+  function ziflist_address(self: PZiflist): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the current interface broadcast address as a printable string
-  function ziflist_broadcast(self: PZiflist): PAnsiChar; cdecl; external lib_czmq;
+  function ziflist_broadcast(self: PZiflist): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the current interface network mask as a printable string
-  function ziflist_netmask(self: PZiflist): PAnsiChar; cdecl; external lib_czmq;
+  function ziflist_netmask(self: PZiflist): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the list of interfaces.
-  procedure ziflist_print(self: PZiflist); cdecl; external lib_czmq;
+  procedure ziflist_print(self: PZiflist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get a list of network interfaces currently defined on the system
   // Includes IPv6 interfaces
-  function ziflist_new_ipv6: PZiflist; cdecl; external lib_czmq;
+  function ziflist_new_ipv6: PZiflist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reload network interfaces from system, including IPv6
-  procedure ziflist_reload_ipv6(self: PZiflist); cdecl; external lib_czmq;
+  procedure ziflist_reload_ipv6(self: PZiflist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the current interface uses IPv6
-  function ziflist_is_ipv6(self: PZiflist): Boolean; cdecl; external lib_czmq;
+  function ziflist_is_ipv6(self: PZiflist): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure ziflist_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure ziflist_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zlist *)
 (* simple generic list container *)
+
 type
 
-    // Comparison function e.g. for sorting and removing.
+  // Comparison function e.g. for sorting and removing.
   TZlistCompareFn = function(Item1: Pointer; Item2: Pointer): Integer; stdcall;
   PZlistCompareFn = ^TZlistCompareFn;
 
-    // Callback function for zlist_freefn method
+  // Callback function for zlist_freefn method
   TZlistFreeFn = procedure(Data: Pointer); stdcall;
   PZlistFreeFn = ^TZlistFreeFn;
 
   // Create a new list container
-  function zlist_new: PZlist; cdecl; external lib_czmq;
+  function zlist_new: PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a list container
-  procedure zlist_destroy(var self: PZlist); cdecl; external lib_czmq;
+  procedure zlist_destroy(var self: PZlist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the item at the head of list. If the list is empty, returns NULL.
   // Leaves cursor pointing at the head item, or NULL if the list is empty.
-  function zlist_first(self: PZlist): Pointer; cdecl; external lib_czmq;
+  function zlist_first(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the next item. If the list is empty, returns NULL. To move to
   // the start of the list call zlist_first (). Advances the cursor.
-  function zlist_next(self: PZlist): Pointer; cdecl; external lib_czmq;
+  function zlist_next(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the item at the tail of list. If the list is empty, returns NULL.
   // Leaves cursor pointing at the tail item, or NULL if the list is empty.
-  function zlist_last(self: PZlist): Pointer; cdecl; external lib_czmq;
+  function zlist_last(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return first item in the list, or null, leaves the cursor
-  function zlist_head(self: PZlist): Pointer; cdecl; external lib_czmq;
+  function zlist_head(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return last item in the list, or null, leaves the cursor
-  function zlist_tail(self: PZlist): Pointer; cdecl; external lib_czmq;
+  function zlist_tail(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the current item of list. If the list is empty, returns NULL.
   // Leaves cursor pointing at the current item, or NULL if the list is empty.
-  function zlist_item(self: PZlist): Pointer; cdecl; external lib_czmq;
+  function zlist_item(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Append an item to the end of the list, return 0 if OK or -1 if this
   // failed for some reason (out of memory). Note that if a duplicator has
   // been set, this method will also duplicate the item.
-  function zlist_append(self: PZlist; Item: Pointer): Integer; cdecl; external lib_czmq;
+  function zlist_append(self: PZlist; Item: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push an item to the start of the list, return 0 if OK or -1 if this
   // failed for some reason (out of memory). Note that if a duplicator has
   // been set, this method will also duplicate the item.
-  function zlist_push(self: PZlist; Item: Pointer): Integer; cdecl; external lib_czmq;
+  function zlist_push(self: PZlist; Item: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Pop the item off the start of the list, if any
-  function zlist_pop(self: PZlist): Pointer; cdecl; external lib_czmq;
+  function zlist_pop(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Checks if an item already is present. Uses compare method to determine if
   // items are equal. If the compare method is NULL the check will only compare
   // pointers. Returns true if item is present else false.
-  function zlist_exists(self: PZlist; Item: Pointer): Boolean; cdecl; external lib_czmq;
+  function zlist_exists(self: PZlist; Item: Pointer): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove the specified item from the list if present
-  procedure zlist_remove(self: PZlist; Item: Pointer); cdecl; external lib_czmq;
+  procedure zlist_remove(self: PZlist; Item: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Make a copy of list. If the list has autofree set, the copied list will
   // duplicate all items, which must be strings. Otherwise, the list will hold
   // pointers back to the items in the original list. If list is null, returns
   // NULL.
-  function zlist_dup(self: PZlist): PZlist; cdecl; external lib_czmq;
+  function zlist_dup(self: PZlist): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Purge all items from list
-  procedure zlist_purge(self: PZlist); cdecl; external lib_czmq;
+  procedure zlist_purge(self: PZlist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return number of items in the list
-  function zlist_size(self: PZlist): NativeUInt; cdecl; external lib_czmq;
+  function zlist_size(self: PZlist): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Sort the list. If the compare function is null, sorts the list by
   // ascending key value using a straight ASCII comparison. If you specify
   // a compare function, this decides how items are sorted. The sort is not
   // stable, so may reorder items with the same keys. The algorithm used is
   // combsort, a compromise between performance and simplicity.
-  procedure zlist_sort(self: PZlist; Compare: TZlistCompareFn); cdecl; external lib_czmq;
+  procedure zlist_sort(self: PZlist; Compare: TZlistCompareFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set list for automatic item destruction; item values MUST be strings.
   // By default a list item refers to a value held elsewhere. When you set
@@ -1394,141 +1406,142 @@ type
   // list values, you must free them explicitly before destroying the list.
   // The usual technique is to pop list items and destroy them, until the
   // list is empty.
-  procedure zlist_autofree(self: PZlist); cdecl; external lib_czmq;
+  procedure zlist_autofree(self: PZlist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Sets a compare function for this list. The function compares two items.
   // It returns an integer less than, equal to, or greater than zero if the
   // first item is found, respectively, to be less than, to match, or be
   // greater than the second item.
   // This function is used for sorting, removal and exists checking.
-  procedure zlist_comparefn(self: PZlist; Fn: TZlistCompareFn); cdecl; external lib_czmq;
+  procedure zlist_comparefn(self: PZlist; Fn: TZlistCompareFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a free function for the specified list item. When the item is
   // destroyed, the free function, if any, is called on that item.
   // Use this when list items are dynamically allocated, to ensure that
   // you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
   // Returns the item, or NULL if there is no such item.
-  function zlist_freefn(self: PZlist; Item: Pointer; Fn: TZlistFreeFn; AtTail: Boolean): Pointer; cdecl; external lib_czmq;
+  function zlist_freefn(self: PZlist; Item: Pointer; Fn: TZlistFreeFn; AtTail: Boolean): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zlist_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zlist_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zlistx *)
 (* extended generic list container *)
+
 type
 
-    // Destroy an item
+  // Destroy an item
   TZlistxDestructorFn = procedure(var Item: Pointer); stdcall;
   PZlistxDestructorFn = ^TZlistxDestructorFn;
 
-    // Duplicate an item
+  // Duplicate an item
   TZlistxDuplicatorFn = function(Item: Pointer): Pointer; stdcall;
   PZlistxDuplicatorFn = ^TZlistxDuplicatorFn;
 
-    // Compare two items, for sorting
+  // Compare two items, for sorting
   TZlistxComparatorFn = function(Item1: Pointer; Item2: Pointer): Integer; stdcall;
   PZlistxComparatorFn = ^TZlistxComparatorFn;
 
   // Create a new, empty list.
-  function zlistx_new: PZlistx; cdecl; external lib_czmq;
+  function zlistx_new: PZlistx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Unpack binary frame into a new list. Packed data must follow format
   // defined by zlistx_pack. List is set to autofree. An empty frame
   // unpacks to an empty list.
-  function zlistx_unpack(Frame: PZframe): PZlistx; cdecl; external lib_czmq;
+  function zlistx_unpack(Frame: PZframe): PZlistx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a list. If an item destructor was specified, all items in the
   // list are automatically destroyed as well.
-  procedure zlistx_destroy(var self: PZlistx); cdecl; external lib_czmq;
+  procedure zlistx_destroy(var self: PZlistx); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add an item to the head of the list. Calls the item duplicator, if any,
   // on the item. Resets cursor to list head. Returns an item handle on
   // success, NULL if memory was exhausted.
-  function zlistx_add_start(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq;
+  function zlistx_add_start(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add an item to the tail of the list. Calls the item duplicator, if any,
   // on the item. Resets cursor to list head. Returns an item handle on
   // success, NULL if memory was exhausted.
-  function zlistx_add_end(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq;
+  function zlistx_add_end(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the number of items in the list
-  function zlistx_size(self: PZlistx): NativeUInt; cdecl; external lib_czmq;
+  function zlistx_size(self: PZlistx): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return first item in the list, or null, leaves the cursor
-  function zlistx_head(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_head(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return last item in the list, or null, leaves the cursor
-  function zlistx_tail(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_tail(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the item at the head of list. If the list is empty, returns NULL.
   // Leaves cursor pointing at the head item, or NULL if the list is empty.
-  function zlistx_first(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_first(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the next item. At the end of the list (or in an empty list),
   // returns NULL. Use repeated zlistx_next () calls to work through the list
   // from zlistx_first (). First time, acts as zlistx_first().
-  function zlistx_next(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_next(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the previous item. At the start of the list (or in an empty list),
   // returns NULL. Use repeated zlistx_prev () calls to work through the list
   // backwards from zlistx_last (). First time, acts as zlistx_last().
-  function zlistx_prev(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_prev(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the item at the tail of list. If the list is empty, returns NULL.
   // Leaves cursor pointing at the tail item, or NULL if the list is empty.
-  function zlistx_last(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_last(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns the value of the item at the cursor, or NULL if the cursor is
   // not pointing to an item.
-  function zlistx_item(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_item(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns the handle of the item at the cursor, or NULL if the cursor is
   // not pointing to an item.
-  function zlistx_cursor(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_cursor(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns the item associated with the given list handle, or NULL if passed
   // in handle is NULL. Asserts that the passed in handle points to a list element.
-  function zlistx_handle_item(Handle: Pointer): Pointer; cdecl; external lib_czmq;
+  function zlistx_handle_item(Handle: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Find an item in the list, searching from the start. Uses the item
   // comparator, if any, else compares item values directly. Returns the
   // item handle found, or NULL. Sets the cursor to the found item, if any.
-  function zlistx_find(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq;
+  function zlistx_find(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Detach an item from the list, using its handle. The item is not modified,
   // and the caller is responsible for destroying it if necessary. If handle is
   // null, detaches the first item on the list. Returns item that was detached,
   // or null if none was. If cursor was at item, moves cursor to previous item,
   // so you can detach items while iterating forwards through a list.
-  function zlistx_detach(self: PZlistx; Handle: Pointer): Pointer; cdecl; external lib_czmq;
+  function zlistx_detach(self: PZlistx; Handle: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Detach item at the cursor, if any, from the list. The item is not modified,
   // and the caller is responsible for destroying it as necessary. Returns item
   // that was detached, or null if none was. Moves cursor to previous item, so
   // you can detach items while iterating forwards through a list.
-  function zlistx_detach_cur(self: PZlistx): Pointer; cdecl; external lib_czmq;
+  function zlistx_detach_cur(self: PZlistx): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Delete an item, using its handle. Calls the item destructor is any is
   // set. If handle is null, deletes the first item on the list. Returns 0
   // if an item was deleted, -1 if not. If cursor was at item, moves cursor
   // to previous item, so you can delete items while iterating forwards
   // through a list.
-  function zlistx_delete(self: PZlistx; Handle: Pointer): Integer; cdecl; external lib_czmq;
+  function zlistx_delete(self: PZlistx; Handle: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Move an item to the start of the list, via its handle.
-  procedure zlistx_move_start(self: PZlistx; Handle: Pointer); cdecl; external lib_czmq;
+  procedure zlistx_move_start(self: PZlistx; Handle: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Move an item to the end of the list, via its handle.
-  procedure zlistx_move_end(self: PZlistx; Handle: Pointer); cdecl; external lib_czmq;
+  procedure zlistx_move_end(self: PZlistx; Handle: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove all items from the list, and destroy them if the item destructor
   // is set.
-  procedure zlistx_purge(self: PZlistx); cdecl; external lib_czmq;
+  procedure zlistx_purge(self: PZlistx); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Sort the list. If an item comparator was set, calls that to compare
   // items, otherwise compares on item value. The sort is not stable, so may
   // reorder equal items.
-  procedure zlistx_sort(self: PZlistx); cdecl; external lib_czmq;
+  procedure zlistx_sort(self: PZlistx); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a new node and insert it into a sorted list. Calls the item
   // duplicator, if any, on the item. If low_value is true, starts searching
@@ -1536,31 +1549,31 @@ type
   // comparator, if any, to find where to place the new node. Returns a handle
   // to the new node, or NULL if memory was exhausted. Resets the cursor to the
   // list head.
-  function zlistx_insert(self: PZlistx; Item: Pointer; LowValue: Boolean): Pointer; cdecl; external lib_czmq;
+  function zlistx_insert(self: PZlistx; Item: Pointer; LowValue: Boolean): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Move an item, specified by handle, into position in a sorted list. Uses
   // the item comparator, if any, to determine the new location. If low_value
   // is true, starts searching from the start of the list, otherwise searches
   // from the end.
-  procedure zlistx_reorder(self: PZlistx; Handle: Pointer; LowValue: Boolean); cdecl; external lib_czmq;
+  procedure zlistx_reorder(self: PZlistx; Handle: Pointer; LowValue: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Make a copy of the list; items are duplicated if you set a duplicator
   // for the list, otherwise not. Copying a null reference returns a null
   // reference.
-  function zlistx_dup(self: PZlistx): PZlistx; cdecl; external lib_czmq;
+  function zlistx_dup(self: PZlistx): PZlistx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined deallocator for list items; by default items are not
   // freed when the list is destroyed.
-  procedure zlistx_set_destructor(self: PZlistx; &Destructor: TZlistxDestructorFn); cdecl; external lib_czmq;
+  procedure zlistx_set_destructor(self: PZlistx; &Destructor: TZlistxDestructorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined duplicator for list items; by default items are not
   // copied when the list is duplicated.
-  procedure zlistx_set_duplicator(self: PZlistx; Duplicator: TZlistxDuplicatorFn); cdecl; external lib_czmq;
+  procedure zlistx_set_duplicator(self: PZlistx; Duplicator: TZlistxDuplicatorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set a user-defined comparator for zlistx_find and zlistx_sort; the method
   // must return -1, 0, or 1 depending on whether item1 is less than, equal to,
   // or greater than, item2.
-  procedure zlistx_set_comparator(self: PZlistx; Comparator: TZlistxComparatorFn); cdecl; external lib_czmq;
+  procedure zlistx_set_comparator(self: PZlistx; Comparator: TZlistxComparatorFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Serialize list to a binary frame that can be sent in a message.
   // The packed format is compatible with the 'strings' type implemented by zproto:
@@ -1574,72 +1587,73 @@ type
   //
   //    ; Numbers are unsigned integers in network byte order
   //    number-4        = 4OCTET
-  function zlistx_pack(self: PZlistx): PZframe; cdecl; external lib_czmq;
+  function zlistx_pack(self: PZlistx): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zlistx_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zlistx_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zloop *)
 (* event-driven reactor *)
+
 type
 
-    // Callback function for reactor socket activity
+  // Callback function for reactor socket activity
   TZloopReaderFn = function(Loop: PZloop; Reader: PZsock; Arg: Pointer): Integer; stdcall;
   PZloopReaderFn = ^TZloopReaderFn;
 
-    // Callback function for reactor events (low-level)
+  // Callback function for reactor events (low-level)
   TZloopFn = function(Loop: PZloop; Item: Pointer; Arg: Pointer): Integer; stdcall;
   PZloopFn = ^TZloopFn;
 
-    // Callback for reactor timer events
+  // Callback for reactor timer events
   TZloopTimerFn = function(Loop: PZloop; TimerId: Integer; Arg: Pointer): Integer; stdcall;
   PZloopTimerFn = ^TZloopTimerFn;
 
   // Create a new zloop reactor
-  function zloop_new: PZloop; cdecl; external lib_czmq;
+  function zloop_new: PZloop; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a reactor
-  procedure zloop_destroy(var self: PZloop); cdecl; external lib_czmq;
+  procedure zloop_destroy(var self: PZloop); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Register socket reader with the reactor. When the reader has messages,
   // the reactor will call the handler, passing the arg. Returns 0 if OK, -1
   // if there was an error. If you register the same socket more than once,
   // each instance will invoke its corresponding handler.
-  function zloop_reader(self: PZloop; Sock: PZsock; Handler: TZloopReaderFn; Arg: Pointer): Integer; cdecl; external lib_czmq;
+  function zloop_reader(self: PZloop; Sock: PZsock; Handler: TZloopReaderFn; Arg: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Cancel a socket reader from the reactor. If multiple readers exist for
   // same socket, cancels ALL of them.
-  procedure zloop_reader_end(self: PZloop; Sock: PZsock); cdecl; external lib_czmq;
+  procedure zloop_reader_end(self: PZloop; Sock: PZsock); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure a registered reader to ignore errors. If you do not set this,
   // then readers that have errors are removed from the reactor silently.
-  procedure zloop_reader_set_tolerant(self: PZloop; Sock: PZsock); cdecl; external lib_czmq;
+  procedure zloop_reader_set_tolerant(self: PZloop; Sock: PZsock); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Register low-level libzmq pollitem with the reactor. When the pollitem
   // is ready, will call the handler, passing the arg. Returns 0 if OK, -1
   // if there was an error. If you register the pollitem more than once, each
   // instance will invoke its corresponding handler. A pollitem with
   // socket=NULL and fd=0 means 'poll on FD zero'.
-  function zloop_poller(self: PZloop; Item: Pointer; Handler: TZloopFn; Arg: Pointer): Integer; cdecl; external lib_czmq;
+  function zloop_poller(self: PZloop; Item: Pointer; Handler: TZloopFn; Arg: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Cancel a pollitem from the reactor, specified by socket or FD. If both
   // are specified, uses only socket. If multiple poll items exist for same
   // socket/FD, cancels ALL of them.
-  procedure zloop_poller_end(self: PZloop; Item: Pointer); cdecl; external lib_czmq;
+  procedure zloop_poller_end(self: PZloop; Item: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure a registered poller to ignore errors. If you do not set this,
   // then poller that have errors are removed from the reactor silently.
-  procedure zloop_poller_set_tolerant(self: PZloop; Item: Pointer); cdecl; external lib_czmq;
+  procedure zloop_poller_set_tolerant(self: PZloop; Item: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Register a timer that expires after some delay and repeats some number of
   // times. At each expiry, will call the handler, passing the arg. To run a
   // timer forever, use 0 times. Returns a timer_id that is used to cancel the
   // timer in the future. Returns -1 if there was an error.
-  function zloop_timer(self: PZloop; Delay: NativeUInt; Times: NativeUInt; Handler: TZloopTimerFn; Arg: Pointer): Integer; cdecl; external lib_czmq;
+  function zloop_timer(self: PZloop; Delay: NativeUInt; Times: NativeUInt; Handler: TZloopTimerFn; Arg: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Cancel a specific timer identified by a specific timer_id (as returned by
   // zloop_timer).
-  function zloop_timer_end(self: PZloop; TimerId: Integer): Integer; cdecl; external lib_czmq;
+  function zloop_timer_end(self: PZloop; TimerId: Integer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Register a ticket timer. Ticket timers are very fast in the case where
   // you use a lot of timers (thousands), and frequently remove and add them.
@@ -1650,81 +1664,81 @@ type
   // must set the ticket delay using zloop_set_ticket_delay before creating a
   // ticket. Returns a handle to the timer that you should use in
   // zloop_ticket_reset and zloop_ticket_delete.
-  function zloop_ticket(self: PZloop; Handler: TZloopTimerFn; Arg: Pointer): Pointer; cdecl; external lib_czmq;
+  function zloop_ticket(self: PZloop; Handler: TZloopTimerFn; Arg: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reset a ticket timer, which moves it to the end of the ticket list and
   // resets its execution time. This is a very fast operation.
-  procedure zloop_ticket_reset(self: PZloop; Handle: Pointer); cdecl; external lib_czmq;
+  procedure zloop_ticket_reset(self: PZloop; Handle: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Delete a ticket timer. We do not actually delete the ticket here, as
   // other code may still refer to the ticket. We mark as deleted, and remove
   // later and safely.
-  procedure zloop_ticket_delete(self: PZloop; Handle: Pointer); cdecl; external lib_czmq;
+  procedure zloop_ticket_delete(self: PZloop; Handle: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set the ticket delay, which applies to all tickets. If you lower the
   // delay and there are already tickets created, the results are undefined.
-  procedure zloop_set_ticket_delay(self: PZloop; TicketDelay: NativeUInt); cdecl; external lib_czmq;
+  procedure zloop_set_ticket_delay(self: PZloop; TicketDelay: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set hard limit on number of timers allowed. Setting more than a small
   // number of timers (10-100) can have a dramatic impact on the performance
   // of the reactor. For high-volume cases, use ticket timers. If the hard
   // limit is reached, the reactor stops creating new timers and logs an
   // error.
-  procedure zloop_set_max_timers(self: PZloop; MaxTimers: NativeUInt); cdecl; external lib_czmq;
+  procedure zloop_set_max_timers(self: PZloop; MaxTimers: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set verbose tracing of reactor on/off. The default verbose setting is
   // off (false).
-  procedure zloop_set_verbose(self: PZloop; Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zloop_set_verbose(self: PZloop; Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // By default the reactor stops if the process receives a SIGINT or SIGTERM
   // signal. This makes it impossible to shut-down message based architectures
   // like zactors. This method lets you switch off break handling. The default
   // nonstop setting is off (false).
-  procedure zloop_set_nonstop(self: PZloop; Nonstop: Boolean); cdecl; external lib_czmq;
+  procedure zloop_set_nonstop(self: PZloop; Nonstop: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Start the reactor. Takes control of the thread and returns when the 0MQ
   // context is terminated or the process is interrupted, or any event handler
   // returns -1. Event handlers may register new sockets and timers, and
   // cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.
-  function zloop_start(self: PZloop): Integer; cdecl; external lib_czmq;
+  function zloop_start(self: PZloop): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zloop_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zloop_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zmsg *)
 (* working with multipart messages *)
 
   // Create a new empty message object
-  function zmsg_new: PZmsg; cdecl; external lib_czmq;
+  function zmsg_new: PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive message from socket, returns zmsg_t object or NULL if the recv
   // was interrupted. Does a blocking recv. If you want to not block then use
   // the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
   // before receiving.
-  function zmsg_recv(Source: PZSock): PZmsg; cdecl; external lib_czmq;
+  function zmsg_recv(Source: PZSock): PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Load/append an open file into new message, return the message.
   // Returns NULL if the message could not be loaded.
-  function zmsg_load(&File: Pointer): PZmsg; cdecl; external lib_czmq;
+  function zmsg_load(&File: Pointer): PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Decodes a serialized message frame created by zmsg_encode () and returns
   // a new zmsg_t object. Returns NULL if the frame was badly formatted or
   // there was insufficient memory to work.
-  function zmsg_decode(Frame: PZframe): PZmsg; cdecl; external lib_czmq;
+  function zmsg_decode(Frame: PZframe): PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Generate a signal message encoding the given status. A signal is a short
   // message carrying a 1-byte success/failure code (by convention, 0 means
   // OK). Signals are encoded to be distinguishable from "normal" messages.
-  function zmsg_new_signal(Status: Byte): PZmsg; cdecl; external lib_czmq;
+  function zmsg_new_signal(Status: Byte): PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a message object and all frames it contains
-  procedure zmsg_destroy(var self: PZmsg); cdecl; external lib_czmq;
+  procedure zmsg_destroy(var self: PZmsg); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send message to destination socket, and destroy the message after sending
   // it successfully. If the message has no frames, sends nothing but destroys
   // the message anyhow. Nullifies the caller's reference to the message (as
   // it is a destructor).
-  function zmsg_send(var SelfP: PZmsg; Dest: PZSock): Integer; cdecl; external lib_czmq;
+  function zmsg_send(var SelfP: PZmsg; Dest: PZSock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send message to destination socket as part of a multipart sequence, and
   // destroy the message after sending it successfully. Note that after a
@@ -1732,123 +1746,123 @@ type
   // message part. If the message has no frames, sends nothing but destroys
   // the message anyhow. Nullifies the caller's reference to the message (as
   // it is a destructor).
-  function zmsg_sendm(var SelfP: PZmsg; Dest: PZSock): Integer; cdecl; external lib_czmq;
+  function zmsg_sendm(var SelfP: PZmsg; Dest: PZSock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return size of message, i.e. number of frames (0 or more).
-  function zmsg_size(self: PZmsg): NativeUInt; cdecl; external lib_czmq;
+  function zmsg_size(self: PZmsg): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return total size of all frames in message.
-  function zmsg_content_size(self: PZmsg): NativeUInt; cdecl; external lib_czmq;
+  function zmsg_content_size(self: PZmsg): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return message routing ID, if the message came from a ZMQ_SERVER socket.
   // Else returns zero.
-  function zmsg_routing_id(self: PZmsg): Cardinal; cdecl; external lib_czmq;
+  function zmsg_routing_id(self: PZmsg): Cardinal; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set routing ID on message. This is used if/when the message is sent to a
   // ZMQ_SERVER socket.
-  procedure zmsg_set_routing_id(self: PZmsg; RoutingId: Cardinal); cdecl; external lib_czmq;
+  procedure zmsg_set_routing_id(self: PZmsg; RoutingId: Cardinal); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push frame to the front of the message, i.e. before all other frames.
   // Message takes ownership of frame, will destroy it when message is sent.
   // Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
   // nullify the caller's frame reference.
-  function zmsg_prepend(self: PZmsg; var FrameP: PZframe): Integer; cdecl; external lib_czmq;
+  function zmsg_prepend(self: PZmsg; var FrameP: PZframe): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add frame to the end of the message, i.e. after all other frames.
   // Message takes ownership of frame, will destroy it when message is sent.
   // Returns 0 on success. Deprecates zmsg_add, which did not nullify the
   // caller's frame reference.
-  function zmsg_append(self: PZmsg; var FrameP: PZframe): Integer; cdecl; external lib_czmq;
+  function zmsg_append(self: PZmsg; var FrameP: PZframe): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove first frame from message, if any. Returns frame, or NULL.
-  function zmsg_pop(self: PZmsg): PZframe; cdecl; external lib_czmq;
+  function zmsg_pop(self: PZmsg): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push block of memory to front of message, as a new frame.
   // Returns 0 on success, -1 on error.
-  function zmsg_pushmem(self: PZmsg; Data: PByte; Size: NativeUInt): Integer; cdecl; external lib_czmq;
+  function zmsg_pushmem(self: PZmsg; Data: PByte; Size: NativeUInt): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add block of memory to the end of the message, as a new frame.
   // Returns 0 on success, -1 on error.
-  function zmsg_addmem(self: PZmsg; Data: PByte; Size: NativeUInt): Integer; cdecl; external lib_czmq;
+  function zmsg_addmem(self: PZmsg; Data: PByte; Size: NativeUInt): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push string as new frame to front of message.
   // Returns 0 on success, -1 on error.
-  function zmsg_pushstr(self: PZmsg; &String: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zmsg_pushstr(self: PZmsg; &String: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push string as new frame to end of message.
   // Returns 0 on success, -1 on error.
-  function zmsg_addstr(self: PZmsg; &String: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zmsg_addstr(self: PZmsg; &String: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push formatted string as new frame to front of message.
   // Returns 0 on success, -1 on error.
-  function zmsg_pushstrf(self: PZmsg; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zmsg_pushstrf(self: PZmsg; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push formatted string as new frame to end of message.
   // Returns 0 on success, -1 on error.
-  function zmsg_addstrf(self: PZmsg; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zmsg_addstrf(self: PZmsg; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Pop frame off front of message, return as fresh string. If there were
   // no more frames in the message, returns NULL.
-  function zmsg_popstr(self: PZmsg): PAnsiChar; cdecl; external lib_czmq;
+  function zmsg_popstr(self: PZmsg): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push encoded message as a new frame. Message takes ownership of
   // submessage, so the original is destroyed in this call. Returns 0 on
   // success, -1 on error.
-  function zmsg_addmsg(self: PZmsg; var MsgP: PZmsg): Integer; cdecl; external lib_czmq;
+  function zmsg_addmsg(self: PZmsg; var MsgP: PZmsg): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove first submessage from message, if any. Returns zmsg_t, or NULL if
   // decoding was not successful.
-  function zmsg_popmsg(self: PZmsg): PZmsg; cdecl; external lib_czmq;
+  function zmsg_popmsg(self: PZmsg): PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove specified frame from list, if present. Does not destroy frame.
-  procedure zmsg_remove(self: PZmsg; Frame: PZframe); cdecl; external lib_czmq;
+  procedure zmsg_remove(self: PZmsg; Frame: PZframe); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set cursor to first frame in message. Returns frame, or NULL, if the
   // message is empty. Use this to navigate the frames as a list.
-  function zmsg_first(self: PZmsg): PZframe; cdecl; external lib_czmq;
+  function zmsg_first(self: PZmsg): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the next frame. If there are no more frames, returns NULL. To move
   // to the first frame call zmsg_first(). Advances the cursor.
-  function zmsg_next(self: PZmsg): PZframe; cdecl; external lib_czmq;
+  function zmsg_next(self: PZmsg): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the last frame. If there are no frames, returns NULL.
-  function zmsg_last(self: PZmsg): PZframe; cdecl; external lib_czmq;
+  function zmsg_last(self: PZmsg): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Save message to an open file, return 0 if OK, else -1. The message is
   // saved as a series of frames, each with length and data. Note that the
   // file is NOT guaranteed to be portable between operating systems, not
   // versions of CZMQ. The file format is at present undocumented and liable
   // to arbitrary change.
-  function zmsg_save(self: PZmsg; &File: Pointer): Integer; cdecl; external lib_czmq;
+  function zmsg_save(self: PZmsg; &File: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Serialize multipart message to a single message frame. Use this method
   // to send structured messages across transports that do not support
   // multipart data. Allocates and returns a new frame containing the
   // serialized message. To decode a serialized message frame, use
   // zmsg_decode ().
-  function zmsg_encode(self: PZmsg): PZframe; cdecl; external lib_czmq;
+  function zmsg_encode(self: PZmsg): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create copy of message, as new message object. Returns a fresh zmsg_t
   // object. If message is null, or memory was exhausted, returns null.
-  function zmsg_dup(self: PZmsg): PZmsg; cdecl; external lib_czmq;
+  function zmsg_dup(self: PZmsg): PZmsg; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send message to zsys log sink (may be stdout, or system facility as
   // configured by zsys_set_logstream).
-  procedure zmsg_print(self: PZmsg); cdecl; external lib_czmq;
+  procedure zmsg_print(self: PZmsg); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the two messages have the same number of frames and each
   // frame in the first message is identical to the corresponding frame in the
   // other message. As with zframe_eq, return false if either message is NULL.
-  function zmsg_eq(self: PZmsg; Other: PZmsg): Boolean; cdecl; external lib_czmq;
+  function zmsg_eq(self: PZmsg; Other: PZmsg): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return signal value, 0 or greater, if message is a signal, -1 if not.
-  function zmsg_signal(self: PZmsg): Integer; cdecl; external lib_czmq;
+  function zmsg_signal(self: PZmsg): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied object, and report if it looks like a zmsg_t.
-  function zmsg_is(This: Pointer): Boolean; cdecl; external lib_czmq;
+  function zmsg_is(This: Pointer): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zmsg_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zmsg_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zpoller *)
 (* event-driven reactor *)
@@ -1856,24 +1870,24 @@ type
   // Create new poller, specifying zero or more readers. The list of
   // readers ends in a NULL. Each reader can be a zsock_t instance, a
   // zactor_t instance, a libzmq socket (void *), or a file handle.
-  function zpoller_new(Reader: PZSock): PZpoller; cdecl; varargs; external lib_czmq;
+  function zpoller_new(Reader: PZSock): PZpoller; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a poller
-  procedure zpoller_destroy(var self: PZpoller); cdecl; external lib_czmq;
+  procedure zpoller_destroy(var self: PZpoller); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
   // be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
-  function zpoller_add(self: PZpoller; Reader: PZSock): Integer; cdecl; external lib_czmq;
+  function zpoller_add(self: PZpoller; Reader: PZSock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
   // must have been passed during construction, or in an zpoller_add () call.
-  function zpoller_remove(self: PZpoller; Reader: Pointer): Integer; cdecl; external lib_czmq;
+  function zpoller_remove(self: PZpoller; Reader: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // By default the poller stops if the process receives a SIGINT or SIGTERM
   // signal. This makes it impossible to shut-down message based architectures
   // like zactors. This method lets you switch off break handling. The default
   // nonstop setting is off (false).
-  procedure zpoller_set_nonstop(self: PZpoller; Nonstop: Boolean); cdecl; external lib_czmq;
+  procedure zpoller_set_nonstop(self: PZpoller; Nonstop: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Poll the registered readers for I/O, return first reader that has input.
   // The reader will be a libzmq void * socket, or a zsock_t or zactor_t
@@ -1884,18 +1898,18 @@ type
   // or the ZMQ context was destroyed, or the timeout expired, returns NULL.
   // You can test the actual exit condition by calling zpoller_expired () and
   // zpoller_terminated (). The timeout is in msec.
-  function zpoller_wait(self: PZpoller; Timeout: Integer): PZSock; cdecl; external lib_czmq;
+  function zpoller_wait(self: PZpoller; Timeout: Integer): PZSock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the last zpoller_wait () call ended because the timeout
   // expired, without any error.
-  function zpoller_expired(self: PZpoller): Boolean; cdecl; external lib_czmq;
+  function zpoller_expired(self: PZpoller): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the last zpoller_wait () call ended because the process
   // was interrupted, or the parent context was destroyed.
-  function zpoller_terminated(self: PZpoller): Boolean; cdecl; external lib_czmq;
+  function zpoller_terminated(self: PZpoller): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zpoller_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zpoller_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zsock *)
 (* high-level socket API that hides libzmq contexts and sockets *)
@@ -1906,66 +1920,66 @@ type
   // variant, enabling intelligent socket leak detection. This can have
   // performance implications if you use a LOT of sockets. To turn off this
   // redirection behaviour, define ZSOCK_NOCHECK.
-  function zsock_new(&Type: Integer): PZsock; cdecl; external lib_czmq;
+  function zsock_new(&Type: Integer): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a PUB socket. Default action is bind.
-  function zsock_new_pub(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_pub(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a SUB socket, and optionally subscribe to some prefix string. Default
   // action is connect.
-  function zsock_new_sub(Endpoint: PAnsiChar; Subscribe: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_sub(Endpoint: PAnsiChar; Subscribe: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a REQ socket. Default action is connect.
-  function zsock_new_req(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_req(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a REP socket. Default action is bind.
-  function zsock_new_rep(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_rep(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a DEALER socket. Default action is connect.
-  function zsock_new_dealer(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_dealer(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a ROUTER socket. Default action is bind.
-  function zsock_new_router(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_router(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a PUSH socket. Default action is connect.
-  function zsock_new_push(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_push(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a PULL socket. Default action is bind.
-  function zsock_new_pull(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_pull(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create an XPUB socket. Default action is bind.
-  function zsock_new_xpub(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_xpub(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create an XSUB socket. Default action is connect.
-  function zsock_new_xsub(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_xsub(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a PAIR socket. Default action is connect.
-  function zsock_new_pair(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_pair(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a STREAM socket. Default action is connect.
-  function zsock_new_stream(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_stream(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a SERVER socket. Default action is bind.
-  function zsock_new_server(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_server(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a CLIENT socket. Default action is connect.
-  function zsock_new_client(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_client(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a RADIO socket. Default action is bind.
-  function zsock_new_radio(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_radio(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a DISH socket. Default action is connect.
-  function zsock_new_dish(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_dish(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a GATHER socket. Default action is bind.
-  function zsock_new_gather(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_gather(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a SCATTER socket. Default action is connect.
-  function zsock_new_scatter(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq;
+  function zsock_new_scatter(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy the socket. You must use this for any socket created via the
   // zsock_new method.
-  procedure zsock_destroy(var self: PZsock); cdecl; external lib_czmq;
+  procedure zsock_destroy(var self: PZsock); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
   // ephemeral ports, if you specify the port number as "*". By default
@@ -1987,24 +2001,24 @@ type
   // ephemeral ports, a port may be reused by different services without
   // clients being aware. Protocols that run on ephemeral ports should take
   // this into account.
-  function zsock_bind(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_bind(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns last bound endpoint, if any.
-  function zsock_endpoint(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_endpoint(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Unbind a socket from a formatted endpoint.
   // Returns 0 if OK, -1 if the endpoint was invalid or the function
   // isn't supported.
-  function zsock_unbind(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_unbind(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Connect a socket to a formatted endpoint
   // Returns 0 if OK, -1 if the endpoint was invalid.
-  function zsock_connect(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_connect(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Disconnect a socket from a formatted endpoint
   // Returns 0 if OK, -1 if the endpoint was invalid or the function
   // isn't supported.
-  function zsock_disconnect(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_disconnect(self: PZsock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Attach a socket to zero or more endpoints. If endpoints is not null,
   // parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
@@ -2012,10 +2026,10 @@ type
   // endpoints were valid, or -1 if there was a syntax error. If the endpoint
   // does not start with '@' or '>', the serverish argument defines whether
   // it is used to bind (serverish = true) or connect (serverish = false).
-  function zsock_attach(self: PZsock; Endpoints: PAnsiChar; Serverish: Boolean): Integer; cdecl; external lib_czmq;
+  function zsock_attach(self: PZsock; Endpoints: PAnsiChar; Serverish: Boolean): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns socket type as printable constant string.
-  function zsock_type_str(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_type_str(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a 'picture' message to the socket (or actor). The picture is a
   // string that defines the type of each frame. This makes it easy to send
@@ -2044,12 +2058,12 @@ type
   // have data in a zchunk or zframe. Does not change or take ownership of
   // any arguments. Returns 0 if successful, -1 if sending failed for any
   // reason.
-  function zsock_send(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_send(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a 'picture' message to the socket (or actor). This is a va_list
   // version of zsock_send (), so please consult its documentation for the
   // details.
-  function zsock_vsend(self: PZsock; Picture: PAnsiChar; Argptr: va_list): Integer; cdecl; external lib_czmq;
+  function zsock_vsend(self: PZsock; Picture: PAnsiChar; Argptr: va_list): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive a 'picture' message to the socket (or actor). See zsock_send for
   // the format and meaning of the picture. Returns the picture elements into
@@ -2078,12 +2092,12 @@ type
   // If an argument pointer is NULL, does not store any value (skips it).
   // An 'n' picture matches an empty frame; if the message does not match,
   // the method will return -1.
-  function zsock_recv(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_recv(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive a 'picture' message from the socket (or actor). This is a
   // va_list version of zsock_recv (), so please consult its documentation
   // for the details.
-  function zsock_vrecv(self: PZsock; Picture: PAnsiChar; Argptr: va_list): Integer; cdecl; external lib_czmq;
+  function zsock_vrecv(self: PZsock; Picture: PAnsiChar; Argptr: va_list): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a binary encoded 'picture' message to the socket (or actor). This
   // method is similar to zsock_send, except the arguments are encoded in a
@@ -2106,7 +2120,7 @@ type
   //
   // Does not change or take ownership of any arguments. Returns 0 if
   // successful, -1 if sending failed for any reason.
-  function zsock_bsend(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_bsend(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive a binary encoded 'picture' message from the socket (or actor).
   // This method is similar to zsock_recv, except the arguments are encoded
@@ -2125,678 +2139,678 @@ type
   // depending on the object as zsock_brecv will create new objects.
   // For type p the caller must coordinate with the sender, as it is just a
   // pointer value being passed.
-  function zsock_brecv(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsock_brecv(self: PZsock; Picture: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return socket routing ID if any. This returns 0 if the socket is not
   // of type ZMQ_SERVER or if no request was already received on it.
-  function zsock_routing_id(self: PZsock): Cardinal; cdecl; external lib_czmq;
+  function zsock_routing_id(self: PZsock): Cardinal; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
   // This will be used when sending messages on the socket via the zsock API.
-  procedure zsock_set_routing_id(self: PZsock; RoutingId: Cardinal); cdecl; external lib_czmq;
+  procedure zsock_set_routing_id(self: PZsock; RoutingId: Cardinal); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket to use unbounded pipes (HWM=0); use this in cases when you are
   // totally certain the message volume can fit in memory. This method works
   // across all versions of ZeroMQ. Takes a polymorphic socket reference.
-  procedure zsock_set_unbounded(self: PZsock); cdecl; external lib_czmq;
+  procedure zsock_set_unbounded(self: PZsock); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a signal over a socket. A signal is a short message carrying a
   // success/failure code (by convention, 0 means OK). Signals are encoded
   // to be distinguishable from "normal" messages. Accepts a zsock_t or a
   // zactor_t argument, and returns 0 if successful, -1 if the signal could
   // not be sent. Takes a polymorphic socket reference.
-  function zsock_signal(self: PZsock; Status: Byte): Integer; cdecl; external lib_czmq;
+  function zsock_signal(self: PZsock; Status: Byte): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Wait on a signal. Use this to coordinate between threads, over pipe
   // pairs. Blocks until the signal is received. Returns -1 on error, 0 or
   // greater on success. Accepts a zsock_t or a zactor_t as argument.
   // Takes a polymorphic socket reference.
-  function zsock_wait(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_wait(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // If there is a partial message still waiting on the socket, remove and
   // discard it. This is useful when reading partial messages, to get specific
   // message types.
-  procedure zsock_flush(self: PZsock); cdecl; external lib_czmq;
+  procedure zsock_flush(self: PZsock); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
   // Returns 0 if OK, -1 if failed.
-  function zsock_join(self: PZsock; Group: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zsock_join(self: PZsock; Group: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
   // Returns 0 if OK, -1 if failed.
-  function zsock_leave(self: PZsock; Group: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zsock_leave(self: PZsock; Group: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied object, and report if it looks like a zsock_t.
   // Takes a polymorphic socket reference.
-  function zsock_is(This: Pointer): Boolean; cdecl; external lib_czmq;
+  function zsock_is(This: Pointer): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied reference. If it looks like a zsock_t instance, return
   // the underlying libzmq socket handle; else if it looks like a file
   // descriptor, return NULL; else if it looks like a libzmq socket handle,
   // return the supplied value. Takes a polymorphic socket reference.
-  function zsock_resolve(This: Pointer): Pointer; cdecl; external lib_czmq;
+  function zsock_resolve(This: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Check whether the socket has available message to read.
-  function zsock_has_in(self: PZsock): Boolean; cdecl; external lib_czmq;
+  function zsock_has_in(self: PZsock): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `router_notify`.
   // Available from libzmq 4.3.0.
-  function zsock_router_notify(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_router_notify(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `router_notify`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_router_notify(self: PZsock; RouterNotify: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_router_notify(self: PZsock; RouterNotify: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `multicast_loop`.
   // Available from libzmq 4.3.0.
-  function zsock_multicast_loop(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_multicast_loop(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `multicast_loop`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_multicast_loop(self: PZsock; MulticastLoop: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_multicast_loop(self: PZsock; MulticastLoop: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `metadata`.
   // Available from libzmq 4.3.0.
-  function zsock_metadata(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_metadata(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `metadata`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_metadata(self: PZsock; Metadata: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_metadata(self: PZsock; Metadata: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `loopback_fastpath`.
   // Available from libzmq 4.3.0.
-  function zsock_loopback_fastpath(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_loopback_fastpath(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `loopback_fastpath`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_loopback_fastpath(self: PZsock; LoopbackFastpath: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_loopback_fastpath(self: PZsock; LoopbackFastpath: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `zap_enforce_domain`.
   // Available from libzmq 4.3.0.
-  function zsock_zap_enforce_domain(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_zap_enforce_domain(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `zap_enforce_domain`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_zap_enforce_domain(self: PZsock; ZapEnforceDomain: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_zap_enforce_domain(self: PZsock; ZapEnforceDomain: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `gssapi_principal_nametype`.
   // Available from libzmq 4.3.0.
-  function zsock_gssapi_principal_nametype(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_gssapi_principal_nametype(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `gssapi_principal_nametype`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_gssapi_principal_nametype(self: PZsock; GssapiPrincipalNametype: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_gssapi_principal_nametype(self: PZsock; GssapiPrincipalNametype: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `gssapi_service_principal_nametype`.
   // Available from libzmq 4.3.0.
-  function zsock_gssapi_service_principal_nametype(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_gssapi_service_principal_nametype(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `gssapi_service_principal_nametype`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_gssapi_service_principal_nametype(self: PZsock; GssapiServicePrincipalNametype: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_gssapi_service_principal_nametype(self: PZsock; GssapiServicePrincipalNametype: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `bindtodevice`.
   // Available from libzmq 4.3.0.
-  function zsock_bindtodevice(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_bindtodevice(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `bindtodevice`.
   // Available from libzmq 4.3.0.
-  procedure zsock_set_bindtodevice(self: PZsock; Bindtodevice: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_bindtodevice(self: PZsock; Bindtodevice: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `heartbeat_ivl`.
   // Available from libzmq 4.2.0.
-  function zsock_heartbeat_ivl(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_heartbeat_ivl(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `heartbeat_ivl`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_heartbeat_ivl(self: PZsock; HeartbeatIvl: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_heartbeat_ivl(self: PZsock; HeartbeatIvl: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `heartbeat_ttl`.
   // Available from libzmq 4.2.0.
-  function zsock_heartbeat_ttl(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_heartbeat_ttl(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `heartbeat_ttl`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_heartbeat_ttl(self: PZsock; HeartbeatTtl: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_heartbeat_ttl(self: PZsock; HeartbeatTtl: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `heartbeat_timeout`.
   // Available from libzmq 4.2.0.
-  function zsock_heartbeat_timeout(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_heartbeat_timeout(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `heartbeat_timeout`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_heartbeat_timeout(self: PZsock; HeartbeatTimeout: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_heartbeat_timeout(self: PZsock; HeartbeatTimeout: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `use_fd`.
   // Available from libzmq 4.2.0.
-  function zsock_use_fd(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_use_fd(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `use_fd`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_use_fd(self: PZsock; UseFd: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_use_fd(self: PZsock; UseFd: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `xpub_manual`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_xpub_manual(self: PZsock; XpubManual: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_xpub_manual(self: PZsock; XpubManual: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `xpub_welcome_msg`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_xpub_welcome_msg(self: PZsock; XpubWelcomeMsg: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_xpub_welcome_msg(self: PZsock; XpubWelcomeMsg: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `stream_notify`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_stream_notify(self: PZsock; StreamNotify: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_stream_notify(self: PZsock; StreamNotify: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `invert_matching`.
   // Available from libzmq 4.2.0.
-  function zsock_invert_matching(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_invert_matching(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `invert_matching`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_invert_matching(self: PZsock; InvertMatching: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_invert_matching(self: PZsock; InvertMatching: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `xpub_verboser`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_xpub_verboser(self: PZsock; XpubVerboser: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_xpub_verboser(self: PZsock; XpubVerboser: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `connect_timeout`.
   // Available from libzmq 4.2.0.
-  function zsock_connect_timeout(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_connect_timeout(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `connect_timeout`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_connect_timeout(self: PZsock; ConnectTimeout: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_connect_timeout(self: PZsock; ConnectTimeout: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `tcp_maxrt`.
   // Available from libzmq 4.2.0.
-  function zsock_tcp_maxrt(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_tcp_maxrt(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `tcp_maxrt`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_tcp_maxrt(self: PZsock; TcpMaxrt: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_tcp_maxrt(self: PZsock; TcpMaxrt: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `thread_safe`.
   // Available from libzmq 4.2.0.
-  function zsock_thread_safe(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_thread_safe(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `multicast_maxtpdu`.
   // Available from libzmq 4.2.0.
-  function zsock_multicast_maxtpdu(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_multicast_maxtpdu(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `multicast_maxtpdu`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_multicast_maxtpdu(self: PZsock; MulticastMaxtpdu: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_multicast_maxtpdu(self: PZsock; MulticastMaxtpdu: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `vmci_buffer_size`.
   // Available from libzmq 4.2.0.
-  function zsock_vmci_buffer_size(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_vmci_buffer_size(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `vmci_buffer_size`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_vmci_buffer_size(self: PZsock; VmciBufferSize: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_vmci_buffer_size(self: PZsock; VmciBufferSize: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `vmci_buffer_min_size`.
   // Available from libzmq 4.2.0.
-  function zsock_vmci_buffer_min_size(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_vmci_buffer_min_size(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `vmci_buffer_min_size`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_vmci_buffer_min_size(self: PZsock; VmciBufferMinSize: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_vmci_buffer_min_size(self: PZsock; VmciBufferMinSize: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `vmci_buffer_max_size`.
   // Available from libzmq 4.2.0.
-  function zsock_vmci_buffer_max_size(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_vmci_buffer_max_size(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `vmci_buffer_max_size`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_vmci_buffer_max_size(self: PZsock; VmciBufferMaxSize: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_vmci_buffer_max_size(self: PZsock; VmciBufferMaxSize: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `vmci_connect_timeout`.
   // Available from libzmq 4.2.0.
-  function zsock_vmci_connect_timeout(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_vmci_connect_timeout(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `vmci_connect_timeout`.
   // Available from libzmq 4.2.0.
-  procedure zsock_set_vmci_connect_timeout(self: PZsock; VmciConnectTimeout: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_vmci_connect_timeout(self: PZsock; VmciConnectTimeout: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `tos`.
   // Available from libzmq 4.1.0.
-  function zsock_tos(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_tos(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `tos`.
   // Available from libzmq 4.1.0.
-  procedure zsock_set_tos(self: PZsock; Tos: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_tos(self: PZsock; Tos: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `router_handover`.
   // Available from libzmq 4.1.0.
-  procedure zsock_set_router_handover(self: PZsock; RouterHandover: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_router_handover(self: PZsock; RouterHandover: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `connect_rid`.
   // Available from libzmq 4.1.0.
-  procedure zsock_set_connect_rid(self: PZsock; ConnectRid: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_connect_rid(self: PZsock; ConnectRid: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `connect_rid` from 32-octet binary
   // Available from libzmq 4.1.0.
-  procedure zsock_set_connect_rid_bin(self: PZsock; ConnectRid: PByte); cdecl; external lib_czmq;
+  procedure zsock_set_connect_rid_bin(self: PZsock; ConnectRid: PByte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `handshake_ivl`.
   // Available from libzmq 4.1.0.
-  function zsock_handshake_ivl(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_handshake_ivl(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `handshake_ivl`.
   // Available from libzmq 4.1.0.
-  procedure zsock_set_handshake_ivl(self: PZsock; HandshakeIvl: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_handshake_ivl(self: PZsock; HandshakeIvl: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `socks_proxy`.
   // Available from libzmq 4.1.0.
-  function zsock_socks_proxy(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_socks_proxy(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `socks_proxy`.
   // Available from libzmq 4.1.0.
-  procedure zsock_set_socks_proxy(self: PZsock; SocksProxy: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_socks_proxy(self: PZsock; SocksProxy: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `xpub_nodrop`.
   // Available from libzmq 4.1.0.
-  procedure zsock_set_xpub_nodrop(self: PZsock; XpubNodrop: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_xpub_nodrop(self: PZsock; XpubNodrop: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `router_mandatory`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_router_mandatory(self: PZsock; RouterMandatory: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_router_mandatory(self: PZsock; RouterMandatory: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `probe_router`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_probe_router(self: PZsock; ProbeRouter: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_probe_router(self: PZsock; ProbeRouter: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `req_relaxed`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_req_relaxed(self: PZsock; ReqRelaxed: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_req_relaxed(self: PZsock; ReqRelaxed: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `req_correlate`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_req_correlate(self: PZsock; ReqCorrelate: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_req_correlate(self: PZsock; ReqCorrelate: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `conflate`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_conflate(self: PZsock; Conflate: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_conflate(self: PZsock; Conflate: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `zap_domain`.
   // Available from libzmq 4.0.0.
-  function zsock_zap_domain(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_zap_domain(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `zap_domain`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_zap_domain(self: PZsock; ZapDomain: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_zap_domain(self: PZsock; ZapDomain: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `mechanism`.
   // Available from libzmq 4.0.0.
-  function zsock_mechanism(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_mechanism(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `plain_server`.
   // Available from libzmq 4.0.0.
-  function zsock_plain_server(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_plain_server(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `plain_server`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_plain_server(self: PZsock; PlainServer: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_plain_server(self: PZsock; PlainServer: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `plain_username`.
   // Available from libzmq 4.0.0.
-  function zsock_plain_username(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_plain_username(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `plain_username`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_plain_username(self: PZsock; PlainUsername: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_plain_username(self: PZsock; PlainUsername: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `plain_password`.
   // Available from libzmq 4.0.0.
-  function zsock_plain_password(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_plain_password(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `plain_password`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_plain_password(self: PZsock; PlainPassword: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_plain_password(self: PZsock; PlainPassword: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `curve_server`.
   // Available from libzmq 4.0.0.
-  function zsock_curve_server(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_curve_server(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `curve_server`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_curve_server(self: PZsock; CurveServer: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_curve_server(self: PZsock; CurveServer: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `curve_publickey`.
   // Available from libzmq 4.0.0.
-  function zsock_curve_publickey(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_curve_publickey(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `curve_publickey`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_curve_publickey(self: PZsock; CurvePublickey: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_curve_publickey(self: PZsock; CurvePublickey: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `curve_publickey` from 32-octet binary
   // Available from libzmq 4.0.0.
-  procedure zsock_set_curve_publickey_bin(self: PZsock; CurvePublickey: PByte); cdecl; external lib_czmq;
+  procedure zsock_set_curve_publickey_bin(self: PZsock; CurvePublickey: PByte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `curve_secretkey`.
   // Available from libzmq 4.0.0.
-  function zsock_curve_secretkey(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_curve_secretkey(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `curve_secretkey`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_curve_secretkey(self: PZsock; CurveSecretkey: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_curve_secretkey(self: PZsock; CurveSecretkey: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `curve_secretkey` from 32-octet binary
   // Available from libzmq 4.0.0.
-  procedure zsock_set_curve_secretkey_bin(self: PZsock; CurveSecretkey: PByte); cdecl; external lib_czmq;
+  procedure zsock_set_curve_secretkey_bin(self: PZsock; CurveSecretkey: PByte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `curve_serverkey`.
   // Available from libzmq 4.0.0.
-  function zsock_curve_serverkey(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_curve_serverkey(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `curve_serverkey`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_curve_serverkey(self: PZsock; CurveServerkey: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_curve_serverkey(self: PZsock; CurveServerkey: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `curve_serverkey` from 32-octet binary
   // Available from libzmq 4.0.0.
-  procedure zsock_set_curve_serverkey_bin(self: PZsock; CurveServerkey: PByte); cdecl; external lib_czmq;
+  procedure zsock_set_curve_serverkey_bin(self: PZsock; CurveServerkey: PByte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `gssapi_server`.
   // Available from libzmq 4.0.0.
-  function zsock_gssapi_server(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_gssapi_server(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `gssapi_server`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_gssapi_server(self: PZsock; GssapiServer: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_gssapi_server(self: PZsock; GssapiServer: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `gssapi_plaintext`.
   // Available from libzmq 4.0.0.
-  function zsock_gssapi_plaintext(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_gssapi_plaintext(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `gssapi_plaintext`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_gssapi_plaintext(self: PZsock; GssapiPlaintext: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_gssapi_plaintext(self: PZsock; GssapiPlaintext: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `gssapi_principal`.
   // Available from libzmq 4.0.0.
-  function zsock_gssapi_principal(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_gssapi_principal(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `gssapi_principal`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_gssapi_principal(self: PZsock; GssapiPrincipal: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_gssapi_principal(self: PZsock; GssapiPrincipal: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `gssapi_service_principal`.
   // Available from libzmq 4.0.0.
-  function zsock_gssapi_service_principal(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_gssapi_service_principal(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `gssapi_service_principal`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_gssapi_service_principal(self: PZsock; GssapiServicePrincipal: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_gssapi_service_principal(self: PZsock; GssapiServicePrincipal: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `ipv6`.
   // Available from libzmq 4.0.0.
-  function zsock_ipv6(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_ipv6(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `ipv6`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_ipv6(self: PZsock; Ipv6: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_ipv6(self: PZsock; Ipv6: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `immediate`.
   // Available from libzmq 4.0.0.
-  function zsock_immediate(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_immediate(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `immediate`.
   // Available from libzmq 4.0.0.
-  procedure zsock_set_immediate(self: PZsock; Immediate: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_immediate(self: PZsock; Immediate: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `sndhwm`.
   // Available from libzmq 3.0.0.
-  function zsock_sndhwm(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_sndhwm(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `sndhwm`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_sndhwm(self: PZsock; Sndhwm: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_sndhwm(self: PZsock; Sndhwm: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `rcvhwm`.
   // Available from libzmq 3.0.0.
-  function zsock_rcvhwm(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_rcvhwm(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `rcvhwm`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_rcvhwm(self: PZsock; Rcvhwm: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_rcvhwm(self: PZsock; Rcvhwm: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `maxmsgsize`.
   // Available from libzmq 3.0.0.
-  function zsock_maxmsgsize(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_maxmsgsize(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `maxmsgsize`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_maxmsgsize(self: PZsock; Maxmsgsize: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_maxmsgsize(self: PZsock; Maxmsgsize: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `multicast_hops`.
   // Available from libzmq 3.0.0.
-  function zsock_multicast_hops(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_multicast_hops(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `multicast_hops`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_multicast_hops(self: PZsock; MulticastHops: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_multicast_hops(self: PZsock; MulticastHops: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `xpub_verbose`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_xpub_verbose(self: PZsock; XpubVerbose: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_xpub_verbose(self: PZsock; XpubVerbose: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `tcp_keepalive`.
   // Available from libzmq 3.0.0.
-  function zsock_tcp_keepalive(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_tcp_keepalive(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `tcp_keepalive`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_tcp_keepalive(self: PZsock; TcpKeepalive: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_tcp_keepalive(self: PZsock; TcpKeepalive: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `tcp_keepalive_idle`.
   // Available from libzmq 3.0.0.
-  function zsock_tcp_keepalive_idle(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_tcp_keepalive_idle(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `tcp_keepalive_idle`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_tcp_keepalive_idle(self: PZsock; TcpKeepaliveIdle: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_tcp_keepalive_idle(self: PZsock; TcpKeepaliveIdle: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `tcp_keepalive_cnt`.
   // Available from libzmq 3.0.0.
-  function zsock_tcp_keepalive_cnt(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_tcp_keepalive_cnt(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `tcp_keepalive_cnt`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_tcp_keepalive_cnt(self: PZsock; TcpKeepaliveCnt: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_tcp_keepalive_cnt(self: PZsock; TcpKeepaliveCnt: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `tcp_keepalive_intvl`.
   // Available from libzmq 3.0.0.
-  function zsock_tcp_keepalive_intvl(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_tcp_keepalive_intvl(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `tcp_keepalive_intvl`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_tcp_keepalive_intvl(self: PZsock; TcpKeepaliveIntvl: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_tcp_keepalive_intvl(self: PZsock; TcpKeepaliveIntvl: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `tcp_accept_filter`.
   // Available from libzmq 3.0.0.
-  function zsock_tcp_accept_filter(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_tcp_accept_filter(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `tcp_accept_filter`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_tcp_accept_filter(self: PZsock; TcpAcceptFilter: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_tcp_accept_filter(self: PZsock; TcpAcceptFilter: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `last_endpoint`.
   // Available from libzmq 3.0.0.
-  function zsock_last_endpoint(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_last_endpoint(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `router_raw`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_router_raw(self: PZsock; RouterRaw: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_router_raw(self: PZsock; RouterRaw: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `ipv4only`.
   // Available from libzmq 3.0.0.
-  function zsock_ipv4only(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_ipv4only(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `ipv4only`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_ipv4only(self: PZsock; Ipv4only: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_ipv4only(self: PZsock; Ipv4only: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `delay_attach_on_connect`.
   // Available from libzmq 3.0.0.
-  procedure zsock_set_delay_attach_on_connect(self: PZsock; DelayAttachOnConnect: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_delay_attach_on_connect(self: PZsock; DelayAttachOnConnect: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `hwm`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  function zsock_hwm(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_hwm(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `hwm`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  procedure zsock_set_hwm(self: PZsock; Hwm: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_hwm(self: PZsock; Hwm: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `swap`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  function zsock_swap(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_swap(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `swap`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  procedure zsock_set_swap(self: PZsock; Swap: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_swap(self: PZsock; Swap: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `affinity`.
   // Available from libzmq 2.0.0.
-  function zsock_affinity(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_affinity(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `affinity`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_affinity(self: PZsock; Affinity: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_affinity(self: PZsock; Affinity: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `identity`.
   // Available from libzmq 2.0.0.
-  function zsock_identity(self: PZsock): PAnsiChar; cdecl; external lib_czmq;
+  function zsock_identity(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `identity`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_identity(self: PZsock; Identity: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_identity(self: PZsock; Identity: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `rate`.
   // Available from libzmq 2.0.0.
-  function zsock_rate(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_rate(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `rate`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_rate(self: PZsock; Rate: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_rate(self: PZsock; Rate: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `recovery_ivl`.
   // Available from libzmq 2.0.0.
-  function zsock_recovery_ivl(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_recovery_ivl(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `recovery_ivl`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_recovery_ivl(self: PZsock; RecoveryIvl: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_recovery_ivl(self: PZsock; RecoveryIvl: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `recovery_ivl_msec`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  function zsock_recovery_ivl_msec(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_recovery_ivl_msec(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `recovery_ivl_msec`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  procedure zsock_set_recovery_ivl_msec(self: PZsock; RecoveryIvlMsec: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_recovery_ivl_msec(self: PZsock; RecoveryIvlMsec: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `mcast_loop`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  function zsock_mcast_loop(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_mcast_loop(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `mcast_loop`.
   // Available from libzmq 2.0.0 to 3.0.0.
-  procedure zsock_set_mcast_loop(self: PZsock; McastLoop: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_mcast_loop(self: PZsock; McastLoop: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `rcvtimeo`.
   // Available from libzmq 2.2.0.
-  function zsock_rcvtimeo(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_rcvtimeo(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `rcvtimeo`.
   // Available from libzmq 2.2.0.
-  procedure zsock_set_rcvtimeo(self: PZsock; Rcvtimeo: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_rcvtimeo(self: PZsock; Rcvtimeo: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `sndtimeo`.
   // Available from libzmq 2.2.0.
-  function zsock_sndtimeo(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_sndtimeo(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `sndtimeo`.
   // Available from libzmq 2.2.0.
-  procedure zsock_set_sndtimeo(self: PZsock; Sndtimeo: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_sndtimeo(self: PZsock; Sndtimeo: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `sndbuf`.
   // Available from libzmq 2.0.0.
-  function zsock_sndbuf(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_sndbuf(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `sndbuf`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_sndbuf(self: PZsock; Sndbuf: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_sndbuf(self: PZsock; Sndbuf: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `rcvbuf`.
   // Available from libzmq 2.0.0.
-  function zsock_rcvbuf(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_rcvbuf(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `rcvbuf`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_rcvbuf(self: PZsock; Rcvbuf: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_rcvbuf(self: PZsock; Rcvbuf: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `linger`.
   // Available from libzmq 2.0.0.
-  function zsock_linger(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_linger(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `linger`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_linger(self: PZsock; Linger: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_linger(self: PZsock; Linger: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `reconnect_ivl`.
   // Available from libzmq 2.0.0.
-  function zsock_reconnect_ivl(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_reconnect_ivl(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `reconnect_ivl`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_reconnect_ivl(self: PZsock; ReconnectIvl: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_reconnect_ivl(self: PZsock; ReconnectIvl: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `reconnect_ivl_max`.
   // Available from libzmq 2.0.0.
-  function zsock_reconnect_ivl_max(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_reconnect_ivl_max(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `reconnect_ivl_max`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_reconnect_ivl_max(self: PZsock; ReconnectIvlMax: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_reconnect_ivl_max(self: PZsock; ReconnectIvlMax: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `backlog`.
   // Available from libzmq 2.0.0.
-  function zsock_backlog(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_backlog(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `backlog`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_backlog(self: PZsock; Backlog: Integer); cdecl; external lib_czmq;
+  procedure zsock_set_backlog(self: PZsock; Backlog: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `subscribe`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_subscribe(self: PZsock; Subscribe: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_subscribe(self: PZsock; Subscribe: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `unsubscribe`.
   // Available from libzmq 2.0.0.
-  procedure zsock_set_unsubscribe(self: PZsock; Unsubscribe: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsock_set_unsubscribe(self: PZsock; Unsubscribe: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `type`.
   // Available from libzmq 2.0.0.
-  function zsock_type(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_type(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `rcvmore`.
   // Available from libzmq 2.0.0.
-  function zsock_rcvmore(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_rcvmore(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `fd`.
   // Available from libzmq 2.0.0.
-  function zsock_fd(self: PZsock): TSocket; cdecl; external lib_czmq;
+  function zsock_fd(self: PZsock): TSocket; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get socket option `events`.
   // Available from libzmq 2.0.0.
-  function zsock_events(self: PZsock): Integer; cdecl; external lib_czmq;
+  function zsock_events(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zsock_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zsock_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zstr *)
 (* sending and receiving strings *)
@@ -2804,7 +2818,7 @@ type
   // Receive C string from socket. Caller must free returned string using
   // zstr_free(). Returns NULL if the context is being terminated or the
   // process was interrupted.
-  function zstr_recv(Source: PZSock): PAnsiChar; cdecl; external lib_czmq;
+  function zstr_recv(Source: PZSock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive a series of strings (until NULL) from multipart data.
   // Each string is allocated and filled with string data; if there
@@ -2813,66 +2827,67 @@ type
   // number of strings filled, zero or more. Free each returned string
   // using zstr_free(). If not enough strings are provided, remaining
   // multipart frames in the message are dropped.
-  function zstr_recvx(Source: PZSock; var StringP: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zstr_recvx(Source: PZSock; var StringP: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // De-compress and receive C string from socket, received as a message
   // with two frames: size of the uncompressed string, and the string itself.
   // Caller must free returned string using zstr_free(). Returns NULL if the
   // context is being terminated or the process was interrupted.
-  function zstr_recv_compress(Source: PZSock): PAnsiChar; cdecl; external lib_czmq;
+  function zstr_recv_compress(Source: PZSock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a C string to a socket, as a frame. The string is sent without
   // trailing null byte; to read this you can use zstr_recv, or a similar
   // method that adds a null terminator on the received string. String
   // may be NULL, which is sent as "".
-  function zstr_send(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zstr_send(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a C string to a socket, as zstr_send(), with a MORE flag, so that
   // you can send further strings in the same multi-part message.
-  function zstr_sendm(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zstr_sendm(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a formatted string to a socket. Note that you should NOT use
   // user-supplied strings in the format (they may contain '%' which
   // will create security holes).
-  function zstr_sendf(Dest: PZSock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zstr_sendf(Dest: PZSock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a formatted string to a socket, as for zstr_sendf(), with a
   // MORE flag, so that you can send further strings in the same multi-part
   // message.
-  function zstr_sendfm(Dest: PZSock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zstr_sendfm(Dest: PZSock; Format: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send a series of strings (until NULL) as multipart data
   // Returns 0 if the strings could be sent OK, or -1 on error.
-  function zstr_sendx(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zstr_sendx(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Compress and send a C string to a socket, as a message with two frames:
   // size of the uncompressed string, and the string itself. The string is
   // sent without trailing null byte; to read this you can use
   // zstr_recv_compress, or a similar method that de-compresses and adds a
   // null terminator on the received string.
-  function zstr_send_compress(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zstr_send_compress(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Compress and send a C string to a socket, as zstr_send_compress(),
   // with a MORE flag, so that you can send further strings in the same
   // multi-part message.
-  function zstr_sendm_compress(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zstr_sendm_compress(Dest: PZSock; &String: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Accepts a void pointer and returns a fresh character string. If source
   // is null, returns an empty string.
-  function zstr_str(Source: PZSock): PAnsiChar; cdecl; external lib_czmq;
+  function zstr_str(Source: PZSock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Free a provided string, and nullify the parent pointer. Safe to call on
   // a null pointer.
-  procedure zstr_free(var StringP: PAnsiChar); cdecl; external lib_czmq;
+  procedure zstr_free(var StringP: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zstr_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zstr_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zsys *)
 (*  *)
+
 type
 
-    // Callback for interrupt signal handler
+  // Callback for interrupt signal handler
   TZsysHandlerFn = procedure(SignalValue: Integer); stdcall;
   PZsysHandlerFn = ^TZsysHandlerFn;
 
@@ -2881,265 +2896,265 @@ type
   // earlier, so e.g. logging is properly set-up before you start working.
   // Not threadsafe, so call only from main thread. Safe to call multiple
   // times. Returns global CZMQ context.
-  function zsys_init: Pointer; cdecl; external lib_czmq;
+  function zsys_init: Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Optionally shut down the CZMQ zsys layer; this normally happens automatically
   // when the process exits; however this call lets you force a shutdown
   // earlier, avoiding any potential problems with atexit() ordering, especially
   // with Windows dlls.
-  procedure zsys_shutdown; cdecl; external lib_czmq;
+  procedure zsys_shutdown; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Get a new ZMQ socket, automagically creating a ZMQ context if this is
   // the first time. Caller is responsible for destroying the ZMQ socket
   // before process exits, to avoid a ZMQ deadlock. Note: you should not use
   // this method in CZMQ apps, use zsock_new() instead.
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  function zsys_socket(&Type: Integer; Filename: PAnsiChar; LineNbr: NativeUInt): Pointer; cdecl; external lib_czmq;
+  function zsys_socket(&Type: Integer; Filename: PAnsiChar; LineNbr: NativeUInt): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy/close a ZMQ socket. You should call this for every socket you
   // create using zsys_socket().
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  function zsys_close(Handle: Pointer; Filename: PAnsiChar; LineNbr: NativeUInt): Integer; cdecl; external lib_czmq;
+  function zsys_close(Handle: Pointer; Filename: PAnsiChar; LineNbr: NativeUInt): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return ZMQ socket name for socket type
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  function zsys_sockname(Socktype: Integer): PAnsiChar; cdecl; external lib_czmq;
+  function zsys_sockname(Socktype: Integer): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a pipe, which consists of two PAIR sockets connected over inproc.
   // The pipe is configured to use the zsys_pipehwm setting. Returns the
   // frontend socket successful, NULL if failed.
-  function zsys_create_pipe(var BackendP: PZsock): PZsock; cdecl; external lib_czmq;
+  function zsys_create_pipe(var BackendP: PZsock): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set interrupt handler; this saves the default handlers so that a
   // zsys_handler_reset () can restore them. If you call this multiple times
   // then the last handler will take affect. If handler_fn is NULL, disables
   // default SIGINT/SIGTERM handling in CZMQ.
-  procedure zsys_handler_set(HandlerFn: PZsysHandlerFn); cdecl; external lib_czmq;
+  procedure zsys_handler_set(HandlerFn: PZsysHandlerFn); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reset interrupt handler, call this at exit if needed
-  procedure zsys_handler_reset; cdecl; external lib_czmq;
+  procedure zsys_handler_reset; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set default interrupt handler, so Ctrl-C or SIGTERM will set
   // zsys_interrupted. Idempotent; safe to call multiple times.
   // Can be suppressed by ZSYS_SIGHANDLER=false
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  procedure zsys_catch_interrupts; cdecl; external lib_czmq;
+  procedure zsys_catch_interrupts; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Check if default interrupt handler of Ctrl-C or SIGTERM was called.
   // Does not work if ZSYS_SIGHANDLER is false and code does not call
   // set interrupted on signal.
-  function zsys_is_interrupted: Boolean; cdecl; external lib_czmq;
+  function zsys_is_interrupted: Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set interrupted flag. This is done by default signal handler, however
   // this can be handy for language bindings or cases without default
   // signal handler.
-  procedure zsys_set_interrupted; cdecl; external lib_czmq;
+  procedure zsys_set_interrupted; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return 1 if file exists, else zero
-  function zsys_file_exists(Filename: PAnsiChar): Boolean; cdecl; external lib_czmq;
+  function zsys_file_exists(Filename: PAnsiChar): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return file modification time. Returns 0 if the file does not exist.
-  function zsys_file_modified(Filename: PAnsiChar): Int64; cdecl; external lib_czmq;
+  function zsys_file_modified(Filename: PAnsiChar): Int64; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return file mode; provides at least support for the POSIX S_ISREG(m)
   // and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
   // Returns a mode_t cast to int, or -1 in case of error.
-  function zsys_file_mode(Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zsys_file_mode(Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Delete file. Does not complain if the file is absent
-  function zsys_file_delete(Filename: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zsys_file_delete(Filename: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Check if file is 'stable'
-  function zsys_file_stable(Filename: PAnsiChar): Boolean; cdecl; external lib_czmq;
+  function zsys_file_stable(Filename: PAnsiChar): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create a file path if it doesn't exist. The file path is treated as
   // printf format.
-  function zsys_dir_create(Pathname: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsys_dir_create(Pathname: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Remove a file path if empty; the pathname is treated as printf format.
-  function zsys_dir_delete(Pathname: PAnsiChar): Integer; cdecl; varargs; external lib_czmq;
+  function zsys_dir_delete(Pathname: PAnsiChar): Integer; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Move to a specified working directory. Returns 0 if OK, -1 if this failed.
-  function zsys_dir_change(Pathname: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zsys_dir_change(Pathname: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set private file creation mode; all files created from here will be
   // readable/writable by the owner only.
-  procedure zsys_file_mode_private; cdecl; external lib_czmq;
+  procedure zsys_file_mode_private; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Reset default file creation mode; all files created from here will use
   // process file mode defaults.
-  procedure zsys_file_mode_default; cdecl; external lib_czmq;
+  procedure zsys_file_mode_default; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the CZMQ version for run-time API detection; returns version
   // number into provided fields, providing reference isn't null in each case.
-  procedure zsys_version(var Major: Integer; var Minor: Integer; var Patch: Integer); cdecl; external lib_czmq;
+  procedure zsys_version(var Major: Integer; var Minor: Integer; var Patch: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Format a string using printf formatting, returning a freshly allocated
   // buffer. If there was insufficient memory, returns NULL. Free the returned
   // string using zstr_free().
-  function zsys_sprintf(Format: PAnsiChar): PAnsiChar; cdecl; varargs; external lib_czmq;
+  function zsys_sprintf(Format: PAnsiChar): PAnsiChar; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Format a string with a va_list argument, returning a freshly allocated
   // buffer. If there was insufficient memory, returns NULL. Free the returned
   // string using zstr_free().
-  function zsys_vprintf(Format: PAnsiChar; Argptr: va_list): PAnsiChar; cdecl; external lib_czmq;
+  function zsys_vprintf(Format: PAnsiChar; Argptr: va_list): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create UDP beacon socket; if the routable option is true, uses
   // multicast (not yet implemented), else uses broadcast. This method
   // and related ones might _eventually_ be moved to a zudp class.
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  function zsys_udp_new(Routable: Boolean): TSocket; cdecl; external lib_czmq;
+  function zsys_udp_new(Routable: Boolean): TSocket; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Close a UDP socket
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  function zsys_udp_close(Handle: TSocket): Integer; cdecl; external lib_czmq;
+  function zsys_udp_close(Handle: TSocket): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Send zframe to UDP socket, return -1 if sending failed due to
   // interface having disappeared (happens easily with WiFi)
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  function zsys_udp_send(Udpsock: TSocket; Frame: PZframe; Address: Pointer; Addrlen: Integer): Integer; cdecl; external lib_czmq;
+  function zsys_udp_send(Udpsock: TSocket; Frame: PZframe; Address: Pointer; Addrlen: Integer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive zframe from UDP socket, and set address of peer that sent it
   // The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
   // NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  function zsys_udp_recv(Udpsock: TSocket; Peername: PAnsiChar; Peerlen: Integer): PZframe; cdecl; external lib_czmq;
+  function zsys_udp_recv(Udpsock: TSocket; Peername: PAnsiChar; Peerlen: Integer): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Handle an I/O error on some socket operation; will report and die on
   // fatal errors, and continue silently on "try again" errors.
   // *** This is for CZMQ internal use only and may change arbitrarily ***
-  procedure zsys_socket_error(Reason: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsys_socket_error(Reason: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return current host name, for use in public tcp:// endpoints. Caller gets
   // a freshly allocated string, should free it using zstr_free(). If the host
   // name is not resolvable, returns NULL.
-  function zsys_hostname: PAnsiChar; cdecl; external lib_czmq;
+  function zsys_hostname: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Move the current process into the background. The precise effect depends
   // on the operating system. On POSIX boxes, moves to a specified working
   // directory (if specified), closes all file handles, reopens stdin, stdout,
   // and stderr to the null device, and sets the process to ignore SIGHUP. On
   // Windows, does nothing. Returns 0 if OK, -1 if there was an error.
-  function zsys_daemonize(Workdir: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zsys_daemonize(Workdir: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Drop the process ID into the lockfile, with exclusive lock, and switch
   // the process to the specified group and/or user. Any of the arguments
   // may be null, indicating a no-op. Returns 0 on success, -1 on failure.
   // Note if you combine this with zsys_daemonize, run after, not before
   // that method, or the lockfile will hold the wrong process ID.
-  function zsys_run_as(Lockfile: PAnsiChar; Group: PAnsiChar; User: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zsys_run_as(Lockfile: PAnsiChar; Group: PAnsiChar; User: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns true if the underlying libzmq supports CURVE security.
   // Uses a heuristic probe according to the version of libzmq being used.
-  function zsys_has_curve: Boolean; cdecl; external lib_czmq;
+  function zsys_has_curve: Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the number of I/O threads that ZeroMQ will use. A good
   // rule of thumb is one thread per gigabit of traffic in or out. The
   // default is 1, sufficient for most applications. If the environment
   // variable ZSYS_IO_THREADS is defined, that provides the default.
   // Note that this method is valid only before any socket is created.
-  procedure zsys_set_io_threads(IoThreads: NativeUInt); cdecl; external lib_czmq;
+  procedure zsys_set_io_threads(IoThreads: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the scheduling policy of the ZMQ context thread pool.
   // Not available on Windows. See the sched_setscheduler man page or sched.h
   // for more information. If the environment variable ZSYS_THREAD_SCHED_POLICY
   // is defined, that provides the default.
   // Note that this method is valid only before any socket is created.
-  procedure zsys_set_thread_sched_policy(Policy: Integer); cdecl; external lib_czmq;
+  procedure zsys_set_thread_sched_policy(Policy: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the scheduling priority of the ZMQ context thread pool.
   // Not available on Windows. See the sched_setscheduler man page or sched.h
   // for more information. If the environment variable ZSYS_THREAD_PRIORITY is
   // defined, that provides the default.
   // Note that this method is valid only before any socket is created.
-  procedure zsys_set_thread_priority(Priority: Integer); cdecl; external lib_czmq;
+  procedure zsys_set_thread_priority(Priority: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the numeric prefix to each thread created for the internal
   // context's thread pool. This option is only supported on Linux.
   // If the environment variable ZSYS_THREAD_NAME_PREFIX is defined, that
   // provides the default.
   // Note that this method is valid only before any socket is created.
-  procedure zsys_set_thread_name_prefix(Prefix: Integer); cdecl; external lib_czmq;
+  procedure zsys_set_thread_name_prefix(Prefix: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return thread name prefix.
-  function zsys_thread_name_prefix: Integer; cdecl; external lib_czmq;
+  function zsys_thread_name_prefix: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
   // This option is only supported on Linux.
   // Note that this method is valid only before any socket is created.
-  procedure zsys_thread_affinity_cpu_add(Cpu: Integer); cdecl; external lib_czmq;
+  procedure zsys_thread_affinity_cpu_add(Cpu: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Removes a specific CPU to the affinity list of the ZMQ context thread pool.
   // This option is only supported on Linux.
   // Note that this method is valid only before any socket is created.
-  procedure zsys_thread_affinity_cpu_remove(Cpu: Integer); cdecl; external lib_czmq;
+  procedure zsys_thread_affinity_cpu_remove(Cpu: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the number of sockets that ZeroMQ will allow. The default
   // is 1024. The actual limit depends on the system, and you can query it
   // by using zsys_socket_limit (). A value of zero means "maximum".
   // Note that this method is valid only before any socket is created.
-  procedure zsys_set_max_sockets(MaxSockets: NativeUInt); cdecl; external lib_czmq;
+  procedure zsys_set_max_sockets(MaxSockets: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return maximum number of ZeroMQ sockets that the system will support.
-  function zsys_socket_limit: NativeUInt; cdecl; external lib_czmq;
+  function zsys_socket_limit: NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the maximum allowed size of a message sent.
   // The default is INT_MAX.
-  procedure zsys_set_max_msgsz(MaxMsgsz: Integer); cdecl; external lib_czmq;
+  procedure zsys_set_max_msgsz(MaxMsgsz: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return maximum message size.
-  function zsys_max_msgsz: Integer; cdecl; external lib_czmq;
+  function zsys_max_msgsz: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure whether to use zero copy strategy in libzmq. If the environment
   // variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
   // Otherwise the default is 1.
-  procedure zsys_set_zero_copy_recv(ZeroCopy: Integer); cdecl; external lib_czmq;
+  procedure zsys_set_zero_copy_recv(ZeroCopy: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return ZMQ_ZERO_COPY_RECV option.
-  function zsys_zero_copy_recv: Integer; cdecl; external lib_czmq;
+  function zsys_zero_copy_recv: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the threshold value of filesystem object age per st_mtime
   // that should elapse until we consider that object "stable" at the
   // current zclock_time() moment.
   // The default is S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC defined in zsys.c
   // which generally depends on host OS, with fallback value of 5000.
-  procedure zsys_set_file_stable_age_msec(FileStableAgeMsec: Int64); cdecl; external lib_czmq;
+  procedure zsys_set_file_stable_age_msec(FileStableAgeMsec: Int64); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return current threshold value of file stable age in msec.
   // This can be used in code that chooses to wait for this timeout
   // before testing if a filesystem object is "stable" or not.
-  function zsys_file_stable_age_msec: Int64; cdecl; external lib_czmq;
+  function zsys_file_stable_age_msec: Int64; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the default linger timeout in msecs for new zsock instances.
   // You can also set this separately on each zsock_t instance. The default
   // linger time is zero, i.e. any pending messages will be dropped. If the
   // environment variable ZSYS_LINGER is defined, that provides the default.
   // Note that process exit will typically be delayed by the linger time.
-  procedure zsys_set_linger(Linger: NativeUInt); cdecl; external lib_czmq;
+  procedure zsys_set_linger(Linger: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the default outgoing pipe limit (HWM) for new zsock instances.
   // You can also set this separately on each zsock_t instance. The default
   // HWM is 1,000, on all versions of ZeroMQ. If the environment variable
   // ZSYS_SNDHWM is defined, that provides the default. Note that a value of
   // zero means no limit, i.e. infinite memory consumption.
-  procedure zsys_set_sndhwm(Sndhwm: NativeUInt); cdecl; external lib_czmq;
+  procedure zsys_set_sndhwm(Sndhwm: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the default incoming pipe limit (HWM) for new zsock instances.
   // You can also set this separately on each zsock_t instance. The default
   // HWM is 1,000, on all versions of ZeroMQ. If the environment variable
   // ZSYS_RCVHWM is defined, that provides the default. Note that a value of
   // zero means no limit, i.e. infinite memory consumption.
-  procedure zsys_set_rcvhwm(Rcvhwm: NativeUInt); cdecl; external lib_czmq;
+  procedure zsys_set_rcvhwm(Rcvhwm: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the default HWM for zactor internal pipes; this is set on both
   // ends of the pipe, for outgoing messages only (sndhwm). The default HWM is
   // 1,000, on all versions of ZeroMQ. If the environment var ZSYS_ACTORHWM is
   // defined, that provides the default. Note that a value of zero means no
   // limit, i.e. infinite memory consumption.
-  procedure zsys_set_pipehwm(Pipehwm: NativeUInt); cdecl; external lib_czmq;
+  procedure zsys_set_pipehwm(Pipehwm: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the HWM for zactor internal pipes.
-  function zsys_pipehwm: NativeUInt; cdecl; external lib_czmq;
+  function zsys_pipehwm: NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure use of IPv6 for new zsock instances. By default sockets accept
   // and make only IPv4 connections. When you enable IPv6, sockets will accept
@@ -3147,10 +3162,10 @@ type
   // each zsock_t instance. The default is IPv4 only (ipv6 set to 0). If the
   // environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
   // default. Note: has no effect on ZMQ v2.
-  procedure zsys_set_ipv6(Ipv6: Integer); cdecl; external lib_czmq;
+  procedure zsys_set_ipv6(Ipv6: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return use of IPv6 for zsock instances.
-  function zsys_ipv6: Integer; cdecl; external lib_czmq;
+  function zsys_ipv6: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set network interface name to use for broadcasts, particularly zbeacon.
   // This lets the interface be configured for test environments where required.
@@ -3158,29 +3173,29 @@ type
   // the default when there is no specified interface. If the environment
   // variable ZSYS_INTERFACE is set, use that as the default interface name.
   // Setting the interface to "*" means "use all available interfaces".
-  procedure zsys_set_interface(Value: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsys_set_interface(Value: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return network interface to use for broadcasts, or "" if none was set.
-  function zsys_interface: PAnsiChar; cdecl; external lib_czmq;
+  function zsys_interface: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set IPv6 address to use zbeacon socket, particularly for receiving zbeacon.
   // This needs to be set IPv6 is enabled as IPv6 can have multiple addresses
   // on a given interface. If the environment variable ZSYS_IPV6_ADDRESS is set,
   // use that as the default IPv6 address.
-  procedure zsys_set_ipv6_address(Value: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsys_set_ipv6_address(Value: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return IPv6 address to use for zbeacon reception, or "" if none was set.
-  function zsys_ipv6_address: PAnsiChar; cdecl; external lib_czmq;
+  function zsys_ipv6_address: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set IPv6 milticast address to use for sending zbeacon messages. This needs
   // to be set if IPv6 is enabled. If the environment variable
   // ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
   // address.
-  procedure zsys_set_ipv6_mcast_address(Value: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsys_set_ipv6_mcast_address(Value: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return IPv6 multicast address to use for sending zbeacon, or "" if none was
   // set.
-  function zsys_ipv6_mcast_address: PAnsiChar; cdecl; external lib_czmq;
+  function zsys_ipv6_mcast_address: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the automatic use of pre-allocated FDs when creating new sockets.
   // If 0 (default), nothing will happen. Else, when a new socket is bound, the
@@ -3188,10 +3203,10 @@ type
   // matching port (if TCP) or path (if IPC) exists, and if it does it will be
   // set via the ZMQ_USE_FD socket option so that the library will use it
   // instead of creating a new socket.
-  procedure zsys_set_auto_use_fd(AutoUseFd: Integer); cdecl; external lib_czmq;
+  procedure zsys_set_auto_use_fd(AutoUseFd: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return use of automatic pre-allocated FDs for zsock instances.
-  function zsys_auto_use_fd: Integer; cdecl; external lib_czmq;
+  function zsys_auto_use_fd: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print formatted string. Format is specified by variable names
   // in Python-like format style
@@ -3202,10 +3217,10 @@ type
   //
   // Returns freshly allocated string or NULL in a case of error.
   // Not enough memory, invalid format specifier, name not in args
-  function zsys_zprintf(Format: PAnsiChar; Args: PZhash): PAnsiChar; cdecl; external lib_czmq;
+  function zsys_zprintf(Format: PAnsiChar; Args: PZhash): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return error string for given format/args combination.
-  function zsys_zprintf_error(Format: PAnsiChar; Args: PZhash): PAnsiChar; cdecl; external lib_czmq;
+  function zsys_zprintf_error(Format: PAnsiChar; Args: PZhash): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print formatted string. Format is specified by variable names
   // in Python-like format style
@@ -3216,20 +3231,20 @@ type
   //
   // Returns freshly allocated string or NULL in a case of error.
   // Not enough memory, invalid format specifier, name not in args
-  function zsys_zplprintf(Format: PAnsiChar; Args: PZconfig): PAnsiChar; cdecl; external lib_czmq;
+  function zsys_zplprintf(Format: PAnsiChar; Args: PZconfig): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return error string for given format/args combination.
-  function zsys_zplprintf_error(Format: PAnsiChar; Args: PZconfig): PAnsiChar; cdecl; external lib_czmq;
+  function zsys_zplprintf_error(Format: PAnsiChar; Args: PZconfig): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set log identity, which is a string that prefixes all log messages sent
   // by this process. The log identity defaults to the environment variable
   // ZSYS_LOGIDENT, if that is set.
-  procedure zsys_set_logident(Value: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsys_set_logident(Value: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set stream to receive log traffic. By default, log traffic is sent to
   // stdout. If you set the stream to NULL, no stream will receive the log
   // traffic (it may still be sent to the system facility).
-  procedure zsys_set_logstream(Stream: Pointer); cdecl; external lib_czmq;
+  procedure zsys_set_logstream(Stream: Pointer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Sends log output to a PUB socket bound to the specified endpoint. To
   // collect such log output, create a SUB socket, subscribe to the traffic
@@ -3238,113 +3253,113 @@ type
   // log system supports a single sender; multiple calls to this method will
   // bind the same sender to multiple endpoints. To disable the sender, call
   // this method with a null argument.
-  procedure zsys_set_logsender(Endpoint: PAnsiChar); cdecl; external lib_czmq;
+  procedure zsys_set_logsender(Endpoint: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Enable or disable logging to the system facility (syslog on POSIX boxes,
   // event log on Windows). By default this is disabled.
-  procedure zsys_set_logsystem(Logsystem: Boolean); cdecl; external lib_czmq;
+  procedure zsys_set_logsystem(Logsystem: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Log error condition - highest priority
-  procedure zsys_error(Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zsys_error(Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Log warning condition - high priority
-  procedure zsys_warning(Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zsys_warning(Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Log normal, but significant, condition - normal priority
-  procedure zsys_notice(Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zsys_notice(Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Log informational message - low priority
-  procedure zsys_info(Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zsys_info(Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Log debug-level message - lowest priority
-  procedure zsys_debug(Format: PAnsiChar); cdecl; varargs; external lib_czmq;
+  procedure zsys_debug(Format: PAnsiChar); cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zsys_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zsys_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zuuid *)
 (* UUID support class *)
 
   // Create a new UUID object.
-  function zuuid_new: PZuuid; cdecl; external lib_czmq;
+  function zuuid_new: PZuuid; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Create UUID object from supplied ZUUID_LEN-octet value.
-  function zuuid_new_from(Source: PByte): PZuuid; cdecl; external lib_czmq;
+  function zuuid_new_from(Source: PByte): PZuuid; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a specified UUID object.
-  procedure zuuid_destroy(var self: PZuuid); cdecl; external lib_czmq;
+  procedure zuuid_destroy(var self: PZuuid); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set UUID to new supplied ZUUID_LEN-octet value.
-  procedure zuuid_set(self: PZuuid; Source: PByte); cdecl; external lib_czmq;
+  procedure zuuid_set(self: PZuuid; Source: PByte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set UUID to new supplied string value skipping '-' and '{' '}'
   // optional delimiters. Return 0 if OK, else returns -1.
-  function zuuid_set_str(self: PZuuid; Source: PAnsiChar): Integer; cdecl; external lib_czmq;
+  function zuuid_set_str(self: PZuuid; Source: PAnsiChar): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return UUID binary data.
-  function zuuid_data(self: PZuuid): PByte; cdecl; external lib_czmq;
+  function zuuid_data(self: PZuuid): PByte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return UUID binary size
-  function zuuid_size(self: PZuuid): NativeUInt; cdecl; external lib_czmq;
+  function zuuid_size(self: PZuuid): NativeUInt; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Returns UUID as string
-  function zuuid_str(self: PZuuid): PAnsiChar; cdecl; external lib_czmq;
+  function zuuid_str(self: PZuuid): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return UUID in the canonical string format: 8-4-4-4-12, in lower
   // case. Caller does not modify or free returned value. See
   // http://en.wikipedia.org/wiki/Universally_unique_identifier
-  function zuuid_str_canonical(self: PZuuid): PAnsiChar; cdecl; external lib_czmq;
+  function zuuid_str_canonical(self: PZuuid): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Store UUID blob in target array
-  procedure zuuid_export(self: PZuuid; Target: PByte); cdecl; external lib_czmq;
+  procedure zuuid_export(self: PZuuid; Target: PByte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Check if UUID is same as supplied value
-  function zuuid_eq(self: PZuuid; Compare: PByte): Boolean; cdecl; external lib_czmq;
+  function zuuid_eq(self: PZuuid; Compare: PByte): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Check if UUID is different from supplied value
-  function zuuid_neq(self: PZuuid; Compare: PByte): Boolean; cdecl; external lib_czmq;
+  function zuuid_neq(self: PZuuid; Compare: PByte): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Make copy of UUID object; if uuid is null, or memory was exhausted,
   // returns null.
-  function zuuid_dup(self: PZuuid): PZuuid; cdecl; external lib_czmq;
+  function zuuid_dup(self: PZuuid): PZuuid; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Self test of this class.
-  procedure zuuid_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zuuid_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zauth *)
 (*  *)
 
   // Self test of this class.
-  procedure zauth_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zauth_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zbeacon *)
 (*  *)
 
   // Self test of this class.
-  procedure zbeacon_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zbeacon_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zgossip *)
 (*  *)
 
   // Self test of this class.
-  procedure zgossip_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zgossip_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zmonitor *)
 (*  *)
 
   // Self test of this class.
-  procedure zmonitor_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zmonitor_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zproxy *)
 (*  *)
 
   // Self test of this class.
-  procedure zproxy_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zproxy_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zrex *)
 (*  *)
 
   // Self test of this class.
-  procedure zrex_test(Verbose: Boolean); cdecl; external lib_czmq;
+  procedure zrex_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 implementation
 end.

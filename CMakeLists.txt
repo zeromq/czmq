@@ -72,7 +72,9 @@ if (NOT HAVE_NET_IF_H)
     CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
 endif()
 
-file(WRITE "${SOURCE_DIR}/src/platform.h.in" "
+file(REMOVE "${SOURCE_DIR}/src/platform.h")
+
+file(WRITE "${CMAKE_BINARY_DIR}/platform.h.in" "
 #cmakedefine HAVE_LINUX_WIRELESS_H
 #cmakedefine HAVE_NET_IF_H
 #cmakedefine HAVE_NET_IF_MEDIA_H
@@ -80,7 +82,7 @@ file(WRITE "${SOURCE_DIR}/src/platform.h.in" "
 #cmakedefine HAVE_FREEIFADDRS
 ")
 
-configure_file("${SOURCE_DIR}/src/platform.h.in" "${SOURCE_DIR}/src/platform.h")
+configure_file("${CMAKE_BINARY_DIR}/platform.h.in" "${CMAKE_BINARY_DIR}/platform.h")
 
 #The MSVC C compiler is too out of date,
 #so the sources have to be compiled as c++
@@ -276,7 +278,7 @@ install(FILES ${czmq_headers} DESTINATION include)
 ########################################################################
 
 
-include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include")
+include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}")
 set (czmq_sources
     src/zactor.c
     src/zarmour.c
@@ -670,7 +672,7 @@ set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt
                     ${CMAKE_BINARY_DIR}/DartConfiguration.tcl
                     ${CMAKE_BINARY_DIR}/Testing
                     ${CMAKE_BINARY_DIR}/compile_commands.json
-                    ${CMAKE_BINARY_DIR}/src/platform.h
+                    ${CMAKE_BINARY_DIR}/platform.h
                     ${CMAKE_BINARY_DIR}/src/libczmq.pc
                     ${CMAKE_BINARY_DIR}/src/libczmq.so
                     ${CMAKE_BINARY_DIR}/src/czmq_selftest
