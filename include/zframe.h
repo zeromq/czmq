@@ -25,9 +25,9 @@ extern "C" {
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
 //  in stable releases, by default. Use --enable-drafts to enable.
-#define ZFRAME_MORE 1                       //
-#define ZFRAME_REUSE 2                      //
-#define ZFRAME_DONTWAIT 4                   //
+#define ZFRAME_MORE 1                        //
+#define ZFRAME_REUSE 2                       //
+#define ZFRAME_DONTWAIT 4                    //
 
 //  Create a new frame. If size is not null, allocates the frame data
 //  to the specified size. If additionally, data is not null, copies

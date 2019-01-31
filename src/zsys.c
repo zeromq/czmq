@@ -134,6 +134,11 @@ typedef CRITICAL_SECTION zsys_mutex_t;
 //  Mutex to guard socket counter
 static zsys_mutex_t s_mutex;
 
+//  Implementation for the zsys_vprintf() which is known from legacy
+//  and poses as a stable interface now.
+static inline
+char *
+s_zsys_vprintf_hint (int hint, const char *format, va_list argptr);
 
 //  --------------------------------------------------------------------------
 //  Initialize CZMQ zsys layer; this happens automatically when you create
@@ -917,28 +922,54 @@ zsys_version (int *major, int *minor, int *patch)
 //  --------------------------------------------------------------------------
 //  Format a string using printf formatting, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free(). The hinted version allows to optimize by using
+//  a larger starting buffer size (known to/assumed by the developer) and so
+//  avoid reallocations.
+
+char *
+zsys_sprintf_hint (int hint, const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = s_zsys_vprintf_hint (hint, format, argptr);
+    va_end (argptr);
+    return (string);
+}
+
+//  --------------------------------------------------------------------------
+//  Format a string using printf formatting, returning a freshly allocated
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
 
 char *
 zsys_sprintf (const char *format, ...)
 {
+    // Effectively this is a copy of the small zsys_sprintf_hint with
+    // hardcoded hint value; this is is cheaper than parsing va_list
+    // several times to just call the other implementation cleanly.
     va_list argptr;
     va_start (argptr, format);
-    char *string = zsys_vprintf (format, argptr);
+    char *string = s_zsys_vprintf_hint (256, format, argptr);
     va_end (argptr);
     return (string);
 }
-
 
 //  --------------------------------------------------------------------------
 //  Format a string with variable arguments, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
 
+static inline
 char *
-zsys_vprintf (const char *format, va_list argptr)
+s_zsys_vprintf_hint (int hint, const char *format, va_list argptr)
 {
-    int size = 256;
+    if (hint <= 0) {
+        //  The hint is not a hard requrement so no error here.
+        //  Just fall back to legacy default.
+        hint = 256;
+    }
+    // Must use int "size" to compare to "required" (from vsnprintf)
+    int size = hint;
     char *string = (char *) malloc (size);
     if (!string)
         return NULL;
@@ -960,9 +991,18 @@ zsys_vprintf (const char *format, va_list argptr)
         va_end (my_argptr);
     }
 #endif
+    if (required < 0) {
+        // vsnprintf failed at unknown point; at least prohibit
+        // accesses by string consumers into random memory
+        string [hint - 1] = '\0';
+        return string;
+    }
     //  If formatted string cannot fit into small string, reallocate a
-    //  larger buffer for it.
-    if (required >= size) {
+    //  larger buffer for it. If it did fit, we only called vsnprintf()
+    //  once and already have the good result, so pre-counting with a
+    //  NULL string would not be beneficial for shorter texts (always
+    //  calling vsnprintf() twice then).
+    if (required >= hint) {
         size = required + 1;
         freen (string);
         string = (char *) malloc (size);
@@ -975,6 +1015,11 @@ zsys_vprintf (const char *format, va_list argptr)
     return string;
 }
 
+char *
+zsys_vprintf (const char *format, va_list argptr)
+{
+    return (s_zsys_vprintf_hint(256, format, argptr));
+}
 
 //  --------------------------------------------------------------------------
 //  Create a UDP beacon socket; if the routable option is true, uses

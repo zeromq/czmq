@@ -25,11 +25,11 @@ extern "C" {
 //  stable builds by default. If you use this in applications, please ask
 //  for it to be pushed to stable state. Use --enable-drafts to enable.
 #ifdef CZMQ_BUILD_DRAFT_API
-#define ZGOSSIP_MSG_HELLO 1                 //
-#define ZGOSSIP_MSG_PUBLISH 2               //
-#define ZGOSSIP_MSG_PING 3                  //
-#define ZGOSSIP_MSG_PONG 4                  //
-#define ZGOSSIP_MSG_INVALID 5               //
+#define ZGOSSIP_MSG_HELLO 1                  //
+#define ZGOSSIP_MSG_PUBLISH 2                //
+#define ZGOSSIP_MSG_PING 3                   //
+#define ZGOSSIP_MSG_PONG 4                   //
+#define ZGOSSIP_MSG_INVALID 5                //
 
 //  *** Draft method, for development use, may change without warning ***
 //  Create a new empty zgossip_msg

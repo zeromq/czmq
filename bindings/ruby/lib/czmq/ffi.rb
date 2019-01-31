@@ -785,6 +785,7 @@ module CZMQ
       attach_function :zsys_file_mode_private, [], :void, **opts
       attach_function :zsys_file_mode_default, [], :void, **opts
       attach_function :zsys_version, [:pointer, :pointer, :pointer], :void, **opts
+      attach_function :zsys_sprintf_hint, [:int, :string, :varargs], :pointer, **opts
       attach_function :zsys_sprintf, [:string, :varargs], :pointer, **opts
       attach_function :zsys_vprintf, [:string, :pointer], :pointer, **opts
       attach_function :zsys_udp_new, [:bool], (::FFI::Platform.unix? ? :int : :uint64), **opts

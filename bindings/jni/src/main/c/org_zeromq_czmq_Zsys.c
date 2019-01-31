@@ -172,6 +172,16 @@ Java_org_zeromq_czmq_Zsys__1_1version (JNIEnv *env, jclass c, jint major, jint m
 }
 
 JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsys__1_1sprintfHint (JNIEnv *env, jclass c, jint hint, jstring format)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    char *sprintf_hint_ = (char *) zsys_sprintf_hint ((int) hint, format_);
+    jstring return_string_ = (*env)->NewStringUTF (env, sprintf_hint_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return return_string_;
+}
+
+JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsys__1_1sprintf (JNIEnv *env, jclass c, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);

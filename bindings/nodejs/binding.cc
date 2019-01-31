@@ -7131,6 +7131,7 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "fileModePrivate", _file_mode_private);
     Nan::SetPrototypeMethod (tpl, "fileModeDefault", _file_mode_default);
     Nan::SetPrototypeMethod (tpl, "version", _version);
+    Nan::SetPrototypeMethod (tpl, "sprintfHint", _sprintf_hint);
     Nan::SetPrototypeMethod (tpl, "sprintf", _sprintf);
     Nan::SetPrototypeMethod (tpl, "socketError", _socket_error);
     Nan::SetPrototypeMethod (tpl, "hostname", _hostname);
@@ -7421,6 +7422,34 @@ NAN_METHOD (Zsys::_version) {
     else
         return Nan::ThrowTypeError ("`patch` must be a number");
     zsys_version ((int *) &major, (int *) &minor, (int *) &patch);
+}
+
+NAN_METHOD (Zsys::_sprintf_hint) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `hint`");
+
+    //int hint; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int hint;
+
+
+    if (info [0]->IsNumber ())
+    {
+          hint = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`hint` must be a number");
+    char *format;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [1].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
+    char *result = (char *) zsys_sprintf_hint ((int) hint, (const char *)format);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zsys::_sprintf) {

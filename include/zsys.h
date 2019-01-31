@@ -442,6 +442,15 @@ CZMQ_EXPORT void
     zsys_set_interrupted (void);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Format a string using printf formatting, returning a freshly allocated
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free(). The hinted version allows to optimize by using
+//  a larger starting buffer size (known to/assumed by the developer) and so
+//  avoid reallocations.
+CZMQ_EXPORT char *
+    zsys_sprintf_hint (int hint, const char *format, ...);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Configure whether to use zero copy strategy in libzmq. If the environment
 //  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
 //  Otherwise the default is 1.
