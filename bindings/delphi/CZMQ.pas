@@ -5194,6 +5194,13 @@ uses
 
     // Format a string using printf formatting, returning a freshly allocated
     // buffer. If there was insufficient memory, returns NULL. Free the returned
+    // string using zstr_free(). The hinted version allows to optimize by using
+    // a larger starting buffer size (known to/assumed by the developer) and so
+    // avoid reallocations.
+    class function SprintfHint(Hint: Integer; const Format: string): string;
+
+    // Format a string using printf formatting, returning a freshly allocated
+    // buffer. If there was insufficient memory, returns NULL. Free the returned
     // string using zstr_free().
     class function Sprintf(const Format: string): string;
 
@@ -9491,6 +9498,14 @@ end;
   class procedure TZsys.Version(var Major: Integer; var Minor: Integer; var Patch: Integer);
   begin
     zsys_version(Major, Minor, Patch);
+  end;
+
+  class function TZsys.SprintfHint(Hint: Integer; const Format: string): string;
+  var
+    __Format__: UTF8String;
+  begin
+    __Format__ := UTF8String(Format);
+    Result := string(UTF8String(zsys_sprintf_hint(Hint, PAnsiChar(__Format__))));
   end;
 
   class function TZsys.Sprintf(const Format: string): string;

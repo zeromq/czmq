@@ -846,6 +846,7 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_file_mode_private);
     static NAN_METHOD (_file_mode_default);
     static NAN_METHOD (_version);
+    static NAN_METHOD (_sprintf_hint);
     static NAN_METHOD (_sprintf);
     static NAN_METHOD (_socket_error);
     static NAN_METHOD (_hostname);

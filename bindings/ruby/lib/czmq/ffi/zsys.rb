@@ -326,6 +326,22 @@ module CZMQ
 
       # Format a string using printf formatting, returning a freshly allocated
       # buffer. If there was insufficient memory, returns NULL. Free the returned
+      # string using zstr_free(). The hinted version allows to optimize by using
+      # a larger starting buffer size (known to/assumed by the developer) and so
+      # avoid reallocations.
+      #
+      # @param hint [Integer, #to_int, #to_i]
+      # @param format [String, #to_s, nil]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [::FFI::Pointer]
+      def self.sprintf_hint(hint, format, *args)
+        hint = Integer(hint)
+        result = ::CZMQ::FFI.zsys_sprintf_hint(hint, format, *args)
+        result
+      end
+
+      # Format a string using printf formatting, returning a freshly allocated
+      # buffer. If there was insufficient memory, returns NULL. Free the returned
       # string using zstr_free().
       #
       # @param format [String, #to_s, nil]

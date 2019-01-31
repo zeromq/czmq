@@ -183,6 +183,16 @@ void QmlZsysAttached::version (int *major, int *minor, int *patch) {
 ///
 //  Format a string using printf formatting, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free(). The hinted version allows to optimize by using
+//  a larger starting buffer size (known to/assumed by the developer) and so
+//  avoid reallocations.
+const QString QmlZsysAttached::sprintfHint (int hint, const QString &format) {
+    return QString (zsys_sprintf_hint (hint, format.toUtf8().data()));
+};
+
+///
+//  Format a string using printf formatting, returning a freshly allocated
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
 const QString QmlZsysAttached::sprintf (const QString &format) {
     return QString (zsys_sprintf (format.toUtf8().data()));

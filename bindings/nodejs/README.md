@@ -3890,6 +3890,16 @@ Return the CZMQ version for run-time API detection; returns version
 number into provided fields, providing reference isn't null in each case.
 
 ```
+string my_zsys.sprintfHint (Number, String)
+```
+
+Format a string using printf formatting, returning a freshly allocated
+buffer. If there was insufficient memory, returns NULL. Free the returned
+string using zstr_free(). The hinted version allows to optimize by using
+a larger starting buffer size (known to/assumed by the developer) and so
+avoid reallocations.
+
+```
 string my_zsys.sprintf (String)
 ```
 

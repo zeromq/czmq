@@ -2991,6 +2991,13 @@ type
 
   // Format a string using printf formatting, returning a freshly allocated
   // buffer. If there was insufficient memory, returns NULL. Free the returned
+  // string using zstr_free(). The hinted version allows to optimize by using
+  // a larger starting buffer size (known to/assumed by the developer) and so
+  // avoid reallocations.
+  function zsys_sprintf_hint(Hint: Integer; Format: PAnsiChar): PAnsiChar; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Format a string using printf formatting, returning a freshly allocated
+  // buffer. If there was insufficient memory, returns NULL. Free the returned
   // string using zstr_free().
   function zsys_sprintf(Format: PAnsiChar): PAnsiChar; cdecl; varargs; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 

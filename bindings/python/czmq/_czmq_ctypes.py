@@ -7289,6 +7289,8 @@ lib.zsys_file_mode_default.restype = None
 lib.zsys_file_mode_default.argtypes = []
 lib.zsys_version.restype = None
 lib.zsys_version.argtypes = [POINTER(c_int), POINTER(c_int), POINTER(c_int)]
+lib.zsys_sprintf_hint.restype = c_char_p
+lib.zsys_sprintf_hint.argtypes = [c_int, c_char_p]
 lib.zsys_sprintf.restype = c_char_p
 lib.zsys_sprintf.argtypes = [c_char_p]
 lib.zsys_vprintf.restype = c_char_p
@@ -7611,6 +7613,17 @@ process file mode defaults.
 number into provided fields, providing reference isn't null in each case.
         """
         return lib.zsys_version(byref(c_int.from_param(major)), byref(c_int.from_param(minor)), byref(c_int.from_param(patch)))
+
+    @staticmethod
+    def sprintf_hint(hint, format, *args):
+        """
+        Format a string using printf formatting, returning a freshly allocated
+buffer. If there was insufficient memory, returns NULL. Free the returned
+string using zstr_free(). The hinted version allows to optimize by using
+a larger starting buffer size (known to/assumed by the developer) and so
+avoid reallocations.
+        """
+        return lib.zsys_sprintf_hint(hint, format, *args)
 
     @staticmethod
     def sprintf(format, *args):
