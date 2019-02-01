@@ -183,7 +183,10 @@ matrix:
         sources: *pkg_src_zeromq_ubuntu14
         packages:
         - *pkg_deps_devtools
-        - *pkg_deps_zproject
+# Do not use packaged zproject as it may be stale if OBS lags,
+# use a fresh build every time, this one is cheap
+###        - *pkg_deps_zproject
+        - generator-scripting-language
   - env: BUILD_TYPE=cmake DO_CLANG_FORMAT_CHECK=1 CLANG_FORMAT=clang-format-5.0
 # For non-cmake users, there is an autotools solution with a bit more overhead
 # to have dependencies ready and pass configure script before making this check).
