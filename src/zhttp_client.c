@@ -47,11 +47,11 @@ size_t write_data (void *buffer, size_t size, size_t nmemb, void *userp) {
 static struct curl_slist *zlistx_to_slist (zlistx_t *zlist) {
     struct curl_slist *slist = NULL;
 
-    char *header = zlistx_first (zlist);
+    char *header = (char *) zlistx_first (zlist);
 
     while (header) {
         slist = curl_slist_append (slist, header);
-        header = zlistx_next (zlist);
+        header = (char *) zlistx_next (zlist);
     }
 
     return slist;
