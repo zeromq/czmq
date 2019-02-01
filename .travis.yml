@@ -98,9 +98,11 @@ pkg_deps_prereqs: &pkg_deps_prereqs
 # NOTE: Currently the shell script does support use of packages or checkout
 # of latest github code for these tools - but only from zeromq org repos,
 # no forks/branches.
+# NOTE: We do not use packaged zproject as it may be stale if OBS lags,
+# use a fresh build every time, this one is cheap.
 pkg_deps_zproject: &pkg_deps_zproject
     - generator-scripting-language
-    - zproject
+#    - zproject
 
 pkg_deps_doctools: &pkg_deps_doctools
     - asciidoc
@@ -183,10 +185,7 @@ matrix:
         sources: *pkg_src_zeromq_ubuntu14
         packages:
         - *pkg_deps_devtools
-# Do not use packaged zproject as it may be stale if OBS lags,
-# use a fresh build every time, this one is cheap
-###        - *pkg_deps_zproject
-        - generator-scripting-language
+        - *pkg_deps_zproject
   - env: BUILD_TYPE=cmake DO_CLANG_FORMAT_CHECK=1 CLANG_FORMAT=clang-format-5.0
 # For non-cmake users, there is an autotools solution with a bit more overhead
 # to have dependencies ready and pass configure script before making this check).
