@@ -316,8 +316,6 @@ zhttp_client_execute (zhttp_client_t *self) {
     zhttp_client_fn *handler;
     int rc;
 
-    int events = zsock_events (self);
-
     while (zsock_has_in (self)) {
         rc = zsock_recv (self, "icpp", &response_code, &data, &handler, &arg);
 
@@ -325,8 +323,6 @@ zhttp_client_execute (zhttp_client_t *self) {
             return rc;
 
         handler (arg, response_code, data);
-
-        events = zsock_events (self);
     }
 
     return 0;
