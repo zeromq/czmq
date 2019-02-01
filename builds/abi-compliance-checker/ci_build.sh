@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -x
 
+# Note: the ABI compliance checker script currently assumes that:
+# 1) Your project sources have a "latest_release" branch or tag
+#    to check out and compare the current commit's ABI to;
+# 2) Prerequisites are available as packages - no custom rebuilds.
+
 cd ../../
 
 mkdir tmp
