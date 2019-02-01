@@ -47,11 +47,11 @@ size_t write_data (void *buffer, size_t size, size_t nmemb, void *userp) {
 static struct curl_slist *zlistx_to_slist (zlistx_t *zlist) {
     struct curl_slist *slist = NULL;
 
-    char *header = zlistx_first (zlist);
+    char *header = (char *) zlistx_first (zlist);
 
     while (header) {
         slist = curl_slist_append (slist, header);
-        header = zlistx_next (zlist);
+        header = (char *) zlistx_next (zlist);
     }
 
     return slist;
@@ -316,8 +316,6 @@ zhttp_client_execute (zhttp_client_t *self) {
     zhttp_client_fn *handler;
     int rc;
 
-    int events = zsock_events (self);
-
     while (zsock_has_in (self)) {
         rc = zsock_recv (self, "icpp", &response_code, &data, &handler, &arg);
 
@@ -325,8 +323,6 @@ zhttp_client_execute (zhttp_client_t *self) {
             return rc;
 
         handler (arg, response_code, data);
-
-        events = zsock_events (self);
     }
 
     return 0;
