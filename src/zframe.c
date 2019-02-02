@@ -96,11 +96,9 @@ zframe_destroy (zframe_t **self_p)
         zframe_t *self = *self_p;
         assert (zframe_is (self));
         zmq_msg_close (&self->zmsg);
+        self->tag = 0xDeadBeef;
+        freen (self);
 
-        if (!self->hint && !self->destructor) {
-            self->tag = 0xDeadBeef;
-            freen (self);
-        }
         *self_p = NULL;
     }
 }
@@ -116,20 +114,22 @@ zframe_from (const char *string)
     return zframe_new (string, strlen (string));
 }
 
-
-static void zmq_msg_destructor (void *data, void *hint) {
-    zframe_t *self = (zframe_t *)hint;
-    self->destructor (&self->hint);
-    self->tag = 0xDeadBeef;
-    self->destructor = NULL;
-    self->hint = NULL;
-
-    freen (self);
-}
-
 //  --------------------------------------------------------------------------
 //  Create a new frame from memory. Taking ownership of the memory and calling the destructor
 //  on destroy.
+
+struct zmq_msg_free_arg {
+    zframe_destructor_fn *destructor;
+    void *hint;
+};
+
+static void
+zmq_msg_free (void *data, void *hint) {
+    struct zmq_msg_free_arg *arg = (struct zmq_msg_free_arg *)hint;
+    arg->destructor (&arg->hint);
+
+    freen (arg);
+}
 
 zframe_t *
 zframe_frommem (void *data, size_t size, zframe_destructor_fn destructor, void *hint) {
@@ -141,8 +141,13 @@ zframe_frommem (void *data, size_t size, zframe_destructor_fn destructor, void *
     self->destructor = destructor;
     self->hint = hint;
 
+    struct zmq_msg_free_arg *arg = (struct zmq_msg_free_arg*) zmalloc (sizeof (struct zmq_msg_free_arg));
+    arg->destructor = destructor;
+    arg->hint = hint;
+
     //  Catch heap exhaustion in this specific case
-    if (zmq_msg_init_data (&self->zmsg, data, size, zmq_msg_destructor, self)) {
+    if (zmq_msg_init_data (&self->zmsg, data, size, zmq_msg_free, arg)) {
+        freen (arg);
         zframe_destroy (&self);
         return NULL;
     }
