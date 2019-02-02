@@ -96,8 +96,11 @@ zframe_destroy (zframe_t **self_p)
         zframe_t *self = *self_p;
         assert (zframe_is (self));
         zmq_msg_close (&self->zmsg);
-        self->tag = 0xDeadBeef;
-        freen (self);
+
+        if (!self->hint && !self->destructor) {
+            self->tag = 0xDeadBeef;
+            freen (self);
+        }
         *self_p = NULL;
     }
 }
@@ -115,8 +118,13 @@ zframe_from (const char *string)
 
 
 static void zmq_msg_destructor (void *data, void *hint) {
-    zframe_t *frame = (zframe_t *)hint;
-    frame->destructor (&frame->hint);
+    zframe_t *self = (zframe_t *)hint;
+    self->destructor (&self->hint);
+    self->tag = 0xDeadBeef;
+    self->destructor = NULL;
+    self->hint = NULL;
+
+    freen (self);
 }
 
 //  --------------------------------------------------------------------------
