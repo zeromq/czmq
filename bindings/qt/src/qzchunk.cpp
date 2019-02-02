@@ -27,9 +27,9 @@ QZchunk::QZchunk (const void *data, size_t size, QObject *qObjParent) : QObject 
 ///
 //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
 //  on destroy.
-QZchunk* QZchunk::frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint, QObject *qObjParent)
+QZchunk* QZchunk::frommem (void *data, size_t size, zchunk_destructor_fn destructor, void *hint, QObject *qObjParent)
 {
-    return new QZchunk (zchunk_frommem (dataP, size, destructor, hint), qObjParent);
+    return new QZchunk (zchunk_frommem (data, size, destructor, hint), qObjParent);
 }
 
 ///

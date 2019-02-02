@@ -41,9 +41,9 @@ QZframe* QZframe::from (const QString &string, QObject *qObjParent)
 ///
 //  Create a new frame from memory. Take ownership of the memory and calling the destructor
 //  on destroy.
-QZframe* QZframe::frommem (byte **dataP, size_t size, zframe_destructor_fn destructor, void *hint, QObject *qObjParent)
+QZframe* QZframe::frommem (void *data, size_t size, zframe_destructor_fn destructor, void *hint, QObject *qObjParent)
 {
-    return new QZframe (zframe_frommem (dataP, size, destructor, hint), qObjParent);
+    return new QZframe (zframe_frommem (data, size, destructor, hint), qObjParent);
 }
 
 ///

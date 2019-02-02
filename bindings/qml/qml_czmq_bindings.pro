@@ -66,7 +66,12 @@ HEADERS += \
   $$SRCDIR/QmlZtimerset.h \
   $$SRCDIR/QmlZtrie.h \
   $$SRCDIR/QmlZuuid.h \
-  $$SRCDIR/QmlZhttpClient.h
+  $$SRCDIR/QmlZhttpClient.h \
+  $$SRCDIR/QmlZhttpServer.h \
+  $$SRCDIR/QmlZhttpServerConnection.h \
+  $$SRCDIR/QmlZhttpServerOptions.h \
+  $$SRCDIR/QmlZhttpRequest.h \
+  $$SRCDIR/QmlZhttpResponse.h
 
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
@@ -97,7 +102,12 @@ SOURCES += \
   $$SRCDIR/QmlZtimerset.cpp \
   $$SRCDIR/QmlZtrie.cpp \
   $$SRCDIR/QmlZuuid.cpp \
-  $$SRCDIR/QmlZhttpClient.cpp
+  $$SRCDIR/QmlZhttpClient.cpp \
+  $$SRCDIR/QmlZhttpServer.cpp \
+  $$SRCDIR/QmlZhttpServerConnection.cpp \
+  $$SRCDIR/QmlZhttpServerOptions.cpp \
+  $$SRCDIR/QmlZhttpRequest.cpp \
+  $$SRCDIR/QmlZhttpResponse.cpp
 
 OBJECTS_DIR = $$BUILDDIR/.obj
 MOC_DIR     = $$BUILDDIR/.moc

@@ -69,6 +69,11 @@ all_tests [] = {
     { "ztimerset", ztimerset_test, false, true, NULL },
     { "ztrie", ztrie_test, false, true, NULL },
     { "zhttp_client", zhttp_client_test, false, true, NULL },
+    { "zhttp_server", zhttp_server_test, false, true, NULL },
+    { "zhttp_server_connection", zhttp_server_connection_test, false, true, NULL },
+    { "zhttp_server_options", zhttp_server_options_test, false, true, NULL },
+    { "zhttp_request", zhttp_request_test, false, true, NULL },
+    { "zhttp_response", zhttp_response_test, false, true, NULL },
 #endif // CZMQ_BUILD_DRAFT_API
 #ifdef CZMQ_BUILD_DRAFT_API
 // Tests for stable/draft private classes:

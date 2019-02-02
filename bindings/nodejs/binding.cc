@@ -8560,8 +8560,6 @@ NAN_MODULE_INIT (ZhttpClient::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
-    Nan::SetPrototypeMethod (tpl, "execute", _execute);
-    Nan::SetPrototypeMethod (tpl, "wait", _wait);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -8613,31 +8611,6 @@ NAN_METHOD (ZhttpClient::defined) {
     info.GetReturnValue ().Set (Nan::New (zhttp_client->self != NULL));
 }
 
-NAN_METHOD (ZhttpClient::_execute) {
-    ZhttpClient *zhttp_client = Nan::ObjectWrap::Unwrap <ZhttpClient> (info.Holder ());
-    int result = zhttp_client_execute (zhttp_client->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
-NAN_METHOD (ZhttpClient::_wait) {
-    ZhttpClient *zhttp_client = Nan::ObjectWrap::Unwrap <ZhttpClient> (info.Holder ());
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `timeout`");
-
-    //int timeout; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
-    int timeout;
-
-
-    if (info [0]->IsNumber ())
-    {
-          timeout = Nan::To<int>(info [0]).FromJust ();
-    }
-    else
-        return Nan::ThrowTypeError ("`timeout` must be a number");
-    int result = zhttp_client_wait (zhttp_client->self, (int) timeout);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
 NAN_METHOD (ZhttpClient::_test) {
     if (info [0]->IsUndefined ())
         return Nan::ThrowTypeError ("method requires a `verbose`");
@@ -8656,6 +8629,717 @@ NAN_METHOD (ZhttpClient::_test) {
 }
 
 Nan::Persistent <Function> &ZhttpClient::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (ZhttpServer::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("ZhttpServer").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "port", _port);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("ZhttpServer").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+ZhttpServer::ZhttpServer (zhttp_server_options_t *options) {
+    self = zhttp_server_new (options);
+}
+
+ZhttpServer::ZhttpServer (zhttp_server_t *self_) {
+    self = self_;
+}
+
+ZhttpServer::~ZhttpServer () {
+}
+
+NAN_METHOD (ZhttpServer::New) {
+    assert (info.IsConstructCall ());
+    ZhttpServerOptions *options = Nan::ObjectWrap::Unwrap<ZhttpServerOptions>(info [0].As<Object>());
+    ZhttpServer *zhttp_server = new ZhttpServer (options->self);
+    if (zhttp_server) {
+        zhttp_server->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (ZhttpServer::destroy) {
+    ZhttpServer *zhttp_server = Nan::ObjectWrap::Unwrap <ZhttpServer> (info.Holder ());
+    zhttp_server_destroy (&zhttp_server->self);
+}
+
+
+NAN_METHOD (ZhttpServer::defined) {
+    ZhttpServer *zhttp_server = Nan::ObjectWrap::Unwrap <ZhttpServer> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zhttp_server->self != NULL));
+}
+
+NAN_METHOD (ZhttpServer::_port) {
+    ZhttpServer *zhttp_server = Nan::ObjectWrap::Unwrap <ZhttpServer> (info.Holder ());
+    int result = zhttp_server_port (zhttp_server->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZhttpServer::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhttp_server_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &ZhttpServer::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (ZhttpServerConnection::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("ZhttpServerConnection").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("ZhttpServerConnection").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+ZhttpServerConnection::ZhttpServerConnection () {
+}
+
+ZhttpServerConnection::~ZhttpServerConnection () {
+}
+
+NAN_METHOD (ZhttpServerConnection::New) {
+    assert (info.IsConstructCall ());
+    ZhttpServerConnection *zhttp_server_connection = new ZhttpServerConnection ();
+    if (zhttp_server_connection) {
+        zhttp_server_connection->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (ZhttpServerConnection::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhttp_server_connection_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &ZhttpServerConnection::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (ZhttpServerOptions::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("ZhttpServerOptions").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "port", _port);
+    Nan::SetPrototypeMethod (tpl, "setPort", _set_port);
+    Nan::SetPrototypeMethod (tpl, "backendAddress", _backend_address);
+    Nan::SetPrototypeMethod (tpl, "setBackendAddress", _set_backend_address);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("ZhttpServerOptions").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+ZhttpServerOptions::ZhttpServerOptions (void) {
+    self = zhttp_server_options_new ();
+}
+
+ZhttpServerOptions::ZhttpServerOptions (zhttp_server_options_t *self_) {
+    self = self_;
+}
+
+ZhttpServerOptions::~ZhttpServerOptions () {
+}
+
+NAN_METHOD (ZhttpServerOptions::New) {
+    assert (info.IsConstructCall ());
+    ZhttpServerOptions *zhttp_server_options = new ZhttpServerOptions ();
+    if (zhttp_server_options) {
+        zhttp_server_options->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (ZhttpServerOptions::destroy) {
+    ZhttpServerOptions *zhttp_server_options = Nan::ObjectWrap::Unwrap <ZhttpServerOptions> (info.Holder ());
+    zhttp_server_options_destroy (&zhttp_server_options->self);
+}
+
+
+NAN_METHOD (ZhttpServerOptions::defined) {
+    ZhttpServerOptions *zhttp_server_options = Nan::ObjectWrap::Unwrap <ZhttpServerOptions> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zhttp_server_options->self != NULL));
+}
+
+NAN_METHOD (ZhttpServerOptions::_port) {
+    ZhttpServerOptions *zhttp_server_options = Nan::ObjectWrap::Unwrap <ZhttpServerOptions> (info.Holder ());
+    int result = zhttp_server_options_port (zhttp_server_options->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZhttpServerOptions::_set_port) {
+    ZhttpServerOptions *zhttp_server_options = Nan::ObjectWrap::Unwrap <ZhttpServerOptions> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `port`");
+
+    //int port; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int port;
+
+
+    if (info [0]->IsNumber ())
+    {
+          port = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`port` must be a number");
+    zhttp_server_options_set_port (zhttp_server_options->self, (int) port);
+}
+
+NAN_METHOD (ZhttpServerOptions::_backend_address) {
+    ZhttpServerOptions *zhttp_server_options = Nan::ObjectWrap::Unwrap <ZhttpServerOptions> (info.Holder ());
+    char *result = (char *) zhttp_server_options_backend_address (zhttp_server_options->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpServerOptions::_set_backend_address) {
+    ZhttpServerOptions *zhttp_server_options = Nan::ObjectWrap::Unwrap <ZhttpServerOptions> (info.Holder ());
+    char *address;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `address`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`address` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String address_utf8 (info [0].As<String>());
+    address = *address_utf8;
+         //} //bjornw end
+    zhttp_server_options_set_backend_address (zhttp_server_options->self, (const char *)address);
+}
+
+NAN_METHOD (ZhttpServerOptions::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhttp_server_options_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &ZhttpServerOptions::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (ZhttpRequest::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("ZhttpRequest").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "recv", _recv);
+    Nan::SetPrototypeMethod (tpl, "method", _method);
+    Nan::SetPrototypeMethod (tpl, "setMethod", _set_method);
+    Nan::SetPrototypeMethod (tpl, "url", _url);
+    Nan::SetPrototypeMethod (tpl, "setUrl", _set_url);
+    Nan::SetPrototypeMethod (tpl, "contentType", _content_type);
+    Nan::SetPrototypeMethod (tpl, "setContentType", _set_content_type);
+    Nan::SetPrototypeMethod (tpl, "contentLength", _content_length);
+    Nan::SetPrototypeMethod (tpl, "headers", _headers);
+    Nan::SetPrototypeMethod (tpl, "content", _content);
+    Nan::SetPrototypeMethod (tpl, "getContent", _get_content);
+    Nan::SetPrototypeMethod (tpl, "setContent", _set_content);
+    Nan::SetPrototypeMethod (tpl, "setContentConst", _set_content_const);
+    Nan::SetPrototypeMethod (tpl, "resetContent", _reset_content);
+    Nan::SetPrototypeMethod (tpl, "match", _match);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("ZhttpRequest").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+ZhttpRequest::ZhttpRequest (void) {
+    self = zhttp_request_new ();
+}
+
+ZhttpRequest::ZhttpRequest (zhttp_request_t *self_) {
+    self = self_;
+}
+
+ZhttpRequest::~ZhttpRequest () {
+}
+
+NAN_METHOD (ZhttpRequest::New) {
+    assert (info.IsConstructCall ());
+    ZhttpRequest *zhttp_request = new ZhttpRequest ();
+    if (zhttp_request) {
+        zhttp_request->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (ZhttpRequest::destroy) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    zhttp_request_destroy (&zhttp_request->self);
+}
+
+
+NAN_METHOD (ZhttpRequest::defined) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zhttp_request->self != NULL));
+}
+
+NAN_METHOD (ZhttpRequest::_recv) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    Zsock *sock = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    zhttp_server_connection_t *result = zhttp_request_recv (zhttp_request->self, sock->self);
+    ZhttpServerConnection *zhttp_server_connection_result = new ZhttpServerConnection (result);
+    if (zhttp_server_connection_result) {
+    //  Don't yet know how to return a new object
+    //      zhttp_server_connection->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (ZhttpRequest::_method) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *result = (char *) zhttp_request_method (zhttp_request->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpRequest::_set_method) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *method;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `method`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`method` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String method_utf8 (info [0].As<String>());
+    method = *method_utf8;
+         //} //bjornw end
+    zhttp_request_set_method (zhttp_request->self, (const char *)method);
+}
+
+NAN_METHOD (ZhttpRequest::_url) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *result = (char *) zhttp_request_url (zhttp_request->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpRequest::_set_url) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *url;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `url`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`url` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String url_utf8 (info [0].As<String>());
+    url = *url_utf8;
+         //} //bjornw end
+    zhttp_request_set_url (zhttp_request->self, (const char *)url);
+}
+
+NAN_METHOD (ZhttpRequest::_content_type) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *result = (char *) zhttp_request_content_type (zhttp_request->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpRequest::_set_content_type) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *content_type;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `content type`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`content type` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String content_type_utf8 (info [0].As<String>());
+    content_type = *content_type_utf8;
+         //} //bjornw end
+    zhttp_request_set_content_type (zhttp_request->self, (const char *)content_type);
+}
+
+NAN_METHOD (ZhttpRequest::_content_length) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    size_t result = zhttp_request_content_length (zhttp_request->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZhttpRequest::_headers) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    zhash_t *result = zhttp_request_headers (zhttp_request->self);
+    Zhash *zhash_result = new Zhash (result);
+    if (zhash_result) {
+    //  Don't yet know how to return a new object
+    //      zhash->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (ZhttpRequest::_content) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *result = (char *) zhttp_request_content (zhttp_request->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpRequest::_get_content) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *result = (char *) zhttp_request_get_content (zhttp_request->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpRequest::_set_content) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *content;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `content`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`content` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String content_utf8 (info [0].As<String>());
+    content = *content_utf8;
+         //} //bjornw end
+    zhttp_request_set_content (zhttp_request->self, (char **)&content);
+}
+
+NAN_METHOD (ZhttpRequest::_set_content_const) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *content;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `content`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`content` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String content_utf8 (info [0].As<String>());
+    content = *content_utf8;
+         //} //bjornw end
+    zhttp_request_set_content_const (zhttp_request->self, (const char *)content);
+}
+
+NAN_METHOD (ZhttpRequest::_reset_content) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    zhttp_request_reset_content (zhttp_request->self);
+}
+
+NAN_METHOD (ZhttpRequest::_match) {
+    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
+    char *method;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `method`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`method` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String method_utf8 (info [0].As<String>());
+    method = *method_utf8;
+         //} //bjornw end
+    char *match;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `match`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`match` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String match_utf8 (info [1].As<String>());
+    match = *match_utf8;
+         //} //bjornw end
+    bool result = zhttp_request_match (zhttp_request->self, (const char *)method, (const char *)match);
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (ZhttpRequest::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhttp_request_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &ZhttpRequest::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
+NAN_MODULE_INIT (ZhttpResponse::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("ZhttpResponse").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "send", _send);
+    Nan::SetPrototypeMethod (tpl, "contentType", _content_type);
+    Nan::SetPrototypeMethod (tpl, "setContentType", _set_content_type);
+    Nan::SetPrototypeMethod (tpl, "statusCode", _status_code);
+    Nan::SetPrototypeMethod (tpl, "setStatusCode", _set_status_code);
+    Nan::SetPrototypeMethod (tpl, "headers", _headers);
+    Nan::SetPrototypeMethod (tpl, "contentLength", _content_length);
+    Nan::SetPrototypeMethod (tpl, "content", _content);
+    Nan::SetPrototypeMethod (tpl, "getContent", _get_content);
+    Nan::SetPrototypeMethod (tpl, "setContent", _set_content);
+    Nan::SetPrototypeMethod (tpl, "setContentConst", _set_content_const);
+    Nan::SetPrototypeMethod (tpl, "resetContent", _reset_content);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("ZhttpResponse").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+ZhttpResponse::ZhttpResponse (void) {
+    self = zhttp_response_new ();
+}
+
+ZhttpResponse::ZhttpResponse (zhttp_response_t *self_) {
+    self = self_;
+}
+
+ZhttpResponse::~ZhttpResponse () {
+}
+
+NAN_METHOD (ZhttpResponse::New) {
+    assert (info.IsConstructCall ());
+    ZhttpResponse *zhttp_response = new ZhttpResponse ();
+    if (zhttp_response) {
+        zhttp_response->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (ZhttpResponse::destroy) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    zhttp_response_destroy (&zhttp_response->self);
+}
+
+
+NAN_METHOD (ZhttpResponse::defined) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zhttp_response->self != NULL));
+}
+
+NAN_METHOD (ZhttpResponse::_send) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    Zsock *sock = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
+    ZhttpServerConnection *connection = Nan::ObjectWrap::Unwrap<ZhttpServerConnection>(info [1].As<Object>());
+    int result = zhttp_response_send (zhttp_response->self, sock->self, &connection->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZhttpResponse::_content_type) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    char *result = (char *) zhttp_response_content_type (zhttp_response->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpResponse::_set_content_type) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
+    zhttp_response_set_content_type (zhttp_response->self, (const char *)value);
+}
+
+NAN_METHOD (ZhttpResponse::_status_code) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    uint32_t result = zhttp_response_status_code (zhttp_response->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZhttpResponse::_set_status_code) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `status_code`");
+
+    //uint32_t status_code; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    uint32_t status_code;
+
+
+    if (info [0]->IsNumber ())
+    {
+          status_code = Nan::To<uint32_t>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`status_code` must be a number");
+    zhttp_response_set_status_code (zhttp_response->self, (uint32_t) status_code);
+}
+
+NAN_METHOD (ZhttpResponse::_headers) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    zhash_t *result = zhttp_response_headers (zhttp_response->self);
+    Zhash *zhash_result = new Zhash (result);
+    if (zhash_result) {
+    //  Don't yet know how to return a new object
+    //      zhash->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (ZhttpResponse::_content_length) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    size_t result = zhttp_response_content_length (zhttp_response->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (ZhttpResponse::_content) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    char *result = (char *) zhttp_response_content (zhttp_response->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpResponse::_get_content) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    char *result = (char *) zhttp_response_get_content (zhttp_response->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (ZhttpResponse::_set_content) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    char *content;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `content`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`content` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String content_utf8 (info [0].As<String>());
+    content = *content_utf8;
+         //} //bjornw end
+    zhttp_response_set_content (zhttp_response->self, (char **)&content);
+}
+
+NAN_METHOD (ZhttpResponse::_set_content_const) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    char *content;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `content`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`content` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String content_utf8 (info [0].As<String>());
+    content = *content_utf8;
+         //} //bjornw end
+    zhttp_response_set_content_const (zhttp_response->self, (const char *)content);
+}
+
+NAN_METHOD (ZhttpResponse::_reset_content) {
+    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
+    zhttp_response_reset_content (zhttp_response->self);
+}
+
+NAN_METHOD (ZhttpResponse::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zhttp_response_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &ZhttpResponse::constructor () {
     static Nan::Persistent <Function> my_constructor;
     return my_constructor;
 }
@@ -8691,6 +9375,11 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     Ztrie::Init (target);
     Zuuid::Init (target);
     ZhttpClient::Init (target);
+    ZhttpServer::Init (target);
+    ZhttpServerConnection::Init (target);
+    ZhttpServerOptions::Init (target);
+    ZhttpRequest::Init (target);
+    ZhttpResponse::Init (target);
 }
 
 NODE_MODULE (czmq, czmq_initialize)

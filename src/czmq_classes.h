@@ -96,7 +96,7 @@ CZMQ_PRIVATE zlistx_t *
 //  *** Draft callbacks, defined for internal use only ***
 // Destroy an item
 typedef void (zchunk_destructor_fn) (
-    void *hint);
+    void **hint);
 
 //  *** Draft method, defined for internal use only ***
 //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
@@ -140,7 +140,7 @@ CZMQ_PRIVATE zfile_t *
 //  *** Draft callbacks, defined for internal use only ***
 // Destroy an item
 typedef void (zframe_destructor_fn) (
-    void *hint);
+    void **hint);
 
 //  *** Draft method, defined for internal use only ***
 //  Create a new frame from memory. Take ownership of the memory and calling the destructor

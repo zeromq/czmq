@@ -106,6 +106,21 @@ if [ ! $INCREMENTAL ]; then
     # Clone and build dependencies
     BASE_PWD=${PWD}
     cd tmp-deps
+    if [ ! -e $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz") ]; then
+        $CI_TIME wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz
+        tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz")
+    fi
+    pushd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz" .tar.gz)
+    (
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        $CI_TIME make -j4
+        $CI_TIME make install
+    ) || exit 1
+    popd
+    cd ${BASE_PWD}
+
+    BASE_PWD=${PWD}
+    cd tmp-deps
     if [ ! -e libzmq ]; then
         $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
     fi

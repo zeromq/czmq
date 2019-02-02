@@ -212,9 +212,9 @@ QmlZchunk *QmlZchunkAttached::construct (const void *data, size_t size) {
 ///
 //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
 //  on destroy.
-QmlZchunk *QmlZchunkAttached::frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint) {
+QmlZchunk *QmlZchunkAttached::frommem (void *data, size_t size, zchunk_destructor_fn destructor, void *hint) {
     QmlZchunk *qmlSelf = new QmlZchunk ();
-    qmlSelf->self = zchunk_frommem (dataP, size, destructor, hint);
+    qmlSelf->self = zchunk_frommem (data, size, destructor, hint);
     return qmlSelf;
 };
 

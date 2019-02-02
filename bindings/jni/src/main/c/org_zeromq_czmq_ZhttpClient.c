@@ -25,20 +25,6 @@ Java_org_zeromq_czmq_ZhttpClient__1_1destroy (JNIEnv *env, jclass c, jlong self)
     zhttp_client_destroy ((zhttp_client_t **) &self);
 }
 
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_ZhttpClient__1_1execute (JNIEnv *env, jclass c, jlong self)
-{
-    jint execute_ = (jint) zhttp_client_execute ((zhttp_client_t *) (intptr_t) self);
-    return execute_;
-}
-
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_ZhttpClient__1_1wait (JNIEnv *env, jclass c, jlong self, jint timeout)
-{
-    jint wait_ = (jint) zhttp_client_wait ((zhttp_client_t *) (intptr_t) self, (int) timeout);
-    return wait_;
-}
-
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_ZhttpClient__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {

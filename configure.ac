@@ -575,6 +575,88 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libcurl
 dnl END of enabled attempts to search for libcurl
 
 
+was_libmicrohttpd_check_lib_detected=no
+
+search_libmicrohttpd="no"
+
+AC_ARG_WITH([libmicrohttpd],
+    [
+        AS_HELP_STRING([--with-libmicrohttpd],
+        [yes or no. Optionally specify libmicrohttpd prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_libmicrohttpd="yes"
+    ],
+    [
+        search_libmicrohttpd="yes"
+    ])
+AS_CASE([x"${with_libmicrohttpd}"],
+    [xyes], [search_libmicrohttpd="yes"],
+    [xno],  [search_libmicrohttpd="no"])
+
+
+AS_IF([test x"${search_libmicrohttpd}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    PKG_CHECK_MODULES([libmicrohttpd], [libmicrohttpd >= 0.9.61],
+    [
+        AC_DEFINE(HAVE_LIBMICROHTTPD, 1, [The optional libmicrohttpd library is to be used])
+        was_libmicrohttpd_check_lib_detected=pkgcfg
+        found_pkgconfig="libmicrohttpd"
+    ],
+    [
+        AC_MSG_NOTICE([Package libmicrohttpd not found with needed constraints; falling back to defined compilability tests])
+
+        libmicrohttpd_synthetic_cflags=""
+        libmicrohttpd_synthetic_libs="-lmicrohttpd"
+
+        if test -n "${with_libmicrohttpd}" && test x"${with_libmicrohttpd}" != xyes && test x"${with_libmicrohttpd}" != xno; then
+            if test -r "${with_libmicrohttpd}/include/microhttpd.h"; then
+                libmicrohttpd_synthetic_cflags="-I${with_libmicrohttpd}/include"
+                libmicrohttpd_synthetic_libs="-L${with_libmicrohttpd}/lib -lmicrohttpd"
+            else
+            AC_MSG_WARN([Header file ${with_libmicrohttpd}/include/microhttpd.h was not found. Please check libmicrohttpd prefix])
+            fi
+        else
+            AC_CHECK_HEADER([microhttpd.h], [],
+            AC_MSG_WARN([Header file microhttpd.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([microhttpd], [MHD_start_daemon],
+            [
+                was_libmicrohttpd_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lmicrohttpd"
+                AC_DEFINE(HAVE_LIBMICROHTTPD, 1, [The optional libmicrohttpd library is to be used (as -lmicrohttpd)])
+            ],
+            [])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for libmicrohttpd
+    AS_CASE(["x${was_libmicrohttpd_check_lib_detected}"],
+        [xpkgcfg], [
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig} >= 0.9.61"
+                CFLAGS="${libmicrohttpd_CFLAGS} ${CFLAGS}"
+                LIBS="${libmicrohttpd_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                CFLAGS="${libmicrohttpd_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${libmicrohttpd_synthetic_libs} ${LDFLAGS}"
+                LIBS="${libmicrohttpd_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([libmicrohttpd_CFLAGS],[${libmicrohttpd_synthetic_cflags}])
+                AC_SUBST([libmicrohttpd_LIBS],[${libmicrohttpd_synthetic_libs}])
+            ],
+        [xno], [
+            AC_MSG_WARN([Cannot find pkg-config metadata for libmicrohttpd 0.9.61 or higher])
+    ])
+])
+dnl END of enabled attempts to search for libmicrohttpd
+
+
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
 

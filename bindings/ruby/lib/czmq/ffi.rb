@@ -889,13 +889,72 @@ module CZMQ
 
       attach_function :zhttp_client_new, [:bool], :pointer, **opts
       attach_function :zhttp_client_destroy, [:pointer], :void, **opts
-      attach_function :zhttp_client_get, [:pointer, :string, :pointer, :int, :pointer, :pointer], :int, **opts
-      attach_function :zhttp_client_post, [:pointer, :string, :pointer, :pointer, :int, :pointer, :pointer], :int, **opts
-      attach_function :zhttp_client_execute, [:pointer], :int, **opts
-      attach_function :zhttp_client_wait, [:pointer, :int], :int, **opts
       attach_function :zhttp_client_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhttp_client'
+
+      attach_function :zhttp_server_new, [:pointer], :pointer, **opts
+      attach_function :zhttp_server_destroy, [:pointer], :void, **opts
+      attach_function :zhttp_server_port, [:pointer], :int, **opts
+      attach_function :zhttp_server_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zhttp_server'
+
+      attach_function :zhttp_server_connection_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zhttp_server_connection'
+
+      attach_function :zhttp_server_options_new, [], :pointer, **opts
+      attach_function :zhttp_server_options_from_config, [:pointer], :pointer, **opts
+      attach_function :zhttp_server_options_destroy, [:pointer], :void, **opts
+      attach_function :zhttp_server_options_port, [:pointer], :int, **opts
+      attach_function :zhttp_server_options_set_port, [:pointer, :int], :void, **opts
+      attach_function :zhttp_server_options_backend_address, [:pointer], :string, **opts
+      attach_function :zhttp_server_options_set_backend_address, [:pointer, :string], :void, **opts
+      attach_function :zhttp_server_options_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zhttp_server_options'
+
+      attach_function :zhttp_request_new, [], :pointer, **opts
+      attach_function :zhttp_request_destroy, [:pointer], :void, **opts
+      attach_function :zhttp_request_recv, [:pointer, :pointer], :pointer, **opts
+      attach_function :zhttp_request_send, [:pointer, :pointer, :int, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_request_method, [:pointer], :string, **opts
+      attach_function :zhttp_request_set_method, [:pointer, :string], :void, **opts
+      attach_function :zhttp_request_url, [:pointer], :string, **opts
+      attach_function :zhttp_request_set_url, [:pointer, :string], :void, **opts
+      attach_function :zhttp_request_content_type, [:pointer], :string, **opts
+      attach_function :zhttp_request_set_content_type, [:pointer, :string], :void, **opts
+      attach_function :zhttp_request_content_length, [:pointer], :size_t, **opts
+      attach_function :zhttp_request_headers, [:pointer], :pointer, **opts
+      attach_function :zhttp_request_content, [:pointer], :string, **opts
+      attach_function :zhttp_request_get_content, [:pointer], :pointer, **opts
+      attach_function :zhttp_request_set_content, [:pointer, :pointer], :void, **opts
+      attach_function :zhttp_request_set_content_const, [:pointer, :string], :void, **opts
+      attach_function :zhttp_request_reset_content, [:pointer], :void, **opts
+      attach_function :zhttp_request_match, [:pointer, :string, :string, :varargs], :bool, **opts
+      attach_function :zhttp_request_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zhttp_request'
+
+      attach_function :zhttp_response_new, [], :pointer, **opts
+      attach_function :zhttp_response_destroy, [:pointer], :void, **opts
+      attach_function :zhttp_response_send, [:pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_response_recv, [:pointer, :pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhttp_response_content_type, [:pointer], :string, **opts
+      attach_function :zhttp_response_set_content_type, [:pointer, :string], :void, **opts
+      attach_function :zhttp_response_status_code, [:pointer], :uint32, **opts
+      attach_function :zhttp_response_set_status_code, [:pointer, :uint32], :void, **opts
+      attach_function :zhttp_response_headers, [:pointer], :pointer, **opts
+      attach_function :zhttp_response_content_length, [:pointer], :size_t, **opts
+      attach_function :zhttp_response_content, [:pointer], :string, **opts
+      attach_function :zhttp_response_get_content, [:pointer], :pointer, **opts
+      attach_function :zhttp_response_set_content, [:pointer, :pointer], :void, **opts
+      attach_function :zhttp_response_set_content_const, [:pointer, :string], :void, **opts
+      attach_function :zhttp_response_reset_content, [:pointer], :void, **opts
+      attach_function :zhttp_response_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zhttp_response'
     end
   end
 end

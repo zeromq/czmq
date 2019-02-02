@@ -87,6 +87,7 @@ override_dh_auto_configure:
 		--with-libsystemd=yes \
 		--with-liblz4=yes \
 		--with-libcurl=yes \
+		--with-libmicrohttpd=yes \
 		--with-docs=$(DOCS) \
 		--enable-drafts=$(DRAFTS)
 

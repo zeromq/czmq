@@ -179,9 +179,9 @@ QmlZframe *QmlZframeAttached::from (const QString &string) {
 ///
 //  Create a new frame from memory. Take ownership of the memory and calling the destructor
 //  on destroy.
-QmlZframe *QmlZframeAttached::frommem (byte **dataP, size_t size, zframe_destructor_fn destructor, void *hint) {
+QmlZframe *QmlZframeAttached::frommem (void *data, size_t size, zframe_destructor_fn destructor, void *hint) {
     QmlZframe *qmlSelf = new QmlZframe ();
-    qmlSelf->self = zframe_frommem (dataP, size, destructor, hint);
+    qmlSelf->self = zframe_frommem (data, size, destructor, hint);
     return qmlSelf;
 };
 
