@@ -183,6 +183,26 @@ class zhttp_client_t(Structure):
     pass # Empty - only for type checking
 zhttp_client_p = POINTER(zhttp_client_t)
 
+class zhttp_server_options_t(Structure):
+    pass # Empty - only for type checking
+zhttp_server_options_p = POINTER(zhttp_server_options_t)
+
+class zhttp_server_t(Structure):
+    pass # Empty - only for type checking
+zhttp_server_p = POINTER(zhttp_server_t)
+
+class zhttp_request_t(Structure):
+    pass # Empty - only for type checking
+zhttp_request_p = POINTER(zhttp_request_t)
+
+class zhttp_server_connection_t(Structure):
+    pass # Empty - only for type checking
+zhttp_server_connection_p = POINTER(zhttp_server_connection_t)
+
+class zhttp_response_t(Structure):
+    pass # Empty - only for type checking
+zhttp_response_p = POINTER(zhttp_response_t)
+
 def return_py_file(c_file):
     if not sys.version_info > (3,):
         PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
@@ -1075,13 +1095,13 @@ objects.
 
 
 # zchunk
-zchunk_destructor_fn = CFUNCTYPE(None, c_void_p, POINTER(c_void_p))
+zchunk_destructor_fn = CFUNCTYPE(None, POINTER(c_void_p))
 lib.zchunk_new.restype = zchunk_p
 lib.zchunk_new.argtypes = [c_void_p, c_size_t]
 lib.zchunk_destroy.restype = None
 lib.zchunk_destroy.argtypes = [POINTER(zchunk_p)]
 lib.zchunk_frommem.restype = zchunk_p
-lib.zchunk_frommem.argtypes = [POINTER(c_void_p), c_size_t, zchunk_destructor_fn, c_void_p]
+lib.zchunk_frommem.argtypes = [c_void_p, c_size_t, zchunk_destructor_fn, c_void_p]
 lib.zchunk_resize.restype = None
 lib.zchunk_resize.argtypes = [zchunk_p, c_size_t]
 lib.zchunk_size.restype = c_size_t
@@ -1184,12 +1204,12 @@ allocated and left empty, and you can then add data using zchunk_append.
         return self._as_parameter_.__nonzero__()
 
     @staticmethod
-    def frommem(data_p, size, destructor, hint):
+    def frommem(data, size, destructor, hint):
         """
         Create a new chunk from memory. Take ownership of the memory and calling the destructor
 on destroy.
         """
-        return Zchunk(lib.zchunk_frommem(byref(c_void_p.from_param(data_p)), size, destructor, hint), True)
+        return Zchunk(lib.zchunk_frommem(data, size, destructor, hint), True)
 
     def resize(self, size):
         """
@@ -2470,7 +2490,7 @@ or NULL if there was nothing more to read from the file.
 
 
 # zframe
-zframe_destructor_fn = CFUNCTYPE(None, c_void_p, POINTER(c_void_p))
+zframe_destructor_fn = CFUNCTYPE(None, POINTER(c_void_p))
 lib.zframe_new.restype = zframe_p
 lib.zframe_new.argtypes = [c_void_p, c_size_t]
 lib.zframe_destroy.restype = None
@@ -2480,7 +2500,7 @@ lib.zframe_new_empty.argtypes = []
 lib.zframe_from.restype = zframe_p
 lib.zframe_from.argtypes = [c_char_p]
 lib.zframe_frommem.restype = zframe_p
-lib.zframe_frommem.argtypes = [POINTER(c_void_p), c_size_t, zframe_destructor_fn, c_void_p]
+lib.zframe_frommem.argtypes = [c_void_p, c_size_t, zframe_destructor_fn, c_void_p]
 lib.zframe_recv.restype = zframe_p
 lib.zframe_recv.argtypes = [c_void_p]
 lib.zframe_send.restype = c_int
@@ -2590,12 +2610,12 @@ size octets from the specified data into the frame body.
         return Zframe(lib.zframe_from(string), True)
 
     @staticmethod
-    def frommem(data_p, size, destructor, hint):
+    def frommem(data, size, destructor, hint):
         """
         Create a new frame from memory. Take ownership of the memory and calling the destructor
 on destroy.
         """
-        return Zframe(lib.zframe_frommem(byref(c_void_p.from_param(data_p)), size, destructor, hint), True)
+        return Zframe(lib.zframe_frommem(data, size, destructor, hint), True)
 
     @staticmethod
     def recv(source):
@@ -8549,25 +8569,18 @@ returns null.
 
 
 # zhttp_client
-zhttp_client_fn = CFUNCTYPE(None, c_void_p, c_int, zchunk_p)
 lib.zhttp_client_new.restype = zhttp_client_p
 lib.zhttp_client_new.argtypes = [c_bool]
 lib.zhttp_client_destroy.restype = None
 lib.zhttp_client_destroy.argtypes = [POINTER(zhttp_client_p)]
-lib.zhttp_client_get.restype = c_int
-lib.zhttp_client_get.argtypes = [zhttp_client_p, c_char_p, zlistx_p, c_int, zhttp_client_fn, c_void_p]
-lib.zhttp_client_post.restype = c_int
-lib.zhttp_client_post.argtypes = [zhttp_client_p, c_char_p, zlistx_p, zchunk_p, c_int, zhttp_client_fn, c_void_p]
-lib.zhttp_client_execute.restype = c_int
-lib.zhttp_client_execute.argtypes = [zhttp_client_p]
-lib.zhttp_client_wait.restype = c_int
-lib.zhttp_client_wait.argtypes = [zhttp_client_p, c_int]
 lib.zhttp_client_test.restype = None
 lib.zhttp_client_test.argtypes = [c_bool]
 
 class ZhttpClient(object):
     """
-    Provides an http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+    Http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+Use zhttp_request class to create and send the request.
+Use zhttp_response class to receive the response.
     """
 
     allow_destruct = False
@@ -8613,47 +8626,631 @@ class ZhttpClient(object):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
-    def get(self, url, headers, timeout, handler, arg):
-        """
-        Send a get request to the url, headers is optional.
-    Use arg to identify response when making multiple requests simultaneously.
-    Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-        """
-        return lib.zhttp_client_get(self._as_parameter_, url, headers, timeout, handler, arg)
-
-    def post(self, url, headers, body, timeout, handler, arg):
-        """
-        Send a post request to the url, headers is optional.
-Use arg to identify response when making multiple requests simultaneously.
-Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-        """
-        return lib.zhttp_client_post(self._as_parameter_, url, headers, body, timeout, handler, arg)
-
-    def execute(self):
-        """
-        Invoke callback function for received responses.
-Should be call after zpoller wait method.
-Returns 0 if OK, -1 on failure.
-        """
-        return lib.zhttp_client_execute(self._as_parameter_)
-
-    def wait(self, timeout):
-        """
-        Wait until a response is ready to be consumed.
-Use when you need a synchronize response.
-
-The timeout should be zero or greater, or -1 to wait indefinitely.
-
-Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-        """
-        return lib.zhttp_client_wait(self._as_parameter_, timeout)
-
     @staticmethod
     def test(verbose):
         """
         Self test of this class.
         """
         return lib.zhttp_client_test(verbose)
+
+
+# zhttp_server
+lib.zhttp_server_new.restype = zhttp_server_p
+lib.zhttp_server_new.argtypes = [zhttp_server_options_p]
+lib.zhttp_server_destroy.restype = None
+lib.zhttp_server_destroy.argtypes = [POINTER(zhttp_server_p)]
+lib.zhttp_server_port.restype = c_int
+lib.zhttp_server_port.argtypes = [zhttp_server_p]
+lib.zhttp_server_test.restype = None
+lib.zhttp_server_test.argtypes = [c_bool]
+
+class ZhttpServer(object):
+    """
+    Simple http server.
+To start handling requests:
+1. Create a dealer socket
+2. Connect the socket to the server backend address provided in the options.
+3. Create a zhttp_request.
+4. Call zhttp_request_recv to accept a new request.
+5. Call zhttp_response_send to send a response.
+
+You can connect as many dealers as you want.
+The Server is using simple dealer socket to route the requests.
+    """
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create a new http server
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhttp_server_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhttp_server_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zhttp_server_new(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy an http server
+        """
+        if self.allow_destruct:
+            lib.zhttp_server_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def port(self):
+        """
+        Return the port the server is listening on.
+        """
+        return lib.zhttp_server_port(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zhttp_server_test(verbose)
+
+
+# zhttp_server_connection
+lib.zhttp_server_connection_test.restype = None
+lib.zhttp_server_connection_test.argtypes = [c_bool]
+
+class ZhttpServerConnection(object):
+    """
+
+    """
+
+    allow_destruct = False
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zhttp_server_connection_test(verbose)
+
+
+# zhttp_server_options
+lib.zhttp_server_options_new.restype = zhttp_server_options_p
+lib.zhttp_server_options_new.argtypes = []
+lib.zhttp_server_options_destroy.restype = None
+lib.zhttp_server_options_destroy.argtypes = [POINTER(zhttp_server_options_p)]
+lib.zhttp_server_options_from_config.restype = zhttp_server_options_p
+lib.zhttp_server_options_from_config.argtypes = [zconfig_p]
+lib.zhttp_server_options_port.restype = c_int
+lib.zhttp_server_options_port.argtypes = [zhttp_server_options_p]
+lib.zhttp_server_options_set_port.restype = None
+lib.zhttp_server_options_set_port.argtypes = [zhttp_server_options_p, c_int]
+lib.zhttp_server_options_backend_address.restype = c_char_p
+lib.zhttp_server_options_backend_address.argtypes = [zhttp_server_options_p]
+lib.zhttp_server_options_set_backend_address.restype = None
+lib.zhttp_server_options_set_backend_address.argtypes = [zhttp_server_options_p, c_char_p]
+lib.zhttp_server_options_test.restype = None
+lib.zhttp_server_options_test.argtypes = [c_bool]
+
+class ZhttpServerOptions(object):
+    """
+    zhttp server.
+    """
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create a new zhttp_server_options.
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhttp_server_options_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhttp_server_options_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zhttp_server_options_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy the zhttp_server_options.
+        """
+        if self.allow_destruct:
+            lib.zhttp_server_options_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def from_config(config):
+        """
+        Create options from config tree.
+        """
+        return ZhttpServerOptions(lib.zhttp_server_options_from_config(config), True)
+
+    def port(self):
+        """
+        Get the server listening port.
+        """
+        return lib.zhttp_server_options_port(self._as_parameter_)
+
+    def set_port(self, port):
+        """
+        Set the server listening port
+        """
+        return lib.zhttp_server_options_set_port(self._as_parameter_, port)
+
+    def backend_address(self):
+        """
+        Get the address sockets should connect to in order to receive requests.
+        """
+        return lib.zhttp_server_options_backend_address(self._as_parameter_)
+
+    def set_backend_address(self, address):
+        """
+        Set the address sockets should connect to in order to receive requests.
+        """
+        return lib.zhttp_server_options_set_backend_address(self._as_parameter_, address)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zhttp_server_options_test(verbose)
+
+
+# zhttp_request
+lib.zhttp_request_new.restype = zhttp_request_p
+lib.zhttp_request_new.argtypes = []
+lib.zhttp_request_destroy.restype = None
+lib.zhttp_request_destroy.argtypes = [POINTER(zhttp_request_p)]
+lib.zhttp_request_recv.restype = zhttp_server_connection_p
+lib.zhttp_request_recv.argtypes = [zhttp_request_p, zsock_p]
+lib.zhttp_request_send.restype = c_int
+lib.zhttp_request_send.argtypes = [zhttp_request_p, zhttp_client_p, c_int, c_void_p, c_void_p]
+lib.zhttp_request_method.restype = c_char_p
+lib.zhttp_request_method.argtypes = [zhttp_request_p]
+lib.zhttp_request_set_method.restype = None
+lib.zhttp_request_set_method.argtypes = [zhttp_request_p, c_char_p]
+lib.zhttp_request_url.restype = c_char_p
+lib.zhttp_request_url.argtypes = [zhttp_request_p]
+lib.zhttp_request_set_url.restype = None
+lib.zhttp_request_set_url.argtypes = [zhttp_request_p, c_char_p]
+lib.zhttp_request_content_type.restype = c_char_p
+lib.zhttp_request_content_type.argtypes = [zhttp_request_p]
+lib.zhttp_request_set_content_type.restype = None
+lib.zhttp_request_set_content_type.argtypes = [zhttp_request_p, c_char_p]
+lib.zhttp_request_content_length.restype = c_size_t
+lib.zhttp_request_content_length.argtypes = [zhttp_request_p]
+lib.zhttp_request_headers.restype = zhash_p
+lib.zhttp_request_headers.argtypes = [zhttp_request_p]
+lib.zhttp_request_content.restype = c_char_p
+lib.zhttp_request_content.argtypes = [zhttp_request_p]
+lib.zhttp_request_get_content.restype = POINTER(c_char)
+lib.zhttp_request_get_content.argtypes = [zhttp_request_p]
+lib.zhttp_request_set_content.restype = None
+lib.zhttp_request_set_content.argtypes = [zhttp_request_p, POINTER(c_char_p)]
+lib.zhttp_request_set_content_const.restype = None
+lib.zhttp_request_set_content_const.argtypes = [zhttp_request_p, c_char_p]
+lib.zhttp_request_reset_content.restype = None
+lib.zhttp_request_reset_content.argtypes = [zhttp_request_p]
+lib.zhttp_request_match.restype = c_bool
+lib.zhttp_request_match.argtypes = [zhttp_request_p, c_char_p, c_char_p]
+lib.zhttp_request_test.restype = None
+lib.zhttp_request_test.argtypes = [c_bool]
+
+class ZhttpRequest(object):
+    """
+    Http request that can be received from zhttp_server or sent to zhttp_client.
+Class can be reused between send & recv calls.
+Headers and Content is being destroyed after every send call.
+    """
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create a new http request.
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhttp_request_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhttp_request_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zhttp_request_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy an http request.
+        """
+        if self.allow_destruct:
+            lib.zhttp_request_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def recv(self, sock):
+        """
+        Receive a new request from zhttp_server.
+Return the underlying connection if successful, to be used when calling zhttp_response_send.
+        """
+        return ZhttpServerConnection(lib.zhttp_request_recv(self._as_parameter_, sock), False)
+
+    def send(self, client, timeout, arg, arg2):
+        """
+        Send a request to zhttp_client.
+Url and the request path will be concatenated.
+This behavior is useful for url rewrite and reverse proxy.
+
+Send also allow two user provided arguments which will be returned with the response.
+The reason for two, is to be able to pass around the server connection when forwarding requests or both a callback function and an arg.
+        """
+        return lib.zhttp_request_send(self._as_parameter_, client, timeout, arg, arg2)
+
+    def method(self):
+        """
+        Get the request method
+        """
+        return lib.zhttp_request_method(self._as_parameter_)
+
+    def set_method(self, method):
+        """
+        Set the request method
+        """
+        return lib.zhttp_request_set_method(self._as_parameter_, method)
+
+    def url(self):
+        """
+        Get the request url.
+When receiving a request from http server this is only the path part of the url.
+        """
+        return lib.zhttp_request_url(self._as_parameter_)
+
+    def set_url(self, url):
+        """
+        Set the request url
+When sending a request to http client this should be full url.
+        """
+        return lib.zhttp_request_set_url(self._as_parameter_, url)
+
+    def content_type(self):
+        """
+        Get the request content type
+        """
+        return lib.zhttp_request_content_type(self._as_parameter_)
+
+    def set_content_type(self, content_type):
+        """
+        Set the request content type
+        """
+        return lib.zhttp_request_set_content_type(self._as_parameter_, content_type)
+
+    def content_length(self):
+        """
+        Get the content length of the request
+        """
+        return lib.zhttp_request_content_length(self._as_parameter_)
+
+    def headers(self):
+        """
+        Get the headers of the request
+        """
+        return Zhash(lib.zhttp_request_headers(self._as_parameter_), False)
+
+    def content(self):
+        """
+        Get the content of the request.
+        """
+        return lib.zhttp_request_content(self._as_parameter_)
+
+    def get_content(self):
+        """
+        Get the content of the request.
+        """
+        return return_fresh_string(lib.zhttp_request_get_content(self._as_parameter_))
+
+    def set_content(self, content):
+        """
+        Set the content of the request.
+Content must by dynamically allocated string.
+Takes ownership of the content.
+        """
+        return lib.zhttp_request_set_content(self._as_parameter_, byref(c_char_p.from_param(content)))
+
+    def set_content_const(self, content):
+        """
+        Set the content of the request..
+The content is assumed to be constant-memory and will therefore not be copied or deallocated in any way.
+        """
+        return lib.zhttp_request_set_content_const(self._as_parameter_, content)
+
+    def reset_content(self):
+        """
+        Set the content to NULL
+        """
+        return lib.zhttp_request_reset_content(self._as_parameter_)
+
+    def match(self, method, match, *args):
+        """
+        Match the path of the request.
+Support wildcards with '%s' symbol inside the match string.
+Matching wildcars is until the next '/', '?' or '\0'.
+On successful match the variadic arguments will be filled with the matching strings.
+On successful match the method is modifying the url field and break it into substrings.
+If you need to use the url, do it before matching or take a copy.
+
+User must not free the variadic arguments as they are part of the url.
+
+To use the percent symbol, just double it, e.g "%%something".
+
+Example:
+if (zhttp_request_match (request, "POST", "/send/%s/%s", &name, &id))
+        """
+        return lib.zhttp_request_match(self._as_parameter_, method, match, *args)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zhttp_request_test(verbose)
+
+
+# zhttp_response
+lib.zhttp_response_new.restype = zhttp_response_p
+lib.zhttp_response_new.argtypes = []
+lib.zhttp_response_destroy.restype = None
+lib.zhttp_response_destroy.argtypes = [POINTER(zhttp_response_p)]
+lib.zhttp_response_send.restype = c_int
+lib.zhttp_response_send.argtypes = [zhttp_response_p, zsock_p, POINTER(zhttp_server_connection_p)]
+lib.zhttp_response_recv.restype = c_int
+lib.zhttp_response_recv.argtypes = [zhttp_response_p, zhttp_client_p, POINTER(c_void_p), POINTER(c_void_p)]
+lib.zhttp_response_content_type.restype = c_char_p
+lib.zhttp_response_content_type.argtypes = [zhttp_response_p]
+lib.zhttp_response_set_content_type.restype = None
+lib.zhttp_response_set_content_type.argtypes = [zhttp_response_p, c_char_p]
+lib.zhttp_response_status_code.restype = c_int
+lib.zhttp_response_status_code.argtypes = [zhttp_response_p]
+lib.zhttp_response_set_status_code.restype = None
+lib.zhttp_response_set_status_code.argtypes = [zhttp_response_p, c_int]
+lib.zhttp_response_headers.restype = zhash_p
+lib.zhttp_response_headers.argtypes = [zhttp_response_p]
+lib.zhttp_response_content_length.restype = c_size_t
+lib.zhttp_response_content_length.argtypes = [zhttp_response_p]
+lib.zhttp_response_content.restype = c_char_p
+lib.zhttp_response_content.argtypes = [zhttp_response_p]
+lib.zhttp_response_get_content.restype = POINTER(c_char)
+lib.zhttp_response_get_content.argtypes = [zhttp_response_p]
+lib.zhttp_response_set_content.restype = None
+lib.zhttp_response_set_content.argtypes = [zhttp_response_p, POINTER(c_char_p)]
+lib.zhttp_response_set_content_const.restype = None
+lib.zhttp_response_set_content_const.argtypes = [zhttp_response_p, c_char_p]
+lib.zhttp_response_reset_content.restype = None
+lib.zhttp_response_reset_content.argtypes = [zhttp_response_p]
+lib.zhttp_response_test.restype = None
+lib.zhttp_response_test.argtypes = [c_bool]
+
+class ZhttpResponse(object):
+    """
+    Http response that can be received from zhttp_client or sent to zhttp_server.
+Class can be reused between send & recv calls.
+Headers and Content is being destroyed after every send call.
+    """
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create a new zhttp_response.
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhttp_response_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhttp_response_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zhttp_response_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy the zhttp_response.
+        """
+        if self.allow_destruct:
+            lib.zhttp_response_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def send(self, sock, connection):
+        """
+        Send a response to a request.
+Returns 0 if successful and -1 otherwise.
+        """
+        return lib.zhttp_response_send(self._as_parameter_, sock, byref(zhttp_server_connection_p.from_param(connection)))
+
+    def recv(self, client, arg, arg2):
+        """
+        Receive a response from zhttp_client.
+On success return 0, -1 otherwise.
+
+Recv returns the two user arguments which was provided with the request.
+The reason for two, is to be able to pass around the server connection when forwarding requests or both a callback function and an argument.
+        """
+        return lib.zhttp_response_recv(self._as_parameter_, client, byref(c_void_p.from_param(arg)), byref(c_void_p.from_param(arg2)))
+
+    def content_type(self):
+        """
+        Get the response content type
+        """
+        return lib.zhttp_response_content_type(self._as_parameter_)
+
+    def set_content_type(self, value):
+        """
+        Set the content type of the response.
+        """
+        return lib.zhttp_response_set_content_type(self._as_parameter_, value)
+
+    def status_code(self):
+        """
+        Get the status code of the response.
+        """
+        return lib.zhttp_response_status_code(self._as_parameter_)
+
+    def set_status_code(self, status_code):
+        """
+        Set the status code of the response.
+        """
+        return lib.zhttp_response_set_status_code(self._as_parameter_, status_code)
+
+    def headers(self):
+        """
+        Get the headers of the response.
+        """
+        return Zhash(lib.zhttp_response_headers(self._as_parameter_), False)
+
+    def content_length(self):
+        """
+        Get the content length of the response
+        """
+        return lib.zhttp_response_content_length(self._as_parameter_)
+
+    def content(self):
+        """
+        Get the content of the response.
+        """
+        return lib.zhttp_response_content(self._as_parameter_)
+
+    def get_content(self):
+        """
+        Get the content of the response.
+        """
+        return return_fresh_string(lib.zhttp_response_get_content(self._as_parameter_))
+
+    def set_content(self, content):
+        """
+        Set the content of the response.
+Content must by dynamically allocated string.
+Takes ownership of the content.
+        """
+        return lib.zhttp_response_set_content(self._as_parameter_, byref(c_char_p.from_param(content)))
+
+    def set_content_const(self, content):
+        """
+        Set the content of the response.
+The content is assumed to be constant-memory and will therefore not be copied or deallocated in any way.
+        """
+        return lib.zhttp_response_set_content_const(self._as_parameter_, content)
+
+    def reset_content(self):
+        """
+        Set the content to NULL
+        """
+        return lib.zhttp_response_reset_content(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zhttp_response_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

@@ -69,6 +69,13 @@ IF EXIST "..\..\..\libcurl" (
     ECHO Building without libcurl
     ECHO #undef HAVE_LIBCURL>> platform.h
 )
+IF EXIST "..\..\..\libmicrohttpd" (
+    ECHO Building with libmicrohttpd
+    ECHO #define HAVE_LIBMICROHTTPD 1>> platform.h
+) ELSE (
+    ECHO Building without libmicrohttpd
+    ECHO #undef HAVE_LIBMICROHTTPD>> platform.h
+)
 
 :-  Check if we want to build the draft API
 if "%1" == "--enable-drafts" goto :with_draft

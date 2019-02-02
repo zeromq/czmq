@@ -89,6 +89,7 @@ kwargs = pkgconfig_kwargs ([
     "libsystemd",
     "liblz4",
     "libcurl",
+    "libmicrohttpd",
     "libczmq"
 ])
 import cffi
@@ -187,6 +188,18 @@ void
 
 void
    zhttp_client_destroy_py (void *self);
+
+void
+   zhttp_server_destroy_py (void *self);
+
+void
+   zhttp_server_options_destroy_py (void *self);
+
+void
+   zhttp_request_destroy_py (void *self);
+
+void
+   zhttp_response_destroy_py (void *self);
 
 ''')
 
@@ -346,6 +359,30 @@ void
 zhttp_client_destroy_py (void *self)
 {
    zhttp_client_destroy ((zhttp_client_t **) &self);
+}
+
+void
+zhttp_server_destroy_py (void *self)
+{
+   zhttp_server_destroy ((zhttp_server_t **) &self);
+}
+
+void
+zhttp_server_options_destroy_py (void *self)
+{
+   zhttp_server_options_destroy ((zhttp_server_options_t **) &self);
+}
+
+void
+zhttp_request_destroy_py (void *self)
+{
+   zhttp_request_destroy ((zhttp_request_t **) &self);
+}
+
+void
+zhttp_response_destroy_py (void *self)
+{
+   zhttp_response_destroy ((zhttp_response_t **) &self);
 }
 
 ''', **kwargs)

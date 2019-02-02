@@ -1,0 +1,43 @@
+<class name = "zhttp_server_options" state = "draft">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    zhttp server.
+
+    <constructor>
+    </constructor>
+
+    <constructor name = "from config">
+        Create options from config tree.
+        <argument name = "config" type = "zconfig" />
+    </constructor>
+
+    <destructor>
+    </destructor>
+
+    <method name = "port" >
+        Get the server listening port.
+        <return type = "integer" />
+    </method>
+
+    <method name = "set port">
+        Set the server listening port
+        <argument name = "port" type = "integer" />
+    </method>
+
+    <method name = "backend address">
+        Get the address sockets should connect to in order to receive requests.
+        <return type = "string" />
+    </method>
+
+    <method name = "set backend address">
+        Set the address sockets should connect to in order to receive requests.
+        <argument name = "address" type = "string" />
+    </method>
+</class>

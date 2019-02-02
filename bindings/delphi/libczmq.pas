@@ -323,7 +323,7 @@ type
 type
 
   // Destroy an item
-  TZchunkDestructorFn = procedure(Hint: Pointer; var Item: PByte); stdcall;
+  TZchunkDestructorFn = procedure(var Hint: Pointer); stdcall;
   PZchunkDestructorFn = ^TZchunkDestructorFn;
 
   // Create a new chunk of the specified size. If you specify the data, it
@@ -333,7 +333,7 @@ type
 
   // Create a new chunk from memory. Take ownership of the memory and calling the destructor
   // on destroy.
-  function zchunk_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+  function zchunk_frommem(Data: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer): PZchunk; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Destroy a chunk
   procedure zchunk_destroy(var self: PZchunk); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
@@ -837,7 +837,7 @@ type
 type
 
   // Destroy an item
-  TZframeDestructorFn = procedure(Hint: Pointer; var Item: PByte); stdcall;
+  TZframeDestructorFn = procedure(var Hint: Pointer); stdcall;
   PZframeDestructorFn = ^TZframeDestructorFn;
 
   // Create a new frame. If size is not null, allocates the frame data
@@ -853,7 +853,7 @@ type
 
   // Create a new frame from memory. Take ownership of the memory and calling the destructor
   // on destroy.
-  function zframe_frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+  function zframe_frommem(Data: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer): PZframe; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Receive frame from socket, returns zframe_t object or NULL if the recv
   // was interrupted. Does a blocking recv, if you want to not block then use

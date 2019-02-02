@@ -43,7 +43,12 @@ include_HEADERS += \
     zproc.h \
     ztimerset.h \
     ztrie.h \
-    zhttp_client.h
+    zhttp_client.h \
+    zhttp_server.h \
+    zhttp_server_connection.h \
+    zhttp_server_options.h \
+    zhttp_request.h \
+    zhttp_response.h
 
 endif
 

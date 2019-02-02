@@ -2483,7 +2483,7 @@ uses
 
     // Create a new chunk from memory. Take ownership of the memory and calling the destructor
     // on destroy.
-    constructor Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer);
+    constructor Frommem(Data: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer);
 
     // Destroy a chunk
     destructor Destroy; override;
@@ -3053,7 +3053,7 @@ uses
 
     // Create a new frame from memory. Take ownership of the memory and calling the destructor
     // on destroy.
-    constructor Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer);
+    constructor Frommem(Data: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer);
 
     // Receive frame from socket, returns zframe_t object or NULL if the recv
     // was interrupted. Does a blocking recv, if you want to not block then use
@@ -6015,9 +6015,9 @@ end;
     Create(zchunk_new(Data, Size), True);
   end;
 
-  constructor TZchunk.Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer);
+  constructor TZchunk.Frommem(Data: PByte; Size: NativeUInt; &Destructor: TZchunkDestructorFn; Hint: Pointer);
   begin
-    Create(zchunk_frommem(DataP, Size, &Destructor, Hint), True);
+    Create(zchunk_frommem(Data, Size, &Destructor, Hint), True);
   end;
 
   constructor TZchunk.Create(handle: PZchunk; owned: Boolean);
@@ -6845,9 +6845,9 @@ end;
     Create(zframe_from(PAnsiChar(__String__)), True);
   end;
 
-  constructor TZframe.Frommem(var DataP: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer);
+  constructor TZframe.Frommem(Data: PByte; Size: NativeUInt; &Destructor: TZframeDestructorFn; Hint: Pointer);
   begin
-    Create(zframe_frommem(DataP, Size, &Destructor, Hint), True);
+    Create(zframe_frommem(Data, Size, &Destructor, Hint), True);
   end;
 
   constructor TZframe.Recv(const Source: IZSock);

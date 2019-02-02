@@ -69,6 +69,16 @@ zuuid.txt
 zuuid.doc
 zhttp_client.txt
 zhttp_client.doc
+zhttp_server.txt
+zhttp_server.doc
+zhttp_server_connection.txt
+zhttp_server_connection.doc
+zhttp_server_options.txt
+zhttp_server_options.doc
+zhttp_request.txt
+zhttp_request.doc
+zhttp_response.txt
+zhttp_response.doc
 zauth.txt
 zauth.doc
 zbeacon.txt

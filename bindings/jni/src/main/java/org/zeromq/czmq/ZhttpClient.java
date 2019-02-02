@@ -42,27 +42,6 @@ public class ZhttpClient implements AutoCloseable{
         self = 0;
     }
     /*
-    Invoke callback function for received responses.
-    Should be call after zpoller wait method.
-    Returns 0 if OK, -1 on failure.
-    */
-    native static int __execute (long self);
-    public int execute () {
-        return __execute (self);
-    }
-    /*
-    Wait until a response is ready to be consumed.
-    Use when you need a synchronize response.
-
-    The timeout should be zero or greater, or -1 to wait indefinitely.
-
-    Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-    */
-    native static int __wait (long self, int timeout);
-    public int Wait (int timeout) {
-        return __wait (self, timeout);
-    }
-    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

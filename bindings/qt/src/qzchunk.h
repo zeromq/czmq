@@ -24,7 +24,7 @@ public:
 
     //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
     //  on destroy.
-    static QZchunk* frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint, QObject *qObjParent = 0);
+    static QZchunk* frommem (void *data, size_t size, zchunk_destructor_fn destructor, void *hint, QObject *qObjParent = 0);
 
     //  Destroy a chunk
     ~QZchunk ();

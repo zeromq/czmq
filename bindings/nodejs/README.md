@@ -4513,7 +4513,9 @@ nothing my_zuuid.test (Boolean)
 
 Self test of this class.
 
-### The ZhttpClient class - Provides an http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+### The ZhttpClient class - Http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+Use zhttp_request class to create and send the request.
+Use zhttp_response class to receive the response.
 
 Constructor:
 
@@ -4531,26 +4533,343 @@ my_zhttp_client.destroy ()
 Methods:
 
 ```
-integer my_zhttp_client.execute ()
-```
-
-Invoke callback function for received responses.
-Should be call after zpoller wait method.
-Returns 0 if OK, -1 on failure.
-
-```
-integer my_zhttp_client.wait (Number)
-```
-
-Wait until a response is ready to be consumed.
-Use when you need a synchronize response.
-
-The timeout should be zero or greater, or -1 to wait indefinitely.
-
-Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-
-```
 nothing my_zhttp_client.test (Boolean)
+```
+
+Self test of this class.
+
+### The ZhttpServer class - Simple http server.
+To start handling requests:
+1. Create a dealer socket
+2. Connect the socket to the server backend address provided in the options.
+3. Create a zhttp_request.
+4. Call zhttp_request_recv to accept a new request.
+5. Call zhttp_response_send to send a response.
+
+You can connect as many dealers as you want.
+The Server is using simple dealer socket to route the requests.
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zhttp_server = new czmq.ZhttpServer (ZhttpServerOptions)
+```
+
+You *must* call the destructor on every ZhttpServer instance:
+
+```
+my_zhttp_server.destroy ()
+```
+
+Methods:
+
+```
+integer my_zhttp_server.port ()
+```
+
+Return the port the server is listening on.
+
+```
+nothing my_zhttp_server.test (Boolean)
+```
+
+Self test of this class.
+
+### The ZhttpServerConnection class -
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zhttp_server_connection = new czmq.ZhttpServerConnection ()
+```
+
+Methods:
+
+```
+nothing my_zhttp_server_connection.test (Boolean)
+```
+
+Self test of this class.
+
+### The ZhttpServerOptions class - zhttp server.
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zhttp_server_options = new czmq.ZhttpServerOptions ()
+```
+
+You *must* call the destructor on every ZhttpServerOptions instance:
+
+```
+my_zhttp_server_options.destroy ()
+```
+
+Methods:
+
+```
+integer my_zhttp_server_options.port ()
+```
+
+Get the server listening port.
+
+```
+nothing my_zhttp_server_options.setPort (Number)
+```
+
+Set the server listening port
+
+```
+string my_zhttp_server_options.backendAddress ()
+```
+
+Get the address sockets should connect to in order to receive requests.
+
+```
+nothing my_zhttp_server_options.setBackendAddress (String)
+```
+
+Set the address sockets should connect to in order to receive requests.
+
+```
+nothing my_zhttp_server_options.test (Boolean)
+```
+
+Self test of this class.
+
+### The ZhttpRequest class - Http request that can be received from zhttp_server or sent to zhttp_client.
+Class can be reused between send & recv calls.
+Headers and Content is being destroyed after every send call.
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zhttp_request = new czmq.ZhttpRequest ()
+```
+
+You *must* call the destructor on every ZhttpRequest instance:
+
+```
+my_zhttp_request.destroy ()
+```
+
+Methods:
+
+```
+zhttp_server_connection my_zhttp_request.recv (Zsock)
+```
+
+Receive a new request from zhttp_server.
+Return the underlying connection if successful, to be used when calling zhttp_response_send.
+
+```
+string my_zhttp_request.method ()
+```
+
+Get the request method
+
+```
+nothing my_zhttp_request.setMethod (String)
+```
+
+Set the request method
+
+```
+string my_zhttp_request.url ()
+```
+
+Get the request url.
+When receiving a request from http server this is only the path part of the url.
+
+```
+nothing my_zhttp_request.setUrl (String)
+```
+
+Set the request url
+When sending a request to http client this should be full url.
+
+```
+string my_zhttp_request.contentType ()
+```
+
+Get the request content type
+
+```
+nothing my_zhttp_request.setContentType (String)
+```
+
+Set the request content type
+
+```
+size my_zhttp_request.contentLength ()
+```
+
+Get the content length of the request
+
+```
+zhash my_zhttp_request.headers ()
+```
+
+Get the headers of the request
+
+```
+string my_zhttp_request.content ()
+```
+
+Get the content of the request.
+
+```
+string my_zhttp_request.getContent ()
+```
+
+Get the content of the request.
+
+```
+nothing my_zhttp_request.setContent (String)
+```
+
+Set the content of the request.
+Content must by dynamically allocated string.
+Takes ownership of the content.
+
+```
+nothing my_zhttp_request.setContentConst (String)
+```
+
+Set the content of the request..
+The content is assumed to be constant-memory and will therefore not be copied or deallocated in any way.
+
+```
+nothing my_zhttp_request.resetContent ()
+```
+
+Set the content to NULL
+
+```
+boolean my_zhttp_request.match (String, String)
+```
+
+Match the path of the request.
+Support wildcards with '%s' symbol inside the match string.
+Matching wildcars is until the next '/', '?' or '\0'.
+On successful match the variadic arguments will be filled with the matching strings.
+On successful match the method is modifying the url field and break it into substrings.
+If you need to use the url, do it before matching or take a copy.
+
+User must not free the variadic arguments as they are part of the url.
+
+To use the percent symbol, just double it, e.g "%%something".
+
+Example:
+if (zhttp_request_match (request, "POST", "/send/%s/%s", &name, &id))
+
+```
+nothing my_zhttp_request.test (Boolean)
+```
+
+Self test of this class.
+
+### The ZhttpResponse class - Http response that can be received from zhttp_client or sent to zhttp_server.
+Class can be reused between send & recv calls.
+Headers and Content is being destroyed after every send call.
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zhttp_response = new czmq.ZhttpResponse ()
+```
+
+You *must* call the destructor on every ZhttpResponse instance:
+
+```
+my_zhttp_response.destroy ()
+```
+
+Methods:
+
+```
+integer my_zhttp_response.send (Zsock, ZhttpServerConnection)
+```
+
+Send a response to a request.
+Returns 0 if successful and -1 otherwise.
+
+```
+string my_zhttp_response.contentType ()
+```
+
+Get the response content type
+
+```
+nothing my_zhttp_response.setContentType (String)
+```
+
+Set the content type of the response.
+
+```
+number my_zhttp_response.statusCode ()
+```
+
+Get the status code of the response.
+
+```
+nothing my_zhttp_response.setStatusCode (Number)
+```
+
+Set the status code of the response.
+
+```
+zhash my_zhttp_response.headers ()
+```
+
+Get the headers of the response.
+
+```
+size my_zhttp_response.contentLength ()
+```
+
+Get the content length of the response
+
+```
+string my_zhttp_response.content ()
+```
+
+Get the content of the response.
+
+```
+string my_zhttp_response.getContent ()
+```
+
+Get the content of the response.
+
+```
+nothing my_zhttp_response.setContent (String)
+```
+
+Set the content of the response.
+Content must by dynamically allocated string.
+Takes ownership of the content.
+
+```
+nothing my_zhttp_response.setContentConst (String)
+```
+
+Set the content of the response.
+The content is assumed to be constant-memory and will therefore not be copied or deallocated in any way.
+
+```
+nothing my_zhttp_response.resetContent ()
+```
+
+Set the content to NULL
+
+```
+nothing my_zhttp_response.test (Boolean)
 ```
 
 Self test of this class.

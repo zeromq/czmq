@@ -29,29 +29,94 @@
 #ifdef HAVE_LIBCURL
 
 typedef struct {
-    void *handler;
-    void *arg;
-    zchunk_t *response;
     CURL *curl;
-    struct curl_slist *headers;
-    zchunk_t *body;
-} http_request;
+    void *arg;
+    void *arg2;
+
+    char *request_content;
+    bool free_request_content;
+
+    struct curl_slist *request_headers;
+
+    char *response_content;
+    size_t response_content_length;
+    zhash_t *response_headers;
+
+} http_request_t;
+
+size_t header_callback(char *buffer, size_t size, size_t nitems, void *userp) {
+    http_request_t *request = (http_request_t *) userp;
+
+    // TODO: support multiline headers
+
+    char *colon = buffer;
+    const char *end = buffer + (size * nitems);
+
+    while (colon != end) {
+        if (*colon == ':') {
+            *colon = '\0';
+            colon++;
+            char* key = buffer;
+            char* value = colon;
+            char *value_end = colon;
+
+            // Find the end of line and set it to null terminated
+            while (*value_end != '\r' && *value_end != '\n' && value_end != end) {
+                value_end++;
+            }
+            *value_end = '\0';
+
+            // Skip any whitespace at the beginning of the value
+            while (*value == ' ' || *value == '\t') {
+                if (value == value_end)
+                    break;
+                value++;
+            }
+
+            zhash_insert (request->response_headers, key, value);
+
+            break;
+        }
+
+        colon++;
+    }
+
+    return size * nitems;
+}
 
 size_t write_data (void *buffer, size_t size, size_t nmemb, void *userp) {
-    zchunk_t *chunk = (zchunk_t *) userp;
-    zchunk_extend (chunk, buffer, nmemb);
+    http_request_t *request = (http_request_t *) userp;
+
+    size_t offset = 0;
+
+    if (request->response_content == NULL) {
+        request->response_content_length = nmemb;
+        request->response_content = (char*)malloc (request->response_content_length + 1);
+    }
+    else {
+        offset = request->response_content_length;
+        request->response_content_length += nmemb;
+        request->response_content = (char*) realloc (request->response_content, request->response_content_length + 1);
+    }
+
+    memcpy (request->response_content + offset, buffer, nmemb);
+    request->response_content[request->response_content_length] = '\0';
 
     return nmemb;
 }
 
-static struct curl_slist *zlistx_to_slist (zlistx_t *zlist) {
+static struct curl_slist *zhash_to_slist (zhash_t *headers) {
     struct curl_slist *slist = NULL;
 
-    char *header = (char *) zlistx_first (zlist);
+    char *value = (char*) zhash_first (headers);
 
-    while (header) {
+    while (value) {
+        const char *key = zhash_cursor (headers);
+        char *header = zsys_sprintf ("%s: %s", key, value); // TODO: avoid allocation here
         slist = curl_slist_append (slist, header);
-        header = (char *) zlistx_next (zlist);
+        zstr_free (&header);
+
+        value = (char *) zhash_next (headers);
     }
 
     return slist;
@@ -59,12 +124,17 @@ static struct curl_slist *zlistx_to_slist (zlistx_t *zlist) {
 
 static void curl_destructor (CURL **curlp) {
     CURL *curl = *curlp;
-    http_request *request;
+    http_request_t *request;
     curl_easy_getinfo (curl, CURLINFO_PRIVATE, &request);
 
-    zchunk_destroy (&request->response);
-    zchunk_destroy (&request->body);
-    curl_slist_free_all (request->headers);
+    if (request->free_request_content)
+        zstr_free (&request->request_content);
+
+    // Those will usually be null, as we are passing the pointer to the caller
+    zstr_free (&request->response_content);
+    zhash_destroy (&request->response_headers);
+
+    curl_slist_free_all (request->request_headers);
     curl_easy_cleanup (curl);
     free (request);
     *curlp = NULL;
@@ -106,28 +176,34 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
             //  All actors must handle $TERM in this way
             if (streq (command, "$TERM"))
                 terminated = true;
-            else if (streq (command, "GET")) {
-                char *url;
-                zlistx_t *headers;
+            else {
                 int timeout;
-                void *handler;
                 void *arg;
-                int rc = zsock_recv (pipe, "slipp", &url, &headers, &timeout, &handler, &arg);
+                void *arg2;
+                char *url;
+                zhash_t *headers;
+                byte free_content;
+                char* content;
+
+                int rc = zsock_brecv (pipe, "4ppSp1p", &timeout, &arg, &arg2,
+                        &url, &headers, &free_content, &content);
                 assert (rc == 0);
 
-                zchunk_t *response = zchunk_new (NULL, 100);
-                assert (response);
-                struct curl_slist *curl_headers = zlistx_to_slist (headers);
+                struct curl_slist *curl_headers = zhash_to_slist (headers);
+
                 CURL *curl = curl_easy_init ();
                 zlistx_add_end (pending_handles, curl);
-                http_request *request = (http_request *) zmalloc (sizeof (http_request));
+                http_request_t *request = (http_request_t *) zmalloc (sizeof (http_request_t));
                 assert (request);
-                request->handler = handler;
+
                 request->arg = arg;
+                request->arg2 = arg2;
                 request->curl = curl;
-                request->response = response;
-                request->headers = curl_headers;
-                request->body = NULL;
+                request->request_headers = curl_headers;
+                request->request_content = content;
+                request->free_request_content = free_content;
+                request->response_headers = zhash_new ();
+                zhash_autofree (request->response_headers);
 
                 curl_easy_setopt (curl, CURLOPT_SHARE, share);
                 curl_easy_setopt (curl, CURLOPT_TIMEOUT_MS, (long)timeout);
@@ -135,56 +211,21 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 curl_easy_setopt (curl, CURLOPT_HTTPHEADER, curl_headers);
                 curl_easy_setopt (curl, CURLOPT_URL, url);
                 curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, write_data);
-                curl_easy_setopt (curl, CURLOPT_WRITEDATA, response);
+                curl_easy_setopt (curl, CURLOPT_WRITEDATA, request);
+                curl_easy_setopt (curl, CURLOPT_HEADERFUNCTION, header_callback);
+                curl_easy_setopt (curl, CURLOPT_HEADERDATA, request);
                 curl_easy_setopt (curl, CURLOPT_PRIVATE, request);
+
+                if (streq (command, "POST")) {
+                    curl_easy_setopt (curl, CURLOPT_POSTFIELDS, content);
+                    curl_easy_setopt (curl, CURLOPT_POSTFIELDSIZE, content ? strlen (content) : 0);
+                }
 
                 code = curl_multi_add_handle (multi, curl);
                 assert (code == CURLM_OK);
-                zlistx_destroy (&headers);
+                zhash_destroy (&headers);
                 zstr_free (&url);
-            } else if (streq (command, "POST")) {
 
-                char *url;
-                zlistx_t *headers;
-                zchunk_t *body;
-                int timeout;
-                void *handler;
-                void *arg;
-                int rc = zsock_recv (pipe, "slcipp", &url, &headers, &body, &timeout, &handler, &arg);
-                assert (rc == 0);
-
-                zchunk_t *response = zchunk_new (NULL, 100);
-                assert (response);
-                struct curl_slist *curl_headers = zlistx_to_slist (headers);
-                CURL *curl = curl_easy_init ();
-                zlistx_add_end (pending_handles, curl);
-                http_request *request = (http_request *) zmalloc (sizeof (http_request));
-                assert (request);
-                request->handler = handler;
-                request->arg = arg;
-                request->curl = curl;
-                request->response = response;
-                request->headers = curl_headers;
-                request->body = body;
-
-                curl_easy_setopt (curl, CURLOPT_SHARE, share);
-                curl_easy_setopt (curl, CURLOPT_TIMEOUT_MS, (long)timeout);
-                curl_easy_setopt (curl, CURLOPT_VERBOSE, verbose);
-                curl_easy_setopt (curl, CURLOPT_POSTFIELDS, zchunk_data (body));
-                curl_easy_setopt (curl, CURLOPT_POSTFIELDSIZE, zchunk_size (body));
-                curl_easy_setopt (curl, CURLOPT_HTTPHEADER, curl_headers);
-                curl_easy_setopt (curl, CURLOPT_URL, url);
-                curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, write_data);
-                curl_easy_setopt (curl, CURLOPT_WRITEDATA, response);
-                curl_easy_setopt (curl, CURLOPT_PRIVATE, request);
-
-                code = curl_multi_add_handle (multi, curl);
-                assert (code == CURLM_OK);
-                zlistx_destroy (&headers);
-                zstr_free (&url);
-            } else {
-                puts ("E: invalid message to actor");
-                assert (false);
             }
             zstr_free (&command);
         }
@@ -199,18 +240,32 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
         while (msg) {
             if (msg->msg == CURLMSG_DONE) {
                 CURL *curl = msg->easy_handle;
-                http_request *request;
+                http_request_t *request;
                 curl_easy_getinfo (curl, CURLINFO_PRIVATE, &request);
 
                 long response_code_long;
                 curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &response_code_long);
-                int response_code = (int) response_code_long;
+                uint32_t response_code = (uint32_t) response_code_long;
 
-                if (response_code == 0 && msg->data.result == CURLE_OPERATION_TIMEDOUT)
-                    response_code = -1;
+                uint32_t result = 0;
 
-                int rc = zsock_send (pipe, "icpp", response_code, request->response, request->handler, request->arg);
+                // TODO: more mappings
+                switch (msg->data.result) {
+                    case CURLE_OK:
+                        result = 0;
+                        break;
+                    case CURLE_OPERATION_TIMEDOUT:
+                        result = ETIMEDOUT;
+                        break;
+                    default:
+                        result = msg->data.result;
+                }
+
+                int rc = zsock_bsend (pipe, "4pp4pp", result, request->arg, request->arg2, response_code, request->response_headers, request->response_content);
                 assert (rc == 0);
+
+                request->response_headers = NULL;
+                request->response_content = NULL;
 
                 curl_multi_remove_handle (multi, curl);
 
@@ -256,216 +311,66 @@ zhttp_client_destroy (zhttp_client_t **self_p) {
 
 
 //  --------------------------------------------------------------------------
-//  Send a get request to the url, headers is optional.
-//  Use userp to identify response when making multiple requests simultaneously.
-
-
-int
-zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, int timeout, zhttp_client_fn handler, void *arg) {
-#ifdef HAVE_LIBCURL
-    if (timeout == -1)
-        timeout = 0;
-
-    if (headers)
-        return zsock_send (self, "sslipp", "GET", url, headers, timeout, handler, arg);
-    else
-        return zsock_send (self, "sszipp", "GET", url, timeout, handler, arg);
-#else
-    return -1;
-#endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send a post request to the url, headers is optional.
-//  Use arg to identify response when making multiple requests simultaneously.
-
-int
-zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, int timeout, zhttp_client_fn handler,
-                   void *arg) {
-#ifdef HAVE_LIBCURL
-
-    if (timeout == -1)
-        timeout = 0;
-
-    if (headers && body)
-        return zsock_send (self, "sslcipp", "POST", url, headers, body, timeout, handler, arg);
-    else if (headers && !body)
-        return zsock_send (self, "sslzipp", "POST", url, headers, timeout, handler, arg);
-    else if (!headers && body)
-        return zsock_send (self, "sszcipp", "POST", url, body, timeout, handler, arg);
-    else
-        return zsock_send (self, "sszzipp", "POST", url, timeout, handler, arg);
-#else
-    return -1;
-#endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Invoke callback function for received responses.
-//  Should be call after zpoller wait method.
-//  Returns 0 if OK, -1 on failure.
-
-int
-zhttp_client_execute (zhttp_client_t *self) {
-#ifdef HAVE_LIBCURL
-    int response_code;
-    zchunk_t *data;
-    void *arg;
-    zhttp_client_fn *handler;
-    int rc;
-
-    while (zsock_has_in (self)) {
-        rc = zsock_recv (self, "icpp", &response_code, &data, &handler, &arg);
-
-        if (rc < 0)
-            return rc;
-
-        handler (arg, response_code, data);
-    }
-
-    return 0;
-#else
-    return -1;
-#endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Wait until a response is ready to be consumed.
-//  Use when you need a synchronize response.
-//
-//  The timeout should be zero or greater, or -1 to wait indefinitely.
-//
-//  Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-
-int
-zhttp_client_wait (zhttp_client_t *self, int timeout) {
-    zpoller_t *poller = zpoller_new (self, NULL);
-    void* sock = zpoller_wait (poller, timeout);
-
-    if (sock) {
-        zpoller_destroy (&poller);
-        return 0;
-    }
-
-    if (zpoller_expired (poller))
-        errno = EAGAIN;
-    else
-        errno = ETERM;
-
-    zpoller_destroy (&poller);
-
-    return -1;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Self test of this class
 
-static void
-test_handler (void *arg, int response_code, zchunk_t *data) {
-    (void) response_code;
-
-    bool *event = (bool *) arg;
-    *event = true;
-
-    if (response_code == 200)
-    assert (zchunk_streq (data, "Hello"));
-
-    zchunk_destroy (&data);
-}
-
-static zchunk_t *
-recv_http_request(void* server) {
-    zchunk_t *routing_id;
-    char *request;
-    int rc = zsock_recv (server, "cs", &routing_id, &request);
-    assert (rc == 0);
-
-    while (strlen (request) == 0) {
-        zchunk_destroy (&routing_id);
-        zstr_free (&request);
-        zsock_recv (server, "cs", &routing_id, &request);
-        assert (rc == 0);
-    }
-
-    zstr_free (&request);
-
-    return routing_id;
-}
 
 void
 zhttp_client_test (bool verbose) {
-#if defined(HAVE_LIBCURL) && defined(ZMQ_STREAM)
+#if defined(HAVE_LIBCURL) && defined(HAVE_LIBMICROHTTPD)
     printf (" * zhttp_client: ");
-    zsock_t *server = zsock_new_stream (NULL);
-    int port = zsock_bind (server, "tcp://127.0.0.1:*");
-    char url[255];
-    sprintf (url, "http://127.0.0.1:%d", port);
+
+    zhttp_server_options_t *options = zhttp_server_options_new ();
+    zhttp_server_options_set_port (options, 0);
+
+    zhttp_server_t *server = zhttp_server_new (options);
+    int port = zhttp_server_port (server);
+
+    char url[256];
+    snprintf (url,255, "http://127.0.0.1:%d", port);
 
     //  @selftest
-    //  Simple create/destroy test
     zhttp_client_t *self = zhttp_client_new (verbose);
     assert (self);
 
-    //  Send the get request
-    bool event = false;
-    zlistx_t *headers = zlistx_new ();
-    zlistx_add_end (headers, "Host: zeromq.org");
-    zhttp_client_get (self, url, headers, -1, test_handler, &event);
-    zlistx_destroy (&headers);
-
-    //  Receive request on the server
-    zchunk_t *routing_id = recv_http_request (server);
-
-    //  Send the response
-    char* response = "HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nHello";
-    zsock_send (server, "cs", routing_id, response);
-    zchunk_destroy (&routing_id);
-
-    //  Receive the response on the http client
-    int rc = zhttp_client_wait (self, -1);
+    zhttp_request_t* request = zhttp_request_new ();
+    zhttp_request_set_url (request, url);
+    zhttp_request_set_method (request, "GET");
+    int rc = zhttp_request_send (request, self, /*timeout*/ 10000, /* user args*/ NULL, NULL);
     assert (rc == 0);
-    zhttp_client_execute (self);
-    assert (event);
-
-    // Send a POST request
-    event = false;
-    zchunk_t *body = zchunk_new ("World", 5);
-    zhttp_client_post (self, url, NULL, body, -1, test_handler, &event);
-
-    //  Receive request on the server
-    routing_id = recv_http_request (server);
-
-    //  Send the response
-    zsock_send (server, "cs", routing_id, response);
-    zchunk_destroy (&routing_id);
-
-    //  Receive the response on the http client
-    rc = zhttp_client_wait (self, -1);
-    assert (rc == 0);
-    zhttp_client_execute (self);
-    assert (event);
-
-    //  Timeout check
-    event = false;
-    zhttp_client_get (self, url, NULL, 1000, test_handler, &event);
-    rc = zhttp_client_wait (self, 1200);
-    assert (rc == 0);
-    zhttp_client_execute (self);
-    assert (event);
-
-    //  Sending another request, without being answer
-    //  Checking the client ability to stop while request are inprogres
-    zhttp_client_get (self, url, NULL, -1, test_handler, NULL);
-
-    zchunk_destroy (&body);
-    zhttp_client_destroy (&self);
-    zsock_destroy (&server);
 
     //  @end
+
+    zsock_t *worker = zsock_new_dealer (zhttp_server_options_backend_address (options));
+    zhttp_request_t *server_request = zhttp_request_new ();
+    zhttp_server_connection_t *connection = zhttp_request_recv (server_request, worker);
+    assert (connection);
+
+    zhttp_response_t *server_response = zhttp_response_new ();
+    zhttp_response_set_content_const (server_response, "Hello World!");
+    zhttp_response_set_status_code (server_response, 200);
+    rc = zhttp_response_send (server_response, worker, &connection);
+    assert (rc == 0);
+
+    //  @selftest
+    void *user_arg;
+    void *user_arg2;
+    zhttp_response_t* response = zhttp_response_new ();
+    rc = zhttp_response_recv (response, self, &user_arg, &user_arg2);
+    assert (rc == 0);
+    assert (streq (zhttp_response_content (response), "Hello World!"));
+
+    zhttp_client_destroy (&self);
+    zhttp_request_destroy (&request);
+    zhttp_response_destroy (&response);
+
+    //  @end
+
+    zhttp_request_destroy (&server_request);
+    zhttp_response_destroy (&server_response);
+    zsock_destroy (&worker);
+    zhttp_server_destroy (&server);
+    zhttp_server_options_destroy (&options);
+
     printf ("OK\n");
 #endif
 }

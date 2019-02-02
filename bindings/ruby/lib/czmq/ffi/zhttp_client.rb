@@ -6,7 +6,9 @@
 module CZMQ
   module FFI
 
-    # Provides an http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+    # Http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+    # Use zhttp_request class to create and send the request.
+    # Use zhttp_response class to receive the response.
     # @note This class is 100% generated using zproject.
     class ZhttpClient
       # Raised when one tries to use an instance of {ZhttpClient} after
@@ -73,23 +75,6 @@ module CZMQ
         @finalizer = nil
       end
 
-      # Create a new callback of the following type:
-      # Callback function for http response.
-      #     typedef void (zhttp_client_fn) (
-      #         void *arg, int response_code, zchunk_t *data);
-      #
-      # @note WARNING: If your Ruby code doesn't retain a reference to the
-      #   FFI::Function object after passing it to a C function call,
-      #   it may be garbage collected while C still holds the pointer,
-      #   potentially resulting in a segmentation fault.
-      def self.fn
-        ::FFI::Function.new :void, [:pointer, :int, :pointer], blocking: true do |arg, response_code, data|
-          data = Zchunk.__new data, false
-          result = yield arg, response_code, data
-          result
-        end
-      end
-
       # Create a new http client
       # @param verbose [Boolean]
       # @return [CZMQ::ZhttpClient]
@@ -106,75 +91,6 @@ module CZMQ
         return unless @ptr
         self_p = __ptr_give_ref
         result = ::CZMQ::FFI.zhttp_client_destroy(self_p)
-        result
-      end
-
-      # Send a get request to the url, headers is optional.
-      #     Use arg to identify response when making multiple requests simultaneously.
-      #     Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-      #
-      # @param url [String, #to_s, nil]
-      # @param headers [Zlistx, #__ptr]
-      # @param timeout [Integer, #to_int, #to_i]
-      # @param handler [::FFI::Pointer, #to_ptr]
-      # @param arg [::FFI::Pointer, #to_ptr]
-      # @return [Integer]
-      def get(url, headers, timeout, handler, arg)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        headers = headers.__ptr if headers
-        timeout = Integer(timeout)
-        result = ::CZMQ::FFI.zhttp_client_get(self_p, url, headers, timeout, handler, arg)
-        result
-      end
-
-      # Send a post request to the url, headers is optional.
-      # Use arg to identify response when making multiple requests simultaneously.
-      # Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-      #
-      # @param url [String, #to_s, nil]
-      # @param headers [Zlistx, #__ptr]
-      # @param body [Zchunk, #__ptr]
-      # @param timeout [Integer, #to_int, #to_i]
-      # @param handler [::FFI::Pointer, #to_ptr]
-      # @param arg [::FFI::Pointer, #to_ptr]
-      # @return [Integer]
-      def post(url, headers, body, timeout, handler, arg)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        headers = headers.__ptr if headers
-        body = body.__ptr if body
-        timeout = Integer(timeout)
-        result = ::CZMQ::FFI.zhttp_client_post(self_p, url, headers, body, timeout, handler, arg)
-        result
-      end
-
-      # Invoke callback function for received responses.
-      # Should be call after zpoller wait method.
-      # Returns 0 if OK, -1 on failure.
-      #
-      # @return [Integer]
-      def execute()
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.zhttp_client_execute(self_p)
-        result
-      end
-
-      # Wait until a response is ready to be consumed.
-      # Use when you need a synchronize response.
-      #
-      # The timeout should be zero or greater, or -1 to wait indefinitely.
-      #
-      # Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-      #
-      # @param timeout [Integer, #to_int, #to_i]
-      # @return [Integer]
-      def wait(timeout)
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        timeout = Integer(timeout)
-        result = ::CZMQ::FFI.zhttp_client_wait(self_p, timeout)
         result
       end
 

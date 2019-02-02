@@ -157,13 +157,13 @@ CZMQ_EXPORT void
 #ifdef CZMQ_BUILD_DRAFT_API
 // Destroy an item
 typedef void (zchunk_destructor_fn) (
-    void *hint, byte **item);
+    void **hint);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
 //  on destroy.
 CZMQ_EXPORT zchunk_t *
-    zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, void *hint);
+    zchunk_frommem (void *data, size_t size, zchunk_destructor_fn destructor, void *hint);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Transform zchunk into a zframe that can be sent in a message.

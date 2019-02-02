@@ -64,6 +64,14 @@ IF EXIST "..\..\..\..\libcurl\builds/msvc/vs2012\libcurl.import.props" (
 ) ELSE (
     ECHO Building without libcurl
 )
+IF EXIST "..\..\..\..\libmicrohttpd\builds/msvc/vs2012\libmicrohttpd.import.props" (
+    COPY /Y "..\..\..\..\libmicrohttpd\builds/msvc/vs2012\libmicrohttpd.import.props" . > %log%
+    IF errorlevel 1 GOTO error
+    SET packages=%packages% /p:HAVE_LIBMICROHTTPD=1
+    ECHO Building with libmicrohttpd
+) ELSE (
+    ECHO Building without libmicrohttpd
+)
 
 ECHO %action% CZMQ... (%packages%)
 

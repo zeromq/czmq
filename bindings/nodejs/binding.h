@@ -980,8 +980,114 @@ class ZhttpClient: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
-    static NAN_METHOD (_execute);
-    static NAN_METHOD (_wait);
+    static NAN_METHOD (_test);
+};
+
+class ZhttpServer: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit ZhttpServer (zhttp_server_options_t *options);
+        explicit ZhttpServer (zhttp_server_t *self);
+        zhttp_server_t *self;
+    private:
+        ~ZhttpServer ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_port);
+    static NAN_METHOD (_test);
+};
+
+class ZhttpServerConnection: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit ZhttpServerConnection ();
+    private:
+        ~ZhttpServerConnection ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (_test);
+};
+
+class ZhttpServerOptions: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit ZhttpServerOptions (void);
+        explicit ZhttpServerOptions (zhttp_server_options_t *self);
+        zhttp_server_options_t *self;
+    private:
+        ~ZhttpServerOptions ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_port);
+    static NAN_METHOD (_set_port);
+    static NAN_METHOD (_backend_address);
+    static NAN_METHOD (_set_backend_address);
+    static NAN_METHOD (_test);
+};
+
+class ZhttpRequest: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit ZhttpRequest (void);
+        explicit ZhttpRequest (zhttp_request_t *self);
+        zhttp_request_t *self;
+    private:
+        ~ZhttpRequest ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_recv);
+    static NAN_METHOD (_method);
+    static NAN_METHOD (_set_method);
+    static NAN_METHOD (_url);
+    static NAN_METHOD (_set_url);
+    static NAN_METHOD (_content_type);
+    static NAN_METHOD (_set_content_type);
+    static NAN_METHOD (_content_length);
+    static NAN_METHOD (_headers);
+    static NAN_METHOD (_content);
+    static NAN_METHOD (_get_content);
+    static NAN_METHOD (_set_content);
+    static NAN_METHOD (_set_content_const);
+    static NAN_METHOD (_reset_content);
+    static NAN_METHOD (_match);
+    static NAN_METHOD (_test);
+};
+
+class ZhttpResponse: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit ZhttpResponse (void);
+        explicit ZhttpResponse (zhttp_response_t *self);
+        zhttp_response_t *self;
+    private:
+        ~ZhttpResponse ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_send);
+    static NAN_METHOD (_content_type);
+    static NAN_METHOD (_set_content_type);
+    static NAN_METHOD (_status_code);
+    static NAN_METHOD (_set_status_code);
+    static NAN_METHOD (_headers);
+    static NAN_METHOD (_content_length);
+    static NAN_METHOD (_content);
+    static NAN_METHOD (_get_content);
+    static NAN_METHOD (_set_content);
+    static NAN_METHOD (_set_content_const);
+    static NAN_METHOD (_reset_content);
     static NAN_METHOD (_test);
 };
 

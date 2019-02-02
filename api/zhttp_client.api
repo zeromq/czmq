@@ -8,14 +8,9 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
-    Provides an http client, allowing multiple requests simultaneously and integrate easily with zpoller.
-
-    <callback_type name="fn">
-        Callback function for http response.
-        <argument name = "arg" type = "anything" />
-        <argument name = "response_code" type = "integer" />
-        <argument name = "data" type = "zchunk" />
-    </callback_type>
+    Http client, allowing multiple requests simultaneously and integrate easily with zpoller.
+    Use zhttp_request class to create and send the request.
+    Use zhttp_response class to receive the response.
 
     <constructor>
         Create a new http client
@@ -25,50 +20,4 @@
     <destructor>
         Destroy an http client
     </destructor>
-
-    <method name = "get">
-        Send a get request to the url, headers is optional.
-	    Use arg to identify response when making multiple requests simultaneously.
-	    Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-
-        <argument name = "url" type = "string" />
-        <argument name = "headers" type = "zlistx" />
-        <argument name = "timeout" type = "integer" />
-        <argument name = "handler" type = "zhttp_client_fn" callback="1" />
-        <argument name = "arg" type = "anything" />
-        <return type = "integer" />
-    </method>
-
-    <method name = "post">
-        Send a post request to the url, headers is optional.
-        Use arg to identify response when making multiple requests simultaneously.
-        Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-
-        <argument name = "url" type = "string" />
-        <argument name = "headers" type = "zlistx" />
-        <argument name = "body" type = "zchunk" />
-        <argument name = "timeout" type = "integer" />
-        <argument name = "handler" type = "zhttp_client_fn" callback="1" />
-        <argument name = "arg" type = "anything" />
-        <return type = "integer" />
-    </method>
-
-
-    <method name = "execute">
-        Invoke callback function for received responses.
-        Should be call after zpoller wait method.
-        Returns 0 if OK, -1 on failure.
-        <return type = "integer" />
-    </method>
-
-    <method name = "wait">
-        Wait until a response is ready to be consumed.
-        Use when you need a synchronize response.
-
-        The timeout should be zero or greater, or -1 to wait indefinitely.
-
-        Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-        <argument name = "timeout" type = "integer" />
-        <return type = "integer" />
-    </method>
 </class>

@@ -286,6 +286,42 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         CONFIG_OPTS+=("--with-libcurl=yes")
     fi
 
+    # Start of recipe for dependency: libmicrohttpd
+    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libmicrohttpd-dev >/dev/null 2>&1) || \
+           (command -v brew >/dev/null 2>&1 && brew ls --versions libmicrohttpd >/dev/null 2>&1) \
+    ; then
+        echo ""
+        BASE_PWD=${PWD}
+        echo "`date`: INFO: Building prerequisite 'libmicrohttpd' from tarball..." >&2
+        cd ./tmp-deps
+        $CI_TIME wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz
+        tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz")
+        cd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz" .tar.gz) || exit $?
+        CCACHE_BASEDIR=${PWD}
+        export CCACHE_BASEDIR
+        if [ -e autogen.sh ]; then
+            $CI_TIME ./autogen.sh 2> /dev/null
+        fi
+        if [ -e buildconf ]; then
+            $CI_TIME ./buildconf 2> /dev/null
+        fi
+        if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+            $CI_TIME libtoolize --copy --force && \
+            $CI_TIME aclocal -I . && \
+            $CI_TIME autoheader && \
+            $CI_TIME automake --add-missing --copy && \
+            $CI_TIME autoconf || \
+            $CI_TIME autoreconf -fiv
+        fi
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        $CI_TIME make -j4
+        $CI_TIME make install
+        cd "${BASE_PWD}"
+        CONFIG_OPTS+=("--with-libmicrohttpd=yes")
+    else
+        CONFIG_OPTS+=("--with-libmicrohttpd=yes")
+    fi
+
     # Build and check this project; note that zprojects always have an autogen.sh
     echo ""
     echo "`date`: INFO: Starting build of currently tested project with DRAFT APIs..."

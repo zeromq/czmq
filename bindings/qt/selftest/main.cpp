@@ -46,6 +46,11 @@ int main(int argc, char **argv)
     QZtrie::test (verbose);
     QZuuid::test (verbose);
     QZhttpClient::test (verbose);
+    QZhttpServer::test (verbose);
+    QZhttpServerConnection::test (verbose);
+    QZhttpServerOptions::test (verbose);
+    QZhttpRequest::test (verbose);
+    QZhttpResponse::test (verbose);
 
     qDebug() << "Tests passed OK\n";
     return 0;

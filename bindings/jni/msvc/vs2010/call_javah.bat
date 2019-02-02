@@ -85,3 +85,18 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zuuid.h GOTO HAVE_Zuuid
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpClient.h GOTO HAVE_ZhttpClient
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpClient
 :HAVE_ZhttpClient
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpServer.h GOTO HAVE_ZhttpServer
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpServer
+:HAVE_ZhttpServer
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpServerConnection.h GOTO HAVE_ZhttpServerConnection
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpServerConnection
+:HAVE_ZhttpServerConnection
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpServerOptions.h GOTO HAVE_ZhttpServerOptions
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpServerOptions
+:HAVE_ZhttpServerOptions
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpRequest.h GOTO HAVE_ZhttpRequest
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpRequest
+:HAVE_ZhttpRequest
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpResponse.h GOTO HAVE_ZhttpResponse
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpResponse
+:HAVE_ZhttpResponse

@@ -25,10 +25,6 @@ extern "C" {
 //  stable builds by default. If you use this in applications, please ask
 //  for it to be pushed to stable state. Use --enable-drafts to enable.
 #ifdef CZMQ_BUILD_DRAFT_API
-// Callback function for http response.
-typedef void (zhttp_client_fn) (
-    void *arg, int response_code, zchunk_t *data);
-
 //  *** Draft method, for development use, may change without warning ***
 //  Create a new http client
 CZMQ_EXPORT zhttp_client_t *
@@ -38,37 +34,6 @@ CZMQ_EXPORT zhttp_client_t *
 //  Destroy an http client
 CZMQ_EXPORT void
     zhttp_client_destroy (zhttp_client_t **self_p);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Send a get request to the url, headers is optional.
-//      Use arg to identify response when making multiple requests simultaneously.
-//      Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-CZMQ_EXPORT int
-    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, int timeout, zhttp_client_fn handler, void *arg);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Send a post request to the url, headers is optional.
-//  Use arg to identify response when making multiple requests simultaneously.
-//  Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-CZMQ_EXPORT int
-    zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, int timeout, zhttp_client_fn handler, void *arg);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Invoke callback function for received responses.
-//  Should be call after zpoller wait method.
-//  Returns 0 if OK, -1 on failure.
-CZMQ_EXPORT int
-    zhttp_client_execute (zhttp_client_t *self);
-
-//  *** Draft method, for development use, may change without warning ***
-//  Wait until a response is ready to be consumed.
-//  Use when you need a synchronize response.
-//
-//  The timeout should be zero or greater, or -1 to wait indefinitely.
-//
-//  Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-CZMQ_EXPORT int
-    zhttp_client_wait (zhttp_client_t *self, int timeout);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.

@@ -139,7 +139,7 @@ public slots:
 
     //  Create a new chunk from memory. Take ownership of the memory and calling the destructor
     //  on destroy.
-    QmlZchunk *frommem (byte **dataP, size_t size, zchunk_destructor_fn destructor, void *hint);
+    QmlZchunk *frommem (void *data, size_t size, zchunk_destructor_fn destructor, void *hint);
 
     //  Destroy a chunk
     void destruct (QmlZchunk *qmlSelf);

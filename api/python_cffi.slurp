@@ -59,6 +59,11 @@ typedef struct _ztimerset_t ztimerset_t;
 typedef struct _ztrie_t ztrie_t;
 typedef struct _zuuid_t zuuid_t;
 typedef struct _zhttp_client_t zhttp_client_t;
+typedef struct _zhttp_server_options_t zhttp_server_options_t;
+typedef struct _zhttp_server_t zhttp_server_t;
+typedef struct _zhttp_server_connection_t zhttp_server_connection_t;
+typedef struct _zhttp_request_t zhttp_request_t;
+typedef struct _zhttp_response_t zhttp_response_t;
 // Actors get a pipe and arguments from caller
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
@@ -82,7 +87,7 @@ typedef void (zcertstore_destructor) (
 
 // Destroy an item
 typedef void (zchunk_destructor_fn) (
-    void *hint, byte **item);
+    void **hint);
 
 //
 typedef int (zconfig_fct) (
@@ -90,7 +95,7 @@ typedef int (zconfig_fct) (
 
 // Destroy an item
 typedef void (zframe_destructor_fn) (
-    void *hint, byte **item);
+    void **hint);
 
 // Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (
@@ -169,10 +174,6 @@ typedef void (ztimerset_fn) (
 // Callback function for ztrie_node to destroy node data.
 typedef void (ztrie_destroy_data_fn) (
     void **data);
-
-// Callback function for http response.
-typedef void (zhttp_client_fn) (
-    void *arg, int response_code, zchunk_t *data);
 
 // CLASS: zactor
 // Create a new actor passing arbitrary arguments reference.
@@ -504,7 +505,7 @@ zchunk_t *
 // Create a new chunk from memory. Take ownership of the memory and calling the destructor
 // on destroy.
 zchunk_t *
-    zchunk_frommem (byte **data_p, size_t size, zchunk_destructor_fn destructor, void *hint);
+    zchunk_frommem (void *data, size_t size, zchunk_destructor_fn destructor, void *hint);
 
 // Destroy a chunk
 void
@@ -1128,7 +1129,7 @@ zframe_t *
 // Create a new frame from memory. Take ownership of the memory and calling the destructor
 // on destroy.
 zframe_t *
-    zframe_frommem (byte **data_p, size_t size, zframe_destructor_fn destructor, void *hint);
+    zframe_frommem (void *data, size_t size, zframe_destructor_fn destructor, void *hint);
 
 // Receive frame from socket, returns zframe_t object or NULL if the recv
 // was interrupted. Does a blocking recv, if you want to not block then use
@@ -4218,35 +4219,236 @@ zhttp_client_t *
 void
     zhttp_client_destroy (zhttp_client_t **self_p);
 
-// Send a get request to the url, headers is optional.
-//     Use arg to identify response when making multiple requests simultaneously.
-//     Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-int
-    zhttp_client_get (zhttp_client_t *self, const char *url, zlistx_t *headers, int timeout, zhttp_client_fn handler, void *arg);
-
-// Send a post request to the url, headers is optional.
-// Use arg to identify response when making multiple requests simultaneously.
-// Timeout is in milliseconds, use -1 or 0 to wait indefinitely.
-int
-    zhttp_client_post (zhttp_client_t *self, const char *url, zlistx_t *headers, zchunk_t *body, int timeout, zhttp_client_fn handler, void *arg);
-
-// Invoke callback function for received responses.
-// Should be call after zpoller wait method.
-// Returns 0 if OK, -1 on failure.
-int
-    zhttp_client_execute (zhttp_client_t *self);
-
-// Wait until a response is ready to be consumed.
-// Use when you need a synchronize response.
-//
-// The timeout should be zero or greater, or -1 to wait indefinitely.
-//
-// Returns 0 if a response is ready, -1 and otherwise. errno will be set to EAGAIN if no response is ready.
-int
-    zhttp_client_wait (zhttp_client_t *self, int timeout);
-
 // Self test of this class.
 void
     zhttp_client_test (bool verbose);
+
+// CLASS: zhttp_server
+// Create a new http server
+zhttp_server_t *
+    zhttp_server_new (zhttp_server_options_t *options);
+
+// Destroy an http server
+void
+    zhttp_server_destroy (zhttp_server_t **self_p);
+
+// Return the port the server is listening on.
+int
+    zhttp_server_port (zhttp_server_t *self);
+
+// Self test of this class.
+void
+    zhttp_server_test (bool verbose);
+
+// CLASS: zhttp_server_connection
+// Self test of this class.
+void
+    zhttp_server_connection_test (bool verbose);
+
+// CLASS: zhttp_server_options
+// Create a new zhttp_server_options.
+zhttp_server_options_t *
+    zhttp_server_options_new (void);
+
+// Create options from config tree.
+zhttp_server_options_t *
+    zhttp_server_options_from_config (zconfig_t *config);
+
+// Destroy the zhttp_server_options.
+void
+    zhttp_server_options_destroy (zhttp_server_options_t **self_p);
+
+// Get the server listening port.
+int
+    zhttp_server_options_port (zhttp_server_options_t *self);
+
+// Set the server listening port
+void
+    zhttp_server_options_set_port (zhttp_server_options_t *self, int port);
+
+// Get the address sockets should connect to in order to receive requests.
+const char *
+    zhttp_server_options_backend_address (zhttp_server_options_t *self);
+
+// Set the address sockets should connect to in order to receive requests.
+void
+    zhttp_server_options_set_backend_address (zhttp_server_options_t *self, const char *address);
+
+// Self test of this class.
+void
+    zhttp_server_options_test (bool verbose);
+
+// CLASS: zhttp_request
+// Create a new http request.
+zhttp_request_t *
+    zhttp_request_new (void);
+
+// Destroy an http request.
+void
+    zhttp_request_destroy (zhttp_request_t **self_p);
+
+// Receive a new request from zhttp_server.
+// Return the underlying connection if successful, to be used when calling zhttp_response_send.
+zhttp_server_connection_t *
+    zhttp_request_recv (zhttp_request_t *self, zsock_t *sock);
+
+// Send a request to zhttp_client.
+// Url and the request path will be concatenated.
+// This behavior is useful for url rewrite and reverse proxy.
+//
+// Send also allow two user provided arguments which will be returned with the response.
+// The reason for two, is to be able to pass around the server connection when forwarding requests or both a callback function and an arg.
+int
+    zhttp_request_send (zhttp_request_t *self, zhttp_client_t *client, int timeout, void *arg, void *arg2);
+
+// Get the request method
+const char *
+    zhttp_request_method (zhttp_request_t *self);
+
+// Set the request method
+void
+    zhttp_request_set_method (zhttp_request_t *self, const char *method);
+
+// Get the request url.
+// When receiving a request from http server this is only the path part of the url.
+const char *
+    zhttp_request_url (zhttp_request_t *self);
+
+// Set the request url
+// When sending a request to http client this should be full url.
+void
+    zhttp_request_set_url (zhttp_request_t *self, const char *url);
+
+// Get the request content type
+const char *
+    zhttp_request_content_type (zhttp_request_t *self);
+
+// Set the request content type
+void
+    zhttp_request_set_content_type (zhttp_request_t *self, const char *content_type);
+
+// Get the content length of the request
+size_t
+    zhttp_request_content_length (zhttp_request_t *self);
+
+// Get the headers of the request
+zhash_t *
+    zhttp_request_headers (zhttp_request_t *self);
+
+// Get the content of the request.
+const char *
+    zhttp_request_content (zhttp_request_t *self);
+
+// Get the content of the request.
+char *
+    zhttp_request_get_content (zhttp_request_t *self);
+
+// Set the content of the request.
+// Content must by dynamically allocated string.
+// Takes ownership of the content.
+void
+    zhttp_request_set_content (zhttp_request_t *self, char **content);
+
+// Set the content of the request..
+// The content is assumed to be constant-memory and will therefore not be copied or deallocated in any way.
+void
+    zhttp_request_set_content_const (zhttp_request_t *self, const char *content);
+
+// Set the content to NULL
+void
+    zhttp_request_reset_content (zhttp_request_t *self);
+
+// Match the path of the request.
+// Support wildcards with '%s' symbol inside the match string.
+// Matching wildcars is until the next '/', '?' or '\0'.
+// On successful match the variadic arguments will be filled with the matching strings.
+// On successful match the method is modifying the url field and break it into substrings.
+// If you need to use the url, do it before matching or take a copy.
+//
+// User must not free the variadic arguments as they are part of the url.
+//
+// To use the percent symbol, just double it, e.g "%%something".
+//
+// Example:
+// if (zhttp_request_match (request, "POST", "/send/%s/%s", &name, &id))
+bool
+    zhttp_request_match (zhttp_request_t *self, const char *method, const char *match, ...);
+
+// Self test of this class.
+void
+    zhttp_request_test (bool verbose);
+
+// CLASS: zhttp_response
+// Create a new zhttp_response.
+zhttp_response_t *
+    zhttp_response_new (void);
+
+// Destroy the zhttp_response.
+void
+    zhttp_response_destroy (zhttp_response_t **self_p);
+
+// Send a response to a request.
+// Returns 0 if successful and -1 otherwise.
+int
+    zhttp_response_send (zhttp_response_t *self, zsock_t *sock, zhttp_server_connection_t **connection);
+
+// Receive a response from zhttp_client.
+// On success return 0, -1 otherwise.
+//
+// Recv returns the two user arguments which was provided with the request.
+// The reason for two, is to be able to pass around the server connection when forwarding requests or both a callback function and an argument.
+int
+    zhttp_response_recv (zhttp_response_t *self, zhttp_client_t *client, void **arg, void **arg2);
+
+// Get the response content type
+const char *
+    zhttp_response_content_type (zhttp_response_t *self);
+
+// Set the content type of the response.
+void
+    zhttp_response_set_content_type (zhttp_response_t *self, const char *value);
+
+// Get the status code of the response.
+uint32_t
+    zhttp_response_status_code (zhttp_response_t *self);
+
+// Set the status code of the response.
+void
+    zhttp_response_set_status_code (zhttp_response_t *self, uint32_t status_code);
+
+// Get the headers of the response.
+zhash_t *
+    zhttp_response_headers (zhttp_response_t *self);
+
+// Get the content length of the response
+size_t
+    zhttp_response_content_length (zhttp_response_t *self);
+
+// Get the content of the response.
+const char *
+    zhttp_response_content (zhttp_response_t *self);
+
+// Get the content of the response.
+char *
+    zhttp_response_get_content (zhttp_response_t *self);
+
+// Set the content of the response.
+// Content must by dynamically allocated string.
+// Takes ownership of the content.
+void
+    zhttp_response_set_content (zhttp_response_t *self, char **content);
+
+// Set the content of the response.
+// The content is assumed to be constant-memory and will therefore not be copied or deallocated in any way.
+void
+    zhttp_response_set_content_const (zhttp_response_t *self, const char *content);
+
+// Set the content to NULL
+void
+    zhttp_response_reset_content (zhttp_response_t *self);
+
+// Self test of this class.
+void
+    zhttp_response_test (bool verbose);
 
 ''')

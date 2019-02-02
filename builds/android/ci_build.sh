@@ -39,6 +39,9 @@ git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
 export LIBCURL_ROOT="/tmp/tmp-deps/libcurl"
 git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
 
+export LIBMICROHTTPD_ROOT="/tmp/tmp-deps/libmicrohttpd"
+git clone --quiet --depth 1 https://gnunet.org/git/libmicrohttpd.git $LIBMICROHTTPD_ROOT
+
 source ./build.sh
 
 ################################################################################
