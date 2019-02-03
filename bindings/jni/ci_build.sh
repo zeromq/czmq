@@ -46,9 +46,9 @@ mkdir -p tmp-deps
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
 BASE_PWD=${PWD}
 cd tmp-deps
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz
-tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz")
-cd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz" .tar.gz)
+wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
+tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+cd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz)
 $CI_TIME ./configure "${CONFIG_OPTS[@]}"
 $CI_TIME make -j4
 $CI_TIME make install

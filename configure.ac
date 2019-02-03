@@ -601,14 +601,14 @@ AS_IF([test x"${search_libmicrohttpd}" = xyes], [
     PRE_SEARCH_LIBS="${LIBS}"
 
     found_pkgconfig=""
-    PKG_CHECK_MODULES([libmicrohttpd], [libmicrohttpd >= 0.9.61],
+    PKG_CHECK_MODULES([libmicrohttpd], [libmicrohttpd >= 0.0.0],
     [
         AC_DEFINE(HAVE_LIBMICROHTTPD, 1, [The optional libmicrohttpd library is to be used])
         was_libmicrohttpd_check_lib_detected=pkgcfg
         found_pkgconfig="libmicrohttpd"
     ],
     [
-        AC_MSG_NOTICE([Package libmicrohttpd not found with needed constraints; falling back to defined compilability tests])
+        AC_MSG_NOTICE([Package libmicrohttpd not found; falling back to defined compilability tests])
 
         libmicrohttpd_synthetic_cflags=""
         libmicrohttpd_synthetic_libs="-lmicrohttpd"
@@ -638,7 +638,7 @@ AS_IF([test x"${search_libmicrohttpd}" = xyes], [
 dnl END of PKG_CHECK_MODULES and/or direct tests for libmicrohttpd
     AS_CASE(["x${was_libmicrohttpd_check_lib_detected}"],
         [xpkgcfg], [
-                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig} >= 0.9.61"
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
                 CFLAGS="${libmicrohttpd_CFLAGS} ${CFLAGS}"
                 LIBS="${libmicrohttpd_LIBS} ${LIBS}"
             ],
@@ -651,7 +651,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libmicrohttpd
                 AC_SUBST([libmicrohttpd_LIBS],[${libmicrohttpd_synthetic_libs}])
             ],
         [xno], [
-            AC_MSG_WARN([Cannot find pkg-config metadata for libmicrohttpd 0.9.61 or higher])
+            AC_MSG_WARN([Cannot find pkg-config metadata for libmicrohttpd 0.0.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for libmicrohttpd

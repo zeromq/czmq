@@ -67,9 +67,9 @@ if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libmicrohttpd-d
 ; then
     BASE_PWD=${PWD}
     cd tmp-deps
-    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz
-    tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz")
-    cd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz" .tar.gz) || exit $?
+    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
+    tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+    cd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) || exit $?
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
     if [ -e autogen.sh ]; then

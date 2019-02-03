@@ -165,6 +165,7 @@ matrix:
       apt:
         packages:
         - openjdk-7-jdk
+        - libmicrohttpd-dev
   - env: BUILD_TYPE=default ADDRESS_SANITIZER=enabled
     os: linux
 #    dist: xenial

@@ -56,7 +56,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  systemd-devel >= 200.0.0
 BuildRequires:  liblz4-devel
 BuildRequires:  libcurl-devel >= 7.28.0
-BuildRequires:  libmicrohttpd-devel >= 0.9.61
+BuildRequires:  libmicrohttpd-devel
 %if %{with python_cffi}
 BuildRequires:  python-cffi
 BuildRequires:  python-devel
@@ -95,7 +95,7 @@ Requires:       libuuid-devel
 Requires:       systemd-devel >= 200.0.0
 Requires:       liblz4-devel
 Requires:       libcurl-devel >= 7.28.0
-Requires:       libmicrohttpd-devel >= 0.9.61
+Requires:       libmicrohttpd-devel
 
 %description devel
 the high-level c binding for 0mq development tools
