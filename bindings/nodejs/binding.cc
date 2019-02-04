@@ -9038,17 +9038,17 @@ NAN_METHOD (ZhttpRequest::_match) {
     Nan::Utf8String method_utf8 (info [0].As<String>());
     method = *method_utf8;
          //} //bjornw end
-    char *match;
+    char *path;
     if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `match`");
+        return Nan::ThrowTypeError ("method requires a `path`");
     else
     if (!info [1]->IsString ())
-        return Nan::ThrowTypeError ("`match` must be a string");
+        return Nan::ThrowTypeError ("`path` must be a string");
     //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String match_utf8 (info [1].As<String>());
-    match = *match_utf8;
+    Nan::Utf8String path_utf8 (info [1].As<String>());
+    path = *path_utf8;
          //} //bjornw end
-    bool result = zhttp_request_match (zhttp_request->self, (const char *)method, (const char *)match);
+    bool result = zhttp_request_match (zhttp_request->self, (const char *)method, (const char *)path);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 

@@ -133,13 +133,13 @@ Java_org_zeromq_czmq_ZhttpRequest__1_1resetContent (JNIEnv *env, jclass c, jlong
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_ZhttpRequest__1_1match (JNIEnv *env, jclass c, jlong self, jstring method, jstring match)
+Java_org_zeromq_czmq_ZhttpRequest__1_1match (JNIEnv *env, jclass c, jlong self, jstring method, jstring path)
 {
     char *method_ = (char *) (*env)->GetStringUTFChars (env, method, NULL);
-    char *match_ = (char *) (*env)->GetStringUTFChars (env, match, NULL);
-    jboolean match_ = (jboolean) zhttp_request_match ((zhttp_request_t *) (intptr_t) self, method_, match_);
+    char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
+    jboolean match_ = (jboolean) zhttp_request_match ((zhttp_request_t *) (intptr_t) self, method_, path_);
     (*env)->ReleaseStringUTFChars (env, method, method_);
-    (*env)->ReleaseStringUTFChars (env, match, match_);
+    (*env)->ReleaseStringUTFChars (env, path, path_);
     return match_;
 }
 

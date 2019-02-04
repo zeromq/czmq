@@ -160,12 +160,12 @@ matrix:
     compiler: clang
   - env: BUILD_TYPE=bindings BINDING=jni
     os: linux
+    dist: xenial
     compiler: clang
     addons:
       apt:
         packages:
-        - openjdk-7-jdk
-        - libmicrohttpd-dev
+        - openjdk-8-jdk
   - env: BUILD_TYPE=default ADDRESS_SANITIZER=enabled
     os: linux
 #    dist: xenial

@@ -127,11 +127,11 @@ Headers and Content is being destroyed after every send call.
         """
         utils.lib.zhttp_request_reset_content(self._p)
 
-    def match(self, method, match, ):
+    def match(self, method, path, ):
         """
         Match the path of the request.
         Support wildcards with '%s' symbol inside the match string.
-        Matching wildcars is until the next '/', '?' or '\0'.
+        Matching wildcards until the next '/', '?' or '\0'.
         On successful match the variadic arguments will be filled with the matching strings.
         On successful match the method is modifying the url field and break it into substrings.
         If you need to use the url, do it before matching or take a copy.
@@ -143,7 +143,7 @@ Headers and Content is being destroyed after every send call.
         Example:
         if (zhttp_request_match (request, "POST", "/send/%s/%s", &name, &id))
         """
-        return utils.lib.zhttp_request_match(self._p, utils.to_bytes(method), utils.to_bytes(match), )
+        return utils.lib.zhttp_request_match(self._p, utils.to_bytes(method), utils.to_bytes(path), )
 
     def test(verbose):
         """

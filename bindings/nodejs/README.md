@@ -4731,7 +4731,7 @@ boolean my_zhttp_request.match (String, String)
 
 Match the path of the request.
 Support wildcards with '%s' symbol inside the match string.
-Matching wildcars is until the next '/', '?' or '\0'.
+Matching wildcards until the next '/', '?' or '\0'.
 On successful match the variadic arguments will be filled with the matching strings.
 On successful match the method is modifying the url field and break it into substrings.
 If you need to use the url, do it before matching or take a copy.
