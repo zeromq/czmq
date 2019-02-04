@@ -25,7 +25,7 @@ public:
 
     //  Receive a new request from zhttp_server.
     //  Return the underlying connection if successful, to be used when calling zhttp_response_send.
-    QZhttpServerConnection * recv (QZsock *sock);
+    void * recv (QZsock *sock);
 
     //  Send a request to zhttp_client.
     //  Url and the request path will be concatenated.

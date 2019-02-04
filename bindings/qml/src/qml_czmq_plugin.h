@@ -71,8 +71,6 @@ class QmlZhttpClient;
 class QmlZhttpClientAttached;
 class QmlZhttpServer;
 class QmlZhttpServerAttached;
-class QmlZhttpServerConnection;
-class QmlZhttpServerConnectionAttached;
 class QmlZhttpServerOptions;
 class QmlZhttpServerOptionsAttached;
 class QmlZhttpRequest;
@@ -110,7 +108,6 @@ class QmlZhttpResponseAttached;
 #include "QmlZuuid.h"
 #include "QmlZhttpClient.h"
 #include "QmlZhttpServer.h"
-#include "QmlZhttpServerConnection.h"
 #include "QmlZhttpServerOptions.h"
 #include "QmlZhttpRequest.h"
 #include "QmlZhttpResponse.h"
@@ -183,8 +180,6 @@ public:
         qmlRegisterType<QmlZhttpClientAttached>();
         qmlRegisterType<QmlZhttpServer> (uri, 1, 0, "QmlZhttpServer");
         qmlRegisterType<QmlZhttpServerAttached>();
-        qmlRegisterType<QmlZhttpServerConnection> (uri, 1, 0, "QmlZhttpServerConnection");
-        qmlRegisterType<QmlZhttpServerConnectionAttached>();
         qmlRegisterType<QmlZhttpServerOptions> (uri, 1, 0, "QmlZhttpServerOptions");
         qmlRegisterType<QmlZhttpServerOptionsAttached>();
         qmlRegisterType<QmlZhttpRequest> (uri, 1, 0, "QmlZhttpRequest");

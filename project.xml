@@ -52,7 +52,6 @@
     <class name = "zuuid" />
     <class name = "zhttp_client" />
     <class name = "zhttp_server" />
-    <class name = "zhttp_server_connection" />
     <class name = "zhttp_server_options" />
     <class name = "zhttp_request"  />
     <class name = "zhttp_response" />

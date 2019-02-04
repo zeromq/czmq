@@ -102,8 +102,6 @@
         '../../include/zhttp_response.h',
         '../../src/zhttp_server.c',
         '../../include/zhttp_server.h',
-        '../../src/zhttp_server_connection.c',
-        '../../include/zhttp_server_connection.h',
         '../../src/zhttp_server_options.c',
         '../../include/zhttp_server_options.h',
         '../../src/ziflist.c',

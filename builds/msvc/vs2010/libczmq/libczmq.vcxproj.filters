@@ -97,9 +97,6 @@
     <ClCompile Include="..\..\..\..\src\zhttp_server.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zhttp_server_connection.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zhttp_server_options.c">
       <Filter>src</Filter>
     </ClCompile>

@@ -495,7 +495,7 @@ zhttp_server_test (bool verbose)
     //  @selftest
     zsock_t *worker = zsock_new_dealer (zhttp_server_options_backend_address (options));
     zhttp_request_t *request = zhttp_request_new ();
-    zhttp_server_connection_t *connection = zhttp_request_recv (request, worker);
+    void *connection = zhttp_request_recv (request, worker);
     assert (connection);
 
     assert (streq (zhttp_request_method (request), "POST"));

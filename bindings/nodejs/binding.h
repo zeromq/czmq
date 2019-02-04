@@ -1000,18 +1000,6 @@ class ZhttpServer: public Nan::ObjectWrap {
     static NAN_METHOD (_test);
 };
 
-class ZhttpServerConnection: public Nan::ObjectWrap {
-    public:
-        static NAN_MODULE_INIT (Init);
-        explicit ZhttpServerConnection ();
-    private:
-        ~ZhttpServerConnection ();
-    static Nan::Persistent <Function> &constructor ();
-
-    static NAN_METHOD (New);
-    static NAN_METHOD (_test);
-};
-
 class ZhttpServerOptions: public Nan::ObjectWrap {
     public:
         static NAN_MODULE_INIT (Init);
@@ -1045,7 +1033,6 @@ class ZhttpRequest: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
-    static NAN_METHOD (_recv);
     static NAN_METHOD (_method);
     static NAN_METHOD (_set_method);
     static NAN_METHOD (_url);
@@ -1076,7 +1063,6 @@ class ZhttpResponse: public Nan::ObjectWrap {
     static NAN_METHOD (New);
     static NAN_METHOD (destroy);
     static NAN_METHOD (defined);
-    static NAN_METHOD (_send);
     static NAN_METHOD (_content_type);
     static NAN_METHOD (_set_content_type);
     static NAN_METHOD (_status_code);

@@ -45,7 +45,6 @@ include_HEADERS += \
     ztrie.h \
     zhttp_client.h \
     zhttp_server.h \
-    zhttp_server_connection.h \
     zhttp_server_options.h \
     zhttp_request.h \
     zhttp_response.h

@@ -25,7 +25,7 @@ public:
 
     //  Send a response to a request.
     //  Returns 0 if successful and -1 otherwise.
-    int send (QZsock *sock, QZhttpServerConnection *connection);
+    int send (QZsock *sock, void **connection);
 
     //  Receive a response from zhttp_client.
     //  On success return 0, -1 otherwise.

@@ -900,10 +900,6 @@ module CZMQ
 
       require_relative 'ffi/zhttp_server'
 
-      attach_function :zhttp_server_connection_test, [:bool], :void, **opts
-
-      require_relative 'ffi/zhttp_server_connection'
-
       attach_function :zhttp_server_options_new, [], :pointer, **opts
       attach_function :zhttp_server_options_from_config, [:pointer], :pointer, **opts
       attach_function :zhttp_server_options_destroy, [:pointer], :void, **opts

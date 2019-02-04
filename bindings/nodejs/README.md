@@ -4576,23 +4576,6 @@ nothing my_zhttp_server.test (Boolean)
 
 Self test of this class.
 
-### The ZhttpServerConnection class -
-
-Constructor:
-
-```
-var czmq = require ('bindings')('czmq')
-var my_zhttp_server_connection = new czmq.ZhttpServerConnection ()
-```
-
-Methods:
-
-```
-nothing my_zhttp_server_connection.test (Boolean)
-```
-
-Self test of this class.
-
 ### The ZhttpServerOptions class - zhttp server.
 
 Constructor:
@@ -4658,13 +4641,6 @@ my_zhttp_request.destroy ()
 ```
 
 Methods:
-
-```
-zhttp_server_connection my_zhttp_request.recv (Zsock)
-```
-
-Receive a new request from zhttp_server.
-Return the underlying connection if successful, to be used when calling zhttp_response_send.
 
 ```
 string my_zhttp_request.method ()
@@ -4791,13 +4767,6 @@ my_zhttp_response.destroy ()
 ```
 
 Methods:
-
-```
-integer my_zhttp_response.send (Zsock, ZhttpServerConnection)
-```
-
-Send a response to a request.
-Returns 0 if successful and -1 otherwise.
 
 ```
 string my_zhttp_response.contentType ()

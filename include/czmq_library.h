@@ -139,8 +139,6 @@ typedef struct _zhttp_client_t zhttp_client_t;
 #define ZHTTP_CLIENT_T_DEFINED
 typedef struct _zhttp_server_t zhttp_server_t;
 #define ZHTTP_SERVER_T_DEFINED
-typedef struct _zhttp_server_connection_t zhttp_server_connection_t;
-#define ZHTTP_SERVER_CONNECTION_T_DEFINED
 typedef struct _zhttp_server_options_t zhttp_server_options_t;
 #define ZHTTP_SERVER_OPTIONS_T_DEFINED
 typedef struct _zhttp_request_t zhttp_request_t;
@@ -188,7 +186,6 @@ typedef struct _zhttp_response_t zhttp_response_t;
 #include "ztrie.h"
 #include "zhttp_client.h"
 #include "zhttp_server.h"
-#include "zhttp_server_connection.h"
 #include "zhttp_server_options.h"
 #include "zhttp_request.h"
 #include "zhttp_response.h"

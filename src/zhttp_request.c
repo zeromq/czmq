@@ -77,7 +77,7 @@ zhttp_request_destroy (zhttp_request_t **self_p)
 }
 
 
-zhttp_server_connection_t *
+void *
 zhttp_request_recv (zhttp_request_t *self, zsock_t *sock) {
     assert (self);
 
@@ -90,7 +90,7 @@ zhttp_request_recv (zhttp_request_t *self, zsock_t *sock) {
     }
 
     char *method;
-    zhttp_server_connection_t* connection;
+    void* connection;
 
     int rc = zsock_brecv (sock, "psSpp", &connection, &method, &self->url,
              &self->headers, &self->content);

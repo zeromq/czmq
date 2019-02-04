@@ -285,7 +285,6 @@ IF (ENABLE_DRAFTS)
         include/ztrie.h
         include/zhttp_client.h
         include/zhttp_server.h
-        include/zhttp_server_connection.h
         include/zhttp_server_options.h
         include/zhttp_request.h
         include/zhttp_response.h
@@ -343,7 +342,6 @@ IF (ENABLE_DRAFTS)
         src/ztrie.c
         src/zhttp_client.c
         src/zhttp_server.c
-        src/zhttp_server_connection.c
         src/zhttp_server_options.c
         src/zhttp_request.c
         src/zhttp_response.c
@@ -645,7 +643,6 @@ IF (ENABLE_DRAFTS)
     ztrie
     zhttp_client
     zhttp_server
-    zhttp_server_connection
     zhttp_server_options
     zhttp_request
     zhttp_response

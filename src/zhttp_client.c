@@ -343,7 +343,7 @@ zhttp_client_test (bool verbose) {
 
     zsock_t *worker = zsock_new_dealer (zhttp_server_options_backend_address (options));
     zhttp_request_t *server_request = zhttp_request_new ();
-    zhttp_server_connection_t *connection = zhttp_request_recv (server_request, worker);
+    void *connection = zhttp_request_recv (server_request, worker);
     assert (connection);
 
     zhttp_response_t *server_response = zhttp_response_new ();

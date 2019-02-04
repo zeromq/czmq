@@ -30,7 +30,7 @@ public:
 public slots:
     //  Send a response to a request.
     //  Returns 0 if successful and -1 otherwise.
-    int send (QmlZsock *sock, QmlZhttpServerConnection *connection);
+    int send (QmlZsock *sock, void **connection);
 
     //  Receive a response from zhttp_client.
     //  On success return 0, -1 otherwise.

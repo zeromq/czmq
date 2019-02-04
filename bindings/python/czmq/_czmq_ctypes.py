@@ -195,10 +195,6 @@ class zhttp_request_t(Structure):
     pass # Empty - only for type checking
 zhttp_request_p = POINTER(zhttp_request_t)
 
-class zhttp_server_connection_t(Structure):
-    pass # Empty - only for type checking
-zhttp_server_connection_p = POINTER(zhttp_server_connection_t)
-
 class zhttp_response_t(Structure):
     pass # Empty - only for type checking
 zhttp_response_p = POINTER(zhttp_response_t)
@@ -8715,44 +8711,6 @@ The Server is using simple dealer socket to route the requests.
         return lib.zhttp_server_test(verbose)
 
 
-# zhttp_server_connection
-lib.zhttp_server_connection_test.restype = None
-lib.zhttp_server_connection_test.argtypes = [c_bool]
-
-class ZhttpServerConnection(object):
-    """
-
-    """
-
-    allow_destruct = False
-    def __eq__(self, other):
-        if type(other) == type(self):
-            return other.c_address() == self.c_address()
-        elif type(other) == c_void_p:
-            return other.value == self.c_address()
-
-    def c_address(self):
-        """
-        Return the address of the object pointer in c.  Useful for comparison.
-        """
-        return addressof(self._as_parameter_.contents)
-
-    def __bool__(self):
-        "Determine whether the object is valid by converting to boolean" # Python 3
-        return self._as_parameter_.__bool__()
-
-    def __nonzero__(self):
-        "Determine whether the object is valid by converting to boolean" # Python 2
-        return self._as_parameter_.__nonzero__()
-
-    @staticmethod
-    def test(verbose):
-        """
-        Self test of this class.
-        """
-        return lib.zhttp_server_connection_test(verbose)
-
-
 # zhttp_server_options
 lib.zhttp_server_options_new.restype = zhttp_server_options_p
 lib.zhttp_server_options_new.argtypes = []
@@ -8863,7 +8821,7 @@ lib.zhttp_request_new.restype = zhttp_request_p
 lib.zhttp_request_new.argtypes = []
 lib.zhttp_request_destroy.restype = None
 lib.zhttp_request_destroy.argtypes = [POINTER(zhttp_request_p)]
-lib.zhttp_request_recv.restype = zhttp_server_connection_p
+lib.zhttp_request_recv.restype = c_void_p
 lib.zhttp_request_recv.argtypes = [zhttp_request_p, zsock_p]
 lib.zhttp_request_send.restype = c_int
 lib.zhttp_request_send.argtypes = [zhttp_request_p, zhttp_client_p, c_int, c_void_p, c_void_p]
@@ -8953,7 +8911,7 @@ Headers and Content is being destroyed after every send call.
         Receive a new request from zhttp_server.
 Return the underlying connection if successful, to be used when calling zhttp_response_send.
         """
-        return ZhttpServerConnection(lib.zhttp_request_recv(self._as_parameter_, sock), False)
+        return c_void_p(lib.zhttp_request_recv(self._as_parameter_, sock))
 
     def send(self, client, timeout, arg, arg2):
         """
@@ -9081,7 +9039,7 @@ lib.zhttp_response_new.argtypes = []
 lib.zhttp_response_destroy.restype = None
 lib.zhttp_response_destroy.argtypes = [POINTER(zhttp_response_p)]
 lib.zhttp_response_send.restype = c_int
-lib.zhttp_response_send.argtypes = [zhttp_response_p, zsock_p, POINTER(zhttp_server_connection_p)]
+lib.zhttp_response_send.argtypes = [zhttp_response_p, zsock_p, POINTER(c_void_p)]
 lib.zhttp_response_recv.restype = c_int
 lib.zhttp_response_recv.argtypes = [zhttp_response_p, zhttp_client_p, POINTER(c_void_p), POINTER(c_void_p)]
 lib.zhttp_response_content_type.restype = c_char_p
@@ -9164,7 +9122,7 @@ Headers and Content is being destroyed after every send call.
         Send a response to a request.
 Returns 0 if successful and -1 otherwise.
         """
-        return lib.zhttp_response_send(self._as_parameter_, sock, byref(zhttp_server_connection_p.from_param(connection)))
+        return lib.zhttp_response_send(self._as_parameter_, sock, byref(c_void_p.from_param(connection)))
 
     def recv(self, client, arg, arg2):
         """

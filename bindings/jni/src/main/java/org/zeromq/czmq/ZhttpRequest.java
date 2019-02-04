@@ -46,8 +46,8 @@ public class ZhttpRequest implements AutoCloseable{
     Return the underlying connection if successful, to be used when calling zhttp_response_send.
     */
     native static long __recv (long self, long sock);
-    public ZhttpServerConnection recv (Zsock sock) {
-        return new ZhttpServerConnection (__recv (self, sock.self));
+    public long recv (Zsock sock) {
+        return __recv (self, sock.self);
     }
     /*
     Send a request to zhttp_client.

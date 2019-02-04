@@ -63,7 +63,6 @@ src_libczmq_la_SOURCES += \
     src/ztrie.c \
     src/zhttp_client.c \
     src/zhttp_server.c \
-    src/zhttp_server_connection.c \
     src/zhttp_server_options.c \
     src/zhttp_request.c \
     src/zhttp_response.c
@@ -159,7 +158,6 @@ dist_api_DATA = \
     api/zuuid.api \
     api/zhttp_client.api \
     api/zhttp_server.api \
-    api/zhttp_server_connection.api \
     api/zhttp_server_options.api \
     api/zhttp_request.api \
     api/zhttp_response.api \
