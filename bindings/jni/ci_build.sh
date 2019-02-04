@@ -46,9 +46,9 @@ mkdir -p tmp-deps
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
 BASE_PWD=${PWD}
 cd tmp-deps
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz
-tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz")
-cd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz" .tar.gz)
+wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
+tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+cd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz)
 $CI_TIME ./configure "${CONFIG_OPTS[@]}"
 $CI_TIME make -j4
 $CI_TIME make install
@@ -81,30 +81,6 @@ BASE_PWD=${PWD}
 cd tmp-deps
 $CI_TIME git clone --quiet --depth 1 https://github.com/curl/curl.git libcurl
 cd libcurl
-git --no-pager log --oneline -n1
-if [ -e autogen.sh ]; then
-    $CI_TIME ./autogen.sh 2> /dev/null
-fi
-if [ -e buildconf ]; then
-    $CI_TIME ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    $CI_TIME libtoolize --copy --force && \
-    $CI_TIME aclocal -I . && \
-    $CI_TIME autoheader && \
-    $CI_TIME automake --add-missing --copy && \
-    $CI_TIME autoconf || \
-    $CI_TIME autoreconf -fiv
-fi
-$CI_TIME ./configure "${CONFIG_OPTS[@]}"
-$CI_TIME make -j4
-$CI_TIME make install
-cd ${BASE_PWD}
-
-BASE_PWD=${PWD}
-cd tmp-deps
-$CI_TIME git clone --quiet --depth 1 https://gnunet.org/git/libmicrohttpd.git libmicrohttpd
-cd libmicrohttpd
 git --no-pager log --oneline -n1
 if [ -e autogen.sh ]; then
     $CI_TIME ./autogen.sh 2> /dev/null

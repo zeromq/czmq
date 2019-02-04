@@ -180,9 +180,6 @@
     <ClCompile Include="..\..\..\..\src\zhttp_server.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zhttp_server_connection.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zhttp_server_options.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

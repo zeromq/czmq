@@ -46,8 +46,8 @@ public class ZhttpResponse implements AutoCloseable{
     Returns 0 if successful and -1 otherwise.
     */
     native static int __send (long self, long sock, long connection);
-    public int send (Zsock sock, ZhttpServerConnection connection) {
-        return __send (self, sock.self, connection.self);
+    public int send (Zsock sock, long connection) {
+        return __send (self, sock.self, connection);
     }
     /*
     Receive a response from zhttp_client.

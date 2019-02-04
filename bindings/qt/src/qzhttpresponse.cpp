@@ -32,9 +32,9 @@ QZhttpResponse::~QZhttpResponse ()
 ///
 //  Send a response to a request.
 //  Returns 0 if successful and -1 otherwise.
-int QZhttpResponse::send (QZsock *sock, QZhttpServerConnection *connection)
+int QZhttpResponse::send (QZsock *sock, void **connection)
 {
-    int rv = zhttp_response_send (self, sock->self, &connection->self);
+    int rv = zhttp_response_send (self, sock->self, connection);
     return rv;
 }
 

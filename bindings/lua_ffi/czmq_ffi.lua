@@ -56,7 +56,6 @@ typedef struct _zuuid_t zuuid_t;
 typedef struct _zhttp_client_t zhttp_client_t;
 typedef struct _zhttp_server_t zhttp_server_t;
 typedef struct _zhttp_server_options_t zhttp_server_options_t;
-typedef struct _zhttp_server_connection_t zhttp_server_connection_t;
 typedef struct _zhttp_request_t zhttp_request_t;
 typedef struct _zhttp_response_t zhttp_response_t;
 // Actors get a pipe and arguments from caller
@@ -4235,11 +4234,6 @@ int
 void
     zhttp_server_test (bool verbose);
 
-// CLASS: zhttp_server_connection
-// Self test of this class.
-void
-    zhttp_server_connection_test (bool verbose);
-
 // CLASS: zhttp_server_options
 // Create a new zhttp_server_options.
 zhttp_server_options_t *
@@ -4284,7 +4278,7 @@ void
 
 // Receive a new request from zhttp_server.
 // Return the underlying connection if successful, to be used when calling zhttp_response_send.
-zhttp_server_connection_t *
+void *
     zhttp_request_recv (zhttp_request_t *self, zsock_t *sock);
 
 // Send a request to zhttp_client.
@@ -4385,7 +4379,7 @@ void
 // Send a response to a request.
 // Returns 0 if successful and -1 otherwise.
 int
-    zhttp_response_send (zhttp_response_t *self, zsock_t *sock, zhttp_server_connection_t **connection);
+    zhttp_response_send (zhttp_response_t *self, zsock_t *sock, void **connection);
 
 // Receive a response from zhttp_client.
 // On success return 0, -1 otherwise.

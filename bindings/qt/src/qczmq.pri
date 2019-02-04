@@ -41,7 +41,6 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzuuid.h \
                      $$PWD/qzhttpclient.h \
                      $$PWD/qzhttpserver.h \
-                     $$PWD/qzhttpserverconnection.h \
                      $$PWD/qzhttpserveroptions.h \
                      $$PWD/qzhttprequest.h \
                      $$PWD/qzhttpresponse.h
@@ -77,7 +76,6 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzuuid.cpp \
                      $$PWD/qzhttpclient.cpp \
                      $$PWD/qzhttpserver.cpp \
-                     $$PWD/qzhttpserverconnection.cpp \
                      $$PWD/qzhttpserveroptions.cpp \
                      $$PWD/qzhttprequest.cpp \
                      $$PWD/qzhttpresponse.cpp

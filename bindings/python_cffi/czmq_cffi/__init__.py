@@ -44,7 +44,6 @@ from .Ztrie import *
 from .Zuuid import *
 from .ZhttpClient import *
 from .ZhttpServer import *
-from .ZhttpServerConnection import *
 from .ZhttpServerOptions import *
 from .ZhttpRequest import *
 from .ZhttpResponse import *

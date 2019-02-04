@@ -11,10 +11,8 @@
 ///
 //  Receive a new request from zhttp_server.
 //  Return the underlying connection if successful, to be used when calling zhttp_response_send.
-QmlZhttpServerConnection *QmlZhttpRequest::recv (QmlZsock *sock) {
-    QmlZhttpServerConnection *retQ_ = new QmlZhttpServerConnection ();
-    retQ_->self = zhttp_request_recv (self, sock->self);
-    return retQ_;
+void *QmlZhttpRequest::recv (QmlZsock *sock) {
+    return zhttp_request_recv (self, sock->self);
 };
 
 ///

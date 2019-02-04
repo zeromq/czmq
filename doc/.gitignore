@@ -71,8 +71,6 @@ zhttp_client.txt
 zhttp_client.doc
 zhttp_server.txt
 zhttp_server.doc
-zhttp_server_connection.txt
-zhttp_server_connection.doc
 zhttp_server_options.txt
 zhttp_server_options.doc
 zhttp_request.txt

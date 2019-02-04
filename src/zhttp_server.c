@@ -28,6 +28,7 @@ typedef struct {
     char* content;
     size_t content_length;
     zhash_t *headers;
+    bool suspended;
 } request_t;
 
 typedef struct {
@@ -108,7 +109,11 @@ server_actor_new (zsock_t *pipe, zhttp_server_options_t *options)
     assert (self);
 
     self->daemon = MHD_start_daemon (
-            MHD_ALLOW_SUSPEND_RESUME, // TODO: use epoll on linux
+#if MHD_VERSION >= 0x00095300
+            MHD_ALLOW_SUSPEND_RESUME,
+#else
+            MHD_USE_SUSPEND_RESUME,
+#endif
             (uint16_t ) zhttp_server_options_port (options),
             NULL, NULL,
             (MHD_AccessHandlerCallback) s_handle_request, self,
@@ -164,9 +169,18 @@ s_recv_api (server_actor_t *self) {
         self->verbose = true;
     else
     if (streq (command, "PORT")) {
+#if MHD_VERSION >= 0x00095600
         const union MHD_DaemonInfo *info = MHD_get_daemon_info (self->daemon, MHD_DAEMON_INFO_BIND_PORT);
         assert (info);
         zsock_send (self->pipe, "i", (int)info->port);
+#else
+        int port = zhttp_server_options_port (self->options);
+
+        if (port == 0)
+            zsock_send (self->pipe, "i", -1);
+        else
+            zsock_send (self->pipe, "i", port);
+#endif
     }
     else
     if (streq (command, "$TERM"))
@@ -205,9 +219,11 @@ s_handle_request (
 
     request_t *request = *request_p;
 
+    if (request && request->suspended)
+        return MHD_YES;
+
     if (request == NULL) {
         request = request_new ();
-
         *request_p = request;
 
         // Get the headers
@@ -225,6 +241,7 @@ s_handle_request (
 
         // Suspending the connection until response is ready
         zlistx_add_end (self->pending_connections, connection);
+        request->suspended = true;
 
         zsock_bsend (self->backend, "psSpp", connection, method, path, request->headers, NULL);
         request->headers = NULL;
@@ -254,6 +271,7 @@ s_handle_request (
 
     // Suspending the connection until response is ready
     zlistx_add_end (self->pending_connections, connection);
+    request->suspended = true;
 
     zsock_bsend (self->backend, "psSpp",
             connection, method, path, request->headers, request->content);
@@ -342,7 +360,11 @@ server_actor (zsock_t *pipe, void *args)
     int rc;
 
     while (!self->terminated) {
+#if MHD_VERSION >= 0x00094400
         MHD_run_from_select (self->daemon, &read_fd_set, &write_fd_set, &except_fd_set);
+#else
+        MHD_run (self->daemon);
+#endif
 
         bool use_timeout = true;
 
@@ -449,16 +471,16 @@ zhttp_server_test (bool verbose)
     printf (" * zhttp_server: ");
 
     //  @selftest
+    int port = 40000 + (randof (10000));
     zhttp_server_options_t *options = zhttp_server_options_new ();
-    zhttp_server_options_set_port (options, 0);
+    zhttp_server_options_set_port (options, port);
 
     zhttp_server_t *server = zhttp_server_new (options);
-    int port = zhttp_server_port (server);
-
+    assert (server);
     //  @end
 
     char url[256];
-    snprintf (url,255, "http://127.0.0.1:%d", port);
+    snprintf (url, 255, "http://127.0.0.1:%d", port);
 
     zhttp_client_t *self = zhttp_client_new (verbose);
     assert (self);
@@ -473,7 +495,7 @@ zhttp_server_test (bool verbose)
     //  @selftest
     zsock_t *worker = zsock_new_dealer (zhttp_server_options_backend_address (options));
     zhttp_request_t *request = zhttp_request_new ();
-    zhttp_server_connection_t *connection = zhttp_request_recv (request, worker);
+    void *connection = zhttp_request_recv (request, worker);
     assert (connection);
 
     assert (streq (zhttp_request_method (request), "POST"));

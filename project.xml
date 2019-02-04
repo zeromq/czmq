@@ -16,8 +16,8 @@
     <use project = "lz4" optional = "1" implied = "1" />
     <use project = "libcurl" optional = "1" implied = "1" min_major = "7" min_minor = "28" />
     <use project = "libmicrohttpd"
-         tarball = "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.61.tar.gz"
-         implied = "1" optional = "1" min_major = "0" min_minor = "9" min_patch = "61"  />
+         tarball = "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
+         implied = "1" optional = "1"  />
 
     <target name = "*" />
 
@@ -52,7 +52,6 @@
     <class name = "zuuid" />
     <class name = "zhttp_client" />
     <class name = "zhttp_server" />
-    <class name = "zhttp_server_connection" />
     <class name = "zhttp_server_options" />
     <class name = "zhttp_request"  />
     <class name = "zhttp_response" />

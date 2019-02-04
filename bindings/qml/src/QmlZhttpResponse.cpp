@@ -11,8 +11,8 @@
 ///
 //  Send a response to a request.
 //  Returns 0 if successful and -1 otherwise.
-int QmlZhttpResponse::send (QmlZsock *sock, QmlZhttpServerConnection *connection) {
-    return zhttp_response_send (self, sock->self, &connection->self);
+int QmlZhttpResponse::send (QmlZsock *sock, void **connection) {
+    return zhttp_response_send (self, sock->self, connection);
 };
 
 ///

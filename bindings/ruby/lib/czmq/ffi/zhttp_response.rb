@@ -96,13 +96,12 @@ module CZMQ
       # Returns 0 if successful and -1 otherwise.
       #
       # @param sock [Zsock, #__ptr]
-      # @param connection [#__ptr_give_ref]
+      # @param connection [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def send(sock, connection)
         raise DestroyedError unless @ptr
         self_p = @ptr
         sock = sock.__ptr if sock
-        connection = connection.__ptr_give_ref
         result = ::CZMQ::FFI.zhttp_response_send(self_p, sock, connection)
         result
       end

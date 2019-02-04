@@ -28,7 +28,7 @@ Java_org_zeromq_czmq_ZhttpResponse__1_1destroy (JNIEnv *env, jclass c, jlong sel
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_ZhttpResponse__1_1send (JNIEnv *env, jclass c, jlong self, jlong sock, jlong connection)
 {
-    jint send_ = (jint) zhttp_response_send ((zhttp_response_t *) (intptr_t) self, (zsock_t *) (intptr_t) sock, (zhttp_server_connection_t **) (intptr_t) &connection);
+    jint send_ = (jint) zhttp_response_send ((zhttp_response_t *) (intptr_t) self, (zsock_t *) (intptr_t) sock, (void **) (intptr_t) &connection);
     return send_;
 }
 

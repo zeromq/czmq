@@ -73,7 +73,7 @@ zhttp_response_destroy (zhttp_response_t **self_p)
 }
 
 int
-zhttp_response_send (zhttp_response_t *self, zsock_t *sock, zhttp_server_connection_t **connection_p) {
+zhttp_response_send (zhttp_response_t *self, zsock_t *sock, void **connection_p) {
     assert (self);
     assert (connection_p);
     assert (*connection_p);

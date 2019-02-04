@@ -68,7 +68,6 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'src/main/java/org/zeromq/czmq/Zuuid.java',
             'src/main/java/org/zeromq/czmq/ZhttpClient.java',
             'src/main/java/org/zeromq/czmq/ZhttpServer.java',
-            'src/main/java/org/zeromq/czmq/ZhttpServerConnection.java',
             'src/main/java/org/zeromq/czmq/ZhttpServerOptions.java',
             'src/main/java/org/zeromq/czmq/ZhttpRequest.java',
             'src/main/java/org/zeromq/czmq/ZhttpResponse.java'

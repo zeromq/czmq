@@ -96,13 +96,12 @@ module CZMQ
       # Return the underlying connection if successful, to be used when calling zhttp_response_send.
       #
       # @param sock [Zsock, #__ptr]
-      # @return [ZhttpServerConnection]
+      # @return [::FFI::Pointer]
       def recv(sock)
         raise DestroyedError unless @ptr
         self_p = @ptr
         sock = sock.__ptr if sock
         result = ::CZMQ::FFI.zhttp_request_recv(self_p, sock)
-        result = ZhttpServerConnection.__new result, false
         result
       end
 

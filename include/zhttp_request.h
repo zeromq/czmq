@@ -40,7 +40,7 @@ CZMQ_EXPORT void
 //  *** Draft method, for development use, may change without warning ***
 //  Receive a new request from zhttp_server.
 //  Return the underlying connection if successful, to be used when calling zhttp_response_send.
-CZMQ_EXPORT zhttp_server_connection_t *
+CZMQ_EXPORT void *
     zhttp_request_recv (zhttp_request_t *self, zsock_t *sock);
 
 //  *** Draft method, for development use, may change without warning ***

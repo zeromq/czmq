@@ -319,14 +319,15 @@ zhttp_client_test (bool verbose) {
 #if defined(HAVE_LIBCURL) && defined(HAVE_LIBMICROHTTPD)
     printf (" * zhttp_client: ");
 
+    int port = 40000 + (randof (10000));
     zhttp_server_options_t *options = zhttp_server_options_new ();
-    zhttp_server_options_set_port (options, 0);
+    zhttp_server_options_set_port (options, port);
 
     zhttp_server_t *server = zhttp_server_new (options);
-    int port = zhttp_server_port (server);
+    assert (server);
 
     char url[256];
-    snprintf (url,255, "http://127.0.0.1:%d", port);
+    snprintf (url, 255, "http://127.0.0.1:%d", port);
 
     //  @selftest
     zhttp_client_t *self = zhttp_client_new (verbose);
@@ -342,7 +343,7 @@ zhttp_client_test (bool verbose) {
 
     zsock_t *worker = zsock_new_dealer (zhttp_server_options_backend_address (options));
     zhttp_request_t *server_request = zhttp_request_new ();
-    zhttp_server_connection_t *connection = zhttp_request_recv (server_request, worker);
+    void *connection = zhttp_request_recv (server_request, worker);
     assert (connection);
 
     zhttp_response_t *server_response = zhttp_response_new ();

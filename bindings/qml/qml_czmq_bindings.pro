@@ -68,7 +68,6 @@ HEADERS += \
   $$SRCDIR/QmlZuuid.h \
   $$SRCDIR/QmlZhttpClient.h \
   $$SRCDIR/QmlZhttpServer.h \
-  $$SRCDIR/QmlZhttpServerConnection.h \
   $$SRCDIR/QmlZhttpServerOptions.h \
   $$SRCDIR/QmlZhttpRequest.h \
   $$SRCDIR/QmlZhttpResponse.h
@@ -104,7 +103,6 @@ SOURCES += \
   $$SRCDIR/QmlZuuid.cpp \
   $$SRCDIR/QmlZhttpClient.cpp \
   $$SRCDIR/QmlZhttpServer.cpp \
-  $$SRCDIR/QmlZhttpServerConnection.cpp \
   $$SRCDIR/QmlZhttpServerOptions.cpp \
   $$SRCDIR/QmlZhttpRequest.cpp \
   $$SRCDIR/QmlZhttpResponse.cpp

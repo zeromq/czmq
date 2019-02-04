@@ -25,7 +25,7 @@
         Return the underlying connection if successful, to be used when calling zhttp_response_send.
 
         <argument name = "sock" type = "zsock" />
-        <return type = "zhttp_server_connection" />
+        <return type = "anything" />
     </method>
 
     <method name = "send">

@@ -23,7 +23,7 @@
         Returns 0 if successful and -1 otherwise.
 
         <argument name = "sock" type = "zsock" />
-        <argument name = "connection" type = "zhttp_server_connection" by_reference = "1" />
+        <argument name = "connection" type = "anything" by_reference = "1" />
 
         <return type = "integer" />
     </method>

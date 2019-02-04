@@ -17,9 +17,6 @@ public:
     //  Copy-construct to return the proper wrapped c types
     QZhttpServerConnection (zhttp_server_connection_t *self, QObject *qObjParent = 0);
 
-    //  Self test of this class.
-    static void test (bool verbose);
-
     zhttp_server_connection_t *self;
 };
 #endif //  Q_ZHTTP_SERVER_CONNECTION_H

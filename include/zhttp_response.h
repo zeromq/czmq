@@ -41,7 +41,7 @@ CZMQ_EXPORT void
 //  Send a response to a request.
 //  Returns 0 if successful and -1 otherwise.
 CZMQ_EXPORT int
-    zhttp_response_send (zhttp_response_t *self, zsock_t *sock, zhttp_server_connection_t **connection);
+    zhttp_response_send (zhttp_response_t *self, zsock_t *sock, void **connection);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Receive a response from zhttp_client.

@@ -32,9 +32,9 @@ QZhttpRequest::~QZhttpRequest ()
 ///
 //  Receive a new request from zhttp_server.
 //  Return the underlying connection if successful, to be used when calling zhttp_response_send.
-QZhttpServerConnection * QZhttpRequest::recv (QZsock *sock)
+void * QZhttpRequest::recv (QZsock *sock)
 {
-    QZhttpServerConnection *rv = new QZhttpServerConnection (zhttp_request_recv (self, sock->self));
+    void * rv = zhttp_request_recv (self, sock->self);
     return rv;
 }
 

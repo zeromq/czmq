@@ -8714,60 +8714,6 @@ Nan::Persistent <Function> &ZhttpServer::constructor () {
 }
 
 
-NAN_MODULE_INIT (ZhttpServerConnection::Init) {
-    Nan::HandleScope scope;
-
-    // Prepare constructor template
-    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
-    tpl->SetClassName (Nan::New ("ZhttpServerConnection").ToLocalChecked ());
-    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
-
-    // Prototypes
-    Nan::SetPrototypeMethod (tpl, "test", _test);
-
-    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
-    Nan::Set (target, Nan::New ("ZhttpServerConnection").ToLocalChecked (),
-    Nan::GetFunction (tpl).ToLocalChecked ());
-}
-
-ZhttpServerConnection::ZhttpServerConnection () {
-}
-
-ZhttpServerConnection::~ZhttpServerConnection () {
-}
-
-NAN_METHOD (ZhttpServerConnection::New) {
-    assert (info.IsConstructCall ());
-    ZhttpServerConnection *zhttp_server_connection = new ZhttpServerConnection ();
-    if (zhttp_server_connection) {
-        zhttp_server_connection->Wrap (info.This ());
-        info.GetReturnValue ().Set (info.This ());
-    }
-}
-
-NAN_METHOD (ZhttpServerConnection::_test) {
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `verbose`");
-
-    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
-    bool verbose;
-
-
-    if (info [0]->IsBoolean ())
-    {
-          verbose = Nan::To<bool>(info [0]).FromJust ();
-    }
-    else
-        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
-    zhttp_server_connection_test ((bool) verbose);
-}
-
-Nan::Persistent <Function> &ZhttpServerConnection::constructor () {
-    static Nan::Persistent <Function> my_constructor;
-    return my_constructor;
-}
-
-
 NAN_MODULE_INIT (ZhttpServerOptions::Init) {
     Nan::HandleScope scope;
 
@@ -8900,7 +8846,6 @@ NAN_MODULE_INIT (ZhttpRequest::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
-    Nan::SetPrototypeMethod (tpl, "recv", _recv);
     Nan::SetPrototypeMethod (tpl, "method", _method);
     Nan::SetPrototypeMethod (tpl, "setMethod", _set_method);
     Nan::SetPrototypeMethod (tpl, "url", _url);
@@ -8951,19 +8896,6 @@ NAN_METHOD (ZhttpRequest::destroy) {
 NAN_METHOD (ZhttpRequest::defined) {
     ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zhttp_request->self != NULL));
-}
-
-NAN_METHOD (ZhttpRequest::_recv) {
-    ZhttpRequest *zhttp_request = Nan::ObjectWrap::Unwrap <ZhttpRequest> (info.Holder ());
-    Zsock *sock = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
-    zhttp_server_connection_t *result = zhttp_request_recv (zhttp_request->self, sock->self);
-    ZhttpServerConnection *zhttp_server_connection_result = new ZhttpServerConnection (result);
-    if (zhttp_server_connection_result) {
-    //  Don't yet know how to return a new object
-    //      zhttp_server_connection->Wrap (info.This ());
-    //      info.GetReturnValue ().Set (info.This ());
-        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
-    }
 }
 
 NAN_METHOD (ZhttpRequest::_method) {
@@ -9154,7 +9086,6 @@ NAN_MODULE_INIT (ZhttpResponse::Init) {
     // Prototypes
     Nan::SetPrototypeMethod (tpl, "destroy", destroy);
     Nan::SetPrototypeMethod (tpl, "defined", defined);
-    Nan::SetPrototypeMethod (tpl, "send", _send);
     Nan::SetPrototypeMethod (tpl, "contentType", _content_type);
     Nan::SetPrototypeMethod (tpl, "setContentType", _set_content_type);
     Nan::SetPrototypeMethod (tpl, "statusCode", _status_code);
@@ -9202,14 +9133,6 @@ NAN_METHOD (ZhttpResponse::destroy) {
 NAN_METHOD (ZhttpResponse::defined) {
     ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
     info.GetReturnValue ().Set (Nan::New (zhttp_response->self != NULL));
-}
-
-NAN_METHOD (ZhttpResponse::_send) {
-    ZhttpResponse *zhttp_response = Nan::ObjectWrap::Unwrap <ZhttpResponse> (info.Holder ());
-    Zsock *sock = Nan::ObjectWrap::Unwrap<Zsock>(info [0].As<Object>());
-    ZhttpServerConnection *connection = Nan::ObjectWrap::Unwrap<ZhttpServerConnection>(info [1].As<Object>());
-    int result = zhttp_response_send (zhttp_response->self, sock->self, &connection->self);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (ZhttpResponse::_content_type) {
@@ -9376,7 +9299,6 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     Zuuid::Init (target);
     ZhttpClient::Init (target);
     ZhttpServer::Init (target);
-    ZhttpServerConnection::Init (target);
     ZhttpServerOptions::Init (target);
     ZhttpRequest::Init (target);
     ZhttpResponse::Init (target);
