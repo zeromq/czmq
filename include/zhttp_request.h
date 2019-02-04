@@ -127,7 +127,7 @@ CZMQ_EXPORT void
 //  *** Draft method, for development use, may change without warning ***
 //  Match the path of the request.
 //  Support wildcards with '%s' symbol inside the match string.
-//  Matching wildcars is until the next '/', '?' or '\0'.
+//  Matching wildcards until the next '/', '?' or '\0'.
 //  On successful match the variadic arguments will be filled with the matching strings.
 //  On successful match the method is modifying the url field and break it into substrings.
 //  If you need to use the url, do it before matching or take a copy.
@@ -139,7 +139,7 @@ CZMQ_EXPORT void
 //  Example:
 //  if (zhttp_request_match (request, "POST", "/send/%s/%s", &name, &id))
 CZMQ_EXPORT bool
-    zhttp_request_match (zhttp_request_t *self, const char *method, const char *match, ...);
+    zhttp_request_match (zhttp_request_t *self, const char *method, const char *path, ...);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.

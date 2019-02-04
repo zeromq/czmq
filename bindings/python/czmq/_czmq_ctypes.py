@@ -9007,11 +9007,11 @@ The content is assumed to be constant-memory and will therefore not be copied or
         """
         return lib.zhttp_request_reset_content(self._as_parameter_)
 
-    def match(self, method, match, *args):
+    def match(self, method, path, *args):
         """
         Match the path of the request.
 Support wildcards with '%s' symbol inside the match string.
-Matching wildcars is until the next '/', '?' or '\0'.
+Matching wildcards until the next '/', '?' or '\0'.
 On successful match the variadic arguments will be filled with the matching strings.
 On successful match the method is modifying the url field and break it into substrings.
 If you need to use the url, do it before matching or take a copy.
@@ -9023,7 +9023,7 @@ To use the percent symbol, just double it, e.g "%%something".
 Example:
 if (zhttp_request_match (request, "POST", "/send/%s/%s", &name, &id))
         """
-        return lib.zhttp_request_match(self._as_parameter_, method, match, *args)
+        return lib.zhttp_request_match(self._as_parameter_, method, path, *args)
 
     @staticmethod
     def test(verbose):
