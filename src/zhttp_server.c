@@ -111,8 +111,10 @@ server_actor_new (zsock_t *pipe, zhttp_server_options_t *options)
     self->daemon = MHD_start_daemon (
 #if MHD_VERSION >= 0x00095300
             MHD_ALLOW_SUSPEND_RESUME,
-#else
+#elif MHD_VERSION >= 0x00093400
             MHD_USE_SUSPEND_RESUME,
+#else
+            MHD_USE_PIPE_FOR_SHUTDOWN,
 #endif
             (uint16_t ) zhttp_server_options_port (options),
             NULL, NULL,
