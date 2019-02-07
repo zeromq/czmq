@@ -92,13 +92,17 @@ request_destroy (request_t **self_p) {
 
 static void *
 s_insert_connection (struct MHD_Connection *connection) {
+#if MHD_VERSION >= 0x00093400
     MHD_suspend_connection (connection);
+#endif
     return connection;
 }
 
 static void
 s_destroy_connection (struct MHD_Connection **connection) {
+#if MHD_VERSION >= 0x00093400
     MHD_resume_connection (*connection);
+#endif
     *connection = NULL;
 }
 

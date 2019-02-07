@@ -4549,6 +4549,11 @@ To start handling requests:
 You can connect as many dealers as you want.
 The Server is using simple dealer socket to route the requests.
 
+NOTE: when using libmicrohttpd << 0.9.34 the application might experience
+high CPU usage due to the lack of MHD_suspend_connection and
+MHD_resume_connection APIs. It is recommended to use this class only with
+libmicrohttpd at least 0.9.34 in production.
+
 Constructor:
 
 ```
