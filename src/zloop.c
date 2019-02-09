@@ -712,6 +712,8 @@ zloop_start (zloop_t *self)
 
     //  Main reactor loop
     while (!zsys_interrupted || self->nonstop) {
+        if (rc == -1)      // somebody wanted us to quit
+            break;
         if (self->need_rebuild) {
             //  If s_rebuild_pollset() fails, break out of the loop and
             //  return its error
@@ -739,12 +741,12 @@ zloop_start (zloop_t *self)
                 if (self->verbose)
                     zsys_debug ("zloop: call timer handler id=%d", timer->timer_id);
                 rc = timer->handler (self, timer->timer_id, timer->arg);
-                if (rc == -1)
-                    break;      //  Timer handler signaled break
                 if (timer->times && --timer->times == 0)
                     zlistx_delete (self->timers, timer->list_handle);
                 else
                     timer->when += timer->delay;
+                if (rc == -1)
+                    break;      //  Timer handler signaled break
             }
             timer = (s_timer_t *) zlistx_next (self->timers);
         }
@@ -846,8 +848,6 @@ zloop_start (zloop_t *self)
             ptrdiff_t timer_id = (byte *) zlistx_detach (self->zombies, NULL) - (byte *) NULL;
             s_timer_remove (self, (int) timer_id);
         }
-        if (rc == -1)
-            break;
     }
     self->terminated = true;
     return rc;
