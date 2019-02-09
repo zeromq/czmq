@@ -739,12 +739,12 @@ zloop_start (zloop_t *self)
                 if (self->verbose)
                     zsys_debug ("zloop: call timer handler id=%d", timer->timer_id);
                 rc = timer->handler (self, timer->timer_id, timer->arg);
-                if (rc == -1)
-                    break;      //  Timer handler signaled break
                 if (timer->times && --timer->times == 0)
                     zlistx_delete (self->timers, timer->list_handle);
                 else
                     timer->when += timer->delay;
+                if (rc == -1)
+                    break;      //  Timer handler signaled break
             }
             timer = (s_timer_t *) zlistx_next (self->timers);
         }
