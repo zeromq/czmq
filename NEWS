@@ -1,4 +1,4 @@
-CZMQ version 4.2.0 stable, released on 20xx/xx/xx
+CZMQ version 4.2.0 stable, released on 2019/02/10
 =================================================
 
 * Note for packagers: as pkg-config's Requires.private is now used to properly
