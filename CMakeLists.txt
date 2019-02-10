@@ -224,7 +224,7 @@ ENDIF (LIBMICROHTTPD_FOUND)
 ########################################################################
 set(CZMQ_VERSION_MAJOR 4)
 set(CZMQ_VERSION_MINOR 2)
-set(CZMQ_VERSION_PATCH 0)
+set(CZMQ_VERSION_PATCH 1)
 set(CZMQ_VERSION "${CZMQ_VERSION_MAJOR}.${CZMQ_VERSION_MINOR}.${CZMQ_VERSION_PATCH}")
 message(STATUS "Detected CZMQ Version - ${CZMQ_VERSION}")
 
@@ -450,7 +450,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project
 ########################################################################
 # pkgconfig
 ########################################################################
-set (VERSION "4.2.0")
+set (VERSION "4.2.1")
 set (prefix "${CMAKE_INSTALL_PREFIX}")
 set (exec_prefix "\${prefix}")
 set (libdir "\${prefix}/lib${LIB_SUFFIX}")

@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name = "czmq",
-    version = "4.2.0",
+    version = "4.2.1",
     license = "mplv2",
     description = """Python bindings of: the high-level c binding for 0mq""",
     url = "https://github.com/zeromq/czmq",
