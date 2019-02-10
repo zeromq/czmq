@@ -21,7 +21,7 @@ uses
 const
   CZMQ_VERSION_MAJOR = 4;
   CZMQ_VERSION_MINOR = 2;
-  CZMQ_VERSION_PATCH = 0;
+  CZMQ_VERSION_PATCH = 1;
 
 const
   lib_czmq = 'libczmq.dll';

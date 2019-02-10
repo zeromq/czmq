@@ -156,8 +156,8 @@ if [ -z "$DO_CLANG_FORMAT_CHECK" -a -f configure.ac ]; then
     $CI_TIME ./autogen.sh
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j5 dist-gzip
-    $CI_TIME tar -xzf czmq-4.2.0.tar.gz
-    cd czmq-4.2.0
+    $CI_TIME tar -xzf czmq-4.2.1.tar.gz
+    cd czmq-4.2.1
 fi
 
 # Build and check this project
