@@ -2,7 +2,7 @@ CZMQ version 4.2.0 stable, released on 20xx/xx/xx
 =================================================
 
 * Note for packagers: as pkg-config's Requires.private is now used to properly
-  propagate dependencies for static builds, the libczmq*-dev or cmq-devel or
+  propagate dependencies for static builds, the libczmq*-dev or czmq-devel or
   equivalent package should now depend on the libfoo-dev or foo-devel packages
   of all the libraries that czmq is linked against, or pkg-config --libs libczmq
   will fail due to missing dependencies on end users machines.
@@ -56,9 +56,10 @@ CZMQ version 4.2.0 stable, released on 20xx/xx/xx
   zlistx are now supported by the zsock_send/receive APIs with type "l".
   See zlistx manpage for more details.
 
-* New DRAFT zhttp_client class to get/post HTTP messages. Requires linking with
-  libcurl.
-  See zhttp_client manpage for more details.
+* New DRAFT zhttp_client, zhttp_server, zhttp_server_options, zhttp_request and
+  zhttp_response to build both server and client http applications.
+  Requires linking with libcurl and libmicrohttpd.
+  See zhttp_* manpages for more details.
 
 * New DRAFT zchunk API to create zero-copy chunks:
   - zchunk_frommem
@@ -79,6 +80,8 @@ CZMQ version 4.2.0 stable, released on 20xx/xx/xx
 
 * Fixed #1961 - unnecessary uuid includes in public headers break builds without
                 libuuid.
+
+* Fixed #1995 - timers are called twice if they change the pollset.
 
 CZMQ version 4.1.1 stable, released on 2018/03/22
 =================================================
