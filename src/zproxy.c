@@ -387,27 +387,7 @@ zproxy (zsock_t *pipe, void *unused)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-#if (ZMQ_VERSION_MAJOR == 4)
-
 #define LOCALENDPOINT "tcp://127.0.0.1:%d"
-
-static void
-s_create_test_sockets (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, bool verbose)
-{
-    zsock_destroy (faucet);
-    zsock_destroy (sink);
-    zactor_destroy (proxy);
-    *faucet = zsock_new (ZMQ_PUSH);
-    assert (*faucet);
-    *sink = zsock_new (ZMQ_PULL);
-    assert (*sink);
-    *proxy = zactor_new (zproxy, NULL);
-    assert (*proxy);
-    if (verbose) {
-        zstr_sendx (*proxy, "VERBOSE", NULL);
-        zsock_wait (*proxy);
-    }
-}
 
 static int
 s_get_available_port (void)
@@ -429,6 +409,26 @@ s_get_available_port (void)
         assert (false);
     }
     return port_nbr;
+}
+
+#if (ZMQ_VERSION_MAJOR == 4)
+
+static void
+s_create_test_sockets (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, bool verbose)
+{
+    zsock_destroy (faucet);
+    zsock_destroy (sink);
+    zactor_destroy (proxy);
+    *faucet = zsock_new (ZMQ_PUSH);
+    assert (*faucet);
+    *sink = zsock_new (ZMQ_PULL);
+    assert (*sink);
+    *proxy = zactor_new (zproxy, NULL);
+    assert (*proxy);
+    if (verbose) {
+        zstr_sendx (*proxy, "VERBOSE", NULL);
+        zsock_wait (*proxy);
+    }
 }
 
 //  Checks whether client can connect to server
@@ -567,30 +567,19 @@ zproxy_test (bool verbose)
     proxy = zactor_new (zproxy, NULL);
     assert (proxy);
 
-#ifdef  WIN32
-	sink = zsock_new_sub(">inproc://backend", "whatever");
-#else
-    // vagrant vms don't like using shared storage for ipc pipes..
-    if (getenv("USER") && streq(getenv("USER"), "vagrant"))
-        sink = zsock_new_sub (">ipc:///tmp/backend", "whatever");
-    else
-	    sink = zsock_new_sub (">ipc://backend", "whatever");
-#endif //  WIN32
-	assert (sink);
+    char *frontend = NULL;
+    char *backend = NULL;
+    backend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
+    zclock_sleep (200);
+    sink = zsock_new_sub (backend, "whatever");
+    assert (sink);
 
-#ifdef WIN32
-	zstr_sendx (proxy, "BACKEND", "XPUB", "inproc://backend", NULL);
-#else
-    // vagrant vms don't like using shared storage for ipc pipes..
-    if (getenv("USER") && streq(getenv("USER"), "vagrant"))
-        zstr_sendx(proxy, "BACKEND", "XPUB", "ipc:///tmp/backend", NULL);
-    else
-        zstr_sendx(proxy, "BACKEND", "XPUB", "ipc://backend", NULL);
-#endif
+    zstr_sendx (proxy, "BACKEND", "XPUB", backend, NULL);
     zsock_wait (proxy);
 
     zsock_destroy(&sink);
     zactor_destroy(&proxy);
+    zstr_free (&backend);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     //  Create and configure our proxy with PUB/SUB to test subscriptions
@@ -648,9 +637,6 @@ zproxy_test (bool verbose)
 
     //  Create temporary directory for test files
     zsys_dir_create (basedirpath);
-
-    char *frontend = NULL;
-    char *backend = NULL;
 
     //  Check there's no authentication
     s_create_test_sockets (&proxy, &faucet, &sink, verbose);
