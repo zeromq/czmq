@@ -68,7 +68,7 @@ build:
 after_build:
   - cmd: cd "%CZMQ_BUILDDIR%\%Configuration%"
   - cmd: copy "%LIBZMQ_BUILDDIR%\bin\%Configuration%\libzmq-*dll" .
-  - cmd: 7z a -y -bd -mx=9 czmq.zip zmakecert.exe czmq_selftest.exe czmq.dll libzmq-*.dll test_randof.exe
+  - cmd: 7z a -y -bd -mx=9 czmq.zip zmakecert.exe czmq_selftest.exe libczmq.dll libzmq-*.dll test_randof.exe
   - ps: Push-AppveyorArtifact "czmq.zip" -Filename "czmq-${env:Platform}-${env:Configuration}.zip"
   - cmd: cd "%CZMQ_BUILDDIR%"
   - cmd: ctest -C "%Configuration%" -V
