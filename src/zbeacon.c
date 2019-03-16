@@ -58,6 +58,8 @@ s_self_destroy (self_t **self_p)
         zframe_destroy (&self->filter);
         if (self->udpsock != INVALID_SOCKET)
             zsys_udp_close (self->udpsock);
+        if (self->udpsock_send != INVALID_SOCKET)
+            zsys_udp_close (self->udpsock_send);
         freen (self);
         *self_p = NULL;
     }
