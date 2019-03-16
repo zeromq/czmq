@@ -56,7 +56,7 @@ s_self_destroy (self_t **self_p)
         self_t *self = *self_p;
         zframe_destroy (&self->transmit);
         zframe_destroy (&self->filter);
-        if (self->udpsock) // don't close STDIN
+        if (self->udpsock != INVALID_SOCKET)
             zsys_udp_close (self->udpsock);
         freen (self);
         *self_p = NULL;
@@ -69,6 +69,8 @@ s_self_new (zsock_t *pipe)
     self_t *self = (self_t *) zmalloc (sizeof (self_t));
     assert (self);
     self->pipe = pipe;
+    self->udpsock = INVALID_SOCKET;
+    self->udpsock_send = INVALID_SOCKET;
     return self;
 }
 
@@ -80,9 +82,9 @@ static void
 s_self_prepare_udp (self_t *self)
 {
     //  Create our UDP socket
-    if (self->udpsock)
+    if (self->udpsock != INVALID_SOCKET)
         zsys_udp_close (self->udpsock);
-    if (self->udpsock_send)
+    if (self->udpsock_send != INVALID_SOCKET)
         zsys_udp_close (self->udpsock_send);
 
     self->hostname [0] = 0;
