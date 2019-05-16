@@ -44,6 +44,7 @@ libmicrohttpd at least 0.9.34 in production.
         """
         return utils.lib.zhttp_server_port(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

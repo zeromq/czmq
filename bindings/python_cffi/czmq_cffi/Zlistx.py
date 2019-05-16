@@ -24,6 +24,15 @@ class Zlistx(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zlistx_destroy_py)
 
+    @staticmethod
+    def unpack(frame):
+        """
+        Unpack binary frame into a new list. Packed data must follow format
+        defined by zlistx_pack. List is set to autofree. An empty frame
+        unpacks to an empty list.
+        """
+        return utils.lib.zlistx_unpack(frame._p)
+
     def add_start(self, item):
         """
         Add an item to the head of the list. Calls the item duplicator, if any,
@@ -102,6 +111,7 @@ class Zlistx(object):
         """
         return utils.lib.zlistx_cursor(self._p)
 
+    @staticmethod
     def handle_item(handle):
         """
         Returns the item associated with the given list handle, or NULL if passed
@@ -240,6 +250,7 @@ class Zlistx(object):
         """
         return utils.lib.zlistx_pack(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

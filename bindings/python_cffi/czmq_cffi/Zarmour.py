@@ -112,6 +112,7 @@ class Zarmour(object):
         """
         utils.lib.zarmour_print(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

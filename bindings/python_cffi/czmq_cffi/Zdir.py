@@ -67,6 +67,7 @@ class Zdir(object):
         """
         utils.lib.zdir_remove(self._p, force)
 
+    @staticmethod
     def diff(older, newer, alias):
         """
         Calculate differences between two versions of a directory tree.
@@ -101,6 +102,7 @@ class Zdir(object):
         """
         utils.lib.zdir_print(self._p, indent)
 
+    @staticmethod
     def watch(pipe, unused):
         """
         Create a new zdir_watch actor instance:
@@ -132,6 +134,7 @@ class Zdir(object):
         """
         utils.lib.zdir_watch(pipe._p, unused._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

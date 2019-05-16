@@ -29,7 +29,7 @@ class Zactor(object):
         Send a zmsg message to the actor, take ownership of the message
         and destroy when it has been sent.
         """
-        return utils.lib.zactor_send(self._p, msg_p._p)
+        return utils.lib.zactor_send(self._p, utils.ffi.new("zmsg_t **", msg_p._p))
 
     def recv(self):
         """
@@ -39,12 +39,14 @@ class Zactor(object):
         """
         return utils.lib.zactor_recv(self._p)
 
+    @staticmethod
     def is_py(self):
         """
         Probe the supplied object, and report if it looks like a zactor_t.
         """
         return utils.lib.zactor_is(self._p)
 
+    @staticmethod
     def resolve(self):
         """
         Probe the supplied reference. If it looks like a zactor_t instance,
@@ -66,6 +68,7 @@ class Zactor(object):
         """
         utils.lib.zactor_set_destructor(self._p, destructor)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

@@ -26,12 +26,44 @@ class Zframe(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zframe_destroy_py)
 
+    @staticmethod
+    def new_empty():
+        """
+        Create an empty (zero-sized) frame
+        """
+        return utils.lib.zframe_new_empty()
+
+    @staticmethod
+    def from_py(string):
+        """
+        Create a frame with a specified string content.
+        """
+        return utils.lib.zframe_from(utils.to_bytes(string))
+
+    @staticmethod
+    def frommem(data, size, destructor, hint):
+        """
+        Create a new frame from memory. Take ownership of the memory and calling the destructor
+        on destroy.
+        """
+        return utils.lib.zframe_frommem(data, size, destructor, hint._p)
+
+    @staticmethod
+    def recv(source):
+        """
+        Receive frame from socket, returns zframe_t object or NULL if the recv
+        was interrupted. Does a blocking recv, if you want to not block then use
+        zpoller or zloop.
+        """
+        return utils.lib.zframe_recv(source._p)
+
+    @staticmethod
     def send(self_p, dest, flags):
         """
         Send a frame to a socket, destroy frame after sending.
         Return -1 on error, 0 on success.
         """
-        return utils.lib.zframe_send(self_p._p, dest._p, flags)
+        return utils.lib.zframe_send(utils.ffi.new("zframe_t **", self_p._p), dest._p, flags)
 
     def size(self):
         """
@@ -142,12 +174,14 @@ class Zframe(object):
         """
         utils.lib.zframe_print(self._p, utils.to_bytes(prefix))
 
+    @staticmethod
     def is_py(self):
         """
         Probe the supplied object, and report if it looks like a zframe_t.
         """
         return utils.lib.zframe_is(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

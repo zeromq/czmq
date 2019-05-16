@@ -11,6 +11,7 @@ class Zsys(object):
 
     """
 
+    @staticmethod
     def init():
         """
         Initialize CZMQ zsys layer; this happens automatically when you create
@@ -21,6 +22,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_init()
 
+    @staticmethod
     def shutdown():
         """
         Optionally shut down the CZMQ zsys layer; this normally happens automatically
@@ -30,6 +32,7 @@ class Zsys(object):
         """
         utils.lib.zsys_shutdown()
 
+    @staticmethod
     def socket(type, filename, line_nbr):
         """
         Get a new ZMQ socket, automagically creating a ZMQ context if this is
@@ -40,6 +43,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_socket(type, utils.to_bytes(filename), line_nbr)
 
+    @staticmethod
     def close(handle, filename, line_nbr):
         """
         Destroy/close a ZMQ socket. You should call this for every socket you
@@ -48,6 +52,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_close(handle._p, utils.to_bytes(filename), line_nbr)
 
+    @staticmethod
     def sockname(socktype):
         """
         Return ZMQ socket name for socket type
@@ -55,14 +60,16 @@ class Zsys(object):
         """
         return utils.lib.zsys_sockname(socktype)
 
+    @staticmethod
     def create_pipe(backend_p):
         """
         Create a pipe, which consists of two PAIR sockets connected over inproc.
         The pipe is configured to use the zsys_pipehwm setting. Returns the
         frontend socket successful, NULL if failed.
         """
-        return utils.lib.zsys_create_pipe(backend_p._p)
+        return utils.lib.zsys_create_pipe(utils.ffi.new("zsock_t **", backend_p._p))
 
+    @staticmethod
     def handler_set(handler_fn):
         """
         Set interrupt handler; this saves the default handlers so that a
@@ -72,12 +79,14 @@ class Zsys(object):
         """
         utils.lib.zsys_handler_set(handler_fn)
 
+    @staticmethod
     def handler_reset():
         """
         Reset interrupt handler, call this at exit if needed
         """
         utils.lib.zsys_handler_reset()
 
+    @staticmethod
     def catch_interrupts():
         """
         Set default interrupt handler, so Ctrl-C or SIGTERM will set
@@ -87,6 +96,7 @@ class Zsys(object):
         """
         utils.lib.zsys_catch_interrupts()
 
+    @staticmethod
     def is_interrupted():
         """
         Check if default interrupt handler of Ctrl-C or SIGTERM was called.
@@ -95,6 +105,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_is_interrupted()
 
+    @staticmethod
     def set_interrupted():
         """
         Set interrupted flag. This is done by default signal handler, however
@@ -103,18 +114,21 @@ class Zsys(object):
         """
         utils.lib.zsys_set_interrupted()
 
+    @staticmethod
     def file_exists(filename):
         """
         Return 1 if file exists, else zero
         """
         return utils.lib.zsys_file_exists(utils.to_bytes(filename))
 
+    @staticmethod
     def file_modified(filename):
         """
         Return file modification time. Returns 0 if the file does not exist.
         """
         return utils.lib.zsys_file_modified(utils.to_bytes(filename))
 
+    @staticmethod
     def file_mode(filename):
         """
         Return file mode; provides at least support for the POSIX S_ISREG(m)
@@ -123,37 +137,43 @@ class Zsys(object):
         """
         return utils.lib.zsys_file_mode(utils.to_bytes(filename))
 
+    @staticmethod
     def file_delete(filename):
         """
         Delete file. Does not complain if the file is absent
         """
         return utils.lib.zsys_file_delete(utils.to_bytes(filename))
 
+    @staticmethod
     def file_stable(filename):
         """
         Check if file is 'stable'
         """
         return utils.lib.zsys_file_stable(utils.to_bytes(filename))
 
-    def dir_create(pathname, ):
+    @staticmethod
+    def dir_create(pathname, *pathname_args):
         """
         Create a file path if it doesn't exist. The file path is treated as
         printf format.
         """
-        return utils.lib.zsys_dir_create(utils.to_bytes(pathname), )
+        return utils.lib.zsys_dir_create(utils.to_bytes(pathname), *pathname_args)
 
-    def dir_delete(pathname, ):
+    @staticmethod
+    def dir_delete(pathname, *pathname_args):
         """
         Remove a file path if empty; the pathname is treated as printf format.
         """
-        return utils.lib.zsys_dir_delete(utils.to_bytes(pathname), )
+        return utils.lib.zsys_dir_delete(utils.to_bytes(pathname), *pathname_args)
 
+    @staticmethod
     def dir_change(pathname):
         """
         Move to a specified working directory. Returns 0 if OK, -1 if this failed.
         """
         return utils.lib.zsys_dir_change(utils.to_bytes(pathname))
 
+    @staticmethod
     def file_mode_private():
         """
         Set private file creation mode; all files created from here will be
@@ -161,6 +181,7 @@ class Zsys(object):
         """
         utils.lib.zsys_file_mode_private()
 
+    @staticmethod
     def file_mode_default():
         """
         Reset default file creation mode; all files created from here will use
@@ -168,6 +189,7 @@ class Zsys(object):
         """
         utils.lib.zsys_file_mode_default()
 
+    @staticmethod
     def version(major, minor, patch):
         """
         Return the CZMQ version for run-time API detection; returns version
@@ -175,7 +197,8 @@ class Zsys(object):
         """
         utils.lib.zsys_version(major, minor, patch)
 
-    def sprintf_hint(hint, format, ):
+    @staticmethod
+    def sprintf_hint(hint, format, *format_args):
         """
         Format a string using printf formatting, returning a freshly allocated
         buffer. If there was insufficient memory, returns NULL. Free the returned
@@ -183,16 +206,18 @@ class Zsys(object):
         a larger starting buffer size (known to/assumed by the developer) and so
         avoid reallocations.
         """
-        return utils.lib.zsys_sprintf_hint(hint, utils.to_bytes(format), )
+        return utils.lib.zsys_sprintf_hint(hint, utils.to_bytes(format), *format_args)
 
-    def sprintf(format, ):
+    @staticmethod
+    def sprintf(format, *format_args):
         """
         Format a string using printf formatting, returning a freshly allocated
         buffer. If there was insufficient memory, returns NULL. Free the returned
         string using zstr_free().
         """
-        return utils.lib.zsys_sprintf(utils.to_bytes(format), )
+        return utils.lib.zsys_sprintf(utils.to_bytes(format), *format_args)
 
+    @staticmethod
     def vprintf(format, argptr):
         """
         Format a string with a va_list argument, returning a freshly allocated
@@ -201,6 +226,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_vprintf(utils.to_bytes(format), argptr._p)
 
+    @staticmethod
     def udp_new(routable):
         """
         Create UDP beacon socket; if the routable option is true, uses
@@ -210,6 +236,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_udp_new(routable)
 
+    @staticmethod
     def udp_close(handle):
         """
         Close a UDP socket
@@ -217,6 +244,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_udp_close(handle._p)
 
+    @staticmethod
     def udp_send(udpsock, frame, address, addrlen):
         """
         Send zframe to UDP socket, return -1 if sending failed due to
@@ -225,6 +253,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_udp_send(udpsock._p, frame._p, address._p, addrlen)
 
+    @staticmethod
     def udp_recv(udpsock, peername, peerlen):
         """
         Receive zframe from UDP socket, and set address of peer that sent it
@@ -234,6 +263,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_udp_recv(udpsock._p, utils.to_bytes(peername), peerlen)
 
+    @staticmethod
     def socket_error(reason):
         """
         Handle an I/O error on some socket operation; will report and die on
@@ -242,6 +272,7 @@ class Zsys(object):
         """
         utils.lib.zsys_socket_error(utils.to_bytes(reason))
 
+    @staticmethod
     def hostname():
         """
         Return current host name, for use in public tcp:// endpoints. Caller gets
@@ -250,6 +281,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_hostname()
 
+    @staticmethod
     def daemonize(workdir):
         """
         Move the current process into the background. The precise effect depends
@@ -260,6 +292,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_daemonize(utils.to_bytes(workdir))
 
+    @staticmethod
     def run_as(lockfile, group, user):
         """
         Drop the process ID into the lockfile, with exclusive lock, and switch
@@ -270,6 +303,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_run_as(utils.to_bytes(lockfile), utils.to_bytes(group), utils.to_bytes(user))
 
+    @staticmethod
     def has_curve():
         """
         Returns true if the underlying libzmq supports CURVE security.
@@ -277,6 +311,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_has_curve()
 
+    @staticmethod
     def set_io_threads(io_threads):
         """
         Configure the number of I/O threads that ZeroMQ will use. A good
@@ -287,6 +322,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_io_threads(io_threads)
 
+    @staticmethod
     def set_thread_sched_policy(policy):
         """
         Configure the scheduling policy of the ZMQ context thread pool.
@@ -297,6 +333,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_thread_sched_policy(policy)
 
+    @staticmethod
     def set_thread_priority(priority):
         """
         Configure the scheduling priority of the ZMQ context thread pool.
@@ -307,6 +344,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_thread_priority(priority)
 
+    @staticmethod
     def set_thread_name_prefix(prefix):
         """
         Configure the numeric prefix to each thread created for the internal
@@ -317,12 +355,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_thread_name_prefix(prefix)
 
+    @staticmethod
     def thread_name_prefix():
         """
         Return thread name prefix.
         """
         return utils.lib.zsys_thread_name_prefix()
 
+    @staticmethod
     def thread_affinity_cpu_add(cpu):
         """
         Adds a specific CPU to the affinity list of the ZMQ context thread pool.
@@ -331,6 +371,7 @@ class Zsys(object):
         """
         utils.lib.zsys_thread_affinity_cpu_add(cpu)
 
+    @staticmethod
     def thread_affinity_cpu_remove(cpu):
         """
         Removes a specific CPU to the affinity list of the ZMQ context thread pool.
@@ -339,6 +380,7 @@ class Zsys(object):
         """
         utils.lib.zsys_thread_affinity_cpu_remove(cpu)
 
+    @staticmethod
     def set_max_sockets(max_sockets):
         """
         Configure the number of sockets that ZeroMQ will allow. The default
@@ -348,12 +390,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_max_sockets(max_sockets)
 
+    @staticmethod
     def socket_limit():
         """
         Return maximum number of ZeroMQ sockets that the system will support.
         """
         return utils.lib.zsys_socket_limit()
 
+    @staticmethod
     def set_max_msgsz(max_msgsz):
         """
         Configure the maximum allowed size of a message sent.
@@ -361,12 +405,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_max_msgsz(max_msgsz)
 
+    @staticmethod
     def max_msgsz():
         """
         Return maximum message size.
         """
         return utils.lib.zsys_max_msgsz()
 
+    @staticmethod
     def set_zero_copy_recv(zero_copy):
         """
         Configure whether to use zero copy strategy in libzmq. If the environment
@@ -375,12 +421,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_zero_copy_recv(zero_copy)
 
+    @staticmethod
     def zero_copy_recv():
         """
         Return ZMQ_ZERO_COPY_RECV option.
         """
         return utils.lib.zsys_zero_copy_recv()
 
+    @staticmethod
     def set_file_stable_age_msec(file_stable_age_msec):
         """
         Configure the threshold value of filesystem object age per st_mtime
@@ -391,6 +439,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_file_stable_age_msec(file_stable_age_msec._p)
 
+    @staticmethod
     def file_stable_age_msec():
         """
         Return current threshold value of file stable age in msec.
@@ -399,6 +448,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_file_stable_age_msec()
 
+    @staticmethod
     def set_linger(linger):
         """
         Configure the default linger timeout in msecs for new zsock instances.
@@ -409,6 +459,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_linger(linger)
 
+    @staticmethod
     def set_sndhwm(sndhwm):
         """
         Configure the default outgoing pipe limit (HWM) for new zsock instances.
@@ -419,6 +470,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_sndhwm(sndhwm)
 
+    @staticmethod
     def set_rcvhwm(rcvhwm):
         """
         Configure the default incoming pipe limit (HWM) for new zsock instances.
@@ -429,6 +481,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_rcvhwm(rcvhwm)
 
+    @staticmethod
     def set_pipehwm(pipehwm):
         """
         Configure the default HWM for zactor internal pipes; this is set on both
@@ -439,12 +492,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_pipehwm(pipehwm)
 
+    @staticmethod
     def pipehwm():
         """
         Return the HWM for zactor internal pipes.
         """
         return utils.lib.zsys_pipehwm()
 
+    @staticmethod
     def set_ipv6(ipv6):
         """
         Configure use of IPv6 for new zsock instances. By default sockets accept
@@ -456,12 +511,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_ipv6(ipv6)
 
+    @staticmethod
     def ipv6():
         """
         Return use of IPv6 for zsock instances.
         """
         return utils.lib.zsys_ipv6()
 
+    @staticmethod
     def set_interface(value):
         """
         Set network interface name to use for broadcasts, particularly zbeacon.
@@ -473,12 +530,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_interface(utils.to_bytes(value))
 
+    @staticmethod
     def interface():
         """
         Return network interface to use for broadcasts, or "" if none was set.
         """
         return utils.lib.zsys_interface()
 
+    @staticmethod
     def set_ipv6_address(value):
         """
         Set IPv6 address to use zbeacon socket, particularly for receiving zbeacon.
@@ -488,12 +547,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_ipv6_address(utils.to_bytes(value))
 
+    @staticmethod
     def ipv6_address():
         """
         Return IPv6 address to use for zbeacon reception, or "" if none was set.
         """
         return utils.lib.zsys_ipv6_address()
 
+    @staticmethod
     def set_ipv6_mcast_address(value):
         """
         Set IPv6 milticast address to use for sending zbeacon messages. This needs
@@ -503,6 +564,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_ipv6_mcast_address(utils.to_bytes(value))
 
+    @staticmethod
     def ipv6_mcast_address():
         """
         Return IPv6 multicast address to use for sending zbeacon, or "" if none was
@@ -510,6 +572,7 @@ class Zsys(object):
         """
         return utils.lib.zsys_ipv6_mcast_address()
 
+    @staticmethod
     def set_auto_use_fd(auto_use_fd):
         """
         Configure the automatic use of pre-allocated FDs when creating new sockets.
@@ -521,12 +584,14 @@ class Zsys(object):
         """
         utils.lib.zsys_set_auto_use_fd(auto_use_fd)
 
+    @staticmethod
     def auto_use_fd():
         """
         Return use of automatic pre-allocated FDs for zsock instances.
         """
         return utils.lib.zsys_auto_use_fd()
 
+    @staticmethod
     def zprintf(format, args):
         """
         Print formatted string. Format is specified by variable names
@@ -541,12 +606,14 @@ class Zsys(object):
         """
         return utils.lib.zsys_zprintf(utils.to_bytes(format), args._p)
 
+    @staticmethod
     def zprintf_error(format, args):
         """
         Return error string for given format/args combination.
         """
         return utils.lib.zsys_zprintf_error(utils.to_bytes(format), args._p)
 
+    @staticmethod
     def zplprintf(format, args):
         """
         Print formatted string. Format is specified by variable names
@@ -561,12 +628,14 @@ class Zsys(object):
         """
         return utils.lib.zsys_zplprintf(utils.to_bytes(format), args._p)
 
+    @staticmethod
     def zplprintf_error(format, args):
         """
         Return error string for given format/args combination.
         """
         return utils.lib.zsys_zplprintf_error(utils.to_bytes(format), args._p)
 
+    @staticmethod
     def set_logident(value):
         """
         Set log identity, which is a string that prefixes all log messages sent
@@ -575,6 +644,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_logident(utils.to_bytes(value))
 
+    @staticmethod
     def set_logstream(stream):
         """
         Set stream to receive log traffic. By default, log traffic is sent to
@@ -583,6 +653,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_logstream(stream)
 
+    @staticmethod
     def set_logsender(endpoint):
         """
         Sends log output to a PUB socket bound to the specified endpoint. To
@@ -595,6 +666,7 @@ class Zsys(object):
         """
         utils.lib.zsys_set_logsender(utils.to_bytes(endpoint))
 
+    @staticmethod
     def set_logsystem(logsystem):
         """
         Enable or disable logging to the system facility (syslog on POSIX boxes,
@@ -602,36 +674,42 @@ class Zsys(object):
         """
         utils.lib.zsys_set_logsystem(logsystem)
 
-    def error(format, ):
+    @staticmethod
+    def error(format, *format_args):
         """
         Log error condition - highest priority
         """
-        utils.lib.zsys_error(utils.to_bytes(format), )
+        utils.lib.zsys_error(utils.to_bytes(format), *format_args)
 
-    def warning(format, ):
+    @staticmethod
+    def warning(format, *format_args):
         """
         Log warning condition - high priority
         """
-        utils.lib.zsys_warning(utils.to_bytes(format), )
+        utils.lib.zsys_warning(utils.to_bytes(format), *format_args)
 
-    def notice(format, ):
+    @staticmethod
+    def notice(format, *format_args):
         """
         Log normal, but significant, condition - normal priority
         """
-        utils.lib.zsys_notice(utils.to_bytes(format), )
+        utils.lib.zsys_notice(utils.to_bytes(format), *format_args)
 
-    def info(format, ):
+    @staticmethod
+    def info(format, *format_args):
         """
         Log informational message - low priority
         """
-        utils.lib.zsys_info(utils.to_bytes(format), )
+        utils.lib.zsys_info(utils.to_bytes(format), *format_args)
 
-    def debug(format, ):
+    @staticmethod
+    def debug(format, *format_args):
         """
         Log debug-level message - lowest priority
         """
-        utils.lib.zsys_debug(utils.to_bytes(format), )
+        utils.lib.zsys_debug(utils.to_bytes(format), *format_args)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

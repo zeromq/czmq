@@ -24,6 +24,15 @@ class Zhash(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zhash_destroy_py)
 
+    @staticmethod
+    def unpack(frame):
+        """
+        Unpack binary frame into a new hash table. Packed data must follow format
+        defined by zhash_pack. Hash table is set to autofree. An empty frame
+        unpacks to an empty hash table.
+        """
+        return utils.lib.zhash_unpack(frame._p)
+
     def insert(self, key, item):
         """
         Insert item into hash table with specified key and item.
@@ -120,13 +129,13 @@ class Zhash(object):
         """
         return utils.lib.zhash_cursor(self._p)
 
-    def comment(self, format, ):
+    def comment(self, format, *format_args):
         """
         Add a comment to hash table before saving to disk. You can add as many
         comment lines as you like. These comment lines are discarded when loading
         the file. If you use a null format, all comments are deleted.
         """
-        utils.lib.zhash_comment(self._p, format, )
+        utils.lib.zhash_comment(self._p, format, *format_args)
 
     def pack(self):
         """
@@ -185,6 +194,7 @@ class Zhash(object):
         """
         utils.lib.zhash_autofree(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

@@ -11,6 +11,7 @@ class Zstr(object):
     sending and receiving strings
     """
 
+    @staticmethod
     def recv(source):
         """
         Receive C string from socket. Caller must free returned string using
@@ -19,7 +20,8 @@ class Zstr(object):
         """
         return utils.lib.zstr_recv(source._p)
 
-    def recvx(source, string_p, ):
+    @staticmethod
+    def recvx(source, string_p, *string_p_args):
         """
         Receive a series of strings (until NULL) from multipart data.
         Each string is allocated and filled with string data; if there
@@ -29,8 +31,9 @@ class Zstr(object):
         using zstr_free(). If not enough strings are provided, remaining
         multipart frames in the message are dropped.
         """
-        return utils.lib.zstr_recvx(source._p, utils.to_bytes(string_p), )
+        return utils.lib.zstr_recvx(source._p, utils.to_bytes(string_p), *string_p_args)
 
+    @staticmethod
     def recv_compress(source):
         """
         De-compress and receive C string from socket, received as a message
@@ -40,6 +43,7 @@ class Zstr(object):
         """
         return utils.lib.zstr_recv_compress(source._p)
 
+    @staticmethod
     def send(dest, string):
         """
         Send a C string to a socket, as a frame. The string is sent without
@@ -49,6 +53,7 @@ class Zstr(object):
         """
         return utils.lib.zstr_send(dest._p, utils.to_bytes(string))
 
+    @staticmethod
     def sendm(dest, string):
         """
         Send a C string to a socket, as zstr_send(), with a MORE flag, so that
@@ -56,29 +61,33 @@ class Zstr(object):
         """
         return utils.lib.zstr_sendm(dest._p, utils.to_bytes(string))
 
-    def sendf(dest, format, ):
+    @staticmethod
+    def sendf(dest, format, *format_args):
         """
         Send a formatted string to a socket. Note that you should NOT use
         user-supplied strings in the format (they may contain '%' which
         will create security holes).
         """
-        return utils.lib.zstr_sendf(dest._p, format, )
+        return utils.lib.zstr_sendf(dest._p, format, *format_args)
 
-    def sendfm(dest, format, ):
+    @staticmethod
+    def sendfm(dest, format, *format_args):
         """
         Send a formatted string to a socket, as for zstr_sendf(), with a
         MORE flag, so that you can send further strings in the same multi-part
         message.
         """
-        return utils.lib.zstr_sendfm(dest._p, format, )
+        return utils.lib.zstr_sendfm(dest._p, format, *format_args)
 
-    def sendx(dest, string, ):
+    @staticmethod
+    def sendx(dest, string, *string_args):
         """
         Send a series of strings (until NULL) as multipart data
         Returns 0 if the strings could be sent OK, or -1 on error.
         """
-        return utils.lib.zstr_sendx(dest._p, utils.to_bytes(string), )
+        return utils.lib.zstr_sendx(dest._p, utils.to_bytes(string), *string_args)
 
+    @staticmethod
     def send_compress(dest, string):
         """
         Compress and send a C string to a socket, as a message with two frames:
@@ -89,6 +98,7 @@ class Zstr(object):
         """
         return utils.lib.zstr_send_compress(dest._p, utils.to_bytes(string))
 
+    @staticmethod
     def sendm_compress(dest, string):
         """
         Compress and send a C string to a socket, as zstr_send_compress(),
@@ -97,6 +107,7 @@ class Zstr(object):
         """
         return utils.lib.zstr_sendm_compress(dest._p, utils.to_bytes(string))
 
+    @staticmethod
     def str(source):
         """
         Accepts a void pointer and returns a fresh character string. If source
@@ -104,6 +115,7 @@ class Zstr(object):
         """
         return utils.lib.zstr_str(source._p)
 
+    @staticmethod
     def free(string_p):
         """
         Free a provided string, and nullify the parent pointer. Safe to call on
@@ -111,6 +123,7 @@ class Zstr(object):
         """
         utils.lib.zstr_free(utils.to_bytes(string_p))
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

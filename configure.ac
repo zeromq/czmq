@@ -970,7 +970,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  include/Makefile
                  src/libczmq.pc
-                 ])
+                ])
 
 
 # Optional project-local hook to put some finishing touches in your configure

@@ -164,6 +164,7 @@ class Zlist(object):
         """
         return utils.lib.zlist_freefn(self._p, item._p, fn, at_tail)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

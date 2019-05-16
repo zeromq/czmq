@@ -95,11 +95,11 @@ In future it SHALL
         """
         return utils.lib.zargs_get(self._p, utils.to_bytes(name))
 
-    def getx(self, name, ):
+    def getx(self, name, *name_args):
         """
         Return value of one of parameter(s) or NULL is it has no value (or was not specified)
         """
-        return utils.lib.zargs_getx(self._p, utils.to_bytes(name), )
+        return utils.lib.zargs_getx(self._p, utils.to_bytes(name), *name_args)
 
     def has(self, name):
         """
@@ -107,11 +107,11 @@ In future it SHALL
         """
         return utils.lib.zargs_has(self._p, utils.to_bytes(name))
 
-    def hasx(self, name, ):
+    def hasx(self, name, *name_args):
         """
         Returns true if named parameter(s) was specified on command line
         """
-        return utils.lib.zargs_hasx(self._p, utils.to_bytes(name), )
+        return utils.lib.zargs_hasx(self._p, utils.to_bytes(name), *name_args)
 
     def print_py(self):
         """
@@ -119,6 +119,7 @@ In future it SHALL
         """
         utils.lib.zargs_print(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

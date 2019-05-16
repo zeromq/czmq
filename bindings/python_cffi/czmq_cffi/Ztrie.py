@@ -81,6 +81,7 @@ class Ztrie(object):
         """
         utils.lib.ztrie_print(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

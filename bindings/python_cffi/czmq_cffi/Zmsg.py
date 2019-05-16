@@ -24,6 +24,43 @@ class Zmsg(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zmsg_destroy_py)
 
+    @staticmethod
+    def recv(source):
+        """
+        Receive message from socket, returns zmsg_t object or NULL if the recv
+        was interrupted. Does a blocking recv. If you want to not block then use
+        the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+        before receiving.
+        """
+        return utils.lib.zmsg_recv(source._p)
+
+    @staticmethod
+    def load(file):
+        """
+        Load/append an open file into new message, return the message.
+        Returns NULL if the message could not be loaded.
+        """
+        return utils.lib.zmsg_load(file)
+
+    @staticmethod
+    def decode(frame):
+        """
+        Decodes a serialized message frame created by zmsg_encode () and returns
+        a new zmsg_t object. Returns NULL if the frame was badly formatted or
+        there was insufficient memory to work.
+        """
+        return utils.lib.zmsg_decode(frame._p)
+
+    @staticmethod
+    def new_signal(status):
+        """
+        Generate a signal message encoding the given status. A signal is a short
+        message carrying a 1-byte success/failure code (by convention, 0 means
+        OK). Signals are encoded to be distinguishable from "normal" messages.
+        """
+        return utils.lib.zmsg_new_signal(status)
+
+    @staticmethod
     def send(self_p, dest):
         """
         Send message to destination socket, and destroy the message after sending
@@ -31,8 +68,9 @@ class Zmsg(object):
         the message anyhow. Nullifies the caller's reference to the message (as
         it is a destructor).
         """
-        return utils.lib.zmsg_send(self_p._p, dest._p)
+        return utils.lib.zmsg_send(utils.ffi.new("zmsg_t **", self_p._p), dest._p)
 
+    @staticmethod
     def sendm(self_p, dest):
         """
         Send message to destination socket as part of a multipart sequence, and
@@ -42,7 +80,7 @@ class Zmsg(object):
         the message anyhow. Nullifies the caller's reference to the message (as
         it is a destructor).
         """
-        return utils.lib.zmsg_sendm(self_p._p, dest._p)
+        return utils.lib.zmsg_sendm(utils.ffi.new("zmsg_t **", self_p._p), dest._p)
 
     def size(self):
         """
@@ -77,7 +115,7 @@ class Zmsg(object):
         Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
         nullify the caller's frame reference.
         """
-        return utils.lib.zmsg_prepend(self._p, frame_p._p)
+        return utils.lib.zmsg_prepend(self._p, utils.ffi.new("zframe_t **", frame_p._p))
 
     def append(self, frame_p):
         """
@@ -86,7 +124,7 @@ class Zmsg(object):
         Returns 0 on success. Deprecates zmsg_add, which did not nullify the
         caller's frame reference.
         """
-        return utils.lib.zmsg_append(self._p, frame_p._p)
+        return utils.lib.zmsg_append(self._p, utils.ffi.new("zframe_t **", frame_p._p))
 
     def pop(self):
         """
@@ -122,19 +160,19 @@ class Zmsg(object):
         """
         return utils.lib.zmsg_addstr(self._p, utils.to_bytes(string))
 
-    def pushstrf(self, format, ):
+    def pushstrf(self, format, *format_args):
         """
         Push formatted string as new frame to front of message.
         Returns 0 on success, -1 on error.
         """
-        return utils.lib.zmsg_pushstrf(self._p, format, )
+        return utils.lib.zmsg_pushstrf(self._p, format, *format_args)
 
-    def addstrf(self, format, ):
+    def addstrf(self, format, *format_args):
         """
         Push formatted string as new frame to end of message.
         Returns 0 on success, -1 on error.
         """
-        return utils.lib.zmsg_addstrf(self._p, format, )
+        return utils.lib.zmsg_addstrf(self._p, format, *format_args)
 
     def popstr(self):
         """
@@ -149,7 +187,7 @@ class Zmsg(object):
         submessage, so the original is destroyed in this call. Returns 0 on
         success, -1 on error.
         """
-        return utils.lib.zmsg_addmsg(self._p, msg_p._p)
+        return utils.lib.zmsg_addmsg(self._p, utils.ffi.new("zmsg_t **", msg_p._p))
 
     def popmsg(self):
         """
@@ -232,12 +270,14 @@ class Zmsg(object):
         """
         return utils.lib.zmsg_signal(self._p)
 
+    @staticmethod
     def is_py(self):
         """
         Probe the supplied object, and report if it looks like a zmsg_t.
         """
         return utils.lib.zmsg_is(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.
