@@ -52,6 +52,7 @@ class Zdigest(object):
         """
         return utils.lib.zdigest_string(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

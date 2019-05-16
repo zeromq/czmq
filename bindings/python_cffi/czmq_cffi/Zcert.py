@@ -24,6 +24,27 @@ class Zcert(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zcert_destroy_py)
 
+    @staticmethod
+    def new_from(public_key, secret_key):
+        """
+        Accepts public/secret key pair from caller
+        """
+        return utils.lib.zcert_new_from(public_key, secret_key)
+
+    @staticmethod
+    def new_from_txt(public_txt, secret_txt):
+        """
+        Accepts public/secret key text pair from caller
+        """
+        return utils.lib.zcert_new_from_txt(utils.to_bytes(public_txt), utils.to_bytes(secret_txt))
+
+    @staticmethod
+    def load(filename):
+        """
+        Load certificate from file
+        """
+        return utils.lib.zcert_load(utils.to_bytes(filename))
+
     def public_key(self):
         """
         Return public part of key pair as 32-byte binary string
@@ -48,11 +69,11 @@ class Zcert(object):
         """
         return utils.lib.zcert_secret_txt(self._p)
 
-    def set_meta(self, name, format, ):
+    def set_meta(self, name, format, *format_args):
         """
         Set certificate metadata from formatted string.
         """
-        utils.lib.zcert_set_meta(self._p, utils.to_bytes(name), format, )
+        utils.lib.zcert_set_meta(self._p, utils.to_bytes(name), format, *format_args)
 
     def unset_meta(self, name):
         """
@@ -120,6 +141,7 @@ class Zcert(object):
         """
         utils.lib.zcert_print(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class

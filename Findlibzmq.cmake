@@ -44,6 +44,9 @@ if (MSVC)
 
     set(_zmq_version ${ZMQ_VERSION_MAJOR}_${ZMQ_VERSION_MINOR}_${ZMQ_VERSION_PATCH})
 
+    set(_zmq_debug_names)
+    set(_zmq_release_names)
+
     set(_zmq_debug_names
         "libzmq${MSVC_TOOLSET}-mt-gd-${_zmq_version}" # Debug, BUILD_SHARED
         "libzmq${MSVC_TOOLSET}-mt-sgd-${_zmq_version}" # Debug, BUILD_STATIC
@@ -81,7 +84,7 @@ endif ()
 if (NOT LIBZMQ_LIBRARIES)
     find_library (
         LIBZMQ_LIBRARIES
-        NAMES libzmq zmq
+        NAMES zmq libzmq
         HINTS ${PC_LIBZMQ_LIBRARY_HINTS}
     )
 endif ()

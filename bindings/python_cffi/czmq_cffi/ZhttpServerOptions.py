@@ -24,6 +24,13 @@ class ZhttpServerOptions(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zhttp_server_options_destroy_py)
 
+    @staticmethod
+    def from_config(config):
+        """
+        Create options from config tree.
+        """
+        return utils.lib.zhttp_server_options_from_config(config._p)
+
     def port(self):
         """
         Get the server listening port.
@@ -48,6 +55,7 @@ class ZhttpServerOptions(object):
         """
         utils.lib.zhttp_server_options_set_backend_address(self._p, utils.to_bytes(address))
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

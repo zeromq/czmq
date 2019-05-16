@@ -159,6 +159,7 @@ class Zloop(object):
         """
         return utils.lib.zloop_start(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

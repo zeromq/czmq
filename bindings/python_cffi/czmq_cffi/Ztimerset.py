@@ -66,6 +66,7 @@ class Ztimerset(object):
         """
         return utils.lib.ztimerset_execute(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

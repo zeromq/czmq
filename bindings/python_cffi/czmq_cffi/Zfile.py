@@ -28,6 +28,14 @@ class Zfile(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zfile_destroy_py)
 
+    @staticmethod
+    def tmp():
+        """
+        Create new temporary file for writing via tmpfile. File is automatically
+        deleted on destroy
+        """
+        return utils.lib.zfile_tmp()
+
     def dup(self):
         """
         Duplicate a file item, returns a newly constructed item. If the file
@@ -173,6 +181,7 @@ class Zfile(object):
         """
         return utils.lib.zfile_digest(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

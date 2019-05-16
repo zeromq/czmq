@@ -67,6 +67,7 @@ class ZdirPatch(object):
         """
         return utils.lib.zdir_patch_digest(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

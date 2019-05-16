@@ -72,6 +72,7 @@ class Ziflist(object):
         """
         utils.lib.ziflist_print(self._p)
 
+    @staticmethod
     def new_ipv6():
         """
         Get a list of network interfaces currently defined on the system
@@ -91,6 +92,7 @@ class Ziflist(object):
         """
         return utils.lib.ziflist_is_ipv6(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

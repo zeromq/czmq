@@ -48,7 +48,7 @@ class Zcertstore(object):
         does not save the certificate to disk. To do that, use zcert_save()
         directly on the certificate. Takes ownership of zcert_t object.
         """
-        utils.lib.zcertstore_insert(self._p, cert_p._p)
+        utils.lib.zcertstore_insert(self._p, utils.ffi.new("zcert_t **", cert_p._p))
 
     def empty(self):
         """
@@ -72,6 +72,7 @@ class Zcertstore(object):
         """
         return utils.lib.zcertstore_certs(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class

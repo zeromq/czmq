@@ -45,20 +45,20 @@ class Zproc(object):
             utils.lib.dproto_set_argv(self._p, foo_p)
             return
 
-        utils.lib.zproc_set_args(self._p, arguments._p)
+        utils.lib.zproc_set_args(self._p, utils.ffi.new("zlist_t **", arguments._p))
 
-    def set_argsx(self, arguments, ):
+    def set_argsx(self, arguments, *arguments_args):
         """
         Setup the command line arguments, the first item must be an (absolute) filename
         to run. Variadic function, must be NULL terminated.
         """
-        utils.lib.zproc_set_argsx(self._p, utils.to_bytes(arguments), )
+        utils.lib.zproc_set_argsx(self._p, utils.to_bytes(arguments), *arguments_args)
 
     def set_env(self, arguments):
         """
         Setup the environment variables for the process.
         """
-        utils.lib.zproc_set_env(self._p, arguments._p)
+        utils.lib.zproc_set_env(self._p, utils.ffi.new("zhash_t **", arguments._p))
 
     def set_stdin(self, socket):
         """
@@ -161,6 +161,7 @@ class Zproc(object):
         """
         utils.lib.zproc_set_verbose(self._p, verbose)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

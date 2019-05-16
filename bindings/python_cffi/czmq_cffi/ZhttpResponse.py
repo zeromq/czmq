@@ -112,6 +112,7 @@ Headers and Content is being destroyed after every send call.
         """
         utils.lib.zhttp_response_reset_content(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

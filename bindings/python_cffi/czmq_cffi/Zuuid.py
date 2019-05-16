@@ -24,6 +24,13 @@ class Zuuid(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zuuid_destroy_py)
 
+    @staticmethod
+    def new_from(source):
+        """
+        Create UUID object from supplied ZUUID_LEN-octet value.
+        """
+        return utils.lib.zuuid_new_from(source)
+
     def set(self, source):
         """
         Set UUID to new supplied ZUUID_LEN-octet value.
@@ -88,6 +95,7 @@ class Zuuid(object):
         """
         return utils.lib.zuuid_dup(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

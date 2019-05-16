@@ -29,7 +29,134 @@ class Zsock(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zsock_destroy_py)
 
-    def bind(self, format, ):
+    @staticmethod
+    def new_pub(endpoint):
+        """
+        Create a PUB socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_pub(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_sub(endpoint, subscribe):
+        """
+        Create a SUB socket, and optionally subscribe to some prefix string. Default
+        action is connect.
+        """
+        return utils.lib.zsock_new_sub(utils.to_bytes(endpoint), utils.to_bytes(subscribe))
+
+    @staticmethod
+    def new_req(endpoint):
+        """
+        Create a REQ socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_req(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_rep(endpoint):
+        """
+        Create a REP socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_rep(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_dealer(endpoint):
+        """
+        Create a DEALER socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_dealer(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_router(endpoint):
+        """
+        Create a ROUTER socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_router(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_push(endpoint):
+        """
+        Create a PUSH socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_push(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_pull(endpoint):
+        """
+        Create a PULL socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_pull(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_xpub(endpoint):
+        """
+        Create an XPUB socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_xpub(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_xsub(endpoint):
+        """
+        Create an XSUB socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_xsub(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_pair(endpoint):
+        """
+        Create a PAIR socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_pair(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_stream(endpoint):
+        """
+        Create a STREAM socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_stream(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_server(endpoint):
+        """
+        Create a SERVER socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_server(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_client(endpoint):
+        """
+        Create a CLIENT socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_client(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_radio(endpoint):
+        """
+        Create a RADIO socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_radio(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_dish(endpoint):
+        """
+        Create a DISH socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_dish(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_gather(endpoint):
+        """
+        Create a GATHER socket. Default action is bind.
+        """
+        return utils.lib.zsock_new_gather(utils.to_bytes(endpoint))
+
+    @staticmethod
+    def new_scatter(endpoint):
+        """
+        Create a SCATTER socket. Default action is connect.
+        """
+        return utils.lib.zsock_new_scatter(utils.to_bytes(endpoint))
+
+    def bind(self, format, *format_args):
         """
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
         ephemeral ports, if you specify the port number as "*". By default
@@ -52,7 +179,7 @@ class Zsock(object):
         clients being aware. Protocols that run on ephemeral ports should take
         this into account.
         """
-        return utils.lib.zsock_bind(self._p, format, )
+        return utils.lib.zsock_bind(self._p, format, *format_args)
 
     def endpoint(self):
         """
@@ -60,28 +187,28 @@ class Zsock(object):
         """
         return utils.lib.zsock_endpoint(self._p)
 
-    def unbind(self, format, ):
+    def unbind(self, format, *format_args):
         """
         Unbind a socket from a formatted endpoint.
         Returns 0 if OK, -1 if the endpoint was invalid or the function
         isn't supported.
         """
-        return utils.lib.zsock_unbind(self._p, format, )
+        return utils.lib.zsock_unbind(self._p, format, *format_args)
 
-    def connect(self, format, ):
+    def connect(self, format, *format_args):
         """
         Connect a socket to a formatted endpoint
         Returns 0 if OK, -1 if the endpoint was invalid.
         """
-        return utils.lib.zsock_connect(self._p, format, )
+        return utils.lib.zsock_connect(self._p, format, *format_args)
 
-    def disconnect(self, format, ):
+    def disconnect(self, format, *format_args):
         """
         Disconnect a socket from a formatted endpoint
         Returns 0 if OK, -1 if the endpoint was invalid or the function
         isn't supported.
         """
-        return utils.lib.zsock_disconnect(self._p, format, )
+        return utils.lib.zsock_disconnect(self._p, format, *format_args)
 
     def attach(self, endpoints, serverish):
         """
@@ -100,7 +227,7 @@ class Zsock(object):
         """
         return utils.lib.zsock_type_str(self._p)
 
-    def send(self, picture, ):
+    def send(self, picture, *picture_args):
         """
         Send a 'picture' message to the socket (or actor). The picture is a
         string that defines the type of each frame. This makes it easy to send
@@ -130,7 +257,7 @@ class Zsock(object):
         any arguments. Returns 0 if successful, -1 if sending failed for any
         reason.
         """
-        return utils.lib.zsock_send(self._p, utils.to_bytes(picture), )
+        return utils.lib.zsock_send(self._p, utils.to_bytes(picture), *picture_args)
 
     def vsend(self, picture, argptr):
         """
@@ -140,7 +267,7 @@ class Zsock(object):
         """
         return utils.lib.zsock_vsend(self._p, utils.to_bytes(picture), argptr._p)
 
-    def recv(self, picture, ):
+    def recv(self, picture, *picture_args):
         """
         Receive a 'picture' message to the socket (or actor). See zsock_send for
         the format and meaning of the picture. Returns the picture elements into
@@ -170,7 +297,7 @@ class Zsock(object):
         An 'n' picture matches an empty frame; if the message does not match,
         the method will return -1.
         """
-        return utils.lib.zsock_recv(self._p, utils.to_bytes(picture), )
+        return utils.lib.zsock_recv(self._p, utils.to_bytes(picture), *picture_args)
 
     def vrecv(self, picture, argptr):
         """
@@ -180,7 +307,7 @@ class Zsock(object):
         """
         return utils.lib.zsock_vrecv(self._p, utils.to_bytes(picture), argptr._p)
 
-    def bsend(self, picture, ):
+    def bsend(self, picture, *picture_args):
         """
         Send a binary encoded 'picture' message to the socket (or actor). This
         method is similar to zsock_send, except the arguments are encoded in a
@@ -204,9 +331,9 @@ class Zsock(object):
         Does not change or take ownership of any arguments. Returns 0 if
         successful, -1 if sending failed for any reason.
         """
-        return utils.lib.zsock_bsend(self._p, utils.to_bytes(picture), )
+        return utils.lib.zsock_bsend(self._p, utils.to_bytes(picture), *picture_args)
 
-    def brecv(self, picture, ):
+    def brecv(self, picture, *picture_args):
         """
         Receive a binary encoded 'picture' message from the socket (or actor).
         This method is similar to zsock_recv, except the arguments are encoded
@@ -226,7 +353,7 @@ class Zsock(object):
         For type p the caller must coordinate with the sender, as it is just a
         pointer value being passed.
         """
-        return utils.lib.zsock_brecv(self._p, utils.to_bytes(picture), )
+        return utils.lib.zsock_brecv(self._p, utils.to_bytes(picture), *picture_args)
 
     def routing_id(self):
         """
@@ -291,6 +418,7 @@ class Zsock(object):
         """
         return utils.lib.zsock_leave(self._p, utils.to_bytes(group))
 
+    @staticmethod
     def is_py(self):
         """
         Probe the supplied object, and report if it looks like a zsock_t.
@@ -298,6 +426,7 @@ class Zsock(object):
         """
         return utils.lib.zsock_is(self._p)
 
+    @staticmethod
     def resolve(self):
         """
         Probe the supplied reference. If it looks like a zsock_t instance, return
@@ -1391,6 +1520,7 @@ class Zsock(object):
         """
         return utils.lib.zsock_events(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

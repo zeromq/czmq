@@ -11,13 +11,13 @@ class Zpoller(object):
     event-driven reactor
     """
 
-    def __init__(self, reader, ):
+    def __init__(self, reader, *reader_args):
         """
         Create new poller, specifying zero or more readers. The list of
         readers ends in a NULL. Each reader can be a zsock_t instance, a
         zactor_t instance, a libzmq socket (void *), or a file handle.
         """
-        p = utils.lib.zpoller_new(reader._p, )
+        p = utils.lib.zpoller_new(reader._p, *reader_args)
         if p == utils.ffi.NULL:
             raise MemoryError("Could not allocate person")
 
@@ -77,6 +77,7 @@ class Zpoller(object):
         """
         return utils.lib.zpoller_terminated(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

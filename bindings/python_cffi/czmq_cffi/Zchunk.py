@@ -26,6 +26,14 @@ class Zchunk(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zchunk_destroy_py)
 
+    @staticmethod
+    def frommem(data, size, destructor, hint):
+        """
+        Create a new chunk from memory. Take ownership of the memory and calling the destructor
+        on destroy.
+        """
+        return utils.lib.zchunk_frommem(data, size, destructor, hint._p)
+
     def resize(self, size):
         """
         Resizes chunk max_size as requested; chunk_cur size is set to zero
@@ -94,6 +102,7 @@ class Zchunk(object):
         """
         return utils.lib.zchunk_exhausted(self._p)
 
+    @staticmethod
     def read(handle, bytes):
         """
         Read chunk from an open file descriptor
@@ -106,6 +115,7 @@ class Zchunk(object):
         """
         return utils.lib.zchunk_write(self._p, handle)
 
+    @staticmethod
     def slurp(filename, maxsize):
         """
         Try to slurp an entire file into a chunk. Will read up to maxsize of
@@ -149,13 +159,15 @@ class Zchunk(object):
         """
         return utils.lib.zchunk_pack(self._p)
 
+    @staticmethod
     def packx(self_p):
         """
         Transform zchunk into a zframe that can be sent in a message.
         Take ownership of the chunk.
         """
-        return utils.lib.zchunk_packx(self_p._p)
+        return utils.lib.zchunk_packx(utils.ffi.new("zchunk_t **", self_p._p))
 
+    @staticmethod
     def unpack(frame):
         """
         Transform a zframe into a zchunk.
@@ -181,12 +193,14 @@ class Zchunk(object):
         """
         utils.lib.zchunk_print(self._p)
 
+    @staticmethod
     def is_py(self):
         """
         Probe the supplied object, and report if it looks like a zchunk_t.
         """
         return utils.lib.zchunk_is(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

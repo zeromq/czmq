@@ -24,6 +24,23 @@ class Zconfig(object):
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zconfig_destroy_py)
 
+    @staticmethod
+    def load(filename):
+        """
+        Load a config tree from a specified ZPL text file; returns a zconfig_t
+        reference for the root, if the file exists and is readable. Returns NULL
+        if the file does not exist.
+        """
+        return utils.lib.zconfig_load(utils.to_bytes(filename))
+
+    @staticmethod
+    def loadf(format, *format_args):
+        """
+        Equivalent to zconfig_load, taking a format string instead of a fixed
+        filename.
+        """
+        return utils.lib.zconfig_loadf(format, *format_args)
+
     def dup(self):
         """
         Create copy of zconfig, caller MUST free the value
@@ -50,12 +67,12 @@ class Zconfig(object):
         """
         utils.lib.zconfig_put(self._p, utils.to_bytes(path), utils.to_bytes(value))
 
-    def putf(self, path, format, ):
+    def putf(self, path, format, *format_args):
         """
         Equivalent to zconfig_put, accepting a format specifier and variable
         argument list, instead of a single string value.
         """
-        utils.lib.zconfig_putf(self._p, utils.to_bytes(path), format, )
+        utils.lib.zconfig_putf(self._p, utils.to_bytes(path), format, *format_args)
 
     def get(self, path, default_value):
         """
@@ -70,14 +87,14 @@ class Zconfig(object):
         """
         utils.lib.zconfig_set_name(self._p, utils.to_bytes(name))
 
-    def set_value(self, format, ):
+    def set_value(self, format, *format_args):
         """
         Set new value for config item. The new value may be a string, a printf
         format, or NULL. Note that if string may possibly contain '%', or if it
         comes from an insecure source, you must use '%s' as the format, followed
         by the string.
         """
-        utils.lib.zconfig_set_value(self._p, format, )
+        utils.lib.zconfig_set_value(self._p, format, *format_args)
 
     def child(self):
         """
@@ -110,13 +127,13 @@ class Zconfig(object):
         """
         return utils.lib.zconfig_execute(self._p, handler, arg._p)
 
-    def set_comment(self, format, ):
+    def set_comment(self, format, *format_args):
         """
         Add comment to config item before saving to disk. You can add as many
         comment lines as you like. If you use a null format, all comments are
         deleted.
         """
-        utils.lib.zconfig_set_comment(self._p, format, )
+        utils.lib.zconfig_set_comment(self._p, format, *format_args)
 
     def comments(self):
         """
@@ -131,12 +148,12 @@ class Zconfig(object):
         """
         return utils.lib.zconfig_save(self._p, utils.to_bytes(filename))
 
-    def savef(self, format, ):
+    def savef(self, format, *format_args):
         """
         Equivalent to zconfig_save, taking a format string instead of a fixed
         filename.
         """
-        return utils.lib.zconfig_savef(self._p, format, )
+        return utils.lib.zconfig_savef(self._p, format, *format_args)
 
     def filename(self):
         """
@@ -144,14 +161,16 @@ class Zconfig(object):
         """
         return utils.lib.zconfig_filename(self._p)
 
+    @staticmethod
     def reload(self_p):
         """
         Reload config tree from same file that it was previously loaded from.
         Returns 0 if OK, -1 if there was an error (and then does not change
         existing data).
         """
-        return utils.lib.zconfig_reload(self_p._p)
+        return utils.lib.zconfig_reload(utils.ffi.new("zconfig_t **", self_p._p))
 
+    @staticmethod
     def chunk_load(chunk):
         """
         Load a config tree from a memory chunk
@@ -164,6 +183,7 @@ class Zconfig(object):
         """
         return utils.lib.zconfig_chunk_save(self._p)
 
+    @staticmethod
     def str_load(string):
         """
         Load a config tree from a null-terminated string
@@ -189,11 +209,12 @@ class Zconfig(object):
         """
         utils.lib.zconfig_remove_subtree(self._p)
 
+    @staticmethod
     def remove(self_p):
         """
         Destroy node and subtree (all children)
         """
-        utils.lib.zconfig_remove(self_p._p)
+        utils.lib.zconfig_remove(utils.ffi.new("zconfig_t **", self_p._p))
 
     def fprint(self, file):
         """
@@ -207,6 +228,7 @@ class Zconfig(object):
         """
         utils.lib.zconfig_print(self._p)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class

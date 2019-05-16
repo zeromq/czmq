@@ -26,6 +26,7 @@ Use zhttp_response class to receive the response.
         # https://cffi.readthedocs.org/en/latest/using.html#ffi-interface
         self._p = utils.ffi.gc(p, libczmq_destructors.zhttp_client_destroy_py)
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.

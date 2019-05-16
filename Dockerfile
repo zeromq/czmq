@@ -20,7 +20,7 @@ RUN sudo make install
 RUN sudo ldconfig
 
 WORKDIR /home/zmq
-RUN git clone --quiet git://github.com/zeromq/czmq.git czmq
+RUN git clone --quiet https://github.com/zeromq/czmq czmq
 WORKDIR /home/zmq/czmq
 RUN ./autogen.sh 2> /dev/null
 RUN ./configure --quiet --without-docs

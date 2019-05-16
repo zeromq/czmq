@@ -11,12 +11,14 @@ class Zclock(object):
     millisecond clocks and delays
     """
 
+    @staticmethod
     def sleep(msecs):
         """
         Sleep for a number of milliseconds
         """
         utils.lib.zclock_sleep(msecs)
 
+    @staticmethod
     def time():
         """
         Return current system clock as milliseconds. Note that this clock can
@@ -25,6 +27,7 @@ class Zclock(object):
         """
         return utils.lib.zclock_time()
 
+    @staticmethod
     def mono():
         """
         Return current monotonic clock in milliseconds. Use this when you compute
@@ -33,6 +36,7 @@ class Zclock(object):
         """
         return utils.lib.zclock_mono()
 
+    @staticmethod
     def usecs():
         """
         Return current monotonic clock in microseconds. Use this when you compute
@@ -41,12 +45,14 @@ class Zclock(object):
         """
         return utils.lib.zclock_usecs()
 
+    @staticmethod
     def timestr():
         """
         Return formatted date/time as fresh string. Free using zstr_free().
         """
         return utils.lib.zclock_timestr()
 
+    @staticmethod
     def test(verbose):
         """
         Self test of this class.
