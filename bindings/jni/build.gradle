@@ -30,7 +30,7 @@ dependencies {
     testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
 
-wrapper.gradleVersion = '5.0'
+wrapper.gradleVersion = '5.4.1'
 
 //  ------------------------------------------------------------------
 //  Build section
@@ -83,7 +83,20 @@ task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
 task buildNative(type: Exec, dependsOn: 'initCMake') {
     commandLine "make"
 }
+
+task copyLibs(type: Copy) {
+    from "/usr/lib/libczmq.so", "/usr/local/lib/libczmq.so", "/tmp/lib/libczmq.so",
+         "/usr/lib/libzmq.so", "/usr/local/lib/libzmq.so", "/tmp/lib/libzmq.so",
+         "/usr/lib/uuid.so", "/usr/local/lib/uuid.so", "/tmp/lib/uuid.so",
+         "/usr/lib/libsystemd.so", "/usr/local/lib/libsystemd.so", "/tmp/lib/libsystemd.so",
+         "/usr/lib/liblz4.so", "/usr/local/lib/liblz4.so", "/tmp/lib/liblz4.so",
+         "/usr/lib/libcurl.so", "/usr/local/lib/libcurl.so", "/tmp/lib/libcurl.so",
+         "/usr/lib/libmicrohttpd.so", "/usr/local/lib/libmicrohttpd.so", "/tmp/lib/libmicrohttpd.so"
+    into "."
+}
+
 jar.dependsOn buildNative
+jar.dependsOn copyLibs
 test.dependsOn buildNative
 
 jar {
@@ -161,5 +174,5 @@ bintray {
 
 clean.doFirst {
     delete "${rootDir}/CMakeCache.txt"
-    delete "${rootDir}/libczmqjni.so"
+    delete fileTree("${rootDir}") { include "*.so" }
 }

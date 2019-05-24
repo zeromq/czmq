@@ -6,6 +6,7 @@
 */
 package org.zeromq.czmq;
 
+import java.util.stream.Stream;
 import org.scijava.nativelib.NativeLoader;
 
 public class Zcert implements AutoCloseable{
@@ -13,6 +14,22 @@ public class Zcert implements AutoCloseable{
         if (System.getProperty("java.vm.vendor").contains("Android")) {
             System.loadLibrary("czmqjni");
         } else {
+            Stream.of(
+                "zmq",
+                "uuid",
+                "libsystemd",
+                "lz4",
+                "curl",
+                "microhttpd",
+                "czmq"
+            )
+            .forEach(lib -> {
+                try {
+                    NativeLoader.loadLibrary(lib);
+                } catch (Exception e) {
+                    System.err.println("[WARN] " + e.getMessage() +" from jar. Assuming it is installed on the system.");
+                }
+            });
             try {
                 NativeLoader.loadLibrary("czmqjni");
             } catch (Exception e) {

@@ -941,22 +941,30 @@ AS_IF([test "x$enable_Werror" = "xyes" || test "x$enable_Werror" = "xauto"],
     [AS_IF([test -n "$CC"],[AS_IF([$CC --version 2>&1 | grep 'Free Software Foundation' > /dev/null && test "x$GCC" = "xyes"],
         [AC_MSG_NOTICE([Enabling pedantic errors for GNU C])
          CFLAGS="$CFLAGS -pedantic -Wall -Werror -Werror=format-security"],
-        [AC_MSG_NOTICE([Not enabling pedantic errors: compiler not supported by this recipe (not GNU C)])
-         AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for C: $CC])])
-        ])])
+        [AS_IF([$CC --version 2>&1 | grep 'clang version' > /dev/null],
+            [AC_MSG_NOTICE([Enabling pedantic errors for clang C])
+             CFLAGS="$CFLAGS -pedantic -Wall -Werror -Werror=format-security"],
+            [AC_MSG_NOTICE([Not enabling pedantic errors: compiler not supported by this recipe (not GNU or clang C)])
+             AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for C: $CC])])
+        ])])])
      AS_IF([test -n "$CXX"],[AS_IF([$CXX --version 2>&1 | grep 'Free Software Foundation' > /dev/null && test "x$GCC" = "xyes"],
         [AC_MSG_NOTICE([Enabling pedantic errors for GNU C++])
          CXXFLAGS="$CXXFLAGS -pedantic -Wall -Werror -Werror=format-security"],
-        [AC_MSG_NOTICE([Not enabling pedantic errors: compiler not supported by this recipe (not GNU C++)])
-         AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for C++: $CXX])])
-        ])])
+        [AS_IF([$CXX --version 2>&1 | grep 'clang version' > /dev/null],
+            [AC_MSG_NOTICE([Enabling pedantic errors for clang C++])
+             CXXFLAGS="$CXXFLAGS -pedantic -Wall -Werror -Werror=format-security"],
+            [AC_MSG_NOTICE([Not enabling pedantic errors: compiler not supported by this recipe (not GNU or clang C++)])
+             AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for C++: $CXX])])
+        ])])])
      AS_IF([test -n "$CPP"],[AS_IF([$CPP --version 2>&1 | grep 'Free Software Foundation' > /dev/null && test "x$GCC" = "xyes"],
         [AC_MSG_NOTICE([Enabling pedantic errors for GNU CPP preprocessor])
-         CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"
-        ],
-        [AC_MSG_NOTICE([Not enabling pedantic errors: preprocessor not supported by this recipe (not GNU CPP)])
-         AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for CPP: $CPP])])
-        ])])
+         CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"],
+        [AS_IF([$CXX --version 2>&1 | grep 'clang version' > /dev/null],
+            [AC_MSG_NOTICE([Enabling pedantic errors for clang CPP preprocessor])
+             CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"],
+            [AC_MSG_NOTICE([Not enabling pedantic errors: preprocessor not supported by this recipe (not GNU or clang CPP)])
+             AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for CPP: $CPP])])
+        ])])])
 ])
 
 # Optional project-local hook to (re-)define some variables that can be used
