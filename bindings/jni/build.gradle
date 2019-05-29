@@ -72,7 +72,10 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'src/main/java/org/zeromq/czmq/ZhttpRequest.java',
             'src/main/java/org/zeromq/czmq/ZhttpResponse.java'
     ]
-    commandLine("javac", "-h", "$nativeIncludes", "-classpath", "$classpath:$appclasspath", *jniClasses)
+    def utilityClasses = [
+            'src/main/java/org/zeromq/tools/ZmqNativeLoader.java'
+    ]
+    commandLine("javac", "-h", "$nativeIncludes", "-classpath", "$classpath:$appclasspath", *jniClasses, *utilityClasses)
 }
 tasks.withType(Test) {
     systemProperty "java.library.path", "/usr/lib:/usr/local/lib:$projectDir"
