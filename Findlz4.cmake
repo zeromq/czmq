@@ -25,7 +25,7 @@ find_path (
 
 find_library (
     LZ4_LIBRARIES
-    NAMES lz4
+    NAMES liblz4 lz4
     HINTS ${PC_LZ4_LIBRARY_HINTS}
 )
 

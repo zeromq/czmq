@@ -25,7 +25,7 @@ find_path (
 
 find_library (
     SYSTEMD_LIBRARIES
-    NAMES systemd
+    NAMES libsystemd systemd
     HINTS ${PC_SYSTEMD_LIBRARY_HINTS}
 )
 

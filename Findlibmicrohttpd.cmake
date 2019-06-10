@@ -25,7 +25,7 @@ find_path (
 
 find_library (
     LIBMICROHTTPD_LIBRARIES
-    NAMES microhttpd
+    NAMES libmicrohttpd microhttpd
     HINTS ${PC_LIBMICROHTTPD_LIBRARY_HINTS}
 )
 
