@@ -44,9 +44,6 @@ if (MSVC)
 
     set(_zmq_version ${ZMQ_VERSION_MAJOR}_${ZMQ_VERSION_MINOR}_${ZMQ_VERSION_PATCH})
 
-    set(_zmq_debug_names)
-    set(_zmq_release_names)
-
     set(_zmq_debug_names
         "libzmq${MSVC_TOOLSET}-mt-gd-${_zmq_version}" # Debug, BUILD_SHARED
         "libzmq${MSVC_TOOLSET}-mt-sgd-${_zmq_version}" # Debug, BUILD_STATIC
@@ -61,30 +58,22 @@ if (MSVC)
         "libzmq-mt-s-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_STATIC
     )
 
-    find_library (ZeroMQ_LIBRARY_DEBUG
+    find_library (LIBZMQ_LIBRARY_DEBUG
         NAMES ${_zmq_debug_names}
     )
 
-    find_library (ZeroMQ_LIBRARY_RELEASE
+    find_library (LIBZMQ_LIBRARY_RELEASE
         NAMES ${_zmq_release_names}
     )
 
-    if (ZeroMQ_LIBRARY_RELEASE AND ZeroMQ_LIBRARY_DEBUG)
-        set(LIBZMQ_LIBRARIES
-            debug ${ZeroMQ_LIBRARY_DEBUG}
-            optimized ${ZeroMQ_LIBRARY_RELEASE}
-        )
-    elseif (ZeroMQ_LIBRARY_RELEASE)
-        set(LIBZMQ_LIBRARIES ${ZeroMQ_LIBRARY_RELEASE})
-    elseif (ZeroMQ_LIBRARY_DEBUG)
-        set(LIBZMQ_LIBRARIES ${ZeroMQ_LIBRARY_DEBUG})
-    endif ()
+    include(SelectLibraryConfigurations)
+    select_library_configurations(LIBZMQ)
 endif ()
 
 if (NOT LIBZMQ_LIBRARIES)
     find_library (
         LIBZMQ_LIBRARIES
-        NAMES zmq libzmq
+        NAMES libzmq zmq
         HINTS ${PC_LIBZMQ_LIBRARY_HINTS}
     )
 endif ()

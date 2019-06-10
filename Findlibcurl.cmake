@@ -25,7 +25,7 @@ find_path (
 
 find_library (
     LIBCURL_LIBRARIES
-    NAMES curl
+    NAMES libcurl curl
     HINTS ${PC_LIBCURL_LIBRARY_HINTS}
 )
 
