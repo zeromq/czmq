@@ -31,6 +31,12 @@ typedef struct {
 
 static test_item_t
 all_tests [] = {
+#ifdef CZMQ_BUILD_DRAFT_API
+// Tests for stable/draft private classes:
+// Now built only with --enable-drafts, so even stable builds are hidden behind the flag
+    { "zgossip_msg", NULL, true, false, "zgossip_msg_test" },
+    { "private_classes", NULL, false, false, "$ALL" }, // compat option for older projects
+#endif // CZMQ_BUILD_DRAFT_API
 // Tests for stable public classes:
     { "zactor", zactor_test, true, true, NULL },
     { "zarmour", zarmour_test, true, true, NULL },
@@ -73,12 +79,6 @@ all_tests [] = {
     { "zhttp_server_options", zhttp_server_options_test, false, true, NULL },
     { "zhttp_request", zhttp_request_test, false, true, NULL },
     { "zhttp_response", zhttp_response_test, false, true, NULL },
-#endif // CZMQ_BUILD_DRAFT_API
-#ifdef CZMQ_BUILD_DRAFT_API
-// Tests for stable/draft private classes:
-// Now built only with --enable-drafts, so even stable builds are hidden behind the flag
-    { "zgossip_msg", NULL, true, false, "zgossip_msg_test" },
-    { "private_classes", NULL, false, false, "$ALL" }, // compat option for older projects
 #endif // CZMQ_BUILD_DRAFT_API
     {NULL, NULL, 0, 0, NULL}          //  Sentinel
 };

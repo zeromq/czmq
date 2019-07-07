@@ -958,10 +958,12 @@ AS_IF([test "x$enable_Werror" = "xyes" || test "x$enable_Werror" = "xauto"],
         ])])])
      AS_IF([test -n "$CPP"],[AS_IF([$CPP --version 2>&1 | grep 'Free Software Foundation' > /dev/null && test "x$GCC" = "xyes"],
         [AC_MSG_NOTICE([Enabling pedantic errors for GNU CPP preprocessor])
-         CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"],
+         CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"
+        ],
         [AS_IF([$CXX --version 2>&1 | grep 'clang version' > /dev/null],
             [AC_MSG_NOTICE([Enabling pedantic errors for clang CPP preprocessor])
-             CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"],
+             CPPFLAGS="$CPPFLAGS -pedantic -Werror -Wall -Wc++-compat"
+            ],
             [AC_MSG_NOTICE([Not enabling pedantic errors: preprocessor not supported by this recipe (not GNU or clang CPP)])
              AS_IF([test "x$enable_Werror" = "xyes"], [AC_MSG_ERROR([--enable-Werror=yes was requested and can not be satisfied for CPP: $CPP])])
         ])])])
