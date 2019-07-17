@@ -1,5 +1,6 @@
 package org.zeromq.tools;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.HashSet;
 import org.scijava.nativelib.NativeLoader;
@@ -8,16 +9,16 @@ public class ZmqNativeLoader {
 
     private static final Set<String> loadedLibraries = new HashSet<>();
 
-    public static void loadLibrary(String libname) {
+    public static void loadLibrary(String libname, boolean optional) {
         if (!loadedLibraries.contains(libname)) {
             try {
-                if (System.getProperty("java.vm.vendor").contains("Android")) {
-                    System.loadLibrary(libname);
+                NativeLoader.loadLibrary(libname);
+            } catch (IOException e) {
+                if (optional) {
+                    System.err.println("[WARN] " + e.getMessage() + " from jar. Assuming it is installed on the system.");
                 } else {
-                    NativeLoader.loadLibrary(libname);
+                    System.exit(-1);
                 }
-            } catch (Exception e) {
-                System.err.println("[WARN] " + e.getMessage() +" from jar. Assuming it is installed on the system.");
             }
             loadedLibraries.add(libname);
         }

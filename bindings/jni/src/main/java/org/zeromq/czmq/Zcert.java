@@ -6,32 +6,18 @@
 */
 package org.zeromq.czmq;
 
-import java.util.stream.Stream;
 import org.zeromq.tools.ZmqNativeLoader;
 
-public class Zcert implements AutoCloseable{
+public class Zcert implements AutoCloseable {
     static {
-        Stream.of(
-                "zmq",
-                "uuid",
-                "libsystemd",
-                "lz4",
-                "curl",
-                "microhttpd",
-                "czmq"
-            )
-            .forEach(lib -> {
-                try {
-                    ZmqNativeLoader.loadLibrary(lib);
-                } catch (Exception e) {
-                    System.err.println("[WARN] " + e.getMessage() +" from jar. Assuming it is installed on the system.");
-                }
-            });
-        try {
-            ZmqNativeLoader.loadLibrary("czmqjni");
-        } catch (Exception e) {
-            System.exit (-1);
-        }
+        ZmqNativeLoader.loadLibrary("zmq", true);
+        ZmqNativeLoader.loadLibrary("uuid", true);
+        ZmqNativeLoader.loadLibrary("libsystemd", true);
+        ZmqNativeLoader.loadLibrary("lz4", true);
+        ZmqNativeLoader.loadLibrary("curl", true);
+        ZmqNativeLoader.loadLibrary("microhttpd", true);
+        ZmqNativeLoader.loadLibrary("czmq", true);
+        ZmqNativeLoader.loadLibrary("czmqjni", false);
     }
     public long self;
     /*
