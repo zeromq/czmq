@@ -37,7 +37,7 @@ wrapper.gradleVersion = '5.4.1'
 
 task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def classpath = sourceSets.main.output.classesDirs
-    def appclasspath = configurations.runtime.files*.getAbsolutePath().join(":")
+    def appclasspath = configurations.runtime.files*.getAbsolutePath().join(File.pathSeparator)
     def nativeIncludes = "src/native/include"
     def jniClasses = [
             'src/main/java/org/zeromq/czmq/Zarmour.java',
@@ -75,10 +75,10 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def utilityClasses = [
             'src/main/java/org/zeromq/tools/ZmqNativeLoader.java'
     ]
-    commandLine("javac", "-h", "$nativeIncludes", "-classpath", "$classpath:$appclasspath", *jniClasses, *utilityClasses)
+    commandLine("javac", "-h", "$nativeIncludes", "-classpath", "$classpath" + File.pathSeparator + "$appclasspath", *jniClasses, *utilityClasses)
 }
 tasks.withType(Test) {
-    systemProperty "java.library.path", "/usr/lib:/usr/local/lib:$projectDir"
+    systemProperty "java.library.path", "/usr/lib" + File.pathSeparator + "/usr/local/lib" + File.pathSeparator + "$projectDir"
 }
 task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
     commandLine "cmake", "."
