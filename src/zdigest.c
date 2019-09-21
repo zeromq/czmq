@@ -24,13 +24,24 @@
 */
 
 #include "czmq_classes.h"
+#ifdef HAVE_LIBNSS
+#include <secoid.h>
+#include <sechash.h>
+#define SHA_DIGEST_LENGTH 20
+#else
 #include "foreign/sha1/sha1.inc_c"
+#endif
 
 
 //  Structure of our class
 
 struct _zdigest_t {
+#ifdef HAVE_LIBNSS
+    HASHContext *context;       //  Digest context
+    bool begun;                 //  Calculating has already started
+#else
     SHA_CTX context;            //  Digest context
+#endif
     //  Binary hash
     byte hash [SHA_DIGEST_LENGTH];
     //  ASCII representation (hex)
@@ -48,7 +59,13 @@ zdigest_new (void)
 {
     zdigest_t *self = (zdigest_t *) zmalloc (sizeof (zdigest_t));
     assert (self);
+#ifdef HAVE_LIBNSS
+    HASH_HashType type = HASH_GetHashTypeByOidTag (SEC_OID_SHA1);
+    self->context = HASH_Create (type);
+    assert (self->context);
+#else
     SHA1_Init (&self->context);
+#endif
     return self;
 }
 
@@ -62,6 +79,9 @@ zdigest_destroy (zdigest_t **self_p)
     assert (self_p);
     if (*self_p) {
         zdigest_t *self = *self_p;
+#ifdef HAVE_LIBNSS
+        HASH_Destroy (self->context);
+#endif
         freen (self);
         *self_p = NULL;
     }
@@ -77,7 +97,15 @@ zdigest_update (zdigest_t *self, const byte *buffer, size_t length)
     //  Calling this after zdigest_data() is illegal use of the API
     assert (self);
     assert (!self->final);
+#ifdef HAVE_LIBNSS
+    if (!self->begun) {
+        HASH_Begin (self->context);
+        self->begun = true;
+    }
+    HASH_Update (self->context, (unsigned char *) buffer, (unsigned int) length);
+#else
     SHA1_Update (&self->context, buffer, length);
+#endif
 }
 
 
@@ -90,7 +118,12 @@ zdigest_data (zdigest_t *self)
 {
     assert (self);
     if (!self->final) {
+#ifdef HAVE_LIBNSS
+        unsigned int len;
+        HASH_End (self->context, self->hash, &len, SHA_DIGEST_LENGTH);
+#else
         SHA1_Final (self->hash, &self->context);
+#endif
         self->final = true;
     }
     return self->hash;
