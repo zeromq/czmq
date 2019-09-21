@@ -64,6 +64,14 @@ IF EXIST "..\..\..\..\libcurl\builds/msvc/vs2013\libcurl.import.props" (
 ) ELSE (
     ECHO Building without libcurl
 )
+IF EXIST "..\..\..\..\nss\builds/msvc/vs2013\nss.import.props" (
+    COPY /Y "..\..\..\..\nss\builds/msvc/vs2013\nss.import.props" . > %log%
+    IF errorlevel 1 GOTO error
+    SET packages=%packages% /p:HAVE_NSS=1
+    ECHO Building with nss
+) ELSE (
+    ECHO Building without nss
+)
 IF EXIST "..\..\..\..\libmicrohttpd\builds/msvc/vs2013\libmicrohttpd.import.props" (
     COPY /Y "..\..\..\..\libmicrohttpd\builds/msvc/vs2013\libmicrohttpd.import.props" . > %log%
     IF errorlevel 1 GOTO error

@@ -56,6 +56,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  systemd-devel >= 200.0.0
 BuildRequires:  liblz4-devel
 BuildRequires:  libcurl-devel >= 7.28.0
+BuildRequires:  nss-devel
 BuildRequires:  libmicrohttpd-devel
 %if %{with python_cffi}
 BuildRequires:  python-cffi
@@ -95,6 +96,7 @@ Requires:       libuuid-devel
 Requires:       systemd-devel >= 200.0.0
 Requires:       liblz4-devel
 Requires:       libcurl-devel >= 7.28.0
+Requires:       nss-devel
 Requires:       libmicrohttpd-devel
 
 %description devel
@@ -154,7 +156,7 @@ exit 1
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS} --with-uuid=yes --with-libsystemd=yes --with-liblz4=yes --with-libcurl=yes --with-libmicrohttpd=yes
+%{configure} --enable-drafts=%{DRAFTS} --with-uuid=yes --with-libsystemd=yes --with-liblz4=yes --with-libcurl=yes --with-nss=yes --with-libmicrohttpd=yes
 make %{_smp_mflags}
 %if %{with python_cffi}
 # Problem: we need pkg-config points to built and not yet installed copy of czmq

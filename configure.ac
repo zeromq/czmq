@@ -575,6 +575,88 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libcurl
 dnl END of enabled attempts to search for libcurl
 
 
+was_nss_check_lib_detected=no
+
+search_nss="no"
+
+AC_ARG_WITH([nss],
+    [
+        AS_HELP_STRING([--with-nss],
+        [yes or no. Optionally specify nss prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_nss="yes"
+    ],
+    [
+        search_nss="yes"
+    ])
+AS_CASE([x"${with_nss}"],
+    [xyes], [search_nss="yes"],
+    [xno],  [search_nss="no"])
+
+
+AS_IF([test x"${search_nss}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    PKG_CHECK_MODULES([nss], [nss >= 0.0.0],
+    [
+        AC_DEFINE(HAVE_NSS, 1, [The optional nss library is to be used])
+        was_nss_check_lib_detected=pkgcfg
+        found_pkgconfig="nss"
+    ],
+    [
+        AC_MSG_NOTICE([Package nss not found; falling back to defined compilability tests])
+
+        nss_synthetic_cflags=""
+        nss_synthetic_libs="-lnss"
+
+        if test -n "${with_nss}" && test x"${with_nss}" != xyes && test x"${with_nss}" != xno; then
+            if test -r "${with_nss}/include/sechash.h"; then
+                nss_synthetic_cflags="-I${with_nss}/include"
+                nss_synthetic_libs="-L${with_nss}/lib -lnss"
+            else
+            AC_MSG_WARN([Header file ${with_nss}/include/sechash.h was not found. Please check nss prefix])
+            fi
+        else
+            AC_CHECK_HEADER([sechash.h], [],
+            AC_MSG_WARN([Header file sechash.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([nss], [HASH_Create],
+            [
+                was_nss_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lnss"
+                AC_DEFINE(HAVE_NSS, 1, [The optional nss library is to be used (as -lnss)])
+            ],
+            [])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for nss
+    AS_CASE(["x${was_nss_check_lib_detected}"],
+        [xpkgcfg], [
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
+                CFLAGS="${nss_CFLAGS} ${CFLAGS}"
+                LIBS="${nss_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                CFLAGS="${nss_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${nss_synthetic_libs} ${LDFLAGS}"
+                LIBS="${nss_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([nss_CFLAGS],[${nss_synthetic_cflags}])
+                AC_SUBST([nss_LIBS],[${nss_synthetic_libs}])
+            ],
+        [xno], [
+            AC_MSG_WARN([Cannot find pkg-config metadata for nss 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for nss
+
+
 was_libmicrohttpd_check_lib_detected=no
 
 search_libmicrohttpd="no"

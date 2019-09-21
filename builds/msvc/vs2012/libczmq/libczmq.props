@@ -39,6 +39,7 @@
     <Import Project="$(SolutionDir)systemd.import.props" Condition="'$(HAVE_SYSTEMD)'=='1'" />
     <Import Project="$(SolutionDir)lz4.import.props" Condition="'$(HAVE_LZ4)'=='1'" />
     <Import Project="$(SolutionDir)libcurl.import.props" Condition="'$(HAVE_LIBCURL)'=='1'" />
+    <Import Project="$(SolutionDir)nss.import.props" Condition="'$(HAVE_NSS)'=='1'" />
     <Import Project="$(SolutionDir)libmicrohttpd.import.props" Condition="'$(HAVE_LIBMICROHTTPD)'=='1'" />
   </ImportGroup>
 
@@ -48,6 +49,7 @@
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">dynamic</Linkage-systemd>
     <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">dynamic</Linkage-lz4>
     <Linkage-libcurl Condition="'$(HAVE_LIBCURL)'=='1'">dynamic</Linkage-libcurl>
+    <Linkage-nss Condition="'$(HAVE_NSS)'=='1'">dynamic</Linkage-nss>
     <Linkage-libmicrohttpd Condition="'$(HAVE_LIBMICROHTTPD)'=='1'">dynamic</Linkage-libmicrohttpd>
   </PropertyGroup>
 
@@ -57,6 +59,7 @@
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">ltcg</Linkage-systemd>
     <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">ltcg</Linkage-lz4>
     <Linkage-libcurl Condition="'$(HAVE_LIBCURL)'=='1'">ltcg</Linkage-libcurl>
+    <Linkage-nss Condition="'$(HAVE_NSS)'=='1'">ltcg</Linkage-nss>
     <Linkage-libmicrohttpd Condition="'$(HAVE_LIBMICROHTTPD)'=='1'">ltcg</Linkage-libmicrohttpd>
   </PropertyGroup>
 
@@ -66,6 +69,7 @@
     <Linkage-systemd Condition="'$(HAVE_SYSTEMD)'=='1'">static</Linkage-systemd>
     <Linkage-lz4 Condition="'$(HAVE_LZ4)'=='1'">static</Linkage-lz4>
     <Linkage-libcurl Condition="'$(HAVE_LIBCURL)'=='1'">static</Linkage-libcurl>
+    <Linkage-nss Condition="'$(HAVE_NSS)'=='1'">static</Linkage-nss>
     <Linkage-libmicrohttpd Condition="'$(HAVE_LIBMICROHTTPD)'=='1'">static</Linkage-libmicrohttpd>
   </PropertyGroup>
 
@@ -80,6 +84,7 @@
     <Message Text="Linkage-systemd: $(Linkage-systemd)" Importance="high" Condition="'$(HAVE_SYSTEMD)'=='1'" />
     <Message Text="Linkage-lz4: $(Linkage-lz4)" Importance="high" Condition="'$(HAVE_LZ4)'=='1'" />
     <Message Text="Linkage-libcurl: $(Linkage-libcurl)" Importance="high" Condition="'$(HAVE_LIBCURL)'=='1'" />
+    <Message Text="Linkage-nss: $(Linkage-nss)" Importance="high" Condition="'$(HAVE_NSS)'=='1'" />
     <Message Text="Linkage-libmicrohttpd: $(Linkage-libmicrohttpd)" Importance="high" Condition="'$(HAVE_LIBMICROHTTPD)'=='1'" />
   </Target>
 <!--

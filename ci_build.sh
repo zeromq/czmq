@@ -286,6 +286,18 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         CONFIG_OPTS+=("--with-libcurl=yes")
     fi
 
+    # Start of recipe for dependency: nss
+    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libnss3-dev >/dev/null 2>&1) || \
+           (command -v brew >/dev/null 2>&1 && brew ls --versions nss >/dev/null 2>&1) \
+    ; then
+        echo ""
+        echo "WARNING: Can not build prerequisite 'nss'" >&2
+        echo "because neither tarball nor repository sources are known for it," >&2
+        echo "and it was not installed as a package; this may cause the test to fail!" >&2
+    else
+        CONFIG_OPTS+=("--with-nss=yes")
+    fi
+
     # Start of recipe for dependency: libmicrohttpd
     if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libmicrohttpd-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions libmicrohttpd >/dev/null 2>&1) \

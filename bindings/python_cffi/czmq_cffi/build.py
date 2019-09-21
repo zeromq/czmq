@@ -89,6 +89,7 @@ kwargs = pkgconfig_kwargs ([
     "libsystemd",
     "liblz4",
     "libcurl",
+    "nss",
     "libmicrohttpd",
     "libczmq"
 ])

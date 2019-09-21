@@ -94,6 +94,7 @@ task copyLibs(type: Copy) {
          "/usr/lib/libsystemd.so", "/usr/local/lib/libsystemd.so", "/tmp/lib/libsystemd.so",
          "/usr/lib/liblz4.so", "/usr/local/lib/liblz4.so", "/tmp/lib/liblz4.so",
          "/usr/lib/libcurl.so", "/usr/local/lib/libcurl.so", "/tmp/lib/libcurl.so",
+         "/usr/lib/nss.so", "/usr/local/lib/nss.so", "/tmp/lib/nss.so",
          "/usr/lib/libmicrohttpd.so", "/usr/local/lib/libmicrohttpd.so", "/tmp/lib/libmicrohttpd.so"
     into "."
 }

@@ -21,6 +21,7 @@ Build-Depends: debhelper (>= 9),
     libsystemd-dev (>= 200.0.0),
     liblz4-dev,
     libcurl4-nss-dev (>= 7.28.0),
+    libnss3-dev,
     libmicrohttpd-dev,
     dh-python,
     python-all-dev, python-cffi, python-setuptools,
@@ -45,6 +46,7 @@ Depends:
     libsystemd-dev (>= 200.0.0),
     liblz4-dev,
     libcurl4-nss-dev (>= 7.28.0),
+    libnss3-dev,
     libmicrohttpd-dev,
     libczmq4 (= ${binary:Version})
 Description: czmq development tools
