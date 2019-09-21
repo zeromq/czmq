@@ -69,6 +69,13 @@ IF EXIST "..\..\..\libcurl" (
     ECHO Building without libcurl
     ECHO #undef HAVE_LIBCURL>> platform.h
 )
+IF EXIST "..\..\..\nss" (
+    ECHO Building with nss
+    ECHO #define HAVE_NSS 1>> platform.h
+) ELSE (
+    ECHO Building without nss
+    ECHO #undef HAVE_NSS>> platform.h
+)
 IF EXIST "..\..\..\libmicrohttpd" (
     ECHO Building with libmicrohttpd
     ECHO #define HAVE_LIBMICROHTTPD 1>> platform.h

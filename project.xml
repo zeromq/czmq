@@ -15,6 +15,7 @@
     <use project = "systemd" optional = "1" implied = "1" min_major = "200" />
     <use project = "lz4" optional = "1" implied = "1" />
     <use project = "libcurl" optional = "1" implied = "1" min_major = "7" min_minor = "28" />
+    <use project = "nss" optional = "1" implied = "1" />
     <use project = "libmicrohttpd"
          tarball = "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
          implied = "1" optional = "1"  />

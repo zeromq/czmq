@@ -15,6 +15,7 @@ public class Zhash implements AutoCloseable {
         ZmqNativeLoader.loadLibrary("libsystemd", true);
         ZmqNativeLoader.loadLibrary("lz4", true);
         ZmqNativeLoader.loadLibrary("curl", true);
+        ZmqNativeLoader.loadLibrary("nss", true);
         ZmqNativeLoader.loadLibrary("microhttpd", true);
         ZmqNativeLoader.loadLibrary("czmq", true);
         ZmqNativeLoader.loadLibrary("czmqjni", false);

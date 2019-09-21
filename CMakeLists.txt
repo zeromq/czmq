@@ -207,6 +207,24 @@ IF (CZMQ_WITH_LIBCURL AND LIBCURL_FOUND)
 ENDIF (CZMQ_WITH_LIBCURL AND LIBCURL_FOUND)
 
 ########################################################################
+# NSS dependency
+########################################################################
+find_package(nss)
+option(CZMQ_WITH_NSS "Build czmq with nss" ${NSS_FOUND})
+IF (CZMQ_WITH_NSS AND NSS_FOUND)
+    include_directories(${NSS_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${NSS_LIBRARIES})
+  IF (PC_NSS_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} nss")
+      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_NSS_STATIC_LDFLAGS})
+  ELSE (PC_NSS_FOUND)
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lnss")
+  ENDIF (PC_NSS_FOUND)
+    add_definitions(-DHAVE_NSS)
+    list(APPEND OPTIONAL_LIBRARIES ${NSS_LIBRARIES})
+ENDIF (CZMQ_WITH_NSS AND NSS_FOUND)
+
+########################################################################
 # LIBMICROHTTPD dependency
 ########################################################################
 find_package(libmicrohttpd)
