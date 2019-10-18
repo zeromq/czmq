@@ -390,7 +390,7 @@ zlistx_detach_cur (zlistx_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Delete an item, using its handle. Calls the item destructor is any is
+//  Delete an item, using its handle. Calls the item destructor if any is
 //  set. If handle is null, deletes the first item on the list. Returns 0
 //  if an item was deleted, -1 if not. If cursor was at item, moves cursor
 //  to previous item, so you can delete items while iterating forwards
