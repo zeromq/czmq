@@ -113,21 +113,19 @@ $CI_TIME make install
 
 popd
 
-TERM=dumb PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig $CI_TIME ./gradlew build jar
+TERM=dumb PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig $CI_TIME ./gradlew build jar --info
 TERM=dumb $CI_TIME ./gradlew clean
 
 ########################################################################
 #  Build and check the jni android binding
 ########################################################################
 
-pushd ../../builds/android
+if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    pushd ../../builds/android
+        . ./ci_build.sh
+    popd
 
-. ./ci_build.sh
-
-popd
-
-pushd android
-
-TERM=dumb PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig $CI_TIME ./build.sh
-
-popd
+    pushd czmq-jni/android
+        TERM=dumb PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig $CI_TIME ./build.sh
+    popd
+fi
