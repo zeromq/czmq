@@ -1326,7 +1326,8 @@ uses
   IZpoller = interface
 
     // Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
-    // be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
+    // be a libzmq void * socket, a zsock_t instance, a zactor_t instance or a
+    // file handle.
     function Add(const Reader: IZSock): Integer;
 
     // Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
@@ -1340,14 +1341,15 @@ uses
     procedure SetNonstop(Nonstop: Boolean);
 
     // Poll the registered readers for I/O, return first reader that has input.
-    // The reader will be a libzmq void * socket, or a zsock_t or zactor_t
-    // instance as specified in zpoller_new/zpoller_add. The timeout should be
-    // zero or greater, or -1 to wait indefinitely. Socket priority is defined
-    // by their order in the poll list. If you need a balanced poll, use the low
-    // level zmq_poll method directly. If the poll call was interrupted (SIGINT),
-    // or the ZMQ context was destroyed, or the timeout expired, returns NULL.
-    // You can test the actual exit condition by calling zpoller_expired () and
-    // zpoller_terminated (). The timeout is in msec.
+    // The reader will be a libzmq void * socket, a zsock_t, a zactor_t
+    // instance or a file handle as specified in zpoller_new/zpoller_add. The
+    // timeout should be zero or greater, or -1 to wait indefinitely. Socket
+    // priority is defined by their order in the poll list. If you need a
+    // balanced poll, use the low level zmq_poll method directly. If the poll
+    // call was interrupted (SIGINT), or the ZMQ context was destroyed, or the
+    // timeout expired, returns NULL. You can test the actual exit condition by
+    // calling zpoller_expired () and zpoller_terminated (). The timeout is in
+    // msec.
     function Wait(Timeout: Integer): IZSock;
 
     // Return true if the last zpoller_wait () call ended because the timeout
@@ -4087,7 +4089,8 @@ uses
   protected
 
     // Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
-    // be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
+    // be a libzmq void * socket, a zsock_t instance, a zactor_t instance or a
+    // file handle.
     function Add(const Reader: IZSock): Integer;
 
     // Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
@@ -4101,14 +4104,15 @@ uses
     procedure SetNonstop(Nonstop: Boolean);
 
     // Poll the registered readers for I/O, return first reader that has input.
-    // The reader will be a libzmq void * socket, or a zsock_t or zactor_t
-    // instance as specified in zpoller_new/zpoller_add. The timeout should be
-    // zero or greater, or -1 to wait indefinitely. Socket priority is defined
-    // by their order in the poll list. If you need a balanced poll, use the low
-    // level zmq_poll method directly. If the poll call was interrupted (SIGINT),
-    // or the ZMQ context was destroyed, or the timeout expired, returns NULL.
-    // You can test the actual exit condition by calling zpoller_expired () and
-    // zpoller_terminated (). The timeout is in msec.
+    // The reader will be a libzmq void * socket, a zsock_t, a zactor_t
+    // instance or a file handle as specified in zpoller_new/zpoller_add. The
+    // timeout should be zero or greater, or -1 to wait indefinitely. Socket
+    // priority is defined by their order in the poll list. If you need a
+    // balanced poll, use the low level zmq_poll method directly. If the poll
+    // call was interrupted (SIGINT), or the ZMQ context was destroyed, or the
+    // timeout expired, returns NULL. You can test the actual exit condition by
+    // calling zpoller_expired () and zpoller_terminated (). The timeout is in
+    // msec.
     function Wait(Timeout: Integer): IZSock;
 
     // Return true if the last zpoller_wait () call ended because the timeout
