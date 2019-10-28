@@ -396,11 +396,15 @@ ENDIF (NOT MSVC)
 
 # shared
 if (CZMQ_BUILD_SHARED)
-  IF (MSVC)
+  IF (APPLE)
     add_library(czmq SHARED ${czmq_sources})
-  ELSE (MSVC)
-    add_library(czmq SHARED $<TARGET_OBJECTS:czmq_objects>)
-  ENDIF (MSVC)
+  ELSE (APPLE)
+    IF (MSVC)
+      add_library(czmq SHARED ${czmq_sources})
+    ELSE (MSVC)
+      add_library(czmq SHARED $<TARGET_OBJECTS:czmq_objects>)
+    ENDIF (MSVC)
+  ENDIF(APPLE)
 
   set_target_properties (czmq PROPERTIES
     PUBLIC_HEADER "${public_headers}"
@@ -432,11 +436,15 @@ endif()
 
 # static
 if (CZMQ_BUILD_STATIC)
-  IF (MSVC)
+  IF (APPLE)
     add_library(czmq-static STATIC ${czmq_sources})
-  ELSE (MSVC)
-    add_library(czmq-static STATIC $<TARGET_OBJECTS:czmq_objects>)
-  ENDIF (MSVC)
+  ELSE (APPLE)
+    IF (MSVC)
+      add_library(czmq-static STATIC ${czmq_sources})
+    ELSE (MSVC)
+      add_library(czmq-static STATIC $<TARGET_OBJECTS:czmq_objects>)
+    ENDIF (MSVC)
+  ENDIF (APPLE)
 
   set_target_properties(czmq-static PROPERTIES
     PUBLIC_HEADER "${public_headers}"

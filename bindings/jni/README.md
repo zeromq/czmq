@@ -18,15 +18,6 @@ If you don't like to install gradle beforehand just use the gradle wrapper.
 
 This calls javah to build the headers in src/native/include, and then compiles the C and Java pieces to create a jar file a sharable library (.so).
 
-## Installing the JNI Layer for Linux
-
-If you like to use this JNI Layer in another project you'll need to distribute it
-to a location where the other project can locate it. The easiest way to do this
-is by leveraging maven and install to the local maven repository located at
-$HOME/.m2. Therefore simply run:
-
-    ./gradlew publishToMavenLocal
-
 ## Building the JNI Layer for Android
 
 See bindings/jni/android/build.sh.
@@ -55,15 +46,36 @@ This does the following:
 
 ## Building the JNI Layer for Windows
 
-You need MS Visual Studio 2010 or later.
+Prerequisites:
+* MS Visual Studio or MS Visual Studio Tools 2010 or later are installed
+* Java JDK 8 or later is installed
 
-You need the Java SDK. Set the JAVA_HOME environment to the installation location, e.g. C:Program FilesJavajdk1.8.0_66.
+Environment Variables:
+* Add MSBuild.exe to the PATH, e.g. C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin
+* Set JAVA_HOME to the installation location, e.g. C:\Program Files\Java\jdk1.8.0_66.
 
 1. Check out all dependent projects from github, at the same level as this project. E.g.: libzmq, czmq.
-2. In each project, open a console in builds/msvc/vs2010 and run the build.bat batch file.
-3. In this project, open a console in bindings/jni/msvc/vs2010 and run the build.bat batch file.
+2. Follow the dependent projects instuctions to build thier '.dll' and '.lib' file.
+3. Copy a dependent '.dll' and '.lib' files to a folder
+4. Add this library folder to the path, e.g.:
 
-The resulting libraries (czmqjni.dll, czmqjni.lib) are created in bindings/jni/msvc/bin.
+	PATH %PATH%;C:\projects\libs
+
+Now run:
+
+	gradlew build jar "-PvsGenerator=Visual Studio 16 2019"
+	gradlew test "-PvsGenerator=Visual Studio 16 2019"
+
+Change the vsGenerator parameter to the version of MS Visual Studio you have installed.
+
+## Installing the JNI Layer
+
+If you like to use this JNI Layer in another project you'll need to distribute it
+to a location where the other project can locate it. The easiest way to do this
+is by leveraging maven and install to the local maven repository located at
+$HOME/.m2. Therefore simply run:
+
+    ./gradlew publishToMavenLocal
 
 ## Using the JNI API
 

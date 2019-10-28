@@ -6,3 +6,4 @@ build/
 src/native
 gradle-app.setting
 libczmqjni.so
+*.class
