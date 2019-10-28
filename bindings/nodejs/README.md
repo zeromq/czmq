@@ -2167,7 +2167,8 @@ integer my_zpoller.add (Zsock)
 ```
 
 Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
-be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
+be a libzmq void * socket, a zsock_t instance, a zactor_t instance or a
+file handle.
 
 ```
 nothing my_zpoller.setNonstop (Boolean)
