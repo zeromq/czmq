@@ -20,29 +20,21 @@ This calls javah to build the headers in src/native/include, and then compiles t
 
 ## Building the JNI Layer for Android
 
-See bindings/jni/android/build.sh.
+Please read the prerequisites section of the [README](../../builds/android/README.md) in the android build directory.
 
-You need the Android Native Development Kit (NDK) installed.
+You only need to set the environment variables.
 
-Set these environment variables, e.g:
+Then in the jni's android directory (czmq-jni/android), run:
 
-    ANDROID_NDK_ROOT=$HOME/android-ndk-r11c
-    TOOLCHAIN_VERSION=4.9
-    TOOLCHAIN_HOST=arm-linux-androideabi
-    TOOLCHAIN_NAME=$TOOLCHAIN_HOST-$TOOLCHAIN_VERSION
-    TOOLCHAIN_ARCH=arm
-    TOOLCHAIN_PATH=$ANDROID_NDK_ROOT/toolchains/$TOOLCHAIN_NAME/prebuilt/linux-x86_64/bin
-
-Then in the android directory, run:
-
-    ./build.sh
+    ./build.sh [ arm | arm64 | x86 | x86_64 ]
 
 This does the following:
 
-* It compiles the CZMQ C sources for Android, into a native library libczmq.so in builds/android/
-* It compiles the JNI Java classes into a jar file czmq-jni-4.2.1.jar in bindings/jni/build/libs
+* It compiles the CZMQ C sources for Android, into a native library libczmq.so in /tmp/android_build/<architecture>/lib
+* It compiles the JNI Java classes into a jar file czmq-jni-4.2.1.jar in bindings/jni/czmq-jni/build/libs
 * It compiles the JNI C sources for Android, into a native library libczmqjni.so.
-* It combines all these into czmq-android.jar, which you can use in your Android projects.
+* It combines all these into jar file for the built architecture, which you can use in your Android projects.
+* It merges the jar files built for the different architectures into one jar file.
 
 ## Building the JNI Layer for Windows
 
