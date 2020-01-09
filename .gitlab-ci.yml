@@ -58,11 +58,11 @@ lib-build-windows:
     - cmake -S .. -B ReleaseX64 -G"Visual Studio %VS_VERSION_NUM% %VS_VERSION_YEAR% Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build ReleaseX64 --target ALL_BUILD --config Release
     - copy /y ..\include\*.h "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\" > nul
-    - copy /y "DebugX86\bin\Debug\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\"
-    - copy /y "DebugX86\lib\Debug\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\"
-    - copy /y "ReleaseX86\bin\Release\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\"
-    - copy /y "ReleaseX86\lib\Release\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\"
-    - copy /y "DebugX64\bin\Debug\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\"
-    - copy /y "DebugX64\lib\Debug\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\"
-    - copy /y "ReleaseX64\bin\Release\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
-    - copy /y "ReleaseX64\lib\Release\libzmq*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
+    - copy /y "DebugX86\bin\Debug\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\"
+    - copy /y "DebugX86\lib\Debug\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\"
+    - copy /y "ReleaseX86\bin\Release\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\"
+    - copy /y "ReleaseX86\lib\Release\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\"
+    - copy /y "DebugX64\bin\Debug\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\"
+    - copy /y "DebugX64\lib\Debug\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\"
+    - copy /y "ReleaseX64\bin\Release\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
+    - copy /y "ReleaseX64\lib\Release\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
