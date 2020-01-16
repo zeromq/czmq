@@ -118,6 +118,15 @@ set(OPTIONAL_LIBRARIES)
 set(OPTIONAL_LIBRARIES_STATIC)
 
 ########################################################################
+# macOS rpath
+########################################################################
+# Apply CMP0042: MACOSX_RPATH is enabled by default
+cmake_policy(SET CMP0042 NEW)
+
+# Add linker search paths pointing to external dependencies
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+########################################################################
 # LIBZMQ dependency
 ########################################################################
 find_package(libzmq REQUIRED)
