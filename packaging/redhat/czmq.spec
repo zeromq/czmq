@@ -37,7 +37,7 @@ Name:           czmq
 Version:        4.2.1
 Release:        1
 Summary:        the high-level c binding for 0mq
-License:        MPLv2
+License:        MPL-2.0
 URL:            https://github.com/zeromq/czmq
 Source0:        %{name}-%{version}.tar.gz
 Group:          System/Libraries
