@@ -3,7 +3,7 @@
     description = "The high-level C binding for 0MQ"
     script = "zproject.gsl"
     email = "zeromq-dev@lists.zeromq.org"
-    license = "MPLv2"
+    license = "MPL-2.0"
     url = "https://github.com/zeromq/czmq"
     repository = "https://github.com/zeromq/czmq"
     >
