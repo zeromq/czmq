@@ -442,6 +442,111 @@ class Zsock(object):
         """
         return utils.lib.zsock_has_in(self._p)
 
+    def set_only_first_subscribe(self, only_first_subscribe):
+        """
+        Set socket option `only_first_subscribe`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_only_first_subscribe(self._p, only_first_subscribe)
+
+    def set_wss_trust_system(self, wss_trust_system):
+        """
+        Set socket option `wss_trust_system`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_wss_trust_system(self._p, wss_trust_system)
+
+    def set_wss_hostname(self, wss_hostname):
+        """
+        Set socket option `wss_hostname`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_wss_hostname(self._p, utils.to_bytes(wss_hostname))
+
+    def set_wss_trust_pem(self, wss_trust_pem):
+        """
+        Set socket option `wss_trust_pem`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_wss_trust_pem(self._p, utils.to_bytes(wss_trust_pem))
+
+    def set_wss_cert_pem(self, wss_cert_pem):
+        """
+        Set socket option `wss_cert_pem`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_wss_cert_pem(self._p, utils.to_bytes(wss_cert_pem))
+
+    def set_wss_key_pem(self, wss_key_pem):
+        """
+        Set socket option `wss_key_pem`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_wss_key_pem(self._p, utils.to_bytes(wss_key_pem))
+
+    def out_batch_size(self):
+        """
+        Get socket option `out_batch_size`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_out_batch_size(self._p)
+
+    def set_out_batch_size(self, out_batch_size):
+        """
+        Set socket option `out_batch_size`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_out_batch_size(self._p, out_batch_size)
+
+    def in_batch_size(self):
+        """
+        Get socket option `in_batch_size`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_in_batch_size(self._p)
+
+    def set_in_batch_size(self, in_batch_size):
+        """
+        Set socket option `in_batch_size`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_in_batch_size(self._p, in_batch_size)
+
+    def socks_password(self):
+        """
+        Get socket option `socks_password`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_socks_password(self._p)
+
+    def set_socks_password(self, socks_password):
+        """
+        Set socket option `socks_password`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_socks_password(self._p, utils.to_bytes(socks_password))
+
+    def socks_username(self):
+        """
+        Get socket option `socks_username`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_socks_username(self._p)
+
+    def set_socks_username(self, socks_username):
+        """
+        Set socket option `socks_username`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_socks_username(self._p, utils.to_bytes(socks_username))
+
+    def set_xpub_manual_last_value(self, xpub_manual_last_value):
+        """
+        Set socket option `xpub_manual_last_value`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_xpub_manual_last_value(self._p, xpub_manual_last_value)
+
     def router_notify(self):
         """
         Get socket option `router_notify`.

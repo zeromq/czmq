@@ -277,6 +277,117 @@ bool QmlZsock::hasIn () {
 };
 
 ///
+//  Set socket option `only_first_subscribe`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setOnlyFirstSubscribe (int onlyFirstSubscribe) {
+    zsock_set_only_first_subscribe (self, onlyFirstSubscribe);
+};
+
+///
+//  Set socket option `wss_trust_system`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setWssTrustSystem (int wssTrustSystem) {
+    zsock_set_wss_trust_system (self, wssTrustSystem);
+};
+
+///
+//  Set socket option `wss_hostname`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setWssHostname (const QString &wssHostname) {
+    zsock_set_wss_hostname (self, wssHostname.toUtf8().data());
+};
+
+///
+//  Set socket option `wss_trust_pem`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setWssTrustPem (const QString &wssTrustPem) {
+    zsock_set_wss_trust_pem (self, wssTrustPem.toUtf8().data());
+};
+
+///
+//  Set socket option `wss_cert_pem`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setWssCertPem (const QString &wssCertPem) {
+    zsock_set_wss_cert_pem (self, wssCertPem.toUtf8().data());
+};
+
+///
+//  Set socket option `wss_key_pem`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setWssKeyPem (const QString &wssKeyPem) {
+    zsock_set_wss_key_pem (self, wssKeyPem.toUtf8().data());
+};
+
+///
+//  Get socket option `out_batch_size`.
+//  Available from libzmq 4.3.0.
+int QmlZsock::outBatchSize () {
+    return zsock_out_batch_size (self);
+};
+
+///
+//  Set socket option `out_batch_size`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setOutBatchSize (int outBatchSize) {
+    zsock_set_out_batch_size (self, outBatchSize);
+};
+
+///
+//  Get socket option `in_batch_size`.
+//  Available from libzmq 4.3.0.
+int QmlZsock::inBatchSize () {
+    return zsock_in_batch_size (self);
+};
+
+///
+//  Set socket option `in_batch_size`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setInBatchSize (int inBatchSize) {
+    zsock_set_in_batch_size (self, inBatchSize);
+};
+
+///
+//  Get socket option `socks_password`.
+//  Available from libzmq 4.3.0.
+QString QmlZsock::socksPassword () {
+    char *retStr_ = zsock_socks_password (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `socks_password`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setSocksPassword (const QString &socksPassword) {
+    zsock_set_socks_password (self, socksPassword.toUtf8().data());
+};
+
+///
+//  Get socket option `socks_username`.
+//  Available from libzmq 4.3.0.
+QString QmlZsock::socksUsername () {
+    char *retStr_ = zsock_socks_username (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `socks_username`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setSocksUsername (const QString &socksUsername) {
+    zsock_set_socks_username (self, socksUsername.toUtf8().data());
+};
+
+///
+//  Set socket option `xpub_manual_last_value`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setXpubManualLastValue (int xpubManualLastValue) {
+    zsock_set_xpub_manual_last_value (self, xpubManualLastValue);
+};
+
+///
 //  Get socket option `router_notify`.
 //  Available from libzmq 4.3.0.
 int QmlZsock::routerNotify () {
