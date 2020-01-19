@@ -10,6 +10,66 @@
 
 <!-- The following socket options are available in libzmq from version 4.3.0 -->
 
+<method name = "set only first subscribe" polymorphic = "1">
+    Set socket option `only_first_subscribe`.
+    Available from libzmq 4.3.0.
+    <argument name = "only first subscribe" type = "integer" />
+</method>
+
+<method name = "out batch size" polymorphic = "1">
+    Get socket option `out_batch_size`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set out batch size" polymorphic = "1">
+    Set socket option `out_batch_size`.
+    Available from libzmq 4.3.0.
+    <argument name = "out batch size" type = "integer" />
+</method>
+
+<method name = "in batch size" polymorphic = "1">
+    Get socket option `in_batch_size`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set in batch size" polymorphic = "1">
+    Set socket option `in_batch_size`.
+    Available from libzmq 4.3.0.
+    <argument name = "in batch size" type = "integer" />
+</method>
+
+<method name = "socks password" polymorphic = "1">
+    Get socket option `socks_password`.
+    Available from libzmq 4.3.0.
+    <return type = "string" fresh = "1" />
+</method>
+
+<method name = "set socks password" polymorphic = "1">
+    Set socket option `socks_password`.
+    Available from libzmq 4.3.0.
+    <argument name = "socks password" type = "string" />
+</method>
+
+<method name = "socks username" polymorphic = "1">
+    Get socket option `socks_username`.
+    Available from libzmq 4.3.0.
+    <return type = "string" fresh = "1" />
+</method>
+
+<method name = "set socks username" polymorphic = "1">
+    Set socket option `socks_username`.
+    Available from libzmq 4.3.0.
+    <argument name = "socks username" type = "string" />
+</method>
+
+<method name = "set xpub manual last value" polymorphic = "1">
+    Set socket option `xpub_manual_last_value`.
+    Available from libzmq 4.3.0.
+    <argument name = "xpub manual last value" type = "integer" />
+</method>
+
 <method name = "router notify" polymorphic = "1">
     Get socket option `router_notify`.
     Available from libzmq 4.3.0.
