@@ -5,6 +5,15 @@ CZMQ version 4.2.1 stable, released on 20xx/xx/xx
   an internal embedded reimplementation of SHA. It is enabled by default if
   present.
 
+* New DRAFT zsock API to match libzmq's 4.3.3 stable socket options:
+  - zsock_set_xpub_manual_last_value
+  - zsock_socks_username, zsock_set_socks_username
+  - zsock_socks_password, zsock_set_socks_password
+  - zsock_in_batch_size, zsock_set_in_batch_size
+  - zsock_out_batch_size, zsock_set_out_batch_size
+  - zsock_set_only_first_subscribe
+  See zsock manpage for more details.
+
 * Fixed #1972 - Findlibzmq.cmake out of date, Windows build fails
 
 * Fixed #1998 - zproxy uses fixed ipc endpoint, causing race condition
