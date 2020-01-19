@@ -10,6 +10,18 @@
     -->
     <version major = "4" minor = "3" style = "macro">
         <!-- Options that are new in 4.3 -->
+        <option name = "only_first_subscribe" type = "int" mode = "w"  test = "XPUB"
+            test_value = "1" />
+        <option name = "out_batch_size"    type = "int"    mode = "rw" test = "ROUTER"
+            test_value = "16384" />
+        <option name = "in_batch_size"     type = "int"    mode = "rw" test = "ROUTER"
+            test_value = "16384" />
+        <option name = "socks_password"    type = "string" mode = "rw" test = "ROUTER"
+            test_value = "password" />
+        <option name = "socks_username"    type = "string" mode = "rw" test = "ROUTER"
+            test_value = "username" />
+        <option name = "xpub_manual_last_value" type = "int" mode = "w" test = "XPUB"
+            test_value = "1" />
         <option name = "router_notify"     type = "int"    mode = "rw" test = "ROUTER"
             test_value = "3" />
         <option name = "multicast_loop"    type = "int"    mode = "rw" test = "RADIO"
