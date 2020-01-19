@@ -1,6 +1,20 @@
 CZMQ version 4.2.1 stable, released on 20xx/xx/xx
 =================================================
 
+* Note for packagers: NSS can now be used and linked against to avoid using
+  an internal embedded reimplementation of SHA. It is enabled by default if
+  present.
+
+* Fixed #1972 - Findlibzmq.cmake out of date, Windows build fails
+
+* Fixed #1998 - zproxy uses fixed ipc endpoint, causing race condition
+
+* Fixed #2002 - fix socket leak in zbeacon
+
+* Fixed #2020 - use libnss in zdigest if available for SHA functions.
+
+* Fixed #2028 - zpoller docs isn't mentioning file handles
+
 CZMQ version 4.2.0 stable, released on 2019/02/10
 =================================================
 
