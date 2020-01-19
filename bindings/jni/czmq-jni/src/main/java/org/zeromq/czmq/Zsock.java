@@ -470,6 +470,126 @@ public class Zsock implements AutoCloseable {
         return __hasIn (self);
     }
     /*
+    Set socket option `only_first_subscribe`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setOnlyFirstSubscribe (long self, int onlyFirstSubscribe);
+    public void setOnlyFirstSubscribe (int onlyFirstSubscribe) {
+        __setOnlyFirstSubscribe (self, onlyFirstSubscribe);
+    }
+    /*
+    Set socket option `wss_trust_system`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setWssTrustSystem (long self, int wssTrustSystem);
+    public void setWssTrustSystem (int wssTrustSystem) {
+        __setWssTrustSystem (self, wssTrustSystem);
+    }
+    /*
+    Set socket option `wss_hostname`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setWssHostname (long self, String wssHostname);
+    public void setWssHostname (String wssHostname) {
+        __setWssHostname (self, wssHostname);
+    }
+    /*
+    Set socket option `wss_trust_pem`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setWssTrustPem (long self, String wssTrustPem);
+    public void setWssTrustPem (String wssTrustPem) {
+        __setWssTrustPem (self, wssTrustPem);
+    }
+    /*
+    Set socket option `wss_cert_pem`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setWssCertPem (long self, String wssCertPem);
+    public void setWssCertPem (String wssCertPem) {
+        __setWssCertPem (self, wssCertPem);
+    }
+    /*
+    Set socket option `wss_key_pem`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setWssKeyPem (long self, String wssKeyPem);
+    public void setWssKeyPem (String wssKeyPem) {
+        __setWssKeyPem (self, wssKeyPem);
+    }
+    /*
+    Get socket option `out_batch_size`.
+    Available from libzmq 4.3.0.
+    */
+    native static int __outBatchSize (long self);
+    public int outBatchSize () {
+        return __outBatchSize (self);
+    }
+    /*
+    Set socket option `out_batch_size`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setOutBatchSize (long self, int outBatchSize);
+    public void setOutBatchSize (int outBatchSize) {
+        __setOutBatchSize (self, outBatchSize);
+    }
+    /*
+    Get socket option `in_batch_size`.
+    Available from libzmq 4.3.0.
+    */
+    native static int __inBatchSize (long self);
+    public int inBatchSize () {
+        return __inBatchSize (self);
+    }
+    /*
+    Set socket option `in_batch_size`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setInBatchSize (long self, int inBatchSize);
+    public void setInBatchSize (int inBatchSize) {
+        __setInBatchSize (self, inBatchSize);
+    }
+    /*
+    Get socket option `socks_password`.
+    Available from libzmq 4.3.0.
+    */
+    native static String __socksPassword (long self);
+    public String socksPassword () {
+        return __socksPassword (self);
+    }
+    /*
+    Set socket option `socks_password`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setSocksPassword (long self, String socksPassword);
+    public void setSocksPassword (String socksPassword) {
+        __setSocksPassword (self, socksPassword);
+    }
+    /*
+    Get socket option `socks_username`.
+    Available from libzmq 4.3.0.
+    */
+    native static String __socksUsername (long self);
+    public String socksUsername () {
+        return __socksUsername (self);
+    }
+    /*
+    Set socket option `socks_username`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setSocksUsername (long self, String socksUsername);
+    public void setSocksUsername (String socksUsername) {
+        __setSocksUsername (self, socksUsername);
+    }
+    /*
+    Set socket option `xpub_manual_last_value`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setXpubManualLastValue (long self, int xpubManualLastValue);
+    public void setXpubManualLastValue (int xpubManualLastValue) {
+        __setXpubManualLastValue (self, xpubManualLastValue);
+    }
+    /*
     Get socket option `router_notify`.
     Available from libzmq 4.3.0.
     */

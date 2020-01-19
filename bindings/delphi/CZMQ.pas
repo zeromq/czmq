@@ -1566,6 +1566,66 @@ uses
     // Check whether the socket has available message to read.
     function HasIn: Boolean;
 
+    // Set socket option `only_first_subscribe`.
+    // Available from libzmq 4.3.0.
+    procedure SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
+
+    // Set socket option `wss_trust_system`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssTrustSystem(WssTrustSystem: Integer);
+
+    // Set socket option `wss_hostname`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssHostname(const WssHostname: string);
+
+    // Set socket option `wss_trust_pem`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssTrustPem(const WssTrustPem: string);
+
+    // Set socket option `wss_cert_pem`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssCertPem(const WssCertPem: string);
+
+    // Set socket option `wss_key_pem`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssKeyPem(const WssKeyPem: string);
+
+    // Get socket option `out_batch_size`.
+    // Available from libzmq 4.3.0.
+    function OutBatchSize: Integer;
+
+    // Set socket option `out_batch_size`.
+    // Available from libzmq 4.3.0.
+    procedure SetOutBatchSize(OutBatchSize: Integer);
+
+    // Get socket option `in_batch_size`.
+    // Available from libzmq 4.3.0.
+    function InBatchSize: Integer;
+
+    // Set socket option `in_batch_size`.
+    // Available from libzmq 4.3.0.
+    procedure SetInBatchSize(InBatchSize: Integer);
+
+    // Get socket option `socks_password`.
+    // Available from libzmq 4.3.0.
+    function SocksPassword: string;
+
+    // Set socket option `socks_password`.
+    // Available from libzmq 4.3.0.
+    procedure SetSocksPassword(const SocksPassword: string);
+
+    // Get socket option `socks_username`.
+    // Available from libzmq 4.3.0.
+    function SocksUsername: string;
+
+    // Set socket option `socks_username`.
+    // Available from libzmq 4.3.0.
+    procedure SetSocksUsername(const SocksUsername: string);
+
+    // Set socket option `xpub_manual_last_value`.
+    // Available from libzmq 4.3.0.
+    procedure SetXpubManualLastValue(XpubManualLastValue: Integer);
+
     // Get socket option `router_notify`.
     // Available from libzmq 4.3.0.
     function RouterNotify: Integer;
@@ -4417,6 +4477,66 @@ uses
 
     // Check whether the socket has available message to read.
     function HasIn: Boolean;
+
+    // Set socket option `only_first_subscribe`.
+    // Available from libzmq 4.3.0.
+    procedure SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
+
+    // Set socket option `wss_trust_system`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssTrustSystem(WssTrustSystem: Integer);
+
+    // Set socket option `wss_hostname`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssHostname(const WssHostname: string);
+
+    // Set socket option `wss_trust_pem`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssTrustPem(const WssTrustPem: string);
+
+    // Set socket option `wss_cert_pem`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssCertPem(const WssCertPem: string);
+
+    // Set socket option `wss_key_pem`.
+    // Available from libzmq 4.3.0.
+    procedure SetWssKeyPem(const WssKeyPem: string);
+
+    // Get socket option `out_batch_size`.
+    // Available from libzmq 4.3.0.
+    function OutBatchSize: Integer;
+
+    // Set socket option `out_batch_size`.
+    // Available from libzmq 4.3.0.
+    procedure SetOutBatchSize(OutBatchSize: Integer);
+
+    // Get socket option `in_batch_size`.
+    // Available from libzmq 4.3.0.
+    function InBatchSize: Integer;
+
+    // Set socket option `in_batch_size`.
+    // Available from libzmq 4.3.0.
+    procedure SetInBatchSize(InBatchSize: Integer);
+
+    // Get socket option `socks_password`.
+    // Available from libzmq 4.3.0.
+    function SocksPassword: string;
+
+    // Set socket option `socks_password`.
+    // Available from libzmq 4.3.0.
+    procedure SetSocksPassword(const SocksPassword: string);
+
+    // Get socket option `socks_username`.
+    // Available from libzmq 4.3.0.
+    function SocksUsername: string;
+
+    // Set socket option `socks_username`.
+    // Available from libzmq 4.3.0.
+    procedure SetSocksUsername(const SocksUsername: string);
+
+    // Set socket option `xpub_manual_last_value`.
+    // Available from libzmq 4.3.0.
+    procedure SetXpubManualLastValue(XpubManualLastValue: Integer);
 
     // Get socket option `router_notify`.
     // Available from libzmq 4.3.0.
@@ -8459,6 +8579,99 @@ end;
   function TZsock.HasIn: Boolean;
   begin
     Result := zsock_has_in(FHandle);
+  end;
+
+  procedure TZsock.SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
+  begin
+    zsock_set_only_first_subscribe(FHandle, OnlyFirstSubscribe);
+  end;
+
+  procedure TZsock.SetWssTrustSystem(WssTrustSystem: Integer);
+  begin
+    zsock_set_wss_trust_system(FHandle, WssTrustSystem);
+  end;
+
+  procedure TZsock.SetWssHostname(const WssHostname: string);
+  var
+    __WssHostname__: UTF8String;
+  begin
+    __WssHostname__ := UTF8String(WssHostname);
+    zsock_set_wss_hostname(FHandle, PAnsiChar(__WssHostname__));
+  end;
+
+  procedure TZsock.SetWssTrustPem(const WssTrustPem: string);
+  var
+    __WssTrustPem__: UTF8String;
+  begin
+    __WssTrustPem__ := UTF8String(WssTrustPem);
+    zsock_set_wss_trust_pem(FHandle, PAnsiChar(__WssTrustPem__));
+  end;
+
+  procedure TZsock.SetWssCertPem(const WssCertPem: string);
+  var
+    __WssCertPem__: UTF8String;
+  begin
+    __WssCertPem__ := UTF8String(WssCertPem);
+    zsock_set_wss_cert_pem(FHandle, PAnsiChar(__WssCertPem__));
+  end;
+
+  procedure TZsock.SetWssKeyPem(const WssKeyPem: string);
+  var
+    __WssKeyPem__: UTF8String;
+  begin
+    __WssKeyPem__ := UTF8String(WssKeyPem);
+    zsock_set_wss_key_pem(FHandle, PAnsiChar(__WssKeyPem__));
+  end;
+
+  function TZsock.OutBatchSize: Integer;
+  begin
+    Result := zsock_out_batch_size(FHandle);
+  end;
+
+  procedure TZsock.SetOutBatchSize(OutBatchSize: Integer);
+  begin
+    zsock_set_out_batch_size(FHandle, OutBatchSize);
+  end;
+
+  function TZsock.InBatchSize: Integer;
+  begin
+    Result := zsock_in_batch_size(FHandle);
+  end;
+
+  procedure TZsock.SetInBatchSize(InBatchSize: Integer);
+  begin
+    zsock_set_in_batch_size(FHandle, InBatchSize);
+  end;
+
+  function TZsock.SocksPassword: string;
+  begin
+    Result := ZFreeString(zsock_socks_password(FHandle));
+  end;
+
+  procedure TZsock.SetSocksPassword(const SocksPassword: string);
+  var
+    __SocksPassword__: UTF8String;
+  begin
+    __SocksPassword__ := UTF8String(SocksPassword);
+    zsock_set_socks_password(FHandle, PAnsiChar(__SocksPassword__));
+  end;
+
+  function TZsock.SocksUsername: string;
+  begin
+    Result := ZFreeString(zsock_socks_username(FHandle));
+  end;
+
+  procedure TZsock.SetSocksUsername(const SocksUsername: string);
+  var
+    __SocksUsername__: UTF8String;
+  begin
+    __SocksUsername__ := UTF8String(SocksUsername);
+    zsock_set_socks_username(FHandle, PAnsiChar(__SocksUsername__));
+  end;
+
+  procedure TZsock.SetXpubManualLastValue(XpubManualLastValue: Integer);
+  begin
+    zsock_set_xpub_manual_last_value(FHandle, XpubManualLastValue);
   end;
 
   function TZsock.RouterNotify: Integer;

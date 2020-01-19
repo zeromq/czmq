@@ -4,7 +4,7 @@
 ################################################################################
 NAME        = "czmq"
 VERSION     = "4.2.1"
-LICENSE     = "mplv2"
+LICENSE     = "mpl-2.0"
 DESCRIPTION = """Python bindings of: the high-level c binding for 0mq"""
 URL         = "https://github.com/zeromq/czmq"
 PACKAGES    = ["czmq"]

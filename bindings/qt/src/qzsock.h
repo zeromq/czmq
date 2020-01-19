@@ -254,6 +254,66 @@ public:
     //  Check whether the socket has available message to read.
     bool hasIn ();
 
+    //  Set socket option `only_first_subscribe`.
+    //  Available from libzmq 4.3.0.
+    void setOnlyFirstSubscribe (int onlyFirstSubscribe);
+
+    //  Set socket option `wss_trust_system`.
+    //  Available from libzmq 4.3.0.
+    void setWssTrustSystem (int wssTrustSystem);
+
+    //  Set socket option `wss_hostname`.
+    //  Available from libzmq 4.3.0.
+    void setWssHostname (const QString &wssHostname);
+
+    //  Set socket option `wss_trust_pem`.
+    //  Available from libzmq 4.3.0.
+    void setWssTrustPem (const QString &wssTrustPem);
+
+    //  Set socket option `wss_cert_pem`.
+    //  Available from libzmq 4.3.0.
+    void setWssCertPem (const QString &wssCertPem);
+
+    //  Set socket option `wss_key_pem`.
+    //  Available from libzmq 4.3.0.
+    void setWssKeyPem (const QString &wssKeyPem);
+
+    //  Get socket option `out_batch_size`.
+    //  Available from libzmq 4.3.0.
+    int outBatchSize ();
+
+    //  Set socket option `out_batch_size`.
+    //  Available from libzmq 4.3.0.
+    void setOutBatchSize (int outBatchSize);
+
+    //  Get socket option `in_batch_size`.
+    //  Available from libzmq 4.3.0.
+    int inBatchSize ();
+
+    //  Set socket option `in_batch_size`.
+    //  Available from libzmq 4.3.0.
+    void setInBatchSize (int inBatchSize);
+
+    //  Get socket option `socks_password`.
+    //  Available from libzmq 4.3.0.
+    QString socksPassword ();
+
+    //  Set socket option `socks_password`.
+    //  Available from libzmq 4.3.0.
+    void setSocksPassword (const QString &socksPassword);
+
+    //  Get socket option `socks_username`.
+    //  Available from libzmq 4.3.0.
+    QString socksUsername ();
+
+    //  Set socket option `socks_username`.
+    //  Available from libzmq 4.3.0.
+    void setSocksUsername (const QString &socksUsername);
+
+    //  Set socket option `xpub_manual_last_value`.
+    //  Available from libzmq 4.3.0.
+    void setXpubManualLastValue (int xpubManualLastValue);
+
     //  Get socket option `router_notify`.
     //  Available from libzmq 4.3.0.
     int routerNotify ();
