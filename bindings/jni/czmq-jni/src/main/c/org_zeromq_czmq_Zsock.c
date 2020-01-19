@@ -364,6 +364,78 @@ Java_org_zeromq_czmq_Zsock__1_1hasIn (JNIEnv *env, jclass c, jlong self)
     return has_in_;
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setOnlyFirstSubscribe (JNIEnv *env, jclass c, jlong self, jint only_first_subscribe)
+{
+    zsock_set_only_first_subscribe ((zsock_t *) (intptr_t) self, (int) only_first_subscribe);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1outBatchSize (JNIEnv *env, jclass c, jlong self)
+{
+    jint out_batch_size_ = (jint) zsock_out_batch_size ((zsock_t *) (intptr_t) self);
+    return out_batch_size_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setOutBatchSize (JNIEnv *env, jclass c, jlong self, jint out_batch_size)
+{
+    zsock_set_out_batch_size ((zsock_t *) (intptr_t) self, (int) out_batch_size);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1inBatchSize (JNIEnv *env, jclass c, jlong self)
+{
+    jint in_batch_size_ = (jint) zsock_in_batch_size ((zsock_t *) (intptr_t) self);
+    return in_batch_size_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setInBatchSize (JNIEnv *env, jclass c, jlong self, jint in_batch_size)
+{
+    zsock_set_in_batch_size ((zsock_t *) (intptr_t) self, (int) in_batch_size);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsock__1_1socksPassword (JNIEnv *env, jclass c, jlong self)
+{
+    char *socks_password_ = (char *) zsock_socks_password ((zsock_t *) (intptr_t) self);
+    jstring return_string_ = (*env)->NewStringUTF (env, socks_password_);
+    zstr_free (&socks_password_);
+    return return_string_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setSocksPassword (JNIEnv *env, jclass c, jlong self, jstring socks_password)
+{
+    char *socks_password_ = (char *) (*env)->GetStringUTFChars (env, socks_password, NULL);
+    zsock_set_socks_password ((zsock_t *) (intptr_t) self, socks_password_);
+    (*env)->ReleaseStringUTFChars (env, socks_password, socks_password_);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsock__1_1socksUsername (JNIEnv *env, jclass c, jlong self)
+{
+    char *socks_username_ = (char *) zsock_socks_username ((zsock_t *) (intptr_t) self);
+    jstring return_string_ = (*env)->NewStringUTF (env, socks_username_);
+    zstr_free (&socks_username_);
+    return return_string_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setSocksUsername (JNIEnv *env, jclass c, jlong self, jstring socks_username)
+{
+    char *socks_username_ = (char *) (*env)->GetStringUTFChars (env, socks_username, NULL);
+    zsock_set_socks_username ((zsock_t *) (intptr_t) self, socks_username_);
+    (*env)->ReleaseStringUTFChars (env, socks_username, socks_username_);
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setXpubManualLastValue (JNIEnv *env, jclass c, jlong self, jint xpub_manual_last_value)
+{
+    zsock_set_xpub_manual_last_value ((zsock_t *) (intptr_t) self, (int) xpub_manual_last_value);
+}
+
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1routerNotify (JNIEnv *env, jclass c, jlong self)
 {

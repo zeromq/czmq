@@ -3,15 +3,15 @@
 # get all project files
 file(GLOB_RECURSE ALL_SOURCE_FILES
      RELATIVE ${CMAKE_CURRENT_BINARY_DIR}
-     ${CMAKE_SOURCE_DIR}/src/*.c ${CMAKE_SOURCE_DIR}/src/*.cc ${CMAKE_SOURCE_DIR}/src/*.cpp
-     ${CMAKE_SOURCE_DIR}/src/*.h ${CMAKE_SOURCE_DIR}/src/*.hpp
-     ${CMAKE_SOURCE_DIR}/tests/*.c ${CMAKE_SOURCE_DIR}/tests/*.cc ${CMAKE_SOURCE_DIR}/tests/*.cpp
-     ${CMAKE_SOURCE_DIR}/tests/*.h ${CMAKE_SOURCE_DIR}/tests/*.hpp
-     ${CMAKE_SOURCE_DIR}/perf/*.c ${CMAKE_SOURCE_DIR}/perf/*.cc ${CMAKE_SOURCE_DIR}/perf/*.cpp
-     ${CMAKE_SOURCE_DIR}/perf/*.h ${CMAKE_SOURCE_DIR}/perf/*.hpp
-     ${CMAKE_SOURCE_DIR}/tools/*.c ${CMAKE_SOURCE_DIR}/tools/*.cc ${CMAKE_SOURCE_DIR}/tools/*.cpp
-     ${CMAKE_SOURCE_DIR}/tools/*.h ${CMAKE_SOURCE_DIR}/tools/*.hpp
-     ${CMAKE_SOURCE_DIR}/include/*.h ${CMAKE_SOURCE_DIR}/include/*.hpp
+     ${PROJECT_SOURCE_DIR}/src/*.c ${PROJECT_SOURCE_DIR}/src/*.cc ${PROJECT_SOURCE_DIR}/src/*.cpp
+     ${PROJECT_SOURCE_DIR}/src/*.h ${PROJECT_SOURCE_DIR}/src/*.hpp
+     ${PROJECT_SOURCE_DIR}/tests/*.c ${PROJECT_SOURCE_DIR}/tests/*.cc ${PROJECT_SOURCE_DIR}/tests/*.cpp
+     ${PROJECT_SOURCE_DIR}/tests/*.h ${PROJECT_SOURCE_DIR}/tests/*.hpp
+     ${PROJECT_SOURCE_DIR}/perf/*.c ${PROJECT_SOURCE_DIR}/perf/*.cc ${PROJECT_SOURCE_DIR}/perf/*.cpp
+     ${PROJECT_SOURCE_DIR}/perf/*.h ${PROJECT_SOURCE_DIR}/perf/*.hpp
+     ${PROJECT_SOURCE_DIR}/tools/*.c ${PROJECT_SOURCE_DIR}/tools/*.cc ${PROJECT_SOURCE_DIR}/tools/*.cpp
+     ${PROJECT_SOURCE_DIR}/tools/*.h ${PROJECT_SOURCE_DIR}/tools/*.hpp
+     ${PROJECT_SOURCE_DIR}/include/*.h ${PROJECT_SOURCE_DIR}/include/*.hpp
     )
 
 if("${CLANG_FORMAT}" STREQUAL "")

@@ -589,6 +589,16 @@ module CZMQ
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
       attach_function :zsock_has_in, [:pointer], :bool, **opts
+      attach_function :zsock_set_only_first_subscribe, [:pointer, :int], :void, **opts
+      attach_function :zsock_out_batch_size, [:pointer], :int, **opts
+      attach_function :zsock_set_out_batch_size, [:pointer, :int], :void, **opts
+      attach_function :zsock_in_batch_size, [:pointer], :int, **opts
+      attach_function :zsock_set_in_batch_size, [:pointer, :int], :void, **opts
+      attach_function :zsock_socks_password, [:pointer], :pointer, **opts
+      attach_function :zsock_set_socks_password, [:pointer, :string], :void, **opts
+      attach_function :zsock_socks_username, [:pointer], :pointer, **opts
+      attach_function :zsock_set_socks_username, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_xpub_manual_last_value, [:pointer, :int], :void, **opts
       attach_function :zsock_router_notify, [:pointer], :int, **opts
       attach_function :zsock_set_router_notify, [:pointer, :int], :void, **opts
       attach_function :zsock_multicast_loop, [:pointer], :int, **opts

@@ -2195,6 +2195,46 @@ type
   // Check whether the socket has available message to read.
   function zsock_has_in(self: PZsock): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Set socket option `only_first_subscribe`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_only_first_subscribe(self: PZsock; OnlyFirstSubscribe: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get socket option `out_batch_size`.
+  // Available from libzmq 4.3.0.
+  function zsock_out_batch_size(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `out_batch_size`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_out_batch_size(self: PZsock; OutBatchSize: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get socket option `in_batch_size`.
+  // Available from libzmq 4.3.0.
+  function zsock_in_batch_size(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `in_batch_size`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_in_batch_size(self: PZsock; InBatchSize: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get socket option `socks_password`.
+  // Available from libzmq 4.3.0.
+  function zsock_socks_password(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `socks_password`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_socks_password(self: PZsock; SocksPassword: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get socket option `socks_username`.
+  // Available from libzmq 4.3.0.
+  function zsock_socks_username(self: PZsock): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `socks_username`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_socks_username(self: PZsock; SocksUsername: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `xpub_manual_last_value`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_xpub_manual_last_value(self: PZsock; XpubManualLastValue: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Get socket option `router_notify`.
   // Available from libzmq 4.3.0.
   function zsock_router_notify(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};

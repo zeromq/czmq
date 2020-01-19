@@ -5223,6 +5223,26 @@ lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
 lib.zsock_has_in.restype = c_bool
 lib.zsock_has_in.argtypes = [zsock_p]
+lib.zsock_set_only_first_subscribe.restype = None
+lib.zsock_set_only_first_subscribe.argtypes = [zsock_p, c_int]
+lib.zsock_out_batch_size.restype = c_int
+lib.zsock_out_batch_size.argtypes = [zsock_p]
+lib.zsock_set_out_batch_size.restype = None
+lib.zsock_set_out_batch_size.argtypes = [zsock_p, c_int]
+lib.zsock_in_batch_size.restype = c_int
+lib.zsock_in_batch_size.argtypes = [zsock_p]
+lib.zsock_set_in_batch_size.restype = None
+lib.zsock_set_in_batch_size.argtypes = [zsock_p, c_int]
+lib.zsock_socks_password.restype = POINTER(c_char)
+lib.zsock_socks_password.argtypes = [zsock_p]
+lib.zsock_set_socks_password.restype = None
+lib.zsock_set_socks_password.argtypes = [zsock_p, c_char_p]
+lib.zsock_socks_username.restype = POINTER(c_char)
+lib.zsock_socks_username.argtypes = [zsock_p]
+lib.zsock_set_socks_username.restype = None
+lib.zsock_set_socks_username.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_xpub_manual_last_value.restype = None
+lib.zsock_set_xpub_manual_last_value.argtypes = [zsock_p, c_int]
 lib.zsock_router_notify.restype = c_int
 lib.zsock_router_notify.argtypes = [zsock_p]
 lib.zsock_set_router_notify.restype = None
@@ -6000,6 +6020,76 @@ return the supplied value. Takes a polymorphic socket reference.
         Check whether the socket has available message to read.
         """
         return lib.zsock_has_in(self._as_parameter_)
+
+    def set_only_first_subscribe(self, only_first_subscribe):
+        """
+        Set socket option `only_first_subscribe`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_only_first_subscribe(self._as_parameter_, only_first_subscribe)
+
+    def out_batch_size(self):
+        """
+        Get socket option `out_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_out_batch_size(self._as_parameter_)
+
+    def set_out_batch_size(self, out_batch_size):
+        """
+        Set socket option `out_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_out_batch_size(self._as_parameter_, out_batch_size)
+
+    def in_batch_size(self):
+        """
+        Get socket option `in_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_in_batch_size(self._as_parameter_)
+
+    def set_in_batch_size(self, in_batch_size):
+        """
+        Set socket option `in_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_in_batch_size(self._as_parameter_, in_batch_size)
+
+    def socks_password(self):
+        """
+        Get socket option `socks_password`.
+Available from libzmq 4.3.0.
+        """
+        return return_fresh_string(lib.zsock_socks_password(self._as_parameter_))
+
+    def set_socks_password(self, socks_password):
+        """
+        Set socket option `socks_password`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_socks_password(self._as_parameter_, socks_password)
+
+    def socks_username(self):
+        """
+        Get socket option `socks_username`.
+Available from libzmq 4.3.0.
+        """
+        return return_fresh_string(lib.zsock_socks_username(self._as_parameter_))
+
+    def set_socks_username(self, socks_username):
+        """
+        Set socket option `socks_username`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_socks_username(self._as_parameter_, socks_username)
+
+    def set_xpub_manual_last_value(self, xpub_manual_last_value):
+        """
+        Set socket option `xpub_manual_last_value`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_xpub_manual_last_value(self._as_parameter_, xpub_manual_last_value)
 
     def router_notify(self):
         """

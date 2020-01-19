@@ -639,6 +639,16 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_join);
     static NAN_METHOD (_leave);
     static NAN_METHOD (_has_in);
+    static NAN_METHOD (_set_only_first_subscribe);
+    static NAN_METHOD (_out_batch_size);
+    static NAN_METHOD (_set_out_batch_size);
+    static NAN_METHOD (_in_batch_size);
+    static NAN_METHOD (_set_in_batch_size);
+    static NAN_METHOD (_socks_password);
+    static NAN_METHOD (_set_socks_password);
+    static NAN_METHOD (_socks_username);
+    static NAN_METHOD (_set_socks_username);
+    static NAN_METHOD (_set_xpub_manual_last_value);
     static NAN_METHOD (_router_notify);
     static NAN_METHOD (_set_router_notify);
     static NAN_METHOD (_multicast_loop);

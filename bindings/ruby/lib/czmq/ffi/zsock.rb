@@ -941,6 +941,280 @@ module CZMQ
         result
       end
 
+      # Set socket option `only_first_subscribe`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param only_first_subscribe [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_only_first_subscribe(only_first_subscribe)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        only_first_subscribe = Integer(only_first_subscribe)
+        result = ::CZMQ::FFI.zsock_set_only_first_subscribe(self_p, only_first_subscribe)
+        result
+      end
+
+      # Set socket option `only_first_subscribe`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_only_first_subscribe.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param only_first_subscribe [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_only_first_subscribe(self_p, only_first_subscribe)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        only_first_subscribe = Integer(only_first_subscribe)
+        result = ::CZMQ::FFI.zsock_set_only_first_subscribe(self_p, only_first_subscribe)
+        result
+      end
+
+      # Get socket option `out_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def out_batch_size()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_out_batch_size(self_p)
+        result
+      end
+
+      # Get socket option `out_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #out_batch_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.out_batch_size(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_out_batch_size(self_p)
+        result
+      end
+
+      # Set socket option `out_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param out_batch_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_out_batch_size(out_batch_size)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        out_batch_size = Integer(out_batch_size)
+        result = ::CZMQ::FFI.zsock_set_out_batch_size(self_p, out_batch_size)
+        result
+      end
+
+      # Set socket option `out_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_out_batch_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param out_batch_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_out_batch_size(self_p, out_batch_size)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        out_batch_size = Integer(out_batch_size)
+        result = ::CZMQ::FFI.zsock_set_out_batch_size(self_p, out_batch_size)
+        result
+      end
+
+      # Get socket option `in_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def in_batch_size()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_in_batch_size(self_p)
+        result
+      end
+
+      # Get socket option `in_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #in_batch_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.in_batch_size(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_in_batch_size(self_p)
+        result
+      end
+
+      # Set socket option `in_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param in_batch_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_in_batch_size(in_batch_size)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        in_batch_size = Integer(in_batch_size)
+        result = ::CZMQ::FFI.zsock_set_in_batch_size(self_p, in_batch_size)
+        result
+      end
+
+      # Set socket option `in_batch_size`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_in_batch_size.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param in_batch_size [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_in_batch_size(self_p, in_batch_size)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        in_batch_size = Integer(in_batch_size)
+        result = ::CZMQ::FFI.zsock_set_in_batch_size(self_p, in_batch_size)
+        result
+      end
+
+      # Get socket option `socks_password`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [::FFI::AutoPointer]
+      def socks_password()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_socks_password(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Get socket option `socks_password`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #socks_password.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [::FFI::AutoPointer]
+      def self.socks_password(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_socks_password(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Set socket option `socks_password`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param socks_password [String, #to_s, nil]
+      # @return [void]
+      def set_socks_password(socks_password)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_socks_password(self_p, socks_password)
+        result
+      end
+
+      # Set socket option `socks_password`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_socks_password.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param socks_password [String, #to_s, nil]
+      # @return [void]
+      def self.set_socks_password(self_p, socks_password)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_socks_password(self_p, socks_password)
+        result
+      end
+
+      # Get socket option `socks_username`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [::FFI::AutoPointer]
+      def socks_username()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_socks_username(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Get socket option `socks_username`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #socks_username.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [::FFI::AutoPointer]
+      def self.socks_username(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_socks_username(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Set socket option `socks_username`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param socks_username [String, #to_s, nil]
+      # @return [void]
+      def set_socks_username(socks_username)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_socks_username(self_p, socks_username)
+        result
+      end
+
+      # Set socket option `socks_username`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_socks_username.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param socks_username [String, #to_s, nil]
+      # @return [void]
+      def self.set_socks_username(self_p, socks_username)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_socks_username(self_p, socks_username)
+        result
+      end
+
+      # Set socket option `xpub_manual_last_value`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param xpub_manual_last_value [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_xpub_manual_last_value(xpub_manual_last_value)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        xpub_manual_last_value = Integer(xpub_manual_last_value)
+        result = ::CZMQ::FFI.zsock_set_xpub_manual_last_value(self_p, xpub_manual_last_value)
+        result
+      end
+
+      # Set socket option `xpub_manual_last_value`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_xpub_manual_last_value.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param xpub_manual_last_value [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_xpub_manual_last_value(self_p, xpub_manual_last_value)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        xpub_manual_last_value = Integer(xpub_manual_last_value)
+        result = ::CZMQ::FFI.zsock_set_xpub_manual_last_value(self_p, xpub_manual_last_value)
+        result
+      end
+
       # Get socket option `router_notify`.
       # Available from libzmq 4.3.0.
       #
