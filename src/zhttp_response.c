@@ -119,6 +119,7 @@ zhttp_response_recv (zhttp_response_t *self, zhttp_client_t *client, void** arg_
     self->free_content = self->content != NULL;
 
     if (result != 0) {
+        zhash_destroy(&self->headers);
         self->headers = zhash_new ();
         zhash_autofree (self->headers);
 
