@@ -737,7 +737,7 @@ zmsg_dup (zmsg_t *self)
 //  configured by zsys_set_logstream).
 
 void
-zmsg_print (zmsg_t *self)
+zmsg_print_n (zmsg_t *self, size_t size)
 {
     assert (self);
     assert (zmsg_is (self));
@@ -748,9 +748,15 @@ zmsg_print (zmsg_t *self)
     }
     zframe_t *frame = zmsg_first (self);
     while (frame) {
-        zframe_print (frame, NULL);
+        zframe_print_n (frame, NULL, size);
         frame = zmsg_next (self);
     }
+}
+
+void
+zmsg_print (zmsg_t *self)
+{
+    zmsg_print_n (self, 0);
 }
 
 
