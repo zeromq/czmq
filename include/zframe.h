@@ -115,8 +115,16 @@ CZMQ_EXPORT void
 
 //  Send message to zsys log sink (may be stdout, or system facility as
 //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+//  Long messages are truncated.
 CZMQ_EXPORT void
     zframe_print (zframe_t *self, const char *prefix);
+
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+//  Message length is specified; no truncation unless length is zero.
+//  Backwards compatible with zframe_print when length is zero.
+CZMQ_EXPORT void
+    zframe_print_n (zframe_t *self, const char *prefix, size_t length);
 
 //  Probe the supplied object, and report if it looks like a zframe_t.
 CZMQ_EXPORT bool

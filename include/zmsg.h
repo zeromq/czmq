@@ -191,8 +191,16 @@ CZMQ_EXPORT zmsg_t *
 
 //  Send message to zsys log sink (may be stdout, or system facility as
 //  configured by zsys_set_logstream).
+//  Long messages are truncated.
 CZMQ_EXPORT void
     zmsg_print (zmsg_t *self);
+
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream).
+//  Message length is specified; no truncation unless length is zero.
+//  Backwards compatible with zframe_print when length is zero.
+CZMQ_EXPORT void
+    zmsg_print_n (zmsg_t *self, size_t size);
 
 //  Return true if the two messages have the same number of frames and each
 //  frame in the first message is identical to the corresponding frame in the

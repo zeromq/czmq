@@ -502,8 +502,13 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 //  Send message to zsys log sink (may be stdout, or system facility as
 //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
 
+//  Send the specified number of chars.
+//  If len is 0, then log 35 hex or 70 chars with ellipsis.
+//  If 0 < len < frame size,
+//  then log in blocks of 35 or 70 up to the specified length.
+//
 void
-zframe_print (zframe_t *self, const char *prefix)
+zframe_print_n (zframe_t *self, const char *prefix, size_t length)
 {
     assert (self);
     assert (zframe_is (self));
@@ -515,18 +520,30 @@ zframe_print (zframe_t *self, const char *prefix)
     int is_bin = 0;
     uint char_nbr;
     for (char_nbr = 0; char_nbr < size; char_nbr++)
-        if (data [char_nbr] < 9 || data [char_nbr] > 127)
+        if (data [char_nbr] < 32 || data [char_nbr] > 127)
             is_bin = 1;
 
     char buffer [256] = "";
-    snprintf (buffer, 30, "%s[%03d] ", prefix? prefix: "", (int) size);
     size_t max_size = is_bin? 35: 70;
     const char *ellipsis = "";
-    if (size > max_size) {
-        size = max_size;
-        ellipsis = "...";
+
+    // backwards compatibility
+    if (!length) {
+        if (size > max_size) {
+            size = max_size;
+            ellipsis = "...";
+        }
+
+	length = size;
     }
-    for (char_nbr = 0; char_nbr < size; char_nbr++) {
+    if (length > size)
+        length = size;
+
+    for (char_nbr = 0; char_nbr < length; char_nbr++) {
+        if (!(char_nbr % max_size)) {
+            if (char_nbr) zsys_debug (buffer);
+            snprintf (buffer, 30, "%s[%03d] ", prefix? prefix: "", (int) size);
+        }
         if (is_bin)
             sprintf (buffer + strlen (buffer), "%02X", (unsigned char) data [char_nbr]);
         else
@@ -534,6 +551,12 @@ zframe_print (zframe_t *self, const char *prefix)
     }
     strcat (buffer, ellipsis);
     zsys_debug (buffer);
+}
+
+void
+zframe_print (zframe_t *self, const char *prefix)
+{
+    zframe_print_n (self, prefix, 0);
 }
 
 
@@ -811,6 +834,118 @@ zframe_test (bool verbose)
     //  The destructor doesn't free the memory, only changing the strid,
     //  so we can check if the destructor was invoked
     assert (streq (str, "world"));
+
+
+    // zframe_print tests
+
+    zsys_set_logstream(verbose ? stdout : NULL);
+
+    // == No data ==
+    frame = zframe_new ("", 0);
+
+    // no prefix, backwards compatible
+    //  - emits nothing but the timestamp
+    zframe_print (frame, "");
+    zframe_print_n (frame, "", 0);
+
+    // prefix, backwards compatible
+    //  - emits nothing but the timestamp
+    zframe_print (frame, "Prefix");
+    zframe_print_n (frame, "Prefix", 0);
+
+    // len > data
+    //  - emits nothing but the timestamp
+    zframe_print_n (frame, "", 15);
+    zframe_print_n (frame, "Prefix", 15);
+
+    // max len
+    //  - emits nothing but the timestamp
+    zframe_print_n (frame, "", -1);
+    zframe_print_n (frame, "Prefix", -1);
+
+    zframe_destroy (&frame);
+
+
+    // == Short data ==
+    frame = zframe_new ("Hello there!", 12);
+
+    // no prefix, backwards compatible: ellipsis
+    //  - "[012] Hello there!"
+    zframe_print (frame, "");
+    zframe_print_n (frame, "", 0);
+
+    // prefix, backwards compatible: ellipsis
+    //  - "Prefix[012] Hello there!"
+    zframe_print (frame, "Prefix");
+    zframe_print_n (frame, "Prefix", 0);
+
+    // len < data
+    //  - "[012] Hello"
+    //  - "Prefix[012] Hello"
+    zframe_print_n (frame, "", 5);
+    zframe_print_n (frame, "Prefix", 5);
+
+    // len > data
+    //  - "[012] Hello there!"
+    //  - "Prefix[012] Hello there!"
+    zframe_print_n (frame, "", 15);
+    zframe_print_n (frame, "Prefix", 15);
+
+    // max len
+    //  - "[012] Hello there!"
+    //  - "Prefix[012] Hello there!"
+    zframe_print_n (frame, "", -1);
+    zframe_print_n (frame, "Prefix", -1);
+
+    zframe_destroy (&frame);
+
+
+    // == Long data ==
+    frame = zframe_new ("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin finibus ligula et aliquam tristique. Phasellus consequat, enim et blandit varius, sapien diam faucibus lorem, non ultricies lacus turpis sed lectus. Vivamus id elit urna. In sit amet lacinia mauris. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer ut cursus diam. Vestibulum semper vel leo eu finibus. Ut urna magna, commodo vel auctor sed, eleifend quis lacus. Aenean quis ipsum et velit auctor ultrices.", 519);
+
+    // no prefix, backwards compatible: ellipsis
+    //  - "[070] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin finibus..."
+    zframe_print (frame, "");
+    zframe_print_n (frame, "", 0);
+
+    // prefix, backwards compatible: ellipsis
+    //  - "Prefix[070] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin finibus..."
+    zframe_print (frame, "Prefix");
+    zframe_print_n (frame, "Prefix", 0);
+
+    // len < data
+    //  - "[519] Lorem"
+    //  - "Prefix[519] Lorem"
+    zframe_print_n (frame, "", 5);
+    zframe_print_n (frame, "Prefix", 5);
+
+    // small len
+    //  - "[519] Lorem ipsum dolor sit amet"
+    //  - "Prefix[519] Lorem ipsum dolor sit amet"
+    zframe_print_n (frame, "", 26);
+    zframe_print_n (frame, "Prefix", 26);
+
+    // mid len
+    // - "[519] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin finibus"
+    //   "[519]  ligula et aliquam tristique. Phasellus consequat, enim et blandit var"
+    //   "[519] ius, sapie"
+    // - "Prefix[519] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin finibus"
+    //   "Prefix[519]  ligula et aliquam tristique. Phasellus consequat, enim et blandit var"
+    //   "Prefix[519] ius, sapie"
+    zframe_print_n (frame, "", 150);
+    zframe_print_n (frame, "Prefix", 150);
+
+    // len > data
+    //  - emits the whole paragraph
+    zframe_print_n (frame, "", 1500);
+    zframe_print_n (frame, "Prefix", 1500);
+
+    // max len
+    //  - emits the whole paragraph
+    zframe_print_n (frame, "", -1);
+    zframe_print_n (frame, "Prefix", -1);
+
+    zframe_destroy (&frame);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
