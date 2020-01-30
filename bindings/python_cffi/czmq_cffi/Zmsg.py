@@ -253,8 +253,18 @@ class Zmsg(object):
         """
         Send message to zsys log sink (may be stdout, or system facility as
         configured by zsys_set_logstream).
+        Long messages are truncated.
         """
         utils.lib.zmsg_print(self._p)
+
+    def print_n(self, size):
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+        configured by zsys_set_logstream).
+        Message length is specified; no truncation unless length is zero.
+        Backwards compatible with zframe_print when length is zero.
+        """
+        utils.lib.zmsg_print_n(self._p, size)
 
     def eq(self, other):
         """

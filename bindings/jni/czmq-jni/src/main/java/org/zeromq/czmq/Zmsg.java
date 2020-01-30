@@ -278,10 +278,21 @@ public class Zmsg implements AutoCloseable {
     /*
     Send message to zsys log sink (may be stdout, or system facility as
     configured by zsys_set_logstream).
+    Long messages are truncated.
     */
     native static void __print (long self);
     public void print () {
         __print (self);
+    }
+    /*
+    Send message to zsys log sink (may be stdout, or system facility as
+    configured by zsys_set_logstream).
+    Message length is specified; no truncation unless length is zero.
+    Backwards compatible with zframe_print when length is zero.
+    */
+    native static void __printN (long self, long size);
+    public void printN (long size) {
+        __printN (self, size);
     }
     /*
     Return true if the two messages have the same number of frames and each

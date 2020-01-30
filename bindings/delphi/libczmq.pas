@@ -926,7 +926,14 @@ type
 
   // Send message to zsys log sink (may be stdout, or system facility as
   // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+  // Long messages are truncated.
   procedure zframe_print(self: PZframe; Prefix: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Send message to zsys log sink (may be stdout, or system facility as
+  // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+  // Message length is specified; no truncation unless length is zero.
+  // Backwards compatible with zframe_print when length is zero.
+  procedure zframe_print_n(self: PZframe; Prefix: PAnsiChar; Length: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Probe the supplied object, and report if it looks like a zframe_t.
   function zframe_is(This: Pointer): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
@@ -1848,7 +1855,14 @@ type
 
   // Send message to zsys log sink (may be stdout, or system facility as
   // configured by zsys_set_logstream).
+  // Long messages are truncated.
   procedure zmsg_print(self: PZmsg); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Send message to zsys log sink (may be stdout, or system facility as
+  // configured by zsys_set_logstream).
+  // Message length is specified; no truncation unless length is zero.
+  // Backwards compatible with zframe_print when length is zero.
+  procedure zmsg_print_n(self: PZmsg; Size: NativeUInt); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return true if the two messages have the same number of frames and each
   // frame in the first message is identical to the corresponding frame in the

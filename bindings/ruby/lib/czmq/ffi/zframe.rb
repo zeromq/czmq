@@ -351,6 +351,7 @@ module CZMQ
 
       # Send message to zsys log sink (may be stdout, or system facility as
       # configured by zsys_set_logstream). Prefix shows before frame, if not null.
+      # Long messages are truncated.
       #
       # @param prefix [String, #to_s, nil]
       # @return [void]
@@ -358,6 +359,22 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zframe_print(self_p, prefix)
+        result
+      end
+
+      # Send message to zsys log sink (may be stdout, or system facility as
+      # configured by zsys_set_logstream). Prefix shows before frame, if not null.
+      # Message length is specified; no truncation unless length is zero.
+      # Backwards compatible with zframe_print when length is zero.
+      #
+      # @param prefix [String, #to_s, nil]
+      # @param length [Integer, #to_int, #to_i]
+      # @return [void]
+      def print_n(prefix, length)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        length = Integer(length)
+        result = ::CZMQ::FFI.zframe_print_n(self_p, prefix, length)
         result
       end
 

@@ -1210,8 +1210,16 @@ void
 
 // Send message to zsys log sink (may be stdout, or system facility as
 // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+// Long messages are truncated.
 void
     zframe_print (zframe_t *self, const char *prefix);
+
+// Send message to zsys log sink (may be stdout, or system facility as
+// configured by zsys_set_logstream). Prefix shows before frame, if not null.
+// Message length is specified; no truncation unless length is zero.
+// Backwards compatible with zframe_print when length is zero.
+void
+    zframe_print_n (zframe_t *self, const char *prefix, size_t length);
 
 // Probe the supplied object, and report if it looks like a zframe_t.
 bool
@@ -2215,8 +2223,16 @@ zmsg_t *
 
 // Send message to zsys log sink (may be stdout, or system facility as
 // configured by zsys_set_logstream).
+// Long messages are truncated.
 void
     zmsg_print (zmsg_t *self);
+
+// Send message to zsys log sink (may be stdout, or system facility as
+// configured by zsys_set_logstream).
+// Message length is specified; no truncation unless length is zero.
+// Backwards compatible with zframe_print when length is zero.
+void
+    zmsg_print_n (zmsg_t *self, size_t size);
 
 // Return true if the two messages have the same number of frames and each
 // frame in the first message is identical to the corresponding frame in the

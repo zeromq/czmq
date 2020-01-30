@@ -2527,6 +2527,7 @@ NAN_MODULE_INIT (Zframe::Init) {
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
     Nan::SetPrototypeMethod (tpl, "reset", _reset);
     Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "printN", _print_n);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -2758,6 +2759,27 @@ NAN_METHOD (Zframe::_print) {
     prefix = *prefix_utf8;
          //} //bjornw end
     zframe_print (zframe->self, (const char *)prefix);
+}
+
+NAN_METHOD (Zframe::_print_n) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *prefix;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `prefix`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`prefix` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String prefix_utf8 (info [0].As<String>());
+    prefix = *prefix_utf8;
+         //} //bjornw end
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `length`");
+    else
+    if (!info [1]->IsNumber ())
+        return Nan::ThrowTypeError ("`length` must be a number");
+    size_t length = Nan::To<int64_t>(info [1]).FromJust ();
+    zframe_print_n (zframe->self, (const char *)prefix, (size_t) length);
 }
 
 NAN_METHOD (Zframe::_test) {
@@ -3804,6 +3826,7 @@ NAN_MODULE_INIT (Zmsg::Init) {
     Nan::SetPrototypeMethod (tpl, "encode", _encode);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "printN", _print_n);
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
     Nan::SetPrototypeMethod (tpl, "signal", _signal);
     Nan::SetPrototypeMethod (tpl, "test", _test);
@@ -4100,6 +4123,17 @@ NAN_METHOD (Zmsg::_dup) {
 NAN_METHOD (Zmsg::_print) {
     Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
     zmsg_print (zmsg->self);
+}
+
+NAN_METHOD (Zmsg::_print_n) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `size`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`size` must be a number");
+    size_t size = Nan::To<int64_t>(info [0]).FromJust ();
+    zmsg_print_n (zmsg->self, (size_t) size);
 }
 
 NAN_METHOD (Zmsg::_eq) {

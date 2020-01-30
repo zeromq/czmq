@@ -307,9 +307,21 @@ QZmsg * QZmsg::dup ()
 ///
 //  Send message to zsys log sink (may be stdout, or system facility as
 //  configured by zsys_set_logstream).
+//  Long messages are truncated.
 void QZmsg::print ()
 {
     zmsg_print (self);
+
+}
+
+///
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream).
+//  Message length is specified; no truncation unless length is zero.
+//  Backwards compatible with zframe_print when length is zero.
+void QZmsg::printN (size_t size)
+{
+    zmsg_print_n (self, size);
 
 }
 

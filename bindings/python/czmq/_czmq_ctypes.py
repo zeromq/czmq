@@ -2533,6 +2533,8 @@ lib.zframe_reset.restype = None
 lib.zframe_reset.argtypes = [zframe_p, c_void_p, c_size_t]
 lib.zframe_print.restype = None
 lib.zframe_print.argtypes = [zframe_p, c_char_p]
+lib.zframe_print_n.restype = None
+lib.zframe_print_n.argtypes = [zframe_p, c_char_p, c_size_t]
 lib.zframe_is.restype = c_bool
 lib.zframe_is.argtypes = [c_void_p]
 lib.zframe_test.restype = None
@@ -2736,8 +2738,18 @@ If either frame is NULL, equality is always false.
         """
         Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Long messages are truncated.
         """
         return lib.zframe_print(self._as_parameter_, prefix)
+
+    def print_n(self, prefix, length):
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
+        """
+        return lib.zframe_print_n(self._as_parameter_, prefix, length)
 
     @staticmethod
     def is_(self):
@@ -4453,6 +4465,8 @@ lib.zmsg_dup.restype = zmsg_p
 lib.zmsg_dup.argtypes = [zmsg_p]
 lib.zmsg_print.restype = None
 lib.zmsg_print.argtypes = [zmsg_p]
+lib.zmsg_print_n.restype = None
+lib.zmsg_print_n.argtypes = [zmsg_p, c_size_t]
 lib.zmsg_eq.restype = c_bool
 lib.zmsg_eq.argtypes = [zmsg_p, zmsg_p]
 lib.zmsg_signal.restype = c_int
@@ -4739,8 +4753,18 @@ object. If message is null, or memory was exhausted, returns null.
         """
         Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream).
+Long messages are truncated.
         """
         return lib.zmsg_print(self._as_parameter_)
+
+    def print_n(self, size):
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream).
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
+        """
+        return lib.zmsg_print_n(self._as_parameter_, size)
 
     def eq(self, other):
         """

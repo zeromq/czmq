@@ -586,7 +586,14 @@ uses
 
     // Send message to zsys log sink (may be stdout, or system facility as
     // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    // Long messages are truncated.
     procedure Print(const Prefix: string);
+
+    // Send message to zsys log sink (may be stdout, or system facility as
+    // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    // Message length is specified; no truncation unless length is zero.
+    // Backwards compatible with zframe_print when length is zero.
+    procedure PrintN(const Prefix: string; Length: NativeUInt);
   end;
 
   // generic type-free hash container (simple)
@@ -1311,7 +1318,14 @@ uses
 
     // Send message to zsys log sink (may be stdout, or system facility as
     // configured by zsys_set_logstream).
+    // Long messages are truncated.
     procedure Print;
+
+    // Send message to zsys log sink (may be stdout, or system facility as
+    // configured by zsys_set_logstream).
+    // Message length is specified; no truncation unless length is zero.
+    // Backwards compatible with zframe_print when length is zero.
+    procedure PrintN(Size: NativeUInt);
 
     // Return true if the two messages have the same number of frames and each
     // frame in the first message is identical to the corresponding frame in the
@@ -3198,7 +3212,14 @@ uses
 
     // Send message to zsys log sink (may be stdout, or system facility as
     // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    // Long messages are truncated.
     procedure Print(const Prefix: string);
+
+    // Send message to zsys log sink (may be stdout, or system facility as
+    // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    // Message length is specified; no truncation unless length is zero.
+    // Backwards compatible with zframe_print when length is zero.
+    procedure PrintN(const Prefix: string; Length: NativeUInt);
   end;
 
   // generic type-free hash container (simple)
@@ -4114,7 +4135,14 @@ uses
 
     // Send message to zsys log sink (may be stdout, or system facility as
     // configured by zsys_set_logstream).
+    // Long messages are truncated.
     procedure Print;
+
+    // Send message to zsys log sink (may be stdout, or system facility as
+    // configured by zsys_set_logstream).
+    // Message length is specified; no truncation unless length is zero.
+    // Backwards compatible with zframe_print when length is zero.
+    procedure PrintN(Size: NativeUInt);
 
     // Return true if the two messages have the same number of frames and each
     // frame in the first message is identical to the corresponding frame in the
@@ -7110,6 +7138,14 @@ end;
     zframe_print(FHandle, PAnsiChar(__Prefix__));
   end;
 
+  procedure TZframe.PrintN(const Prefix: string; Length: NativeUInt);
+  var
+    __Prefix__: UTF8String;
+  begin
+    __Prefix__ := UTF8String(Prefix);
+    zframe_print_n(FHandle, PAnsiChar(__Prefix__), Length);
+  end;
+
  (* TZhash *)
 
   constructor TZhash.New;
@@ -8166,6 +8202,11 @@ end;
   procedure TZmsg.Print;
   begin
     zmsg_print(FHandle);
+  end;
+
+  procedure TZmsg.PrintN(Size: NativeUInt);
+  begin
+    zmsg_print_n(FHandle, Size);
   end;
 
   function TZmsg.Eq(const Other: IZmsg): Boolean;
