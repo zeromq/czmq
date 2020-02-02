@@ -171,8 +171,18 @@ class Zframe(object):
         """
         Send message to zsys log sink (may be stdout, or system facility as
         configured by zsys_set_logstream). Prefix shows before frame, if not null.
+        Long messages are truncated.
         """
         utils.lib.zframe_print(self._p, utils.to_bytes(prefix))
+
+    def print_n(self, prefix, length):
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+        configured by zsys_set_logstream). Prefix shows before frame, if not null.
+        Message length is specified; no truncation unless length is zero.
+        Backwards compatible with zframe_print when length is zero.
+        """
+        utils.lib.zframe_print_n(self._p, utils.to_bytes(prefix), length)
 
     @staticmethod
     def is_py(self):

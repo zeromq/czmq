@@ -307,6 +307,7 @@ module CZMQ
       attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zframe_reset, [:pointer, :pointer, :size_t], :void, **opts
       attach_function :zframe_print, [:pointer, :string], :void, **opts
+      attach_function :zframe_print_n, [:pointer, :string, :size_t], :void, **opts
       attach_function :zframe_is, [:pointer], :bool, **opts
       attach_function :zframe_test, [:bool], :void, **opts
 
@@ -501,6 +502,7 @@ module CZMQ
       attach_function :zmsg_encode, [:pointer], :pointer, **opts
       attach_function :zmsg_dup, [:pointer], :pointer, **opts
       attach_function :zmsg_print, [:pointer], :void, **opts
+      attach_function :zmsg_print_n, [:pointer, :size_t], :void, **opts
       attach_function :zmsg_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zmsg_signal, [:pointer], :int, **opts
       attach_function :zmsg_is, [:pointer], :bool, **opts

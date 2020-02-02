@@ -210,9 +210,21 @@ void QZframe::reset (const void *data, size_t size)
 ///
 //  Send message to zsys log sink (may be stdout, or system facility as
 //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+//  Long messages are truncated.
 void QZframe::print (const QString &prefix)
 {
     zframe_print (self, prefix.toUtf8().data());
+
+}
+
+///
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+//  Message length is specified; no truncation unless length is zero.
+//  Backwards compatible with zframe_print when length is zero.
+void QZframe::printN (const QString &prefix, size_t length)
+{
+    zframe_print_n (self, prefix.toUtf8().data(), length);
 
 }
 

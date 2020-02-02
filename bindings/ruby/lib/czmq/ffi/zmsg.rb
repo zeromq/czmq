@@ -454,12 +454,28 @@ module CZMQ
 
       # Send message to zsys log sink (may be stdout, or system facility as
       # configured by zsys_set_logstream).
+      # Long messages are truncated.
       #
       # @return [void]
       def print()
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zmsg_print(self_p)
+        result
+      end
+
+      # Send message to zsys log sink (may be stdout, or system facility as
+      # configured by zsys_set_logstream).
+      # Message length is specified; no truncation unless length is zero.
+      # Backwards compatible with zframe_print when length is zero.
+      #
+      # @param size [Integer, #to_int, #to_i]
+      # @return [void]
+      def print_n(size)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        size = Integer(size)
+        result = ::CZMQ::FFI.zmsg_print_n(self_p, size)
         result
       end
 

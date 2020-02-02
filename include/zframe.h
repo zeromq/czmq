@@ -119,13 +119,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_print (zframe_t *self, const char *prefix);
 
-//  Send message to zsys log sink (may be stdout, or system facility as
-//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
-//  Message length is specified; no truncation unless length is zero.
-//  Backwards compatible with zframe_print when length is zero.
-CZMQ_EXPORT void
-    zframe_print_n (zframe_t *self, const char *prefix, size_t length);
-
 //  Probe the supplied object, and report if it looks like a zframe_t.
 CZMQ_EXPORT bool
     zframe_is (void *self);
@@ -168,6 +161,14 @@ CZMQ_EXPORT const char *
 //  Return -1 on error, 0 on success.
 CZMQ_EXPORT int
     zframe_set_group (zframe_t *self, const char *group);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+//  Message length is specified; no truncation unless length is zero.
+//  Backwards compatible with zframe_print when length is zero.
+CZMQ_EXPORT void
+    zframe_print_n (zframe_t *self, const char *prefix, size_t length);
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end

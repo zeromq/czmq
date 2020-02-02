@@ -1353,6 +1353,16 @@ nothing my_zframe.print (String)
 
 Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Long messages are truncated.
+
+```
+nothing my_zframe.printN (String)
+```
+
+Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
 
 ```
 nothing my_zframe.test (Boolean)
@@ -2124,6 +2134,16 @@ nothing my_zmsg.print ()
 
 Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream).
+Long messages are truncated.
+
+```
+nothing my_zmsg.printN ()
+```
+
+Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream).
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
 
 ```
 boolean my_zmsg.eq (Zmsg)

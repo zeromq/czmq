@@ -174,6 +174,14 @@ CZMQ_PRIVATE int
     zframe_set_group (zframe_t *self, const char *group);
 
 //  *** Draft method, defined for internal use only ***
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+//  Message length is specified; no truncation unless length is zero.
+//  Backwards compatible with zframe_print when length is zero.
+CZMQ_PRIVATE void
+    zframe_print_n (zframe_t *self, const char *prefix, size_t length);
+
+//  *** Draft method, defined for internal use only ***
 //  Same as pack but uses a user-defined serializer function to convert items
 //  into longstr.
 //  Caller owns return value and must destroy it when done.
@@ -240,6 +248,14 @@ CZMQ_PRIVATE uint32_t
 //  ZMQ_SERVER socket.
 CZMQ_PRIVATE void
     zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
+
+//  *** Draft method, defined for internal use only ***
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream).
+//  Message length is specified; no truncation unless length is zero.
+//  Backwards compatible with zframe_print when length is zero.
+CZMQ_PRIVATE void
+    zmsg_print_n (zmsg_t *self, size_t size);
 
 //  *** Draft method, defined for internal use only ***
 //  Create a SERVER socket. Default action is bind.

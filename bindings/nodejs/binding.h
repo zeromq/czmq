@@ -366,6 +366,7 @@ class Zframe: public Nan::ObjectWrap {
     static NAN_METHOD (_eq);
     static NAN_METHOD (_reset);
     static NAN_METHOD (_print);
+    static NAN_METHOD (_print_n);
     static NAN_METHOD (_test);
 };
 
@@ -554,6 +555,7 @@ class Zmsg: public Nan::ObjectWrap {
     static NAN_METHOD (_encode);
     static NAN_METHOD (_dup);
     static NAN_METHOD (_print);
+    static NAN_METHOD (_print_n);
     static NAN_METHOD (_eq);
     static NAN_METHOD (_signal);
     static NAN_METHOD (_test);

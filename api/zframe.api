@@ -160,7 +160,17 @@
     <method name = "print">
         Send message to zsys log sink (may be stdout, or system facility as
         configured by zsys_set_logstream). Prefix shows before frame, if not null.
+        Long messages are truncated.
         <argument name = "prefix" type = "string" />
+    </method>
+
+    <method name = "print n" state = "draft">
+        Send message to zsys log sink (may be stdout, or system facility as
+        configured by zsys_set_logstream). Prefix shows before frame, if not null.
+        Message length is specified; no truncation unless length is zero.
+        Backwards compatible with zframe_print when length is zero.
+        <argument name = "prefix" type = "string" />
+        <argument name = "length" type = "size" />
     </method>
 
     <method name = "is" singleton = "1">

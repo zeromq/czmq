@@ -87,7 +87,14 @@ public slots:
 
     //  Send message to zsys log sink (may be stdout, or system facility as
     //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    //  Long messages are truncated.
     void print (const QString &prefix);
+
+    //  Send message to zsys log sink (may be stdout, or system facility as
+    //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    //  Message length is specified; no truncation unless length is zero.
+    //  Backwards compatible with zframe_print when length is zero.
+    void printN (const QString &prefix, size_t length);
 };
 
 class QmlZframeAttached : public QObject
