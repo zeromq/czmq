@@ -2248,6 +2248,9 @@ zsys_set_logsystem (bool logsystem)
 static void
 s_log (char loglevel, char *string)
 {
+    if (!s_initialized)
+        zsys_init ();
+
 #if defined (__UNIX__)
 #   if defined (__UTYPE_ANDROID)
     int priority = ANDROID_LOG_INFO;
