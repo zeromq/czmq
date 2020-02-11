@@ -20,6 +20,357 @@
 */
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_ONLY_FIRST_SUBSCRIBE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_only_first_subscribe (void *self, int only_first_subscribe)
+{
+    assert (self);
+#   if defined (ZMQ_ONLY_FIRST_SUBSCRIBE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock only_first_subscribe option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    if (zsock_type (self) != ZMQ_XPUB
+    &&  zsock_type (self) != ZMQ_XSUB) {
+        printf ("ZMQ_ONLY_FIRST_SUBSCRIBE is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ONLY_FIRST_SUBSCRIBE, &only_first_subscribe, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_WSS_TRUST_SYSTEM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_wss_trust_system (void *self, int wss_trust_system)
+{
+    assert (self);
+#   if defined (ZMQ_WSS_TRUST_SYSTEM)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock wss_trust_system option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_WSS_TRUST_SYSTEM, &wss_trust_system, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_WSS_HOSTNAME value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_wss_hostname (void *self, const char * wss_hostname)
+{
+    assert (self);
+#   if defined (ZMQ_WSS_HOSTNAME)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock wss_hostname option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_WSS_HOSTNAME, wss_hostname, strlen (wss_hostname));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_WSS_TRUST_PEM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_wss_trust_pem (void *self, const char * wss_trust_pem)
+{
+    assert (self);
+#   if defined (ZMQ_WSS_TRUST_PEM)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock wss_trust_pem option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_WSS_TRUST_PEM, wss_trust_pem, strlen (wss_trust_pem));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_WSS_CERT_PEM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_wss_cert_pem (void *self, const char * wss_cert_pem)
+{
+    assert (self);
+#   if defined (ZMQ_WSS_CERT_PEM)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock wss_cert_pem option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_WSS_CERT_PEM, wss_cert_pem, strlen (wss_cert_pem));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_WSS_KEY_PEM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_wss_key_pem (void *self, const char * wss_key_pem)
+{
+    assert (self);
+#   if defined (ZMQ_WSS_KEY_PEM)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock wss_key_pem option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_WSS_KEY_PEM, wss_key_pem, strlen (wss_key_pem));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_OUT_BATCH_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_out_batch_size (void *self, int out_batch_size)
+{
+    assert (self);
+#   if defined (ZMQ_OUT_BATCH_SIZE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock out_batch_size option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_OUT_BATCH_SIZE, &out_batch_size, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_OUT_BATCH_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_out_batch_size (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_OUT_BATCH_SIZE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock out_batch_size option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int out_batch_size;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_OUT_BATCH_SIZE, &out_batch_size, &option_len);
+    return out_batch_size;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_IN_BATCH_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_in_batch_size (void *self, int in_batch_size)
+{
+    assert (self);
+#   if defined (ZMQ_IN_BATCH_SIZE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock in_batch_size option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IN_BATCH_SIZE, &in_batch_size, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_IN_BATCH_SIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_in_batch_size (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_IN_BATCH_SIZE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock in_batch_size option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int in_batch_size;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IN_BATCH_SIZE, &in_batch_size, &option_len);
+    return in_batch_size;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_SOCKS_PASSWORD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_socks_password (void *self, const char * socks_password)
+{
+    assert (self);
+#   if defined (ZMQ_SOCKS_PASSWORD)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock socks_password option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SOCKS_PASSWORD, socks_password, strlen (socks_password));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_SOCKS_PASSWORD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char *
+zsock_socks_password (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_SOCKS_PASSWORD)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock socks_password option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    size_t option_len = 255;
+    char *socks_password = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SOCKS_PASSWORD, socks_password, &option_len);
+    return (char *) socks_password;
+#   else
+    return NULL;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_SOCKS_USERNAME value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_socks_username (void *self, const char * socks_username)
+{
+    assert (self);
+#   if defined (ZMQ_SOCKS_USERNAME)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock socks_username option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SOCKS_USERNAME, socks_username, strlen (socks_username));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_SOCKS_USERNAME value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char *
+zsock_socks_username (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_SOCKS_USERNAME)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock socks_username option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    size_t option_len = 255;
+    char *socks_username = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SOCKS_USERNAME, socks_username, &option_len);
+    return (char *) socks_username;
+#   else
+    return NULL;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_XPUB_MANUAL_LAST_VALUE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_xpub_manual_last_value (void *self, int xpub_manual_last_value)
+{
+    assert (self);
+#   if defined (ZMQ_XPUB_MANUAL_LAST_VALUE)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock xpub_manual_last_value option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    if (zsock_type (self) != ZMQ_XPUB) {
+        printf ("ZMQ_XPUB_MANUAL_LAST_VALUE is not valid on %s sockets\n", zsys_sockname (zsock_type (self)));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_XPUB_MANUAL_LAST_VALUE, &xpub_manual_last_value, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_ROUTER_NOTIFY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -3796,6 +4147,52 @@ zsock_option_test (bool verbose)
     zsock_t *self;
 #if (ZMQ_VERSION_MAJOR >= 4)
 #   if (ZMQ_VERSION_MINOR >= 3)
+#     if defined (ZMQ_ONLY_FIRST_SUBSCRIBE)
+    self = zsock_new (ZMQ_XPUB);
+    assert (self);
+    zsock_set_only_first_subscribe (self, 1);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_OUT_BATCH_SIZE)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_out_batch_size (self, 16384);
+    assert (zsock_out_batch_size (self) == 16384);
+    zsock_out_batch_size (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_IN_BATCH_SIZE)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_in_batch_size (self, 16384);
+    assert (zsock_in_batch_size (self) == 16384);
+    zsock_in_batch_size (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_SOCKS_PASSWORD)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_socks_password (self, "password");
+    char *socks_password = zsock_socks_password (self);
+    assert (socks_password);
+    freen (socks_password);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_SOCKS_USERNAME)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_socks_username (self, "username");
+    char *socks_username = zsock_socks_username (self);
+    assert (socks_username);
+    freen (socks_username);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_XPUB_MANUAL_LAST_VALUE)
+    self = zsock_new (ZMQ_XPUB);
+    assert (self);
+    zsock_set_xpub_manual_last_value (self, 1);
+    zsock_destroy (&self);
+#     endif
 #     if defined (ZMQ_ROUTER_NOTIFY)
     self = zsock_new (ZMQ_ROUTER);
     assert (self);

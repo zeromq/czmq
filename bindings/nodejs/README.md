@@ -1353,6 +1353,16 @@ nothing my_zframe.print (String)
 
 Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Long messages are truncated.
+
+```
+nothing my_zframe.printN (String)
+```
+
+Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
 
 ```
 nothing my_zframe.test (Boolean)
@@ -2124,6 +2134,16 @@ nothing my_zmsg.print ()
 
 Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream).
+Long messages are truncated.
+
+```
+nothing my_zmsg.printN ()
+```
+
+Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream).
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
 
 ```
 boolean my_zmsg.eq (Zmsg)
@@ -2557,6 +2577,111 @@ boolean my_zsock.hasIn ()
 ```
 
 Check whether the socket has available message to read.
+
+```
+nothing my_zsock.setOnlyFirstSubscribe (Number)
+```
+
+Set socket option `only_first_subscribe`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setWssTrustSystem (Number)
+```
+
+Set socket option `wss_trust_system`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setWssHostname (String)
+```
+
+Set socket option `wss_hostname`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setWssTrustPem (String)
+```
+
+Set socket option `wss_trust_pem`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setWssCertPem (String)
+```
+
+Set socket option `wss_cert_pem`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setWssKeyPem (String)
+```
+
+Set socket option `wss_key_pem`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.outBatchSize ()
+```
+
+Get socket option `out_batch_size`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setOutBatchSize (Number)
+```
+
+Set socket option `out_batch_size`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.inBatchSize ()
+```
+
+Get socket option `in_batch_size`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setInBatchSize (Number)
+```
+
+Set socket option `in_batch_size`.
+Available from libzmq 4.3.0.
+
+```
+string my_zsock.socksPassword ()
+```
+
+Get socket option `socks_password`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setSocksPassword (String)
+```
+
+Set socket option `socks_password`.
+Available from libzmq 4.3.0.
+
+```
+string my_zsock.socksUsername ()
+```
+
+Get socket option `socks_username`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setSocksUsername (String)
+```
+
+Set socket option `socks_username`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setXpubManualLastValue (Number)
+```
+
+Set socket option `xpub_manual_last_value`.
+Available from libzmq 4.3.0.
 
 ```
 integer my_zsock.routerNotify ()

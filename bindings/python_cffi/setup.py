@@ -7,7 +7,7 @@ from setuptools import setup
 setup(
     name = "czmq_cffi",
     version = "4.2.1",
-    license = "mplv2",
+    license = "mpl-2.0",
     description = """Python cffi bindings of: the high-level c binding for 0mq""",
     packages = ["czmq_cffi", ],
     setup_requires=["cffi"],

@@ -2533,6 +2533,8 @@ lib.zframe_reset.restype = None
 lib.zframe_reset.argtypes = [zframe_p, c_void_p, c_size_t]
 lib.zframe_print.restype = None
 lib.zframe_print.argtypes = [zframe_p, c_char_p]
+lib.zframe_print_n.restype = None
+lib.zframe_print_n.argtypes = [zframe_p, c_char_p, c_size_t]
 lib.zframe_is.restype = c_bool
 lib.zframe_is.argtypes = [c_void_p]
 lib.zframe_test.restype = None
@@ -2736,8 +2738,18 @@ If either frame is NULL, equality is always false.
         """
         Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Long messages are truncated.
         """
         return lib.zframe_print(self._as_parameter_, prefix)
+
+    def print_n(self, prefix, length):
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream). Prefix shows before frame, if not null.
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
+        """
+        return lib.zframe_print_n(self._as_parameter_, prefix, length)
 
     @staticmethod
     def is_(self):
@@ -4453,6 +4465,8 @@ lib.zmsg_dup.restype = zmsg_p
 lib.zmsg_dup.argtypes = [zmsg_p]
 lib.zmsg_print.restype = None
 lib.zmsg_print.argtypes = [zmsg_p]
+lib.zmsg_print_n.restype = None
+lib.zmsg_print_n.argtypes = [zmsg_p, c_size_t]
 lib.zmsg_eq.restype = c_bool
 lib.zmsg_eq.argtypes = [zmsg_p, zmsg_p]
 lib.zmsg_signal.restype = c_int
@@ -4739,8 +4753,18 @@ object. If message is null, or memory was exhausted, returns null.
         """
         Send message to zsys log sink (may be stdout, or system facility as
 configured by zsys_set_logstream).
+Long messages are truncated.
         """
         return lib.zmsg_print(self._as_parameter_)
+
+    def print_n(self, size):
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream).
+Message length is specified; no truncation unless length is zero.
+Backwards compatible with zframe_print when length is zero.
+        """
+        return lib.zmsg_print_n(self._as_parameter_, size)
 
     def eq(self, other):
         """
@@ -5223,6 +5247,36 @@ lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
 lib.zsock_has_in.restype = c_bool
 lib.zsock_has_in.argtypes = [zsock_p]
+lib.zsock_set_only_first_subscribe.restype = None
+lib.zsock_set_only_first_subscribe.argtypes = [zsock_p, c_int]
+lib.zsock_set_wss_trust_system.restype = None
+lib.zsock_set_wss_trust_system.argtypes = [zsock_p, c_int]
+lib.zsock_set_wss_hostname.restype = None
+lib.zsock_set_wss_hostname.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_wss_trust_pem.restype = None
+lib.zsock_set_wss_trust_pem.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_wss_cert_pem.restype = None
+lib.zsock_set_wss_cert_pem.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_wss_key_pem.restype = None
+lib.zsock_set_wss_key_pem.argtypes = [zsock_p, c_char_p]
+lib.zsock_out_batch_size.restype = c_int
+lib.zsock_out_batch_size.argtypes = [zsock_p]
+lib.zsock_set_out_batch_size.restype = None
+lib.zsock_set_out_batch_size.argtypes = [zsock_p, c_int]
+lib.zsock_in_batch_size.restype = c_int
+lib.zsock_in_batch_size.argtypes = [zsock_p]
+lib.zsock_set_in_batch_size.restype = None
+lib.zsock_set_in_batch_size.argtypes = [zsock_p, c_int]
+lib.zsock_socks_password.restype = POINTER(c_char)
+lib.zsock_socks_password.argtypes = [zsock_p]
+lib.zsock_set_socks_password.restype = None
+lib.zsock_set_socks_password.argtypes = [zsock_p, c_char_p]
+lib.zsock_socks_username.restype = POINTER(c_char)
+lib.zsock_socks_username.argtypes = [zsock_p]
+lib.zsock_set_socks_username.restype = None
+lib.zsock_set_socks_username.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_xpub_manual_last_value.restype = None
+lib.zsock_set_xpub_manual_last_value.argtypes = [zsock_p, c_int]
 lib.zsock_router_notify.restype = c_int
 lib.zsock_router_notify.argtypes = [zsock_p]
 lib.zsock_set_router_notify.restype = None
@@ -6000,6 +6054,111 @@ return the supplied value. Takes a polymorphic socket reference.
         Check whether the socket has available message to read.
         """
         return lib.zsock_has_in(self._as_parameter_)
+
+    def set_only_first_subscribe(self, only_first_subscribe):
+        """
+        Set socket option `only_first_subscribe`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_only_first_subscribe(self._as_parameter_, only_first_subscribe)
+
+    def set_wss_trust_system(self, wss_trust_system):
+        """
+        Set socket option `wss_trust_system`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_wss_trust_system(self._as_parameter_, wss_trust_system)
+
+    def set_wss_hostname(self, wss_hostname):
+        """
+        Set socket option `wss_hostname`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_wss_hostname(self._as_parameter_, wss_hostname)
+
+    def set_wss_trust_pem(self, wss_trust_pem):
+        """
+        Set socket option `wss_trust_pem`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_wss_trust_pem(self._as_parameter_, wss_trust_pem)
+
+    def set_wss_cert_pem(self, wss_cert_pem):
+        """
+        Set socket option `wss_cert_pem`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_wss_cert_pem(self._as_parameter_, wss_cert_pem)
+
+    def set_wss_key_pem(self, wss_key_pem):
+        """
+        Set socket option `wss_key_pem`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_wss_key_pem(self._as_parameter_, wss_key_pem)
+
+    def out_batch_size(self):
+        """
+        Get socket option `out_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_out_batch_size(self._as_parameter_)
+
+    def set_out_batch_size(self, out_batch_size):
+        """
+        Set socket option `out_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_out_batch_size(self._as_parameter_, out_batch_size)
+
+    def in_batch_size(self):
+        """
+        Get socket option `in_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_in_batch_size(self._as_parameter_)
+
+    def set_in_batch_size(self, in_batch_size):
+        """
+        Set socket option `in_batch_size`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_in_batch_size(self._as_parameter_, in_batch_size)
+
+    def socks_password(self):
+        """
+        Get socket option `socks_password`.
+Available from libzmq 4.3.0.
+        """
+        return return_fresh_string(lib.zsock_socks_password(self._as_parameter_))
+
+    def set_socks_password(self, socks_password):
+        """
+        Set socket option `socks_password`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_socks_password(self._as_parameter_, socks_password)
+
+    def socks_username(self):
+        """
+        Get socket option `socks_username`.
+Available from libzmq 4.3.0.
+        """
+        return return_fresh_string(lib.zsock_socks_username(self._as_parameter_))
+
+    def set_socks_username(self, socks_username):
+        """
+        Set socket option `socks_username`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_socks_username(self._as_parameter_, socks_username)
+
+    def set_xpub_manual_last_value(self, xpub_manual_last_value):
+        """
+        Set socket option `xpub_manual_last_value`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_xpub_manual_last_value(self._as_parameter_, xpub_manual_last_value)
 
     def router_notify(self):
         """

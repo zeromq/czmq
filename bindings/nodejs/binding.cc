@@ -2527,6 +2527,7 @@ NAN_MODULE_INIT (Zframe::Init) {
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
     Nan::SetPrototypeMethod (tpl, "reset", _reset);
     Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "printN", _print_n);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -2758,6 +2759,27 @@ NAN_METHOD (Zframe::_print) {
     prefix = *prefix_utf8;
          //} //bjornw end
     zframe_print (zframe->self, (const char *)prefix);
+}
+
+NAN_METHOD (Zframe::_print_n) {
+    Zframe *zframe = Nan::ObjectWrap::Unwrap <Zframe> (info.Holder ());
+    char *prefix;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `prefix`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`prefix` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String prefix_utf8 (info [0].As<String>());
+    prefix = *prefix_utf8;
+         //} //bjornw end
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `length`");
+    else
+    if (!info [1]->IsNumber ())
+        return Nan::ThrowTypeError ("`length` must be a number");
+    size_t length = Nan::To<int64_t>(info [1]).FromJust ();
+    zframe_print_n (zframe->self, (const char *)prefix, (size_t) length);
 }
 
 NAN_METHOD (Zframe::_test) {
@@ -3804,6 +3826,7 @@ NAN_MODULE_INIT (Zmsg::Init) {
     Nan::SetPrototypeMethod (tpl, "encode", _encode);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "printN", _print_n);
     Nan::SetPrototypeMethod (tpl, "eq", _eq);
     Nan::SetPrototypeMethod (tpl, "signal", _signal);
     Nan::SetPrototypeMethod (tpl, "test", _test);
@@ -4100,6 +4123,17 @@ NAN_METHOD (Zmsg::_dup) {
 NAN_METHOD (Zmsg::_print) {
     Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
     zmsg_print (zmsg->self);
+}
+
+NAN_METHOD (Zmsg::_print_n) {
+    Zmsg *zmsg = Nan::ObjectWrap::Unwrap <Zmsg> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `size`");
+    else
+    if (!info [0]->IsNumber ())
+        return Nan::ThrowTypeError ("`size` must be a number");
+    size_t size = Nan::To<int64_t>(info [0]).FromJust ();
+    zmsg_print_n (zmsg->self, (size_t) size);
 }
 
 NAN_METHOD (Zmsg::_eq) {
@@ -4502,6 +4536,21 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "join", _join);
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
     Nan::SetPrototypeMethod (tpl, "hasIn", _has_in);
+    Nan::SetPrototypeMethod (tpl, "setOnlyFirstSubscribe", _set_only_first_subscribe);
+    Nan::SetPrototypeMethod (tpl, "setWssTrustSystem", _set_wss_trust_system);
+    Nan::SetPrototypeMethod (tpl, "setWssHostname", _set_wss_hostname);
+    Nan::SetPrototypeMethod (tpl, "setWssTrustPem", _set_wss_trust_pem);
+    Nan::SetPrototypeMethod (tpl, "setWssCertPem", _set_wss_cert_pem);
+    Nan::SetPrototypeMethod (tpl, "setWssKeyPem", _set_wss_key_pem);
+    Nan::SetPrototypeMethod (tpl, "outBatchSize", _out_batch_size);
+    Nan::SetPrototypeMethod (tpl, "setOutBatchSize", _set_out_batch_size);
+    Nan::SetPrototypeMethod (tpl, "inBatchSize", _in_batch_size);
+    Nan::SetPrototypeMethod (tpl, "setInBatchSize", _set_in_batch_size);
+    Nan::SetPrototypeMethod (tpl, "socksPassword", _socks_password);
+    Nan::SetPrototypeMethod (tpl, "setSocksPassword", _set_socks_password);
+    Nan::SetPrototypeMethod (tpl, "socksUsername", _socks_username);
+    Nan::SetPrototypeMethod (tpl, "setSocksUsername", _set_socks_username);
+    Nan::SetPrototypeMethod (tpl, "setXpubManualLastValue", _set_xpub_manual_last_value);
     Nan::SetPrototypeMethod (tpl, "routerNotify", _router_notify);
     Nan::SetPrototypeMethod (tpl, "setRouterNotify", _set_router_notify);
     Nan::SetPrototypeMethod (tpl, "multicastLoop", _multicast_loop);
@@ -5014,6 +5063,210 @@ NAN_METHOD (Zsock::_has_in) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     bool result = zsock_has_in (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zsock::_set_only_first_subscribe) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `only first subscribe`");
+
+    //int only_first_subscribe; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int only_first_subscribe;
+
+
+    if (info [0]->IsNumber ())
+    {
+          only_first_subscribe = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`only first subscribe` must be a number");
+    zsock_set_only_first_subscribe (zsock->self, (int) only_first_subscribe);
+}
+
+NAN_METHOD (Zsock::_set_wss_trust_system) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `wss trust system`");
+
+    //int wss_trust_system; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int wss_trust_system;
+
+
+    if (info [0]->IsNumber ())
+    {
+          wss_trust_system = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`wss trust system` must be a number");
+    zsock_set_wss_trust_system (zsock->self, (int) wss_trust_system);
+}
+
+NAN_METHOD (Zsock::_set_wss_hostname) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *wss_hostname;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `wss hostname`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`wss hostname` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String wss_hostname_utf8 (info [0].As<String>());
+    wss_hostname = *wss_hostname_utf8;
+         //} //bjornw end
+    zsock_set_wss_hostname (zsock->self, (const char *)wss_hostname);
+}
+
+NAN_METHOD (Zsock::_set_wss_trust_pem) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *wss_trust_pem;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `wss trust pem`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`wss trust pem` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String wss_trust_pem_utf8 (info [0].As<String>());
+    wss_trust_pem = *wss_trust_pem_utf8;
+         //} //bjornw end
+    zsock_set_wss_trust_pem (zsock->self, (const char *)wss_trust_pem);
+}
+
+NAN_METHOD (Zsock::_set_wss_cert_pem) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *wss_cert_pem;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `wss cert pem`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`wss cert pem` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String wss_cert_pem_utf8 (info [0].As<String>());
+    wss_cert_pem = *wss_cert_pem_utf8;
+         //} //bjornw end
+    zsock_set_wss_cert_pem (zsock->self, (const char *)wss_cert_pem);
+}
+
+NAN_METHOD (Zsock::_set_wss_key_pem) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *wss_key_pem;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `wss key pem`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`wss key pem` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String wss_key_pem_utf8 (info [0].As<String>());
+    wss_key_pem = *wss_key_pem_utf8;
+         //} //bjornw end
+    zsock_set_wss_key_pem (zsock->self, (const char *)wss_key_pem);
+}
+
+NAN_METHOD (Zsock::_out_batch_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_out_batch_size (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_out_batch_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `out batch size`");
+
+    //int out_batch_size; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int out_batch_size;
+
+
+    if (info [0]->IsNumber ())
+    {
+          out_batch_size = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`out batch size` must be a number");
+    zsock_set_out_batch_size (zsock->self, (int) out_batch_size);
+}
+
+NAN_METHOD (Zsock::_in_batch_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_in_batch_size (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_in_batch_size) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `in batch size`");
+
+    //int in_batch_size; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int in_batch_size;
+
+
+    if (info [0]->IsNumber ())
+    {
+          in_batch_size = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`in batch size` must be a number");
+    zsock_set_in_batch_size (zsock->self, (int) in_batch_size);
+}
+
+NAN_METHOD (Zsock::_socks_password) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_socks_password (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_socks_password) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *socks_password;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `socks password`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`socks password` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String socks_password_utf8 (info [0].As<String>());
+    socks_password = *socks_password_utf8;
+         //} //bjornw end
+    zsock_set_socks_password (zsock->self, (const char *)socks_password);
+}
+
+NAN_METHOD (Zsock::_socks_username) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *result = (char *) zsock_socks_username (zsock->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsock::_set_socks_username) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    char *socks_username;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `socks username`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`socks username` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String socks_username_utf8 (info [0].As<String>());
+    socks_username = *socks_username_utf8;
+         //} //bjornw end
+    zsock_set_socks_username (zsock->self, (const char *)socks_username);
+}
+
+NAN_METHOD (Zsock::_set_xpub_manual_last_value) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `xpub manual last value`");
+
+    //int xpub_manual_last_value; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int xpub_manual_last_value;
+
+
+    if (info [0]->IsNumber ())
+    {
+          xpub_manual_last_value = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`xpub manual last value` must be a number");
+    zsock_set_xpub_manual_last_value (zsock->self, (int) xpub_manual_last_value);
 }
 
 NAN_METHOD (Zsock::_router_notify) {

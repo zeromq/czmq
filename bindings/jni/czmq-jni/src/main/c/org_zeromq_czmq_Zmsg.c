@@ -232,6 +232,12 @@ Java_org_zeromq_czmq_Zmsg__1_1print (JNIEnv *env, jclass c, jlong self)
     zmsg_print ((zmsg_t *) (intptr_t) self);
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zmsg__1_1printN (JNIEnv *env, jclass c, jlong self, jlong size)
+{
+    zmsg_print_n ((zmsg_t *) (intptr_t) self, (size_t) size);
+}
+
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zmsg__1_1eq (JNIEnv *env, jclass c, jlong self, jlong other)
 {

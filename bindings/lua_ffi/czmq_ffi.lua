@@ -1210,8 +1210,16 @@ void
 
 // Send message to zsys log sink (may be stdout, or system facility as
 // configured by zsys_set_logstream). Prefix shows before frame, if not null.
+// Long messages are truncated.
 void
     zframe_print (zframe_t *self, const char *prefix);
+
+// Send message to zsys log sink (may be stdout, or system facility as
+// configured by zsys_set_logstream). Prefix shows before frame, if not null.
+// Message length is specified; no truncation unless length is zero.
+// Backwards compatible with zframe_print when length is zero.
+void
+    zframe_print_n (zframe_t *self, const char *prefix, size_t length);
 
 // Probe the supplied object, and report if it looks like a zframe_t.
 bool
@@ -2215,8 +2223,16 @@ zmsg_t *
 
 // Send message to zsys log sink (may be stdout, or system facility as
 // configured by zsys_set_logstream).
+// Long messages are truncated.
 void
     zmsg_print (zmsg_t *self);
+
+// Send message to zsys log sink (may be stdout, or system facility as
+// configured by zsys_set_logstream).
+// Message length is specified; no truncation unless length is zero.
+// Backwards compatible with zframe_print when length is zero.
+void
+    zmsg_print_n (zmsg_t *self, size_t size);
 
 // Return true if the two messages have the same number of frames and each
 // frame in the first message is identical to the corresponding frame in the
@@ -2720,6 +2736,81 @@ void *
 // Check whether the socket has available message to read.
 bool
     zsock_has_in (void *self);
+
+// Set socket option `only_first_subscribe`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_only_first_subscribe (void *self, int only_first_subscribe);
+
+// Set socket option `wss_trust_system`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_wss_trust_system (void *self, int wss_trust_system);
+
+// Set socket option `wss_hostname`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_wss_hostname (void *self, const char *wss_hostname);
+
+// Set socket option `wss_trust_pem`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_wss_trust_pem (void *self, const char *wss_trust_pem);
+
+// Set socket option `wss_cert_pem`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_wss_cert_pem (void *self, const char *wss_cert_pem);
+
+// Set socket option `wss_key_pem`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_wss_key_pem (void *self, const char *wss_key_pem);
+
+// Get socket option `out_batch_size`.
+// Available from libzmq 4.3.0.
+int
+    zsock_out_batch_size (void *self);
+
+// Set socket option `out_batch_size`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_out_batch_size (void *self, int out_batch_size);
+
+// Get socket option `in_batch_size`.
+// Available from libzmq 4.3.0.
+int
+    zsock_in_batch_size (void *self);
+
+// Set socket option `in_batch_size`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_in_batch_size (void *self, int in_batch_size);
+
+// Get socket option `socks_password`.
+// Available from libzmq 4.3.0.
+char *
+    zsock_socks_password (void *self);
+
+// Set socket option `socks_password`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_socks_password (void *self, const char *socks_password);
+
+// Get socket option `socks_username`.
+// Available from libzmq 4.3.0.
+char *
+    zsock_socks_username (void *self);
+
+// Set socket option `socks_username`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_socks_username (void *self, const char *socks_username);
+
+// Set socket option `xpub_manual_last_value`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_xpub_manual_last_value (void *self, int xpub_manual_last_value);
 
 // Get socket option `router_notify`.
 // Available from libzmq 4.3.0.

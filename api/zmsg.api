@@ -220,6 +220,15 @@
     <method name = "print">
         Send message to zsys log sink (may be stdout, or system facility as
         configured by zsys_set_logstream).
+        Long messages are truncated.
+    </method>
+
+    <method name = "print n" state = "draft">
+        Send message to zsys log sink (may be stdout, or system facility as
+        configured by zsys_set_logstream).
+        Message length is specified; no truncation unless length is zero.
+        Backwards compatible with zframe_print when length is zero.
+        <argument name = "size" type = "size" />
     </method>
 
     <method name = "eq">

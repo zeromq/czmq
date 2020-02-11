@@ -74,7 +74,7 @@ endif()
 
 file(REMOVE "${SOURCE_DIR}/src/platform.h")
 
-file(WRITE "${CMAKE_BINARY_DIR}/platform.h.in" "
+file(WRITE "${PROJECT_BINARY_DIR}/platform.h.in" "
 #cmakedefine HAVE_LINUX_WIRELESS_H
 #cmakedefine HAVE_NET_IF_H
 #cmakedefine HAVE_NET_IF_MEDIA_H
@@ -82,7 +82,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/platform.h.in" "
 #cmakedefine HAVE_FREEIFADDRS
 ")
 
-configure_file("${CMAKE_BINARY_DIR}/platform.h.in" "${CMAKE_BINARY_DIR}/platform.h")
+configure_file("${PROJECT_BINARY_DIR}/platform.h.in" "${PROJECT_BINARY_DIR}/platform.h")
 
 #The MSVC C compiler is too out of date,
 #so the sources have to be compiled as c++
@@ -331,7 +331,7 @@ install(FILES ${czmq_headers} DESTINATION include)
 ########################################################################
 
 
-include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}")
+include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}")
 set (czmq_sources
     src/zactor.c
     src/zarmour.c
@@ -698,17 +698,17 @@ ENDIF (ENABLE_DRAFTS)
 
 add_custom_target(
     copy-selftest-ro ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/src/selftest-ro ${CMAKE_BINARY_DIR}/src/selftest-ro
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/src/selftest-ro ${PROJECT_BINARY_DIR}/src/selftest-ro
 )
 
 add_custom_target(
     make-selftest-rw ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/src/selftest-rw
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/src/selftest-rw
 )
 
 set_directory_properties(
     PROPERTIES
-    ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_BINARY_DIR}/src/selftest-ro;${CMAKE_BINARY_DIR}/src/selftest-rw"
+    ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_BINARY_DIR}/src/selftest-ro;${PROJECT_BINARY_DIR}/src/selftest-rw"
 )
 
 foreach(TEST_CLASS ${TEST_CLASSES})
@@ -733,22 +733,22 @@ include(CTest)
 ########################################################################
 add_custom_target (distclean @echo Cleaning for source distribution)
 
-set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt
-                    ${CMAKE_BINARY_DIR}/cmake_install.cmake
-                    ${CMAKE_BINARY_DIR}/Makefile
-                    ${CMAKE_BINARY_DIR}/CMakeFiles
-                    ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
-                    ${CMAKE_BINARY_DIR}/DartConfiguration.tcl
-                    ${CMAKE_BINARY_DIR}/Testing
-                    ${CMAKE_BINARY_DIR}/compile_commands.json
-                    ${CMAKE_BINARY_DIR}/platform.h
-                    ${CMAKE_BINARY_DIR}/src/libczmq.pc
-                    ${CMAKE_BINARY_DIR}/src/libczmq.so
-                    ${CMAKE_BINARY_DIR}/src/czmq_selftest
-                    ${CMAKE_BINARY_DIR}/src/zmakecert
-                    ${CMAKE_BINARY_DIR}/src/zsp
-                    ${CMAKE_BINARY_DIR}/src/test_randof
-                    ${CMAKE_BINARY_DIR}/src/czmq_selftest
+set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
+                    ${PROJECT_BINARY_DIR}/cmake_install.cmake
+                    ${PROJECT_BINARY_DIR}/Makefile
+                    ${PROJECT_BINARY_DIR}/CMakeFiles
+                    ${PROJECT_BINARY_DIR}/CTestTestfile.cmake
+                    ${PROJECT_BINARY_DIR}/DartConfiguration.tcl
+                    ${PROJECT_BINARY_DIR}/Testing
+                    ${PROJECT_BINARY_DIR}/compile_commands.json
+                    ${PROJECT_BINARY_DIR}/platform.h
+                    ${PROJECT_BINARY_DIR}/src/libczmq.pc
+                    ${PROJECT_BINARY_DIR}/src/libczmq.so
+                    ${PROJECT_BINARY_DIR}/src/czmq_selftest
+                    ${PROJECT_BINARY_DIR}/src/zmakecert
+                    ${PROJECT_BINARY_DIR}/src/zsp
+                    ${PROJECT_BINARY_DIR}/src/test_randof
+                    ${PROJECT_BINARY_DIR}/src/czmq_selftest
 )
 
 add_custom_command(

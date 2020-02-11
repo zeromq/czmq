@@ -366,6 +366,7 @@ class Zframe: public Nan::ObjectWrap {
     static NAN_METHOD (_eq);
     static NAN_METHOD (_reset);
     static NAN_METHOD (_print);
+    static NAN_METHOD (_print_n);
     static NAN_METHOD (_test);
 };
 
@@ -554,6 +555,7 @@ class Zmsg: public Nan::ObjectWrap {
     static NAN_METHOD (_encode);
     static NAN_METHOD (_dup);
     static NAN_METHOD (_print);
+    static NAN_METHOD (_print_n);
     static NAN_METHOD (_eq);
     static NAN_METHOD (_signal);
     static NAN_METHOD (_test);
@@ -639,6 +641,21 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_join);
     static NAN_METHOD (_leave);
     static NAN_METHOD (_has_in);
+    static NAN_METHOD (_set_only_first_subscribe);
+    static NAN_METHOD (_set_wss_trust_system);
+    static NAN_METHOD (_set_wss_hostname);
+    static NAN_METHOD (_set_wss_trust_pem);
+    static NAN_METHOD (_set_wss_cert_pem);
+    static NAN_METHOD (_set_wss_key_pem);
+    static NAN_METHOD (_out_batch_size);
+    static NAN_METHOD (_set_out_batch_size);
+    static NAN_METHOD (_in_batch_size);
+    static NAN_METHOD (_set_in_batch_size);
+    static NAN_METHOD (_socks_password);
+    static NAN_METHOD (_set_socks_password);
+    static NAN_METHOD (_socks_username);
+    static NAN_METHOD (_set_socks_username);
+    static NAN_METHOD (_set_xpub_manual_last_value);
     static NAN_METHOD (_router_notify);
     static NAN_METHOD (_set_router_notify);
     static NAN_METHOD (_multicast_loop);

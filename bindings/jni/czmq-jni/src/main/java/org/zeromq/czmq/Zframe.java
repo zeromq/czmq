@@ -199,10 +199,21 @@ public class Zframe implements AutoCloseable {
     /*
     Send message to zsys log sink (may be stdout, or system facility as
     configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    Long messages are truncated.
     */
     native static void __print (long self, String prefix);
     public void print (String prefix) {
         __print (self, prefix);
+    }
+    /*
+    Send message to zsys log sink (may be stdout, or system facility as
+    configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    Message length is specified; no truncation unless length is zero.
+    Backwards compatible with zframe_print when length is zero.
+    */
+    native static void __printN (long self, String prefix, long length);
+    public void printN (String prefix, long length) {
+        __printN (self, prefix, length);
     }
     /*
     Probe the supplied object, and report if it looks like a zframe_t.

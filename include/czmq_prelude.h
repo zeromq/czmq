@@ -541,7 +541,7 @@ typedef struct {
 #   endif
 #   define srandom srand
 #   define TIMEZONE _timezone
-#   if (!defined (__MINGW32__))
+#   if (!defined (__MINGW32__)) && (defined(_MSC_VER) && _MSC_VER < 1500)
 #       define snprintf _snprintf
 #       define vsnprintf _vsnprintf
 #   endif

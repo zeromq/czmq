@@ -184,6 +184,14 @@ Java_org_zeromq_czmq_Zframe__1_1print (JNIEnv *env, jclass c, jlong self, jstrin
     (*env)->ReleaseStringUTFChars (env, prefix, prefix_);
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zframe__1_1printN (JNIEnv *env, jclass c, jlong self, jstring prefix, jlong length)
+{
+    char *prefix_ = (char *) (*env)->GetStringUTFChars (env, prefix, NULL);
+    zframe_print_n ((zframe_t *) (intptr_t) self, prefix_, (size_t) length);
+    (*env)->ReleaseStringUTFChars (env, prefix, prefix_);
+}
+
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zframe__1_1is (JNIEnv *env, jclass c, jlong self)
 {

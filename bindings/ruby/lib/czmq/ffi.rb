@@ -307,6 +307,7 @@ module CZMQ
       attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zframe_reset, [:pointer, :pointer, :size_t], :void, **opts
       attach_function :zframe_print, [:pointer, :string], :void, **opts
+      attach_function :zframe_print_n, [:pointer, :string, :size_t], :void, **opts
       attach_function :zframe_is, [:pointer], :bool, **opts
       attach_function :zframe_test, [:bool], :void, **opts
 
@@ -501,6 +502,7 @@ module CZMQ
       attach_function :zmsg_encode, [:pointer], :pointer, **opts
       attach_function :zmsg_dup, [:pointer], :pointer, **opts
       attach_function :zmsg_print, [:pointer], :void, **opts
+      attach_function :zmsg_print_n, [:pointer, :size_t], :void, **opts
       attach_function :zmsg_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zmsg_signal, [:pointer], :int, **opts
       attach_function :zmsg_is, [:pointer], :bool, **opts
@@ -589,6 +591,21 @@ module CZMQ
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
       attach_function :zsock_has_in, [:pointer], :bool, **opts
+      attach_function :zsock_set_only_first_subscribe, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_wss_trust_system, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_wss_hostname, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_wss_trust_pem, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_wss_cert_pem, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_wss_key_pem, [:pointer, :string], :void, **opts
+      attach_function :zsock_out_batch_size, [:pointer], :int, **opts
+      attach_function :zsock_set_out_batch_size, [:pointer, :int], :void, **opts
+      attach_function :zsock_in_batch_size, [:pointer], :int, **opts
+      attach_function :zsock_set_in_batch_size, [:pointer, :int], :void, **opts
+      attach_function :zsock_socks_password, [:pointer], :pointer, **opts
+      attach_function :zsock_set_socks_password, [:pointer, :string], :void, **opts
+      attach_function :zsock_socks_username, [:pointer], :pointer, **opts
+      attach_function :zsock_set_socks_username, [:pointer, :string], :void, **opts
+      attach_function :zsock_set_xpub_manual_last_value, [:pointer, :int], :void, **opts
       attach_function :zsock_router_notify, [:pointer], :int, **opts
       attach_function :zsock_set_router_notify, [:pointer, :int], :void, **opts
       attach_function :zsock_multicast_loop, [:pointer], :int, **opts
