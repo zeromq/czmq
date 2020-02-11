@@ -85,6 +85,9 @@ zsock_new_checked (int type, const char *filename, size_t line_nbr)
     self->tag = ZSOCK_TAG;
     self->type = type;
     self->handle = zsys_socket (type, filename, line_nbr);
+    if (self->handle == NULL){
+        zsys_socket_error ("zsock_new_checked");
+    }
     assert (self->handle);
     return self;
 }
