@@ -37,7 +37,7 @@ compiler:
 env:
   global:
     - CI_TIME=false
-    - CI_TRACE=false
+    - CI_TRACE=true
     - CI_CONFIG_QUIET=true
     - CI_REQUIRE_GOOD_GITIGNORE=false
     - CI_REQUIRE_GOOD_CLANG_FORMAT=false
@@ -159,13 +159,22 @@ matrix:
   - env: BUILD_TYPE=android
     compiler: clang
   - env: BUILD_TYPE=bindings BINDING=jni
-    os: linux
-    dist: xenial
+    os: osx
+    language: java
+    jdk: openjdk13
     compiler: clang
-    addons:
-      apt:
-        packages:
-        - openjdk-8-jdk
+  - env: BUILD_TYPE=bindings BINDING=jni
+    os: linux
+    dist: trusty
+    language: java
+    jdk: openjdk8
+    compiler: clang
+  - env: BUILD_TYPE=bindings BINDING=jni BINDING_OPTS=android
+    os: linux
+    dist: trusty
+    language: java
+    jdk: openjdk8
+    compiler: clang
   - env: BUILD_TYPE=default ADDRESS_SANITIZER=enabled
     os: linux
 #    dist: xenial
