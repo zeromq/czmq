@@ -25,6 +25,9 @@
 **[Building and Installing](#building-and-installing)**
 
 **[Building on Windows](#building-on-windows)**
+*  [Using vcpkg](#using-vcpkg)
+*  [Using CMake](#using-cmake)
+*  [Using MSBuild (Out of date, may not work now!)](#using-msbuild-out-of-date-may-not-work-now)
 
 **[Linking with an Application](#linking-with-an-application)**
 
@@ -128,7 +131,7 @@ To start with, you need at least these packages:
 
 Plus some others:
 
-* {{uuid-dev}}, {{libpcre3-dev}}, {{libsodium-dev}} - utility libraries.
+* {{uuid-dev}}, {{libpcre3-dev}} - utility libraries.
 
 * {{valgrind}} - a useful tool for checking your code.
 
@@ -140,7 +143,7 @@ Which we install like this (using the Debian-style apt-get package manager):
     sudo apt-get install -y \
         git build-essential libtool \
         pkg-config autotools-dev autoconf automake cmake \
-        uuid-dev libpcre3-dev libsodium-dev valgrind
+        uuid-dev libpcre3-dev valgrind
 
     # only execute this next line if interested in updating the man pages as well (adds to build time):
     sudo apt-get install -y asciidoc
@@ -182,12 +185,12 @@ You will need the pkg-config, libtool, and autoreconf packages. After building, 
 
     make check
 
-
 ### Building on Windows
 
 To start with, you need MS Visual Studio (C/C++). The free community edition works well.
 
 Then, install git, and make sure it works from a DevStudio command prompt:
+
 ```
 git
 ```
@@ -196,28 +199,28 @@ git
 
 If you are already using [vcpkg](https://github.com/Microsoft/vcpkg/), you can download and install `czmq` with one single command:
 ```
-.\vcpkg.exe install czmq
+vcpkg.exe install czmq
 ```
 this will build `czmq` as a 32-bit shared library.
 ```
-.\vcpkg.exe install czmq:x64-windows-static
+vcpkg.exe install czmq:x64-windows-static
 ```
 this will build `czmq` as a 64-bit static library.
 
 You may also build `czmq` with one or more optional libraries:
 ```
-.\vcpkg.exe install czmq[curl,httpd,lz4]:x64-windows
+vcpkg.exe install czmq[curl,httpd,lz4]:x64-windows
 ```
 this will build `czmq` with `libcurl`, `libmicrohttpd`, `lz4`, as a 64-bit shared library.
 
 To use the draft APIs, you may build `czmq` with `draft` feature:
 ```
-.\vcpkg install czmq[draft]
+vcpkg install czmq[draft]
 ```
 
 If you are an adventurer, and want to always use the lastest version of `czmq`, pass an extra `--head` option:
 ```
-.\vcpkg.exe install czmq --head
+vcpkg.exe install czmq --head
 ```
 
 These commands will also print out instructions on how to use the library from your MSBuild or CMake-based projects.
@@ -271,7 +274,7 @@ That is not the whole story. We didn't mention the building of `libcurl`, `lz4`,
 
     :: if libsodium is on disk, the Windows build of libzmq will automatically use it
     git clone git://github.com/zeromq/libzmq.git
-    cd libzmq\builds\deprecated-msvc
+    cd libzmq\builds\msvc
     configure.bat
     cd build
     buildall.bat

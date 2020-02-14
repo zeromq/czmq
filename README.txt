@@ -75,7 +75,7 @@ To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/
 
 To start with, you need at least these packages:
 
-* {{git-all}} -- git is how we share code with other people.
+* {{git}} -- git is how we share code with other people.
 
 * {{build-essential}}, {{libtool}}, {{pkg-config}} - the C compiler and related tools.
 
@@ -95,7 +95,7 @@ Which we install like this (using the Debian-style apt-get package manager):
 
     sudo apt-get update
     sudo apt-get install -y \
-        git-all build-essential libtool \
+        git build-essential libtool \
         pkg-config autotools-dev autoconf automake cmake \
         uuid-dev libpcre3-dev valgrind
 
@@ -139,7 +139,6 @@ You will need the pkg-config, libtool, and autoreconf packages. After building, 
 
     make check
 
-
 ### Building on Windows
 
 To start with, you need MS Visual Studio (C/C++). The free community edition works well.
@@ -150,7 +149,76 @@ Then, install git, and make sure it works from a DevStudio command prompt:
 git
 ```
 
-Now let's build CZMQ from GitHub:
+#### Using vcpkg
+
+If you are already using [vcpkg](https://github.com/Microsoft/vcpkg/), you can download and install `czmq` with one single command:
+```
+vcpkg.exe install czmq
+```
+this will build `czmq` as a 32-bit shared library.
+```
+vcpkg.exe install czmq:x64-windows-static
+```
+this will build `czmq` as a 64-bit static library.
+
+You may also build `czmq` with one or more optional libraries:
+```
+vcpkg.exe install czmq[curl,httpd,lz4]:x64-windows
+```
+this will build `czmq` with `libcurl`, `libmicrohttpd`, `lz4`, as a 64-bit shared library.
+
+To use the draft APIs, you may build `czmq` with `draft` feature:
+```
+vcpkg install czmq[draft]
+```
+
+If you are an adventurer, and want to always use the lastest version of `czmq`, pass an extra `--head` option:
+```
+vcpkg.exe install czmq --head
+```
+
+These commands will also print out instructions on how to use the library from your MSBuild or CMake-based projects.
+
+#### Using CMake
+
+`czmq` requires `libzmq`, so we need to build `libzmq` first. For `libzmq`, you can optionally use [libsodium](https://github.com/jedisct1/libsodium) as the curve encryption library. So we will start from building `libsodium` in the following (and you can bypass the building of `libsodium` if you are ok with libzmq's default curve encryption library):
+```
+git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
+cd libsodium\builds\msvc\build
+buildall.bat
+cd ..\..\..\..
+```
+Once done, you can find the library files under `libsodium\bin\<Win32|x64>\<Debug|Release>\<Platform Toolset>\<dynamic|ltcg|static>`.
+
+Here, the `<Platform Toolset>` is the platform toolset you are using: `v100` for `VS2010`, `v140` for `VS2015`, `v141` for `VS2017`, etc.
+
+```
+git clone git://github.com/zeromq/libzmq.git
+cd libzmq
+mkdir build
+cd build
+cmake .. -DBUILD_STATIC=OFF -DBUILD_SHARED=ON -DZMQ_BUILD_TESTS=ON -DWITH_LIBSODIUM=ON -DCMAKE_INCLUDE_PATH=..\libsodium\src\libsodium\include -DCMAKE_LIBRARY_PATH=..\libsodium\bin\Win32\Release\<Platform Toolset>\dynamic -DCMAKE_INSTALL_PREFIX=C:\libzmq
+cmake --build . --config Release --target install
+cd ..\..\
+```
+`-DWITH_LIBSODIUM=ON` is necessary if you want to build `libzmq` with `libsodium`. `CMAKE_INCLUDE_PATH` option tells `libzmq` where to search for `libsodium`'s header files. And the `CMAKE_LIBRARY_PATH` option tells where to search for libsodium library files. If you don't need `libsodium` support, you can omit these three options.
+
+`-DCMAKE_INSTALL_PREFIX=C:\libzmq` means we want to install `libzmq` into the `C:\libzmq`. You may need to run your shell with administrator privilege in order to write to the system disk.
+
+Now, it is time to build `czmq`:
+```
+git clone git://github.com/zeromq/czmq.git
+cd czmq
+mkdir build
+cd build
+cmake .. -DCZMQ_BUILD_SHARED=ON -DCZMQ_BUILD_STATIC=OFF -DCMAKE_PREFIX_PATH=C:\libzmq
+cmake --build . --config Release
+```
+Remember that we install `libzmq` to `C:\libzmq` through specifying `-DCMAKE_INSTALL_PREFIX=C:\libzmq` in the previous step. We here use `-DCMAKE_PREFIX_PATH=C:\libzmq` to tell `czmq` where to search for `libzmq`.
+
+That is not the whole story. We didn't mention the building of `libcurl`, `lz4`, `libuuid` and other `czmq` optional libraries above. In fact, to build all of these optional libraries successfully is really tricky. Please refer issue [#1972](https://github.com/zeromq/czmq/issues/1972) for more details.
+
+#### Using MSBuild (Out of date, may not work now!)
 
 ```
     git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
