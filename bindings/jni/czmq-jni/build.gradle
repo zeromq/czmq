@@ -5,6 +5,11 @@
 ################################################################################
 */
 
+ext.jni_dependencies_version = project.hasProperty('isRelease') ? 'latest.release' : 'latest.integration'
+ext.hasNotEmptyProperty = { propertyName ->
+    return project.hasProperty(propertyName) ? project[propertyName]?.trim() : false
+}
+
 dependencies {
     compile 'org.scijava:native-lib-loader:2.3.4'
     testCompile 'junit:junit:4.12'
@@ -59,10 +64,17 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
 
 tasks.withType(Test) {
     def defaultJavaLibraryPath = System.getProperty("java.library.path")
+    def extraJavaLibraryPath = hasNotEmptyProperty('buildPrefix') ? "$project.buildPrefix/lib" : ''
     if (osdetector.os == 'windows') {
-        systemProperty "java.library.path", "${projectDir}/build/Release${File.pathSeparator}${defaultJavaLibraryPath}"
+        systemProperty "java.library.path", "${projectDir}/build/Release${File.pathSeparator}" +
+                                            "${defaultJavaLibraryPath}${File.pathSeparator}" +
+                                            "${extraJavaLibraryPath}"
     } else {
-        systemProperty "java.library.path", "${projectDir}${File.pathSeparator}${defaultJavaLibraryPath}${File.pathSeparator}/usr/local/lib${File.pathSeparator}/tmp/lib"
+        systemProperty "java.library.path", "${projectDir}${File.pathSeparator}" +
+                                            "${defaultJavaLibraryPath}${File.pathSeparator}" +
+                                            "/usr/local/lib${File.pathSeparator}" +
+                                            "/tmp/lib${File.pathSeparator}" +
+                                            "${extraJavaLibraryPath}"
     }
 }
 
@@ -82,7 +94,8 @@ task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
                     '-D', "CMAKE_INCLUDE_PATH=\"${includePath}\"",
                     '..'
     } else {
-        commandLine 'cmake', '.'
+        def findRootPathOpt = hasNotEmptyProperty('buildPrefix') ? "-DCMAKE_FIND_ROOT_PATH=$project.buildPrefix" : ''
+        commandLine 'cmake', "$findRootPathOpt", '.'
     }
 }
 

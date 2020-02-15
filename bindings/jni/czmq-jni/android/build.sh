@@ -48,6 +48,7 @@ export MIN_SDK_VERSION=21
 export ANDROID_BUILD_DIR=/tmp/android_build
 
 #   Build any dependent libraries
+#   Use a default value assuming that dependent libraries sits alongside this one
 
 #   Ensure we've built dependencies for Android
 echo "********  Building CZMQ Android native libraries"
@@ -55,7 +56,7 @@ echo "********  Building CZMQ Android native libraries"
 
 #   Ensure we've built JNI interface
 echo "********  Building CZMQ JNI interface & classes"
-( cd ../.. && ./gradlew build jar --info )
+( cd ../.. && TERM=dumb ./gradlew build jar -PbuildPrefix=$BUILD_PREFIX --info )
 
 echo "********  Building CZMQ JNI for Android"
 rm -rf build && mkdir build && cd build
