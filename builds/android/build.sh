@@ -53,8 +53,8 @@ case $(uname | tr '[:upper:]' '[:lower:]') in
 esac
 
 # Set default values used in ci builds
-export NDK_VERSION=${NDK_VERSION:-android-ndk-r20}
-# With NDK r20, the minimum SDK version range is [16, 29].
+export NDK_VERSION=${NDK_VERSION:-android-ndk-r21}
+# With NDK r21, the minimum SDK version range is [16, 29].
 # SDK version 21 is the minimum version for 64-bit builds.
 export MIN_SDK_VERSION=${MIN_SDK_VERSION:-21}
 

@@ -83,12 +83,12 @@ function android_build_env {
 
     if [ -z "$ANDROID_NDK_ROOT" ]; then
         ANDROID_BUILD_FAIL+=("Please set the ANDROID_NDK_ROOT environment variable")
-        ANDROID_BUILD_FAIL+=("  (eg. \"/home/user/android/android-ndk-r20\")")
+        ANDROID_BUILD_FAIL+=("  (eg. \"/home/user/android/android-ndk-r21\")")
     fi
 
     if [ -z "$TOOLCHAIN_PATH" ]; then
         ANDROID_BUILD_FAIL+=("Please set the TOOLCHAIN_PATH environment variable")
-        ANDROID_BUILD_FAIL+=("  (eg. \"/home/user/android/android-ndk-r20/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin\")")
+        ANDROID_BUILD_FAIL+=("  (eg. \"/home/user/android/android-ndk-r21/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin\")")
     fi
 
     if [ -z "$TOOLCHAIN_HOST" ]; then

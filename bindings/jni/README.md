@@ -4,7 +4,7 @@
 
 JNI Binding for CZMQ
 
-## Building the JNI Layer for Linux
+## Building the JNI Layer for Linux and OSX
 
 Ensure you have gradle and cmake installed, then run:
 
@@ -16,7 +16,15 @@ If you don't like to install gradle beforehand just use the gradle wrapper.
     ./gradlew build jar
     ./gradlew test
 
-This calls javah to build the headers in src/native/include, and then compiles the C and Java pieces to create a jar file a sharable library (.so).
+This does the following:
+
+* It calls javah to build the headers in src/native/include
+* It compiles the C and Java classes
+* It creates a jar file and a shareable native library
+
+If libraries of dependent projects are not installed in any of the default locations of your OS use parameter `buildPrefix` to point to their location, e.g.:
+
+    ./gradlew build jar -PbuildPrefix=/tmp/jni_build
 
 ## Building the JNI Layer for Android
 
@@ -47,7 +55,7 @@ Environment Variables:
 * Set JAVA_HOME to the installation location, e.g. C:\Program Files\Java\jdk1.8.0_66.
 
 1. Check out all dependent projects from github, at the same level as this project. E.g.: libzmq, czmq.
-2. Follow the dependent projects instuctions to build thier '.dll' and '.lib' file.
+2. Follow the dependent projects instructions to build their '.dll' and '.lib' file.
 3. Copy a dependent '.dll' and '.lib' files to a folder
 4. Add this library folder to the path, e.g.:
 
@@ -69,6 +77,11 @@ $HOME/.m2. Therefore simply run:
 
     ./gradlew publishToMavenLocal
 
+By default the JNI Layer builds SNAPSHOT versions (e.g. 1.1.3-SNAPSHOT). If you
+like to build a release version you need the set the release switch:
+
+    ./gradlew publishToMavenLocal -PisRelease
+
 ## Using the JNI API
 
 - to be written.
@@ -87,7 +100,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 ## Information for maintainers
 
-### Building the gradle wrapper
+### Create or update the gradle wrapper
 
 The gradle wrapper is a tool that allows to use gradle on multiple platforms
 without installing it beforehand. Make sure you have installed a version of
@@ -107,7 +120,7 @@ travis environment matrix
 
     - BUILD_TYPE=bindings BINDING=jni
 
-### Travis deploy to bintray
+### Deploy to bintray with Travis CI
 
 When tagging a release travis can automatically deploy this jni layer to bintray.
 Therefore you'll need to supply travis with three environment variables:
