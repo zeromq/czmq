@@ -251,7 +251,7 @@ deploy:
   api_key:
     # To encrypt your access token run: `travis encrypt -r user/repo`
     #secure: <encrypted github access token>
-    secure: mmpmM0uhaMIKjL7ZkZduDOHkhAWA4Ngaq2FtjQVnUXrsCelSObSLe6BwcvvPp7yYGW44mAmoYPEPWAADatt+6bdVCcf0hgSJS02G4EiuxRAOiZ/ffTaAOhaqfmjuwmZ1cftFUFwehS9JEE9Be59Hv+tGnOOZSkxMWhkQ7xTvidQ=
+    secure: tQgYveuVEQhskgvJXilEURJd4CETCa8eWwEhFyVjITeDq5GLlOzUWCuCWygg0kAIx2I+WH0ybQz+L4hUSe5/EedoGtaXRxmV+4CUWAKaO8hqkccszwpClpJRvblPjXF6s/TL003Hm/bTPKrEaGApUPL4hwjEnXvPoGejGcTNfok=
   file_glob: true
   file: ${CZMQ_DEPLOYMENT}
   skip_cleanup: true
