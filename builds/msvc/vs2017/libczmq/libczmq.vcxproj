@@ -10,6 +10,7 @@
     <ProjectGuid>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</ProjectGuid>
     <ProjectName>libczmq</ProjectName>
     <PlatformToolset>v141</PlatformToolset>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDLL|Win32">
@@ -72,6 +73,18 @@
     <Import Project="$(ProjectDir)..\..\properties\Output.props" />
     <Import Project="$(ProjectDir)$(ProjectName).props" />
   </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDLL|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..;$(ProjectDir)..\..\..\..\..\libsodium\src\libsodium\include;$(ProjectDir)..\..\..\..\..\libzmq\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\libzmq\lib\Debug\libzmq-v141-mt-gd-4_3_3.lib;$(ProjectDir)..\..\..\..\..\libsodium\bin\x64\Debug\v141\dynamic\libsodium.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>"$(BuildRoot)configure.bat"
+copy "$(BuildRoot)platform.h" "$(RepoRoot)include\"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\platform.h" />
     <ClInclude Include="..\..\resource.h" />
@@ -222,6 +235,14 @@
     <None Include="..\..\nuget\package.nuspec" />
     <None Include="..\..\nuget\package.targets" />
     <None Include="..\..\nuget\package.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\libsodium\builds\msvc\vs2017\libsodium\libsodium.vcxproj">
+      <Project>{a185b162-6cb6-4502-b03f-b56f7699a8d9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\libzmq\builds\msvc\vs2017\x64\libzmq.vcxproj">
+      <Project>{f1b953db-2496-3db5-835f-ef2766da64ee}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <!--

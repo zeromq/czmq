@@ -34,7 +34,6 @@
 
   <!-- Dependencies -->
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(SolutionDir)libzmq.import.props" />
     <Import Project="$(SolutionDir)uuid.import.props" Condition="'$(HAVE_UUID)'=='1'" />
     <Import Project="$(SolutionDir)systemd.import.props" Condition="'$(HAVE_SYSTEMD)'=='1'" />
     <Import Project="$(SolutionDir)lz4.import.props" Condition="'$(HAVE_LZ4)'=='1'" />
