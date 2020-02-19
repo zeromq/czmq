@@ -376,6 +376,9 @@ zchunk_slurp (const char *filename, size_t maxsize)
         size = maxsize;
 
     FILE *handle = fopen (filename, "r");
+    if (!handle)
+        return NULL;
+
     zchunk_t *chunk = zchunk_read (handle, size);
     assert (chunk);
     fclose (handle);
