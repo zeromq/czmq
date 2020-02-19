@@ -1,4 +1,4 @@
-DEFINES += CZMQ_STATIC
+DEFINES += CZMQ_STATIC CZMQ_BUILD_DRAFT_API
 
 SOURCES += \
     $$PWD/../../src/zactor.c \
@@ -51,4 +51,11 @@ HEADERS += \
 INCLUDEPATH += \
     $$PWD/../../include
 
-LIBS += -L$$C:/Windows/System32 -lrpcrt4
+unix {
+INCLUDEPATH += \
+    $$PWD/macos
+}
+
+win32 {
+    LIBS += -L$$C:/Windows/System32 -lrpcrt4
+}
