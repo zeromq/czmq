@@ -131,3 +131,4 @@ nbproject/
 
 # editor backups
 *~
+builds/xcode/*
