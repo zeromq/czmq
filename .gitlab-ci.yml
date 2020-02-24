@@ -1,16 +1,10 @@
 # Define job order
 stages:
   - lib-build
-  
-# Define library files
-.lib-build-files: &lib-build-files
-  only:
-    refs:
-      - master
+
 
 # Create library for macos
 lib-build-macos:
-  <<: *lib-build-files
   stage: lib-build
   tags:
     - osx
@@ -35,41 +29,39 @@ lib-build-macos:
 # Create library for windows
 # Library will be build for 4 targets : Debug x86, Debug x64, Release x86, Release x64
 lib-build-windows:
-  <<: *lib-build-files
   stage: lib-build
   tags:
     - windows
   script:
-    - IF "%VS_VERSION_YEAR%"=="" (ECHO ">> VS_VERSION_YEAR must be defined on the Runner side <<" && EXIT /B 1)
-    - IF "%VS_VERSION_NUM%"=="" (ECHO ">> VS_VERSION_NUM must be defined on the Runner side <<" && EXIT /B 1)
-    - set INITIAL_PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - mkdir build && cd build
-    - set PATH=%INITIAL_PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86
-    - cmake -S .. -B DebugX86 -G"Visual Studio %VS_VERSION_NUM% %VS_VERSION_YEAR%" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - IF (!$env:VS_VERSION_YEAR) { ECHO ">> VS_VERSION_YEAR must be defined on the Runner side <<" ; EXIT 1 } 
+    - IF (!$env:VS_VERSION_NUM) { ECHO ">> VS_VERSION_NUM must be defined on the Runner side <<" ; EXIT 1 }
+    - $env:INITIAL_PATH="$env:PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\include"
+    - mkdir build
+    - cd build
+    - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86"
+    - cmake -S .. -B DebugX86 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build DebugX86 --target ALL_BUILD --config Debug
-    - set PATH=%INITIAL_PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86
-    - cmake -S .. -B ReleaseX86 -G"Visual Studio %VS_VERSION_NUM% %VS_VERSION_YEAR%" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86"
+    - cmake -S .. -B ReleaseX86 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build ReleaseX86 --target ALL_BUILD --config Release
-    - set PATH=%INITIAL_PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64
-    - cmake -S .. -B DebugX64 -G"Visual Studio %VS_VERSION_NUM% %VS_VERSION_YEAR% Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64"
+    - cmake -S .. -B DebugX64 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build DebugX64 --target ALL_BUILD --config Debug
-    - set PATH=%INITIAL_PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64
-    - cmake -S .. -B ReleaseX64 -G"Visual Studio %VS_VERSION_NUM% %VS_VERSION_YEAR% Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64"
+    - cmake -S .. -B ReleaseX64 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build ReleaseX64 --target ALL_BUILD --config Release
-    - copy /y ..\include\*.h "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\" > nul
-    - copy /y "DebugX86\Debug\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\"
-    - copy /y "DebugX86\Debug\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\"
-    - copy /y "ReleaseX86\Release\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\"
-    - copy /y "ReleaseX86\Release\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\"
-    - copy /y "DebugX64\Debug\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\"
-    - copy /y "DebugX64\Debug\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\"
-    - copy /y "ReleaseX64\Release\czmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
-    - copy /y "ReleaseX64\Release\libczmq.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
+    - copy ..\include\*.h "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\include\" -Force
+    - copy "DebugX86\Debug\czmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\" -Force
+    - copy "DebugX86\Debug\libczmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\" -Force
+    - copy "ReleaseX86\Release\czmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\" -Force
+    - copy "ReleaseX86\Release\libczmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\" -Force
+    - copy "DebugX64\Debug\czmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\" -Force
+    - copy "DebugX64\Debug\libczmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\" -Force
+    - copy "ReleaseX64\Release\czmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\" -Force
+    - copy "ReleaseX64\Release\libczmq.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\" -Force
 
 # Create library for linux
 lib-build-linux:
-  <<: *lib-build-files
   stage: lib-build
   image: ingescape/debian-testing-compil
   tags:
