@@ -687,15 +687,19 @@ IF (ENABLE_DRAFTS)
 ENDIF (ENABLE_DRAFTS)
 
 
-add_custom_target(
-    copy-selftest-ro ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/src/selftest-ro ${PROJECT_BINARY_DIR}/src/selftest-ro
-)
+if (NOT TARGET copy-selftest-ro)
+    add_custom_target(
+        copy-selftest-ro ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/src/selftest-ro ${PROJECT_BINARY_DIR}/src/selftest-ro
+    )
+endif()
 
-add_custom_target(
-    make-selftest-rw ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/src/selftest-rw
-)
+if (NOT TARGET make-selftest-rw)
+    add_custom_target(
+        make-selftest-rw ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/src/selftest-rw
+    )
+endif()
 
 set_directory_properties(
     PROPERTIES
@@ -722,7 +726,9 @@ include(CTest)
 ########################################################################
 # cleanup
 ########################################################################
-add_custom_target (distclean @echo Cleaning for source distribution)
+if (NOT TARGET distclean)
+    add_custom_target (distclean @echo Cleaning for source distribution)
+endif()
 
 set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
                     ${PROJECT_BINARY_DIR}/cmake_install.cmake
