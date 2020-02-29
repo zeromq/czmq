@@ -16,6 +16,12 @@ os:
 - linux
 - osx
 
+arch:
+- amd64
+- arm64
+- ppc64le
+- s390x
+
 ### Note to use ubuntu14 repos below, if the default distro is trusty
 #dist:
 #- xenial
@@ -110,6 +116,7 @@ pkg_deps_doctools: &pkg_deps_doctools
 
 pkg_deps_devtools: &pkg_deps_devtools
     - git
+    - zip
 
 pkg_src_zeromq_ubuntu14: &pkg_src_zeromq_ubuntu14
 - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
