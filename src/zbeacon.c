@@ -219,8 +219,9 @@ s_self_prepare_udp (self_t *self)
         const char *name = ziflist_first (iflist);
         while (name) {
             //  If IPv6 is not enabled ignore IPv6 interfaces.
-            if ((streq (iface, name) || streq (iface, "")) &&
-                    ((ziflist_is_ipv6 (iflist) && zsys_ipv6 ()) ||
+            if ( (streq (iface, name) || streq (iface, "") ||
+                    streq (ziflist_address (iflist), iface)) &&
+                        ((ziflist_is_ipv6 (iflist) && zsys_ipv6 ()) ||
                             (!ziflist_is_ipv6 (iflist) && !zsys_ipv6 ()))) {
                 rc = getaddrinfo (ziflist_address (iflist), self->port_nbr,
                         &hint, &bind_to);
