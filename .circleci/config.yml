@@ -1,0 +1,55 @@
+version: 2.1 # Use version 2.1 to enable orb usage.
+
+orbs:
+  win: circleci/windows@2.2.0 # The Windows orb give you everything you need to start using the Windows executor.
+
+jobs:
+  build: # name of your job
+    executor: win/default # executor type
+
+    environment:
+      - CMAKE_DIR: 'C:\Program Files\CMake\bin'
+      - PREFIX_DIR: 'C:\tmp\ci_build'
+      - LIBZMQ_DIR: 'C:\tmp\libzmq'
+      - CZMQ_DIR: 'C:\tmp\czmq'
+
+    steps:
+      # Commands are run in a Windows virtual machine environment
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: |
+            choco install --no-progress cmake
+            if (-not $?) { throw "Failed to install CMake" }
+
+      - run:
+          name: Build libzmq
+          command: |
+            $Env:PATH += ";$Env:CMAKE_DIR"
+            git clone --depth 1 --quiet https://github.com/zeromq/libzmq.git "$Env:LIBZMQ_DIR"
+            cd "$Env:LIBZMQ_DIR"
+            mkdir build
+            cd build
+            cmake .. -DBUILD_STATIC=OFF -DBUILD_SHARED=ON -DZMQ_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX="$Env:PREFIX_DIR"
+            cmake --build . --config Release --target install
+
+      - run:
+          name: Build and test czmq
+          command: |
+            $Env:PATH += ";$Env:CMAKE_DIR"
+            git clone --depth 1 --quiet git://github.com/sappo/czmq.git "$Env:CZMQ_DIR"
+            cd "$Env:CZMQ_DIR"
+            mkdir build
+            cd build
+            cmake .. -DCZMQ_BUILD_STATIC=OFF -DCZMQ_BUILD_SHARED=ON -DCMAKE_PREFIX_PATH="$Env:PREFIX_DIR" -DCMAKE_INSTALL_PREFIX="$Env:PREFIX_DIR"
+            cmake --build . --config Release --target install
+            ctest -C Release
+
+      - run:
+          name: Build czmq JNI
+          command: |
+            $Env:PATH += ";$Env:CMAKE_DIR"
+            cd "$Env:CZMQ_DIR"
+            cd bindings/jni
+            .\gradlew build jar -PbuildPrefix="$Env:PREFIX_DIR" -x test --info
