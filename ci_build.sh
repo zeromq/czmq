@@ -27,37 +27,39 @@ esac
 
 case $TRAVIS_OS_NAME in
 windows)
-	export
-	choco install openjdk
-	export JAVA_HOME="C:\Program Files\OpenJDK\jdk-13.0.2"
-	export BUILD_PREFIX=$TEMP/ci_build
+    export
+    choco install openjdk
+    export JAVA_HOME="C:\Program Files\OpenJDK\jdk-13.0.2"
+    export BUILD_PREFIX=$TEMP/ci_build
 
-	cd ..
+    cd ..
 
-	git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
-	cd libzmq
-	mkdir build
-	cd build
-	cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
-	cmake --build . --config Release --target install
-	cd ../..
+    git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
+    cd libzmq
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    cmake --build . --config Release --target install
+    cd ../..
 
-	cd czmq
-	mkdir build
-	cd build
-	cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
-	cmake --build . --config Release --target install
-	ctest --build-config Release
-	cd ../..
+    cd czmq
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    cmake --build . --config Release --target install
+    ctest --build-config Release
+    cd ../..
 
-	cd czmq
-	cd bindings/jni
-	ls $BUILD_PREFIX/bin
-	ls $BUILD_PREFIX/lib
-	./gradlew build jar -PbuildPrefix=$BUILD_PREFIX -x test --info
-	./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
+    cd czmq
+    cd bindings/jni
+    # Build will fail if processes are still running at the end of the script.
+    # Gradle by default starts a daemon so consequtive builds are faster.
+    # Therefore instruct gradle not to use its daemon.
+    export GRADLE_OPTS=-Dorg.gradle.daemon=false
+    ./gradlew build jar -PbuildPrefix=$BUILD_PREFIX -x test --info
+    ./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
 
-	exit 0
+    exit 0
 esac
 
 case "$BUILD_TYPE" in
