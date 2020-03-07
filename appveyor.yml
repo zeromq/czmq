@@ -4,7 +4,7 @@ clone_depth: 1
 
 skip_tags: true
 
-os: Visual Studio 2015
+image: Visual Studio 2019
 
 environment:
   CMAKE_GENERATOR: "Visual Studio 14 2015"
@@ -31,50 +31,54 @@ init:
   - cmd: reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
 
 cache:
-    - C:\projects\libzmq -> appveyor.yml
+  - C:\projects\libzmq -> appveyor.yml
 
 install:
-  - cmd: if "%Platform%"=="x64" set "CMAKE_GENERATOR=%CMAKE_GENERATOR% Win64"
-  - cmd: echo "Generator='%CMAKE_GENERATOR%'"
-  - cmd: echo "Platform='%Platform%'"
-  - cmd: set LIBZMQ_SOURCEDIR=C:\projects\libzmq
-  - cmd: set LIBZMQ_BUILDDIR=C:\projects\libzmq\build
-  - cmd: set ZEROMQ_INCLUDE_DIR="%LIBZMQ_SOURCEDIR%\include"
-  - cmd: set ZEROMQ_LIBRARY_DIR="%LIBZMQ_BUILDDIR%\lib\%Configuration%"
+  - cmd: |
+      if "%Platform%"=="x64" set "CMAKE_GENERATOR=%CMAKE_GENERATOR% Win64"
+      echo "Generator='%CMAKE_GENERATOR%'"
+      echo "Platform='%Platform%'"
+      set LIBZMQ_SOURCEDIR=C:\projects\libzmq
+      set LIBZMQ_BUILDDIR=C:\projects\libzmq\build
   - if not exist C:\projects\libzmq (
       git clone --depth 1 --quiet https://github.com/zeromq/libzmq.git "%LIBZMQ_SOURCEDIR%" &&
       md "%LIBZMQ_BUILDDIR%" &&
-      cd "%LIBZMQ_BUILDDIR%" ) else (
+      cd "%LIBZMQ_BUILDDIR%"
+    )
+    else (
       cd "%LIBZMQ_SOURCEDIR%" &&
+      git reset --hard HEAD &&
       git pull &&
-      cd "%LIBZMQ_BUILDDIR%" )
-  - cmd: cmake -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
-  - cmd: msbuild /v:minimal /maxcpucount:%NUMBER_OF_PROCESSORS% /p:Configuration=%Configuration% libzmq.vcxproj
-  - ps: Copy-Item "C:\projects\libzmq\build\lib\${env:Configuration}\libzmq-*lib" -Destination "C:\projects\libzmq\build\lib\${env:Configuration}\zmq.lib"
+      cd "%LIBZMQ_BUILDDIR%"
+    )
+  - cmd: |
+      cmake .. -DBUILD_STATIC=OFF -DBUILD_SHARED=ON -DZMQ_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX="C:\tmp\ci_build"
+      cmake --build . --config %Configuration% --target install
 
 clone_folder: C:\projects\czmq
 
-before_build:
-  - cmd: set CZMQ_BUILDDIR=C:\projects\build_czmq
-  - cmd: md "%CZMQ_BUILDDIR%"
-  - cmd: cd "%CZMQ_BUILDDIR%"
-  - cmd: cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" "%APPVEYOR_BUILD_FOLDER%"
-
-build:
-  parallel: true
-  project: C:\projects\build_czmq\czmq.sln
-  verbosity: minimal
+build_script:
+  - cmd: |
+      set CZMQ_BUILDDIR="%APPVEYOR_BUILD_FOLDER%\build"
+      md "%CZMQ_BUILDDIR%"
+      cd "%CZMQ_BUILDDIR%"
+      cmake .. -DBUILD_STATIC=OFF -DBUILD_SHARED=ON -DCMAKE_PREFIX_PATH="C:\tmp\ci_build" -DCMAKE_INSTALL_PREFIX="C:\tmp\ci_build"
+      cmake --build . --config %Configuration% --target install
+      ctest -C %Configuration% -V
+      cd "%CZMQ_BUILDDIR%\%Configuration%"
+      SET PATH=%PATH%;C:\tmp\ci_build\bin
+      test_randof.exe -h | find "ZSYS"
+      test_randof.exe -r 100000 -i 3000000
+  - cmd: |
+      cd "%APPVEYOR_BUILD_FOLDER%"
+      cd bindings\jni
+      gradlew.bat build jar -PbuildPrefix="C:\tmp\ci_build" -x test --info
 
 after_build:
   - cmd: cd "%CZMQ_BUILDDIR%\%Configuration%"
   - cmd: copy "%LIBZMQ_BUILDDIR%\bin\%Configuration%\libzmq-*dll" .
   - cmd: 7z a -y -bd -mx=9 czmq.zip zmakecert.exe czmq_selftest.exe libczmq.dll libzmq-*.dll test_randof.exe
   - ps: Push-AppveyorArtifact "czmq.zip" -Filename "czmq-${env:Platform}-${env:Configuration}.zip"
-  - cmd: cd "%CZMQ_BUILDDIR%"
-  - cmd: ctest -C "%Configuration%" -V
-  - cmd: cd "%Configuration%"
-  - cmd: test_randof.exe -h | find "ZSYS"
-  - cmd: test_randof.exe -r 100000 -i 3000000
 
 test:
   none
