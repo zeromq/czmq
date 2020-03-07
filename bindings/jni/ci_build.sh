@@ -144,18 +144,18 @@ if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$BINDING_OPTS" == "android" ]; then
         export NDK_VERSION=android-ndk-r20
         export ANDROID_NDK_ROOT="/tmp/${NDK_VERSION}"
 
-		case $(uname | tr '[:upper:]' '[:lower:]') in
-		  linux*)
-			HOST_PLATFORM=linux-x86_64
-			;;
-		  darwin*)
-			HOST_PLATFORM=darwin-x86_64
-			;;
-		  *)
-			echo "Unsupported platform"
-			exit 1
-			;;
-		esac
+        case $(uname | tr '[:upper:]' '[:lower:]') in
+          linux*)
+            HOST_PLATFORM=linux-x86_64
+            ;;
+          darwin*)
+            HOST_PLATFORM=darwin-x86_64
+            ;;
+          *)
+            echo "Unsupported platform"
+            exit 1
+            ;;
+        esac
 
         if [ ! -d "${ANDROID_NDK_ROOT}" ]; then
             export FILENAME=$NDK_VERSION-$HOST_PLATFORM.zip

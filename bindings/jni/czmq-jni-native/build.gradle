@@ -15,8 +15,18 @@ dependencies {
 task copyLibs(type: Copy) {
     def libraryPaths = System.getProperty('java.library.path').split(File.pathSeparator).toList()
     libraryPaths.add('/usr/local/lib')
-    libraryPaths.add("${rootDir}/czmq-jni")
-    libraryPaths.add("${rootDir}/czmq-jni/build/Release")
+    if (osdetector.os == 'windows') {
+        libraryPaths.add("${rootDir}/czmq-jni/build/Release")
+    } else {
+        libraryPaths.add("${rootDir}/czmq-jni/build")
+    }
+    if (project.hasProperty('buildPrefix')) {
+        if (osdetector.os == 'windows') {
+            // DLLs are installed to the bin directory by cmake
+            libraryPaths.add("${project.buildPrefix}/bin")
+        }
+        libraryPaths.add("${project.buildPrefix}/lib")
+    }
 
     libraryPaths.each { path ->
         from path
