@@ -156,6 +156,8 @@ matrix:
         packages:
         - valgrind
         - *pkg_deps_common
+  - env: BUILD_TYPE=default
+    os: windows
   - env: BUILD_TYPE=android
     compiler: clang
   - env: BUILD_TYPE=bindings BINDING=jni
