@@ -711,6 +711,13 @@ foreach(TEST_CLASS ${TEST_CLASSES})
         NAME ${TEST_CLASS}
         COMMAND czmq_selftest --continue --verbose --test ${TEST_CLASS}
     )
+    IF (WIN32 AND CMAKE_PREFIX_PATH)
+		file(TO_NATIVE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH_WIN)
+		set_tests_properties(
+			${TEST_CLASS}
+			PROPERTIES ENVIRONMENT "PATH=%PATH%\;${CMAKE_PREFIX_PATH_WIN}\\bin"
+		)
+    ENDIF (WIN32 AND CMAKE_PREFIX_PATH)
     set_tests_properties(
         ${TEST_CLASS}
         PROPERTIES TIMEOUT ${CLASSTEST_TIMEOUT}

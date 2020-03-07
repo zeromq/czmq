@@ -51,22 +51,23 @@ Prerequisites:
 * Java JDK 8 or later is installed
 
 Environment Variables:
-* Add MSBuild.exe to the PATH, e.g. C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin
-* Set JAVA_HOME to the installation location, e.g. C:\Program Files\Java\jdk1.8.0_66.
+* Add MSBuild.exe to the PATH (e.g. `C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin`)
+* Set JAVA_HOME to the installation location (e.g. `C:\Program Files\Java\jdk1.8.0_66`).
 
-1. Check out all dependent projects from github, at the same level as this project. E.g.: libzmq, czmq.
-2. Follow the dependent projects instructions to build their '.dll' and '.lib' file.
-3. Copy a dependent '.dll' and '.lib' files to a folder
-4. Add this library folder to the path, e.g.:
+1. Check out all dependent projects from github, at the same level as this project (e.g. libzmq, czmq).
+2. Follow the dependent projects instructions to build their `.dll` and `.lib` file.
 
-	PATH %PATH%;C:\projects\libs
+If you used cmake to install the dependencies you can skip the following steps.
+
+3. Create a folder where to place the dlls and libs (e.g. `C:\tmp\deps`).
+4. Copy all dependent `.dll` files to the `bin` subfolder (e.g. `C:\tmp\deps\bin`)
+5. Copy all dependent `.lib` files to the `lib` subfolder (e.g. `C:\tmp\deps\lib`)
+6. Copy all dependent `.h` files to the `include` subfolder (e.g. `C:\tmpdeps\include`)
 
 Now run:
 
-	gradlew build jar "-PvsGenerator=Visual Studio 16 2019"
-	gradlew test "-PvsGenerator=Visual Studio 16 2019"
-
-Change the vsGenerator parameter to the version of MS Visual Studio you have installed.
+    gradlew build jar -PbuildPrefix=C:\tmp\deps
+    gradlew test -PbuildPrefix=C:\tmp\deps
 
 ## Installing the JNI Layer
 
