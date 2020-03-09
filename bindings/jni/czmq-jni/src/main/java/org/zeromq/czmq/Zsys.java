@@ -532,6 +532,39 @@ public class Zsys {
         return __ipv6McastAddress ();
     }
     /*
+    Set IPv4 multicast address to use for sending zbeacon messages. By default
+    IPv4 multicast is NOT used. If the environment variable
+    ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+    address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+    will enable IPv4 zbeacon messages.
+    */
+    native static void __setIpv4McastAddress (String value);
+    public static void setIpv4McastAddress (String value) {
+        __setIpv4McastAddress (value);
+    }
+    /*
+    Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+    set.
+    */
+    native static String __ipv4McastAddress ();
+    public static String ipv4McastAddress () {
+        return __ipv4McastAddress ();
+    }
+    /*
+    Set multicast TTL default is 1
+    */
+    native static void __setMcastTtl (byte value);
+    public static void setMcastTtl (byte value) {
+        __setMcastTtl (value);
+    }
+    /*
+    Get multicast TTL
+    */
+    native static byte __mcastTtl ();
+    public static byte mcastTtl () {
+        return __mcastTtl ();
+    }
+    /*
     Configure the automatic use of pre-allocated FDs when creating new sockets.
     If 0 (default), nothing will happen. Else, when a new socket is bound, the
     system API will be used to check if an existing pre-allocated FD with a

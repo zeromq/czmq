@@ -5559,6 +5559,23 @@ uses
     // set.
     class function Ipv6McastAddress: string;
 
+    // Set IPv4 multicast address to use for sending zbeacon messages. By default
+    // IPv4 multicast is NOT used. If the environment variable
+    // ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+    // address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+    // will enable IPv4 zbeacon messages.
+    class procedure SetIpv4McastAddress(const Value: string);
+
+    // Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+    // set.
+    class function Ipv4McastAddress: string;
+
+    // Set multicast TTL default is 1
+    class procedure SetMcastTtl(Value: Byte);
+
+    // Get multicast TTL
+    class function McastTtl: Byte;
+
     // Configure the automatic use of pre-allocated FDs when creating new sockets.
     // If 0 (default), nothing will happen. Else, when a new socket is bound, the
     // system API will be used to check if an existing pre-allocated FD with a
@@ -9990,6 +10007,29 @@ end;
   class function TZsys.Ipv6McastAddress: string;
   begin
     Result := string(UTF8String(zsys_ipv6_mcast_address));
+  end;
+
+  class procedure TZsys.SetIpv4McastAddress(const Value: string);
+  var
+    __Value__: UTF8String;
+  begin
+    __Value__ := UTF8String(Value);
+    zsys_set_ipv4_mcast_address(PAnsiChar(__Value__));
+  end;
+
+  class function TZsys.Ipv4McastAddress: string;
+  begin
+    Result := string(UTF8String(zsys_ipv4_mcast_address));
+  end;
+
+  class procedure TZsys.SetMcastTtl(Value: Byte);
+  begin
+    zsys_set_mcast_ttl(Value);
+  end;
+
+  class function TZsys.McastTtl: Byte;
+  begin
+    Result := zsys_mcast_ttl;
   end;
 
   class procedure TZsys.SetAutoUseFd(AutoUseFd: Integer);

@@ -424,6 +424,35 @@ Java_org_zeromq_czmq_Zsys__1_1ipv6McastAddress (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1setIpv4McastAddress (JNIEnv *env, jclass c, jstring value)
+{
+    char *value_ = (char *) (*env)->GetStringUTFChars (env, value, NULL);
+    zsys_set_ipv4_mcast_address (value_);
+    (*env)->ReleaseStringUTFChars (env, value, value_);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsys__1_1ipv4McastAddress (JNIEnv *env, jclass c)
+{
+    char *ipv4_mcast_address_ = (char *) zsys_ipv4_mcast_address ();
+    jstring return_string_ = (*env)->NewStringUTF (env, ipv4_mcast_address_);
+    return return_string_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1setMcastTtl (JNIEnv *env, jclass c, jbyte value)
+{
+    zsys_set_mcast_ttl ((byte) value);
+}
+
+JNIEXPORT jbyte JNICALL
+Java_org_zeromq_czmq_Zsys__1_1mcastTtl (JNIEnv *env, jclass c)
+{
+    jbyte mcast_ttl_ = (jbyte) zsys_mcast_ttl ();
+    return mcast_ttl_;
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsys__1_1setAutoUseFd (JNIEnv *env, jclass c, jint auto_use_fd)
 {
     zsys_set_auto_use_fd ((int) auto_use_fd);

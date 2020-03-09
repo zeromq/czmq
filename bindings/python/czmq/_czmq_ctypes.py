@@ -7546,6 +7546,14 @@ lib.zsys_set_ipv6_mcast_address.restype = None
 lib.zsys_set_ipv6_mcast_address.argtypes = [c_char_p]
 lib.zsys_ipv6_mcast_address.restype = c_char_p
 lib.zsys_ipv6_mcast_address.argtypes = []
+lib.zsys_set_ipv4_mcast_address.restype = None
+lib.zsys_set_ipv4_mcast_address.argtypes = [c_char_p]
+lib.zsys_ipv4_mcast_address.restype = c_char_p
+lib.zsys_ipv4_mcast_address.argtypes = []
+lib.zsys_set_mcast_ttl.restype = None
+lib.zsys_set_mcast_ttl.argtypes = [c_ubyte]
+lib.zsys_mcast_ttl.restype = c_ubyte
+lib.zsys_mcast_ttl.argtypes = []
 lib.zsys_set_auto_use_fd.restype = None
 lib.zsys_set_auto_use_fd.argtypes = [c_int]
 lib.zsys_auto_use_fd.restype = c_int
@@ -8165,6 +8173,39 @@ address.
 set.
         """
         return lib.zsys_ipv6_mcast_address()
+
+    @staticmethod
+    def set_ipv4_mcast_address(value):
+        """
+        Set IPv4 multicast address to use for sending zbeacon messages. By default
+IPv4 multicast is NOT used. If the environment variable
+ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+will enable IPv4 zbeacon messages.
+        """
+        return lib.zsys_set_ipv4_mcast_address(value)
+
+    @staticmethod
+    def ipv4_mcast_address():
+        """
+        Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+set.
+        """
+        return lib.zsys_ipv4_mcast_address()
+
+    @staticmethod
+    def set_mcast_ttl(value):
+        """
+        Set multicast TTL default is 1
+        """
+        return lib.zsys_set_mcast_ttl(value)
+
+    @staticmethod
+    def mcast_ttl():
+        """
+        Get multicast TTL
+        """
+        return lib.zsys_mcast_ttl()
 
     @staticmethod
     def set_auto_use_fd(auto_use_fd):

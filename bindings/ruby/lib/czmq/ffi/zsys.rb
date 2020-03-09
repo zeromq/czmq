@@ -798,6 +798,46 @@ module CZMQ
         result
       end
 
+      # Set IPv4 multicast address to use for sending zbeacon messages. By default
+      # IPv4 multicast is NOT used. If the environment variable
+      # ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+      # address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+      # will enable IPv4 zbeacon messages.
+      #
+      # @param value [String, #to_s, nil]
+      # @return [void]
+      def self.set_ipv4_mcast_address(value)
+        result = ::CZMQ::FFI.zsys_set_ipv4_mcast_address(value)
+        result
+      end
+
+      # Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+      # set.
+      #
+      # @return [String]
+      def self.ipv4_mcast_address()
+        result = ::CZMQ::FFI.zsys_ipv4_mcast_address()
+        result
+      end
+
+      # Set multicast TTL default is 1
+      #
+      # @param value [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_mcast_ttl(value)
+        value = Integer(value)
+        result = ::CZMQ::FFI.zsys_set_mcast_ttl(value)
+        result
+      end
+
+      # Get multicast TTL
+      #
+      # @return [Integer]
+      def self.mcast_ttl()
+        result = ::CZMQ::FFI.zsys_mcast_ttl()
+        result
+      end
+
       # Configure the automatic use of pre-allocated FDs when creating new sockets.
       # If 0 (default), nothing will happen. Else, when a new socket is bound, the
       # system API will be used to check if an existing pre-allocated FD with a

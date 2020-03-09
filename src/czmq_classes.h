@@ -406,6 +406,31 @@ CZMQ_PRIVATE int64_t
     zsys_file_stable_age_msec (void);
 
 //  *** Draft method, defined for internal use only ***
+//  Set IPv4 multicast address to use for sending zbeacon messages. By default
+//  IPv4 multicast is NOT used. If the environment variable
+//  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+//  address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+//  will enable IPv4 zbeacon messages.
+CZMQ_PRIVATE void
+    zsys_set_ipv4_mcast_address (const char *value);
+
+//  *** Draft method, defined for internal use only ***
+//  Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+//  set.
+CZMQ_PRIVATE const char *
+    zsys_ipv4_mcast_address (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Set multicast TTL default is 1
+CZMQ_PRIVATE void
+    zsys_set_mcast_ttl (byte value);
+
+//  *** Draft method, defined for internal use only ***
+//  Get multicast TTL
+CZMQ_PRIVATE byte
+    zsys_mcast_ttl (void);
+
+//  *** Draft method, defined for internal use only ***
 //  Print formatted string. Format is specified by variable names
 //  in Python-like format style
 //
