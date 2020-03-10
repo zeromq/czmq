@@ -3280,6 +3280,23 @@ type
   // set.
   function zsys_ipv6_mcast_address: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Set IPv4 multicast address to use for sending zbeacon messages. By default
+  // IPv4 multicast is NOT used. If the environment variable
+  // ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+  // address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+  // will enable IPv4 zbeacon messages.
+  procedure zsys_set_ipv4_mcast_address(Value: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+  // set.
+  function zsys_ipv4_mcast_address: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set multicast TTL default is 1
+  procedure zsys_set_mcast_ttl(Value: Byte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get multicast TTL
+  function zsys_mcast_ttl: Byte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Configure the automatic use of pre-allocated FDs when creating new sockets.
   // If 0 (default), nothing will happen. Else, when a new socket is bound, the
   // system API will be used to check if an existing pre-allocated FD with a

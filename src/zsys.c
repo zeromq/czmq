@@ -101,6 +101,8 @@ static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
 static zsock_t *s_logsender = NULL;    //  ZSYS_LOGSENDER=
 static int s_zero_copy_recv = 1;    // ZSYS_ZERO_COPY_RECV=1
+static char *s_ipv4_mcast_address = NULL; //  ZSYS_IPV4_MCAST_ADDRESS=
+static unsigned char s_mcast_ttl = 1;     //  ZSYS_MCAST_TTL=1
 
 //  Track number of open sockets so we can zmq_term() safely
 static size_t s_open_sockets = 0;
@@ -238,6 +240,11 @@ zsys_init (void)
         zsys_set_ipv6_mcast_address (getenv ("ZSYS_IPV6_MCAST_ADDRESS"));
     else
         zsys_set_ipv6_mcast_address ("ff02:0:0:0:0:0:0:1");
+
+    if (getenv ("ZSYS_IPV4_MCAST_ADDRESS"))
+        zsys_set_ipv4_mcast_address (getenv ("ZSYS_IPV4_MCAST_ADDRESS"));
+    else
+        zsys_set_ipv4_mcast_address (NULL);
 
 
     if (getenv ("ZSYS_LOGIDENT"))
@@ -1029,8 +1036,8 @@ zsys_vprintf (const char *format, va_list argptr)
 SOCKET
 zsys_udp_new (bool routable)
 {
-    //  We haven't implemented multicast yet
-    assert (!routable);
+    //IPV6 Multicast not implemented yet so only allow routable if IPv4
+    assert ((routable && !zsys_ipv6 ()) || !routable);
     SOCKET udpsock;
     int type = SOCK_DGRAM;
 #ifdef CZMQ_HAVE_SOCK_CLOEXEC
@@ -1071,6 +1078,25 @@ zsys_udp_new (bool routable)
                     (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEPORT)");
 #endif
+
+    //  Only set TLL for IPv4
+    if (routable && zsys_mcast_ttl () > 1) {
+        int ttl = zsys_mcast_ttl ();
+        if (setsockopt (udpsock, IPPROTO_IP, IP_MULTICAST_TTL, (const char *) &ttl,
+                        sizeof (ttl))
+            == SOCKET_ERROR)
+            zsys_socket_error ("setsockopt (IP_MULTICAST_TTL)");
+    }
+
+    //  TODO
+    //  Set TLL for IPv6
+    /*if (routable && zsys_ipv6 ()) {
+       int ttl = zsys_mcast_ttl ();
+        if (setsockopt (udpsock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+                (char *) &ttl, sizeof (ttl))
+            == SOCKET_ERROR)
+            zsys_socket_error ("setsockopt (IP_MULTICAST_TTL)");
+    }*/
     return udpsock;
 }
 
@@ -1943,6 +1969,31 @@ zsys_set_ipv6_mcast_address (const char *value)
     assert (s_ipv6_mcast_address);
 }
 
+//  --------------------------------------------------------------------------
+//  Set IPv4 multicast address to use for sending zbeacon messages. By default
+//  IPv4 multicast is NOT used. If the environment variable
+//  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+//  address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+//  will enable IPv4 zbeacon messages.
+
+void zsys_set_ipv4_mcast_address (const char *value)
+{
+    zsys_init ();
+    freen (s_ipv4_mcast_address);
+    s_ipv4_mcast_address = value ? strdup (value) : NULL;
+    assert (!value || s_ipv4_mcast_address);
+}
+
+//  --------------------------------------------------------------------------
+//  Set multicast TTL
+
+void zsys_set_mcast_ttl (const unsigned char value)
+{
+    zsys_init ();
+    s_mcast_ttl = value;
+    assert (s_mcast_ttl);
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return IPv6 multicast address to use for sending zbeacon, or
@@ -1952,6 +2003,23 @@ const char *
 zsys_ipv6_mcast_address (void)
 {
     return s_ipv6_mcast_address ? s_ipv6_mcast_address : "ff02:0:0:0:0:0:0:1";
+}
+
+//  --------------------------------------------------------------------------
+//  Return IPv4 multicast address to use for sending zbeacon, or
+//  NULL if none was set.
+
+const char *zsys_ipv4_mcast_address (void)
+{
+    return s_ipv4_mcast_address;
+}
+
+//  --------------------------------------------------------------------------
+//  Get multicast TTL
+
+unsigned char zsys_mcast_ttl ()
+{
+    return s_mcast_ttl;
 }
 
 

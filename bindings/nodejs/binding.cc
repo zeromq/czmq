@@ -7419,6 +7419,8 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "ipv6Address", _ipv6_address);
     Nan::SetPrototypeMethod (tpl, "setIpv6McastAddress", _set_ipv6_mcast_address);
     Nan::SetPrototypeMethod (tpl, "ipv6McastAddress", _ipv6_mcast_address);
+    Nan::SetPrototypeMethod (tpl, "setIpv4McastAddress", _set_ipv4_mcast_address);
+    Nan::SetPrototypeMethod (tpl, "ipv4McastAddress", _ipv4_mcast_address);
     Nan::SetPrototypeMethod (tpl, "setAutoUseFd", _set_auto_use_fd);
     Nan::SetPrototypeMethod (tpl, "autoUseFd", _auto_use_fd);
     Nan::SetPrototypeMethod (tpl, "zprintf", _zprintf);
@@ -8096,6 +8098,25 @@ NAN_METHOD (Zsys::_set_ipv6_mcast_address) {
 
 NAN_METHOD (Zsys::_ipv6_mcast_address) {
     char *result = (char *) zsys_ipv6_mcast_address ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_set_ipv4_mcast_address) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
+    zsys_set_ipv4_mcast_address ((const char *)value);
+}
+
+NAN_METHOD (Zsys::_ipv4_mcast_address) {
+    char *result = (char *) zsys_ipv4_mcast_address ();
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 

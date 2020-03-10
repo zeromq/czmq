@@ -4310,6 +4310,23 @@ Return IPv6 multicast address to use for sending zbeacon, or "" if none was
 set.
 
 ```
+nothing my_zsys.setIpv4McastAddress (String)
+```
+
+Set IPv4 multicast address to use for sending zbeacon messages. By default
+IPv4 multicast is NOT used. If the environment variable
+ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+will enable IPv4 zbeacon messages.
+
+```
+string my_zsys.ipv4McastAddress ()
+```
+
+Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+set.
+
+```
 nothing my_zsys.setAutoUseFd (Number)
 ```
 

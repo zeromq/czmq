@@ -842,6 +842,10 @@ module CZMQ
       attach_function :zsys_ipv6_address, [], :string, **opts
       attach_function :zsys_set_ipv6_mcast_address, [:string], :void, **opts
       attach_function :zsys_ipv6_mcast_address, [], :string, **opts
+      attach_function :zsys_set_ipv4_mcast_address, [:string], :void, **opts
+      attach_function :zsys_ipv4_mcast_address, [], :string, **opts
+      attach_function :zsys_set_mcast_ttl, [:char], :void, **opts
+      attach_function :zsys_mcast_ttl, [], :char, **opts
       attach_function :zsys_set_auto_use_fd, [:int], :void, **opts
       attach_function :zsys_auto_use_fd, [], :int, **opts
       attach_function :zsys_zprintf, [:string, :pointer], :pointer, **opts

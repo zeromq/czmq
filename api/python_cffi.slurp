@@ -4048,6 +4048,27 @@ void
 const char *
     zsys_ipv6_mcast_address (void);
 
+// Set IPv4 multicast address to use for sending zbeacon messages. By default
+// IPv4 multicast is NOT used. If the environment variable
+// ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+// address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+// will enable IPv4 zbeacon messages.
+void
+    zsys_set_ipv4_mcast_address (const char *value);
+
+// Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+// set.
+const char *
+    zsys_ipv4_mcast_address (void);
+
+// Set multicast TTL default is 1
+void
+    zsys_set_mcast_ttl (byte value);
+
+// Get multicast TTL
+byte
+    zsys_mcast_ttl (void);
+
 // Configure the automatic use of pre-allocated FDs when creating new sockets.
 // If 0 (default), nothing will happen. Else, when a new socket is bound, the
 // system API will be used to check if an existing pre-allocated FD with a

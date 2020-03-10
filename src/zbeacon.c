@@ -89,6 +89,8 @@ s_self_prepare_udp (self_t *self)
     if (self->udpsock_send != INVALID_SOCKET)
         zsys_udp_close (self->udpsock_send);
 
+    bool enable_multicast = zsys_ipv4_mcast_address () != NULL;
+
     self->hostname [0] = 0;
     //  For IPv6 we need two sockets. At least on Linux, IPv6 multicast packets
     //  are NOT received despite joining the group and setting the interface
@@ -101,12 +103,12 @@ s_self_prepare_udp (self_t *self)
     //  As a workaround, use a different socket to send packets. So the socket
     //  that receives can be bound to in6_addrany, and the socket that sends
     //  can be bound to the actual intended host address.
-    self->udpsock = zsys_udp_new (false);
+    self->udpsock = zsys_udp_new (enable_multicast);
     if (self->udpsock == INVALID_SOCKET) {
         self->udpsock_send = INVALID_SOCKET;
         return;
     }
-    self->udpsock_send = zsys_udp_new (false);
+    self->udpsock_send = zsys_udp_new (enable_multicast);
     if (self->udpsock_send == INVALID_SOCKET) {
         zsys_udp_close (self->udpsock);
         self->udpsock = INVALID_SOCKET;
@@ -146,6 +148,11 @@ s_self_prepare_udp (self_t *self)
                     &send_to);
             assert (rc == 0);
         }
+        else if (enable_multicast) {
+            rc = getaddrinfo (zsys_ipv4_mcast_address(), self->port_nbr, &hint,
+                    &send_to);
+            assert (rc == 0);
+        }
         else {
             rc = getaddrinfo ("255.255.255.255", self->port_nbr, &hint,
                     &send_to);
@@ -173,14 +180,24 @@ s_self_prepare_udp (self_t *self)
                 rc = getaddrinfo (ziflist_address (iflist), self->port_nbr,
                         &hint, &bind_to);
                 assert (rc == 0);
-                rc = getaddrinfo (ziflist_broadcast (iflist), self->port_nbr,
-                        &hint, &send_to);
+                if (enable_multicast) {
+                    rc = getaddrinfo (zsys_ipv4_mcast_address (), self->port_nbr,
+                            &hint, &send_to);
+                }
+                else {
+                    rc = getaddrinfo (ziflist_broadcast (iflist), self->port_nbr,
+                            &hint, &send_to);
+                }
                 assert (rc == 0);
                 if_index = if_nametoindex (name);
-
-                if (self->verbose)
+                if (self->verbose && !enable_multicast)
                     zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
-                            name, ziflist_address (iflist), ziflist_broadcast (iflist));
+                               name, ziflist_address (iflist),
+                               ziflist_broadcast (iflist));
+                if (self->verbose && enable_multicast)
+                    zsys_info ("zbeacon: interface=%s address=%s multicast=%s",
+                               name, ziflist_address (iflist),
+                               zsys_ipv4_mcast_address ());
                 found_iface = 1;
                 break;      //  iface is known, so allow it
             }
@@ -226,14 +243,25 @@ s_self_prepare_udp (self_t *self)
                 rc = getaddrinfo (ziflist_address (iflist), self->port_nbr,
                         &hint, &bind_to);
                 assert (rc == 0);
-                rc = getaddrinfo (ziflist_broadcast (iflist), self->port_nbr,
-                        &hint, &send_to);
+                if (enable_multicast) {
+                    rc = getaddrinfo (zsys_ipv4_mcast_address (),
+                            self->port_nbr, &hint, &send_to);
+                }
+                else {
+                    rc = getaddrinfo (ziflist_broadcast (iflist),
+                            self->port_nbr, &hint, &send_to);
+                }
+                assert (rc == 0);
                 assert (rc == 0);
                 if_index = if_nametoindex (name);
 
-                if (self->verbose)
+                if (self->verbose && !enable_multicast)
                     zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
                                name, ziflist_address (iflist), ziflist_broadcast (iflist));
+                if (self->verbose && enable_multicast)
+                    zsys_info ("zbeacon: interface=%s address=%s multicast=%s",
+                               name, ziflist_address (iflist),
+                               zsys_ipv4_mcast_address ());
                 found_iface = 1;
                 break;      //  iface is known, so allow it
             }
@@ -280,6 +308,35 @@ s_self_prepare_udp (self_t *self)
             if (setsockopt (self->udpsock_send, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                     (char *)&if_index, sizeof (if_index)))
                 zsys_socket_error ("zbeacon: setsockopt IPV6_MULTICAST_IF failed");
+        }
+        else if(enable_multicast){
+            struct ip_mreq mreq;
+            memcpy (&mreq.imr_interface,
+                    &(((inaddr_t *) (bind_to->ai_addr))->sin_addr),
+                    sizeof (struct in_addr));
+            memcpy (&mreq.imr_multiaddr,
+                    &(((inaddr_t *) (send_to->ai_addr))->sin_addr),
+                    sizeof (struct in_addr));
+
+            if (setsockopt (self->udpsock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                            (char *) &mreq, sizeof (mreq)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_ADD_MEMBERSHIP failed");
+
+            if (setsockopt (self->udpsock, IPPROTO_IP, IP_MULTICAST_IF,
+                            (char *) &if_index, sizeof (if_index)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_MULTICAST_IF failed");
+
+            if (setsockopt (self->udpsock_send, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                            (char *) &mreq, sizeof (mreq)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_ADD_MEMBERSHIP failed");
+
+            if (setsockopt (self->udpsock_send, IPPROTO_IP, IP_MULTICAST_IF,
+                            (char *) &if_index, sizeof (if_index)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_MULTICAST_IF failed");
         }
 
         //  If bind fails, we close the socket for opening again later (next poll interval)
@@ -528,6 +585,157 @@ zbeacon (zsock_t *pipe, void *args)
     s_self_destroy (&self);
 }
 
+//  --------------------------------------------------------------------------
+//  Selftest Multicast
+
+static void zbeacon_ipv4_mcast_test (bool verbose)
+{
+    printf (" * zbeacon_ipv4_mcast: ");
+    if (verbose)
+        printf ("\n");
+
+    //  Before starting test configure beacon for ipv4 multicast
+    zsys_set_ipv4_mcast_address ("239.0.0.0");
+
+    //  Check that udp multicast is enabled
+    {
+        SOCKET sock = zsys_udp_new (true);
+        if (sock == INVALID_SOCKET) {
+            //  multicast may not be enabled during test so skip!
+            printf ("SKIPPED - Is IPv4 UDP multicast allowed?\n");
+            //  Unset multicast
+            zsys_set_ipv4_mcast_address (NULL);
+            return;
+        }
+        unsigned int if_index = 1;
+        if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, (char *)&if_index,
+                sizeof(if_index)) != 0){
+            //  multicast may not be enabled during test so skip!
+            printf ("SKIPPED - Is IPv4 UDP multicast allowed?\n");
+            zsys_udp_close (sock);
+            //  Unset multicast
+            zsys_set_ipv4_mcast_address (NULL);
+            return;
+        }
+        zsys_udp_close (sock);
+    }
+
+    //  @selftest
+    //  Test 1 - two beacons, one speaking, one listening
+    //  Create speaker beacon to broadcast our service
+    zactor_t *speaker = zactor_new (zbeacon, NULL);
+    assert (speaker);
+    if (verbose)
+        zstr_sendx (speaker, "VERBOSE", NULL);
+
+    zsock_send (speaker, "si", "CONFIGURE", 9999);
+    char *hostname = zstr_recv (speaker);
+    if (!*hostname) {
+        printf ("OK (skipping test, no UDP broadcasting)\n");
+        zactor_destroy (&speaker);
+        freen (hostname);
+        return;
+    }
+    freen (hostname);
+
+    //  Create listener beacon on port 9999 to lookup service
+    zactor_t *listener = zactor_new (zbeacon, NULL);
+    assert (listener);
+    if (verbose)
+        zstr_sendx (listener, "VERBOSE", NULL);
+    zsock_send (listener, "si", "CONFIGURE", 9999);
+    hostname = zstr_recv (listener);
+    assert (*hostname);
+    freen (hostname);
+
+    //  We will broadcast the magic value 0xCAFE
+    byte announcement [2] = { 0xCA, 0xFE };
+    zsock_send (speaker, "sbi", "PUBLISH", announcement, 2, 100);
+    //  We will listen to anything (empty subscription)
+    zsock_send (listener, "sb", "SUBSCRIBE", "", 0);
+
+    //  Wait for at most 1/2 second if there's no broadcasting
+    zsock_set_rcvtimeo (listener, 500);
+    char *ipaddress = zstr_recv (listener);
+    if (ipaddress) {
+        zframe_t *content = zframe_recv (listener);
+        assert (zframe_size (content) == 2);
+        assert (zframe_data (content) [0] == 0xCA);
+        assert (zframe_data (content) [1] == 0xFE);
+        zframe_destroy (&content);
+        zstr_free (&ipaddress);
+        zstr_sendx (speaker, "SILENCE", NULL);
+    }
+    zactor_destroy (&listener);
+    zactor_destroy (&speaker);
+
+    //  Test subscription filter using a 3-node setup
+    zactor_t *node1 = zactor_new (zbeacon, NULL);
+    assert (node1);
+    zsock_send (node1, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node1);
+    assert (*hostname);
+    freen (hostname);
+
+    zactor_t *node2 = zactor_new (zbeacon, NULL);
+    assert (node2);
+    zsock_send (node2, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node2);
+    assert (*hostname);
+    freen (hostname);
+
+    zactor_t *node3 = zactor_new (zbeacon, NULL);
+    assert (node3);
+    zsock_send (node3, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node3);
+    assert (*hostname);
+    freen (hostname);
+
+    zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
+    zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);
+    zsock_send (node3, "sbi", "PUBLISH", "RANDOM", 6, 250);
+    zsock_send (node1, "sb", "SUBSCRIBE", "NODE", 4);
+
+    //  Poll on three API sockets at once
+    zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
+    assert (poller);
+    int64_t stop_at = zclock_mono () + 1000;
+    while (zclock_mono () < stop_at) {
+        long timeout = (long) (stop_at - zclock_mono ());
+        if (timeout < 0)
+            timeout = 0;
+        void *which = zpoller_wait (poller, timeout);
+        if (which) {
+            assert (which == node1);
+            char *ipaddress, *received;
+            zstr_recvx (node1, &ipaddress, &received, NULL);
+            assert (streq (received, "NODE/2"));
+            zstr_free (&ipaddress);
+            zstr_free (&received);
+        }
+    }
+    zpoller_destroy (&poller);
+
+    //  Stop listening
+    zstr_sendx (node1, "UNSUBSCRIBE", NULL);
+
+    //  Stop all node broadcasts
+    zstr_sendx (node1, "SILENCE", NULL);
+    zstr_sendx (node2, "SILENCE", NULL);
+    zstr_sendx (node3, "SILENCE", NULL);
+
+    //  Destroy the test nodes
+    zactor_destroy (&node1);
+    zactor_destroy (&node2);
+    zactor_destroy (&node3);
+
+    //  Unset multicast
+    zsys_set_ipv4_mcast_address (NULL);
+
+    //  @end
+    printf ("OK\n");
+}
+
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -535,6 +743,8 @@ zbeacon (zsock_t *pipe, void *args)
 void
 zbeacon_test (bool verbose)
 {
+    zbeacon_ipv4_mcast_test (verbose);
+
     printf (" * zbeacon: ");
     if (verbose)
         printf ("\n");
