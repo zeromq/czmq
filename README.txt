@@ -124,22 +124,15 @@ These commands will also print out instructions on how to use the library from y
 ### Building on Linux and macOS
 
 To start with, you need at least these packages:
-
-* {{git}} -- git is how we share code with other people.
-
-* {{build-essential}}, {{libtool}}, {{pkg-config}} - the C compiler and related tools.
-
-* {{autotools-dev}}, {{autoconf}}, {{automake}} - the GNU autoconf makefile generators.
-
-* {{cmake}} - the CMake makefile generators (an alternative to autoconf).
+* `git` -- git is how we share code with other people.
+* `build-essential`, `libtool`, `pkg-config` - the C compiler and related tools.
+* `autotools-dev`, `autoconf`, `automake` - the GNU autoconf makefile generators.
+* `cmake` - the CMake makefile generators (an alternative to autoconf).
 
 Plus some others:
-
-* {{uuid-dev}}, {{libpcre3-dev}} - utility libraries.
-
-* {{valgrind}} - a useful tool for checking your code.
-
-* {{pkg-config}} - an optional useful tool to make building with dependencies easier.
+* `uuid-dev`, `libpcre3-dev` - utility libraries.
+* `valgrind` - a useful tool for checking your code.
+* `pkg-config` - an optional useful tool to make building with dependencies easier.
 
 Which we install like this (using the Debian-style apt-get package manager):
 
