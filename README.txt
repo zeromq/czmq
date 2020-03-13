@@ -124,22 +124,15 @@ These commands will also print out instructions on how to use the library from y
 ### Building on Linux and macOS
 
 To start with, you need at least these packages:
-
-* {{git}} -- git is how we share code with other people.
-
-* {{build-essential}}, {{libtool}}, {{pkg-config}} - the C compiler and related tools.
-
-* {{autotools-dev}}, {{autoconf}}, {{automake}} - the GNU autoconf makefile generators.
-
-* {{cmake}} - the CMake makefile generators (an alternative to autoconf).
+* `git` -- git is how we share code with other people.
+* `build-essential`, `libtool`, `pkg-config` - the C compiler and related tools.
+* `autotools-dev`, `autoconf`, `automake` - the GNU autoconf makefile generators.
+* `cmake` - the CMake makefile generators (an alternative to autoconf).
 
 Plus some others:
-
-* {{uuid-dev}}, {{libpcre3-dev}} - utility libraries.
-
-* {{valgrind}} - a useful tool for checking your code.
-
-* {{pkg-config}} - an optional useful tool to make building with dependencies easier.
+* `uuid-dev`, `libpcre3-dev` - utility libraries.
+* `valgrind` - a useful tool for checking your code.
+* `pkg-config` - an optional useful tool to make building with dependencies easier.
 
 Which we install like this (using the Debian-style apt-get package manager):
 
@@ -593,8 +586,30 @@ Before opening a pull request read our [contribution guidelines](https://github.
 
 ### Code Generation
 
-We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
+We generate autotools, cmake and other build scripts as well as bindings to higher level languages using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image. 
+
+#### Docker
+
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq. 
+
+Then run the following command:
+
+```sh
+# Shell and Powershell
+docker run -v ${PWD}/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+
+# Windows CMD
+docker run -v %cd%/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+```
+
+#### Linux and MacOS
+
+* Install [GSL](https://github.com/zeromq/gsl) and [zproject](https://github.com/zeromq/zproject)
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq
+
+Then run the following command:
+
+	gsl project.xml
 
 ### This Document
 
-This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

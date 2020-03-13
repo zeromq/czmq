@@ -88,6 +88,8 @@
 **[Hints to Contributors](#hints-to-contributors)**
 
 **[Code Generation](#code-generation)**
+*  [Docker](#docker)
+*  [Linux and MacOS](#linux-and-macos)
 
 **[This Document](#this-document)**
 
@@ -174,22 +176,15 @@ These commands will also print out instructions on how to use the library from y
 ### Building on Linux and macOS
 
 To start with, you need at least these packages:
-
-* {{git}} -- git is how we share code with other people.
-
-* {{build-essential}}, {{libtool}}, {{pkg-config}} - the C compiler and related tools.
-
-* {{autotools-dev}}, {{autoconf}}, {{automake}} - the GNU autoconf makefile generators.
-
-* {{cmake}} - the CMake makefile generators (an alternative to autoconf).
+* `git` -- git is how we share code with other people.
+* `build-essential`, `libtool`, `pkg-config` - the C compiler and related tools.
+* `autotools-dev`, `autoconf`, `automake` - the GNU autoconf makefile generators.
+* `cmake` - the CMake makefile generators (an alternative to autoconf).
 
 Plus some others:
-
-* {{uuid-dev}}, {{libpcre3-dev}} - utility libraries.
-
-* {{valgrind}} - a useful tool for checking your code.
-
-* {{pkg-config}} - an optional useful tool to make building with dependencies easier.
+* `uuid-dev`, `libpcre3-dev` - utility libraries.
+* `valgrind` - a useful tool for checking your code.
+* `pkg-config` - an optional useful tool to make building with dependencies easier.
 
 Which we install like this (using the Debian-style apt-get package manager):
 
@@ -878,6 +873,117 @@ Please add '@interface' section in './../src/zbeacon.c'.
 This is the class self test code:
 
 ```c
+    //  Test 1 - two beacons, one speaking, one listening
+    //  Create speaker beacon to broadcast our service
+    zactor_t *speaker = zactor_new (zbeacon, NULL);
+    assert (speaker);
+    if (verbose)
+        zstr_sendx (speaker, "VERBOSE", NULL);
+    
+    zsock_send (speaker, "si", "CONFIGURE", 9999);
+    char *hostname = zstr_recv (speaker);
+    if (!*hostname) {
+        printf ("OK (skipping test, no UDP broadcasting)\n");
+        zactor_destroy (&speaker);
+        freen (hostname);
+        return;
+    }
+    freen (hostname);
+    
+    //  Create listener beacon on port 9999 to lookup service
+    zactor_t *listener = zactor_new (zbeacon, NULL);
+    assert (listener);
+    if (verbose)
+        zstr_sendx (listener, "VERBOSE", NULL);
+    zsock_send (listener, "si", "CONFIGURE", 9999);
+    hostname = zstr_recv (listener);
+    assert (*hostname);
+    freen (hostname);
+    
+    //  We will broadcast the magic value 0xCAFE
+    byte announcement [2] = { 0xCA, 0xFE };
+    zsock_send (speaker, "sbi", "PUBLISH", announcement, 2, 100);
+    //  We will listen to anything (empty subscription)
+    zsock_send (listener, "sb", "SUBSCRIBE", "", 0);
+    
+    //  Wait for at most 1/2 second if there's no broadcasting
+    zsock_set_rcvtimeo (listener, 500);
+    char *ipaddress = zstr_recv (listener);
+    if (ipaddress) {
+        zframe_t *content = zframe_recv (listener);
+        assert (zframe_size (content) == 2);
+        assert (zframe_data (content) [0] == 0xCA);
+        assert (zframe_data (content) [1] == 0xFE);
+        zframe_destroy (&content);
+        zstr_free (&ipaddress);
+        zstr_sendx (speaker, "SILENCE", NULL);
+    }
+    zactor_destroy (&listener);
+    zactor_destroy (&speaker);
+    
+    //  Test subscription filter using a 3-node setup
+    zactor_t *node1 = zactor_new (zbeacon, NULL);
+    assert (node1);
+    zsock_send (node1, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node1);
+    assert (*hostname);
+    freen (hostname);
+    
+    zactor_t *node2 = zactor_new (zbeacon, NULL);
+    assert (node2);
+    zsock_send (node2, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node2);
+    assert (*hostname);
+    freen (hostname);
+    
+    zactor_t *node3 = zactor_new (zbeacon, NULL);
+    assert (node3);
+    zsock_send (node3, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node3);
+    assert (*hostname);
+    freen (hostname);
+    
+    zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
+    zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);
+    zsock_send (node3, "sbi", "PUBLISH", "RANDOM", 6, 250);
+    zsock_send (node1, "sb", "SUBSCRIBE", "NODE", 4);
+    
+    //  Poll on three API sockets at once
+    zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
+    assert (poller);
+    int64_t stop_at = zclock_mono () + 1000;
+    while (zclock_mono () < stop_at) {
+        long timeout = (long) (stop_at - zclock_mono ());
+        if (timeout < 0)
+            timeout = 0;
+        void *which = zpoller_wait (poller, timeout);
+        if (which) {
+            assert (which == node1);
+            char *ipaddress, *received;
+            zstr_recvx (node1, &ipaddress, &received, NULL);
+            assert (streq (received, "NODE/2"));
+            zstr_free (&ipaddress);
+            zstr_free (&received);
+        }
+    }
+    zpoller_destroy (&poller);
+    
+    //  Stop listening
+    zstr_sendx (node1, "UNSUBSCRIBE", NULL);
+    
+    //  Stop all node broadcasts
+    zstr_sendx (node1, "SILENCE", NULL);
+    zstr_sendx (node2, "SILENCE", NULL);
+    zstr_sendx (node3, "SILENCE", NULL);
+    
+    //  Destroy the test nodes
+    zactor_destroy (&node1);
+    zactor_destroy (&node2);
+    zactor_destroy (&node3);
+    
+    //  Unset multicast
+    zsys_set_ipv4_mcast_address (NULL);
+    
     //  Test 1 - two beacons, one speaking, one listening
     //  Create speaker beacon to broadcast our service
     zactor_t *speaker = zactor_new (zbeacon, NULL);
@@ -3317,6 +3423,7 @@ This is the class interface:
     
     //  Send message to zsys log sink (may be stdout, or system facility as
     //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    //  Long messages are truncated.
     CZMQ_EXPORT void
         zframe_print (zframe_t *self, const char *prefix);
     
@@ -3362,6 +3469,14 @@ This is the class interface:
     //  Return -1 on error, 0 on success.
     CZMQ_EXPORT int
         zframe_set_group (zframe_t *self, const char *group);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Send message to zsys log sink (may be stdout, or system facility as
+    //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    //  Message length is specified; no truncation unless length is zero.
+    //  Backwards compatible with zframe_print when length is zero.
+    CZMQ_EXPORT void
+        zframe_print_n (zframe_t *self, const char *prefix, size_t length);
     
     #endif // CZMQ_BUILD_DRAFT_API
 ```
@@ -6105,6 +6220,7 @@ This is the class interface:
     
     //  Send message to zsys log sink (may be stdout, or system facility as
     //  configured by zsys_set_logstream).
+    //  Long messages are truncated.
     CZMQ_EXPORT void
         zmsg_print (zmsg_t *self);
     
@@ -6138,6 +6254,14 @@ This is the class interface:
     //  ZMQ_SERVER socket.
     CZMQ_EXPORT void
         zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Send message to zsys log sink (may be stdout, or system facility as
+    //  configured by zsys_set_logstream).
+    //  Message length is specified; no truncation unless length is zero.
+    //  Backwards compatible with zframe_print when length is zero.
+    CZMQ_EXPORT void
+        zmsg_print_n (zmsg_t *self, size_t size);
     
     #endif // CZMQ_BUILD_DRAFT_API
 ```
@@ -6461,7 +6585,8 @@ This is the class interface:
         zpoller_destroy (zpoller_t **self_p);
     
     //  Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
-    //  be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
+    //  be a libzmq void * socket, a zsock_t instance, a zactor_t instance or a
+    //  file handle.
     CZMQ_EXPORT int
         zpoller_add (zpoller_t *self, void *reader);
     
@@ -6478,14 +6603,15 @@ This is the class interface:
         zpoller_set_nonstop (zpoller_t *self, bool nonstop);
     
     //  Poll the registered readers for I/O, return first reader that has input.
-    //  The reader will be a libzmq void * socket, or a zsock_t or zactor_t
-    //  instance as specified in zpoller_new/zpoller_add. The timeout should be
-    //  zero or greater, or -1 to wait indefinitely. Socket priority is defined
-    //  by their order in the poll list. If you need a balanced poll, use the low
-    //  level zmq_poll method directly. If the poll call was interrupted (SIGINT),
-    //  or the ZMQ context was destroyed, or the timeout expired, returns NULL.
-    //  You can test the actual exit condition by calling zpoller_expired () and
-    //  zpoller_terminated (). The timeout is in msec.
+    //  The reader will be a libzmq void * socket, a zsock_t, a zactor_t
+    //  instance or a file handle as specified in zpoller_new/zpoller_add. The
+    //  timeout should be zero or greater, or -1 to wait indefinitely. Socket
+    //  priority is defined by their order in the poll list. If you need a
+    //  balanced poll, use the low level zmq_poll method directly. If the poll
+    //  call was interrupted (SIGINT), or the ZMQ context was destroyed, or the
+    //  timeout expired, returns NULL. You can test the actual exit condition by
+    //  calling zpoller_expired () and zpoller_terminated (). The timeout is in
+    //  msec.
     CZMQ_EXPORT void *
         zpoller_wait (zpoller_t *self, int timeout);
     
@@ -7946,6 +8072,85 @@ This is the class interface:
     //  return the supplied value. Takes a polymorphic socket reference.
     CZMQ_EXPORT void *
         zsock_resolve (void *self);
+    
+    //  Set socket option `only_first_subscribe`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_only_first_subscribe (void *self, int only_first_subscribe);
+    
+    //  Set socket option `wss_trust_system`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_wss_trust_system (void *self, int wss_trust_system);
+    
+    //  Set socket option `wss_hostname`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_wss_hostname (void *self, const char *wss_hostname);
+    
+    //  Set socket option `wss_trust_pem`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_wss_trust_pem (void *self, const char *wss_trust_pem);
+    
+    //  Set socket option `wss_cert_pem`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_wss_cert_pem (void *self, const char *wss_cert_pem);
+    
+    //  Set socket option `wss_key_pem`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_wss_key_pem (void *self, const char *wss_key_pem);
+    
+    //  Get socket option `out_batch_size`.
+    //  Available from libzmq 4.3.0.
+    //  Caller owns return value and must destroy it when done.
+    CZMQ_EXPORT int
+        zsock_out_batch_size (void *self);
+    
+    //  Set socket option `out_batch_size`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_out_batch_size (void *self, int out_batch_size);
+    
+    //  Get socket option `in_batch_size`.
+    //  Available from libzmq 4.3.0.
+    //  Caller owns return value and must destroy it when done.
+    CZMQ_EXPORT int
+        zsock_in_batch_size (void *self);
+    
+    //  Set socket option `in_batch_size`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_in_batch_size (void *self, int in_batch_size);
+    
+    //  Get socket option `socks_password`.
+    //  Available from libzmq 4.3.0.
+    //  Caller owns return value and must destroy it when done.
+    CZMQ_EXPORT char *
+        zsock_socks_password (void *self);
+    
+    //  Set socket option `socks_password`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_socks_password (void *self, const char *socks_password);
+    
+    //  Get socket option `socks_username`.
+    //  Available from libzmq 4.3.0.
+    //  Caller owns return value and must destroy it when done.
+    CZMQ_EXPORT char *
+        zsock_socks_username (void *self);
+    
+    //  Set socket option `socks_username`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_socks_username (void *self, const char *socks_username);
+    
+    //  Set socket option `xpub_manual_last_value`.
+    //  Available from libzmq 4.3.0.
+    CZMQ_EXPORT void
+        zsock_set_xpub_manual_last_value (void *self, int xpub_manual_last_value);
     
     //  Get socket option `router_notify`.
     //  Available from libzmq 4.3.0.
@@ -9997,6 +10202,31 @@ This is the class interface:
         zsys_file_stable_age_msec (void);
     
     //  *** Draft method, for development use, may change without warning ***
+    //  Set IPv4 multicast address to use for sending zbeacon messages. By default
+    //  IPv4 multicast is NOT used. If the environment variable
+    //  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+    //  address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+    //  will enable IPv4 zbeacon messages.
+    CZMQ_EXPORT void
+        zsys_set_ipv4_mcast_address (const char *value);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+    //  set.
+    CZMQ_EXPORT const char *
+        zsys_ipv4_mcast_address (void);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Set multicast TTL default is 1
+    CZMQ_EXPORT void
+        zsys_set_mcast_ttl (byte value);
+    
+    //  *** Draft method, for development use, may change without warning ***
+    //  Get multicast TTL
+    CZMQ_EXPORT byte
+        zsys_mcast_ttl (void);
+    
+    //  *** Draft method, for development use, may change without warning ***
     //  Print formatted string. Format is specified by variable names
     //  in Python-like format style
     //
@@ -11048,10 +11278,32 @@ Before opening a pull request read our [contribution guidelines](https://github.
 
 ### Code Generation
 
-We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
+We generate autotools, cmake and other build scripts as well as bindings to higher level languages using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image. 
+
+#### Docker
+
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq. 
+
+Then run the following command:
+
+```sh
+# Shell and Powershell
+docker run -v ${PWD}/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+
+# Windows CMD
+docker run -v %cd%/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+```
+
+#### Linux and MacOS
+
+* Install [GSL](https://github.com/zeromq/gsl) and [zproject](https://github.com/zeromq/zproject)
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq
+
+Then run the following command:
+
+	gsl project.xml
 
 ### This Document
 
-This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
 
 _This documentation was generated from czmq/README.txt using [Gitdown](https://github.com/zeromq/gitdown)_
