@@ -613,4 +613,3 @@ Then run the following command:
 
 ### This Document
 
-This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
