@@ -586,7 +586,30 @@ Before opening a pull request read our [contribution guidelines](https://github.
 
 ### Code Generation
 
-We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
+We generate autotools, cmake and other build scripts as well as bindings to higher level languages using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image. 
+
+#### Docker
+
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq. 
+
+Then run the following command:
+
+```sh
+# Shell and Powershell
+docker run -v ${PWD}/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+
+# Windows CMD
+docker run -v %cd%/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+```
+
+#### Linux and MacOS
+
+* Install [GSL](https://github.com/zeromq/gsl) and [zproject](https://github.com/zeromq/zproject)
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq
+
+Then run the following command:
+
+	gsl project.xml
 
 ### This Document
 
