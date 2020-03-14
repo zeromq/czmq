@@ -5,11 +5,6 @@
 ################################################################################
 */
 
-ext.jni_dependencies_version = project.hasProperty('isRelease') ? 'latest.release' : 'latest.integration'
-ext.hasNotEmptyProperty = { propertyName ->
-    return project.hasProperty(propertyName) ? project[propertyName]?.trim() : false
-}
-
 dependencies {
     compile 'org.scijava:native-lib-loader:2.3.4'
     testCompile 'junit:junit:4.12'
@@ -65,25 +60,30 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
 tasks.withType(Test) {
     def defaultJavaLibraryPath = System.getProperty("java.library.path")
     if (osdetector.os == 'windows') {
-         def extraJavaLibraryPath = hasNotEmptyProperty('buildPrefix') ? "$project.buildPrefix\\bin;$project.buildPrefix\\lib" : ''
-         extraJavaLibraryPath = extraJavaLibraryPath.replace("/", "\\")
-         systemProperty "java.library.path", "${projectDir}\\build\\Release${File.pathSeparator}" +
-                                             "${extraJavaLibraryPath}${File.pathSeparator}" +
-                                             "${defaultJavaLibraryPath}"
+        systemProperty "java.library.path", "${projectDir}/build/Release${File.pathSeparator}${defaultJavaLibraryPath}"
     } else {
-        def extraJavaLibraryPath = hasNotEmptyProperty('buildPrefix') ? "$project.buildPrefix/lib" : ''
-        systemProperty "java.library.path", "${projectDir}/build${File.pathSeparator}" +
-                                            "/usr/local/lib${File.pathSeparator}" +
-                                            "/tmp/lib${File.pathSeparator}" +
-                                            "${extraJavaLibraryPath}${File.pathSeparator}" +
-                                            "${defaultJavaLibraryPath}"
+        systemProperty "java.library.path", "${projectDir}${File.pathSeparator}${defaultJavaLibraryPath}${File.pathSeparator}/usr/local/lib${File.pathSeparator}/tmp/lib"
     }
 }
 
 task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
-    workingDir  'build'
-    def prefixPath = hasNotEmptyProperty('buildPrefix') ? "-DCMAKE_PREFIX_PATH=$project.buildPrefix" : ''
-    commandLine 'cmake', "$prefixPath", '..'
+    if (osdetector.os == 'windows') {
+        def includePath = "${rootDir}/../../include"
+        includePath += "${File.pathSeparator}${rootDir}/../../../libzmq/include"
+        includePath += "${File.pathSeparator}${rootDir}/../../../uuid/include"
+        includePath += "${File.pathSeparator}${rootDir}/../../../systemd/include"
+        includePath += "${File.pathSeparator}${rootDir}/../../../lz4/include"
+        includePath += "${File.pathSeparator}${rootDir}/../../../libcurl/include"
+        includePath += "${File.pathSeparator}${rootDir}/../../../nss/include"
+        includePath += "${File.pathSeparator}${rootDir}/../../../libmicrohttpd/include"
+        workingDir  'build'
+        commandLine 'cmake',
+                    '-G', vsGenerator,
+                    '-D', "CMAKE_INCLUDE_PATH=\"${includePath}\"",
+                    '..'
+    } else {
+        commandLine 'cmake', '.'
+    }
 }
 
 task buildNative(type: Exec, dependsOn: 'initCMake') {
@@ -94,8 +94,7 @@ task buildNative(type: Exec, dependsOn: 'initCMake') {
                     '--target', 'czmqjni',
                     '--', '-verbosity:Minimal',  '-maxcpucount'
     } else {
-        commandLine 'cmake',
-                    '--build',  'build'
+        commandLine 'make'
     }
 }
 

@@ -60,7 +60,7 @@ def pkgconfig_kwargs (libs):
     for libname in libs:
         foo = kwargs (libname)
         for key, value in foo.items ():
-            if key not in ret:
+            if not key in ret:
                 ret [key] = value
             else:
                 ret [key].extend (value)

@@ -25,43 +25,6 @@ case "$CI_TRACE" in
         set -x ;;
 esac
 
-case $TRAVIS_OS_NAME in
-windows)
-    export
-    choco install openjdk
-    export JAVA_HOME="C:\Program Files\OpenJDK\jdk-13.0.2"
-    export BUILD_PREFIX=$TEMP/ci_build
-
-    cd ..
-
-    git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
-    cd libzmq
-    mkdir build
-    cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
-    cmake --build . --config Release --target install
-    cd ../..
-
-    cd czmq
-    mkdir build
-    cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
-    cmake --build . --config Release --target install
-    ctest --build-config Release
-    cd ../..
-
-    cd czmq
-    cd bindings/jni
-    # Build will fail if processes are still running at the end of the script.
-    # Gradle by default starts a daemon so consequtive builds are faster.
-    # Therefore instruct gradle not to use its daemon.
-    export GRADLE_OPTS=-Dorg.gradle.daemon=false
-    ./gradlew build jar -PbuildPrefix=$BUILD_PREFIX -x test --info
-    ./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
-
-    exit 0
-esac
-
 case "$BUILD_TYPE" in
 default|default-Werror|default-with-docs|valgrind|clang-format-check)
     LANG=C
@@ -72,12 +35,11 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         # Proto installation area for this project and its deps
         rm -rf ./tmp
     fi
-    mkdir -p tmp
     if [ -d "./tmp-deps" ]; then
         # Checkout/unpack and build area for dependencies
         rm -rf ./tmp-deps
     fi
-    mkdir -p tmp-deps
+    mkdir -p tmp tmp-deps
     BUILD_PREFIX=$PWD/tmp
 
     PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'`"
