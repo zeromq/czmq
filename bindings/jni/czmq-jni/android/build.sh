@@ -4,44 +4,71 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 #   Build JNI interface for Android
-#   Targets Android API level 8, ARM architecture (see below)
 #
 #   Requires these environment variables be set, e.g.:
 #
-#     ANDROID_NDK_ROOT=$HOME/android-ndk-r11c
-#     TOOLCHAIN_NAME=arm-linux-androideabi-4.9
-#     TOOLCHAIN_VERSION=4.9
-#     TOOLCHAIN_HOST=arm-linux-androideabi
-#     TOOLCHAIN_ARCH=arm
-#     TOOLCHAIN_PATH=$ANDROID_NDK_ROOT/toolchains/$TOOLCHAIN_NAME/prebuilt/linux-x86_64/bin
+#     ANDROID_NDK_ROOT=$HOME/android-ndk-r20
 #
 #   Exit if any step fails
 set -e
-set -x
 
-export ANDROID_API_LEVEL=android-8
-export ANDROID_SYS_ROOT=$ANDROID_NDK_ROOT/platforms/$ANDROID_API_LEVEL/arch-$TOOLCHAIN_ARCH
-if [ "$1" = "-d" ]; then
-    MAKE_OPTIONS=VERBOSE=1
+# Set this to enable verbose profiling
+[ -n "${CI_TIME-}" ] || CI_TIME=""
+case "$CI_TIME" in
+    [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
+        CI_TIME="time -p " ;;
+    [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
+        CI_TIME="" ;;
+esac
+
+# Set this to enable verbose tracing
+[ -n "${CI_TRACE-}" ] || CI_TRACE="no"
+case "$CI_TRACE" in
+    [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
+        set +x ;;
+    [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
+        set -x
+        MAKE_OPTIONS=VERBOSE=1
+        ;;
+esac
+
+function usage {
+    echo "Usage ./build.sh [ arm | arm64 | x86 | x86_64 ]"
+}
+
+BUILD_ARCH=$1
+if [ -z $BUILD_ARCH ]; then
+    usage
+    exit 1
 fi
 
 source ../../../../builds/android/android_build_helper.sh
-android_build_env
+
+export MIN_SDK_VERSION=21
+export ANDROID_BUILD_DIR=/tmp/android_build
 
 #   Build any dependent libraries
+#   Use a default value assuming that dependent libraries sits alongside this one
 
 #   Ensure we've built dependencies for Android
 echo "********  Building CZMQ Android native libraries"
-( cd ../../../../builds/android && ./build.sh )
+( cd ../../../../builds/android && ./build.sh $BUILD_ARCH )
 
 #   Ensure we've built JNI interface
 echo "********  Building CZMQ JNI interface & classes"
-( cd ../.. && ./gradlew build jar --info )
+( cd ../.. && TERM=dumb ./gradlew build jar -PbuildPrefix=$BUILD_PREFIX --info )
 
 echo "********  Building CZMQ JNI for Android"
 rm -rf build && mkdir build && cd build
-export ANDROID_BUILD_PREFIX=$ANDROID_BUILD_PREFIX
-cmake -v -DCMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake ..
+# Export android build's environment variables for cmake
+android_build_set_env $BUILD_ARCH
+cmake -v \
+    -DANDROID_ABI=$TOOLCHAIN_ABI \
+    -DANDROID_PLATFORM=$MIN_SDK_VERSION \
+    -DANDROID_STL=c++_shared \
+    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+    -DCMAKE_FIND_ROOT_PATH=$ANDROID_BUILD_PREFIX \
+    ..
 
 #   CMake wrongly searches current directory and then toolchain path instead
 #   of lib path for these files, so make them available temporarily
@@ -50,18 +77,27 @@ ln -s $ANDROID_SYS_ROOT/usr/lib/crtbegin_so.o
 
 make $MAKE_OPTIONS
 
-echo "********  Building czmq.jar for Android"
+echo "********  Building jar for $TOOLCHAIN_ABI"
 #   Copy class files into org/zeromq/etc.
-unzip -q ../../build/libs/czmq-jni-4.2.1*.jar
+find ../../build/libs/ -type f -name 'czmq-jni-*.jar' ! -name '*javadoc.jar' ! -name '*sources.jar' -exec unzip -q {} +
 
-#   Copy native libraries into lib/armeabi
-mkdir -p lib/armeabi
-mv libczmqjni.so lib/armeabi
-cp ../../../../../builds/android/prefix/*/lib/*.so lib/armeabi
+#   Copy native libraries into lib/$TOOLCHAIN_ABI
+mkdir -p lib/$TOOLCHAIN_ABI
+cp libczmqjni.so lib/$TOOLCHAIN_ABI
+cp $ANDROID_BUILD_PREFIX/lib/*.so lib/$TOOLCHAIN_ABI
+cp $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/$TOOLCHAIN_ABI/libc++_shared.so lib/$TOOLCHAIN_ABI
 
-cp $ANDROID_NDK_ROOT/sources/cxx-stl/gnu-libstdc++/$TOOLCHAIN_VERSION/libs/armeabi/libgnustl_shared.so lib/armeabi
+#   Build android jar
+zip -r -m ../czmq-android-$TOOLCHAIN_ABI-4.2.1.jar lib/ org/ META-INF/
+cd ..
+rm -rf build
 
-zip -r -m ../czmq-android.jar lib/ org/ META-INF/
+echo "********  Merging ABI jars"
+mkdir build && cd build
+#   Copy contents from all ABI jar - overwriting class files and manifest
+unzip -qo '../czmq-android-*4.2.1.jar'
+#   Build merged jar
+zip -r -m ../czmq-android-4.2.1.jar lib/ org/ META-INF/
 cd ..
 rm -rf build
 

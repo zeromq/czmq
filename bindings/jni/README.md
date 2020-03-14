@@ -4,7 +4,7 @@
 
 JNI Binding for CZMQ
 
-## Building the JNI Layer for Linux
+## Building the JNI Layer for Linux and OSX
 
 Ensure you have gradle and cmake installed, then run:
 
@@ -16,33 +16,33 @@ If you don't like to install gradle beforehand just use the gradle wrapper.
     ./gradlew build jar
     ./gradlew test
 
-This calls javah to build the headers in src/native/include, and then compiles the C and Java pieces to create a jar file a sharable library (.so).
+This does the following:
+
+* It calls javah to build the headers in src/native/include
+* It compiles the C and Java classes
+* It creates a jar file and a shareable native library
+
+If libraries of dependent projects are not installed in any of the default locations of your OS use parameter `buildPrefix` to point to their location, e.g.:
+
+    ./gradlew build jar -PbuildPrefix=/tmp/jni_build
 
 ## Building the JNI Layer for Android
 
-See bindings/jni/android/build.sh.
+Please read the prerequisites section of the [README](../../builds/android/README.md) in the android build directory.
 
-You need the Android Native Development Kit (NDK) installed.
+You only need to set the environment variables.
 
-Set these environment variables, e.g:
+Then in the jni's android directory (czmq-jni/android), run:
 
-    ANDROID_NDK_ROOT=$HOME/android-ndk-r11c
-    TOOLCHAIN_VERSION=4.9
-    TOOLCHAIN_HOST=arm-linux-androideabi
-    TOOLCHAIN_NAME=$TOOLCHAIN_HOST-$TOOLCHAIN_VERSION
-    TOOLCHAIN_ARCH=arm
-    TOOLCHAIN_PATH=$ANDROID_NDK_ROOT/toolchains/$TOOLCHAIN_NAME/prebuilt/linux-x86_64/bin
-
-Then in the android directory, run:
-
-    ./build.sh
+    ./build.sh [ arm | arm64 | x86 | x86_64 ]
 
 This does the following:
 
-* It compiles the CZMQ C sources for Android, into a native library libczmq.so in builds/android/
-* It compiles the JNI Java classes into a jar file czmq-jni-4.2.1.jar in bindings/jni/build/libs
+* It compiles the CZMQ C sources for Android, into a native library libczmq.so in /tmp/android_build/<architecture>/lib
+* It compiles the JNI Java classes into a jar file czmq-jni-4.2.1.jar in bindings/jni/czmq-jni/build/libs
 * It compiles the JNI C sources for Android, into a native library libczmqjni.so.
-* It combines all these into czmq-android.jar, which you can use in your Android projects.
+* It combines all these into jar file for the built architecture, which you can use in your Android projects.
+* It merges the jar files built for the different architectures into one jar file.
 
 ## Building the JNI Layer for Windows
 
@@ -51,22 +51,23 @@ Prerequisites:
 * Java JDK 8 or later is installed
 
 Environment Variables:
-* Add MSBuild.exe to the PATH, e.g. C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin
-* Set JAVA_HOME to the installation location, e.g. C:\Program Files\Java\jdk1.8.0_66.
+* Add MSBuild.exe to the PATH (e.g. `C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin`)
+* Set JAVA_HOME to the installation location (e.g. `C:\Program Files\Java\jdk1.8.0_66`).
 
-1. Check out all dependent projects from github, at the same level as this project. E.g.: libzmq, czmq.
-2. Follow the dependent projects instuctions to build thier '.dll' and '.lib' file.
-3. Copy a dependent '.dll' and '.lib' files to a folder
-4. Add this library folder to the path, e.g.:
+1. Check out all dependent projects from github, at the same level as this project (e.g. libzmq, czmq).
+2. Follow the dependent projects instructions to build their `.dll` and `.lib` file.
 
-	PATH %PATH%;C:\projects\libs
+If you used cmake to install the dependencies you can skip the following steps.
+
+3. Create a folder where to place the dlls and libs (e.g. `C:\tmp\deps`).
+4. Copy all dependent `.dll` files to the `bin` subfolder (e.g. `C:\tmp\deps\bin`)
+5. Copy all dependent `.lib` files to the `lib` subfolder (e.g. `C:\tmp\deps\lib`)
+6. Copy all dependent `.h` files to the `include` subfolder (e.g. `C:\tmpdeps\include`)
 
 Now run:
 
-	gradlew build jar "-PvsGenerator=Visual Studio 16 2019"
-	gradlew test "-PvsGenerator=Visual Studio 16 2019"
-
-Change the vsGenerator parameter to the version of MS Visual Studio you have installed.
+    gradlew build jar -PbuildPrefix=C:\tmp\deps
+    gradlew test -PbuildPrefix=C:\tmp\deps
 
 ## Installing the JNI Layer
 
@@ -76,6 +77,11 @@ is by leveraging maven and install to the local maven repository located at
 $HOME/.m2. Therefore simply run:
 
     ./gradlew publishToMavenLocal
+
+By default the JNI Layer builds SNAPSHOT versions (e.g. 1.1.3-SNAPSHOT). If you
+like to build a release version you need the set the release switch:
+
+    ./gradlew publishToMavenLocal -PisRelease
 
 ## Using the JNI API
 
@@ -95,7 +101,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 ## Information for maintainers
 
-### Building the gradle wrapper
+### Create or update the gradle wrapper
 
 The gradle wrapper is a tool that allows to use gradle on multiple platforms
 without installing it beforehand. Make sure you have installed a version of
@@ -115,7 +121,7 @@ travis environment matrix
 
     - BUILD_TYPE=bindings BINDING=jni
 
-### Travis deploy to bintray
+### Deploy to bintray with Travis CI
 
 When tagging a release travis can automatically deploy this jni layer to bintray.
 Therefore you'll need to supply travis with three environment variables:
