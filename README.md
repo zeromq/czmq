@@ -11278,11 +11278,18 @@ Before opening a pull request read our [contribution guidelines](https://github.
 
 ### Code Generation
 
-We generate autotools, cmake and other build scripts as well as bindings to higher level languages using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image. 
+We generate scripts for build systems like autotools, cmake and others as well as class skeletons, class headers, the selftest runner, bindings to higher level languages and more using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image. 
 
 #### Docker
 
 * Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq. 
+
+Next always download the latest image: 
+
+```sh
+# Make sure 
+docker pull zeromqorg/zproject:latest
+```
 
 Then run the following command:
 
