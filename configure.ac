@@ -1131,6 +1131,7 @@ echo
 echo Configure complete! Now proceed with:
 echo "    - 'make'               compile the project"
 echo "    - 'make check'         run the project's selftest"
+echo "    - 'make check-<test-name>'    run the project's selftest"
 echo "    - 'make install'       install the project to $prefix"
 echo "    - 'make bindings       install enabled language bindings (Python, etc)"
 echo
@@ -1147,7 +1148,7 @@ echo "    - 'make coverage'      generate project's selftest coverage report"
 echo "                           expects --with-gcov option for configure"
 echo "    - 'make clang-format-check'   check if project sources conform"
 echo "                           to style requirements"
-echo "    - 'make clang-format'         modify project sources to conform"
+echo "    - 'make clang-format'  modify project sources to conform"
 echo "                           to style requirements"
 echo "    - 'make clang-format-diff'    modify as above and print 'git diff'"
 echo

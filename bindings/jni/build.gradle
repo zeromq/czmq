@@ -13,7 +13,7 @@ plugins {
     id 'com.google.osdetector' version '1.6.2'
 }
 
-wrapper.gradleVersion = '5.6.2'
+wrapper.gradleVersion = '6.1.1'
 
 subprojects {
     apply plugin: 'java'
