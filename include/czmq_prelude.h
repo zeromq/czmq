@@ -286,9 +286,14 @@
 #   include <sys/un.h>
 #   include <sys/uio.h>             //  Let CZMQ build with libzmq/3.x
 #   include <netinet/in.h>          //  Must come before arpa/inet.h
-#   if (!defined (__UTYPE_ANDROID)) && (!defined (__UTYPE_IBMAIX)) \
-    && (!defined (__UTYPE_HPUX))
-#       include <ifaddrs.h>
+#   if (!defined (__UTYPE_IBMAIX)) && (!defined (__UTYPE_HPUX))
+#       if(defined(__UTYPE_ANDROID))
+#           if(defined(__ANDROID_API__)) && (__ANDROID_API__ >= 24)
+#               include <ifaddrs.h>
+#           endif
+#       else
+#           include <ifaddrs.h>
+#       endif
 #   endif
 #   if defined (__UTYPE_SUNSOLARIS) || defined (__UTYPE_SUNOS)
 #       include <sys/sockio.h>
