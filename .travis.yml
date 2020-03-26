@@ -1,3 +1,4 @@
+version: ">= 1.0.0"
 # Travis CI script
 # This is a skeleton created by zproject.
 # You can add hand-written code here.
@@ -6,8 +7,7 @@
 #   after generation, be sure to review and keep those changes.
 #   The `git difftool` is your friend here.
 
-language:
-- c
+language: c
 
 cache:
 - ccache
@@ -29,8 +29,6 @@ dist: trusty
 
 #services:
 #- docker
-
-sudo: false
 
 compiler:
 - gcc
@@ -69,7 +67,7 @@ env:
     - secure: O0nI2RARxdXndopjlNI1EnnLvgbjbSk3+ZFuyxz2eW0zGm4/Bx7lRfQSqXnKtEGyjFsGdthVji24h5g1EQnrX0mmOvweH0tiTdfjfubnaUGMStU2DtGPOZMLE93khdwJcOsM9XeSsYK9MeTz3SYTLGsNcXDd6enOnrVygzUdmlk=
     - secure: LYZtGhy+XiKeUOLaqceeTRUZo76y2oo6f8Uv/c8Qvy9LcYueE+lDT5njXO/wUNVKt+V5TRZX/pURxo4osCB1Ax/tNoHIhcsvLzBEsjnd40MBfxvr8finBFVj4v/HOyguLMCljo4GhF4t71T+PY+Ewq5WYo3vxpKNmroZlrHp2Zg=
     - secure: lrkGh4GMacTQJPXgOTtb4PhUnMJEaiXUFXbrsVxeqZBHtFua5bX3gJ34yNkcDOhSqY6LrRJAB4NJu7qIJoh+SzoOwKtR4+pTGh86ioOswjImSNBvVnid/DVPI1w0eDPlMSeq8zESZQ4rurFqRi+gvi7oW2BIlCRrejagDErNmpY=
-  matrix:
+  jobs:
     - BUILD_TYPE=default
     - BUILD_TYPE=default-Werror
     - BUILD_TYPE=stable_zmq ZMQ_REPO=zeromq2-x
@@ -83,7 +81,7 @@ env:
 # Prerequisite packages provided by OS distro and used "as is"
 # NOTE: For travis, we want the pre-built libcurl4-nss-dev variant
 #      rather than a build from scratch
-pkg_deps_prereqs_distro: &pkg_deps_prereqs_distro
+_pkg_deps_prereqs_distro: &pkg_deps_prereqs_distro
     - uuid-dev
     - libsystemd-dev
     - liblz4-dev
@@ -92,12 +90,12 @@ pkg_deps_prereqs_distro: &pkg_deps_prereqs_distro
 # Prerequisite packages that may be built from source or used from
 # prebuilt packages of that source (usually not from an OS distro)
 # NOTE: For travis, we want also libsodium as a common dependency
-pkg_deps_prereqs_source: &pkg_deps_prereqs_source
+_pkg_deps_prereqs_source: &pkg_deps_prereqs_source
     - libsodium-dev
     - libzmq3-dev
 #    - libcurl4-nss-dev
 
-pkg_deps_prereqs: &pkg_deps_prereqs
+_pkg_deps_prereqs: &pkg_deps_prereqs
     - *pkg_deps_prereqs_source
     - *pkg_deps_prereqs_distro
 
@@ -106,23 +104,23 @@ pkg_deps_prereqs: &pkg_deps_prereqs
 # no forks/branches.
 # NOTE: We do not use packaged zproject as it may be stale if OBS lags,
 # use a fresh build every time, this one is cheap.
-pkg_deps_zproject: &pkg_deps_zproject
+_pkg_deps_zproject: &pkg_deps_zproject
     - generator-scripting-language
 #    - zproject
 
-pkg_deps_doctools: &pkg_deps_doctools
+_pkg_deps_doctools: &pkg_deps_doctools
     - asciidoc
     - xmlto
 
-pkg_deps_devtools: &pkg_deps_devtools
+_pkg_deps_devtools: &pkg_deps_devtools
     - git
     - zip
 
-pkg_src_zeromq_ubuntu14: &pkg_src_zeromq_ubuntu14
+_pkg_src_zeromq_ubuntu14: &pkg_src_zeromq_ubuntu14
 - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
   key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
 
-pkg_src_zeromq_ubuntu16: &pkg_src_zeromq_ubuntu16
+_pkg_src_zeromq_ubuntu16: &pkg_src_zeromq_ubuntu16
 - sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_16.04/ ./'
   key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_16.04/Release.key'
 
@@ -136,7 +134,11 @@ addons:
     - *pkg_deps_devtools
     - *pkg_deps_prereqs
 
-matrix:
+jobs:
+  allow_failures:
+    - arch: arm64
+    - arch: ppc64le
+    - arch: s390x
   include:
   - env: BUILD_TYPE=default-with-docs
     os: linux
@@ -257,13 +259,12 @@ before_deploy: . ./ci_deploy.sh && ./ci_deploy_obs.sh
 # Upload the prepared deployment to github
 deploy:
   provider: releases
-  api_key:
+  token:
     # To encrypt your access token run: `travis encrypt -r user/repo`
     #secure: <encrypted github access token>
     secure: tQgYveuVEQhskgvJXilEURJd4CETCa8eWwEhFyVjITeDq5GLlOzUWCuCWygg0kAIx2I+WH0ybQz+L4hUSe5/EedoGtaXRxmV+4CUWAKaO8hqkccszwpClpJRvblPjXF6s/TL003Hm/bTPKrEaGApUPL4hwjEnXvPoGejGcTNfok=
   file_glob: true
   file: ${CZMQ_DEPLOYMENT}
-  skip_cleanup: true
   on:
     branch: master
     tags: true
