@@ -6,12 +6,14 @@ JNI Binding for CZMQ
 
 ## Building the JNI Layer for Linux and OSX
 
-Ensure you have gradle and cmake installed, then run:
+Before you start make sure CZMQ is built and installed on your system.
+
+Next, ensure you have gradle and cmake installed, then run:
 
     gradle build jar
     gradle test
 
-If you don't like to install gradle beforehand just use the gradle wrapper.
+If you don't like to install gradle beforehand simply use the gradle wrapper.
 
     ./gradlew build jar
     ./gradlew test
@@ -27,6 +29,8 @@ If libraries of dependent projects are not installed in any of the default locat
     ./gradlew build jar -PbuildPrefix=/tmp/jni_build
 
 ## Building the JNI Layer for Android
+
+Before you start make sure that you've built the JNI Layer for your current OS.
 
 Please read the prerequisites section of the [README](../../builds/android/README.md) in the android build directory.
 
