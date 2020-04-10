@@ -14,7 +14,11 @@ enable_testing()
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
-SET(CMAKE_C_FLAGS_RELEASE "-O3")
+if(MSVC)
+    SET(CMAKE_C_FLAGS_RELEASE "/O2")
+else()
+    SET(CMAKE_C_FLAGS_RELEASE "-O3")
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/Modules)
 
@@ -84,15 +88,17 @@ file(WRITE "${PROJECT_BINARY_DIR}/platform.h.in" "
 
 configure_file("${PROJECT_BINARY_DIR}/platform.h.in" "${PROJECT_BINARY_DIR}/platform.h")
 
-#The MSVC C compiler is too out of date,
-#so the sources have to be compiled as c++
-if (MSVC)
-    enable_language(CXX)
-    file(GLOB sources "${SOURCE_DIR}/src/*.c")
-    set_source_files_properties(
-        ${sources}
-        PROPERTIES LANGUAGE CXX
-    )
+if (WIN32)
+    #The MSVC C compiler is too out of date,
+    #so the sources have to be compiled as c++
+    if (MSVC AND NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+        enable_language(CXX)
+        file(GLOB sources "${SOURCE_DIR}/src/*.c")
+        set_source_files_properties(
+            ${sources}
+            PROPERTIES LANGUAGE CXX
+        )
+    endif()
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
 endif()
 
