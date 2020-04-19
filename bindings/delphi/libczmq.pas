@@ -2213,6 +2213,14 @@ type
   // Available from libzmq 4.3.0.
   procedure zsock_set_only_first_subscribe(self: PZsock; OnlyFirstSubscribe: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Set socket option `hello_msg`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_hello_msg(self: PZsock; HelloMsg: PZframe); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `disconnect_msg`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_disconnect_msg(self: PZsock; DisconnectMsg: PZframe); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Set socket option `wss_trust_system`.
   // Available from libzmq 4.3.0.
   procedure zsock_set_wss_trust_system(self: PZsock; WssTrustSystem: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};

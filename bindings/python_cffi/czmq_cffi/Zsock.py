@@ -449,6 +449,20 @@ class Zsock(object):
         """
         utils.lib.zsock_set_only_first_subscribe(self._p, only_first_subscribe)
 
+    def set_hello_msg(self, hello_msg):
+        """
+        Set socket option `hello_msg`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_hello_msg(self._p, hello_msg._p)
+
+    def set_disconnect_msg(self, disconnect_msg):
+        """
+        Set socket option `disconnect_msg`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_disconnect_msg(self._p, disconnect_msg._p)
+
     def set_wss_trust_system(self, wss_trust_system):
         """
         Set socket option `wss_trust_system`.

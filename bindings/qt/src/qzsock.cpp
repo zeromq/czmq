@@ -458,6 +458,24 @@ void QZsock::setOnlyFirstSubscribe (int onlyFirstSubscribe)
 }
 
 ///
+//  Set socket option `hello_msg`.
+//  Available from libzmq 4.3.0.
+void QZsock::setHelloMsg (QZframe *helloMsg)
+{
+    zsock_set_hello_msg (self, helloMsg->self);
+
+}
+
+///
+//  Set socket option `disconnect_msg`.
+//  Available from libzmq 4.3.0.
+void QZsock::setDisconnectMsg (QZframe *disconnectMsg)
+{
+    zsock_set_disconnect_msg (self, disconnectMsg->self);
+
+}
+
+///
 //  Set socket option `wss_trust_system`.
 //  Available from libzmq 4.3.0.
 void QZsock::setWssTrustSystem (int wssTrustSystem)

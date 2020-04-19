@@ -5249,6 +5249,10 @@ lib.zsock_has_in.restype = c_bool
 lib.zsock_has_in.argtypes = [zsock_p]
 lib.zsock_set_only_first_subscribe.restype = None
 lib.zsock_set_only_first_subscribe.argtypes = [zsock_p, c_int]
+lib.zsock_set_hello_msg.restype = None
+lib.zsock_set_hello_msg.argtypes = [zsock_p, zframe_p]
+lib.zsock_set_disconnect_msg.restype = None
+lib.zsock_set_disconnect_msg.argtypes = [zsock_p, zframe_p]
 lib.zsock_set_wss_trust_system.restype = None
 lib.zsock_set_wss_trust_system.argtypes = [zsock_p, c_int]
 lib.zsock_set_wss_hostname.restype = None
@@ -6061,6 +6065,20 @@ return the supplied value. Takes a polymorphic socket reference.
 Available from libzmq 4.3.0.
         """
         return lib.zsock_set_only_first_subscribe(self._as_parameter_, only_first_subscribe)
+
+    def set_hello_msg(self, hello_msg):
+        """
+        Set socket option `hello_msg`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_hello_msg(self._as_parameter_, hello_msg)
+
+    def set_disconnect_msg(self, disconnect_msg):
+        """
+        Set socket option `disconnect_msg`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_disconnect_msg(self._as_parameter_, disconnect_msg)
 
     def set_wss_trust_system(self, wss_trust_system):
         """

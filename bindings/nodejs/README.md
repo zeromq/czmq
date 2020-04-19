@@ -2586,6 +2586,20 @@ Set socket option `only_first_subscribe`.
 Available from libzmq 4.3.0.
 
 ```
+nothing my_zsock.setHelloMsg (Zframe)
+```
+
+Set socket option `hello_msg`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setDisconnectMsg (Zframe)
+```
+
+Set socket option `disconnect_msg`.
+Available from libzmq 4.3.0.
+
+```
 nothing my_zsock.setWssTrustSystem (Number)
 ```
 

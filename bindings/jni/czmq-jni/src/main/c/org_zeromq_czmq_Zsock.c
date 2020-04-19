@@ -371,6 +371,18 @@ Java_org_zeromq_czmq_Zsock__1_1setOnlyFirstSubscribe (JNIEnv *env, jclass c, jlo
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setHelloMsg (JNIEnv *env, jclass c, jlong self, jlong hello_msg)
+{
+    zsock_set_hello_msg ((zsock_t *) (intptr_t) self, (zframe_t *) (intptr_t) hello_msg);
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setDisconnectMsg (JNIEnv *env, jclass c, jlong self, jlong disconnect_msg)
+{
+    zsock_set_disconnect_msg ((zsock_t *) (intptr_t) self, (zframe_t *) (intptr_t) disconnect_msg);
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setWssTrustSystem (JNIEnv *env, jclass c, jlong self, jint wss_trust_system)
 {
     zsock_set_wss_trust_system ((zsock_t *) (intptr_t) self, (int) wss_trust_system);

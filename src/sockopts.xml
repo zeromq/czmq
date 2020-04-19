@@ -16,6 +16,9 @@
             <restrict type = "XSUB" />
         </option>
 
+        <option name = "hello_msg"         type = "frame" mode = "w" test = "ROUTER" />
+        <option name = "disconnect_msg"    type = "frame" mode = "w" test = "ROUTER" />
+
         <!-- We don't test these as libzmq doesn't always support WSS -->
         <option name = "wss_trust_system"  type = "int"    mode = "w" />
         <option name = "wss_hostname"      type = "string" mode = "w" />

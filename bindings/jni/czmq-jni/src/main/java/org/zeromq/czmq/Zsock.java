@@ -478,6 +478,22 @@ public class Zsock implements AutoCloseable {
         __setOnlyFirstSubscribe (self, onlyFirstSubscribe);
     }
     /*
+    Set socket option `hello_msg`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setHelloMsg (long self, long helloMsg);
+    public void setHelloMsg (Zframe helloMsg) {
+        __setHelloMsg (self, helloMsg.self);
+    }
+    /*
+    Set socket option `disconnect_msg`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setDisconnectMsg (long self, long disconnectMsg);
+    public void setDisconnectMsg (Zframe disconnectMsg) {
+        __setDisconnectMsg (self, disconnectMsg.self);
+    }
+    /*
     Set socket option `wss_trust_system`.
     Available from libzmq 4.3.0.
     */
