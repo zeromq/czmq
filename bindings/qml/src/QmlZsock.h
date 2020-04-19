@@ -234,6 +234,14 @@ public slots:
     //  Available from libzmq 4.3.0.
     void setOnlyFirstSubscribe (int onlyFirstSubscribe);
 
+    //  Set socket option `hello_msg`.
+    //  Available from libzmq 4.3.0.
+    void setHelloMsg (QmlZframe *helloMsg);
+
+    //  Set socket option `disconnect_msg`.
+    //  Available from libzmq 4.3.0.
+    void setDisconnectMsg (QmlZframe *disconnectMsg);
+
     //  Set socket option `wss_trust_system`.
     //  Available from libzmq 4.3.0.
     void setWssTrustSystem (int wssTrustSystem);

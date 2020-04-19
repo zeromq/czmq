@@ -970,6 +970,64 @@ module CZMQ
         result
       end
 
+      # Set socket option `hello_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param hello_msg [Zframe, #__ptr]
+      # @return [void]
+      def set_hello_msg(hello_msg)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        hello_msg = hello_msg.__ptr if hello_msg
+        result = ::CZMQ::FFI.zsock_set_hello_msg(self_p, hello_msg)
+        result
+      end
+
+      # Set socket option `hello_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_hello_msg.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param hello_msg [Zframe, #__ptr]
+      # @return [void]
+      def self.set_hello_msg(self_p, hello_msg)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        hello_msg = hello_msg.__ptr if hello_msg
+        result = ::CZMQ::FFI.zsock_set_hello_msg(self_p, hello_msg)
+        result
+      end
+
+      # Set socket option `disconnect_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param disconnect_msg [Zframe, #__ptr]
+      # @return [void]
+      def set_disconnect_msg(disconnect_msg)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        disconnect_msg = disconnect_msg.__ptr if disconnect_msg
+        result = ::CZMQ::FFI.zsock_set_disconnect_msg(self_p, disconnect_msg)
+        result
+      end
+
+      # Set socket option `disconnect_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_disconnect_msg.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param disconnect_msg [Zframe, #__ptr]
+      # @return [void]
+      def self.set_disconnect_msg(self_p, disconnect_msg)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        disconnect_msg = disconnect_msg.__ptr if disconnect_msg
+        result = ::CZMQ::FFI.zsock_set_disconnect_msg(self_p, disconnect_msg)
+        result
+      end
+
       # Set socket option `wss_trust_system`.
       # Available from libzmq 4.3.0.
       #

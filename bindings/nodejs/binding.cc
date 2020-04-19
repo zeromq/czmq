@@ -4537,6 +4537,8 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
     Nan::SetPrototypeMethod (tpl, "hasIn", _has_in);
     Nan::SetPrototypeMethod (tpl, "setOnlyFirstSubscribe", _set_only_first_subscribe);
+    Nan::SetPrototypeMethod (tpl, "setHelloMsg", _set_hello_msg);
+    Nan::SetPrototypeMethod (tpl, "setDisconnectMsg", _set_disconnect_msg);
     Nan::SetPrototypeMethod (tpl, "setWssTrustSystem", _set_wss_trust_system);
     Nan::SetPrototypeMethod (tpl, "setWssHostname", _set_wss_hostname);
     Nan::SetPrototypeMethod (tpl, "setWssTrustPem", _set_wss_trust_pem);
@@ -5081,6 +5083,18 @@ NAN_METHOD (Zsock::_set_only_first_subscribe) {
     else
         return Nan::ThrowTypeError ("`only first subscribe` must be a number");
     zsock_set_only_first_subscribe (zsock->self, (int) only_first_subscribe);
+}
+
+NAN_METHOD (Zsock::_set_hello_msg) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    Zframe *hello_msg = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    zsock_set_hello_msg (zsock->self, hello_msg->self);
+}
+
+NAN_METHOD (Zsock::_set_disconnect_msg) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    Zframe *disconnect_msg = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    zsock_set_disconnect_msg (zsock->self, disconnect_msg->self);
 }
 
 NAN_METHOD (Zsock::_set_wss_trust_system) {

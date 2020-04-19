@@ -592,6 +592,8 @@ module CZMQ
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
       attach_function :zsock_has_in, [:pointer], :bool, **opts
       attach_function :zsock_set_only_first_subscribe, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_hello_msg, [:pointer, :pointer], :void, **opts
+      attach_function :zsock_set_disconnect_msg, [:pointer, :pointer], :void, **opts
       attach_function :zsock_set_wss_trust_system, [:pointer, :int], :void, **opts
       attach_function :zsock_set_wss_hostname, [:pointer, :string], :void, **opts
       attach_function :zsock_set_wss_trust_pem, [:pointer, :string], :void, **opts

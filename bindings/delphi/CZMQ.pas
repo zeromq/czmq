@@ -1584,6 +1584,14 @@ uses
     // Available from libzmq 4.3.0.
     procedure SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
 
+    // Set socket option `hello_msg`.
+    // Available from libzmq 4.3.0.
+    procedure SetHelloMsg(const HelloMsg: IZframe);
+
+    // Set socket option `disconnect_msg`.
+    // Available from libzmq 4.3.0.
+    procedure SetDisconnectMsg(const DisconnectMsg: IZframe);
+
     // Set socket option `wss_trust_system`.
     // Available from libzmq 4.3.0.
     procedure SetWssTrustSystem(WssTrustSystem: Integer);
@@ -4509,6 +4517,14 @@ uses
     // Set socket option `only_first_subscribe`.
     // Available from libzmq 4.3.0.
     procedure SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
+
+    // Set socket option `hello_msg`.
+    // Available from libzmq 4.3.0.
+    procedure SetHelloMsg(const HelloMsg: IZframe);
+
+    // Set socket option `disconnect_msg`.
+    // Available from libzmq 4.3.0.
+    procedure SetDisconnectMsg(const DisconnectMsg: IZframe);
 
     // Set socket option `wss_trust_system`.
     // Available from libzmq 4.3.0.
@@ -8642,6 +8658,16 @@ end;
   procedure TZsock.SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
   begin
     zsock_set_only_first_subscribe(FHandle, OnlyFirstSubscribe);
+  end;
+
+  procedure TZsock.SetHelloMsg(const HelloMsg: IZframe);
+  begin
+    zsock_set_hello_msg(FHandle, TZframe.UnWrap(HelloMsg));
+  end;
+
+  procedure TZsock.SetDisconnectMsg(const DisconnectMsg: IZframe);
+  begin
+    zsock_set_disconnect_msg(FHandle, TZframe.UnWrap(DisconnectMsg));
   end;
 
   procedure TZsock.SetWssTrustSystem(WssTrustSystem: Integer);

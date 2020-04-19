@@ -642,6 +642,8 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_leave);
     static NAN_METHOD (_has_in);
     static NAN_METHOD (_set_only_first_subscribe);
+    static NAN_METHOD (_set_hello_msg);
+    static NAN_METHOD (_set_disconnect_msg);
     static NAN_METHOD (_set_wss_trust_system);
     static NAN_METHOD (_set_wss_hostname);
     static NAN_METHOD (_set_wss_trust_pem);
