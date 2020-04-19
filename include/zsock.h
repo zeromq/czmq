@@ -311,6 +311,16 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void
     zsock_set_only_first_subscribe (void *self, int only_first_subscribe);
 
+//  Set socket option `hello_msg`.
+//  Available from libzmq 4.3.0.
+CZMQ_EXPORT void
+    zsock_set_hello_msg (void *self, zframe_t *hello_msg);
+
+//  Set socket option `disconnect_msg`.
+//  Available from libzmq 4.3.0.
+CZMQ_EXPORT void
+    zsock_set_disconnect_msg (void *self, zframe_t *disconnect_msg);
+
 //  Set socket option `wss_trust_system`.
 //  Available from libzmq 4.3.0.
 CZMQ_EXPORT void

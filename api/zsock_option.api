@@ -16,6 +16,18 @@
     <argument name = "only first subscribe" type = "integer" />
 </method>
 
+<method name = "set hello msg" polymorphic = "1">
+    Set socket option `hello_msg`.
+    Available from libzmq 4.3.0.
+    <argument name = "hello msg" type = "zframe" />
+</method>
+
+<method name = "set disconnect msg" polymorphic = "1">
+    Set socket option `disconnect_msg`.
+    Available from libzmq 4.3.0.
+    <argument name = "disconnect msg" type = "zframe" />
+</method>
+
 <method name = "set wss trust system" polymorphic = "1">
     Set socket option `wss_trust_system`.
     Available from libzmq 4.3.0.

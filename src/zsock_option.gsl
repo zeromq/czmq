@@ -176,6 +176,8 @@ zsock_set_$(name) (void *self, $(ctype_const:) $(name))
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), sizeof (int));
 .           elsif type = "string" | type = "key"
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), strlen ($(name)));
+.           elsif type = "frame"
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), zframe_data ($(name)), zframe_size ($(name)));
 .           endif
 .           if defined (major_changed)
 #        else
@@ -192,6 +194,8 @@ zsock_set_$(name) (void *self, $(ctype_const:) $(name))
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), sizeof (int));
 .           elsif type_new = "string" | type = "key"
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), strlen ($(name)));
+.           elsif type = "frame"
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), zframe_data ($(name)), zframe_size ($(name)));
 .           endif
 #        endif
 .           endif
@@ -367,6 +371,10 @@ zsock_option_test (bool verbose)
 .               if mode = "rw"
     assert (zsock_$(name) (self) == $(test_value? 1 :));
 .               endif
+.           elsif type = "frame"
+    zframe_t *$(name) = zframe_from ("$(test_value?'test':)");
+    zsock_set_$(name) (self, $(name));
+    zframe_destroy (&$(name));
 .           else
     zsock_set_$(name) (self, "$(test_value?'test':)");
 .           endif
