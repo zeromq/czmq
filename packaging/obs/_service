@@ -2,6 +2,8 @@
   <service name="tar_scm">
     <param name="url">https://github.com/zeromq/czmq</param>
     <param name="scm">git</param>
+    <!-- delete to build from latest master on each refresh -->
+    <param name="revision">@PARENT_TAG@</param>
     <param name="versionformat">@PARENT_TAG@+git%cd</param>
     <param name="versionrewrite-pattern">v(.*)</param>
     <param name="versionrewrite-replacement">1</param>
