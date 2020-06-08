@@ -483,7 +483,7 @@ This is the class self test code:
 #### zauth - authentication for ZeroMQ security mechanisms
 
 A zauth actor takes over authentication for all incoming connections in
-its context. You can whitelist or blacklist peers based on IP address,
+its context. You can allow or block peers based on IP address,
 and define policies for securing PLAIN, CURVE, and GSSAPI connections.
 
 This class replaces zauth_v2, and is meant for applications that use the
@@ -517,20 +517,20 @@ This is the class interface:
     //      zstr_send (auth, "VERBOSE");
     //      zsock_wait (auth);
     //
-    //  Allow (whitelist) a list of IP addresses. For NULL, all clients from
+    //  Allow a list of IP addresses. For NULL, all clients from
     //  these addresses will be accepted. For PLAIN and CURVE, they will be
     //  allowed to continue with authentication. You can call this method
-    //  multiple times to whitelist more IP addresses. If you whitelist one
-    //  or more addresses, any non-whitelisted addresses are treated as
-    //  blacklisted:
+    //  multiple times to allow more IP addresses. If you allow one
+    //  or more addresses, any non-allowed addresses are treated as
+    //  blocked:
     //  
     //      zstr_sendx (auth, "ALLOW", "127.0.0.1", "127.0.0.2", NULL);
     //      zsock_wait (auth);
     //  
-    //  Deny (blacklist) a list of IP addresses. For all security mechanisms,
+    //  Deny (block) a list of IP addresses. For all security mechanisms,
     //  this rejects the connection without any further authentication. Use
-    //  either a whitelist, or a blacklist, not not both. If you define both
-    //  a whitelist and a blacklist, only the whitelist takes effect:
+    //  either an allowed list, or a blocked list, not not both. If you define both
+    //  an allowed list and a block list, only the allowed list takes effect:
     //  
     //      zstr_sendx (auth, "DENY", "192.168.0.1", "192.168.0.2", NULL);
     //      zsock_wait (auth);
@@ -626,14 +626,14 @@ This is the class self test code:
     success = s_can_connect (&server, &client, true);
     assert (success);
     
-    //  Blacklist 127.0.0.1, connection should fail
+    //  Block 127.0.0.1, connection should fail
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client, true);
     assert (!success);
     
-    //  Whitelist our address, which overrides the blacklist
+    //  Allow our address, which overrides the block list
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
     zsock_wait (auth);
@@ -7485,7 +7485,7 @@ This is the class self test code:
         true);
     assert (success);
     
-    //  Blacklist 127.0.0.1, connection should fail
+    //  Block 127.0.0.1, connection should fail
     zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
     zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
@@ -7495,7 +7495,7 @@ This is the class self test code:
         false);
     assert (!success);
     
-    //  Whitelist our address, which overrides the blacklist
+    //  Allow our address, which overrides the block list
     zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
     zsock_wait (proxy);
     zstr_sendx (proxy, "DOMAIN", "BACKEND", "global", NULL);

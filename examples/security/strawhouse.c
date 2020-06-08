@@ -21,7 +21,7 @@ int main (void)
     zstr_send (auth,"VERBOSE");
     zsock_wait (auth);
     
-    //  Whitelist our address; any other address will be rejected
+    //  Allow our address; any other address will be rejected
     //  Add as much address as argument as you like before the NULL-Argument
     //  e.g. zstr_sendx (auth,"ALLOW","127.0.0.1","192.168.1.20",NULL);
     zstr_sendx (auth,"ALLOW","127.0.0.1",NULL);    
