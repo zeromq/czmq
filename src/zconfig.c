@@ -665,6 +665,9 @@ zconfig_chunk_load (zchunk_t *chunk)
     char *data_ptr = (char *) zchunk_data (chunk);
     size_t remaining = zchunk_size (chunk);
 
+    char cur_line_p [1024 + 1]; // predefined line buffer (to limit zmalloc() calls)
+    char *cur_line = (char *) NULL;
+
     while (remaining) {
         //  Copy stuff into cur_line; not fastest but safest option
         //  since chunk may not be null terminated, etc.
@@ -675,9 +678,23 @@ zconfig_chunk_load (zchunk_t *chunk)
         else
             cur_size = remaining;
 
-        if (cur_size > 1024)
-            cur_size = 1024;
-        char cur_line [1024 + 1];
+        if (cur_line && (cur_line != cur_line_p))
+            freen (cur_line); //  Release prev. allocated cur_line
+
+        if (cur_size > 1024) {
+            // NOTE: WA Valgring memcheck "Invalid read of size 4" error > alloc. 4 bytes more
+            //       revealed by the dyn. allocation to fix support of 'big length' value
+            cur_line = (char *) zmalloc (cur_size + 4 + 1); // allocate buffer (+ 0-term)
+            if (!cur_line) {
+                zclock_log ("E (zconfig): (%d) buffer allocation failed (%zu bytes)", lineno, cur_size);
+                valid = false;
+                break;
+            }
+        }
+        else {
+            cur_line = cur_line_p; // points to the predefined buffer
+        }
+
         memcpy (cur_line, data_ptr, cur_size);
         cur_line [cur_size] = '\0';
         data_ptr = eoln? eoln + 1: NULL;
@@ -738,6 +755,11 @@ zconfig_chunk_load (zchunk_t *chunk)
         if (!valid)
             break;
     }
+
+    //  Release allocated cur_line
+    if (cur_line && (cur_line != cur_line_p))
+        freen (cur_line);
+
     //  Either the whole ZPL stream is valid or none of it is
     if (!valid)
         zconfig_destroy (&self);
