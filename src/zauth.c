@@ -14,7 +14,7 @@
 /*
 @header
     A zauth actor takes over authentication for all incoming connections in
-    its context. You can whitelist or blacklist peers based on IP address,
+    its context. You can allow or block peers based on IP address,
     and define policies for securing PLAIN, CURVE, and GSSAPI connections.
 @discuss
     This class replaces zauth_v2, and is meant for applications that use the
@@ -31,8 +31,8 @@
 typedef struct {
     zsock_t *pipe;              //  Actor command pipe
     zsock_t *handler;           //  ZAP handler socket
-    zhashx_t *whitelist;        //  Whitelisted addresses
-    zhashx_t *blacklist;        //  Blacklisted addresses
+    zhashx_t *allowlist;        //  Allowed addresses
+    zhashx_t *blocklist;        //  Blocked addresses
     zhashx_t *passwords;        //  PLAIN passwords, if loaded
     zpoller_t *poller;          //  Socket poller
     zcertstore_t *certstore;    //  CURVE certificate store, if loaded
@@ -48,8 +48,8 @@ s_self_destroy (self_t **self_p)
     if (*self_p) {
         self_t *self = *self_p;
         zhashx_destroy (&self->passwords);
-        zhashx_destroy (&self->whitelist);
-        zhashx_destroy (&self->blacklist);
+        zhashx_destroy (&self->allowlist);
+        zhashx_destroy (&self->blocklist);
         zcertstore_destroy (&self->certstore);
         zpoller_destroy (&self->poller);
         if (self->handler) {
@@ -71,12 +71,12 @@ s_self_new (zsock_t *pipe, zcertstore_t *certstore)
         self->allow_any = false;
     }
     self->pipe = pipe;
-    self->whitelist = zhashx_new ();
-    assert (self->whitelist);
-    self->blacklist = zhashx_new ();
+    self->allowlist = zhashx_new ();
+    assert (self->allowlist);
+    self->blocklist = zhashx_new ();
 
     //  Create ZAP handler and get ready for requests
-    assert (self->blacklist);
+    assert (self->blocklist);
     self->handler = zsock_new (ZMQ_REP);
     assert (self->handler);
     int rc = zsock_bind (self->handler, ZAP_ENDPOINT);
@@ -107,8 +107,8 @@ s_self_handle_pipe (self_t *self)
         char *address = zmsg_popstr (request);
         while (address) {
             if (self->verbose)
-                zsys_info ("zauth: - whitelisting ipaddress=%s", address);
-            zhashx_insert (self->whitelist, address, "OK");
+                zsys_info ("zauth: - allowlisting ipaddress=%s", address);
+            zhashx_insert (self->allowlist, address, "OK");
             zstr_free (&address);
             address = zmsg_popstr (request);
         }
@@ -119,8 +119,8 @@ s_self_handle_pipe (self_t *self)
         char *address = zmsg_popstr (request);
         while (address) {
             if (self->verbose)
-                zsys_info ("zauth: - blacklisting ipaddress=%s", address);
-            zhashx_insert (self->blacklist, address, "OK");
+                zsys_info ("zauth: - blocking ipaddress=%s", address);
+            zhashx_insert (self->blocklist, address, "OK");
             zstr_free (&address);
             address = zmsg_popstr (request);
         }
@@ -426,7 +426,7 @@ s_self_authenticate (self_t *self)
     if (!request)
         return 0;           //  Interrupted, no request to process
 
-    //  Is address explicitly whitelisted or blacklisted?
+    //  Is address explicitly allowed or blocked?
     bool allowed = false;
     bool denied = false;
 
@@ -435,50 +435,50 @@ s_self_authenticate (self_t *self)
     assert (metabuf != NULL);
     unsigned char *metadata = metabuf;
 
-    if (zhashx_size (self->whitelist)) {
-        if (zhashx_lookup (self->whitelist, request->address)) {
+    if (zhashx_size (self->allowlist)) {
+        if (zhashx_lookup (self->allowlist, request->address)) {
             allowed = true;
             if (self->verbose)
-                zsys_info ("zauth: - passed (whitelist) address=%s", request->address);
+                zsys_info ("zauth: - passed (allowed list) address=%s", request->address);
         }
         else {
             denied = true;
             if (self->verbose)
-                zsys_info ("zauth: - denied (not in whitelist) address=%s", request->address);
+                zsys_info ("zauth: - denied (not in allowed list) address=%s", request->address);
         }
     }
     else
-    if (zhashx_size (self->blacklist)) {
-        if (zhashx_lookup (self->blacklist, request->address)) {
+    if (zhashx_size (self->blocklist)) {
+        if (zhashx_lookup (self->blocklist, request->address)) {
             denied = true;
             if (self->verbose)
-                zsys_info ("zauth: - denied (blacklist) address=%s", request->address);
+                zsys_info ("zauth: - denied (blocked list) address=%s", request->address);
         }
         else {
             allowed = true;
             if (self->verbose)
-                zsys_info ("zauth: - passed (not in blacklist) address=%s", request->address);
+                zsys_info ("zauth: - passed (not in blocked list) address=%s", request->address);
         }
     }
     //  Mechanism-specific checks
     if (!denied) {
         if (streq (request->mechanism, "NULL") && !allowed) {
-            //  For NULL, we allow if the address wasn't blacklisted
+            //  For NULL, we allow if the address wasn't blocked
             if (self->verbose)
                 zsys_info ("zauth: - allowed (NULL)");
             allowed = true;
         }
         else
         if (streq (request->mechanism, "PLAIN"))
-            //  For PLAIN, even a whitelisted address must authenticate
+            //  For PLAIN, even a allowlisted address must authenticate
             allowed = s_authenticate_plain (self, request);
         else
         if (streq (request->mechanism, "CURVE"))
-            //  For CURVE, even a whitelisted address must authenticate
+            //  For CURVE, even a allowlisted address must authenticate
             allowed = s_authenticate_curve (self, request, &metadata);
         else
         if (streq (request->mechanism, "GSSAPI"))
-            //  For GSSAPI, even a whitelisted address must authenticate
+            //  For GSSAPI, even a allowlisted address must authenticate
             allowed = s_authenticate_gssapi (self, request);
     }
     if (allowed) {
@@ -650,14 +650,14 @@ zauth_test (bool verbose)
     success = s_can_connect (&server, &client, true);
     assert (success);
 
-    //  Blacklist 127.0.0.1, connection should fail
+    //  Block 127.0.0.1, connection should fail
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client, true);
     assert (!success);
 
-    //  Whitelist our address, which overrides the blacklist
+    //  Allow our address, which overrides the block list
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
     zsock_wait (auth);

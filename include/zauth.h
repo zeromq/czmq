@@ -44,20 +44,20 @@ extern "C" {
 //      zstr_send (auth, "VERBOSE");
 //      zsock_wait (auth);
 //
-//  Allow (whitelist) a list of IP addresses. For NULL, all clients from
+//  Allow a list of IP addresses. For NULL, all clients from
 //  these addresses will be accepted. For PLAIN and CURVE, they will be
 //  allowed to continue with authentication. You can call this method
-//  multiple times to whitelist more IP addresses. If you whitelist one
-//  or more addresses, any non-whitelisted addresses are treated as
-//  blacklisted:
+//  multiple times to allow more IP addresses. If you allow one
+//  or more addresses, any non-allowed addresses are treated as
+//  blocked:
 //  
 //      zstr_sendx (auth, "ALLOW", "127.0.0.1", "127.0.0.2", NULL);
 //      zsock_wait (auth);
 //  
-//  Deny (blacklist) a list of IP addresses. For all security mechanisms,
+//  Deny (block) a list of IP addresses. For all security mechanisms,
 //  this rejects the connection without any further authentication. Use
-//  either a whitelist, or a blacklist, not not both. If you define both
-//  a whitelist and a blacklist, only the whitelist takes effect:
+//  either an allowed list, or a blocked list, not not both. If you define both
+//  an allowed list and a blocked list, only the allowed list takes effect:
 //  
 //      zstr_sendx (auth, "DENY", "192.168.0.1", "192.168.0.2", NULL);
 //      zsock_wait (auth);

@@ -669,7 +669,7 @@ zproxy_test (bool verbose)
         true);
     assert (success);
 
-    //  Blacklist 127.0.0.1, connection should fail
+    //  Block 127.0.0.1, connection should fail
     zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
     zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
@@ -679,7 +679,7 @@ zproxy_test (bool verbose)
         false);
     assert (!success);
 
-    //  Whitelist our address, which overrides the blacklist
+    //  Allow our address, which overrides the block list
     zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
     zsock_wait (proxy);
     zstr_sendx (proxy, "DOMAIN", "BACKEND", "global", NULL);
