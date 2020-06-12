@@ -286,7 +286,6 @@ zsys_shutdown (void)
     if (!s_initialized)
         return;
 
-    s_initialized = false;
 
     //  The atexit handler is called when the main function exits;
     //  however we may have zactor threads shutting down and still
@@ -358,6 +357,8 @@ zsys_shutdown (void)
     zctx_interrupted = 0;
 
     zsys_handler_reset ();
+
+    s_initialized = false;
 
 #if defined (__UNIX__)
     closelog ();                //  Just to be pedantic
