@@ -13,9 +13,11 @@ lib-build-macos:
     - mkdir build
     - mkdir release
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$HOME/builds/sysroot/usr/local/
+    - cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$HOME/builds/sysroot/usr/local/ -G "Xcode"
     - make -j8 -C build
     - make -C build DESTDIR=$PWD/release install
     - make -C build DESTDIR=$HOME/builds/sysroot/ install
+    - cp build/libczmq.?.?.?.dylib builds/xcode/Debug
     - cd release/usr/local/
     - tar zcvf ../../../libczmq.tgz *
     - cd ../../..
