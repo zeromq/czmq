@@ -17,6 +17,7 @@ lib-build-macos:
     - make -j8 -C build
     - make -C build DESTDIR=$PWD/release install
     - make -C build DESTDIR=$HOME/builds/sysroot/ install
+    - mkdir -p builds/xcode/Debug
     - cp build/libczmq.?.?.?.dylib builds/xcode/Debug
     - cd release/usr/local/
     - tar zcvf ../../../libczmq.tgz *
