@@ -69,6 +69,7 @@ s_handler_fn_shim (DWORD ctrltype)
 //  ZeroMQ context for this process
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
+static bool s_shutting_down = false;
 
 #ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
 // This is a private tunable that is likely to be replaced or tweaked later
@@ -283,9 +284,10 @@ zsys_init (void)
 void
 zsys_shutdown (void)
 {
-    if (!s_initialized)
+    if (!s_initialized || s_shutting_down)
         return;
 
+    s_shutting_down = true;
 
     //  The atexit handler is called when the main function exits;
     //  however we may have zactor threads shutting down and still
@@ -298,10 +300,6 @@ zsys_shutdown (void)
     ZMUTEX_UNLOCK (s_mutex);
     if (busy)
         zclock_sleep (200);
-
-    //  Close logsender socket if opened (don't do this in critical section)
-    if (s_logsender)
-        zsock_destroy (&s_logsender);
 
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
@@ -321,6 +319,10 @@ zsys_shutdown (void)
     }
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
+
+    //  Close logsender socket if opened (don't do this in critical section)
+    if (s_logsender)
+        zsock_destroy (&s_logsender);
 
     if (s_open_sockets == 0)
     {
@@ -358,11 +360,12 @@ zsys_shutdown (void)
 
     zsys_handler_reset ();
 
-    s_initialized = false;
-
 #if defined (__UNIX__)
     closelog ();                //  Just to be pedantic
 #endif
+
+    s_initialized = false;
+    s_shutting_down = false;
 }
 
 
