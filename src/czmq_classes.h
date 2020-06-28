@@ -34,6 +34,8 @@
 //  External API
 #include "../include/czmq.h"
 
+//  Private external dependencies
+
 //  Opaque class structures to allow forward references
 #ifndef ZGOSSIP_MSG_T_DEFINED
 typedef struct _zgossip_msg_t zgossip_msg_t;
