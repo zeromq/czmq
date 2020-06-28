@@ -707,6 +707,7 @@ if (NOT TARGET make-selftest-rw)
     )
 endif()
 
+
 set_directory_properties(
     PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_BINARY_DIR}/src/selftest-ro;${PROJECT_BINARY_DIR}/src/selftest-rw"
@@ -718,11 +719,11 @@ foreach(TEST_CLASS ${TEST_CLASSES})
         COMMAND czmq_selftest --continue --verbose --test ${TEST_CLASS}
     )
     IF (WIN32 AND CMAKE_PREFIX_PATH)
-		file(TO_NATIVE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH_WIN)
-		set_tests_properties(
-			${TEST_CLASS}
-			PROPERTIES ENVIRONMENT "PATH=%PATH%\;${CMAKE_PREFIX_PATH_WIN}\\bin"
-		)
+        file(TO_NATIVE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH_WIN)
+        set_tests_properties(
+            ${TEST_CLASS}
+            PROPERTIES ENVIRONMENT "PATH=%PATH%\;${CMAKE_PREFIX_PATH_WIN}\\bin"
+        )
     ENDIF (WIN32 AND CMAKE_PREFIX_PATH)
     set_tests_properties(
         ${TEST_CLASS}

@@ -12,16 +12,18 @@ cd "$REPO_DIR/.."
 git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
 cd -
 
-if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list zproject >/dev/null 2>&1) || \
-       (command -v brew >/dev/null 2>&1 && brew ls --versions zproject >/dev/null 2>&1)); then
+if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s zproject >/dev/null 2>&1) || \
+      (command -v brew >/dev/null 2>&1 && brew ls --versions zproject >/dev/null 2>&1)) \
+; then
     cd "$REPO_DIR/.."
     git clone --quiet --depth 1 https://github.com/zeromq/zproject zproject
     cd zproject
     PATH="`pwd`:$PATH"
 fi
 
-if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list generator-scripting-language >/dev/null 2>&1) || \
-       (command -v brew >/dev/null 2>&1 && brew ls --versions gsl >/dev/null 2>&1)); then
+if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s generator-scripting-language >/dev/null 2>&1) || \
+      (command -v brew >/dev/null 2>&1 && brew ls --versions gsl >/dev/null 2>&1)) \
+; then
     cd "$REPO_DIR/.."
     git clone https://github.com/zeromq/gsl.git gsl
     cd gsl/src
