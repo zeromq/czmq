@@ -199,6 +199,10 @@ class zhttp_response_t(Structure):
     pass # Empty - only for type checking
 zhttp_response_p = POINTER(zhttp_response_t)
 
+class zosc_t(Structure):
+    pass # Empty - only for type checking
+zosc_p = POINTER(zosc_t)
+
 def return_py_file(c_file):
     if not sys.version_info > (3,):
         PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
@@ -9462,6 +9466,266 @@ The content is assumed to be constant-memory and will therefore not be copied or
         Self test of this class.
         """
         return lib.zhttp_response_test(verbose)
+
+
+# zosc
+lib.zosc_new.restype = zosc_p
+lib.zosc_new.argtypes = [c_char_p]
+lib.zosc_destroy.restype = None
+lib.zosc_destroy.argtypes = [POINTER(zosc_p)]
+lib.zosc_fromframe.restype = zosc_p
+lib.zosc_fromframe.argtypes = [zframe_p]
+lib.zosc_frommem.restype = zosc_p
+lib.zosc_frommem.argtypes = [c_void_p, c_size_t]
+lib.zosc_create.restype = zosc_p
+lib.zosc_create.argtypes = [c_char_p, c_char_p]
+lib.zosc_size.restype = c_size_t
+lib.zosc_size.argtypes = [zosc_p]
+lib.zosc_data.restype = c_void_p
+lib.zosc_data.argtypes = [zosc_p]
+lib.zosc_address.restype = c_char_p
+lib.zosc_address.argtypes = [zosc_p]
+lib.zosc_format.restype = c_char_p
+lib.zosc_format.argtypes = [zosc_p]
+lib.zosc_retr.restype = c_int
+lib.zosc_retr.argtypes = [zosc_p, c_char_p]
+lib.zosc_append.restype = c_size_t
+lib.zosc_append.argtypes = [zosc_p, c_char_p, c_void_p]
+lib.zosc_dup.restype = zosc_p
+lib.zosc_dup.argtypes = [zosc_p]
+lib.zosc_pack.restype = zframe_p
+lib.zosc_pack.argtypes = [zosc_p]
+lib.zosc_packx.restype = zframe_p
+lib.zosc_packx.argtypes = [POINTER(zchunk_p)]
+lib.zosc_unpack.restype = zosc_p
+lib.zosc_unpack.argtypes = [zframe_p]
+lib.zosc_digest.restype = c_char_p
+lib.zosc_digest.argtypes = [zosc_p]
+lib.zosc_print.restype = None
+lib.zosc_print.argtypes = [zosc_p]
+lib.zosc_is.restype = c_bool
+lib.zosc_is.argtypes = [c_void_p]
+lib.zosc_test.restype = None
+lib.zosc_test.argtypes = [c_bool]
+
+class Zosc(object):
+    """
+    Create and decode Open Sound Control messages. (OSC)
+
+OSC is a serialisation format (and usually transported over UDP) which is
+supported by many applications and appliances. It is a de facto protocol
+for networking sound synthesizers, computers, and other multimedia devices
+for purposes such as musical performance or show control. It is also often
+used for rapid prototyping purposes due to the support by many applications
+and frameworks in this field. With ZeroMQ's DGRAM sockets it is possible
+to use ZeroMQ to send and receive OSC messages which can be understood by
+any device supporting OSC.
+
+Example creating an OSC message:
+
+    zosc_t* conm = zosc_create("/someaddress", "iihfdscF",
+                        1, 2, 3, 3.14, 6.283185307179586, "greetings", 'q');
+
+Decoding a message:
+
+    int rc = zosc_retr(oscmsg, "iihfdscF", &intx, &inty, &intz, &floatz,
+                        &doublez, &strings, &charq, &someBool);
+
+See the class's test method for more examples how to use the class.
+    """
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """
+        Create a new empty OSC message with the specified address string.
+        """
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zosc_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zosc_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zosc_new(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """
+        Destroy an OSC message
+        """
+        if self.allow_destruct:
+            lib.zosc_destroy(byref(self._as_parameter_))
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return other.c_address() == self.c_address()
+        elif type(other) == c_void_p:
+            return other.value == self.c_address()
+
+    def c_address(self):
+        """
+        Return the address of the object pointer in c.  Useful for comparison.
+        """
+        return addressof(self._as_parameter_.contents)
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def fromframe(frame):
+        """
+        Create a new OSC message from the specified zframe. Takes ownership of
+the zframe.
+        """
+        return Zosc(lib.zosc_fromframe(frame), True)
+
+    @staticmethod
+    def frommem(data, size):
+        """
+        Create a new zosc message from memory. Take ownership of the memory
+and calling free on the data after construction.
+        """
+        return Zosc(lib.zosc_frommem(data, size), True)
+
+    @staticmethod
+    def create(address, format, *args):
+        """
+        Create a new zosc message from the given format and arguments.
+The format type tags are as follows:
+  i - 32bit integer
+  h - 64bit integer
+  f - 32bit floating point number (IEEE)
+  d - 64bit (double) floating point number
+  s - string (NULL terminated)
+  t = timetag: an OSC timetag in NTP format (uint64_t)
+  S - symbol
+  c - char
+  m - 4 byte midi packet (8 digits hexadecimal)
+  T - TRUE (no value required)
+  F - FALSE (no value required)
+  N - NIL (no value required)
+  I - Impulse (for triggers) or INFINITUM (no value required)
+  b - binary blob
+        """
+        return Zosc(lib.zosc_create(address, format, *args), True)
+
+    def size(self):
+        """
+        Return chunk data size
+        """
+        return lib.zosc_size(self._as_parameter_)
+
+    def data(self):
+        """
+        Return OSC chunk data. Caller does not own the data!
+        """
+        return lib.zosc_data(self._as_parameter_)
+
+    def address(self):
+        """
+        Return the OSC address string
+        """
+        return lib.zosc_address(self._as_parameter_)
+
+    def format(self):
+        """
+        Return the OSC format of the message.
+  i - 32bit integer
+  h - 64bit integer
+  f - 32bit floating point number (IEEE)
+  d - 64bit (double) floating point number
+  s - string (NULL terminated)
+  t = timetag: an OSC timetag in NTP format (uint64_t)
+  S - symbol
+  c - char
+  m - 4 byte midi packet (8 digits hexadecimal)
+  T - TRUE (no value required)
+  F - FALSE (no value required)
+  N - NIL (no value required)
+  I - Impulse (for triggers) or INFINITUM (no value required)
+  b - binary blob
+        """
+        return lib.zosc_format(self._as_parameter_)
+
+    def retr(self, format, *args):
+        """
+        Retrieve the values provided by the given format. Note that zosc_retr
+creates the objects and the caller must destroy them when finished.
+The supplied pointers do not need to be initialized. Returns 0 if
+successful, or -1 if it failed to retrieve a value in which case the
+pointers are not modified. If an argument pointer is NULL is skips the
+value. See the format method for a detailed list op type tags for the
+format string.
+        """
+        return lib.zosc_retr(self._as_parameter_, format, *args)
+
+    def append(self, type_hint, data):
+        """
+        Append user-supplied data to OSC message, return resulting chunk size.
+        """
+        return lib.zosc_append(self._as_parameter_, type_hint, data)
+
+    def dup(self):
+        """
+        Create copy of the message, as new chunk object. Returns a fresh zosc_t
+object, or null if there was not enough heap memory. If chunk is null,
+returns null.
+        """
+        return Zosc(lib.zosc_dup(self._as_parameter_), True)
+
+    def pack(self):
+        """
+        Transform zosc into a zframe that can be sent in a message.
+        """
+        return Zframe(lib.zosc_pack(self._as_parameter_), True)
+
+    @staticmethod
+    def packx(self_p):
+        """
+        Transform zosc into a zframe that can be sent in a message.
+Take ownership of the chunk.
+        """
+        return Zframe(lib.zosc_packx(byref(zchunk_p.from_param(self_p))), True)
+
+    @staticmethod
+    def unpack(frame):
+        """
+        Transform a zframe into a zosc.
+        """
+        return Zosc(lib.zosc_unpack(frame), True)
+
+    def digest(self):
+        """
+        Calculate SHA1 digest for OSC message, using zdigest class.
+        """
+        return lib.zosc_digest(self._as_parameter_)
+
+    def print(self):
+        """
+        Dump OSC message to stderr, for debugging and tracing.
+See zosc_fprint for details
+        """
+        return lib.zosc_print(self._as_parameter_)
+
+    @staticmethod
+    def is_(self):
+        """
+        Probe the supplied object, and report if it looks like a zosc_t.
+        """
+        return lib.zosc_is(self)
+
+    @staticmethod
+    def test(verbose):
+        """
+        Self test of this class.
+        """
+        return lib.zosc_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

@@ -47,7 +47,8 @@ include_HEADERS += \
     zhttp_server.h \
     zhttp_server_options.h \
     zhttp_request.h \
-    zhttp_response.h
+    zhttp_response.h \
+    zosc.h
 
 endif
 

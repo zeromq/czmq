@@ -65,7 +65,8 @@ src_libczmq_la_SOURCES += \
     src/zhttp_server.c \
     src/zhttp_server_options.c \
     src/zhttp_request.c \
-    src/zhttp_response.c
+    src/zhttp_response.c \
+    src/zosc.c
 
 endif
 
@@ -161,6 +162,7 @@ dist_api_DATA = \
     api/zhttp_server_options.api \
     api/zhttp_request.api \
     api/zhttp_response.api \
+    api/zosc.api \
     api/zgossip_msg.api
 
 # define custom target for all products of /src
@@ -480,6 +482,13 @@ check-zhttp_response: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top
 	$(MAKE) check-empty-selftest-rw
 check-zhttp_response-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute $(builddir)/src/czmq_selftest -v -t zhttp_response
+	$(MAKE) check-empty-selftest-rw
+
+check-zosc: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/czmq_selftest -t zosc
+	$(MAKE) check-empty-selftest-rw
+check-zosc-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/czmq_selftest -v -t zosc
 	$(MAKE) check-empty-selftest-rw
 
 check-zauth: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
@@ -1011,6 +1020,20 @@ memcheck-zhttp_response-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_DI
 		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/czmq_selftest -v -t zhttp_response
 	$(MAKE) check-empty-selftest-rw
+memcheck-zosc: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/czmq_selftest -t zosc
+	$(MAKE) check-empty-selftest-rw
+memcheck-zosc-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/czmq_selftest -v -t zosc
+	$(MAKE) check-empty-selftest-rw
 memcheck-zauth: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
@@ -1453,6 +1476,16 @@ callcheck-zhttp_response-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_D
 		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/czmq_selftest -v -t zhttp_response
 	$(MAKE) check-empty-selftest-rw
+callcheck-zosc: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/czmq_selftest -t zosc
+	$(MAKE) check-empty-selftest-rw
+callcheck-zosc-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/czmq_selftest -v -t zosc
+	$(MAKE) check-empty-selftest-rw
 callcheck-zauth: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
 		$(VALGRIND_OPTIONS) \
@@ -1798,6 +1831,14 @@ debug-zhttp_response: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top
 debug-zhttp_response-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \
 		--args $(builddir)/src/czmq_selftest -v -t zhttp_response
+	$(MAKE) check-empty-selftest-rw
+debug-zosc: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/czmq_selftest -t zosc
+	$(MAKE) check-empty-selftest-rw
+debug-zosc-verbose: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/czmq_selftest -v -t zosc
 	$(MAKE) check-empty-selftest-rw
 debug-zauth: src/czmq_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \

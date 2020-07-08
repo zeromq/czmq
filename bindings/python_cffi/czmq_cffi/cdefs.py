@@ -65,6 +65,7 @@ typedef struct _zhttp_server_options_t zhttp_server_options_t;
 typedef struct _zhttp_server_t zhttp_server_t;
 typedef struct _zhttp_request_t zhttp_request_t;
 typedef struct _zhttp_response_t zhttp_response_t;
+typedef struct _zosc_t zosc_t;
 // Actors get a pipe and arguments from caller
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
@@ -4588,6 +4589,124 @@ void
 // Self test of this class.
 void
     zhttp_response_test (bool verbose);
+
+// CLASS: zosc
+// Create a new empty OSC message with the specified address string.
+zosc_t *
+    zosc_new (const char *address);
+
+// Create a new OSC message from the specified zframe. Takes ownership of
+// the zframe.
+zosc_t *
+    zosc_fromframe (zframe_t *frame);
+
+// Create a new zosc message from memory. Take ownership of the memory
+// and calling free on the data after construction.
+zosc_t *
+    zosc_frommem (char *data, size_t size);
+
+// Create a new zosc message from the given format and arguments.
+// The format type tags are as follows:
+//   i - 32bit integer
+//   h - 64bit integer
+//   f - 32bit floating point number (IEEE)
+//   d - 64bit (double) floating point number
+//   s - string (NULL terminated)
+//   t = timetag: an OSC timetag in NTP format (uint64_t)
+//   S - symbol
+//   c - char
+//   m - 4 byte midi packet (8 digits hexadecimal)
+//   T - TRUE (no value required)
+//   F - FALSE (no value required)
+//   N - NIL (no value required)
+//   I - Impulse (for triggers) or INFINITUM (no value required)
+//   b - binary blob
+zosc_t *
+    zosc_create (const char *address, const char *format, ...);
+
+// Destroy an OSC message
+void
+    zosc_destroy (zosc_t **self_p);
+
+// Return chunk data size
+size_t
+    zosc_size (zosc_t *self);
+
+// Return OSC chunk data. Caller does not own the data!
+byte *
+    zosc_data (zosc_t *self);
+
+// Return the OSC address string
+const char *
+    zosc_address (zosc_t *self);
+
+// Return the OSC format of the message.
+//   i - 32bit integer
+//   h - 64bit integer
+//   f - 32bit floating point number (IEEE)
+//   d - 64bit (double) floating point number
+//   s - string (NULL terminated)
+//   t = timetag: an OSC timetag in NTP format (uint64_t)
+//   S - symbol
+//   c - char
+//   m - 4 byte midi packet (8 digits hexadecimal)
+//   T - TRUE (no value required)
+//   F - FALSE (no value required)
+//   N - NIL (no value required)
+//   I - Impulse (for triggers) or INFINITUM (no value required)
+//   b - binary blob
+const char *
+    zosc_format (zosc_t *self);
+
+// Retrieve the values provided by the given format. Note that zosc_retr
+// creates the objects and the caller must destroy them when finished.
+// The supplied pointers do not need to be initialized. Returns 0 if
+// successful, or -1 if it failed to retrieve a value in which case the
+// pointers are not modified. If an argument pointer is NULL is skips the
+// value. See the format method for a detailed list op type tags for the
+// format string.
+int
+    zosc_retr (zosc_t *self, const char *format, ...);
+
+// Append user-supplied data to OSC message, return resulting chunk size.
+size_t
+    zosc_append (zosc_t *self, const char *type_hint, const void *data);
+
+// Create copy of the message, as new chunk object. Returns a fresh zosc_t
+// object, or null if there was not enough heap memory. If chunk is null,
+// returns null.
+zosc_t *
+    zosc_dup (zosc_t *self);
+
+// Transform zosc into a zframe that can be sent in a message.
+zframe_t *
+    zosc_pack (zosc_t *self);
+
+// Transform zosc into a zframe that can be sent in a message.
+// Take ownership of the chunk.
+zframe_t *
+    zosc_packx (zchunk_t **self_p);
+
+// Transform a zframe into a zosc.
+zosc_t *
+    zosc_unpack (zframe_t *frame);
+
+// Calculate SHA1 digest for OSC message, using zdigest class.
+const char *
+    zosc_digest (zosc_t *self);
+
+// Dump OSC message to stderr, for debugging and tracing.
+// See zosc_fprint for details
+void
+    zosc_print (zosc_t *self);
+
+// Probe the supplied object, and report if it looks like a zosc_t.
+bool
+    zosc_is (void *self);
+
+// Self test of this class.
+void
+    zosc_test (bool verbose);
 
 ''')
 for i, item in enumerate (czmq_cdefs):

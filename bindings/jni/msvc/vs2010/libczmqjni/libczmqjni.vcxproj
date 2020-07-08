@@ -76,6 +76,7 @@
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_ZhttpServerOptions.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_ZhttpRequest.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_ZhttpResponse.h" />
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zosc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zarmour.c">
@@ -169,6 +170,9 @@
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_ZhttpResponse.c">
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zosc.c">
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
   </ItemGroup>

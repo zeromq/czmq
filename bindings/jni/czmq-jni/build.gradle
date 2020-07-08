@@ -54,7 +54,8 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'src/main/java/org/zeromq/czmq/ZhttpServer.java',
             'src/main/java/org/zeromq/czmq/ZhttpServerOptions.java',
             'src/main/java/org/zeromq/czmq/ZhttpRequest.java',
-            'src/main/java/org/zeromq/czmq/ZhttpResponse.java'
+            'src/main/java/org/zeromq/czmq/ZhttpResponse.java',
+            'src/main/java/org/zeromq/czmq/Zosc.java'
     ]
     def utilityClasses = [
             'src/main/java/org/zeromq/tools/ZmqNativeLoader.java'
