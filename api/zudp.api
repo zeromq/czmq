@@ -1,0 +1,66 @@
+<class name = "zudp" state = "draft">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+
+    <constructor>
+        Create UDP socket of the given type. Set the reuse option if 
+        you need to reuse the socket's address.
+        <argument name = "type" type = "integer">
+            <map name = "ZUDP_UNICAST" value = "0" />
+            <map name = "ZUDP_MULTICAST" value = "1" />
+            <map name = "ZUDP_BROADCAST" value = "2" />
+        </argument>
+        <argument name = "reuse" type = "boolean" />
+        <return type = "socket" />
+    </constructor>
+
+    <destructor>
+        Close a UDP socket
+    </destructor>
+
+    <method name = "sendto">
+        Send zframe to UDP socket to given address and port, 
+        return -1 if sending failed (i.e. due to interface having 
+        disappeared (happens easily with WiFi))
+        <argument name = "frame" type = "zframe" />
+        <argument name = "address" type = "string" />
+        <argument name = "port" type = "integer" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "recv">
+        Receive zframe from UDP socket, and set address of peer that sent it
+        The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
+        NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
+        <argument name = "peername" type = "string" mutable = "1" />
+        <argument name = "peerlen" type = "integer" />
+        <return type = "zframe" />
+    </method>
+    
+    <method name = "bind">
+        Bind a socket to a and address and port number.
+        On failure, returns -1. 
+        <argument name = "address" type = "string" />
+        <argument name = "port" type = "integer" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "fd">
+        Return the socket's filedescriptor
+        <return type = "integer" />
+    </method>
+    
+    <method name = "error" singleton = "1">
+        Handle an I/O error on some socket operation; will report and die on
+        fatal errors, and continue silently on "try again" errors.
+        <argument name = "reason" type = "string" />
+    </method>
+
+</class>
