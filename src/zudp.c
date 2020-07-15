@@ -24,8 +24,8 @@
 enum ZUDP_TYPE { ZUDP_UNICAST, ZUDP_MULTICAST, ZUDP_BROADCAST };
 struct _zudp_t {
     SOCKET  udpsock;    //  our UDP socket
-    int     socktype;   //  the socket's type flags
-
+    int     sockflags;  //  the socket's type flags
+    int     socktype;   //  our socket type
 };
 
 
@@ -37,17 +37,18 @@ zudp_new (int type, bool reuse)
 {
     zudp_t *self = (zudp_t *) zmalloc (sizeof (zudp_t));
     assert (self);
+    self->socktype = type;
     //  Initialize class properties here
-    self->socktype = SOCK_DGRAM;    //  udp socket type
+    self->sockflags = SOCK_DGRAM;    //  udp socket type
 #ifdef CZMQ_HAVE_SOCK_CLOEXEC
     //  Ensure socket is closed by exec() functions.
-    self->socktype |= SOCK_CLOEXEC;
+    self->sockflags |= SOCK_CLOEXEC;
 #endif
 
     if (zsys_ipv6 ())
-        self->udpsock = socket (AF_INET6, self->socktype, IPPROTO_UDP);
+        self->udpsock = socket (AF_INET6, self->sockflags, IPPROTO_UDP);
     else
-        self->udpsock = socket (AF_INET, self->socktype, IPPROTO_UDP);
+        self->udpsock = socket (AF_INET, self->sockflags, IPPROTO_UDP);
     if (self->udpsock == INVALID_SOCKET) {
         zudp_error ("socket");
         return NULL;    // todo cleanup!
@@ -70,7 +71,7 @@ zudp_new (int type, bool reuse)
 #endif
     }
 
-    if ( type == ZUDP_BROADCAST )
+    if ( self->socktype == ZUDP_BROADCAST )
     {
         int on = 1;
         if (setsockopt (self->udpsock, SOL_SOCKET, SO_BROADCAST,
@@ -207,13 +208,15 @@ zudp_recv (zudp_t *self, char *peername, int peerlen)
     return zframe_new (buffer, (size_t)size);
 }
 
-//  Bind a socket to an address and port number.
-//  On failure, returns -1.
+// bind helpers
 int
-zudp_bind (zudp_t *self, const char *address, int port)
+zudp_unicast_bind( zudp_t *self, const char *address, int port)
 {
     assert(self);
-    int rc = 0;
+    assert(address);
+    assert(port);
+
+    int rc;
     if ( zsys_ipv6() )
     {
         in6addr_t laddr;
@@ -221,7 +224,10 @@ zudp_bind (zudp_t *self, const char *address, int port)
         laddr.sin6_port = htons( (ushort)port );
         laddr.sin6_family = AF_INET6;
         if ( streq(address, "*") || streq(address, "") )
+        {
             laddr.sin6_addr = in6addr_any;
+            rc = bind( self->udpsock, (struct sockaddr*)&laddr, sizeof (laddr) );
+        }
         else
         {
             if ( inet_pton(AF_INET6, address, &laddr.sin6_addr) < 1 )
@@ -229,8 +235,8 @@ zudp_bind (zudp_t *self, const char *address, int port)
                 zsys_error("inet_pton conversion error %s", strerror(errno));
                 return -1;
             }
+            rc = bind( self->udpsock, (struct sockaddr*)&laddr, sizeof (laddr) );
         }
-        rc = bind( self->udpsock, (struct sockaddr*)&laddr, sizeof (laddr) );
     }
     else
     {
@@ -250,6 +256,98 @@ zudp_bind (zudp_t *self, const char *address, int port)
         }
         rc = bind( self->udpsock, (const struct sockaddr*)&laddr, sizeof (laddr) );
     }
+    return rc;
+}
+
+int zudp_multicast_bind(zudp_t *self, const char *address, int port)
+{
+    assert(self);
+    assert(address);
+    assert(port);
+
+    if ( streq(address, "*") || streq(address, "") )
+    {
+        zsys_error("You need to set a multicast address to bind to!");
+        return -1;
+    }
+
+    int rc;
+    if ( zsys_ipv6() )
+    {
+        in6addr_t laddr;
+        memset(&laddr, 0, sizeof(in6addr_t));
+        laddr.sin6_port = htons( (ushort)port );
+        laddr.sin6_family = AF_INET6;
+
+        // JOIN MEMBERSHIP
+        struct ipv6_mreq group;
+        group.ipv6mr_interface = 0;
+        if ( inet_pton( AF_INET6, address, &group.ipv6mr_multiaddr ) < 1 )
+        {
+            zsys_error("inet_pton multicast address %s conversion error: %s", address, strerror(errno));
+            return -1;
+        }
+        setsockopt( self->udpsock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &group, sizeof group );
+        rc = bind( self->udpsock, (struct sockaddr*)&laddr, sizeof (laddr) );
+        if ( rc == -1 ) zsys_error("multicast ipv6 bind error %s", strerror(errno));
+    }
+    else
+    {
+        inaddr_t laddr;
+        memset(&laddr, 0, sizeof(inaddr_t));
+        laddr.sin_port = htons( (ushort)port );
+        laddr.sin_family = AF_INET;
+        laddr.sin_addr.s_addr = htonl(INADDR_ANY); // the bind address! better use the nic ip
+
+        // JOIN MEMBERSHIP
+        struct ip_mreq group;
+        if ( inet_pton( AF_INET, address, &group.imr_multiaddr.s_addr ) < 1 )
+        {
+            zsys_error("inet_pton multicast address %s conversion error: %s", address, strerror(errno));
+            return -1;
+        }
+        rc = bind( self->udpsock, (const struct sockaddr*)&laddr, sizeof (laddr) );
+        if (setsockopt(self->udpsock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, sizeof(group)) < 0 )
+        {
+            zsys_error("Multicast setsockopt error: %s", strerror(errno));
+            return -1;
+        }
+    }
+    return rc;
+}
+
+int
+zudp_broadcast_bind( zudp_t *self, const char *address, int port)
+{
+    return -1;
+}
+
+//  Bind a socket to an address and port number.
+//  On failure, returns -1.
+int
+zudp_bind (zudp_t *self, const char *address, int port)
+{
+    assert(self);
+    int rc = 0;
+    switch ( self->socktype )
+    {
+        case ZUDP_UNICAST:
+        {
+            rc = zudp_unicast_bind(self, address, port );
+            break;
+        }
+        case ZUDP_MULTICAST:
+        {
+            rc = zudp_multicast_bind(self, address, port );
+            break;
+        }
+        case ZUDP_BROADCAST:
+        {
+            rc = zudp_broadcast_bind(self, address, port );
+            break;
+        }
+    }
+
     return rc;
 }
 
@@ -303,12 +401,13 @@ zudp_test (bool verbose)
     assert(sender);
     zudp_t *recvr = zudp_new( ZUDP_UNICAST, true);
     assert(recvr);
-    zudp_bind( recvr, "*", 7777);
+    int rc = zudp_bind( recvr, "*", 7777);
+    assert( rc == 0 );
 
     zframe_t *f = zframe_new("hello", 5);
     assert(f);
 
-    int rc = zudp_sendto(sender, f, "127.0.0.1", 7777);
+    rc = zudp_sendto(sender, f, "127.0.0.1", 7777);
     assert( rc == 0 );
     char peername [100];
     zframe_t *r = zudp_recv(recvr, peername, 100);
@@ -324,7 +423,8 @@ zudp_test (bool verbose)
     assert(sender2);
     zudp_t *recvr2 = zudp_new( ZUDP_UNICAST, true);
     assert(recvr2);
-    zudp_bind( recvr2, "*", 7777);
+    rc = zudp_bind( recvr2, "*", 7777);
+    assert( rc == 0 );
 
     zframe_t *f2 = zframe_new("hello", 5);
     assert(f2);
@@ -337,6 +437,27 @@ zudp_test (bool verbose)
     assert( ! streq(peername, "") );
     zudp_destroy(&sender2);
     zudp_destroy(&recvr2);
+
+    // multicast ipv6 send receive test
+    zudp_t *msender = zudp_new( ZUDP_MULTICAST, true);
+    assert(msender);
+    zudp_t *mrecvr = zudp_new( ZUDP_MULTICAST, true);
+    assert(mrecvr);
+    rc = zudp_bind( mrecvr, "ff12::feed:a:dead:beef", 7777);
+    assert( rc == 0 );
+
+    zframe_t *fm = zframe_new("hello", 5);
+    assert(fm);
+    rc = zudp_sendto(msender, fm, "ff12::feed:a:dead:beef", 7777); // FF0X:0:0:0:0:0:0:114  any private experiment
+    assert(rc == 0 );
+    char mpeername [100];
+    zframe_t *r3 = zudp_recv(mrecvr, mpeername, 100);
+    assert( r3 );
+    assert( zframe_size( r3 ) == 5 );
+    assert( ! streq(mpeername, "") );
+    zudp_destroy(&sender2);
+    zudp_destroy(&recvr2);
+
     //  @end
     printf ("OK\n");
 }
