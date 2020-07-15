@@ -306,6 +306,7 @@ int zudp_multicast_bind(zudp_t *self, const char *address, int port)
             zsys_error("inet_pton multicast address %s conversion error: %s", address, strerror(errno));
             return -1;
         }
+        group.imr_interface.s_addr = INADDR_ANY;
         rc = bind( self->udpsock, (const struct sockaddr*)&laddr, sizeof (laddr) );
         if (setsockopt(self->udpsock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, sizeof(group)) < 0 )
         {
@@ -455,8 +456,27 @@ zudp_test (bool verbose)
     assert( r3 );
     assert( zframe_size( r3 ) == 5 );
     assert( ! streq(mpeername, "") );
-    zudp_destroy(&sender2);
-    zudp_destroy(&recvr2);
+    zudp_destroy(&msender);
+    zudp_destroy(&mrecvr);
+
+    // multicast ipv4 send receive test
+    zsys_set_ipv6(0);
+    zudp_t *msender2 = zudp_new( ZUDP_MULTICAST, true);
+    assert(msender2);
+    zudp_t *mrecvr2 = zudp_new( ZUDP_MULTICAST, true);
+    assert(mrecvr2);
+    rc = zudp_bind( mrecvr2, "225.25.25.25", 7777);
+    assert( rc == 0 );
+
+    assert(fm);
+    rc = zudp_sendto(msender2, fm, "225.25.25.25", 7777);
+    assert(rc == 0 );
+    zframe_t *r4 = zudp_recv(mrecvr2, mpeername, 100);
+    assert( r4 );
+    assert( zframe_size( r4 ) == 5 );
+    assert( ! streq(mpeername, "") );
+    zudp_destroy(&msender);
+    zudp_destroy(&mrecvr);
 
     //  @end
     printf ("OK\n");
