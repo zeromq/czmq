@@ -134,6 +134,8 @@
         '../../include/ztimerset.h',
         '../../src/ztrie.c',
         '../../include/ztrie.h',
+        '../../src/zudp.c',
+        '../../include/zudp.h',
         '../../src/zuuid.c',
         '../../include/zuuid.h',
         '../../src/foreign/sha1/sha1.h',

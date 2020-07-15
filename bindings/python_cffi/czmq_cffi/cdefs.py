@@ -65,6 +65,7 @@ typedef struct _zhttp_server_options_t zhttp_server_options_t;
 typedef struct _zhttp_server_t zhttp_server_t;
 typedef struct _zhttp_request_t zhttp_request_t;
 typedef struct _zhttp_response_t zhttp_response_t;
+typedef struct _zudp_t zudp_t;
 // Actors get a pipe and arguments from caller
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
@@ -4570,6 +4571,46 @@ void
 // Self test of this class.
 void
     zhttp_response_test (bool verbose);
+
+// CLASS: zudp
+// Create UDP socket of the given type. Set the reuse option if
+// you need to reuse the socket's address.
+zudp_t *
+    zudp_new (int type, bool reuse);
+
+// Close a UDP socket
+void
+    zudp_destroy (zudp_t **self_p);
+
+// Send zframe to UDP socket to given address and port,
+// return -1 if sending failed (i.e. due to interface having
+// disappeared (happens easily with WiFi))
+int
+    zudp_sendto (zudp_t *self, zframe_t *frame, const char *address, int port);
+
+// Receive zframe from UDP socket, and set address of peer that sent it
+// The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
+// NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
+zframe_t *
+    zudp_recv (zudp_t *self, char *peername, int peerlen);
+
+// Bind a socket to a and address and port number.
+// On failure, returns -1.
+int
+    zudp_bind (zudp_t *self, const char *address, int port);
+
+// Return the socket's filedescriptor
+int
+    zudp_fd (zudp_t *self);
+
+// Handle an I/O error on some socket operation; will report and die on
+// fatal errors, and continue silently on "try again" errors.
+void
+    zudp_error (const char *reason);
+
+// Self test of this class.
+void
+    zudp_test (bool verbose);
 
 ''')
 for i, item in enumerate (czmq_cdefs):

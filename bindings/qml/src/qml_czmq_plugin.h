@@ -77,6 +77,8 @@ class QmlZhttpRequest;
 class QmlZhttpRequestAttached;
 class QmlZhttpResponse;
 class QmlZhttpResponseAttached;
+class QmlZudp;
+class QmlZudpAttached;
 
 #include "QmlZactor.h"
 #include "QmlZargs.h"
@@ -111,6 +113,7 @@ class QmlZhttpResponseAttached;
 #include "QmlZhttpServerOptions.h"
 #include "QmlZhttpRequest.h"
 #include "QmlZhttpResponse.h"
+#include "QmlZudp.h"
 
 class QmlCZMQPlugin : public QQmlExtensionPlugin
 {
@@ -186,6 +189,8 @@ public:
         qmlRegisterType<QmlZhttpRequestAttached>();
         qmlRegisterType<QmlZhttpResponse> (uri, 1, 0, "QmlZhttpResponse");
         qmlRegisterType<QmlZhttpResponseAttached>();
+        qmlRegisterType<QmlZudp> (uri, 1, 0, "QmlZudp");
+        qmlRegisterType<QmlZudpAttached>();
     };
 };
 

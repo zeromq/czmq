@@ -974,6 +974,17 @@ module CZMQ
       attach_function :zhttp_response_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhttp_response'
+
+      attach_function :zudp_new, [:int, :bool], :pointer, **opts
+      attach_function :zudp_destroy, [:pointer], :void, **opts
+      attach_function :zudp_sendto, [:pointer, :pointer, :string, :int], :int, **opts
+      attach_function :zudp_recv, [:pointer, :pointer, :int], :pointer, **opts
+      attach_function :zudp_bind, [:pointer, :string, :int], :int, **opts
+      attach_function :zudp_fd, [:pointer], :int, **opts
+      attach_function :zudp_error, [:string], :void, **opts
+      attach_function :zudp_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zudp'
     end
   end
 end

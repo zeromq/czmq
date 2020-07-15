@@ -61,6 +61,7 @@ class QZhttpServer;
 class QZhttpServerOptions;
 class QZhttpRequest;
 class QZhttpResponse;
+class QZudp;
 
 //  Public API classes
 #include "qzactor.h"
@@ -96,6 +97,7 @@ class QZhttpResponse;
 #include "qzhttpserveroptions.h"
 #include "qzhttprequest.h"
 #include "qzhttpresponse.h"
+#include "qzudp.h"
 
 #endif //  Q_CZMQ_H
 /*

@@ -79,6 +79,7 @@ all_tests [] = {
     { "zhttp_server_options", zhttp_server_options_test, false, true, NULL },
     { "zhttp_request", zhttp_request_test, false, true, NULL },
     { "zhttp_response", zhttp_response_test, false, true, NULL },
+    { "zudp", zudp_test, false, true, NULL },
 #endif // CZMQ_BUILD_DRAFT_API
     {NULL, NULL, 0, 0, NULL}          //  Sentinel
 };

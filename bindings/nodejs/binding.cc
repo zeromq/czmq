@@ -9556,6 +9556,241 @@ Nan::Persistent <Function> &ZhttpResponse::constructor () {
 }
 
 
+NAN_MODULE_INIT (Zudp::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zudp").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "sendto", _sendto);
+    Nan::SetPrototypeMethod (tpl, "recv", _recv);
+    Nan::SetPrototypeMethod (tpl, "bind", _bind);
+    Nan::SetPrototypeMethod (tpl, "fd", _fd);
+    Nan::SetPrototypeMethod (tpl, "error", _error);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zudp").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zudp::Zudp (int type, bool reuse) {
+    self = zudp_new ((int) type, (bool) reuse);
+}
+
+Zudp::Zudp (zudp_t *self_) {
+    self = self_;
+}
+
+Zudp::~Zudp () {
+}
+
+NAN_METHOD (Zudp::New) {
+    assert (info.IsConstructCall ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `type`");
+
+    //int type; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int type;
+
+    if (info [0]->IsString ()) {
+        Nan::Utf8String type_utf8 (info [0].As<String>());
+            // bjornw: check if we need to remove scope here
+        char *type_name = *type_utf8;
+        for (char *type_ptr = type_name; *type_ptr; type_ptr++)
+            *type_ptr = tolower (*type_ptr);
+        if (streq (type_name, "zudp_unicast"))
+            type = 0;
+        else
+        if (streq (type_name, "zudp_multicast"))
+            type = 1;
+        else
+        if (streq (type_name, "zudp_broadcast"))
+            type = 2;
+        else
+            return Nan::ThrowTypeError ("`type` not a valid string");
+    }
+    else
+
+    if (info [0]->IsNumber ())
+    {
+          type = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`type` must be a number or string");
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `reuse`");
+
+    //bool reuse; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool reuse;
+
+
+    if (info [1]->IsBoolean ())
+    {
+          reuse = Nan::To<bool>(info [1]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`reuse` must be a Boolean");
+    Zudp *zudp = new Zudp ((int) type, (bool) reuse);
+    if (zudp) {
+        zudp->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zudp::destroy) {
+    Zudp *zudp = Nan::ObjectWrap::Unwrap <Zudp> (info.Holder ());
+    zudp_destroy (&zudp->self);
+}
+
+
+NAN_METHOD (Zudp::defined) {
+    Zudp *zudp = Nan::ObjectWrap::Unwrap <Zudp> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zudp->self != NULL));
+}
+
+NAN_METHOD (Zudp::_sendto) {
+    Zudp *zudp = Nan::ObjectWrap::Unwrap <Zudp> (info.Holder ());
+    Zframe *frame = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    char *address;
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `address`");
+    else
+    if (!info [1]->IsString ())
+        return Nan::ThrowTypeError ("`address` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String address_utf8 (info [1].As<String>());
+    address = *address_utf8;
+         //} //bjornw end
+    if (info [2]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `port`");
+
+    //int port; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int port;
+
+
+    if (info [2]->IsNumber ())
+    {
+          port = Nan::To<int>(info [2]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`port` must be a number");
+    int result = zudp_sendto (zudp->self, frame->self, (const char *)address, (int) port);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zudp::_recv) {
+    Zudp *zudp = Nan::ObjectWrap::Unwrap <Zudp> (info.Holder ());
+    char *peername;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `peername`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`peername` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String peername_utf8 (info [0].As<String>());
+    peername = *peername_utf8;
+         //} //bjornw end
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `peerlen`");
+
+    //int peerlen; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int peerlen;
+
+
+    if (info [1]->IsNumber ())
+    {
+          peerlen = Nan::To<int>(info [1]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`peerlen` must be a number");
+    zframe_t *result = zudp_recv (zudp->self, (char *)peername, (int) peerlen);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zudp::_bind) {
+    Zudp *zudp = Nan::ObjectWrap::Unwrap <Zudp> (info.Holder ());
+    char *address;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `address`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`address` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String address_utf8 (info [0].As<String>());
+    address = *address_utf8;
+         //} //bjornw end
+    if (info [1]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `port`");
+
+    //int port; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int port;
+
+
+    if (info [1]->IsNumber ())
+    {
+          port = Nan::To<int>(info [1]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`port` must be a number");
+    int result = zudp_bind (zudp->self, (const char *)address, (int) port);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zudp::_fd) {
+    Zudp *zudp = Nan::ObjectWrap::Unwrap <Zudp> (info.Holder ());
+    int result = zudp_fd (zudp->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zudp::_error) {
+    char *reason;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `reason`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`reason` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String reason_utf8 (info [0].As<String>());
+    reason = *reason_utf8;
+         //} //bjornw end
+    zudp_error ((const char *)reason);
+}
+
+NAN_METHOD (Zudp::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zudp_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &Zudp::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
 extern "C" NAN_MODULE_INIT (czmq_initialize)
 {
     Zargs::Init (target);
@@ -9590,6 +9825,7 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     ZhttpServerOptions::Init (target);
     ZhttpRequest::Init (target);
     ZhttpResponse::Init (target);
+    Zudp::Init (target);
 }
 
 NODE_MODULE (czmq, czmq_initialize)

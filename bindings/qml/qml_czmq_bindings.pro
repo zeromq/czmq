@@ -70,7 +70,8 @@ HEADERS += \
   $$SRCDIR/QmlZhttpServer.h \
   $$SRCDIR/QmlZhttpServerOptions.h \
   $$SRCDIR/QmlZhttpRequest.h \
-  $$SRCDIR/QmlZhttpResponse.h
+  $$SRCDIR/QmlZhttpResponse.h \
+  $$SRCDIR/QmlZudp.h
 
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
@@ -105,7 +106,8 @@ SOURCES += \
   $$SRCDIR/QmlZhttpServer.cpp \
   $$SRCDIR/QmlZhttpServerOptions.cpp \
   $$SRCDIR/QmlZhttpRequest.cpp \
-  $$SRCDIR/QmlZhttpResponse.cpp
+  $$SRCDIR/QmlZhttpResponse.cpp \
+  $$SRCDIR/QmlZudp.cpp
 
 OBJECTS_DIR = $$BUILDDIR/.obj
 MOC_DIR     = $$BUILDDIR/.moc

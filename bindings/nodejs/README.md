@@ -5004,3 +5004,62 @@ nothing my_zhttp_response.test (Boolean)
 ```
 
 Self test of this class.
+
+### The Zudp class -
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zudp = new czmq.Zudp (Number, Boolean)
+```
+
+You *must* call the destructor on every Zudp instance:
+
+```
+my_zudp.destroy ()
+```
+
+Methods:
+
+```
+integer my_zudp.sendto (Zframe, String, Number)
+```
+
+Send zframe to UDP socket to given address and port,
+return -1 if sending failed (i.e. due to interface having
+disappeared (happens easily with WiFi))
+
+```
+zframe my_zudp.recv (String, Number)
+```
+
+Receive zframe from UDP socket, and set address of peer that sent it
+The peername must be a char [INET_ADDRSTRLEN] array if IPv6 is disabled or
+NI_MAXHOST if it's enabled. Returns NULL when failing to get peer address.
+
+```
+integer my_zudp.bind (String, Number)
+```
+
+Bind a socket to a and address and port number.
+On failure, returns -1.
+
+```
+integer my_zudp.fd ()
+```
+
+Return the socket's filedescriptor
+
+```
+nothing my_zudp.error (String)
+```
+
+Handle an I/O error on some socket operation; will report and die on
+fatal errors, and continue silently on "try again" errors.
+
+```
+nothing my_zudp.test (Boolean)
+```
+
+Self test of this class.

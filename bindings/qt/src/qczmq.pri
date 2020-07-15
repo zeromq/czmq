@@ -43,7 +43,8 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzhttpserver.h \
                      $$PWD/qzhttpserveroptions.h \
                      $$PWD/qzhttprequest.h \
-                     $$PWD/qzhttpresponse.h
+                     $$PWD/qzhttpresponse.h \
+                     $$PWD/qzudp.h
 
     SOURCES       += \
                      $$PWD/qzactor.cpp \
@@ -78,7 +79,8 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzhttpserver.cpp \
                      $$PWD/qzhttpserveroptions.cpp \
                      $$PWD/qzhttprequest.cpp \
-                     $$PWD/qzhttpresponse.cpp
+                     $$PWD/qzhttpresponse.cpp \
+                     $$PWD/qzudp.cpp
 }
 
 win32 {

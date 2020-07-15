@@ -1098,4 +1098,25 @@ class ZhttpResponse: public Nan::ObjectWrap {
     static NAN_METHOD (_test);
 };
 
+class Zudp: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit Zudp (int type, bool reuse);
+        explicit Zudp (zudp_t *self);
+        zudp_t *self;
+    private:
+        ~Zudp ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_sendto);
+    static NAN_METHOD (_recv);
+    static NAN_METHOD (_bind);
+    static NAN_METHOD (_fd);
+    static NAN_METHOD (_error);
+    static NAN_METHOD (_test);
+};
+
 #endif

@@ -77,6 +77,8 @@ zhttp_request.txt
 zhttp_request.doc
 zhttp_response.txt
 zhttp_response.doc
+zudp.txt
+zudp.doc
 zauth.txt
 zauth.doc
 zbeacon.txt
