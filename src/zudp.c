@@ -417,6 +417,8 @@ zudp_test (bool verbose)
     assert( ! streq(peername, "") );
     zudp_destroy(&sender);
     zudp_destroy(&recvr);
+    zframe_destroy(&f);
+    zframe_destroy(&r);
 
     zsys_set_ipv6(1);
     // simple ipv6 send receive test
@@ -429,7 +431,7 @@ zudp_test (bool verbose)
 
     zframe_t *f2 = zframe_new("hello", 5);
     assert(f2);
-    rc = zudp_sendto(sender2, f, "::1", 7777);
+    rc = zudp_sendto(sender2, f2, "::1", 7777);
     assert(rc == 0 );
     char peername2 [100];
     zframe_t *r2 = zudp_recv(recvr2, peername2, 100);
@@ -438,6 +440,8 @@ zudp_test (bool verbose)
     assert( ! streq(peername, "") );
     zudp_destroy(&sender2);
     zudp_destroy(&recvr2);
+    zframe_destroy( &f2 );
+    zframe_destroy( &r2 );
 
     // multicast ipv6 send receive test
     zudp_t *msender = zudp_new( ZUDP_MULTICAST, true);
@@ -458,6 +462,7 @@ zudp_test (bool verbose)
     assert( ! streq(mpeername, "") );
     zudp_destroy(&msender);
     zudp_destroy(&mrecvr);
+    zframe_destroy( &r3 );
 
     // multicast ipv4 send receive test
     zsys_set_ipv6(0);
@@ -475,8 +480,10 @@ zudp_test (bool verbose)
     assert( r4 );
     assert( zframe_size( r4 ) == 5 );
     assert( ! streq(mpeername, "") );
-    zudp_destroy(&msender);
-    zudp_destroy(&mrecvr);
+    zudp_destroy(&msender2);
+    zudp_destroy(&mrecvr2);
+    zframe_destroy( &fm );
+    zframe_destroy( &r4 );
 
     //  @end
     printf ("OK\n");
