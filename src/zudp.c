@@ -55,6 +55,7 @@ zudp_new (int type, bool reuse)
         self->udpsock = socket (AF_INET, self->sockflags, IPPROTO_UDP);
     if (self->udpsock == INVALID_SOCKET) {
         zudp_error ("socket");
+        zudp_destroy( &self );
         return NULL;    // todo cleanup!
     }
 
@@ -96,7 +97,7 @@ zudp_destroy (zudp_t **self_p)
     if (*self_p) {
         zudp_t *self = *self_p;
         //  Free class properties here
-        close(self->udpsock);
+        if (self->udpsock > 0 ) close(self->udpsock);
         self->socktype = 0;
         //  Free object itself
         free (self);
@@ -447,6 +448,11 @@ zudp_test (bool verbose)
     zframe_destroy( &fm );
     zframe_destroy( &r4 );
 
+    if ( ! zsys_ipv6_available() )
+    {
+        zsys_info( "No IPv6 available skipping those tests" );
+        return;
+    }
     /// ***************
     /// IPV6 tests
     /// ***************
