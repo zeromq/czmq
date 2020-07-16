@@ -120,8 +120,8 @@ zudp_destroy (zudp_t **self_p)
 //  --------------------------------------------------------------------------
 //  low level internal udp send method
 
-int
-zudp_send (zudp_t *self, zframe_t *frame, inaddr_t *address, int addrlen)
+static int
+s_udp_send (zudp_t *self, zframe_t *frame, inaddr_t *address, int addrlen)
 {
     assert (self);
     assert (frame);
@@ -160,7 +160,7 @@ zudp_sendto (zudp_t *self, zframe_t *frame, const char *address, int port)
             zsys_error("inet_pton conversion error %s", strerror(errno));
             return -1;
         }
-        return zudp_send(self, frame, (inaddr_t *)&daddr, sizeof(in6addr_t));
+        return s_udp_send(self, frame, (inaddr_t *)&daddr, sizeof(in6addr_t));
     }
     else
     {
@@ -173,7 +173,7 @@ zudp_sendto (zudp_t *self, zframe_t *frame, const char *address, int port)
             zsys_error("inet_pton conversion error %s", strerror(errno));
             return -1;
         }
-        return zudp_send(self, frame, (inaddr_t *)&daddr, sizeof(inaddr_t));
+        return s_udp_send(self, frame, (inaddr_t *)&daddr, sizeof(inaddr_t));
     }
 }
 
@@ -226,8 +226,8 @@ zudp_recv (zudp_t *self, char *peername, int peerlen)
 }
 
 // bind helpers
-int
-zudp_unicast_bind( zudp_t *self, const char *address, int port)
+static int
+s_udp_unicast_bind( zudp_t *self, const char *address, int port)
 {
     assert(self);
     assert(address);
@@ -276,7 +276,8 @@ zudp_unicast_bind( zudp_t *self, const char *address, int port)
     return rc;
 }
 
-int zudp_multicast_bind(zudp_t *self, const char *address, int port)
+static int
+s_udp_multicast_bind(zudp_t *self, const char *address, int port)
 {
     assert(self);
     assert(address);
@@ -334,9 +335,13 @@ int zudp_multicast_bind(zudp_t *self, const char *address, int port)
     return rc;
 }
 
-int
-zudp_broadcast_bind( zudp_t *self, const char *address, int port)
+static int
+s_udp_broadcast_bind( zudp_t *self, const char *address, int port)
 {
+    assert(self);
+    assert(address);
+    assert(port);
+    zsys_error("binding to broadcast not yet implemented");
     return -1;
 }
 
@@ -351,17 +356,17 @@ zudp_bind (zudp_t *self, const char *address, int port)
     {
         case ZUDP_UNICAST:
         {
-            rc = zudp_unicast_bind(self, address, port );
+            rc = s_udp_unicast_bind(self, address, port );
             break;
         }
         case ZUDP_MULTICAST:
         {
-            rc = zudp_multicast_bind(self, address, port );
+            rc = s_udp_multicast_bind(self, address, port );
             break;
         }
         case ZUDP_BROADCAST:
         {
-            rc = zudp_broadcast_bind(self, address, port );
+            rc = s_udp_broadcast_bind(self, address, port );
             break;
         }
     }
