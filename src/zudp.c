@@ -83,6 +83,17 @@ zudp_new (int type, bool reuse)
                         (char *) &on, sizeof (on)) == SOCKET_ERROR)
             zsys_socket_error ("setsockopt (SO_BROADCAST)");
     }
+    if ( self->socktype == ZUDP_MULTICAST )
+    {
+        // set the IP_MULTICAST_IF socket option
+        if ( zsys_ipv6() )
+        {
+            ziflist_t *ifs = ziflist_new_ipv6();
+            uint ifidx = if_nametoindex( ziflist_first(ifs) );
+            setsockopt (self->udpsock, IPPROTO_IP, IPV6_MULTICAST_IF, &ifidx, sizeof(ifidx) );
+            ziflist_destroy(&ifs);
+        }
+    }
     return self;
 }
 
