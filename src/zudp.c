@@ -91,7 +91,9 @@ zudp_new (int type, bool reuse)
         {
             ziflist_t *ifs = ziflist_new_ipv6();
             uint ifidx = if_nametoindex( ziflist_first(ifs) );
-            setsockopt (self->udpsock, IPPROTO_IP, IPV6_MULTICAST_IF, &ifidx, sizeof(ifidx) );
+            if ( setsockopt (self->udpsock, IPPROTO_IPV6, IPV6_MULTICAST_IF, (const char *)&ifidx, sizeof(ifidx) ) )
+                zudp_error ("setsockopt (IPV6_MULTICAST_IF)");
+
             ziflist_destroy(&ifs);
         }
     }
@@ -153,7 +155,7 @@ zudp_sendto (zudp_t *self, zframe_t *frame, const char *address, int port)
     {
         in6addr_t daddr;
         memset(&daddr, 0, sizeof(in6addr_t));
-        daddr.sin6_port = htons( (ushort)port );
+        daddr.sin6_port = htons( (uint16_t)port );
         daddr.sin6_family = AF_INET6;
         if ( inet_pton(AF_INET6, address, &daddr.sin6_addr) < 1 )
         {
@@ -166,7 +168,7 @@ zudp_sendto (zudp_t *self, zframe_t *frame, const char *address, int port)
     {
         inaddr_t daddr;
         memset(&daddr, 0, sizeof(inaddr_t));
-        daddr.sin_port = htons( (ushort)port );
+        daddr.sin_port = htons( (uint16_t)port );
         daddr.sin_family = AF_INET;
         if ( inet_pton(AF_INET, address, &daddr.sin_addr) < 1 )
         {
@@ -238,7 +240,7 @@ s_udp_unicast_bind( zudp_t *self, const char *address, int port)
     {
         in6addr_t laddr;
         memset(&laddr, 0, sizeof(in6addr_t));
-        laddr.sin6_port = htons( (ushort)port );
+        laddr.sin6_port = htons( (uint16_t)port );
         laddr.sin6_family = AF_INET6;
         if ( streq(address, "*") || streq(address, "") )
         {
@@ -259,7 +261,7 @@ s_udp_unicast_bind( zudp_t *self, const char *address, int port)
     {
         inaddr_t laddr;
         memset(&laddr, 0, sizeof(inaddr_t));
-        laddr.sin_port = htons( (ushort)port );
+        laddr.sin_port = htons( (uint16_t)port );
         laddr.sin_family = AF_INET;
         if ( streq(address, "*") || streq(address, "") )
             laddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -294,7 +296,7 @@ s_udp_multicast_bind(zudp_t *self, const char *address, int port)
     {
         in6addr_t laddr;
         memset(&laddr, 0, sizeof(in6addr_t));
-        laddr.sin6_port = htons( (ushort)port );
+        laddr.sin6_port = htons( (uint16_t)port );
         laddr.sin6_family = AF_INET6;
 
         // JOIN MEMBERSHIP
@@ -305,7 +307,7 @@ s_udp_multicast_bind(zudp_t *self, const char *address, int port)
             zsys_error("inet_pton multicast address %s conversion error: %s", address, strerror(errno));
             return -1;
         }
-        setsockopt( self->udpsock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &group, sizeof group );
+        setsockopt( self->udpsock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (const char *)&group, sizeof group );
         rc = bind( self->udpsock, (struct sockaddr*)&laddr, sizeof (laddr) );
         if ( rc == -1 ) zsys_error("multicast ipv6 bind error %s", strerror(errno));
     }
@@ -313,7 +315,7 @@ s_udp_multicast_bind(zudp_t *self, const char *address, int port)
     {
         inaddr_t laddr;
         memset(&laddr, 0, sizeof(inaddr_t));
-        laddr.sin_port = htons( (ushort)port );
+        laddr.sin_port = htons( (uint16_t)port );
         laddr.sin_family = AF_INET;
         laddr.sin_addr.s_addr = htonl(INADDR_ANY); // the bind address! better use the nic ip
 
@@ -326,7 +328,7 @@ s_udp_multicast_bind(zudp_t *self, const char *address, int port)
         }
         group.imr_interface.s_addr = INADDR_ANY;
         rc = bind( self->udpsock, (const struct sockaddr*)&laddr, sizeof (laddr) );
-        if (setsockopt(self->udpsock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, sizeof(group)) < 0 )
+        if (setsockopt(self->udpsock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&group, sizeof(group)) < 0 )
         {
             zsys_error("Multicast setsockopt error: %s", strerror(errno));
             return -1;
