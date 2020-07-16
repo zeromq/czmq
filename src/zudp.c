@@ -414,8 +414,8 @@ zudp_test (bool verbose)
 
     rc = zudp_sendto(sender, f, "127.0.0.1", 7777);
     assert( rc == 0 );
-    char peername [100];
-    zframe_t *r = zudp_recv(recvr, peername, 100);
+    char peername [INET_ADDRSTRLEN];
+    zframe_t *r = zudp_recv(recvr, peername, INET_ADDRSTRLEN);
     assert( r );
     assert( zframe_size( r ) == 5 );
     assert( ! streq(peername, "") );
@@ -437,8 +437,8 @@ zudp_test (bool verbose)
     assert(f2);
     rc = zudp_sendto(sender2, f2, "::1", 7777);
     assert(rc == 0 );
-    char peername2 [100];
-    zframe_t *r2 = zudp_recv(recvr2, peername2, 100);
+    char peername2 [NI_MAXHOST];
+    zframe_t *r2 = zudp_recv(recvr2, peername2, NI_MAXHOST);
     assert( r2 );
     assert( zframe_size( r2 ) == 5 );
     assert( ! streq(peername, "") );
