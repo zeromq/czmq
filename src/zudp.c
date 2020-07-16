@@ -421,6 +421,7 @@ zudp_test (bool verbose)
     printf (" * zudp: ");
 
     //  @selftest
+    zsys_init ();
     //  Simple create/destroy test
     zudp_t *self = zudp_new (ZUDP_UNICAST, true);
     assert(self);
@@ -530,6 +531,7 @@ zudp_test (bool verbose)
     zframe_destroy( &rm6 );
     zframe_destroy( &fm6 );
 #endif
+    zsys_shutdown ();
     //  @end
     printf ("OK\n");
 }
