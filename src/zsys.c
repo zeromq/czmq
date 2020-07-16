@@ -1935,6 +1935,7 @@ zsys_ipv6_available (void)
             if (rc == SOCKET_ERROR)
                 ipv6 = 0;
         }
+        closesocket (fd);
 #else
         setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &ipv6, sizeof (int));
         rc = setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6, sizeof (int));
@@ -1946,8 +1947,8 @@ zsys_ipv6_available (void)
             if (rc != 0)
                 ipv6 = 0;
         }
-#endif
         close (fd);
+#endif
     }
 
     return ipv6;

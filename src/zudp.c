@@ -111,7 +111,12 @@ zudp_destroy (zudp_t **self_p)
     if (*self_p) {
         zudp_t *self = *self_p;
         //  Free class properties here
-        if (self->udpsock > 0 ) close(self->udpsock);
+        if (self->udpsock > 0 )
+#if (defined (__WINDOWS__))
+            closesocket (self->udpsock);
+#else
+            close (self->udpsock);
+#endif
         self->socktype = 0;
         //  Free object itself
         free (self);
