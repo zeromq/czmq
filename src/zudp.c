@@ -54,7 +54,7 @@ zudp_new (int type, bool reuse)
     else
         self->udpsock = socket (AF_INET, self->sockflags, IPPROTO_UDP);
     if (self->udpsock == INVALID_SOCKET) {
-        zudp_error ("socket");
+        zudp_error ("socket creation");
         zudp_destroy( &self );
         return NULL;    // todo cleanup!
     }
@@ -421,6 +421,7 @@ zudp_test (bool verbose)
     assert(self);
     zudp_destroy (&self);
 
+    if (verbose) zsys_info("ipv4 send receive test");
     // simple send receive test
     zudp_t *sender = zudp_new( ZUDP_UNICAST, true);
     assert(sender);
@@ -445,7 +446,7 @@ zudp_test (bool verbose)
     zframe_destroy(&r);
 
     // multicast ipv4 send receive test
-    zsys_set_ipv6(0);
+    if (verbose) zsys_info("ipv4 multicast send receive test");
     zudp_t *msender4 = zudp_new( ZUDP_MULTICAST, true);
     assert(msender4);
     zudp_t *mrecvr4 = zudp_new( ZUDP_MULTICAST, true);
@@ -476,6 +477,7 @@ zudp_test (bool verbose)
     /// IPV6 tests
     /// ***************
     // simple ipv6 send receive test
+    if (verbose) zsys_info("ipv6 send receive test");
     zsys_set_ipv6(1);
     zudp_t *sender6 = zudp_new( ZUDP_UNICAST, true);
     assert(sender6);
@@ -497,8 +499,10 @@ zudp_test (bool verbose)
     zudp_destroy(&recvr6);
     zframe_destroy( &f6 );
     zframe_destroy( &r6 );
+
 #ifndef CZMQ_HAVE_OSX                       // TODO multicast still fails on OSX
     // multicast ipv6 send receive test     // with zudp_send: failed, reason=No route to host
+    if (verbose) zsys_info("ipv6 multicast send receive test");
     zudp_t *msender6 = zudp_new( ZUDP_MULTICAST, true);
     assert(msender6);
     zudp_t *mrecvr6 = zudp_new( ZUDP_MULTICAST, true);
