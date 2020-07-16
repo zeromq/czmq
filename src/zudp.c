@@ -161,7 +161,7 @@ zudp_sendto (zudp_t *self, zframe_t *frame, const char *address, int port)
             zsys_error("inet_pton conversion error %s", strerror(errno));
             return -1;
         }
-        return zudp_send(self, frame, (inaddr_t *)&daddr, sizeof(in6addr_t));
+        return zudp_send(self, frame, (inaddr_t *)&daddr, sizeof(inaddr_t));
     }
 }
 
