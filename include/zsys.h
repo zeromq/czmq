@@ -326,6 +326,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zsys_ipv6 (void);
 
+//  Test if ipv6 is available on the system. The only way to reliably
+//  check is to actually open a socket and try to bind it. (ported from
+//  libzmq)
+CZMQ_EXPORT bool
+    zsys_ipv6_available (void);
+
 //  Set network interface name to use for broadcasts, particularly zbeacon.
 //  This lets the interface be configured for test environments where required.
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
