@@ -424,70 +424,77 @@ zudp_test (bool verbose)
     zframe_destroy(&f);
     zframe_destroy(&r);
 
-    zsys_set_ipv6(1);
-    // simple ipv6 send receive test
-    zudp_t *sender2 = zudp_new( ZUDP_UNICAST, true);
-    assert(sender2);
-    zudp_t *recvr2 = zudp_new( ZUDP_UNICAST, true);
-    assert(recvr2);
-    rc = zudp_bind( recvr2, "*", 7777);
-    assert( rc == 0 );
-
-    zframe_t *f2 = zframe_new("hello", 5);
-    assert(f2);
-    rc = zudp_sendto(sender2, f2, "::1", 7777);
-    assert(rc == 0 );
-    char peername2 [NI_MAXHOST];
-    zframe_t *r2 = zudp_recv(recvr2, peername2, NI_MAXHOST);
-    assert( r2 );
-    assert( zframe_size( r2 ) == 5 );
-    assert( ! streq(peername, "") );
-    zudp_destroy(&sender2);
-    zudp_destroy(&recvr2);
-    zframe_destroy( &f2 );
-    zframe_destroy( &r2 );
-
-    // multicast ipv6 send receive test
-    zudp_t *msender = zudp_new( ZUDP_MULTICAST, true);
-    assert(msender);
-    zudp_t *mrecvr = zudp_new( ZUDP_MULTICAST, true);
-    assert(mrecvr);
-    rc = zudp_bind( mrecvr, "ff12::feed:a:dead:beef", 7777);
+    // multicast ipv4 send receive test
+    zsys_set_ipv6(0);
+    zudp_t *msender4 = zudp_new( ZUDP_MULTICAST, true);
+    assert(msender4);
+    zudp_t *mrecvr4 = zudp_new( ZUDP_MULTICAST, true);
+    assert(mrecvr4);
+    rc = zudp_bind( mrecvr4, "225.25.25.25", 7777);
     assert( rc == 0 );
 
     zframe_t *fm = zframe_new("hello", 5);
     assert(fm);
-    rc = zudp_sendto(msender, fm, "ff12::feed:a:dead:beef", 7777); // FF0X:0:0:0:0:0:0:114  any private experiment
+    rc = zudp_sendto(msender4, fm, "225.25.25.25", 7777);
     assert(rc == 0 );
-    char mpeername [100];
-    zframe_t *r3 = zudp_recv(mrecvr, mpeername, 100);
-    assert( r3 );
-    assert( zframe_size( r3 ) == 5 );
-    assert( ! streq(mpeername, "") );
-    zudp_destroy(&msender);
-    zudp_destroy(&mrecvr);
-    zframe_destroy( &r3 );
-
-    // multicast ipv4 send receive test
-    zsys_set_ipv6(0);
-    zudp_t *msender2 = zudp_new( ZUDP_MULTICAST, true);
-    assert(msender2);
-    zudp_t *mrecvr2 = zudp_new( ZUDP_MULTICAST, true);
-    assert(mrecvr2);
-    rc = zudp_bind( mrecvr2, "225.25.25.25", 7777);
-    assert( rc == 0 );
-
-    assert(fm);
-    rc = zudp_sendto(msender2, fm, "225.25.25.25", 7777);
-    assert(rc == 0 );
-    zframe_t *r4 = zudp_recv(mrecvr2, mpeername, 100);
+    char mpeername [INET_ADDRSTRLEN];
+    zframe_t *r4 = zudp_recv(mrecvr4, mpeername, INET_ADDRSTRLEN);
     assert( r4 );
     assert( zframe_size( r4 ) == 5 );
     assert( ! streq(mpeername, "") );
-    zudp_destroy(&msender2);
-    zudp_destroy(&mrecvr2);
+    zudp_destroy(&msender4);
+    zudp_destroy(&mrecvr4);
     zframe_destroy( &fm );
     zframe_destroy( &r4 );
+
+    /// ***************
+    /// IPV6 tests
+    /// ***************
+    // simple ipv6 send receive test
+    zsys_set_ipv6(1);
+    zudp_t *sender6 = zudp_new( ZUDP_UNICAST, true);
+    assert(sender6);
+    zudp_t *recvr6 = zudp_new( ZUDP_UNICAST, true);
+    assert(recvr6);
+    rc = zudp_bind( recvr6, "*", 7777);
+    assert( rc == 0 );
+
+    zframe_t *f6 = zframe_new("hello", 5);
+    assert(f6);
+    rc = zudp_sendto(sender6, f6, "::1", 7777);
+    assert(rc == 0 );
+    char peername6 [NI_MAXHOST];
+    zframe_t *r6 = zudp_recv(recvr6, peername6, NI_MAXHOST);
+    assert( r6 );
+    assert( zframe_size( r6 ) == 5 );
+    assert( ! streq(peername6, "") );
+    zudp_destroy(&sender6);
+    zudp_destroy(&recvr6);
+    zframe_destroy( &f6 );
+    zframe_destroy( &r6 );
+
+    // multicast ipv6 send receive test
+    zudp_t *msender6 = zudp_new( ZUDP_MULTICAST, true);
+    assert(msender6);
+    zudp_t *mrecvr6 = zudp_new( ZUDP_MULTICAST, true);
+    assert(mrecvr6);
+    rc = zudp_bind( mrecvr6, "ff12::feed:a:dead:beef", 7777);
+    assert( rc == 0 );
+
+    zframe_t *fm6 = zframe_new("hello", 5);
+    assert(fm6);
+    rc = zudp_sendto(msender6, fm6, "ff12::feed:a:dead:beef", 7777);
+    assert(rc == 0 );
+    char mpeername6 [NI_MAXHOST];
+    zframe_t *rm6 = zudp_recv(mrecvr6, mpeername6, NI_MAXHOST);
+    assert( rm6 );
+    assert( zframe_size( rm6 ) == 5 );
+    assert( zframe_streq(rm6, "hello" ) );
+    assert( ! streq(mpeername6, "") );
+    zudp_destroy(&msender6);
+    zudp_destroy(&mrecvr6);
+    zframe_destroy( &rm6 );
+    zframe_destroy( &fm6 );
 
     //  @end
     printf ("OK\n");
