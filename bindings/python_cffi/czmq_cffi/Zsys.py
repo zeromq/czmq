@@ -519,6 +519,15 @@ class Zsys(object):
         return utils.lib.zsys_ipv6()
 
     @staticmethod
+    def ipv6_available():
+        """
+        Test if ipv6 is available on the system. The only way to reliably
+        check is to actually open a socket and try to bind it. (ported from
+        libzmq)
+        """
+        return utils.lib.zsys_ipv6_available()
+
+    @staticmethod
     def set_interface(value):
         """
         Set network interface name to use for broadcasts, particularly zbeacon.

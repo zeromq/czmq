@@ -3258,6 +3258,11 @@ type
   // Return use of IPv6 for zsock instances.
   function zsys_ipv6: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Test if ipv6 is available on the system. The only way to reliably
+  // check is to actually open a socket and try to bind it. (ported from
+  // libzmq)
+  function zsys_ipv6_available: Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Set network interface name to use for broadcasts, particularly zbeacon.
   // This lets the interface be configured for test environments where required.
   // For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is

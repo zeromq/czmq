@@ -735,6 +735,16 @@ module CZMQ
         result
       end
 
+      # Test if ipv6 is available on the system. The only way to reliably
+      # check is to actually open a socket and try to bind it. (ported from
+      # libzmq)
+      #
+      # @return [Boolean]
+      def self.ipv6_available()
+        result = ::CZMQ::FFI.zsys_ipv6_available()
+        result
+      end
+
       # Set network interface name to use for broadcasts, particularly zbeacon.
       # This lets the interface be configured for test environments where required.
       # For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is

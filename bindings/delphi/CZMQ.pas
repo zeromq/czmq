@@ -5545,6 +5545,11 @@ uses
     // Return use of IPv6 for zsock instances.
     class function Ipv6: Integer;
 
+    // Test if ipv6 is available on the system. The only way to reliably
+    // check is to actually open a socket and try to bind it. (ported from
+    // libzmq)
+    class function Ipv6Available: Boolean;
+
     // Set network interface name to use for broadcasts, particularly zbeacon.
     // This lets the interface be configured for test environments where required.
     // For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -9994,6 +9999,11 @@ end;
   class function TZsys.Ipv6: Integer;
   begin
     Result := zsys_ipv6;
+  end;
+
+  class function TZsys.Ipv6Available: Boolean;
+  begin
+    Result := zsys_ipv6_available;
   end;
 
   class procedure TZsys.SetInterface(const Value: string);

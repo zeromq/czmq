@@ -894,6 +894,7 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_pipehwm);
     static NAN_METHOD (_set_ipv6);
     static NAN_METHOD (_ipv6);
+    static NAN_METHOD (_ipv6_available);
     static NAN_METHOD (_set_interface);
     static NAN_METHOD (_interface);
     static NAN_METHOD (_set_ipv6_address);

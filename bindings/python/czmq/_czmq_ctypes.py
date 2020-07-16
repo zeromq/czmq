@@ -7556,6 +7556,8 @@ lib.zsys_set_ipv6.restype = None
 lib.zsys_set_ipv6.argtypes = [c_int]
 lib.zsys_ipv6.restype = c_int
 lib.zsys_ipv6.argtypes = []
+lib.zsys_ipv6_available.restype = c_bool
+lib.zsys_ipv6_available.argtypes = []
 lib.zsys_set_interface.restype = None
 lib.zsys_set_interface.argtypes = [c_char_p]
 lib.zsys_interface.restype = c_char_p
@@ -8141,6 +8143,15 @@ default. Note: has no effect on ZMQ v2.
         Return use of IPv6 for zsock instances.
         """
         return lib.zsys_ipv6()
+
+    @staticmethod
+    def ipv6_available():
+        """
+        Test if ipv6 is available on the system. The only way to reliably
+check is to actually open a socket and try to bind it. (ported from
+libzmq)
+        """
+        return lib.zsys_ipv6_available()
 
     @staticmethod
     def set_interface(value):
