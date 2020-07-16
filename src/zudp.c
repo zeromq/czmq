@@ -28,7 +28,11 @@ struct _zudp_t {
     int     socktype;   //  our socket type
 };
 
-
+//  Some OS define IPV6_ADD_MEMBERSHIP some IPV6_JOIN_GROUP. They are identical
+#ifndef IPV6_ADD_MEMBERSHIP
+# define IPV6_ADD_MEMBERSHIP	IPV6_JOIN_GROUP
+# define IPV6_DROP_MEMBERSHIP	IPV6_LEAVE_GROUP
+#endif
 //  --------------------------------------------------------------------------
 //  Create a new zudp
 
@@ -115,7 +119,7 @@ zudp_send (zudp_t *self, zframe_t *frame, inaddr_t *address, int addrlen)
         0, //  Flags
         (struct sockaddr *) address, (socklen_t)addrlen) == -1)
     {
-        zsys_debug ("zsys_udp_send: failed, reason=%s", strerror (errno));
+        zsys_debug ("zudp_send: failed, reason=%s", strerror (errno));
         return -1;              //  UDP send not possible
     }
     else
