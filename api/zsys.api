@@ -440,7 +440,7 @@
         <return type = "integer" />
     </method>
 
-    <method name = "ipv6 available" singleton = "1">
+    <method name = "ipv6 available" singleton = "1" state = "draft">
         Test if ipv6 is available on the system. The only way to reliably 
         check is to actually open a socket and try to bind it. (ported from
         libzmq)
