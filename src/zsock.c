@@ -2379,13 +2379,7 @@ zsock_test (bool verbose)
     zsock_t* mdgramr = zsock_new_dgram ("udp://225.25.25.25:7777");
     assert (mdgramr);
     zsock_t* mdgrams = zsock_new_dgram ("udp://*:*");
-    //zsock_t* mdgrams = zsock_new (ZMQ_DGRAM);
     assert (mdgrams);
-    //rc = zsock_bind (mdgrams, "udp://239.0.0.1:7777" );
-    //assert ( rc == 0 ); // only for tcp the port number is returned
-    //rc = zsock_connect (mdgrams, "udp://239.0.0.1:7777");
-    //assert (rc == 0 );
-    // perhaps sleep a little for sockets to setup?
 
     rc = zstr_sendm( mdgrams, "225.25.25.25:7777" );
     assert (rc == 0);
