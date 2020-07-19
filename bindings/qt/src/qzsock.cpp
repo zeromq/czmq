@@ -155,6 +155,21 @@ QZsock* QZsock::newScatter (const QString &endpoint, QObject *qObjParent)
 }
 
 ///
+//  Create a DGRAM (UDP) socket. Default action is bind.
+//  The endpoint is a string consisting of a
+//  'transport'`://` followed by an 'address'. As this is
+//  a UDP socket the 'transport' has to be 'udp'. The
+//  'address' specifies the ip address and port to
+//  bind to. For example:  udp://127.0.0.1:1234
+//  Note: To send to an endpoint over UDP you have to
+//  send a message with the destination endpoint address
+//  as a first message!
+QZsock* QZsock::newDgram (const QString &endpoint, QObject *qObjParent)
+{
+    return new QZsock (zsock_new_dgram (endpoint.toUtf8().data()), qObjParent);
+}
+
+///
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.
 QZsock::~QZsock ()

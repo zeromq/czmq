@@ -183,6 +183,15 @@ Java_org_zeromq_czmq_Zsock__1_1newScatter (JNIEnv *env, jclass c, jstring endpoi
     return new_scatter_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zsock__1_1newDgram (JNIEnv *env, jclass c, jstring endpoint)
+{
+    char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
+    jlong new_dgram_ = (jlong) (intptr_t) zsock_new_dgram (endpoint_);
+    (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
+    return new_dgram_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {

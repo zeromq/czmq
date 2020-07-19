@@ -566,6 +566,7 @@ module CZMQ
       attach_function :zsock_new_dish, [:string], :pointer, **opts
       attach_function :zsock_new_gather, [:string], :pointer, **opts
       attach_function :zsock_new_scatter, [:string], :pointer, **opts
+      attach_function :zsock_new_dgram, [:string], :pointer, **opts
       attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_endpoint, [:pointer], :string, **opts
