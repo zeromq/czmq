@@ -311,11 +311,10 @@ CZMQ_PRIVATE zsock_t *
 //  'transport'`://` followed by an 'address'. As this is
 //  a UDP socket the 'transport' has to be 'udp'. The
 //  'address' specifies the ip address and port to
-//  bind or connect to. For example:  udp://127.0.0.1:1234
-//  Note: a DGRAM socket can only connect to a RADIO socket!
-//  To send to an endpoint over UDP you have to send a
-//  message with the destination endpoint address as a
-//  first message!
+//  bind to. For example:  udp://127.0.0.1:1234
+//  Note: To send to an endpoint over UDP you have to
+//  send a message with the destination endpoint address
+//  as a first message!
 //  Caller owns return value and must destroy it when done.
 CZMQ_PRIVATE zsock_t *
     zsock_new_dgram (const char *endpoint);

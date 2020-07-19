@@ -175,11 +175,10 @@ public class Zsock implements AutoCloseable {
     'transport'`://` followed by an 'address'. As this is
     a UDP socket the 'transport' has to be 'udp'. The
     'address' specifies the ip address and port to
-    bind or connect to. For example:  udp://127.0.0.1:1234
-    Note: a DGRAM socket can only connect to a RADIO socket!
-    To send to an endpoint over UDP you have to send a
-    message with the destination endpoint address as a
-    first message!
+    bind to. For example:  udp://127.0.0.1:1234
+    Note: To send to an endpoint over UDP you have to
+    send a message with the destination endpoint address
+    as a first message!
     */
     native static long __newDgram (String endpoint);
     public static Zsock newDgram (String endpoint) {
