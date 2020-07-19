@@ -4291,6 +4291,18 @@ uses
     // Create a SCATTER socket. Default action is connect.
     constructor NewScatter(const Endpoint: string);
 
+    // Create a DGRAM (UDP) socket. Default action is bind.
+    // The endpoint is a string consisting of a
+    // 'transport'`://` followed by an 'address'. As this is
+    // a UDP socket the 'transport' has to be 'udp'. The
+    // 'address' specifies the ip address and port to
+    // bind or connect to. For example:  udp://127.0.0.1:1234
+    // Note: a DGRAM socket can only connect to a RADIO socket!
+    // To send to an endpoint over UDP you have to send a
+    // message with the destination endpoint address as a
+    // first message!
+    constructor NewDgram(const Endpoint: string);
+
     // Destroy the socket. You must use this for any socket created via the
     // zsock_new method.
     destructor Destroy; override;
@@ -8467,6 +8479,14 @@ end;
   begin
     __Endpoint__ := UTF8String(Endpoint);
     Create(zsock_new_scatter(PAnsiChar(__Endpoint__)), True);
+  end;
+
+  constructor TZsock.NewDgram(const Endpoint: string);
+  var
+    __Endpoint__: UTF8String;
+  begin
+    __Endpoint__ := UTF8String(Endpoint);
+    Create(zsock_new_dgram(PAnsiChar(__Endpoint__)), True);
   end;
 
   constructor TZsock.Create(handle: PZsock; owned: Boolean);

@@ -156,6 +156,22 @@ class Zsock(object):
         """
         return utils.lib.zsock_new_scatter(utils.to_bytes(endpoint))
 
+    @staticmethod
+    def new_dgram(endpoint):
+        """
+        Create a DGRAM (UDP) socket. Default action is bind.
+        The endpoint is a string consisting of a
+        'transport'`://` followed by an 'address'. As this is
+        a UDP socket the 'transport' has to be 'udp'. The
+        'address' specifies the ip address and port to
+        bind or connect to. For example:  udp://127.0.0.1:1234
+        Note: a DGRAM socket can only connect to a RADIO socket!
+        To send to an endpoint over UDP you have to send a
+        message with the destination endpoint address as a
+        first message!
+        """
+        return utils.lib.zsock_new_dgram(utils.to_bytes(endpoint))
+
     def bind(self, format, *format_args):
         """
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports

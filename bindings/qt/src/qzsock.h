@@ -80,6 +80,18 @@ public:
     //  Create a SCATTER socket. Default action is connect.
     static QZsock* newScatter (const QString &endpoint, QObject *qObjParent = 0);
 
+    //  Create a DGRAM (UDP) socket. Default action is bind.
+    //  The endpoint is a string consisting of a
+    //  'transport'`://` followed by an 'address'. As this is
+    //  a UDP socket the 'transport' has to be 'udp'. The
+    //  'address' specifies the ip address and port to
+    //  bind or connect to. For example:  udp://127.0.0.1:1234
+    //  Note: a DGRAM socket can only connect to a RADIO socket!
+    //  To send to an endpoint over UDP you have to send a
+    //  message with the destination endpoint address as a
+    //  first message!
+    static QZsock* newDgram (const QString &endpoint, QObject *qObjParent = 0);
+
     //  Destroy the socket. You must use this for any socket created via the
     //  zsock_new method.
     ~QZsock ();

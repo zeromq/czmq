@@ -4792,6 +4792,9 @@ NAN_METHOD (Zsock::New) {
         if (streq (type_name, "scatter"))
             type = 17;
         else
+        if (streq (type_name, "dgram"))
+            type = 18;
+        else
             return Nan::ThrowTypeError ("`type` not a valid string");
     }
     else

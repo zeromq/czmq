@@ -5199,6 +5199,8 @@ lib.zsock_new_gather.restype = zsock_p
 lib.zsock_new_gather.argtypes = [c_char_p]
 lib.zsock_new_scatter.restype = zsock_p
 lib.zsock_new_scatter.argtypes = [c_char_p]
+lib.zsock_new_dgram.restype = zsock_p
+lib.zsock_new_dgram.argtypes = [c_char_p]
 lib.zsock_bind.restype = c_int
 lib.zsock_bind.argtypes = [zsock_p, c_char_p]
 lib.zsock_endpoint.restype = c_char_p
@@ -5772,6 +5774,22 @@ action is connect.
         Create a SCATTER socket. Default action is connect.
         """
         return Zsock(lib.zsock_new_scatter(endpoint), True)
+
+    @staticmethod
+    def new_dgram(endpoint):
+        """
+        Create a DGRAM (UDP) socket. Default action is bind.
+The endpoint is a string consisting of a
+'transport'`://` followed by an 'address'. As this is
+a UDP socket the 'transport' has to be 'udp'. The
+'address' specifies the ip address and port to
+bind or connect to. For example:  udp://127.0.0.1:1234
+Note: a DGRAM socket can only connect to a RADIO socket!
+To send to an endpoint over UDP you have to send a
+message with the destination endpoint address as a
+first message!
+        """
+        return Zsock(lib.zsock_new_dgram(endpoint), True)
 
     def bind(self, format, *args):
         """
