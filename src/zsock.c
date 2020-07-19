@@ -2400,34 +2400,33 @@ zsock_test (bool verbose)
     zstr_free (&maddr);
     zstr_free (&mdmessage);
 
-    /*// ipv6 (not supported yet)
-    zsys_set_ipv6(1);
-    zsock_t* dgramr6 = zsock_new_dgram ("udp://*:7777");
-    assert (dgramr6);
-    zsock_t* dgrams6 = zsock_new_dgram ("udp://*:*");
-    assert (dgrams6);
-    // perhaps sleep a little for sockets to setup?
-    zclock_sleep(100);
+//    // ipv6 (not supported yet)
+//    zsys_set_ipv6(1);
+//    zsock_t* dgramr6 = zsock_new_dgram ("udp://*:7777");
+//    assert (dgramr6);
+//    zsock_t* dgrams6 = zsock_new_dgram ("udp://*:*");
+//    assert (dgrams6);
+//    // perhaps sleep a little for sockets to setup?
+//    zclock_sleep(100);
 
-    rc = zstr_sendm( dgrams6, "::1:7777" );
-    assert (rc == 0);
-    rc = zstr_send (dgrams6, "HELLO");
-    assert (rc == 0);
+//    rc = zstr_sendm( dgrams6, "::1:7777" );
+//    assert (rc == 0);
+//    rc = zstr_send (dgrams6, "HELLO");
+//    assert (rc == 0);
 
-    char *dmessage6, *addr6;
-    zmsg_t *dmsg6 = zmsg_recv( dgramr6 );
-    assert (dmsg6);
-    addr6 = zmsg_popstr (dmsg6);
-    dmessage6 = zmsg_popstr(dmsg6);
-    assert (streq(dmessage6, "HELLO"));
-    zmsg_destroy( &dmsg6 );
-    zsock_destroy (&dgrams6);
-    zsock_destroy (&dgramr6);
+//    char *dmessage6, *addr6;
+//    zmsg_t *dmsg6 = zmsg_recv( dgramr6 );
+//    assert (dmsg6);
+//    addr6 = zmsg_popstr (dmsg6);
+//    dmessage6 = zmsg_popstr(dmsg6);
+//    assert (streq(dmessage6, "HELLO"));
+//    zmsg_destroy( &dmsg6 );
+//    zsock_destroy (&dgrams6);
+//    zsock_destroy (&dgramr6);
 
-    zstr_free (&dmessage6);
-    zstr_free (&addr6);
-    zstr_free (&dmessage6);
-    */
+//    zstr_free (&dmessage6);
+//    zstr_free (&addr6);
+//    zstr_free (&dmessage6);
 #endif
 
     //  @end
