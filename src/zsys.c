@@ -1903,6 +1903,58 @@ zsys_ipv6 (void)
     return s_ipv6;
 }
 
+//  Test if ipv6 is available on the system. The only way to reliably
+//  check is to actually open a socket and try to bind it. (ported from
+//  libzmq)
+
+bool
+zsys_ipv6_available (void)
+{
+#if defined(__WINDOWS__) && (_WIN32_WINNT < 0x0600)
+    return 0;
+#else
+    int rc, ipv6 = 1;
+    struct sockaddr_in6 test_addr;
+
+    memset (&test_addr, 0, sizeof (test_addr));
+    test_addr.sin6_family = AF_INET6;
+    inet_pton (AF_INET6, "::1", &(test_addr.sin6_addr));
+
+    SOCKET fd = socket (AF_INET6, SOCK_STREAM, IPPROTO_IP);
+    if (fd == INVALID_SOCKET)
+        ipv6 = 0;
+    else {
+#if defined(__WINDOWS__)
+        setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, (const char *) &ipv6,
+                    sizeof (int));
+        rc = setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char *) &ipv6,
+                         sizeof (int));
+        if (rc == SOCKET_ERROR)
+            ipv6 = 0;
+        else {
+            rc = bind (fd, (struct sockaddr *) &test_addr, sizeof (test_addr));
+            if (rc == SOCKET_ERROR)
+                ipv6 = 0;
+        }
+        closesocket (fd);
+#else
+        setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &ipv6, sizeof (int));
+        rc = setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6, sizeof (int));
+        if (rc != 0)
+            ipv6 = 0;
+        else {
+            rc = bind (fd, (struct sockaddr *) (&test_addr),
+                       sizeof (test_addr));
+            if (rc != 0)
+                ipv6 = 0;
+        }
+        close (fd);
+#endif
+    }
+
+    return ipv6;
+#endif // _WIN32_WINNT < 0x0600
+}
 
 //  --------------------------------------------------------------------------
 //  Set network interface name to use for broadcasts, particularly zbeacon.
@@ -2475,7 +2527,10 @@ zsys_test (bool verbose)
     zsys_init();
     zsys_shutdown();
     zsys_init();
-
+#ifdef CZMQ_BUILD_DRAFT_API
+    // just check if we can check for ipv6
+    zsys_ipv6_available();
+#endif
 
     //  @selftest
     zsys_catch_interrupts ();

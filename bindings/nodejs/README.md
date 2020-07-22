@@ -4276,6 +4276,14 @@ integer my_zsys.ipv6 ()
 Return use of IPv6 for zsock instances.
 
 ```
+boolean my_zsys.ipv6Available ()
+```
+
+Test if ipv6 is available on the system. Return true if available.
+The only way to reliably check is to actually open a socket and
+try to bind it. (ported from libzmq)
+
+```
 nothing my_zsys.setInterface (String)
 ```
 

@@ -7430,6 +7430,7 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "pipehwm", _pipehwm);
     Nan::SetPrototypeMethod (tpl, "setIpv6", _set_ipv6);
     Nan::SetPrototypeMethod (tpl, "ipv6", _ipv6);
+    Nan::SetPrototypeMethod (tpl, "ipv6Available", _ipv6_available);
     Nan::SetPrototypeMethod (tpl, "setInterface", _set_interface);
     Nan::SetPrototypeMethod (tpl, "interface", _interface);
     Nan::SetPrototypeMethod (tpl, "setIpv6Address", _set_ipv6_address);
@@ -8059,6 +8060,11 @@ NAN_METHOD (Zsys::_set_ipv6) {
 NAN_METHOD (Zsys::_ipv6) {
     int result = zsys_ipv6 ();
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_ipv6_available) {
+    bool result = zsys_ipv6_available ();
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
 }
 
 NAN_METHOD (Zsys::_set_interface) {
