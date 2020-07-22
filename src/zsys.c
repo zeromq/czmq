@@ -2747,6 +2747,8 @@ zsys_test (bool verbose)
     zsys_set_max_msgsz (-1);
     assert (zsys_max_msgsz () == 2000);
 
+    // cleanup log_sender
+    zsys_set_logsender(NULL);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
