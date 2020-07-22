@@ -479,6 +479,13 @@ CZMQ_EXPORT int64_t
     zsys_file_stable_age_msec (void);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Test if ipv6 is available on the system. Return true if available.
+//  The only way to reliably check is to actually open a socket and
+//  try to bind it. (ported from libzmq)
+CZMQ_EXPORT bool
+    zsys_ipv6_available (void);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Set IPv4 multicast address to use for sending zbeacon messages. By default
 //  IPv4 multicast is NOT used. If the environment variable
 //  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
