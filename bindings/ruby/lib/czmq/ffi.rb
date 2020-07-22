@@ -839,6 +839,7 @@ module CZMQ
       attach_function :zsys_pipehwm, [], :size_t, **opts
       attach_function :zsys_set_ipv6, [:int], :void, **opts
       attach_function :zsys_ipv6, [], :int, **opts
+      attach_function :zsys_ipv6_available, [], :bool, **opts
       attach_function :zsys_set_interface, [:string], :void, **opts
       attach_function :zsys_interface, [], :string, **opts
       attach_function :zsys_set_ipv6_address, [:string], :void, **opts
