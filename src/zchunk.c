@@ -477,7 +477,7 @@ zchunk_pack (zchunk_t *self)
 {
     assert (self);
     assert (zchunk_is (self));
-    return zframe_new (self->data, self->max_size);
+    return zframe_new (self->data, self->size);
 }
 
 
@@ -505,7 +505,7 @@ zchunk_packx (zchunk_t **self_p) {
     zchunk_t *self = *self_p;
     *self_p = NULL;
 
-    return zframe_frommem (self->data, self->max_size, (zchunk_destructor_fn *) zchunk_destroy, self);
+    return zframe_frommem (self->data, self->size, (zchunk_destructor_fn *) zchunk_destroy, self);
 }
 
 
