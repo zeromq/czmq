@@ -284,6 +284,20 @@ void QmlZsock::setOnlyFirstSubscribe (int onlyFirstSubscribe) {
 };
 
 ///
+//  Set socket option `hello_msg`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setHelloMsg (QmlZframe *helloMsg) {
+    zsock_set_hello_msg (self, helloMsg->self);
+};
+
+///
+//  Set socket option `disconnect_msg`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setDisconnectMsg (QmlZframe *disconnectMsg) {
+    zsock_set_disconnect_msg (self, disconnectMsg->self);
+};
+
+///
 //  Set socket option `wss_trust_system`.
 //  Available from libzmq 4.3.0.
 void QmlZsock::setWssTrustSystem (int wssTrustSystem) {
@@ -1690,6 +1704,22 @@ QmlZsock *QmlZsockAttached::constructGather (const QString &endpoint) {
 QmlZsock *QmlZsockAttached::constructScatter (const QString &endpoint) {
     QmlZsock *qmlSelf = new QmlZsock ();
     qmlSelf->self = zsock_new_scatter (endpoint.toUtf8().data());
+    return qmlSelf;
+};
+
+///
+//  Create a DGRAM (UDP) socket. Default action is bind.
+//  The endpoint is a string consisting of a
+//  'transport'`://` followed by an 'address'. As this is
+//  a UDP socket the 'transport' has to be 'udp'. The
+//  'address' specifies the ip address and port to
+//  bind to. For example:  udp://127.0.0.1:1234
+//  Note: To send to an endpoint over UDP you have to
+//  send a message with the destination endpoint address
+//  as a first message!
+QmlZsock *QmlZsockAttached::constructDgram (const QString &endpoint) {
+    QmlZsock *qmlSelf = new QmlZsock ();
+    qmlSelf->self = zsock_new_dgram (endpoint.toUtf8().data());
     return qmlSelf;
 };
 

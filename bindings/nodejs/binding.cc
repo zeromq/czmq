@@ -4537,6 +4537,8 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
     Nan::SetPrototypeMethod (tpl, "hasIn", _has_in);
     Nan::SetPrototypeMethod (tpl, "setOnlyFirstSubscribe", _set_only_first_subscribe);
+    Nan::SetPrototypeMethod (tpl, "setHelloMsg", _set_hello_msg);
+    Nan::SetPrototypeMethod (tpl, "setDisconnectMsg", _set_disconnect_msg);
     Nan::SetPrototypeMethod (tpl, "setWssTrustSystem", _set_wss_trust_system);
     Nan::SetPrototypeMethod (tpl, "setWssHostname", _set_wss_hostname);
     Nan::SetPrototypeMethod (tpl, "setWssTrustPem", _set_wss_trust_pem);
@@ -4789,6 +4791,9 @@ NAN_METHOD (Zsock::New) {
         else
         if (streq (type_name, "scatter"))
             type = 17;
+        else
+        if (streq (type_name, "dgram"))
+            type = 18;
         else
             return Nan::ThrowTypeError ("`type` not a valid string");
     }
@@ -5081,6 +5086,18 @@ NAN_METHOD (Zsock::_set_only_first_subscribe) {
     else
         return Nan::ThrowTypeError ("`only first subscribe` must be a number");
     zsock_set_only_first_subscribe (zsock->self, (int) only_first_subscribe);
+}
+
+NAN_METHOD (Zsock::_set_hello_msg) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    Zframe *hello_msg = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    zsock_set_hello_msg (zsock->self, hello_msg->self);
+}
+
+NAN_METHOD (Zsock::_set_disconnect_msg) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    Zframe *disconnect_msg = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    zsock_set_disconnect_msg (zsock->self, disconnect_msg->self);
 }
 
 NAN_METHOD (Zsock::_set_wss_trust_system) {
@@ -7413,12 +7430,15 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "pipehwm", _pipehwm);
     Nan::SetPrototypeMethod (tpl, "setIpv6", _set_ipv6);
     Nan::SetPrototypeMethod (tpl, "ipv6", _ipv6);
+    Nan::SetPrototypeMethod (tpl, "ipv6Available", _ipv6_available);
     Nan::SetPrototypeMethod (tpl, "setInterface", _set_interface);
     Nan::SetPrototypeMethod (tpl, "interface", _interface);
     Nan::SetPrototypeMethod (tpl, "setIpv6Address", _set_ipv6_address);
     Nan::SetPrototypeMethod (tpl, "ipv6Address", _ipv6_address);
     Nan::SetPrototypeMethod (tpl, "setIpv6McastAddress", _set_ipv6_mcast_address);
     Nan::SetPrototypeMethod (tpl, "ipv6McastAddress", _ipv6_mcast_address);
+    Nan::SetPrototypeMethod (tpl, "setIpv4McastAddress", _set_ipv4_mcast_address);
+    Nan::SetPrototypeMethod (tpl, "ipv4McastAddress", _ipv4_mcast_address);
     Nan::SetPrototypeMethod (tpl, "setAutoUseFd", _set_auto_use_fd);
     Nan::SetPrototypeMethod (tpl, "autoUseFd", _auto_use_fd);
     Nan::SetPrototypeMethod (tpl, "zprintf", _zprintf);
@@ -8042,6 +8062,11 @@ NAN_METHOD (Zsys::_ipv6) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
+NAN_METHOD (Zsys::_ipv6_available) {
+    bool result = zsys_ipv6_available ();
+    info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
 NAN_METHOD (Zsys::_set_interface) {
     char *value;
     if (info [0]->IsUndefined ())
@@ -8096,6 +8121,25 @@ NAN_METHOD (Zsys::_set_ipv6_mcast_address) {
 
 NAN_METHOD (Zsys::_ipv6_mcast_address) {
     char *result = (char *) zsys_ipv6_mcast_address ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zsys::_set_ipv4_mcast_address) {
+    char *value;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `value`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`value` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String value_utf8 (info [0].As<String>());
+    value = *value_utf8;
+         //} //bjornw end
+    zsys_set_ipv4_mcast_address ((const char *)value);
+}
+
+NAN_METHOD (Zsys::_ipv4_mcast_address) {
+    char *result = (char *) zsys_ipv4_mcast_address ();
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 

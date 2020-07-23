@@ -156,6 +156,21 @@ class Zsock(object):
         """
         return utils.lib.zsock_new_scatter(utils.to_bytes(endpoint))
 
+    @staticmethod
+    def new_dgram(endpoint):
+        """
+        Create a DGRAM (UDP) socket. Default action is bind.
+        The endpoint is a string consisting of a
+        'transport'`://` followed by an 'address'. As this is
+        a UDP socket the 'transport' has to be 'udp'. The
+        'address' specifies the ip address and port to
+        bind to. For example:  udp://127.0.0.1:1234
+        Note: To send to an endpoint over UDP you have to
+        send a message with the destination endpoint address
+        as a first message!
+        """
+        return utils.lib.zsock_new_dgram(utils.to_bytes(endpoint))
+
     def bind(self, format, *format_args):
         """
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
@@ -448,6 +463,20 @@ class Zsock(object):
         Available from libzmq 4.3.0.
         """
         utils.lib.zsock_set_only_first_subscribe(self._p, only_first_subscribe)
+
+    def set_hello_msg(self, hello_msg):
+        """
+        Set socket option `hello_msg`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_hello_msg(self._p, hello_msg._p)
+
+    def set_disconnect_msg(self, disconnect_msg):
+        """
+        Set socket option `disconnect_msg`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_disconnect_msg(self._p, disconnect_msg._p)
 
     def set_wss_trust_system(self, wss_trust_system):
         """

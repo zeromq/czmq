@@ -521,6 +521,31 @@ zsock_new_scatter (const char *endpoints)
     return zsock_new_scatter_checked (endpoints, NULL, 0);
 }
 
+//  --------------------------------------------------------------------------
+//  Create a dgram socket. Default action is bind.
+
+zsock_t *
+zsock_new_dgram_checked (const char *endpoints, const char *filename, size_t line_nbr)
+{
+#if defined ZMQ_DGRAM
+    zsock_t *sock = zsock_new_checked (ZMQ_DGRAM, filename, line_nbr);
+    if (zsock_attach (sock, endpoints, true))
+        zsock_destroy (&sock);
+    return sock;
+#else
+    errno = ENOTSUP;
+    return NULL;
+#endif
+}
+
+//  *** Draft method, for development use, may change without warning ***
+//  Create a DGRAM socket. Default action is bind.
+zsock_t *
+zsock_new_dgram (const char *endpoint)
+{
+    return zsock_new_dgram_checked ( endpoint, NULL, 0 );
+}
+
 
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
@@ -2322,6 +2347,90 @@ zsock_test (bool verbose)
 
     zsock_destroy (&reader);
     zsock_destroy (&writer);
+
+#ifdef ZMQ_DGRAM
+    // ZMQ_DGRAM ipv4 unicast test
+    zsock_t* dgramr = zsock_new_dgram ("udp://*:7777");
+    assert (dgramr);
+    //zsock_t* dgrams = zsock_new_dgram ("udp://*:*");
+    zsock_t* dgrams = zsock_new (ZMQ_DGRAM);
+    zsock_bind (dgrams, "udp://127.0.0.1:7778" );
+
+    assert (dgrams);
+    // perhaps sleep a little for sockets to setup?
+
+    rc = zstr_sendm( dgrams, "127.0.0.1:7777" );
+    assert (rc == 0);
+    rc = zstr_send (dgrams, "HELLO");
+    assert (rc == 0);
+
+    char *dmessage, *addr;
+
+    zmsg_t *dmsg = zmsg_recv( dgramr );
+    assert (dmsg);
+    addr = zmsg_popstr (dmsg);
+    dmessage = zmsg_popstr (dmsg);
+    assert (streq(dmessage, "HELLO"));
+    zmsg_destroy ( &dmsg );
+    zsock_destroy (&dgrams);
+    zsock_destroy (&dgramr);
+    zstr_free (&dmessage);
+    zstr_free (&addr);
+    zstr_free (&message);
+
+    // ZMQ_DGRAM ipv4 multicast test
+    zsock_t* mdgramr = zsock_new_dgram ("udp://225.25.25.25:7777");
+    assert (mdgramr);
+    zsock_t* mdgrams = zsock_new_dgram ("udp://*:*");
+    assert (mdgrams);
+
+    rc = zstr_sendm( mdgrams, "225.25.25.25:7777" );
+    assert (rc == 0);
+    rc = zstr_send (mdgrams, "HELLO");
+    assert (rc == 0);
+
+    char *mdmessage, *maddr;
+
+    zmsg_t *mdmsg = zmsg_recv( mdgramr );
+    assert (mdmsg);
+    maddr = zmsg_popstr (mdmsg);
+    mdmessage = zmsg_popstr (mdmsg);
+    assert (streq(mdmessage, "HELLO"));
+    zmsg_destroy ( &mdmsg );
+    zsock_destroy (&mdgrams);
+    zsock_destroy (&mdgramr);
+    zstr_free (&mdmessage);
+    zstr_free (&maddr);
+    zstr_free (&mdmessage);
+
+//    // ipv6 (not supported yet)
+//    zsys_set_ipv6(1);
+//    zsock_t* dgramr6 = zsock_new_dgram ("udp://*:7777");
+//    assert (dgramr6);
+//    zsock_t* dgrams6 = zsock_new_dgram ("udp://*:*");
+//    assert (dgrams6);
+//    // perhaps sleep a little for sockets to setup?
+//    zclock_sleep(100);
+
+//    rc = zstr_sendm( dgrams6, "::1:7777" );
+//    assert (rc == 0);
+//    rc = zstr_send (dgrams6, "HELLO");
+//    assert (rc == 0);
+
+//    char *dmessage6, *addr6;
+//    zmsg_t *dmsg6 = zmsg_recv( dgramr6 );
+//    assert (dmsg6);
+//    addr6 = zmsg_popstr (dmsg6);
+//    dmessage6 = zmsg_popstr(dmsg6);
+//    assert (streq(dmessage6, "HELLO"));
+//    zmsg_destroy( &dmsg6 );
+//    zsock_destroy (&dgrams6);
+//    zsock_destroy (&dgramr6);
+
+//    zstr_free (&dmessage6);
+//    zstr_free (&addr6);
+//    zstr_free (&dmessage6);
+#endif
 
     //  @end
     printf ("OK\n");

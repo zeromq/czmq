@@ -47,6 +47,50 @@ zsock_set_only_first_subscribe (void *self, int only_first_subscribe)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_HELLO_MSG value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_hello_msg (void *self, zframe_t * hello_msg)
+{
+    assert (self);
+#   if defined (ZMQ_HELLO_MSG)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock hello_msg option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_HELLO_MSG, zframe_data (hello_msg), zframe_size (hello_msg));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_DISCONNECT_MSG value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_disconnect_msg (void *self, zframe_t * disconnect_msg)
+{
+    assert (self);
+#   if defined (ZMQ_DISCONNECT_MSG)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock disconnect_msg option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_DISCONNECT_MSG, zframe_data (disconnect_msg), zframe_size (disconnect_msg));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_WSS_TRUST_SYSTEM value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -4151,6 +4195,22 @@ zsock_option_test (bool verbose)
     self = zsock_new (ZMQ_XPUB);
     assert (self);
     zsock_set_only_first_subscribe (self, 1);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_HELLO_MSG)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zframe_t *hello_msg = zframe_from ("test");
+    zsock_set_hello_msg (self, hello_msg);
+    zframe_destroy (&hello_msg);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_DISCONNECT_MSG)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zframe_t *disconnect_msg = zframe_from ("test");
+    zsock_set_disconnect_msg (self, disconnect_msg);
+    zframe_destroy (&disconnect_msg);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_OUT_BATCH_SIZE)

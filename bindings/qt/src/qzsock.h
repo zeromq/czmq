@@ -80,6 +80,17 @@ public:
     //  Create a SCATTER socket. Default action is connect.
     static QZsock* newScatter (const QString &endpoint, QObject *qObjParent = 0);
 
+    //  Create a DGRAM (UDP) socket. Default action is bind.
+    //  The endpoint is a string consisting of a
+    //  'transport'`://` followed by an 'address'. As this is
+    //  a UDP socket the 'transport' has to be 'udp'. The
+    //  'address' specifies the ip address and port to
+    //  bind to. For example:  udp://127.0.0.1:1234
+    //  Note: To send to an endpoint over UDP you have to
+    //  send a message with the destination endpoint address
+    //  as a first message!
+    static QZsock* newDgram (const QString &endpoint, QObject *qObjParent = 0);
+
     //  Destroy the socket. You must use this for any socket created via the
     //  zsock_new method.
     ~QZsock ();
@@ -257,6 +268,14 @@ public:
     //  Set socket option `only_first_subscribe`.
     //  Available from libzmq 4.3.0.
     void setOnlyFirstSubscribe (int onlyFirstSubscribe);
+
+    //  Set socket option `hello_msg`.
+    //  Available from libzmq 4.3.0.
+    void setHelloMsg (QZframe *helloMsg);
+
+    //  Set socket option `disconnect_msg`.
+    //  Available from libzmq 4.3.0.
+    void setDisconnectMsg (QZframe *disconnectMsg);
 
     //  Set socket option `wss_trust_system`.
     //  Available from libzmq 4.3.0.

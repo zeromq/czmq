@@ -233,6 +233,22 @@ module CZMQ
         __new ptr
       end
 
+      # Create a DGRAM (UDP) socket. Default action is bind.
+      # The endpoint is a string consisting of a
+      # 'transport'`://` followed by an 'address'. As this is
+      # a UDP socket the 'transport' has to be 'udp'. The
+      # 'address' specifies the ip address and port to
+      # bind to. For example:  udp://127.0.0.1:1234
+      # Note: To send to an endpoint over UDP you have to
+      # send a message with the destination endpoint address
+      # as a first message!
+      # @param endpoint [String, #to_s, nil]
+      # @return [CZMQ::Zsock]
+      def self.new_dgram(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_dgram(endpoint)
+        __new ptr
+      end
+
       # Destroy the socket. You must use this for any socket created via the
       # zsock_new method.
       #
@@ -967,6 +983,64 @@ module CZMQ
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         only_first_subscribe = Integer(only_first_subscribe)
         result = ::CZMQ::FFI.zsock_set_only_first_subscribe(self_p, only_first_subscribe)
+        result
+      end
+
+      # Set socket option `hello_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param hello_msg [Zframe, #__ptr]
+      # @return [void]
+      def set_hello_msg(hello_msg)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        hello_msg = hello_msg.__ptr if hello_msg
+        result = ::CZMQ::FFI.zsock_set_hello_msg(self_p, hello_msg)
+        result
+      end
+
+      # Set socket option `hello_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_hello_msg.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param hello_msg [Zframe, #__ptr]
+      # @return [void]
+      def self.set_hello_msg(self_p, hello_msg)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        hello_msg = hello_msg.__ptr if hello_msg
+        result = ::CZMQ::FFI.zsock_set_hello_msg(self_p, hello_msg)
+        result
+      end
+
+      # Set socket option `disconnect_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param disconnect_msg [Zframe, #__ptr]
+      # @return [void]
+      def set_disconnect_msg(disconnect_msg)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        disconnect_msg = disconnect_msg.__ptr if disconnect_msg
+        result = ::CZMQ::FFI.zsock_set_disconnect_msg(self_p, disconnect_msg)
+        result
+      end
+
+      # Set socket option `disconnect_msg`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_disconnect_msg.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param disconnect_msg [Zframe, #__ptr]
+      # @return [void]
+      def self.set_disconnect_msg(self_p, disconnect_msg)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        disconnect_msg = disconnect_msg.__ptr if disconnect_msg
+        result = ::CZMQ::FFI.zsock_set_disconnect_msg(self_p, disconnect_msg)
         result
       end
 

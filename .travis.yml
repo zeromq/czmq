@@ -37,7 +37,7 @@ compiler:
 env:
   global:
     - CI_TIME=false
-    - CI_TRACE=false
+    - CI_TRACE=true
     - CI_CONFIG_QUIET=true
     - CI_REQUIRE_GOOD_GITIGNORE=false
     - CI_REQUIRE_GOOD_CLANG_FORMAT=false
@@ -53,12 +53,10 @@ env:
     - secure: "ZMvDhR/PxayFeHd70j8J5f260ydu4pSkMV4HFAjRd1e0YuYCy5PUCFIbXWpZ8XujlxcFVSOkfaekIvs4P5KejkKNxoJM+caJ4DAUW/zwtsrHhL1jT7HsCFdEpL2vcOZFXsfWBXkniVU800vgaV+YK4jfewyv0rPTQaImuMlrgRU="
     - secure: "Tc1HPM1HnWr4ZwtPKFMasrLLFgW0WHMZs6ncBFZMhKVKTjUnBO7zdKw4ZXvSEaa1pxqvJhuQRjcbmVL2H8NmT3IdWg7ToSTuDHazUP03QBGvXVKMxIhnPI9cOzsz6LQUklNY4WihairAwlt8hnD+85pU1vl0hEhMNmHLJ7RiT+4="
     - BINTRAY_USER_ORG=zeromq
-    # tokens to deploy releases on OBS and create/delete temporary branch on Github.
-    # 1) Create a token on https://github.com/settings/tokens/new with "public_repo"
-    #    capability and encrypt it with travis encrypt --org -r <org>/<repo> GH_TOKEN="<token>"
-    # 2) Create 2 OBS tokens with osc token --create network:messaging:zeromq:release-<stable|draft> <project>
+    # tokens to deploy releases on OBS.
+    # 1) Create 2 OBS tokens with osc token --create network:messaging:zeromq:release-<stable|draft> <project>
     #    encrypt them with travis encrypt --org -r <org>/<repo> OBS_<STABLE|DRAFT>_TOKEN="<token>"
-    # 3) Uncomment the three "secure" lines and paste the three generated hashed
+    # 2) Uncomment the three "secure" lines and paste the three generated hashed
     #    strings, which include each token's name, as parameters
     - secure: O0nI2RARxdXndopjlNI1EnnLvgbjbSk3+ZFuyxz2eW0zGm4/Bx7lRfQSqXnKtEGyjFsGdthVji24h5g1EQnrX0mmOvweH0tiTdfjfubnaUGMStU2DtGPOZMLE93khdwJcOsM9XeSsYK9MeTz3SYTLGsNcXDd6enOnrVygzUdmlk=
     - secure: LYZtGhy+XiKeUOLaqceeTRUZo76y2oo6f8Uv/c8Qvy9LcYueE+lDT5njXO/wUNVKt+V5TRZX/pURxo4osCB1Ax/tNoHIhcsvLzBEsjnd40MBfxvr8finBFVj4v/HOyguLMCljo4GhF4t71T+PY+Ewq5WYo3vxpKNmroZlrHp2Zg=
@@ -156,16 +154,27 @@ matrix:
         packages:
         - valgrind
         - *pkg_deps_common
+  - env: BUILD_TYPE=default
+    os: windows
   - env: BUILD_TYPE=android
     compiler: clang
   - env: BUILD_TYPE=bindings BINDING=jni
-    os: linux
-    dist: xenial
+    os: osx
+    language: java
+    jdk: openjdk13
     compiler: clang
-    addons:
-      apt:
-        packages:
-        - openjdk-8-jdk
+  - env: BUILD_TYPE=bindings BINDING=jni
+    os: linux
+    dist: trusty
+    language: java
+    jdk: openjdk8
+    compiler: clang
+  - env: BUILD_TYPE=bindings BINDING=jni BINDING_OPTS=android
+    os: linux
+    dist: trusty
+    language: java
+    jdk: openjdk8
+    compiler: clang
   - env: BUILD_TYPE=default ADDRESS_SANITIZER=enabled
     os: linux
 #    dist: xenial
@@ -242,7 +251,7 @@ deploy:
   api_key:
     # To encrypt your access token run: `travis encrypt -r user/repo`
     #secure: <encrypted github access token>
-    secure: mmpmM0uhaMIKjL7ZkZduDOHkhAWA4Ngaq2FtjQVnUXrsCelSObSLe6BwcvvPp7yYGW44mAmoYPEPWAADatt+6bdVCcf0hgSJS02G4EiuxRAOiZ/ffTaAOhaqfmjuwmZ1cftFUFwehS9JEE9Be59Hv+tGnOOZSkxMWhkQ7xTvidQ=
+    secure: tQgYveuVEQhskgvJXilEURJd4CETCa8eWwEhFyVjITeDq5GLlOzUWCuCWygg0kAIx2I+WH0ybQz+L4hUSe5/EedoGtaXRxmV+4CUWAKaO8hqkccszwpClpJRvblPjXF6s/TL003Hm/bTPKrEaGApUPL4hwjEnXvPoGejGcTNfok=
   file_glob: true
   file: ${CZMQ_DEPLOYMENT}
   skip_cleanup: true

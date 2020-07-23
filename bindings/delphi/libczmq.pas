@@ -1993,6 +1993,17 @@ type
   // Create a SCATTER socket. Default action is connect.
   function zsock_new_scatter(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Create a DGRAM (UDP) socket. Default action is bind.
+  // The endpoint is a string consisting of a
+  // 'transport'`://` followed by an 'address'. As this is
+  // a UDP socket the 'transport' has to be 'udp'. The
+  // 'address' specifies the ip address and port to
+  // bind to. For example:  udp://127.0.0.1:1234
+  // Note: To send to an endpoint over UDP you have to
+  // send a message with the destination endpoint address
+  // as a first message!
+  function zsock_new_dgram(Endpoint: PAnsiChar): PZsock; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Destroy the socket. You must use this for any socket created via the
   // zsock_new method.
   procedure zsock_destroy(var self: PZsock); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
@@ -2212,6 +2223,14 @@ type
   // Set socket option `only_first_subscribe`.
   // Available from libzmq 4.3.0.
   procedure zsock_set_only_first_subscribe(self: PZsock; OnlyFirstSubscribe: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `hello_msg`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_hello_msg(self: PZsock; HelloMsg: PZframe); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `disconnect_msg`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_disconnect_msg(self: PZsock; DisconnectMsg: PZframe); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Set socket option `wss_trust_system`.
   // Available from libzmq 4.3.0.
@@ -3250,6 +3269,11 @@ type
   // Return use of IPv6 for zsock instances.
   function zsys_ipv6: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Test if ipv6 is available on the system. Return true if available.
+  // The only way to reliably check is to actually open a socket and
+  // try to bind it. (ported from libzmq)
+  function zsys_ipv6_available: Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Set network interface name to use for broadcasts, particularly zbeacon.
   // This lets the interface be configured for test environments where required.
   // For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -3279,6 +3303,23 @@ type
   // Return IPv6 multicast address to use for sending zbeacon, or "" if none was
   // set.
   function zsys_ipv6_mcast_address: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set IPv4 multicast address to use for sending zbeacon messages. By default
+  // IPv4 multicast is NOT used. If the environment variable
+  // ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+  // address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+  // will enable IPv4 zbeacon messages.
+  procedure zsys_set_ipv4_mcast_address(Value: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+  // set.
+  function zsys_ipv4_mcast_address: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set multicast TTL default is 1
+  procedure zsys_set_mcast_ttl(Value: Byte); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get multicast TTL
+  function zsys_mcast_ttl: Byte; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Configure the automatic use of pre-allocated FDs when creating new sockets.
   // If 0 (default), nothing will happen. Else, when a new socket is bound, the

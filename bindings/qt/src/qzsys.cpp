@@ -540,6 +540,16 @@ int QZsys::ipv6 ()
 }
 
 ///
+//  Test if ipv6 is available on the system. Return true if available.
+//  The only way to reliably check is to actually open a socket and
+//  try to bind it. (ported from libzmq)
+bool QZsys::ipv6Available ()
+{
+    bool rv = zsys_ipv6_available ();
+    return rv;
+}
+
+///
 //  Set network interface name to use for broadcasts, particularly zbeacon.
 //  This lets the interface be configured for test environments where required.
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -596,6 +606,43 @@ void QZsys::setIpv6McastAddress (const QString &value)
 const QString QZsys::ipv6McastAddress ()
 {
     const QString rv = QString (zsys_ipv6_mcast_address ());
+    return rv;
+}
+
+///
+//  Set IPv4 multicast address to use for sending zbeacon messages. By default
+//  IPv4 multicast is NOT used. If the environment variable
+//  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+//  address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+//  will enable IPv4 zbeacon messages.
+void QZsys::setIpv4McastAddress (const QString &value)
+{
+    zsys_set_ipv4_mcast_address (value.toUtf8().data());
+
+}
+
+///
+//  Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+//  set.
+const QString QZsys::ipv4McastAddress ()
+{
+    const QString rv = QString (zsys_ipv4_mcast_address ());
+    return rv;
+}
+
+///
+//  Set multicast TTL default is 1
+void QZsys::setMcastTtl (byte value)
+{
+    zsys_set_mcast_ttl (value);
+
+}
+
+///
+//  Get multicast TTL
+byte QZsys::mcastTtl ()
+{
+    byte rv = zsys_mcast_ttl ();
     return rv;
 }
 

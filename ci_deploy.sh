@@ -20,10 +20,10 @@ if [ "$BUILD_TYPE" == "default" ]; then
     md5sum *.zip *.tar.gz > MD5SUMS
     sha1sum *.zip *.tar.gz > SHA1SUMS
     cd -
-elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ]; then
-    ( cd bindings/jni && TERM=dumb PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./gradlew clean bintrayUpload )
-    cp bindings/jni/android/czmq-android.jar czmq-android-4.2.1.jar
-    export CZMQ_DEPLOYMENT=czmq-android-4.2.1.jar
+elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ] && [ -z "$BINDING_OPTS" ]; then
+    ( cd bindings/jni && TERM=dumb ./gradlew clean bintrayUpload -PisRelease -PbuildPrefix=/tmp/jni_build )
+elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ] && [ "$BINDING_OPTS" == "android" ]; then
+    export CZMQ_DEPLOYMENT=bindings/jni/czmq-jni/android/czmq-android-*.jar
 else
     export CZMQ_DEPLOYMENT=""
 fi

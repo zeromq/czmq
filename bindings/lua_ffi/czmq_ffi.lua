@@ -2501,6 +2501,18 @@ zsock_t *
 zsock_t *
     zsock_new_scatter (const char *endpoint);
 
+// Create a DGRAM (UDP) socket. Default action is bind.
+// The endpoint is a string consisting of a
+// 'transport'`://` followed by an 'address'. As this is
+// a UDP socket the 'transport' has to be 'udp'. The
+// 'address' specifies the ip address and port to
+// bind to. For example:  udp://127.0.0.1:1234
+// Note: To send to an endpoint over UDP you have to
+// send a message with the destination endpoint address
+// as a first message!
+zsock_t *
+    zsock_new_dgram (const char *endpoint);
+
 // Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
 // ephemeral ports, if you specify the port number as "*". By default
 // zsock uses the IANA designated range from C000 (49152) to FFFF (65535).
@@ -2741,6 +2753,16 @@ bool
 // Available from libzmq 4.3.0.
 void
     zsock_set_only_first_subscribe (void *self, int only_first_subscribe);
+
+// Set socket option `hello_msg`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_hello_msg (void *self, zframe_t *hello_msg);
+
+// Set socket option `disconnect_msg`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_disconnect_msg (void *self, zframe_t *disconnect_msg);
 
 // Set socket option `wss_trust_system`.
 // Available from libzmq 4.3.0.
@@ -4007,6 +4029,12 @@ void
 int
     zsys_ipv6 (void);
 
+// Test if ipv6 is available on the system. Return true if available.
+// The only way to reliably check is to actually open a socket and
+// try to bind it. (ported from libzmq)
+bool
+    zsys_ipv6_available (void);
+
 // Set network interface name to use for broadcasts, particularly zbeacon.
 // This lets the interface be configured for test environments where required.
 // For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -4042,6 +4070,27 @@ void
 // set.
 const char *
     zsys_ipv6_mcast_address (void);
+
+// Set IPv4 multicast address to use for sending zbeacon messages. By default
+// IPv4 multicast is NOT used. If the environment variable
+// ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+// address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+// will enable IPv4 zbeacon messages.
+void
+    zsys_set_ipv4_mcast_address (const char *value);
+
+// Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+// set.
+const char *
+    zsys_ipv4_mcast_address (void);
+
+// Set multicast TTL default is 1
+void
+    zsys_set_mcast_ttl (byte value);
+
+// Get multicast TTL
+byte
+    zsys_mcast_ttl (void);
 
 // Configure the automatic use of pre-allocated FDs when creating new sockets.
 // If 0 (default), nothing will happen. Else, when a new socket is bound, the

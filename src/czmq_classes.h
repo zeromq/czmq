@@ -21,8 +21,20 @@
 //  Platform definitions, must come first
 #include "platform.h"
 
+//  Asserts check the invariants of methods. If they're not
+//  fulfilled the program should fail fast. Therefore enforce them!
+#ifdef NDEBUG
+  #undef NDEBUG
+  #include <assert.h>
+  #define NDEBUG
+#else
+  #include <assert.h>
+#endif
+
 //  External API
 #include "../include/czmq.h"
+
+//  Private external dependencies
 
 //  Opaque class structures to allow forward references
 #ifndef ZGOSSIP_MSG_T_DEFINED
@@ -294,6 +306,20 @@ CZMQ_PRIVATE zsock_t *
     zsock_new_scatter (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
+//  Create a DGRAM (UDP) socket. Default action is bind.
+//  The endpoint is a string consisting of a
+//  'transport'`://` followed by an 'address'. As this is
+//  a UDP socket the 'transport' has to be 'udp'. The
+//  'address' specifies the ip address and port to
+//  bind to. For example:  udp://127.0.0.1:1234
+//  Note: To send to an endpoint over UDP you have to
+//  send a message with the destination endpoint address
+//  as a first message!
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zsock_t *
+    zsock_new_dgram (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.
 CZMQ_PRIVATE uint32_t
@@ -404,6 +430,38 @@ CZMQ_PRIVATE void
 //  before testing if a filesystem object is "stable" or not.
 CZMQ_PRIVATE int64_t
     zsys_file_stable_age_msec (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Test if ipv6 is available on the system. Return true if available.
+//  The only way to reliably check is to actually open a socket and
+//  try to bind it. (ported from libzmq)
+CZMQ_PRIVATE bool
+    zsys_ipv6_available (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Set IPv4 multicast address to use for sending zbeacon messages. By default
+//  IPv4 multicast is NOT used. If the environment variable
+//  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+//  address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+//  will enable IPv4 zbeacon messages.
+CZMQ_PRIVATE void
+    zsys_set_ipv4_mcast_address (const char *value);
+
+//  *** Draft method, defined for internal use only ***
+//  Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+//  set.
+CZMQ_PRIVATE const char *
+    zsys_ipv4_mcast_address (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Set multicast TTL default is 1
+CZMQ_PRIVATE void
+    zsys_set_mcast_ttl (byte value);
+
+//  *** Draft method, defined for internal use only ***
+//  Get multicast TTL
+CZMQ_PRIVATE byte
+    zsys_mcast_ttl (void);
 
 //  *** Draft method, defined for internal use only ***
 //  Print formatted string. Format is specified by variable names

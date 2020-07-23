@@ -844,7 +844,7 @@ zproc_wait (zproc_t *self, int timeout) {
         return self->return_code;
     } else {
         // wait up to timeout
-        int quit = zclock_mono () + timeout;
+        int64_t quit = zclock_mono () + timeout;
         while (true) {
             if (! zproc_running (self))
                 break;

@@ -5,7 +5,7 @@
 [![OBS draft](https://img.shields.io/badge/OBS%20master-draft-yellow.svg)](http://software.opensuse.org/download.html?project=network%3Amessaging%3Azeromq%3Agit-draft&package=czmq)
 [![OBS stable](https://img.shields.io/badge/OBS%20master-stable-yellow.svg)](http://software.opensuse.org/download.html?project=network%3Amessaging%3Azeromq%3Agit-stable&package=czmq)
 <a target="_blank" href="http://webchat.freenode.net?channels=%23zeromq&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
-[![license](https://img.shields.io/github/license/zeromq/czmq.svg)](https://github.com/zeromq/czmq/blob/master/LICENSE)
+[![license](https://img.shields.io/badge/license-MPL%202.0-green.svg)](https://github.com/zeromq/czmq/blob/master/LICENSE)
 
 # CZMQ - High-level C binding for 0MQ
 
@@ -71,31 +71,74 @@ To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/
 
 ## Using CZMQ
 
-### Building and Installing
+### Install from a package manager
+
+#### Linux
+
+Deb packages are available for [Debian](https://packages.debian.org/search?searchon=sourcenames&keywords=czmq) and [Ubuntu](https://packages.ubuntu.com/search?searchon=sourcenames&keywords=czmq).
+
+For other distros please refer to [pkgs.org](https://pkgs.org/download/czmq).
+
+You can also get prebuild binaries for latest git `master` for most distros on openSUSE's Build Service:
+
+**Git `master` only stable APIs:** http://software.opensuse.org/download.html?project=network%3Amessaging%3Azeromq%3Agit-stable&package=czmq
+
+**Git `master` including draft APIs:** http://software.opensuse.org/download.html?project=network%3Amessaging%3Azeromq%3Agit-draft&package=czmq
+
+#### MacOS
+
+On macOS install czmq with Homebrew see [here](https://formulae.brew.sh/formula/czmq).
+
+#### Windows
+
+**Using vcpkg**
+
+If you are already using [vcpkg](https://github.com/Microsoft/vcpkg/), you can download and install `czmq` with one single command:
+```
+vcpkg.exe install czmq
+```
+this will build `czmq` as a 32-bit shared library.
+```
+vcpkg.exe install czmq:x64-windows-static
+```
+this will build `czmq` as a 64-bit static library.
+
+You may also build `czmq` with one or more optional libraries:
+```
+vcpkg.exe install czmq[curl,httpd,lz4]:x64-windows
+```
+this will build `czmq` with `libcurl`, `libmicrohttpd`, `lz4`, as a 64-bit shared library.
+
+To use the draft APIs, you may build `czmq` with `draft` feature:
+```
+vcpkg install czmq[draft]
+```
+
+If you are an adventurer, and want to always use the lastest version of `czmq`, pass an extra `--head` option:
+```
+vcpkg.exe install czmq --head
+```
+
+These commands will also print out instructions on how to use the library from your MSBuild or CMake-based projects.
+
+### Building on Linux and macOS
 
 To start with, you need at least these packages:
-
-* {{git-all}} -- git is how we share code with other people.
-
-* {{build-essential}}, {{libtool}}, {{pkg-config}} - the C compiler and related tools.
-
-* {{autotools-dev}}, {{autoconf}}, {{automake}} - the GNU autoconf makefile generators.
-
-* {{cmake}} - the CMake makefile generators (an alternative to autoconf).
+* `git` -- git is how we share code with other people.
+* `build-essential`, `libtool`, `pkg-config` - the C compiler and related tools.
+* `autotools-dev`, `autoconf`, `automake` - the GNU autoconf makefile generators.
+* `cmake` - the CMake makefile generators (an alternative to autoconf).
 
 Plus some others:
-
-* {{uuid-dev}}, {{libpcre3-dev}} - utility libraries.
-
-* {{valgrind}} - a useful tool for checking your code.
-
-* {{pkg-config}} - an optional useful tool to make building with dependencies easier.
+* `uuid-dev`, `libpcre3-dev` - utility libraries.
+* `valgrind` - a useful tool for checking your code.
+* `pkg-config` - an optional useful tool to make building with dependencies easier.
 
 Which we install like this (using the Debian-style apt-get package manager):
 
     sudo apt-get update
     sudo apt-get install -y \
-        git-all build-essential libtool \
+        git build-essential libtool \
         pkg-config autotools-dev autoconf automake cmake \
         uuid-dev libpcre3-dev valgrind
 
@@ -139,7 +182,6 @@ You will need the pkg-config, libtool, and autoreconf packages. After building, 
 
     make check
 
-
 ### Building on Windows
 
 To start with, you need MS Visual Studio (C/C++). The free community edition works well.
@@ -150,7 +192,46 @@ Then, install git, and make sure it works from a DevStudio command prompt:
 git
 ```
 
-Now let's build CZMQ from GitHub:
+#### Using CMake
+
+`czmq` requires `libzmq`, so we need to build `libzmq` first. For `libzmq`, you can optionally use [libsodium](https://github.com/jedisct1/libsodium) as the curve encryption library. So we will start from building `libsodium` in the following (and you can bypass the building of `libsodium` if you are ok with libzmq's default curve encryption library):
+```
+git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
+cd libsodium\builds\msvc\build
+buildall.bat
+cd ..\..\..\..
+```
+Once done, you can find the library files under `libsodium\bin\<Win32|x64>\<Debug|Release>\<Platform Toolset>\<dynamic|ltcg|static>`.
+
+Here, the `<Platform Toolset>` is the platform toolset you are using: `v100` for `VS2010`, `v140` for `VS2015`, `v141` for `VS2017`, etc.
+
+```
+git clone git://github.com/zeromq/libzmq.git
+cd libzmq
+mkdir build
+cd build
+cmake .. -DBUILD_STATIC=OFF -DBUILD_SHARED=ON -DZMQ_BUILD_TESTS=ON -DWITH_LIBSODIUM=ON -DCMAKE_INCLUDE_PATH=..\libsodium\src\libsodium\include -DCMAKE_LIBRARY_PATH=..\libsodium\bin\Win32\Release\<Platform Toolset>\dynamic -DCMAKE_INSTALL_PREFIX=C:\libzmq
+cmake --build . --config Release --target install
+cd ..\..\
+```
+`-DWITH_LIBSODIUM=ON` is necessary if you want to build `libzmq` with `libsodium`. `CMAKE_INCLUDE_PATH` option tells `libzmq` where to search for `libsodium`'s header files. And the `CMAKE_LIBRARY_PATH` option tells where to search for libsodium library files. If you don't need `libsodium` support, you can omit these three options.
+
+`-DCMAKE_INSTALL_PREFIX=C:\libzmq` means we want to install `libzmq` into the `C:\libzmq`. You may need to run your shell with administrator privilege in order to write to the system disk.
+
+Now, it is time to build `czmq`:
+```
+git clone git://github.com/zeromq/czmq.git
+cd czmq
+mkdir build
+cd build
+cmake .. -DCZMQ_BUILD_SHARED=ON -DCZMQ_BUILD_STATIC=OFF -DCMAKE_PREFIX_PATH=C:\libzmq
+cmake --build . --config Release
+```
+Remember that we install `libzmq` to `C:\libzmq` through specifying `-DCMAKE_INSTALL_PREFIX=C:\libzmq` in the previous step. We here use `-DCMAKE_PREFIX_PATH=C:\libzmq` to tell `czmq` where to search for `libzmq`.
+
+That is not the whole story. We didn't mention the building of `libcurl`, `lz4`, `libuuid` and other `czmq` optional libraries above. In fact, to build all of these optional libraries successfully is really tricky. Please refer issue [#1972](https://github.com/zeromq/czmq/issues/1972) for more details.
+
+#### Using MSBuild (Out of date, may not work now!)
 
 ```
     git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
@@ -505,8 +586,37 @@ Before opening a pull request read our [contribution guidelines](https://github.
 
 ### Code Generation
 
-We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
+We generate scripts for build systems like autotools, cmake and others as well as class skeletons, class headers, the selftest runner, bindings to higher level languages and more using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image. 
+
+#### Docker
+
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq. 
+
+Next always download the latest image: 
+
+```sh
+# Make sure 
+docker pull zeromqorg/zproject:latest
+```
+
+Then run the following command:
+
+```sh
+# Shell and Powershell
+docker run -v ${PWD}/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+
+# Windows CMD
+docker run -v %cd%/..:/workspace -e BUILD_DIR=/workspace/czmq zeromqorg/zproject
+```
+
+#### Linux and MacOS
+
+* Install [GSL](https://github.com/zeromq/gsl) and [zproject](https://github.com/zeromq/zproject)
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as czmq
+
+Then run the following command:
+
+	gsl project.xml
 
 ### This Document
 
-This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

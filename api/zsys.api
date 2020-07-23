@@ -440,6 +440,13 @@
         <return type = "integer" />
     </method>
 
+    <method name = "ipv6 available" singleton = "1" state = "draft">
+        Test if ipv6 is available on the system. Return true if available.
+        The only way to reliably check is to actually open a socket and 
+        try to bind it. (ported from libzmq)
+        <return type = "boolean" />
+    </method>
+
     <method name = "set interface" singleton = "1">
         Set network interface name to use for broadcasts, particularly zbeacon.
         This lets the interface be configured for test environments where required.
@@ -480,6 +487,31 @@
         Return IPv6 multicast address to use for sending zbeacon, or "" if none was
         set.
         <return type = "string" />
+    </method>
+
+    <method name = "set ipv4 mcast address" singleton = "1"  state = "draft">
+        Set IPv4 multicast address to use for sending zbeacon messages. By default
+        IPv4 multicast is NOT used. If the environment variable
+        ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+        address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+        will enable IPv4 zbeacon messages.
+        <argument name = "value" type = "string" />
+    </method>
+
+    <method name = "ipv4 mcast address" singleton = "1" state = "draft">
+        Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+        set.
+        <return type = "string" />
+    </method>
+
+	<method name = "set mcast ttl" singleton = "1"  state = "draft">
+        Set multicast TTL default is 1
+        <argument name = "value" type = "byte" />
+    </method>
+
+	<method name = "mcast ttl" singleton = "1"  state = "draft">
+        Get multicast TTL
+        <return type = "byte" />
     </method>
 
     <method name = "set auto use fd" singleton = "1">

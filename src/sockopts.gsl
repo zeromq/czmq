@@ -23,6 +23,10 @@ for version
             option.ctype = "char *"   #   Enforce C strings
             option.ctype_const = "const char *"
             option.api_type = "string"
+        elsif type = "frame"
+            option.ctype = "zframe_t *"
+            option.ctype_const = "zframe_t *"
+            option.api_type = "zframe"
         elsif type = "socket"
             option.ctype = "SOCKET"   #   Portable socket type
             option.ctype_const = "SOCKET"

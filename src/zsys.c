@@ -69,6 +69,7 @@ s_handler_fn_shim (DWORD ctrltype)
 //  ZeroMQ context for this process
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
+static bool s_shutting_down = false;
 
 #ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
 // This is a private tunable that is likely to be replaced or tweaked later
@@ -101,6 +102,8 @@ static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
 static zsock_t *s_logsender = NULL;    //  ZSYS_LOGSENDER=
 static int s_zero_copy_recv = 1;    // ZSYS_ZERO_COPY_RECV=1
+static char *s_ipv4_mcast_address = NULL; //  ZSYS_IPV4_MCAST_ADDRESS=
+static unsigned char s_mcast_ttl = 1;     //  ZSYS_MCAST_TTL=1
 
 //  Track number of open sockets so we can zmq_term() safely
 static size_t s_open_sockets = 0;
@@ -239,6 +242,11 @@ zsys_init (void)
     else
         zsys_set_ipv6_mcast_address ("ff02:0:0:0:0:0:0:1");
 
+    if (getenv ("ZSYS_IPV4_MCAST_ADDRESS"))
+        zsys_set_ipv4_mcast_address (getenv ("ZSYS_IPV4_MCAST_ADDRESS"));
+    else
+        zsys_set_ipv4_mcast_address (NULL);
+
 
     if (getenv ("ZSYS_LOGIDENT"))
         zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
@@ -276,10 +284,10 @@ zsys_init (void)
 void
 zsys_shutdown (void)
 {
-    if (!s_initialized)
+    if (!s_initialized || s_shutting_down)
         return;
 
-    s_initialized = false;
+    s_shutting_down = true;
 
     //  The atexit handler is called when the main function exits;
     //  however we may have zactor threads shutting down and still
@@ -292,10 +300,6 @@ zsys_shutdown (void)
     ZMUTEX_UNLOCK (s_mutex);
     if (busy)
         zclock_sleep (200);
-
-    //  Close logsender socket if opened (don't do this in critical section)
-    if (s_logsender)
-        zsock_destroy (&s_logsender);
 
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
@@ -316,6 +320,10 @@ zsys_shutdown (void)
     }
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
+
+    //  Close logsender socket if opened (don't do this in critical section)
+    if (s_logsender)
+        zsock_destroy (&s_logsender);
 
     if (s_open_sockets == 0)
     {
@@ -356,6 +364,9 @@ zsys_shutdown (void)
 #if defined (__UNIX__)
     closelog ();                //  Just to be pedantic
 #endif
+
+    s_initialized = false;
+    s_shutting_down = false;
 }
 
 
@@ -1030,8 +1041,8 @@ zsys_vprintf (const char *format, va_list argptr)
 SOCKET
 zsys_udp_new (bool routable)
 {
-    //  We haven't implemented multicast yet
-    assert (!routable);
+    //IPV6 Multicast not implemented yet so only allow routable if IPv4
+    assert ((routable && !zsys_ipv6 ()) || !routable);
     SOCKET udpsock;
     int type = SOCK_DGRAM;
 #ifdef CZMQ_HAVE_SOCK_CLOEXEC
@@ -1072,6 +1083,25 @@ zsys_udp_new (bool routable)
                     (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEPORT)");
 #endif
+
+    //  Only set TLL for IPv4
+    if (routable && zsys_mcast_ttl () > 1) {
+        int ttl = zsys_mcast_ttl ();
+        if (setsockopt (udpsock, IPPROTO_IP, IP_MULTICAST_TTL, (const char *) &ttl,
+                        sizeof (ttl))
+            == SOCKET_ERROR)
+            zsys_socket_error ("setsockopt (IP_MULTICAST_TTL)");
+    }
+
+    //  TODO
+    //  Set TLL for IPv6
+    /*if (routable && zsys_ipv6 ()) {
+       int ttl = zsys_mcast_ttl ();
+        if (setsockopt (udpsock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+                (char *) &ttl, sizeof (ttl))
+            == SOCKET_ERROR)
+            zsys_socket_error ("setsockopt (IP_MULTICAST_TTL)");
+    }*/
     return udpsock;
 }
 
@@ -1874,6 +1904,58 @@ zsys_ipv6 (void)
     return s_ipv6;
 }
 
+//  Test if ipv6 is available on the system. The only way to reliably
+//  check is to actually open a socket and try to bind it. (ported from
+//  libzmq)
+
+bool
+zsys_ipv6_available (void)
+{
+#if defined(__WINDOWS__) && (_WIN32_WINNT < 0x0600)
+    return 0;
+#else
+    int rc, ipv6 = 1;
+    struct sockaddr_in6 test_addr;
+
+    memset (&test_addr, 0, sizeof (test_addr));
+    test_addr.sin6_family = AF_INET6;
+    inet_pton (AF_INET6, "::1", &(test_addr.sin6_addr));
+
+    SOCKET fd = socket (AF_INET6, SOCK_STREAM, IPPROTO_IP);
+    if (fd == INVALID_SOCKET)
+        ipv6 = 0;
+    else {
+#if defined(__WINDOWS__)
+        setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, (const char *) &ipv6,
+                    sizeof (int));
+        rc = setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char *) &ipv6,
+                         sizeof (int));
+        if (rc == SOCKET_ERROR)
+            ipv6 = 0;
+        else {
+            rc = bind (fd, (struct sockaddr *) &test_addr, sizeof (test_addr));
+            if (rc == SOCKET_ERROR)
+                ipv6 = 0;
+        }
+        closesocket (fd);
+#else
+        setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &ipv6, sizeof (int));
+        rc = setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6, sizeof (int));
+        if (rc != 0)
+            ipv6 = 0;
+        else {
+            rc = bind (fd, (struct sockaddr *) (&test_addr),
+                       sizeof (test_addr));
+            if (rc != 0)
+                ipv6 = 0;
+        }
+        close (fd);
+#endif
+    }
+
+    return ipv6;
+#endif // _WIN32_WINNT < 0x0600
+}
 
 //  --------------------------------------------------------------------------
 //  Set network interface name to use for broadcasts, particularly zbeacon.
@@ -1944,6 +2026,31 @@ zsys_set_ipv6_mcast_address (const char *value)
     assert (s_ipv6_mcast_address);
 }
 
+//  --------------------------------------------------------------------------
+//  Set IPv4 multicast address to use for sending zbeacon messages. By default
+//  IPv4 multicast is NOT used. If the environment variable
+//  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+//  address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+//  will enable IPv4 zbeacon messages.
+
+void zsys_set_ipv4_mcast_address (const char *value)
+{
+    zsys_init ();
+    freen (s_ipv4_mcast_address);
+    s_ipv4_mcast_address = value ? strdup (value) : NULL;
+    assert (!value || s_ipv4_mcast_address);
+}
+
+//  --------------------------------------------------------------------------
+//  Set multicast TTL
+
+void zsys_set_mcast_ttl (const unsigned char value)
+{
+    zsys_init ();
+    s_mcast_ttl = value;
+    assert (s_mcast_ttl);
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return IPv6 multicast address to use for sending zbeacon, or
@@ -1953,6 +2060,23 @@ const char *
 zsys_ipv6_mcast_address (void)
 {
     return s_ipv6_mcast_address ? s_ipv6_mcast_address : "ff02:0:0:0:0:0:0:1";
+}
+
+//  --------------------------------------------------------------------------
+//  Return IPv4 multicast address to use for sending zbeacon, or
+//  NULL if none was set.
+
+const char *zsys_ipv4_mcast_address (void)
+{
+    return s_ipv4_mcast_address;
+}
+
+//  --------------------------------------------------------------------------
+//  Get multicast TTL
+
+unsigned char zsys_mcast_ttl ()
+{
+    return s_mcast_ttl;
 }
 
 
@@ -2404,7 +2528,10 @@ zsys_test (bool verbose)
     zsys_init();
     zsys_shutdown();
     zsys_init();
-
+#ifdef CZMQ_BUILD_DRAFT_API
+    // just check if we can check for ipv6
+    zsys_ipv6_available();
+#endif
 
     //  @selftest
     zsys_catch_interrupts ();
@@ -2676,6 +2803,8 @@ zsys_test (bool verbose)
     zsys_set_max_msgsz (-1);
     assert (zsys_max_msgsz () == 2000);
 
+    // cleanup log_sender
+    zsys_set_logsender(NULL);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();

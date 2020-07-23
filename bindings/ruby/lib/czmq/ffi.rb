@@ -566,6 +566,7 @@ module CZMQ
       attach_function :zsock_new_dish, [:string], :pointer, **opts
       attach_function :zsock_new_gather, [:string], :pointer, **opts
       attach_function :zsock_new_scatter, [:string], :pointer, **opts
+      attach_function :zsock_new_dgram, [:string], :pointer, **opts
       attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_endpoint, [:pointer], :string, **opts
@@ -592,6 +593,8 @@ module CZMQ
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
       attach_function :zsock_has_in, [:pointer], :bool, **opts
       attach_function :zsock_set_only_first_subscribe, [:pointer, :int], :void, **opts
+      attach_function :zsock_set_hello_msg, [:pointer, :pointer], :void, **opts
+      attach_function :zsock_set_disconnect_msg, [:pointer, :pointer], :void, **opts
       attach_function :zsock_set_wss_trust_system, [:pointer, :int], :void, **opts
       attach_function :zsock_set_wss_hostname, [:pointer, :string], :void, **opts
       attach_function :zsock_set_wss_trust_pem, [:pointer, :string], :void, **opts
@@ -836,12 +839,17 @@ module CZMQ
       attach_function :zsys_pipehwm, [], :size_t, **opts
       attach_function :zsys_set_ipv6, [:int], :void, **opts
       attach_function :zsys_ipv6, [], :int, **opts
+      attach_function :zsys_ipv6_available, [], :bool, **opts
       attach_function :zsys_set_interface, [:string], :void, **opts
       attach_function :zsys_interface, [], :string, **opts
       attach_function :zsys_set_ipv6_address, [:string], :void, **opts
       attach_function :zsys_ipv6_address, [], :string, **opts
       attach_function :zsys_set_ipv6_mcast_address, [:string], :void, **opts
       attach_function :zsys_ipv6_mcast_address, [], :string, **opts
+      attach_function :zsys_set_ipv4_mcast_address, [:string], :void, **opts
+      attach_function :zsys_ipv4_mcast_address, [], :string, **opts
+      attach_function :zsys_set_mcast_ttl, [:char], :void, **opts
+      attach_function :zsys_mcast_ttl, [], :char, **opts
       attach_function :zsys_set_auto_use_fd, [:int], :void, **opts
       attach_function :zsys_auto_use_fd, [], :int, **opts
       attach_function :zsys_zprintf, [:string, :pointer], :pointer, **opts

@@ -281,6 +281,11 @@ public:
     //  Return use of IPv6 for zsock instances.
     static int ipv6 ();
 
+    //  Test if ipv6 is available on the system. Return true if available.
+    //  The only way to reliably check is to actually open a socket and
+    //  try to bind it. (ported from libzmq)
+    static bool ipv6Available ();
+
     //  Set network interface name to use for broadcasts, particularly zbeacon.
     //  This lets the interface be configured for test environments where required.
     //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -310,6 +315,23 @@ public:
     //  Return IPv6 multicast address to use for sending zbeacon, or "" if none was
     //  set.
     static const QString ipv6McastAddress ();
+
+    //  Set IPv4 multicast address to use for sending zbeacon messages. By default
+    //  IPv4 multicast is NOT used. If the environment variable
+    //  ZSYS_IPV4_MCAST_ADDRESS is set, use that as the default IPv4 multicast
+    //  address. Calling this function or setting ZSYS_IPV4_MCAST_ADDRESS
+    //  will enable IPv4 zbeacon messages.
+    static void setIpv4McastAddress (const QString &value);
+
+    //  Return IPv4 multicast address to use for sending zbeacon, or NULL if none was
+    //  set.
+    static const QString ipv4McastAddress ();
+
+    //  Set multicast TTL default is 1
+    static void setMcastTtl (byte value);
+
+    //  Get multicast TTL
+    static byte mcastTtl ();
 
     //  Configure the automatic use of pre-allocated FDs when creating new sockets.
     //  If 0 (default), nothing will happen. Else, when a new socket is bound, the

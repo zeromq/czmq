@@ -18,10 +18,12 @@ if("${CLANG_FORMAT}" STREQUAL "")
   set(CLANG_FORMAT "clang-format")
 endif()
 
-add_custom_target(
+if (NOT TARGET clang-format)
+    add_custom_target(
         clang-format
         COMMAND ${CLANG_FORMAT} -style=file -i ${ALL_SOURCE_FILES}
-)
+    )
+endif()
 
 function(JOIN VALUES GLUE OUTPUT)
   string (REPLACE ";" "${GLUE}" _TMP_STR "${VALUES}")
@@ -30,23 +32,31 @@ endfunction()
 
 configure_file(builds/cmake/clang-format-check.sh.in clang-format-check.sh @ONLY)
 
-add_custom_target(
+if (NOT TARGET clang-format-check)
+    add_custom_target(
         clang-format-check
         COMMAND chmod +x clang-format-check.sh
         COMMAND ./clang-format-check.sh
         COMMENT "Checking correct formatting according to .clang-format file using ${CLANG_FORMAT}"
-)
+    )
+endif()
 
-add_custom_target(
+if (NOT TARGET clang-format-check-CI)
+    add_custom_target(
         clang-format-check-CI
         COMMAND chmod +x clang-format-check.sh
         COMMAND ./clang-format-check.sh --CI
         COMMENT "Checking correct formatting according to .clang-format file using ${CLANG_FORMAT}"
-)
+    )
+endif()
 
-add_custom_target(
+
+if (NOT TARGET clang-format-diff)
+    add_custom_target(
         clang-format-diff
         COMMAND ${CLANG_FORMAT} -style=file -i ${ALL_SOURCE_FILES}
         COMMAND git diff ${ALL_SOURCE_FILES}
         COMMENT "Formatting with clang-format (using ${CLANG_FORMAT}) and showing differences with latest commit"
-)
+    )
+endif()
+
