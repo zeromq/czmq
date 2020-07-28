@@ -18,6 +18,9 @@
 @end
 */
 
+#ifdef WIN32
+#include <winsock2.h>           //  needed for ntohll/htonll
+#endif
 #include "czmq_classes.h"
 #if __unix__ && !__APPLE__
 #include <endian.h>
@@ -236,7 +239,7 @@ zosc_create (const char *address, const char *format, ...)
                 char char_v = (char)va_arg( argptr, int); // the standard dictates to use int for smaller vars
                 //  osc dictates we need to supply data in multitudes of 4 bytes so create a 0 array to hold our char
                 //  Not sure if this correct on big endian machines!!!
-                char v[4] = "\x00\x00\x00\x00";
+                char v[5] = "\x00\x00\x00\x00";
                 v[3] = char_v;
                 size = zchunk_extend( self->chunk, v, sizeof(v) );
                 break;
@@ -262,7 +265,7 @@ zosc_create (const char *address, const char *format, ...)
     // the chunk data starts with the address string
     self->address =  (char *)zchunk_data(self->chunk);
     // set the format string to the pointer in the chunk of data
-    self->format = zchunk_data(self->chunk)+format_start;
+    self->format = (char *)zchunk_data(self->chunk)+format_start;
     return self;
 }
 
@@ -369,7 +372,7 @@ zosc_retr(zosc_t *self, const char *format, ...)
                     str_p = strdup((char*)(zchunk_data( self->chunk ) + needle));
                     *str_pp = str_p;
                 }
-                unsigned long l = strlen((char*)(zchunk_data( self->chunk ) + needle));
+                size_t l = strlen((char*)(zchunk_data( self->chunk ) + needle));
                 needle += l + 1;
                 needle = (needle + 3) & (size_t)~0x03;
                 break;
@@ -388,12 +391,12 @@ zosc_retr(zosc_t *self, const char *format, ...)
                 needle += sizeof (int);  // advance multitude of 4!
                 break;
             }
-            case 'm': // todo memcpy
+            case 'm':
             {
-                u_char *midi_p = va_arg( argptr, u_char * );
+                uint32_t *midi_p = va_arg( argptr, uint32_t * );
                 if ( midi_p )
-                    *midi_p = ntohl(*(u_char*)(zchunk_data( self->chunk ) + needle));
-                needle += sizeof (u_char);
+                    *midi_p = ntohl(*(uint32_t *)(zchunk_data( self->chunk ) + needle));
+                needle += sizeof (uint32_t);
                 break;
             }
             case 'T':
@@ -427,6 +430,18 @@ zosc_retr(zosc_t *self, const char *format, ...)
     return rc;
 }
 
+//  Create copy of the message, as new chunk object. Returns a fresh zosc_t
+//  object, or null if there was not enough heap memory. If chunk is null,
+//  returns null.
+//  Caller owns return value and must destroy it when done.
+zosc_t *
+zosc_dup (zosc_t *self)
+{
+    byte* data = (byte *)zmalloc( zchunk_size(self->chunk) );
+    memcpy(data, zchunk_data(self->chunk), zchunk_size( self->chunk ));
+    return zosc_frommem( (char *)data, zchunk_size( self->chunk ));
+}
+
 //  Transform zosc into a zframe that can be sent in a message.
 //  Caller owns return value and must destroy it when done.
 zframe_t *
@@ -435,6 +450,43 @@ zosc_pack (zosc_t *self)
     assert(self);
     assert(self->chunk);
     return zchunk_pack (self->chunk);
+}
+
+//  Transform zosc into a zframe that can be sent in a message.
+//  Take ownership of the chunk.
+//  Caller owns return value and must destroy it when done.
+zframe_t *
+zosc_packx (zosc_t **self_p)
+{
+    assert(self_p);
+    //  detach the chunk from the zosc struct
+    zchunk_t *data = (*self_p)->chunk;
+    (*self_p)->chunk = NULL;
+    zosc_destroy(self_p);
+    return zchunk_packx( &data );
+}
+
+//  Transform a zframe into a zosc.
+//  Caller owns return value and must destroy it when done.
+zosc_t *
+zosc_unpack (zframe_t *frame)
+{
+    return zosc_fromframe(frame);
+}
+
+//  Dump OSC message to stderr, for debugging and tracing.
+void
+zosc_print (zosc_t *self)
+{
+    zchunk_print(self->chunk);
+}
+
+bool
+zosc_is (void *self)
+{
+    zosc_t *test = (zosc_t *)self;
+    // for now just test if there's an address and format string
+    return strlen( test->address ) && strlen( test->format );
 }
 
 //  --------------------------------------------------------------------------
@@ -457,7 +509,9 @@ void
 zosc_test (bool verbose)
 {
     printf (" * zosc: ");
-
+#ifdef __WINDOWS__
+    zsys_init();
+#endif
     // $ oscsend localhost 7777 /sample/address iTfs 1 3.14 hello
     /*     16 wide
     0000   2f 73 61 6d 70 6c 65 2f 61 64 64 72 65 73 73 00   /sample/address.
@@ -466,22 +520,23 @@ zosc_test (bool verbose)
     */
     // /sample/address,iTfs@HõÃhello
     //2f73616d706c652f61646472657373002c69546673000000000000014048f5c368656c6c6f000000
-    char oscpacket[40] = "\x2f\x73\x61\x6d\x70\x6c" \
+    char oscpacket[41] = "\x2f\x73\x61\x6d\x70\x6c" \
     "\x65\x2f\x61\x64\x64\x72\x65\x73\x73\x00\x2c\x69\x54\x66\x73\x00" \
     "\x00\x00\x00\x00\x00\x01\x40\x48\xf5\xc3\x68\x65\x6c\x6c\x6f\x00" \
     "\x00\x00";
 
     // oscsend localhost 7777 /test ihTfds 2 1844674407370 3.14 3.1415926535897932 hello
-    char testpack[48] = "\x2f\x74\x65\x73\x74\x00\x00\x00\x2c\x69\x68\x54\x66\x64\x73\x00" \
+    char testpack[49] = "\x2f\x74\x65\x73\x74\x00\x00\x00\x2c\x69\x68\x54\x66\x64\x73\x00" \
     "\x00\x00\x00\x02\x00\x00\x01\xad\x7f\x29\xab\xca\x40\x48\xf5\xc3" \
     "\x40\x09\x21\xfb\x54\x44\x2d\x18\x68\x65\x6c\x6c\x6f\x00\x00\x00";
 
     //  @selftest
     // we need to have packets on the heap
-    char *p1 = malloc(sizeof(oscpacket)*sizeof(char));
-    memcpy(p1, oscpacket, sizeof(oscpacket)*sizeof(char));
-    zosc_t *self = zosc_frommem(p1, sizeof(oscpacket)*sizeof(char));
+    char *p1 = (char *)malloc(40);
+    memcpy(p1, oscpacket, 40);
+    zosc_t *self = zosc_frommem(p1, 40);
     assert (self);
+    assert ( zosc_is( self ));
     assert(streq ( zosc_address(self), "/sample/address"));
     assert(streq ( zosc_format(self), "iTfs"));
     // check value
@@ -495,11 +550,10 @@ zosc_test (bool verbose)
     assert(fabsf(f - 3.14f) < FLT_EPSILON); // float equal
     assert(streq(s, "hello"));
     zstr_free(&s);
-    //assert(zosc_next_int32(self) == 1 );
 
     zosc_destroy (&self);
 
-    zframe_t *frame = zframe_new(oscpacket, sizeof(oscpacket));
+    zframe_t *frame = zframe_new(oscpacket, 40);
     assert(frame);
     assert(zframe_size(frame) == 40);
     zosc_t *fosc = zosc_fromframe(frame);
@@ -515,16 +569,16 @@ zosc_test (bool verbose)
     zosc_destroy (&fosc);
 
     // to the heap, otherwise we can't destroy
-    char *p2 = malloc(sizeof(testpack)*sizeof(char));
-    memcpy(p2, testpack, sizeof(testpack)*sizeof(char));
-    zosc_t *testmsg = zosc_frommem(p2, sizeof(testpack)*sizeof(char));
+    char *p2 = (char *)malloc(48);
+    memcpy(p2, testpack, 48);
+    zosc_t *testmsg = zosc_frommem(p2, 48);
     assert( testmsg );
     assert(streq ( zosc_address(testmsg), "/test"));
     const char *format = zosc_format(testmsg);
     assert(streq ( zosc_format(testmsg), "ihTfds" ) );
     // check value
     int itest = -1;
-    long ltest = -1;
+    int64_t ltest = -1;
     bool btest = false;
     float ftest = -1.f;
     double dtest = -1.;
@@ -540,7 +594,8 @@ zosc_test (bool verbose)
     zosc_destroy(&testmsg);
 
     // test constructing messages
-    zosc_t* conm = zosc_create("/construct", "iihfdscF", 1,2,3,3.14,6.283185307179586, "greetings", 'q');
+    int64_t prez = 3;
+    zosc_t* conm = zosc_create("/construct", "iihfdscF", 1,2, prez, 3.14,6.283185307179586, "greetings", 'q');
     assert(conm);
     assert(streq(zosc_address(conm), "/construct"));
     assert(streq(zosc_format(conm), "iihfdscF"));
@@ -575,7 +630,7 @@ zosc_test (bool verbose)
     struct sockaddr_in     servaddr;
 
     // Creating socket file descriptor
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+    if ( (sockfd = (int)socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
         zsys_error("socket creation failed");
     }
 
@@ -584,13 +639,20 @@ zosc_test (bool verbose)
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(7777);
     servaddr.sin_addr.s_addr = INADDR_ANY;
-
+#ifdef __WINDOWS__
+    sendto(sockfd, (const char *)zosc_data(conm), (int)zosc_size(conm),
+            0, (const struct sockaddr *) &servaddr,
+                sizeof(servaddr));
+#else
     sendto(sockfd, zosc_data(conm), zosc_size(conm),
-            MSG_CONFIRM, (const struct sockaddr *) &servaddr,
+            0, (const struct sockaddr *) &servaddr,
                 sizeof(servaddr));
 #endif
+#endif
     zosc_destroy(&conm);
-
+#ifdef __WINDOWS__
+    zsys_shutdown();
+#endif
     //  @end
     printf ("OK\n");
 }

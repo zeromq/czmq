@@ -5102,12 +5102,6 @@ value. See the format method for a detailed list op type tags for the
 format string.
 
 ```
-size my_zosc.append (String, String)
-```
-
-Append user-supplied data to OSC message, return resulting chunk size.
-
-```
 zosc my_zosc.dup ()
 ```
 
@@ -5122,7 +5116,7 @@ zframe my_zosc.pack ()
 Transform zosc into a zframe that can be sent in a message.
 
 ```
-zframe my_zosc.packx (Zchunk)
+zframe my_zosc.packx (Zosc)
 ```
 
 Transform zosc into a zframe that can be sent in a message.
@@ -5135,17 +5129,10 @@ zosc my_zosc.unpack (Zframe)
 Transform a zframe into a zosc.
 
 ```
-string my_zosc.digest ()
-```
-
-Calculate SHA1 digest for OSC message, using zdigest class.
-
-```
 nothing my_zosc.print ()
 ```
 
 Dump OSC message to stderr, for debugging and tracing.
-See zosc_fprint for details
 
 ```
 nothing my_zosc.test (Boolean)

@@ -9489,18 +9489,14 @@ lib.zosc_format.restype = c_char_p
 lib.zosc_format.argtypes = [zosc_p]
 lib.zosc_retr.restype = c_int
 lib.zosc_retr.argtypes = [zosc_p, c_char_p]
-lib.zosc_append.restype = c_size_t
-lib.zosc_append.argtypes = [zosc_p, c_char_p, c_void_p]
 lib.zosc_dup.restype = zosc_p
 lib.zosc_dup.argtypes = [zosc_p]
 lib.zosc_pack.restype = zframe_p
 lib.zosc_pack.argtypes = [zosc_p]
 lib.zosc_packx.restype = zframe_p
-lib.zosc_packx.argtypes = [POINTER(zchunk_p)]
+lib.zosc_packx.argtypes = [POINTER(zosc_p)]
 lib.zosc_unpack.restype = zosc_p
 lib.zosc_unpack.argtypes = [zframe_p]
-lib.zosc_digest.restype = c_char_p
-lib.zosc_digest.argtypes = [zosc_p]
 lib.zosc_print.restype = None
 lib.zosc_print.argtypes = [zosc_p]
 lib.zosc_is.restype = c_bool
@@ -9665,12 +9661,6 @@ format string.
         """
         return lib.zosc_retr(self._as_parameter_, format, *args)
 
-    def append(self, type_hint, data):
-        """
-        Append user-supplied data to OSC message, return resulting chunk size.
-        """
-        return lib.zosc_append(self._as_parameter_, type_hint, data)
-
     def dup(self):
         """
         Create copy of the message, as new chunk object. Returns a fresh zosc_t
@@ -9691,7 +9681,7 @@ returns null.
         Transform zosc into a zframe that can be sent in a message.
 Take ownership of the chunk.
         """
-        return Zframe(lib.zosc_packx(byref(zchunk_p.from_param(self_p))), True)
+        return Zframe(lib.zosc_packx(byref(zosc_p.from_param(self_p))), True)
 
     @staticmethod
     def unpack(frame):
@@ -9700,16 +9690,9 @@ Take ownership of the chunk.
         """
         return Zosc(lib.zosc_unpack(frame), True)
 
-    def digest(self):
-        """
-        Calculate SHA1 digest for OSC message, using zdigest class.
-        """
-        return lib.zosc_digest(self._as_parameter_)
-
     def print(self):
         """
         Dump OSC message to stderr, for debugging and tracing.
-See zosc_fprint for details
         """
         return lib.zosc_print(self._as_parameter_)
 

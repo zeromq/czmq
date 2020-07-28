@@ -120,13 +120,6 @@
         <return type = "integer" />
     </method>
 
-    <method name = "append">
-        Append user-supplied data to OSC message, return resulting chunk size. 
-        <argument name = "type_hint" type = "string" />
-        <argument name = "data" type = "buffer" c_type = "const void *" />
-        <return type = "size" />
-    </method>
-
     <method name = "dup">
         Create copy of the message, as new chunk object. Returns a fresh zosc_t
         object, or null if there was not enough heap memory. If chunk is null,
@@ -142,7 +135,7 @@
     <method name = "packx" state = "draft" singleton = "1">
         Transform zosc into a zframe that can be sent in a message.
         Take ownership of the chunk.
-        <argument name = "self_p" type = "zchunk" by_reference = "1" />
+        <argument name = "self_p" type = "zosc" by_reference = "1" />
         <return type = "zframe" fresh = "1" />
     </method>
 
@@ -152,14 +145,8 @@
         <return type = "zosc" fresh = "1" />
     </method>
 
-    <method name = "digest">
-        Calculate SHA1 digest for OSC message, using zdigest class.
-        <return type = "string" />
-    </method>
-
     <method name = "print">
         Dump OSC message to stderr, for debugging and tracing.
-        See zosc_fprint for details
     </method>
 
     <method name = "is" singleton = "1">

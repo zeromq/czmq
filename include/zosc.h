@@ -113,11 +113,6 @@ CZMQ_EXPORT int
     zosc_retr (zosc_t *self, const char *format, ...);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Append user-supplied data to OSC message, return resulting chunk size.
-CZMQ_EXPORT size_t
-    zosc_append (zosc_t *self, const char *type_hint, const void *data);
-
-//  *** Draft method, for development use, may change without warning ***
 //  Create copy of the message, as new chunk object. Returns a fresh zosc_t
 //  object, or null if there was not enough heap memory. If chunk is null,
 //  returns null.
@@ -136,7 +131,7 @@ CZMQ_EXPORT zframe_t *
 //  Take ownership of the chunk.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zframe_t *
-    zosc_packx (zchunk_t **self_p);
+    zosc_packx (zosc_t **self_p);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Transform a zframe into a zosc.
@@ -145,13 +140,7 @@ CZMQ_EXPORT zosc_t *
     zosc_unpack (zframe_t *frame);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Calculate SHA1 digest for OSC message, using zdigest class.
-CZMQ_EXPORT const char *
-    zosc_digest (zosc_t *self);
-
-//  *** Draft method, for development use, may change without warning ***
 //  Dump OSC message to stderr, for debugging and tracing.
-//  See zosc_fprint for details
 CZMQ_EXPORT void
     zosc_print (zosc_t *self);
 

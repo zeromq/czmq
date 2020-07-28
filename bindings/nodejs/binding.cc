@@ -9581,12 +9581,10 @@ NAN_MODULE_INIT (Zosc::Init) {
     Nan::SetPrototypeMethod (tpl, "address", _address);
     Nan::SetPrototypeMethod (tpl, "format", _format);
     Nan::SetPrototypeMethod (tpl, "retr", _retr);
-    Nan::SetPrototypeMethod (tpl, "append", _append);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
     Nan::SetPrototypeMethod (tpl, "packx", _packx);
     Nan::SetPrototypeMethod (tpl, "unpack", _unpack);
-    Nan::SetPrototypeMethod (tpl, "digest", _digest);
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
@@ -9676,26 +9674,6 @@ NAN_METHOD (Zosc::_retr) {
     info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
-NAN_METHOD (Zosc::_append) {
-    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
-    char *type_hint;
-    if (info [0]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a `type_hint`");
-    else
-    if (!info [0]->IsString ())
-        return Nan::ThrowTypeError ("`type_hint` must be a string");
-    //else { // bjornw: remove brackets to keep scope
-    Nan::Utf8String type_hint_utf8 (info [0].As<String>());
-    type_hint = *type_hint_utf8;
-         //} //bjornw end
-    if (info [1]->IsUndefined ())
-        return Nan::ThrowTypeError ("method requires a argument to provide data");
-    Local<Object> buffer_node = info [1].As<Object> ();
-    const byte *data = (const byte *) node::Buffer::Data (buffer_node);
-    size_t result = zosc_append (zosc->self, (const char *)type_hint, (const void *)data);
-    info.GetReturnValue ().Set (Nan::New<Number>(result));
-}
-
 NAN_METHOD (Zosc::_dup) {
     Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
     zosc_t *result = zosc_dup (zosc->self);
@@ -9721,7 +9699,7 @@ NAN_METHOD (Zosc::_pack) {
 }
 
 NAN_METHOD (Zosc::_packx) {
-    Zchunk *self_p = Nan::ObjectWrap::Unwrap<Zchunk>(info [0].As<Object>());
+    Zosc *self_p = Nan::ObjectWrap::Unwrap<Zosc>(info [0].As<Object>());
     zframe_t *result = zosc_packx (&self_p->self);
     Zframe *zframe_result = new Zframe (result);
     if (zframe_result) {
@@ -9742,12 +9720,6 @@ NAN_METHOD (Zosc::_unpack) {
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }
-}
-
-NAN_METHOD (Zosc::_digest) {
-    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
-    char *result = (char *) zosc_digest (zosc->self);
-    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zosc::_print) {

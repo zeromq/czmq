@@ -987,12 +987,10 @@ module CZMQ
       attach_function :zosc_address, [:pointer], :string, **opts
       attach_function :zosc_format, [:pointer], :string, **opts
       attach_function :zosc_retr, [:pointer, :string, :varargs], :int, **opts
-      attach_function :zosc_append, [:pointer, :string, :pointer], :size_t, **opts
       attach_function :zosc_dup, [:pointer], :pointer, **opts
       attach_function :zosc_pack, [:pointer], :pointer, **opts
       attach_function :zosc_packx, [:pointer], :pointer, **opts
       attach_function :zosc_unpack, [:pointer], :pointer, **opts
-      attach_function :zosc_digest, [:pointer], :string, **opts
       attach_function :zosc_print, [:pointer], :void, **opts
       attach_function :zosc_is, [:pointer], :bool, **opts
       attach_function :zosc_test, [:bool], :void, **opts

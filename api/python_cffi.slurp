@@ -4666,10 +4666,6 @@ const char *
 int
     zosc_retr (zosc_t *self, const char *format, ...);
 
-// Append user-supplied data to OSC message, return resulting chunk size.
-size_t
-    zosc_append (zosc_t *self, const char *type_hint, const void *data);
-
 // Create copy of the message, as new chunk object. Returns a fresh zosc_t
 // object, or null if there was not enough heap memory. If chunk is null,
 // returns null.
@@ -4683,18 +4679,13 @@ zframe_t *
 // Transform zosc into a zframe that can be sent in a message.
 // Take ownership of the chunk.
 zframe_t *
-    zosc_packx (zchunk_t **self_p);
+    zosc_packx (zosc_t **self_p);
 
 // Transform a zframe into a zosc.
 zosc_t *
     zosc_unpack (zframe_t *frame);
 
-// Calculate SHA1 digest for OSC message, using zdigest class.
-const char *
-    zosc_digest (zosc_t *self);
-
 // Dump OSC message to stderr, for debugging and tracing.
-// See zosc_fprint for details
 void
     zosc_print (zosc_t *self);
 
