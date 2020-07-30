@@ -9565,6 +9565,191 @@ Nan::Persistent <Function> &ZhttpResponse::constructor () {
 }
 
 
+NAN_MODULE_INIT (Zosc::Init) {
+    Nan::HandleScope scope;
+
+    // Prepare constructor template
+    Local <FunctionTemplate> tpl = Nan::New <FunctionTemplate> (New);
+    tpl->SetClassName (Nan::New ("Zosc").ToLocalChecked ());
+    tpl->InstanceTemplate ()->SetInternalFieldCount (1);
+
+    // Prototypes
+    Nan::SetPrototypeMethod (tpl, "destroy", destroy);
+    Nan::SetPrototypeMethod (tpl, "defined", defined);
+    Nan::SetPrototypeMethod (tpl, "size", _size);
+    Nan::SetPrototypeMethod (tpl, "data", _data);
+    Nan::SetPrototypeMethod (tpl, "address", _address);
+    Nan::SetPrototypeMethod (tpl, "format", _format);
+    Nan::SetPrototypeMethod (tpl, "retr", _retr);
+    Nan::SetPrototypeMethod (tpl, "dup", _dup);
+    Nan::SetPrototypeMethod (tpl, "pack", _pack);
+    Nan::SetPrototypeMethod (tpl, "packx", _packx);
+    Nan::SetPrototypeMethod (tpl, "unpack", _unpack);
+    Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "test", _test);
+
+    constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
+    Nan::Set (target, Nan::New ("Zosc").ToLocalChecked (),
+    Nan::GetFunction (tpl).ToLocalChecked ());
+}
+
+Zosc::Zosc (const char *address) {
+    self = zosc_new ((const char *)address);
+}
+
+Zosc::Zosc (zosc_t *self_) {
+    self = self_;
+}
+
+Zosc::~Zosc () {
+}
+
+NAN_METHOD (Zosc::New) {
+    assert (info.IsConstructCall ());
+    char *address;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `address`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`address` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String address_utf8 (info [0].As<String>());
+    address = *address_utf8;
+         //} //bjornw end
+    Zosc *zosc = new Zosc ((const char *)address);
+    if (zosc) {
+        zosc->Wrap (info.This ());
+        info.GetReturnValue ().Set (info.This ());
+    }
+}
+
+NAN_METHOD (Zosc::destroy) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    zosc_destroy (&zosc->self);
+}
+
+
+NAN_METHOD (Zosc::defined) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    info.GetReturnValue ().Set (Nan::New (zosc->self != NULL));
+}
+
+NAN_METHOD (Zosc::_size) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    size_t result = zosc_size (zosc->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_data) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    const char *result = (const char *) zosc_data (zosc->self);
+    info.GetReturnValue().Set (Nan::CopyBuffer (result, zosc_size (zosc->self)).ToLocalChecked ());
+}
+
+NAN_METHOD (Zosc::_address) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    char *result = (char *) zosc_address (zosc->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zosc::_format) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    char *result = (char *) zosc_format (zosc->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zosc::_retr) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
+    int result = zosc_retr (zosc->self, (const char *)format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_dup) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    zosc_t *result = zosc_dup (zosc->self);
+    Zosc *zosc_result = new Zosc (result);
+    if (zosc_result) {
+    //  Don't yet know how to return a new object
+    //      zosc->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zosc::_pack) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    zframe_t *result = zosc_pack (zosc->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zosc::_packx) {
+    Zosc *self_p = Nan::ObjectWrap::Unwrap<Zosc>(info [0].As<Object>());
+    zframe_t *result = zosc_packx (&self_p->self);
+    Zframe *zframe_result = new Zframe (result);
+    if (zframe_result) {
+    //  Don't yet know how to return a new object
+    //      zframe->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zosc::_unpack) {
+    Zframe *frame = Nan::ObjectWrap::Unwrap<Zframe>(info [0].As<Object>());
+    zosc_t *result = zosc_unpack (frame->self);
+    Zosc *zosc_result = new Zosc (result);
+    if (zosc_result) {
+    //  Don't yet know how to return a new object
+    //      zosc->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zosc::_print) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    zosc_print (zosc->self);
+}
+
+NAN_METHOD (Zosc::_test) {
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `verbose`");
+
+    //bool verbose; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool verbose;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          verbose = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`verbose` must be a Boolean");
+    zosc_test ((bool) verbose);
+}
+
+Nan::Persistent <Function> &Zosc::constructor () {
+    static Nan::Persistent <Function> my_constructor;
+    return my_constructor;
+}
+
+
 extern "C" NAN_MODULE_INIT (czmq_initialize)
 {
     Zargs::Init (target);
@@ -9599,6 +9784,7 @@ extern "C" NAN_MODULE_INIT (czmq_initialize)
     ZhttpServerOptions::Init (target);
     ZhttpRequest::Init (target);
     ZhttpResponse::Init (target);
+    Zosc::Init (target);
 }
 
 NODE_MODULE (czmq, czmq_initialize)

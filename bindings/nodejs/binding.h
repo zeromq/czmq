@@ -1099,4 +1099,30 @@ class ZhttpResponse: public Nan::ObjectWrap {
     static NAN_METHOD (_test);
 };
 
+class Zosc: public Nan::ObjectWrap {
+    public:
+        static NAN_MODULE_INIT (Init);
+        explicit Zosc (const char *address);
+        explicit Zosc (zosc_t *self);
+        zosc_t *self;
+    private:
+        ~Zosc ();
+    static Nan::Persistent <Function> &constructor ();
+
+    static NAN_METHOD (New);
+    static NAN_METHOD (destroy);
+    static NAN_METHOD (defined);
+    static NAN_METHOD (_size);
+    static NAN_METHOD (_data);
+    static NAN_METHOD (_address);
+    static NAN_METHOD (_format);
+    static NAN_METHOD (_retr);
+    static NAN_METHOD (_dup);
+    static NAN_METHOD (_pack);
+    static NAN_METHOD (_packx);
+    static NAN_METHOD (_unpack);
+    static NAN_METHOD (_print);
+    static NAN_METHOD (_test);
+};
+
 #endif
