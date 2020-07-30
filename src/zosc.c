@@ -95,7 +95,6 @@ zosc_frommem (char *data, size_t size)
 {
     assert(data);
     size_t needle = 0;
-    size_t address_end = 0;
     size_t format_start = 0;
 
     // an OSC message always starts with a null terminated string
@@ -107,7 +106,6 @@ zosc_frommem (char *data, size_t size)
         return NULL;
     }
     needle++;
-    address_end = needle;
 
     // find the format string
     while( data[needle] != ',' )
