@@ -124,7 +124,7 @@ s_self_prepare_udp (self_t *self)
     struct addrinfo hint;
     memset (&hint, 0, sizeof(struct addrinfo));
     hint.ai_flags = AI_NUMERICHOST;
-#if !defined (CZMQ_HAVE_ANDROID) && !defined (CZMQ_HAVE_FREEBSD)
+#if !defined (CZMQ_HAVE_ANDROID) && !defined (CZMQ_HAVE_FREEBSD) && !defined (CZMQ_HAVE_OPENBSD)
     hint.ai_flags |= AI_V4MAPPED;
 #endif
     hint.ai_socktype = SOCK_DGRAM;
