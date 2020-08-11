@@ -116,8 +116,10 @@ struct _server_t {
     zconfig_t *config;          //  Current loaded configuration
 
     //  Add any properties you need here
-    zlistx_t *remotes;          //  Parents, as zsock_t instances
+    zhashx_t *active_remotes;   //  Active (i.e. really connected) remote servers, indexed by their endpoint
+    zhashx_t *remotes;          //  All remote servers, connected or not, indexed by their endpoint
     zhashx_t *tuples;           //  Tuples, indexed by key
+    zhashx_t *monitors;         //  Zmonitors for remote servers, indexed by their own actor socket
 
     tuple_t *cur_tuple;         //  Holds current tuple to publish
     zgossip_msg_t *message;     //  Message to broadcast
@@ -163,9 +165,11 @@ tuple_free (void *argument)
     freen (self);
 }
 
-//  Handle traffic from remotes
+//  Handle traffic from remote servers and their monitors
 static int
 remote_handler (zloop_t *loop, zsock_t *remote, void *argument);
+static int
+monitor_handler (zloop_t *loop, zsock_t *monitor, void *argument);
 
 //  ---------------------------------------------------------------------
 //  Include the generated server engine
@@ -183,12 +187,18 @@ server_initialize (server_t *self)
     engine_configure (self, "server/timeout", "1000");
     self->message = zgossip_msg_new ();
 
-    self->remotes = zlistx_new ();
+    self->remotes = zhashx_new ();
     assert (self->remotes);
-    zlistx_set_destructor (self->remotes, (czmq_destructor *) zsock_destroy);
+
+    self->active_remotes = zhashx_new ();
+    assert (self->active_remotes);
 
     self->tuples = zhashx_new ();
     assert (self->tuples);
+    
+    self->monitors = zhashx_new ();
+    assert (self->monitors);
+    zhashx_set_destructor (self->monitors, (czmq_destructor *) zactor_destroy);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     // DRAFT-API: Security
@@ -204,7 +214,14 @@ static void
 server_terminate (server_t *self)
 {
     zgossip_msg_destroy (&self->message);
-    zlistx_destroy (&self->remotes);
+    zhashx_destroy (&self->monitors);
+    zsock_t *remote = (zsock_t *) zhashx_first (self->remotes);
+    while (remote) {
+        zsock_destroy (&remote);
+        remote = (zsock_t *) zhashx_next (self->remotes);
+    }
+    zhashx_destroy (&self->remotes);
+    zhashx_destroy (&self->active_remotes);
     zhashx_destroy (&self->tuples);
     zstr_free (&self->public_key);
     zstr_free (&self->secret_key);
@@ -223,39 +240,60 @@ server_connect (server_t *self, const char *endpoint, const char *public_key)
 server_connect (server_t *self, const char *endpoint)
 #endif
 {
-    zsock_t *remote = zsock_new (ZMQ_DEALER);
-    assert (remote);          //  No recovery if exhausted
-
+    zsock_t *remote = (zsock_t *) zhashx_lookup (self->active_remotes, endpoint);
+    if (!remote) {
+        remote = zsock_new (ZMQ_DEALER);
+        assert (remote);          //  No recovery if exhausted
+        
 #ifdef CZMQ_BUILD_DRAFT_API
-    //  DRAFT-API: Security
-    if (public_key){
-        zcert_t *cert = zcert_new_from_txt (self->public_key, self->secret_key);
-        zcert_apply(cert, remote);
-        zsock_set_curve_serverkey (remote, public_key);
+        //  DRAFT-API: Security
+        if (public_key){
+            zcert_t *cert = zcert_new_from_txt (self->public_key, self->secret_key);
+            zcert_apply(cert, remote);
+            zsock_set_curve_serverkey (remote, public_key);
 #ifndef ZMQ_CURVE
-        // legacy ZMQ support
-        // inline incase the underlying assert is removed
-        bool ZMQ_CURVE = false;
+            // legacy ZMQ support
+            // inline incase the underlying assert is removed
+            bool ZMQ_CURVE = false;
 #endif
-        assert (zsock_mechanism (remote) == ZMQ_CURVE);
-        zcert_destroy(&cert);
-    }
+            assert (zsock_mechanism (remote) == ZMQ_CURVE);
+            zcert_destroy(&cert);
+        }
 #endif
-    //  Never block on sending; we use an infinite HWM and buffer as many
-    //  messages as needed in outgoing pipes. Note that the maximum number
-    //  is the overall tuple set size.
-    zsock_set_unbounded (remote);
-
-    if (zsock_connect (remote, "%s", endpoint)) {
-        zsys_warning ("bad zgossip endpoint '%s'", endpoint);
-        zsock_destroy (&remote);
-        return;
+        //  Never block on sending; we use an infinite HWM and buffer as many
+        //  messages as needed in outgoing pipes. Note that the maximum number
+        //  is the overall tuple set size.
+        zsock_set_unbounded (remote);
+        
+        if (zsock_connect (remote, "%s", endpoint)) {
+            zsys_warning ("bad zgossip endpoint '%s'", endpoint);
+            zsock_destroy (&remote);
+            return;
+        }
+        
+        //  Monitor this remote server for incoming messages
+        engine_handle_socket (self, remote, remote_handler);
+        
+        //  Monitor this remote server for disconnection / reconnection
+        zactor_t *monitor = zactor_new (zmonitor, remote);
+        zhashx_insert (self->monitors, zactor_sock (monitor), monitor);
+        //zstr_send (monitor, "VERBOSE");
+        zstr_sendx (monitor, "LISTEN", "DISCONNECTED", "HANDSHAKE_SUCCEEDED", NULL);
+        zstr_send (monitor, "START");
+        zsock_wait (monitor);
+        engine_handle_socket (self, zactor_sock (monitor), monitor_handler);
+        
+        zhashx_insert (self->active_remotes, endpoint, remote);
+        zhashx_insert (self->remotes, endpoint, remote);
+        
     }
-    //  Send HELLO and then PUBLISH for each tuple we have
+    
+    //  Send HELLO
     zgossip_msg_t *gossip = zgossip_msg_new ();
     zgossip_msg_set_id (gossip, ZGOSSIP_MSG_HELLO);
     zgossip_msg_send (gossip, remote);
 
+    //  And then PUBLISH for each tuple we have
     tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
     while (tuple) {
         zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
@@ -264,10 +302,8 @@ server_connect (server_t *self, const char *endpoint)
         zgossip_msg_send (gossip, remote);
         tuple = (tuple_t *) zhashx_next (self->tuples);
     }
-    //  Now monitor this remote for incoming messages
     zgossip_msg_destroy (&gossip);
-    engine_handle_socket (self, remote, remote_handler);
-    zlistx_add_end (self->remotes, remote);
+    
 }
 
 
@@ -301,12 +337,12 @@ server_accept (server_t *self, const char *key, const char *value)
     //  Copy new tuple announcement to all remotes
     zgossip_msg_t *gossip = zgossip_msg_new ();
     zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
-    zsock_t *remote = (zsock_t *) zlistx_first (self->remotes);
+    zsock_t *remote = (zsock_t *) zhashx_first (self->active_remotes);
     while (remote) {
         zgossip_msg_set_key (gossip, tuple->key);
         zgossip_msg_set_value (gossip, tuple->value);
         zgossip_msg_send (gossip, remote);
-        remote = (zsock_t *) zlistx_next (self->remotes);
+        remote = (zsock_t *) zhashx_next (self->active_remotes);
     }
     zgossip_msg_destroy (&gossip);
 }
@@ -383,9 +419,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     if (streq (method, "UNPUBLISH")) {
         char *key = zmsg_popstr (msg);
         assert (key);
-        tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
-        assert(tuple);
-        if (tuple) {
+        if (self->tuples) {
             zhashx_delete(self->tuples, key);
         }
        zstr_free (&key);
@@ -518,6 +552,49 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
     return 0;
 }
 
+//  --------------------------------------------------------------------------
+//  Handle messages coming from monitors
+
+static int
+monitor_handler (zloop_t *loop, zsock_t *monitor_socket, void *argument)
+{
+    server_t *self = (server_t *) argument;
+    zactor_t *monitor = (zactor_t *) zhashx_lookup (self->monitors, monitor_socket);
+    if (monitor) {
+        zmsg_t *msg = zmsg_recv (monitor);
+        if (msg) {
+            zmsg_print (msg);
+            char *event = zmsg_popstr (msg);
+            assert (event);
+            zframe_t *number = zmsg_pop (msg);
+            zframe_destroy (&number);
+            char *endpoint = zmsg_popstr (msg);
+            assert (endpoint);
+            zsock_t *remote = (zsock_t *) zhashx_lookup (self->active_remotes, endpoint);
+            if (streq (event, "DISCONNECTED") && remote) {
+                // Remote server is disconnected : dereference it from active remotes
+                zhashx_delete (self->active_remotes, endpoint);
+                
+            } else if (streq (event, "HANDSHAKE_SUCCEEDED") && !remote) {
+                // Remote socket is not in active remotes but is monitored:
+                // it's a reconnection, restart connect process for this endpoint
+                remote = (zsock_t *) zhashx_lookup (self->remotes, endpoint);
+                assert (remote);
+                zhashx_insert (self->active_remotes, endpoint, remote);
+#ifdef CZMQ_BUILD_DRAFT_API
+                server_connect (self, endpoint, self->public_key);
+#else
+                server_connect (self, endpoint);
+#endif
+            }
+            free(event);
+            free(endpoint);
+            zmsg_destroy (&msg);
+        }
+    }
+
+    return 0;
+}
 
 //  --------------------------------------------------------------------------
 //  Selftest
