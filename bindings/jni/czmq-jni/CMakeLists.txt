@@ -71,6 +71,7 @@ set (czmqjni_sources
     src/main/c/org_zeromq_czmq_ZhttpServerOptions.c
     src/main/c/org_zeromq_czmq_ZhttpRequest.c
     src/main/c/org_zeromq_czmq_ZhttpResponse.c
+    src/main/c/org_zeromq_czmq_Zosc.c
 )
 
 add_library (czmqjni SHARED ${czmqjni_sources})

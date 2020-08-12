@@ -5012,3 +5012,130 @@ nothing my_zhttp_response.test (Boolean)
 ```
 
 Self test of this class.
+
+### The Zosc class - Create and decode Open Sound Control messages. (OSC)
+
+OSC is a serialisation format (and usually transported over UDP) which is
+supported by many applications and appliances. It is a de facto protocol
+for networking sound synthesizers, computers, and other multimedia devices
+for purposes such as musical performance or show control. It is also often
+used for rapid prototyping purposes due to the support by many applications
+and frameworks in this field. With ZeroMQ's DGRAM sockets it is possible
+to use ZeroMQ to send and receive OSC messages which can be understood by
+any device supporting OSC.
+
+Example creating an OSC message:
+
+    zosc_t* conm = zosc_create("/someaddress", "iihfdscF",
+                        1, 2, 3, 3.14, 6.283185307179586, "greetings", 'q');
+
+Decoding a message:
+
+    int rc = zosc_retr(oscmsg, "iihfdscF", &intx, &inty, &intz, &floatz,
+                        &doublez, &strings, &charq, &someBool);
+
+See the class's test method for more examples how to use the class.
+
+Constructor:
+
+```
+var czmq = require ('bindings')('czmq')
+var my_zosc = new czmq.Zosc (String)
+```
+
+You *must* call the destructor on every Zosc instance:
+
+```
+my_zosc.destroy ()
+```
+
+Methods:
+
+```
+size my_zosc.size ()
+```
+
+Return chunk data size
+
+```
+buffer my_zosc.data ()
+```
+
+Return OSC chunk data. Caller does not own the data!
+
+```
+string my_zosc.address ()
+```
+
+Return the OSC address string
+
+```
+string my_zosc.format ()
+```
+
+Return the OSC format of the message.
+  i - 32bit integer
+  h - 64bit integer
+  f - 32bit floating point number (IEEE)
+  d - 64bit (double) floating point number
+  s - string (NULL terminated)
+  t = timetag: an OSC timetag in NTP format (uint64_t)
+  S - symbol
+  c - char
+  m - 4 byte midi packet (8 digits hexadecimal)
+  T - TRUE (no value required)
+  F - FALSE (no value required)
+  N - NIL (no value required)
+  I - Impulse (for triggers) or INFINITUM (no value required)
+  b - binary blob
+
+```
+integer my_zosc.retr (String)
+```
+
+Retrieve the values provided by the given format. Note that zosc_retr
+creates the objects and the caller must destroy them when finished.
+The supplied pointers do not need to be initialized. Returns 0 if
+successful, or -1 if it failed to retrieve a value in which case the
+pointers are not modified. If an argument pointer is NULL is skips the
+value. See the format method for a detailed list op type tags for the
+format string.
+
+```
+zosc my_zosc.dup ()
+```
+
+Create copy of the message, as new chunk object. Returns a fresh zosc_t
+object, or null if there was not enough heap memory. If chunk is null,
+returns null.
+
+```
+zframe my_zosc.pack ()
+```
+
+Transform zosc into a zframe that can be sent in a message.
+
+```
+zframe my_zosc.packx (Zosc)
+```
+
+Transform zosc into a zframe that can be sent in a message.
+Take ownership of the chunk.
+
+```
+zosc my_zosc.unpack (Zframe)
+```
+
+Transform a zframe into a zosc.
+
+```
+nothing my_zosc.print ()
+```
+
+Dump OSC message to stderr, for debugging and tracing.
+
+```
+nothing my_zosc.test (Boolean)
+```
+
+Self test of this class.

@@ -326,6 +326,7 @@ IF (ENABLE_DRAFTS)
         include/zhttp_server_options.h
         include/zhttp_request.h
         include/zhttp_response.h
+        include/zosc.h
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -383,6 +384,7 @@ IF (ENABLE_DRAFTS)
         src/zhttp_server_options.c
         src/zhttp_request.c
         src/zhttp_response.c
+        src/zosc.c
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -692,6 +694,7 @@ IF (ENABLE_DRAFTS)
     zhttp_server_options
     zhttp_request
     zhttp_response
+    zosc
     )
 ENDIF (ENABLE_DRAFTS)
 

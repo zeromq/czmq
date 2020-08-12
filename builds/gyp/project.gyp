@@ -116,6 +116,8 @@
         '../../include/zmonitor.h',
         '../../src/zmsg.c',
         '../../include/zmsg.h',
+        '../../src/zosc.c',
+        '../../include/zosc.h',
         '../../src/zpoller.c',
         '../../include/zpoller.h',
         '../../src/zproc.c',
