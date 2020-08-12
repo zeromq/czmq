@@ -563,7 +563,6 @@ monitor_handler (zloop_t *loop, zsock_t *monitor_socket, void *argument)
     if (monitor) {
         zmsg_t *msg = zmsg_recv (monitor);
         if (msg) {
-            zmsg_print (msg);
             char *event = zmsg_popstr (msg);
             assert (event);
             zframe_t *number = zmsg_pop (msg);
