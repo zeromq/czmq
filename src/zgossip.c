@@ -277,7 +277,7 @@ server_connect (server_t *self, const char *endpoint)
         //  Monitor this remote server for disconnection / reconnection
         zactor_t *monitor = zactor_new (zmonitor, remote);
         char socket_address[32] = "";
-        snprintf(socket_address, 32, "%p", zactor_sock (monitor));
+        snprintf (socket_address, 32, "%p", zactor_sock (monitor));
         assert (zhashx_insert (self->monitors, socket_address, monitor) == 0);
         //zstr_send (monitor, "VERBOSE");
         zstr_sendx (monitor, "LISTEN", "DISCONNECTED", "HANDSHAKE_SUCCEEDED", NULL);
@@ -562,9 +562,9 @@ monitor_handler (zloop_t *loop, zsock_t *monitor_socket, void *argument)
 {
     server_t *self = (server_t *) argument;
     char socket_address[32] = "";
-    snprintf(socket_address, 32, "%p", monitor_socket);
+    snprintf (socket_address, 32, "%p", monitor_socket);
     zactor_t *monitor = (zactor_t *) zhashx_lookup (self->monitors, socket_address);
-    assert(monitor);
+    assert (monitor);
     zmsg_t *msg = zmsg_recv (monitor);
     if (msg) {
         char *event = zmsg_popstr (msg);
@@ -590,8 +590,8 @@ monitor_handler (zloop_t *loop, zsock_t *monitor_socket, void *argument)
             server_connect (self, endpoint);
 #endif
         }
-        free(event);
-        free(endpoint);
+        free (event);
+        free (endpoint);
         zmsg_destroy (&msg);
     }
 
