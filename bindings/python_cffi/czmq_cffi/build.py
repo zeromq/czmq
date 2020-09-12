@@ -202,6 +202,9 @@ void
 void
    zhttp_response_destroy_py (void *self);
 
+void
+   zosc_destroy_py (void *self);
+
 ''')
 
 ffidestructorbuilder.set_source ("czmq_cffi.destructors", '''
@@ -384,6 +387,12 @@ void
 zhttp_response_destroy_py (void *self)
 {
    zhttp_response_destroy ((zhttp_response_t **) &self);
+}
+
+void
+zosc_destroy_py (void *self)
+{
+   zosc_destroy ((zosc_t **) &self);
 }
 
 ''', **kwargs)

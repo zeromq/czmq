@@ -317,6 +317,7 @@ IF (ENABLE_DRAFTS)
         include/zhttp_server_options.h
         include/zhttp_request.h
         include/zhttp_response.h
+        include/zosc.h
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -374,6 +375,7 @@ IF (ENABLE_DRAFTS)
         src/zhttp_server_options.c
         src/zhttp_request.c
         src/zhttp_response.c
+        src/zosc.c
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -683,6 +685,7 @@ IF (ENABLE_DRAFTS)
     zhttp_server_options
     zhttp_request
     zhttp_response
+    zosc
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -707,6 +710,7 @@ if (NOT TARGET make-selftest-rw)
     )
 endif()
 
+
 set_directory_properties(
     PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_BINARY_DIR}/src/selftest-ro;${PROJECT_BINARY_DIR}/src/selftest-rw"
@@ -718,11 +722,11 @@ foreach(TEST_CLASS ${TEST_CLASSES})
         COMMAND czmq_selftest --continue --verbose --test ${TEST_CLASS}
     )
     IF (WIN32 AND CMAKE_PREFIX_PATH)
-		file(TO_NATIVE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH_WIN)
-		set_tests_properties(
-			${TEST_CLASS}
-			PROPERTIES ENVIRONMENT "PATH=%PATH%\;${CMAKE_PREFIX_PATH_WIN}\\bin"
-		)
+        file(TO_NATIVE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH_WIN)
+        set_tests_properties(
+            ${TEST_CLASS}
+            PROPERTIES ENVIRONMENT "PATH=%PATH%\;${CMAKE_PREFIX_PATH_WIN}\\bin"
+        )
     ENDIF (WIN32 AND CMAKE_PREFIX_PATH)
     set_tests_properties(
         ${TEST_CLASS}

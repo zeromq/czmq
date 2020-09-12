@@ -63,6 +63,7 @@ typedef struct _zhttp_server_options_t zhttp_server_options_t;
 typedef struct _zhttp_server_t zhttp_server_t;
 typedef struct _zhttp_request_t zhttp_request_t;
 typedef struct _zhttp_response_t zhttp_response_t;
+typedef struct _zosc_t zosc_t;
 // Actors get a pipe and arguments from caller
 typedef void (zactor_fn) (
     zsock_t *pipe, void *args);
@@ -2506,6 +2507,18 @@ zsock_t *
 zsock_t *
     zsock_new_scatter (const char *endpoint);
 
+// Create a DGRAM (UDP) socket. Default action is bind.
+// The endpoint is a string consisting of a
+// 'transport'`://` followed by an 'address'. As this is
+// a UDP socket the 'transport' has to be 'udp'. The
+// 'address' specifies the ip address and port to
+// bind to. For example:  udp://127.0.0.1:1234
+// Note: To send to an endpoint over UDP you have to
+// send a message with the destination endpoint address
+// as a first message!
+zsock_t *
+    zsock_new_dgram (const char *endpoint);
+
 // Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
 // ephemeral ports, if you specify the port number as "*". By default
 // zsock uses the IANA designated range from C000 (49152) to FFFF (65535).
@@ -4022,6 +4035,12 @@ void
 int
     zsys_ipv6 (void);
 
+// Test if ipv6 is available on the system. Return true if available.
+// The only way to reliably check is to actually open a socket and
+// try to bind it. (ported from libzmq)
+bool
+    zsys_ipv6_available (void);
+
 // Set network interface name to use for broadcasts, particularly zbeacon.
 // This lets the interface be configured for test environments where required.
 // For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -4568,5 +4587,114 @@ void
 // Self test of this class.
 void
     zhttp_response_test (bool verbose);
+
+// CLASS: zosc
+// Create a new empty OSC message with the specified address string.
+zosc_t *
+    zosc_new (const char *address);
+
+// Create a new OSC message from the specified zframe. Takes ownership of
+// the zframe.
+zosc_t *
+    zosc_fromframe (zframe_t *frame);
+
+// Create a new zosc message from memory. Take ownership of the memory
+// and calling free on the data after construction.
+zosc_t *
+    zosc_frommem (char *data, size_t size);
+
+// Create a new zosc message from the given format and arguments.
+// The format type tags are as follows:
+//   i - 32bit integer
+//   h - 64bit integer
+//   f - 32bit floating point number (IEEE)
+//   d - 64bit (double) floating point number
+//   s - string (NULL terminated)
+//   t = timetag: an OSC timetag in NTP format (uint64_t)
+//   S - symbol
+//   c - char
+//   m - 4 byte midi packet (8 digits hexadecimal)
+//   T - TRUE (no value required)
+//   F - FALSE (no value required)
+//   N - NIL (no value required)
+//   I - Impulse (for triggers) or INFINITUM (no value required)
+//   b - binary blob
+zosc_t *
+    zosc_create (const char *address, const char *format, ...);
+
+// Destroy an OSC message
+void
+    zosc_destroy (zosc_t **self_p);
+
+// Return chunk data size
+size_t
+    zosc_size (zosc_t *self);
+
+// Return OSC chunk data. Caller does not own the data!
+byte *
+    zosc_data (zosc_t *self);
+
+// Return the OSC address string
+const char *
+    zosc_address (zosc_t *self);
+
+// Return the OSC format of the message.
+//   i - 32bit integer
+//   h - 64bit integer
+//   f - 32bit floating point number (IEEE)
+//   d - 64bit (double) floating point number
+//   s - string (NULL terminated)
+//   t = timetag: an OSC timetag in NTP format (uint64_t)
+//   S - symbol
+//   c - char
+//   m - 4 byte midi packet (8 digits hexadecimal)
+//   T - TRUE (no value required)
+//   F - FALSE (no value required)
+//   N - NIL (no value required)
+//   I - Impulse (for triggers) or INFINITUM (no value required)
+//   b - binary blob
+const char *
+    zosc_format (zosc_t *self);
+
+// Retrieve the values provided by the given format. Note that zosc_retr
+// creates the objects and the caller must destroy them when finished.
+// The supplied pointers do not need to be initialized. Returns 0 if
+// successful, or -1 if it failed to retrieve a value in which case the
+// pointers are not modified. If an argument pointer is NULL is skips the
+// value. See the format method for a detailed list op type tags for the
+// format string.
+int
+    zosc_retr (zosc_t *self, const char *format, ...);
+
+// Create copy of the message, as new chunk object. Returns a fresh zosc_t
+// object, or null if there was not enough heap memory. If chunk is null,
+// returns null.
+zosc_t *
+    zosc_dup (zosc_t *self);
+
+// Transform zosc into a zframe that can be sent in a message.
+zframe_t *
+    zosc_pack (zosc_t *self);
+
+// Transform zosc into a zframe that can be sent in a message.
+// Take ownership of the chunk.
+zframe_t *
+    zosc_packx (zosc_t **self_p);
+
+// Transform a zframe into a zosc.
+zosc_t *
+    zosc_unpack (zframe_t *frame);
+
+// Dump OSC message to stderr, for debugging and tracing.
+void
+    zosc_print (zosc_t *self);
+
+// Probe the supplied object, and report if it looks like a zosc_t.
+bool
+    zosc_is (void *self);
+
+// Self test of this class.
+void
+    zosc_test (bool verbose);
 
 ''')

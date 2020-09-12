@@ -1271,6 +1271,19 @@ CZMQ_EXPORT zsock_t *
     zsock_new_scatter (const char *endpoint);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Create a DGRAM (UDP) socket. Default action is bind.
+//  The endpoint is a string consisting of a
+//  'transport'`://` followed by an 'address'. As this is
+//  a UDP socket the 'transport' has to be 'udp'. The
+//  'address' specifies the ip address and port to
+//  bind to. For example:  udp://127.0.0.1:1234
+//  Note: To send to an endpoint over UDP you have to
+//  send a message with the destination endpoint address
+//  as a first message!
+CZMQ_EXPORT zsock_t *
+    zsock_new_dgram (const char *endpoint);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.
 CZMQ_EXPORT uint32_t

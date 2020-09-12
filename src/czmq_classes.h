@@ -34,6 +34,8 @@
 //  External API
 #include "../include/czmq.h"
 
+//  Private external dependencies
+
 //  Opaque class structures to allow forward references
 #ifndef ZGOSSIP_MSG_T_DEFINED
 typedef struct _zgossip_msg_t zgossip_msg_t;
@@ -304,6 +306,20 @@ CZMQ_PRIVATE zsock_t *
     zsock_new_scatter (const char *endpoint);
 
 //  *** Draft method, defined for internal use only ***
+//  Create a DGRAM (UDP) socket. Default action is bind.
+//  The endpoint is a string consisting of a
+//  'transport'`://` followed by an 'address'. As this is
+//  a UDP socket the 'transport' has to be 'udp'. The
+//  'address' specifies the ip address and port to
+//  bind to. For example:  udp://127.0.0.1:1234
+//  Note: To send to an endpoint over UDP you have to
+//  send a message with the destination endpoint address
+//  as a first message!
+//  Caller owns return value and must destroy it when done.
+CZMQ_PRIVATE zsock_t *
+    zsock_new_dgram (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.
 CZMQ_PRIVATE uint32_t
@@ -414,6 +430,13 @@ CZMQ_PRIVATE void
 //  before testing if a filesystem object is "stable" or not.
 CZMQ_PRIVATE int64_t
     zsys_file_stable_age_msec (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Test if ipv6 is available on the system. Return true if available.
+//  The only way to reliably check is to actually open a socket and
+//  try to bind it. (ported from libzmq)
+CZMQ_PRIVATE bool
+    zsys_ipv6_available (void);
 
 //  *** Draft method, defined for internal use only ***
 //  Set IPv4 multicast address to use for sending zbeacon messages. By default

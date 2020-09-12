@@ -323,6 +323,11 @@ public slots:
     //  Return use of IPv6 for zsock instances.
     int ipv6 ();
 
+    //  Test if ipv6 is available on the system. Return true if available.
+    //  The only way to reliably check is to actually open a socket and
+    //  try to bind it. (ported from libzmq)
+    bool ipv6Available ();
+
     //  Set network interface name to use for broadcasts, particularly zbeacon.
     //  This lets the interface be configured for test environments where required.
     //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is

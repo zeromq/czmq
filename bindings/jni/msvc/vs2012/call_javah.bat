@@ -97,3 +97,6 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpRequest.h GOTO HAVE_Zh
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_ZhttpResponse.h GOTO HAVE_ZhttpResponse
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.ZhttpResponse
 :HAVE_ZhttpResponse
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zosc.h GOTO HAVE_Zosc
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zosc
+:HAVE_Zosc

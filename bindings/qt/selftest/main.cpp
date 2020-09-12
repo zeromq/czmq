@@ -50,6 +50,7 @@ int main(int argc, char **argv)
     QZhttpServerOptions::test (verbose);
     QZhttpRequest::test (verbose);
     QZhttpResponse::test (verbose);
+    QZosc::test (verbose);
 
     qDebug() << "Tests passed OK\n";
     return 0;

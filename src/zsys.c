@@ -69,6 +69,7 @@ s_handler_fn_shim (DWORD ctrltype)
 //  ZeroMQ context for this process
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
+static bool s_shutting_down = false;
 
 #ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
 // This is a private tunable that is likely to be replaced or tweaked later
@@ -283,9 +284,10 @@ zsys_init (void)
 void
 zsys_shutdown (void)
 {
-    if (!s_initialized)
+    if (!s_initialized || s_shutting_down)
         return;
 
+    s_shutting_down = true;
 
     //  The atexit handler is called when the main function exits;
     //  however we may have zactor threads shutting down and still
@@ -298,10 +300,6 @@ zsys_shutdown (void)
     ZMUTEX_UNLOCK (s_mutex);
     if (busy)
         zclock_sleep (200);
-
-    //  Close logsender socket if opened (don't do this in critical section)
-    if (s_logsender)
-        zsock_destroy (&s_logsender);
 
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
@@ -321,6 +319,10 @@ zsys_shutdown (void)
     }
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
+
+    //  Close logsender socket if opened (don't do this in critical section)
+    if (s_logsender)
+        zsock_destroy (&s_logsender);
 
     if (s_open_sockets == 0)
     {
@@ -358,11 +360,12 @@ zsys_shutdown (void)
 
     zsys_handler_reset ();
 
-    s_initialized = false;
-
 #if defined (__UNIX__)
     closelog ();                //  Just to be pedantic
 #endif
+
+    s_initialized = false;
+    s_shutting_down = false;
 }
 
 
@@ -1900,6 +1903,58 @@ zsys_ipv6 (void)
     return s_ipv6;
 }
 
+//  Test if ipv6 is available on the system. The only way to reliably
+//  check is to actually open a socket and try to bind it. (ported from
+//  libzmq)
+
+bool
+zsys_ipv6_available (void)
+{
+#if defined(__WINDOWS__) && (_WIN32_WINNT < 0x0600)
+    return 0;
+#else
+    int rc, ipv6 = 1;
+    struct sockaddr_in6 test_addr;
+
+    memset (&test_addr, 0, sizeof (test_addr));
+    test_addr.sin6_family = AF_INET6;
+    inet_pton (AF_INET6, "::1", &(test_addr.sin6_addr));
+
+    SOCKET fd = socket (AF_INET6, SOCK_STREAM, IPPROTO_IP);
+    if (fd == INVALID_SOCKET)
+        ipv6 = 0;
+    else {
+#if defined(__WINDOWS__)
+        setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, (const char *) &ipv6,
+                    sizeof (int));
+        rc = setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char *) &ipv6,
+                         sizeof (int));
+        if (rc == SOCKET_ERROR)
+            ipv6 = 0;
+        else {
+            rc = bind (fd, (struct sockaddr *) &test_addr, sizeof (test_addr));
+            if (rc == SOCKET_ERROR)
+                ipv6 = 0;
+        }
+        closesocket (fd);
+#else
+        setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &ipv6, sizeof (int));
+        rc = setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6, sizeof (int));
+        if (rc != 0)
+            ipv6 = 0;
+        else {
+            rc = bind (fd, (struct sockaddr *) (&test_addr),
+                       sizeof (test_addr));
+            if (rc != 0)
+                ipv6 = 0;
+        }
+        close (fd);
+#endif
+    }
+
+    return ipv6;
+#endif // _WIN32_WINNT < 0x0600
+}
 
 //  --------------------------------------------------------------------------
 //  Set network interface name to use for broadcasts, particularly zbeacon.
@@ -2472,7 +2527,10 @@ zsys_test (bool verbose)
     zsys_init();
     zsys_shutdown();
     zsys_init();
-
+#ifdef CZMQ_BUILD_DRAFT_API
+    // just check if we can check for ipv6
+    zsys_ipv6_available();
+#endif
 
     //  @selftest
     zsys_catch_interrupts ();
@@ -2744,6 +2802,8 @@ zsys_test (bool verbose)
     zsys_set_max_msgsz (-1);
     assert (zsys_max_msgsz () == 2000);
 
+    // cleanup log_sender
+    zsys_set_logsender(NULL);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();

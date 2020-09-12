@@ -28,8 +28,8 @@ function print_abi_api_breakages() {
    exit 1
 }
 
-git fetch --all --tags
 git fetch --unshallow
+git fetch --all --tags
 LATEST_VERSION=$(git describe --abbrev=0 --tags)
 
 ./autogen.sh

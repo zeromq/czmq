@@ -375,6 +375,13 @@ Java_org_zeromq_czmq_Zsys__1_1ipv6 (JNIEnv *env, jclass c)
     return ipv6_;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_org_zeromq_czmq_Zsys__1_1ipv6Available (JNIEnv *env, jclass c)
+{
+    jboolean ipv6_available_ = (jboolean) zsys_ipv6_available ();
+    return ipv6_available_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsys__1_1setInterface (JNIEnv *env, jclass c, jstring value)
 {

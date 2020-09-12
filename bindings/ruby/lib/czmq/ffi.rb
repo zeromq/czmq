@@ -566,6 +566,7 @@ module CZMQ
       attach_function :zsock_new_dish, [:string], :pointer, **opts
       attach_function :zsock_new_gather, [:string], :pointer, **opts
       attach_function :zsock_new_scatter, [:string], :pointer, **opts
+      attach_function :zsock_new_dgram, [:string], :pointer, **opts
       attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_endpoint, [:pointer], :string, **opts
@@ -838,6 +839,7 @@ module CZMQ
       attach_function :zsys_pipehwm, [], :size_t, **opts
       attach_function :zsys_set_ipv6, [:int], :void, **opts
       attach_function :zsys_ipv6, [], :int, **opts
+      attach_function :zsys_ipv6_available, [], :bool, **opts
       attach_function :zsys_set_interface, [:string], :void, **opts
       attach_function :zsys_interface, [], :string, **opts
       attach_function :zsys_set_ipv6_address, [:string], :void, **opts
@@ -974,6 +976,26 @@ module CZMQ
       attach_function :zhttp_response_test, [:bool], :void, **opts
 
       require_relative 'ffi/zhttp_response'
+
+      attach_function :zosc_new, [:string], :pointer, **opts
+      attach_function :zosc_fromframe, [:pointer], :pointer, **opts
+      attach_function :zosc_frommem, [:pointer, :size_t], :pointer, **opts
+      attach_function :zosc_create, [:string, :string, :varargs], :pointer, **opts
+      attach_function :zosc_destroy, [:pointer], :void, **opts
+      attach_function :zosc_size, [:pointer], :size_t, **opts
+      attach_function :zosc_data, [:pointer], :pointer, **opts
+      attach_function :zosc_address, [:pointer], :string, **opts
+      attach_function :zosc_format, [:pointer], :string, **opts
+      attach_function :zosc_retr, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zosc_dup, [:pointer], :pointer, **opts
+      attach_function :zosc_pack, [:pointer], :pointer, **opts
+      attach_function :zosc_packx, [:pointer], :pointer, **opts
+      attach_function :zosc_unpack, [:pointer], :pointer, **opts
+      attach_function :zosc_print, [:pointer], :void, **opts
+      attach_function :zosc_is, [:pointer], :bool, **opts
+      attach_function :zosc_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zosc'
     end
   end
 end
