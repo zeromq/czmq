@@ -1301,9 +1301,9 @@ zsys_daemonize (const char *workdir)
     }
     //  Close all open file descriptors inherited from the parent
     //  process, to reduce the resources we use
-    int file_handle = sysconf (_SC_OPEN_MAX);
+    long file_handle = sysconf (_SC_OPEN_MAX);
     while (file_handle)
-        close (file_handle--);  //  Ignore any errors
+        close ((int) file_handle--);  //  Ignore any errors
 
     //  Set the umask for new files we might create
     umask (file_mask);
@@ -1311,8 +1311,8 @@ zsys_daemonize (const char *workdir)
     //  Set standard input and output to the null device so that any
     //  code that assumes that these files are open will work
     file_handle = open ("/dev/null", O_RDWR);
-    int fh_stdout = dup (file_handle);
-    int fh_stderr = dup (file_handle);
+    int fh_stdout = dup ((int) file_handle);
+    int fh_stderr = dup ((int) file_handle);
     assert (fh_stdout);
     assert (fh_stderr);
 
@@ -1457,7 +1457,7 @@ zsys_set_io_threads (size_t io_threads)
     s_process_ctx = zmq_init ((int) s_io_threads);
 #else
 #  if defined (ZMQ_IO_THREADS)
-    zmq_ctx_set (s_process_ctx, ZMQ_IO_THREADS, s_io_threads);
+    zmq_ctx_set (s_process_ctx, ZMQ_IO_THREADS, (int) s_io_threads);
 #  endif
 #endif
     ZMUTEX_UNLOCK (s_mutex);

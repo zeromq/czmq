@@ -1276,7 +1276,7 @@ zproc_test (bool verbose)
 
     int r = zproc_run (self);
     assert (r == 0);
-    int t = zclock_mono ();
+    int64_t t = zclock_mono ();
     r = zproc_wait (self, 8000);
     assert (r == 0);
     t = zclock_mono () - t;

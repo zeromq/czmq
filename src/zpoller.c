@@ -214,7 +214,7 @@ zpoller_set_nonstop (zpoller_t *self, bool nonstop)
 //  zpoller_terminated (). The timeout is in msec.
 
 void *
-zpoller_wait (zpoller_t *self, int timeout)
+zpoller_wait (zpoller_t *self, long timeout)
 {
     assert (self);
     self->expired = false;

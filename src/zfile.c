@@ -746,7 +746,7 @@ zfile_test (bool verbose)
 
     file = zfile_new (dirpath, testfile);
     assert (file);
-    int rc = zfile_output (file);
+    size_t rc = zfile_output (file);
     assert (rc == 0);
     zchunk_t *chunk = zchunk_new (NULL, 100);
     assert (chunk);
