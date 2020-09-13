@@ -65,7 +65,7 @@ CZMQ_EXPORT int
 //  Return the time until the next interval.
 //  Should be used as timeout parameter for the zpoller wait method.
 //  The timeout is in msec.
-CZMQ_EXPORT long
+CZMQ_EXPORT int64_t
     ztimerset_timeout (ztimerset_t *self);
 
 //  *** Draft method, for development use, may change without warning ***

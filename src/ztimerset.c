@@ -123,7 +123,7 @@ ztimerset_reset (ztimerset_t *self, int timer_id)
 //  Return the time until the next interval.
 //  Should be used as timeout parameter for the zpoller wait method.
 //  The timeout is in msec.
-long
+int64_t
 ztimerset_timeout (ztimerset_t *self)
 {
 #ifdef ZMQ_HAVE_TIMERS
@@ -203,7 +203,7 @@ ztimerset_test (bool verbose)
     timeout = ztimerset_timeout (self);
     rc = ztimerset_reset(self, timer_id);
     assert (rc == 0);
-    long timeout2 = ztimerset_timeout (self);
+    int64_t timeout2 = ztimerset_timeout (self);
     assert (timeout2 > timeout);
     rc = ztimerset_cancel (self, timer_id);
     assert (rc == 0);

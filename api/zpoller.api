@@ -55,7 +55,7 @@
         timeout expired, returns NULL. You can test the actual exit condition by 
         calling zpoller_expired () and zpoller_terminated (). The timeout is in 
         msec.
-        <argument name = "timeout" type = "integer" />
+        <argument name = "timeout" type = "msecs" />
         <return type = "sockish" />
     </method>
 

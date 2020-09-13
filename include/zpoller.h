@@ -62,7 +62,7 @@ CZMQ_EXPORT void
 //  calling zpoller_expired () and zpoller_terminated (). The timeout is in
 //  msec.
 CZMQ_EXPORT void *
-    zpoller_wait (zpoller_t *self, long timeout);
+    zpoller_wait (zpoller_t *self, int64_t timeout);
 
 //  Return true if the last zpoller_wait () call ended because the timeout
 //  expired, without any error.

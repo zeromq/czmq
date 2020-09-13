@@ -57,7 +57,7 @@
         Return the time until the next interval.
         Should be used as timeout parameter for the zpoller wait method.
         The timeout is in msec.
-        <return type = "integer" />
+        <return type = "msecs" />
     </method>
 
     <method name = "execute">

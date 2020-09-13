@@ -12,7 +12,7 @@
 
     <method name = "sleep" singleton = "1">
         Sleep for a number of milliseconds
-        <argument name = "msecs" type = "integer" />
+        <argument name = "msecs" type = "msecs" />
     </method>
 
     <method name = "time" singleton = "1">

@@ -49,7 +49,7 @@ s_filetime_to_msec (const FILETIME *ft)
 //  Sleep for a number of milliseconds
 
 void
-zclock_sleep (long msecs)
+zclock_sleep (int64_t msecs)
 {
 #if defined (__UNIX__)
     struct timespec t;

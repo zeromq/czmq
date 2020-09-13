@@ -25,7 +25,7 @@ extern "C" {
 //  is provided in stable builds.
 //  Sleep for a number of milliseconds
 CZMQ_EXPORT void
-    zclock_sleep (long msecs);
+    zclock_sleep (int64_t msecs);
 
 //  Return current system clock as milliseconds. Note that this clock can
 //  jump backwards (if the system clock is changed) so is unsafe to use for
