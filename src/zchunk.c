@@ -33,9 +33,9 @@ struct _zchunk_t {
     size_t max_size;                    //  Maximum allocated size
     size_t consumed;                    //  Amount already consumed
     zdigest_t *digest;                  //  Chunk digest, if known
-    byte *data;                         //  Data part follows here
     zchunk_destructor_fn *destructor;   //  Destructor for memory
-    void * hint;                        //  Hint for destroying the memory
+    void *hint;                        //  Hint for destroying the memory
+    byte *data;                         //  Data part follows here
 };
 
 
