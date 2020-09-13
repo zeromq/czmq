@@ -1905,6 +1905,8 @@ zsock_test (bool verbose)
     int rc;
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  Check unbind
+    if (verbose)
+        zsys_debug ("check unbind");
     rc = zsock_unbind (writer, "tcp://127.0.0.1:%d", port);
     assert (rc == 0);
 
@@ -1929,6 +1931,8 @@ zsock_test (bool verbose)
     assert (streq (zsock_type_str (reader), "PULL"));
 
     //  Basic Hello, World
+    if (verbose)
+        zsys_debug ("basic Hello, World");
     zstr_send (writer, "Hello, World");
     zmsg_t *msg = zmsg_recv (reader);
     assert (msg);
@@ -1938,6 +1942,8 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
     //  Test resolve libzmq socket
+    if (verbose)
+        zsys_debug ("resolve libzmq socket");
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     void *zmq_ctx = zmq_ctx_new ();
 #else
@@ -1951,16 +1957,22 @@ zsock_test (bool verbose)
     zmq_ctx_term (zmq_ctx);
 
     //  Test resolve zsock
+    if (verbose)
+        zsys_debug ("resolve zsock");
     zsock_t *resolve = zsock_new_pub("@tcp://127.0.0.1:*");
     assert (resolve);
     assert (zsock_resolve (resolve) == resolve->handle);
     zsock_destroy (&resolve);
 
     //  Test resolve FD
+    if (verbose)
+        zsys_debug ("resolve FD");
     SOCKET fd = zsock_fd (reader);
     assert (zsock_resolve ((void *) &fd) == NULL);
 
     //  Test binding to ephemeral ports, sequential and random
+    if (verbose)
+        zsys_debug ("binding to ephemeral ports, sequential and random");
     port = zsock_bind (writer, "tcp://127.0.0.1:*");
     assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
     port = zsock_bind (writer, "tcp://127.0.0.1:*[50000-]");
@@ -1980,6 +1992,8 @@ zsock_test (bool verbose)
     assert (port >= 60000 && port <= 60500);
 
     //  Test zsock_attach method
+    if (verbose)
+        zsys_debug ("zsock_attach method");
     zsock_t *dealer = zsock_new (ZMQ_DEALER);
     assert (dealer);
     rc = zsock_attach (dealer, "@inproc://myendpoint,tcp://127.0.0.1:*,inproc://others", true);
@@ -1993,22 +2007,30 @@ zsock_test (bool verbose)
     zsock_destroy (&dealer);
 
     //  Test zsock_endpoint method
+    if (verbose)
+        zsys_debug ("zsock_endpoint method");
     rc = zsock_bind (writer, "inproc://test.%s", "writer");
     assert (rc == 0);
     assert (streq (zsock_endpoint (writer), "inproc://test.writer"));
 
     //  Test error state when connecting to an invalid socket type
+    if (verbose)
+        zsys_debug ("error state when connecting to an invalid socket type");
     //  ('txp://' instead of 'tcp://', typo intentional)
     rc = zsock_connect (reader, "txp://127.0.0.1:5560");
     assert (rc == -1);
 
     //  Test signal/wait methods
+    if (verbose)
+        zsys_debug ("signal/wait methods");
     rc = zsock_signal (writer, 123);
     assert (rc == 0);
     rc = zsock_wait (reader);
     assert (rc == 123);
 
     //  Test zsock_send/recv pictures
+    if (verbose)
+        zsys_debug ("zsock_send/recv pictures");
     uint8_t  number1 = 123;
     uint16_t number2 = 123 * 123;
     uint32_t number4 = 123 * 123;
@@ -2044,6 +2066,8 @@ zsock_test (bool verbose)
     char *original = "pointer";
 
     //  Test zsock_recv into each supported type
+    if (verbose)
+        zsys_debug ("zsock_recv into each supported type");
 #ifdef CZMQ_BUILD_DRAFT_API
     zsock_send (writer, "i124488zsbcfUhlp",
 #else
@@ -2124,6 +2148,8 @@ zsock_test (bool verbose)
     //  Test zsock_recv of short message; this lets us return a failure
     //  with a status code and then nothing else; the receiver will get
     //  the status code and NULL/zero for all other values
+    if (verbose)
+        zsys_debug ("zsock_recv of short message");
     zsock_send (writer, "i", -1);
     zsock_recv (reader, "izsbcfp",
         &integer, &string, &data, &size, &chunk, &frame, &pointer);
@@ -2151,6 +2177,8 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
     //  Test zsock_recv with null arguments
+    if (verbose)
+        zsys_debug ("zsock_recv with null arguments");
     chunk = zchunk_new ("HELLO", 5);
     assert (chunk);
     frame = zframe_new ("WORLD", 5);
@@ -2166,6 +2194,8 @@ zsock_test (bool verbose)
     zchunk_destroy (&chunk);
 
     //  Test zsock_bsend/brecv pictures with binary encoding
+    if (verbose)
+        zsys_debug ("zsock_bsend/brecv pictures with binary encoding");
     frame = zframe_new ("Hello", 5);
     chunk = zchunk_new ("World", 5);
 
@@ -2205,6 +2235,8 @@ zsock_test (bool verbose)
 #ifdef ZMQ_SERVER
 
     //  Test zsock_bsend/brecv pictures with binary encoding on SERVER and CLIENT sockets
+    if (verbose)
+        zsys_debug ("zsock_bsend/brecv pictures with binary encoding on SERVER and CLIENT sockets");
     zsock_t *server = zsock_new (ZMQ_SERVER);
     assert (server);
     port = zsock_bind (server, "tcp://127.0.0.1:*");
@@ -2284,6 +2316,8 @@ zsock_test (bool verbose)
 #endif
 
 #ifdef ZMQ_SCATTER
+    if (verbose)
+        zsys_debug ("ZMQ_SCATTER");
 
     zsock_t* gather = zsock_new_gather ("inproc://test-gather-scatter");
     assert (gather);
@@ -2313,6 +2347,8 @@ zsock_test (bool verbose)
 #endif
 
 #ifndef ZMQ_RADIO
+    if (verbose)
+        zsys_debug ("ZMQ_RADIO");
     errno = 0;
     zsock_t* radio = zsock_new_radio (NULL);
     assert(radio == NULL);
@@ -2346,6 +2382,8 @@ zsock_test (bool verbose)
     zsock_destroy (&writer);
 
 #ifdef ZMQ_DGRAM
+    if (verbose)
+        zsys_debug ("ZMQ_DGRAM");
     // ZMQ_DGRAM ipv4 unicast test
     zsock_t* dgramr = zsock_new_dgram ("udp://*:7777");
     assert (dgramr);
@@ -2375,20 +2413,20 @@ zsock_test (bool verbose)
     zstr_free (&addr);
     zstr_free (&message);
 
+#if !__APPLE__
     // ZMQ_DGRAM ipv4 multicast test
     zsock_t* mdgramr = zsock_new_dgram ("udp://225.25.25.25:7777");
     assert (mdgramr);
     zsock_t* mdgrams = zsock_new_dgram ("udp://*:*");
     assert (mdgrams);
 
-    rc = zstr_sendm( mdgrams, "225.25.25.25:7777" );
+    rc = zstr_sendm (mdgrams, "225.25.25.25:7777");
     assert (rc == 0);
     rc = zstr_send (mdgrams, "HELLO");
     assert (rc == 0);
 
     char *mdmessage, *maddr;
-
-    zmsg_t *mdmsg = zmsg_recv( mdgramr );
+    zmsg_t *mdmsg = zmsg_recv (mdgramr);
     assert (mdmsg);
     maddr = zmsg_popstr (mdmsg);
     mdmessage = zmsg_popstr (mdmsg);
@@ -2399,7 +2437,8 @@ zsock_test (bool verbose)
     zstr_free (&mdmessage);
     zstr_free (&maddr);
     zstr_free (&mdmessage);
-
+#endif
+    
 //    // ipv6 (not supported yet)
 //    zsys_set_ipv6(1);
 //    zsock_t* dgramr6 = zsock_new_dgram ("udp://*:7777");
