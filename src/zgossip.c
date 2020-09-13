@@ -270,23 +270,23 @@ server_connect (server_t *self, const char *endpoint)
             zsock_destroy (&remote);
             return;
         }
-#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEEDED)
-        //  ZMQ_EVENT_HANDSHAKE_SUCCEEDED is mandatory for our behavior:
-        //  disable if event is not available.
         //  Monitor this remote server for incoming messages
         engine_handle_socket (self, remote, remote_handler);
         
         //  Monitor this remote server for disconnection / reconnection
         zactor_t *monitor = zactor_new (zmonitor, remote);
-        char socket_address[32] = "";
-        snprintf (socket_address, 32, "%p", (void *) zactor_sock (monitor));
+        char socket_address[64] = "";
+        snprintf (socket_address, 64, "%p", (void *) zactor_sock (monitor));
         assert (zhashx_insert (self->monitors, socket_address, monitor) == 0);
         //zstr_send (monitor, "VERBOSE");
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEEDED)
         zstr_sendx (monitor, "LISTEN", "DISCONNECTED", "HANDSHAKE_SUCCEEDED", NULL);
+#else
+        zstr_sendx (monitor, "LISTEN", "DISCONNECTED", NULL);
+#endif
         zstr_send (monitor, "START");
         zsock_wait (monitor);
         engine_handle_socket (self, zactor_sock (monitor), monitor_handler);
-#endif
         zhashx_insert (self->active_remotes, endpoint, remote);
         zhashx_insert (self->remotes, endpoint, remote);
 
@@ -563,8 +563,8 @@ static int
 monitor_handler (zloop_t *loop, zsock_t *monitor_socket, void *argument)
 {
     server_t *self = (server_t *) argument;
-    char socket_address[32] = "";
-    snprintf (socket_address, 32, "%p", (void *) monitor_socket);
+    char socket_address[64] = "";
+    snprintf (socket_address, 64, "%p", (void *) monitor_socket);
     zactor_t *monitor = (zactor_t *) zhashx_lookup (self->monitors, socket_address);
     assert (monitor);
     zmsg_t *msg = zmsg_recv (monitor);
