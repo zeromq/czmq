@@ -655,8 +655,10 @@ s_armour_decode (zarmour_t *self, const char *test_string, const char *expected,
     assert (chunk);
     if (verbose)
         zsys_debug ("    decoded '%s' into '%s'", test_string, (char *) zchunk_data (chunk));
-    assert (zchunk_size (chunk) == strlen (expected) + 1);
-    assert (streq ((char *) zchunk_data (chunk), expected));
+    assert (zchunk_size (chunk) == strlen (expected) + 1
+            || (strlen (expected) == 0 && zchunk_size (chunk) == 0));
+    assert (streq ((char *) zchunk_data (chunk), expected)
+            || (strlen (expected) == 0 && zchunk_size (chunk) == 0));
     zchunk_destroy (&chunk);
 }
 
