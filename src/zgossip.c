@@ -119,7 +119,7 @@ struct _server_t {
     zhashx_t *active_remotes;   //  Active (i.e. really connected) remote servers, indexed by their endpoint
     zhashx_t *remotes;          //  All remote servers, connected or not, indexed by their endpoint
     zhashx_t *tuples;           //  Tuples, indexed by key
-    zhashx_t *monitors;         //  Zmonitors for remote servers, indexed by their own actor socket
+    zlistx_t *monitors;         //  Zmonitors for remote servers
 
     tuple_t *cur_tuple;         //  Holds current tuple to publish
     zgossip_msg_t *message;     //  Message to broadcast
@@ -196,9 +196,9 @@ server_initialize (server_t *self)
     self->tuples = zhashx_new ();
     assert (self->tuples);
     
-    self->monitors = zhashx_new ();
+    self->monitors = zlistx_new ();
     assert (self->monitors);
-    zhashx_set_destructor (self->monitors, (czmq_destructor *) zactor_destroy);
+    zlistx_set_destructor (self->monitors, (czmq_destructor *) zactor_destroy);
 
 #ifdef CZMQ_BUILD_DRAFT_API
     // DRAFT-API: Security
@@ -214,7 +214,7 @@ static void
 server_terminate (server_t *self)
 {
     zgossip_msg_destroy (&self->message);
-    zhashx_destroy (&self->monitors);
+    zlistx_destroy (&self->monitors);
     zsock_t *remote = (zsock_t *) zhashx_first (self->remotes);
     while (remote) {
         zsock_destroy (&remote);
@@ -276,9 +276,13 @@ server_connect (server_t *self, const char *endpoint)
         
         //  Monitor this remote server for disconnection / reconnection
         zactor_t *monitor = zactor_new (zmonitor, remote);
-        zhashx_insert (self->monitors, zactor_sock (monitor), monitor);
+        zlistx_add_end (self->monitors, monitor);
         //zstr_send (monitor, "VERBOSE");
+#if defined (ZMQ_EVENT_HANDSHAKE_SUCCEEDED)
         zstr_sendx (monitor, "LISTEN", "DISCONNECTED", "HANDSHAKE_SUCCEEDED", NULL);
+#else
+        zstr_sendx (monitor, "LISTEN", "DISCONNECTED", NULL);
+#endif
         zstr_send (monitor, "START");
         zsock_wait (monitor);
         engine_handle_socket (self, zactor_sock (monitor), monitor_handler);
@@ -559,39 +563,40 @@ static int
 monitor_handler (zloop_t *loop, zsock_t *monitor_socket, void *argument)
 {
     server_t *self = (server_t *) argument;
-    zactor_t *monitor = (zactor_t *) zhashx_lookup (self->monitors, monitor_socket);
-    if (monitor) {
-        zmsg_t *msg = zmsg_recv (monitor);
-        if (msg) {
-            char *event = zmsg_popstr (msg);
-            assert (event);
-            zframe_t *number = zmsg_pop (msg);
-            zframe_destroy (&number);
-            char *endpoint = zmsg_popstr (msg);
-            assert (endpoint);
-            zsock_t *remote = (zsock_t *) zhashx_lookup (self->active_remotes, endpoint);
-            if (streq (event, "DISCONNECTED") && remote) {
-                // Remote server is disconnected : dereference it from active remotes
-                zhashx_delete (self->active_remotes, endpoint);
-                
-            } else if (streq (event, "HANDSHAKE_SUCCEEDED") && !remote) {
-                // Remote socket is not in active remotes but is monitored:
-                // it's a reconnection, restart connect process for this endpoint
-                remote = (zsock_t *) zhashx_lookup (self->remotes, endpoint);
-                assert (remote);
-                zhashx_insert (self->active_remotes, endpoint, remote);
-#ifdef CZMQ_BUILD_DRAFT_API
-                server_connect (self, endpoint, self->public_key);
-#else
-                server_connect (self, endpoint);
-#endif
-            }
-            free(event);
-            free(endpoint);
-            zmsg_destroy (&msg);
-        }
+    zactor_t *monitor = (zactor_t *) zlistx_first (self->monitors);
+    while (monitor && monitor_socket != zactor_sock (monitor)) {
+        monitor = (zactor_t *) zlistx_next (self->monitors);
     }
-
+    assert(monitor);
+    zmsg_t *msg = zmsg_recv (monitor);
+    if (msg) {
+        char *event = zmsg_popstr (msg);
+        assert (event);
+        zframe_t *number = zmsg_pop (msg);
+        zframe_destroy (&number);
+        char *endpoint = zmsg_popstr (msg);
+        assert (endpoint);
+        zsock_t *remote = (zsock_t *) zhashx_lookup (self->active_remotes, endpoint);
+        if (streq (event, "DISCONNECTED") && remote) {
+            // Remote server is disconnected : dereference it from active remotes
+            zhashx_delete (self->active_remotes, endpoint);
+            
+        } else if (streq (event, "HANDSHAKE_SUCCEEDED") && !remote) {
+            // Remote socket is not in active remotes but is monitored:
+            // it's a reconnection, restart connect process for this endpoint
+            remote = (zsock_t *) zhashx_lookup (self->remotes, endpoint);
+            assert (remote);
+            zhashx_insert (self->active_remotes, endpoint, remote);
+#ifdef CZMQ_BUILD_DRAFT_API
+            server_connect (self, endpoint, self->public_key);
+#else
+            server_connect (self, endpoint);
+#endif
+        }
+        free(event);
+        free(endpoint);
+        zmsg_destroy (&msg);
+    }
     return 0;
 }
 
