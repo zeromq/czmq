@@ -12,3 +12,21 @@
    fun:send
    ...
 }
+{
+   <curl_global_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc
+   ...
+   fun:curl_global_init
+   ...
+}
+{
+   <MHD_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc
+   ...
+   fun:MHD_init
+   ...
+}
