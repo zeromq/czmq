@@ -70,7 +70,7 @@ s_handler_fn_shim (DWORD ctrltype)
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
 static bool s_shutting_down = false;
-void zsys_cleanup (void);
+static void zsys_cleanup (void);
 
 #ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
 // This is a private tunable that is likely to be replaced or tweaked later
@@ -157,13 +157,13 @@ s_zsys_vprintf_hint (int hint, const char *format, va_list argptr);
 static pthread_once_t init_all_mutex_var = PTHREAD_ONCE_INIT;
 
 // handler to initialize mutexes one time in multi threaded env
-void zsys_initialize_mutex() {
+static void zsys_initialize_mutex() {
     ZMUTEX_INIT (s_mutex);
     ZMUTEX_INIT (s_init_mutex);
 }
 
 // handler to detect fork condition and cleanup the stale context inherited from parent process
-void zsys_pthread_at_fork_handler(void) {
+static void zsys_pthread_at_fork_handler(void) {
     // re-initialize mutexes
     ZMUTEX_INIT (s_init_mutex);
     ZMUTEX_INIT (s_mutex);
@@ -409,7 +409,7 @@ zsys_shutdown (void)
 }
 
 //  Restores all CZMQ global state to initial values
-void
+static void
 zsys_cleanup (void)
 {
     ZMUTEX_LOCK (s_init_mutex);
