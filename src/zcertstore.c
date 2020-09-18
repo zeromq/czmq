@@ -272,10 +272,8 @@ zcertstore_print (zcertstore_t *self)
 void *
 zcertstore_state (zcertstore_t *self)
 {
-    if (self)
-        return self->state;
-
-    return NULL;
+    assert (self);
+    return self->state;
 }
 
 
