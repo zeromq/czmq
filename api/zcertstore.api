@@ -73,6 +73,11 @@
         <return type = "zlistx" fresh = "1" />
     </method>
 
+    <method name = "state" state = "draft">
+        Return the state stored in certstore
+        <return type = "anything" />
+    </method>
+
     <method name = "test" singleton = "1">
         Self test of this class
         <argument name = "verbose" type = "boolean" />

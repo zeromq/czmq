@@ -105,6 +105,11 @@ CZMQ_PRIVATE void
 CZMQ_PRIVATE zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
+//  *** Draft method, defined for internal use only ***
+//  Return the state stored in certstore
+CZMQ_PRIVATE void *
+    zcertstore_state (zcertstore_t *self);
+
 //  *** Draft callbacks, defined for internal use only ***
 // Destroy an item
 typedef void (zchunk_destructor_fn) (

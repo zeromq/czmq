@@ -87,6 +87,11 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
+//  *** Draft method, for development use, may change without warning ***
+//  Return the state stored in certstore
+CZMQ_EXPORT void *
+    zcertstore_state (zcertstore_t *self);
+
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
 

@@ -267,6 +267,15 @@ zcertstore_print (zcertstore_t *self)
     }
 }
 
+//  --------------------------------------------------------------------------
+//  Return the state stored in certstore
+void *
+zcertstore_state (zcertstore_t *self)
+{
+    assert (self);
+    return self->state;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Selftest
