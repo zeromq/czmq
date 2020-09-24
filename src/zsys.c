@@ -70,7 +70,9 @@ s_handler_fn_shim (DWORD ctrltype)
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
 static bool s_shutting_down = false;
+#if defined (__UNIX__)
 static void zsys_cleanup (void);
+#endif
 
 #ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
 // This is a private tunable that is likely to be replaced or tweaked later
@@ -137,9 +139,10 @@ typedef CRITICAL_SECTION zsys_mutex_t;
 
 //  Mutex to guard socket counter
 static zsys_mutex_t s_mutex;
+#if defined (__UNIX__)
 // Mutex to guard the multiple zsys_init() - to make it threadsafe
 static zsys_mutex_t s_init_mutex;
-
+#endif
 //  Implementation for the zsys_vprintf() which is known from legacy
 //  and poses as a stable interface now.
 static inline
@@ -153,6 +156,7 @@ s_zsys_vprintf_hint (int hint, const char *format, va_list argptr);
 //  Not threadsafe, so call only from main thread. Safe to call multiple
 //  times. Returns global CZMQ context.
 
+#if defined (__UNIX__)
 // mutex for pthread_once to run the init function only once in a process
 static pthread_once_t init_all_mutex_var = PTHREAD_ONCE_INIT;
 
@@ -170,10 +174,12 @@ static void zsys_pthread_at_fork_handler(void) {
     // call cleanup
     zsys_cleanup();
 }
+#endif
 
 void *
 zsys_init (void)
 {
+#if defined (__UNIX__)
     //To avoid two inits at same time
     pthread_once(&init_all_mutex_var, zsys_initialize_mutex);
 
@@ -183,13 +189,16 @@ zsys_init (void)
     }
 
     ZMUTEX_LOCK (s_init_mutex);
+#endif
 
     // Doing this again here... to ensure that after mutex wait if the thread 2 gets execution, it will
     // will get the context right away
     if (s_initialized) {
         assert (s_process_ctx);
+#if defined (__UNIX__)
         // unlock the mutex before returning the context
         ZMUTEX_UNLOCK(s_init_mutex);
+#endif
         return s_process_ctx;
     }
 
@@ -247,10 +256,15 @@ zsys_init (void)
 
     zsys_catch_interrupts ();
 
+#if defined (__WINDOWS__)
+    ZMUTEX_INIT (s_mutex);
+#endif
     s_sockref_list = zlist_new ();
     if (!s_sockref_list) {
         zsys_shutdown ();
+#if defined (__UNIX__)
         ZMUTEX_UNLOCK(s_init_mutex);
+#endif
         return NULL;
     }
     srandom ((unsigned) time (NULL));
@@ -263,8 +277,10 @@ zsys_init (void)
 #endif
     s_initialized = true;
 
+#if defined (__UNIX__)
     atexit (zsys_shutdown);
     pthread_atfork(NULL, NULL, &zsys_pthread_at_fork_handler);
+#endif
 
     //don't hold the lock because some of the function will call zsys_init again
     ZMUTEX_UNLOCK(s_init_mutex);
@@ -408,6 +424,7 @@ zsys_shutdown (void)
     s_shutting_down = false;
 }
 
+#if defined (__UNIX__)
 //  Restores all CZMQ global state to initial values
 static void
 zsys_cleanup (void)
@@ -442,6 +459,7 @@ zsys_cleanup (void)
     s_open_sockets = 0;
     ZMUTEX_UNLOCK (s_init_mutex);
 }
+#endif
 
 //  --------------------------------------------------------------------------
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
