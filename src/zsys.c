@@ -280,10 +280,9 @@ zsys_init (void)
 #if defined (__UNIX__)
     atexit (zsys_shutdown);
     pthread_atfork(NULL, NULL, &zsys_pthread_at_fork_handler);
-#endif
-
     //don't hold the lock because some of the function will call zsys_init again
     ZMUTEX_UNLOCK(s_init_mutex);
+#endif
 
     //  The following functions call zsys_init(), so they MUST be called after
     //  s_initialized is set in order to avoid an infinite recursion
