@@ -55,6 +55,12 @@ QmlZlistx *QmlZcertstore::certs () {
     return retQ_;
 };
 
+///
+//  Return the state stored in certstore
+void *QmlZcertstore::state () {
+    return zcertstore_state (self);
+};
+
 
 QObject* QmlZcertstore::qmlAttachedProperties(QObject* object) {
     return new QmlZcertstoreAttached(object);

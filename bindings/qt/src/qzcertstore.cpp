@@ -91,6 +91,14 @@ QZlistx * QZcertstore::certs ()
 }
 
 ///
+//  Return the state stored in certstore
+void * QZcertstore::state ()
+{
+    void * rv = zcertstore_state (self);
+    return rv;
+}
+
+///
 //  Self test of this class
 void QZcertstore::test (bool verbose)
 {

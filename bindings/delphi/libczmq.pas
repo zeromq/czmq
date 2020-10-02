@@ -314,6 +314,9 @@ type
   // objects.
   function zcertstore_certs(self: PZcertstore): PZlistx; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Return the state stored in certstore
+  function zcertstore_state(self: PZcertstore): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Self test of this class
   procedure zcertstore_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 

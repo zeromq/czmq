@@ -986,6 +986,8 @@ lib.zcertstore_print.restype = None
 lib.zcertstore_print.argtypes = [zcertstore_p]
 lib.zcertstore_certs.restype = zlistx_p
 lib.zcertstore_certs.argtypes = [zcertstore_p]
+lib.zcertstore_state.restype = c_void_p
+lib.zcertstore_state.argtypes = [zcertstore_p]
 lib.zcertstore_test.restype = None
 lib.zcertstore_test.argtypes = [c_bool]
 
@@ -1085,6 +1087,12 @@ for destroying it.  The caller does not take ownership of the zcert_t
 objects.
         """
         return Zlistx(lib.zcertstore_certs(self._as_parameter_), True)
+
+    def state(self):
+        """
+        Return the state stored in certstore
+        """
+        return c_void_p(lib.zcertstore_state(self._as_parameter_))
 
     @staticmethod
     def test(verbose):
