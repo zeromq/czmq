@@ -493,6 +493,10 @@ void
 zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
+// Return the state stored in certstore
+void *
+    zcertstore_state (zcertstore_t *self);
+
 // Self test of this class
 void
     zcertstore_test (bool verbose);

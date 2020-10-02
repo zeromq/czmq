@@ -95,6 +95,13 @@ public class Zcertstore implements AutoCloseable {
         return new Zlistx (__certs (self));
     }
     /*
+    Return the state stored in certstore
+    */
+    native static long __state (long self);
+    public long state () {
+        return __state (self);
+    }
+    /*
     Self test of this class
     */
     native static void __test (boolean verbose);

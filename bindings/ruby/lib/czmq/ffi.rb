@@ -135,6 +135,7 @@ module CZMQ
       attach_function :zcertstore_empty, [:pointer], :void, **opts
       attach_function :zcertstore_print, [:pointer], :void, **opts
       attach_function :zcertstore_certs, [:pointer], :pointer, **opts
+      attach_function :zcertstore_state, [:pointer], :pointer, **opts
       attach_function :zcertstore_test, [:bool], :void, **opts
 
       require_relative 'ffi/zcertstore'

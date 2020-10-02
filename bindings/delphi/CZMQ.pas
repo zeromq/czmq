@@ -188,6 +188,9 @@ uses
     // for destroying it.  The caller does not take ownership of the zcert_t
     // objects.
     function Certs: IZlistx;
+
+    // Return the state stored in certstore
+    function State: Pointer;
   end;
 
   // work with memory chunks
@@ -2550,6 +2553,9 @@ uses
     // for destroying it.  The caller does not take ownership of the zcert_t
     // objects.
     function Certs: IZlistx;
+
+    // Return the state stored in certstore
+    function State: Pointer;
   end;
 
   // work with memory chunks
@@ -6207,6 +6213,11 @@ end;
   function TZcertstore.Certs: IZlistx;
   begin
     Result := TZlistx.Wrap(zcertstore_certs(FHandle), true);
+  end;
+
+  function TZcertstore.State: Pointer;
+  begin
+    Result := zcertstore_state(FHandle);
   end;
 
  (* TZchunk *)
