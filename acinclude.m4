@@ -4,7 +4,6 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
         [CFLAGS="${CFLAGS} -pthread"],
         [AC_MSG_WARN([cannot link with -pthread.])]
     )
-    AC_CHECK_DECLS([AI_V4MAPPED], [], [], [[#include <netdb.h>]])
 
     AC_CACHE_CHECK([whether SOCK_CLOEXEC is supported], [czmq_cv_sock_cloexec],
         [AC_TRY_RUN([/* SOCK_CLOEXEC test */

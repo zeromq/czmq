@@ -76,6 +76,9 @@ if (NOT HAVE_NET_IF_H)
     CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
 endif()
 
+include(CheckSymbolExists)
+check_symbol_exists(AI_V4MAPPED "czmq.h" HAVE_DECL_AI_V4MAPPED)
+
 file(REMOVE "${SOURCE_DIR}/src/platform.h")
 
 file(WRITE "${PROJECT_BINARY_DIR}/platform.h.in" "
@@ -84,6 +87,7 @@ file(WRITE "${PROJECT_BINARY_DIR}/platform.h.in" "
 #cmakedefine HAVE_NET_IF_MEDIA_H
 #cmakedefine HAVE_GETIFADDRS
 #cmakedefine HAVE_FREEIFADDRS
+#cmakedefine01 HAVE_DECL_AI_V4MAPPED
 ")
 
 configure_file("${PROJECT_BINARY_DIR}/platform.h.in" "${PROJECT_BINARY_DIR}/platform.h")
