@@ -44,11 +44,4 @@ int main(int argc, char *argv [])
   endif()
 endif()
 
-include(CheckSymbolExists)
-check_symbol_exists(AI_V4MAPPED "netdb.h" HAVE_DECL_AI_V4MAPPED)
-
-file(APPEND "${PROJECT_BINARY_DIR}/platform.h.in" "
-#cmakedefine01 HAVE_DECL_AI_V4MAPPED
-")
-
 configure_file("${PROJECT_BINARY_DIR}/platform.h.in" "${PROJECT_BINARY_DIR}/platform.h")

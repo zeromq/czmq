@@ -912,6 +912,9 @@ AC_TYPE_UINT32_T
 AC_C_VOLATILE
 AC_C_BIGENDIAN
 
+# Check for symbols (function, variable, or macro)
+AC_CHECK_DECLS([AI_V4MAPPED], [], [], [[#include <czmq.h>]])
+
 AM_CONDITIONAL(ENABLE_SHARED, test "x$enable_shared" = "xyes")
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
 AM_CONDITIONAL(ON_CYGWIN, test "x$czmq_on_cygwin" = "xyes")
