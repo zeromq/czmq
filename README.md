@@ -334,6 +334,10 @@ Include `czmq.h` in your application and link with libczmq. Here is a typical gc
 
     gcc myapp.c -o myapp -lczmq -lzmq
 
+Note: if you want to use the draft APIs you'll need to define `CZMQ_BUILD_DRAFT_API=1` 
+and `ZMQ_BUILD_DRAFT_API=1` in order to unlock them. This handled automatically 
+by platforms using pkg-config but not through cmake on Windows for example.
+
 ### Use from Other Languages
 
 This is a list of auto-generated bindings:
