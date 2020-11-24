@@ -435,9 +435,14 @@ zosc_retr(zosc_t *self, const char *format, ...)
 zosc_t *
 zosc_dup (zosc_t *self)
 {
-    byte* data = (byte *)zmalloc( zchunk_size(self->chunk) );
-    memcpy(data, zchunk_data(self->chunk), zchunk_size( self->chunk ));
-    return zosc_frommem( (char *)data, zchunk_size( self->chunk ));
+    if (self)
+    {
+        byte* data = (byte *)zmalloc( zchunk_size(self->chunk) );
+        memcpy(data, zchunk_data(self->chunk), zchunk_size( self->chunk ));
+        return zosc_frommem( (char *)data, zchunk_size( self->chunk ));
+    }
+    else
+        return NULL;
 }
 
 //  Transform zosc into a zframe that can be sent in a message.
@@ -572,8 +577,15 @@ zosc_test (bool verbose)
     zosc_t *testmsg = zosc_frommem(p2, 48);
     assert( testmsg );
     assert(streq ( zosc_address(testmsg), "/test"));
-    const char *format = zosc_format(testmsg);
     assert(streq ( zosc_format(testmsg), "ihTfds" ) );
+    // test duplicate
+    zosc_t *testmsgdup = zosc_dup(NULL);
+    assert( testmsgdup == NULL );
+    testmsgdup = zosc_dup(testmsg);
+    assert( testmsgdup );
+    assert(streq ( zosc_address(testmsgdup), "/test"));
+    assert(streq ( zosc_format(testmsgdup), "ihTfds" ) );
+    zosc_destroy(&testmsgdup);
     // check value
     int itest = -1;
     int64_t ltest = -1;
@@ -581,6 +593,7 @@ zosc_test (bool verbose)
     float ftest = -1.f;
     double dtest = -1.;
     char *stest;
+    const char *format = zosc_format(testmsg);
     zosc_retr(testmsg, format, &itest, &ltest, &btest, &ftest, &dtest, &stest);
     assert( itest == 2 );
     assert( ltest == 1844674407370 );
