@@ -4684,7 +4684,7 @@ zframe_t *
 zosc_t *
     zosc_unpack (zframe_t *frame);
 
-// Dump OSC message to stderr, for debugging and tracing.
+// Dump OSC message to stdout, for debugging and tracing.
 void
     zosc_print (zosc_t *self);
 

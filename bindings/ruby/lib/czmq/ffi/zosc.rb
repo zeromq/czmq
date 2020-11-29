@@ -277,7 +277,7 @@ module CZMQ
         result
       end
 
-      # Dump OSC message to stderr, for debugging and tracing.
+      # Dump OSC message to stdout, for debugging and tracing.
       #
       # @return [void]
       def print()

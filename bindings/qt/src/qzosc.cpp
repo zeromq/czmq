@@ -127,7 +127,7 @@ QZosc * QZosc::unpack (QZframe *frame)
 }
 
 ///
-//  Dump OSC message to stderr, for debugging and tracing.
+//  Dump OSC message to stdout, for debugging and tracing.
 void QZosc::print ()
 {
     zosc_print (self);

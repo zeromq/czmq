@@ -9700,7 +9700,7 @@ Take ownership of the chunk.
 
     def print(self):
         """
-        Dump OSC message to stderr, for debugging and tracing.
+        Dump OSC message to stdout, for debugging and tracing.
         """
         return lib.zosc_print(self._as_parameter_)
 
