@@ -140,7 +140,7 @@ CZMQ_EXPORT zosc_t *
     zosc_unpack (zframe_t *frame);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Dump OSC message to stderr, for debugging and tracing.
+//  Dump OSC message to stdout, for debugging and tracing.
 CZMQ_EXPORT void
     zosc_print (zosc_t *self);
 

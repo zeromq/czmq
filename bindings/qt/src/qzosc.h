@@ -72,7 +72,7 @@ public:
     //  Transform a zframe into a zosc.
     static QZosc * unpack (QZframe *frame);
 
-    //  Dump OSC message to stderr, for debugging and tracing.
+    //  Dump OSC message to stdout, for debugging and tracing.
     void print ();
 
     //  Probe the supplied object, and report if it looks like a zosc_t.

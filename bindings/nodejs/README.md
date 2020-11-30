@@ -5132,7 +5132,7 @@ Transform a zframe into a zosc.
 nothing my_zosc.print ()
 ```
 
-Dump OSC message to stderr, for debugging and tracing.
+Dump OSC message to stdout, for debugging and tracing.
 
 ```
 nothing my_zosc.test (Boolean)

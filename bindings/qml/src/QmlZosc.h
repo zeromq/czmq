@@ -71,7 +71,7 @@ public slots:
     //  Transform zosc into a zframe that can be sent in a message.
     QmlZframe *pack ();
 
-    //  Dump OSC message to stderr, for debugging and tracing.
+    //  Dump OSC message to stdout, for debugging and tracing.
     void print ();
 };
 

@@ -171,7 +171,7 @@ public class Zosc implements AutoCloseable {
         return new Zosc (__unpack (frame.self));
     }
     /*
-    Dump OSC message to stderr, for debugging and tracing.
+    Dump OSC message to stdout, for debugging and tracing.
     */
     native static void __print (long self);
     public void print () {

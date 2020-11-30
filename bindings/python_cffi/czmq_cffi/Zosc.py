@@ -164,7 +164,7 @@ See the class's test method for more examples how to use the class.
 
     def print_py(self):
         """
-        Dump OSC message to stderr, for debugging and tracing.
+        Dump OSC message to stdout, for debugging and tracing.
         """
         utils.lib.zosc_print(self._p)
 

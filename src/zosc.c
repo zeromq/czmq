@@ -477,11 +477,100 @@ zosc_unpack (zframe_t *frame)
     return zosc_fromframe(frame);
 }
 
-//  Dump OSC message to stderr, for debugging and tracing.
+//  Dump OSC message to stdout, for debugging and tracing.
 void
 zosc_print (zosc_t *self)
 {
-    zchunk_print(self->chunk);
+    assert(self);
+    assert(self->format);
+
+    size_t needle = self->data_begin;
+    int i=0;
+    fprintf(stdout, "%s %s", self->address, self->format);
+    while(self->format[i])
+    {
+        switch (self->format[i])
+        {
+            case 'i' :
+            {
+                uint32_t int_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
+                fprintf(stdout, " %i", int_v);
+                needle += sizeof (uint32_t);
+                break;
+            }
+            case 'h':
+            {
+                uint64_t int_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + (needle * sizeof (char) )));
+                fprintf(stdout, " %ld", (long)int_v);
+                needle += sizeof (uint64_t);
+                break;
+            }
+            case 'f':
+            {
+                float flt_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
+                fprintf(stdout, " %.6f", (double)flt_v);
+                needle += sizeof (float);
+                break;
+            }
+            case 'd':
+            {
+                double dbl_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + needle));
+                fprintf(stdout, " %f", dbl_v);
+                needle += sizeof (double);
+                break;
+            }
+            case 's':
+            {
+                //  not sure if the double pointer is the way to go
+                char *str = (char*)(zchunk_data( self->chunk ) + needle);
+                fprintf(stdout, " %s", str);
+                size_t l = strlen((char*)(zchunk_data( self->chunk ) + needle));
+                needle += l + 1;
+                needle = (needle + 3) & (size_t)~0x03;
+                break;
+            }
+            case 'S': // never used???
+                break;
+            case 'c':
+            {
+                char chr = (*(char*)(zchunk_data( self->chunk ) +
+                                        needle + 3));
+                fprintf(stdout, " %c", chr);
+                needle += sizeof (int);  // advance multitude of 4!
+                break;
+            }
+            case 'm':
+            {
+                uint32_t midi = ntohl(*(uint32_t *)(zchunk_data( self->chunk ) + needle));
+                fprintf(stdout, " 0x%08x", midi);
+                needle += sizeof (uint32_t);
+                break;
+            }
+            case 'T':
+            {
+                // value only determined based on the format!
+                fprintf(stdout, " True");
+                break;
+            }
+            case 'F':
+            {
+                fprintf(stdout, " False");
+                break;
+            }
+            case 'N': // never used???
+            case 'I': // never used???
+            {
+                needle++;
+                break;
+            }
+        default:
+            zsys_error("format identifier '%c' not matched", self->format[i]);
+
+
+        }
+        i++;
+    }
+    fprintf(stdout, "\n");
 }
 
 bool
@@ -610,6 +699,7 @@ zosc_test (bool verbose)
     assert(conm);
     assert(streq(zosc_address(conm), "/construct"));
     assert(streq(zosc_format(conm), "iihfdscF"));
+    if (verbose) zosc_print(conm);
     int x,y;
     int64_t z;
     float zz;
