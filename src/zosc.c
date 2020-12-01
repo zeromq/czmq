@@ -237,9 +237,9 @@ zosc_create (const char *address, const char *format, ...)
                 char char_v = (char)va_arg( argptr, int); // the standard dictates to use int for smaller vars
                 //  osc dictates we need to supply data in multitudes of 4 bytes so create a 0 array to hold our char
                 //  Not sure if this correct on big endian machines!!!
-                char v[4] = "\x00\x00\x00\x00";
+                char v[5] = "\x00\x00\x00\x00"; // a char array on windows always wants a terminating null so we need size 5 :|
                 v[3] = char_v;
-                size = zchunk_extend( self->chunk, v, sizeof(v) );
+                size = zchunk_extend( self->chunk, v, 4 );
                 break;
             }
             case 'm': // midi data
