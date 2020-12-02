@@ -185,6 +185,33 @@ public class Zosc implements AutoCloseable {
         return __is (self);
     }
     /*
+    Return a pointer to the item at the head of the OSC data.
+    Sets the given char argument to the type tag of the data.
+    If the message is empty, returns NULL and the sets the
+    given char to NULL.
+    */
+    native static long __first (long self, char type);
+    public long first (char type) {
+        return __first (self, type);
+    }
+    /*
+    Return the next item of the OSC message. If the list is empty, returns
+    NULL. To move to the start of the OSC message call zosc_first ().
+    */
+    native static long __next (long self, char type);
+    public long next (char type) {
+        return __next (self, type);
+    }
+    /*
+    Return a pointer to the item at the tail of the OSC message.
+    Sets the given char argument to the type tag of the data. If
+    the message is empty, returns NULL.
+    */
+    native static long __last (long self, char type);
+    public long last (char type) {
+        return __last (self, type);
+    }
+    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

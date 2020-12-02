@@ -73,6 +73,21 @@ public slots:
 
     //  Dump OSC message to stdout, for debugging and tracing.
     void print ();
+
+    //  Return a pointer to the item at the head of the OSC data.
+    //  Sets the given char argument to the type tag of the data.
+    //  If the message is empty, returns NULL and the sets the
+    //  given char to NULL.
+    void *first (char *type);
+
+    //  Return the next item of the OSC message. If the list is empty, returns
+    //  NULL. To move to the start of the OSC message call zosc_first ().
+    void *next (char *type);
+
+    //  Return a pointer to the item at the tail of the OSC message.
+    //  Sets the given char argument to the type tag of the data. If
+    //  the message is empty, returns NULL.
+    void *last (char *type);
 };
 
 class QmlZoscAttached : public QObject

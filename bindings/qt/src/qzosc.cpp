@@ -143,6 +143,36 @@ bool QZosc::is (void *self)
 }
 
 ///
+//  Return a pointer to the item at the head of the OSC data.
+//  Sets the given char argument to the type tag of the data.
+//  If the message is empty, returns NULL and the sets the
+//  given char to NULL.
+void * QZosc::first (char *type)
+{
+    void * rv = zosc_first (self, type);
+    return rv;
+}
+
+///
+//  Return the next item of the OSC message. If the list is empty, returns
+//  NULL. To move to the start of the OSC message call zosc_first ().
+void * QZosc::next (char *type)
+{
+    void * rv = zosc_next (self, type);
+    return rv;
+}
+
+///
+//  Return a pointer to the item at the tail of the OSC message.
+//  Sets the given char argument to the type tag of the data. If
+//  the message is empty, returns NULL.
+void * QZosc::last (char *type)
+{
+    void * rv = zosc_last (self, type);
+    return rv;
+}
+
+///
 //  Self test of this class.
 void QZosc::test (bool verbose)
 {

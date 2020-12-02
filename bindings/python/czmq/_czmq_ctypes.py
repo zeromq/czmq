@@ -9509,6 +9509,12 @@ lib.zosc_print.restype = None
 lib.zosc_print.argtypes = [zosc_p]
 lib.zosc_is.restype = c_bool
 lib.zosc_is.argtypes = [c_void_p]
+lib.zosc_first.restype = c_void_p
+lib.zosc_first.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_next.restype = c_void_p
+lib.zosc_next.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_last.restype = c_void_p
+lib.zosc_last.argtypes = [zosc_p, POINTER(char_p)]
 lib.zosc_test.restype = None
 lib.zosc_test.argtypes = [c_bool]
 
@@ -9710,6 +9716,30 @@ Take ownership of the chunk.
         Probe the supplied object, and report if it looks like a zosc_t.
         """
         return lib.zosc_is(self)
+
+    def first(self, type):
+        """
+        Return a pointer to the item at the head of the OSC data.
+Sets the given char argument to the type tag of the data.
+If the message is empty, returns NULL and the sets the
+given char to NULL.
+        """
+        return c_void_p(lib.zosc_first(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def next(self, type):
+        """
+        Return the next item of the OSC message. If the list is empty, returns
+NULL. To move to the start of the OSC message call zosc_first ().
+        """
+        return c_void_p(lib.zosc_next(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def last(self, type):
+        """
+        Return a pointer to the item at the tail of the OSC message.
+Sets the given char argument to the type tag of the data. If
+the message is empty, returns NULL.
+        """
+        return c_void_p(lib.zosc_last(self._as_parameter_, byref(char_p.from_param(type))))
 
     @staticmethod
     def test(verbose):

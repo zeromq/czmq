@@ -175,6 +175,30 @@ See the class's test method for more examples how to use the class.
         """
         return utils.lib.zosc_is(self._p)
 
+    def first(self, type):
+        """
+        Return a pointer to the item at the head of the OSC data.
+        Sets the given char argument to the type tag of the data.
+        If the message is empty, returns NULL and the sets the
+        given char to NULL.
+        """
+        return utils.lib.zosc_first(self._p, utils.ffi.new("char_t **", type._p))
+
+    def next(self, type):
+        """
+        Return the next item of the OSC message. If the list is empty, returns
+        NULL. To move to the start of the OSC message call zosc_first ().
+        """
+        return utils.lib.zosc_next(self._p, utils.ffi.new("char_t **", type._p))
+
+    def last(self, type):
+        """
+        Return a pointer to the item at the tail of the OSC message.
+        Sets the given char argument to the type tag of the data. If
+        the message is empty, returns NULL.
+        """
+        return utils.lib.zosc_last(self._p, utils.ffi.new("char_t **", type._p))
+
     @staticmethod
     def test(verbose):
         """

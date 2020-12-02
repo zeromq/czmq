@@ -150,6 +150,27 @@ CZMQ_EXPORT bool
     zosc_is (void *self);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Return a pointer to the item at the head of the OSC data.
+//  Sets the given char argument to the type tag of the data.
+//  If the message is empty, returns NULL and the sets the
+//  given char to NULL.
+CZMQ_EXPORT void *
+    zosc_first (zosc_t *self, char *type);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return the next item of the OSC message. If the list is empty, returns
+//  NULL. To move to the start of the OSC message call zosc_first ().
+CZMQ_EXPORT void *
+    zosc_next (zosc_t *self, char *type);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return a pointer to the item at the tail of the OSC message.
+//  Sets the given char argument to the type tag of the data. If
+//  the message is empty, returns NULL.
+CZMQ_EXPORT void *
+    zosc_last (zosc_t *self, char *type);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.
 CZMQ_EXPORT void
     zosc_test (bool verbose);

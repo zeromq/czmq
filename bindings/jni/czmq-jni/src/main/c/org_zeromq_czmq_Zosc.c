@@ -137,6 +137,27 @@ Java_org_zeromq_czmq_Zosc__1_1is (JNIEnv *env, jclass c, jlong self)
     return is_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zosc__1_1first (JNIEnv *env, jclass c, jlong self, jchar type)
+{
+    jlong first_ = (jlong) (intptr_t) zosc_first ((zosc_t *) (intptr_t) self, (char *) (intptr_t) &type);
+    return first_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zosc__1_1next (JNIEnv *env, jclass c, jlong self, jchar type)
+{
+    jlong next_ = (jlong) (intptr_t) zosc_next ((zosc_t *) (intptr_t) self, (char *) (intptr_t) &type);
+    return next_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zosc__1_1last (JNIEnv *env, jclass c, jlong self, jchar type)
+{
+    jlong last_ = (jlong) (intptr_t) zosc_last ((zosc_t *) (intptr_t) self, (char *) (intptr_t) &type);
+    return last_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zosc__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {

@@ -82,6 +82,30 @@ void QmlZosc::print () {
     zosc_print (self);
 };
 
+///
+//  Return a pointer to the item at the head of the OSC data.
+//  Sets the given char argument to the type tag of the data.
+//  If the message is empty, returns NULL and the sets the
+//  given char to NULL.
+void *QmlZosc::first (char *type) {
+    return zosc_first (self, type);
+};
+
+///
+//  Return the next item of the OSC message. If the list is empty, returns
+//  NULL. To move to the start of the OSC message call zosc_first ().
+void *QmlZosc::next (char *type) {
+    return zosc_next (self, type);
+};
+
+///
+//  Return a pointer to the item at the tail of the OSC message.
+//  Sets the given char argument to the type tag of the data. If
+//  the message is empty, returns NULL.
+void *QmlZosc::last (char *type) {
+    return zosc_last (self, type);
+};
+
 
 QObject* QmlZosc::qmlAttachedProperties(QObject* object) {
     return new QmlZoscAttached(object);

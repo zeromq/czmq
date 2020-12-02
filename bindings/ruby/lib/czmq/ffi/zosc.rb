@@ -296,6 +296,45 @@ module CZMQ
         result
       end
 
+      # Return a pointer to the item at the head of the OSC data.
+      # Sets the given char argument to the type tag of the data.
+      # If the message is empty, returns NULL and the sets the
+      # given char to NULL.
+      #
+      # @param type [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
+      def first(type)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_first(self_p, type)
+        result
+      end
+
+      # Return the next item of the OSC message. If the list is empty, returns
+      # NULL. To move to the start of the OSC message call zosc_first ().
+      #
+      # @param type [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
+      def next(type)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_next(self_p, type)
+        result
+      end
+
+      # Return a pointer to the item at the tail of the OSC message.
+      # Sets the given char argument to the type tag of the data. If
+      # the message is empty, returns NULL.
+      #
+      # @param type [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
+      def last(type)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_last(self_p, type)
+        result
+      end
+
       # Self test of this class.
       #
       # @param verbose [Boolean]

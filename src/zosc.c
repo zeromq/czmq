@@ -34,7 +34,8 @@ struct _zosc_t {
     char        *format;        //  the string containing type hints
     zchunk_t    *chunk;         //  zchunk containing the complete OSC data
     size_t      data_begin;     //  start position of actual OSC data
-    // time tag???
+    int         cursor_index;   //  cursor position of the iterator
+    size_t      *data_indexes;  //  data offset positions of the elements in the message
 };
 
 
@@ -50,6 +51,7 @@ zosc_new (const char *address)
     self->address = strdup(address);
     assert(self->address);
     self->chunk = zchunk_new(NULL, 0);
+    self->data_indexes = NULL;
     return self;
 }
 
@@ -67,6 +69,8 @@ zosc_destroy (zosc_t **self_p)
         self->address = NULL;
         self->format = NULL;
         zchunk_destroy(&self->chunk);
+        if (self->data_indexes)
+            free(self->data_indexes);
 
         //  Free object itself
         free (self);
@@ -158,6 +162,7 @@ zosc_create (const char *address, const char *format, ...)
     size_t init_size = strlen(address) + strlen(format) * 5; // 5 times format string as almost all types are 4 bytes
     init_size += 2;       // to count for the two terminating \0's
     self->chunk = zchunk_new(NULL, init_size);
+    self->data_indexes = NULL;
 
     size_t size = zchunk_extend(self->chunk, address, strlen(address) + 1);
     size_t newsize = (size + 3) & (size_t)~0x03;
@@ -579,6 +584,43 @@ zosc_is (void *self)
     zosc_t *test = (zosc_t *)self;
     // for now just test if there's an address and format string
     return strlen( test->address ) && strlen( test->format );
+}
+
+static void
+s_require_indexes(zosc_t *self)
+{
+    assert(self);
+
+}
+
+// Return a pointer to the item at the head of the OSC data.
+// Sets the given char argument to the type tag of the data.
+// If the message is empty, returns NULL and the sets the
+// given char to NULL.
+void *
+zosc_first (zosc_t *self, char *type)
+{
+    assert(self);
+    s_require_indexes(self);
+}
+
+// Return the next item of the OSC message. If the list is empty, returns
+// NULL. To move to the start of the OSC message call zosc_first ().
+void *
+zosc_next (zosc_t *self, char *type)
+{
+    assert(self);
+    s_require_indexes(self);
+}
+
+// Return a pointer to the item at the tail of the OSC message.
+// Sets the given char argument to the type tag of the data. If
+// the message is empty, returns NULL.
+void *
+zosc_last (zosc_t *self, char *type)
+{
+    assert(self);
+    s_require_indexes(self);
 }
 
 //  --------------------------------------------------------------------------
