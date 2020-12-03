@@ -499,7 +499,8 @@ zosc_print (zosc_t *self)
         {
             case 'i' :
             {
-                uint32_t int_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
+                void *data = zchunk_data( self->chunk ) + needle;
+                int32_t int_v = (int32_t)ntohl(*(uint32_t *)data);
                 fprintf(stdout, " %i", int_v);
                 needle += sizeof (uint32_t);
                 break;
@@ -717,6 +718,55 @@ zosc_last (zosc_t *self, char *type)
     return zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
 }
 
+int
+zosc_pop_int32(zosc_t *self, int32_t *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'i')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = (int32_t)ntohl(*((uint32_t *)data));
+    return 0;
+}
+
+int
+zosc_pop_int64(zosc_t *self, int64_t *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'h')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = (int64_t)ntohll(*((uint64_t *)data));
+    return 0;
+}
+
+int
+zosc_pop_float(zosc_t *self, float *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'f')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    uint32_t flt_v = ntohl(*((uint32_t *)data));
+    *val = *((float *)&flt_v);  // tricky but it works, a normal cast gets it wrong
+    return 0;
+}
+
+int
+zosc_pop_double(zosc_t *self, double *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'd')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    uint64_t dbl_v = ntohll(*((uint64_t *)data));
+    *val = *((double *)&dbl_v);  // tricky but it works, a normal cast gets it wrong
+    return 0;
+}
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
@@ -831,7 +881,7 @@ zosc_test (bool verbose)
 
     // test constructing messages
     int64_t prez = 3;
-    zosc_t* conm = zosc_create("/construct", "iihfdscF", 1,2, prez, 3.14,6.283185307179586, "greetings", 'q');
+    zosc_t* conm = zosc_create("/construct", "iihfdscF", -2,2, prez, 3.14,6.283185307179586, "greetings", 'q');
     assert(conm);
     assert(streq(zosc_address(conm), "/construct"));
     assert(streq(zosc_format(conm), "iihfdscF"));
@@ -844,7 +894,7 @@ zosc_test (bool verbose)
     char q = 'z';
     bool Ftest = true;
     zosc_retr(conm, "iihfdscF", &x, &y, &z, &zz, &zzz, &ss, &q, &Ftest);
-    assert( x==1 );
+    assert( x==-2 );
     assert( y==2 );
     assert( z==3 );
     assert( fabsf(zz-3.14f) < FLT_EPSILON );
@@ -864,28 +914,37 @@ zosc_test (bool verbose)
         {
         case('i'):
         {
-            uint32_t test = ntohl(*((uint32_t *)data));
-            assert( test == 1 || test == 2);
+            int32_t test = 9;
+            int rc = zosc_pop_int32(conm, &test);
+            assert(rc == 0);
+            assert( test == -2 || test == 2);
             break;
         }
         case('h'):
         {
-            uint64_t test = ntohll(*((uint64_t *)data));
-            assert( test == 3);
+            int32_t fail = 9;
+            int rc = zosc_pop_int32(conm, &fail); // this will fail
+            assert(rc == -1);
+            int64_t test = 9;
+            rc = zosc_pop_int64(conm, &test);
+            assert(rc == 0);
+            assert( test == 3 );
             break;
         }
         case('f'):
         {
-            uint32_t flt_v = ntohl(*(uint32_t *)data);
-            float *v = (float *)&flt_v;  // hackish
-            assert( fabsf(*v-3.14f) < FLT_EPSILON );
+            float flt_v = 0.f;
+            int rc = zosc_pop_float(conm, &flt_v);
+            assert(rc == 0);
+            assert( fabsf(flt_v-3.14f) < FLT_EPSILON );
             break;
         }
         case 'd':
         {
-            uint64_t dbl_v = ntohll(*(uint64_t*)data);
-            double *v = (double *)&dbl_v;
-            assert( fabs(*v-6.283185307179586) < DBL_EPSILON );
+            double dbl_v = 0.;
+            int rc = zosc_pop_double(conm, &dbl_v);
+            assert(rc == 0);
+            assert( fabs(dbl_v-6.283185307179586) < DBL_EPSILON );
             break;
         }
         case 's':
