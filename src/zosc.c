@@ -513,15 +513,17 @@ zosc_print (zosc_t *self)
             }
             case 'f':
             {
-                float flt_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
-                fprintf(stdout, " %.6f", (double)flt_v);
+                uint32_t flt_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
+                float *v = (float *)&flt_v;  // hackish
+                fprintf(stdout, " %.6f", (double)*v);
                 needle += sizeof (float);
                 break;
             }
             case 'd':
             {
-                double dbl_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + needle));
-                fprintf(stdout, " %f", dbl_v);
+                uint64_t dbl_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + needle));
+                double *v = (double *)&dbl_v;
+                fprintf(stdout, " %f", *v);
                 needle += sizeof (double);
                 break;
             }
@@ -593,7 +595,7 @@ s_require_indexes(zosc_t *self)
     assert(self);
     assert(self->data_begin);
     if (self->data_indexes) return;
-    self->data_indexes = zmalloc( sizeof(size_t) * strlen(self->format) );
+    self->data_indexes = zmalloc( sizeof(size_t) * (strlen(self->format)+1) );
     self->data_indexes[0] = self->data_begin;
     // generate the indexes
     size_t needle = self->data_begin;
@@ -661,6 +663,7 @@ s_require_indexes(zosc_t *self)
         // save current element bytearray index
         stridx++;
         self->data_indexes[stridx] = needle;
+        zsys_info("stridx: %i, strlen format: %i", stridx, strlen(self->format));
     }
 }
 
@@ -857,6 +860,53 @@ zosc_test (bool verbose)
     while ( data )
     {
         zsys_info("type tag is %c", type);
+        switch (type)
+        {
+        case('i'):
+        {
+            uint32_t test = ntohl(*((uint32_t *)data));
+            assert( test == 1 || test == 2);
+            break;
+        }
+        case('h'):
+        {
+            uint64_t test = ntohll(*((uint64_t *)data));
+            assert( test == 3);
+            break;
+        }
+        case('f'):
+        {
+            uint32_t flt_v = ntohl(*(uint32_t *)data);
+            float *v = (float *)&flt_v;  // hackish
+            assert( fabsf(*v-3.14f) < FLT_EPSILON );
+            break;
+        }
+        case 'd':
+        {
+            uint64_t dbl_v = ntohll(*(uint64_t*)data);
+            double *v = (double *)&dbl_v;
+            assert( fabs(*v-6.283185307179586) < DBL_EPSILON );
+            break;
+        }
+        case 's':
+        {
+            char *str = (char *)data;
+            assert(streq(str, "greetings"));
+            break;
+        }
+        case 'c':
+        {
+            char chr = *((char*)data+3);
+            assert(chr == 'q');
+            break;
+        }
+        case 'F':
+        {
+            break;
+        }
+        default:
+            assert(0);
+        }
         data = zosc_next(conm, &type);
     }
 
