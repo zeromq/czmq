@@ -34,7 +34,8 @@ struct _zosc_t {
     char        *format;        //  the string containing type hints
     zchunk_t    *chunk;         //  zchunk containing the complete OSC data
     size_t      data_begin;     //  start position of actual OSC data
-    // time tag???
+    int         cursor_index;   //  cursor position of the iterator
+    size_t      *data_indexes;  //  data offset positions of the elements in the message
 };
 
 
@@ -50,6 +51,8 @@ zosc_new (const char *address)
     self->address = strdup(address);
     assert(self->address);
     self->chunk = zchunk_new(NULL, 0);
+    self->data_begin = 0;
+    self->data_indexes = NULL;
     return self;
 }
 
@@ -67,6 +70,8 @@ zosc_destroy (zosc_t **self_p)
         self->address = NULL;
         self->format = NULL;
         zchunk_destroy(&self->chunk);
+        if (self->data_indexes)
+            free(self->data_indexes);
 
         //  Free object itself
         free (self);
@@ -158,6 +163,7 @@ zosc_create (const char *address, const char *format, ...)
     size_t init_size = strlen(address) + strlen(format) * 5; // 5 times format string as almost all types are 4 bytes
     init_size += 2;       // to count for the two terminating \0's
     self->chunk = zchunk_new(NULL, init_size);
+    self->data_indexes = NULL;
 
     size_t size = zchunk_extend(self->chunk, address, strlen(address) + 1);
     size_t newsize = (size + 3) & (size_t)~0x03;
@@ -493,7 +499,8 @@ zosc_print (zosc_t *self)
         {
             case 'i' :
             {
-                uint32_t int_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
+                void *data = zchunk_data( self->chunk ) + needle;
+                int32_t int_v = (int32_t)ntohl(*(uint32_t *)data);
                 fprintf(stdout, " %i", int_v);
                 needle += sizeof (uint32_t);
                 break;
@@ -507,15 +514,17 @@ zosc_print (zosc_t *self)
             }
             case 'f':
             {
-                float flt_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
-                fprintf(stdout, " %.6f", (double)flt_v);
+                uint32_t flt_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
+                float *v = (float *)&flt_v;  // hackish
+                fprintf(stdout, " %.6f", (double)*v);
                 needle += sizeof (float);
                 break;
             }
             case 'd':
             {
-                double dbl_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + needle));
-                fprintf(stdout, " %f", dbl_v);
+                uint64_t dbl_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + needle));
+                double *v = (double *)&dbl_v;
+                fprintf(stdout, " %f", *v);
                 needle += sizeof (double);
                 break;
             }
@@ -579,6 +588,230 @@ zosc_is (void *self)
     zosc_t *test = (zosc_t *)self;
     // for now just test if there's an address and format string
     return strlen( test->address ) && strlen( test->format );
+}
+
+static void
+s_require_indexes(zosc_t *self)
+{
+    assert(self);
+    assert(self->data_begin);
+    if (self->data_indexes) return;
+    self->data_indexes = (size_t *)zmalloc( sizeof(size_t) * (strlen(self->format)+1) );
+    self->data_indexes[0] = self->data_begin;
+    // generate the indexes
+    size_t needle = self->data_begin;
+    int stridx = 0;
+    while ( self->format[stridx] )
+    {
+        switch (self->format[stridx])
+        {
+            case 'i' :
+            {
+                needle += sizeof (uint32_t);
+                break;
+            }
+            case 'h':
+            {
+                needle += sizeof (uint64_t);
+                break;
+            }
+            case 'f':
+            {
+                needle += sizeof (float);
+                break;
+            }
+            case 'd':
+            {
+                needle += sizeof (double);
+                break;
+            }
+            case 's':
+            {
+                size_t l = strlen((char*)(zchunk_data( self->chunk ) + needle));
+                needle += l + 1;
+                needle = (needle + 3) & (size_t)~0x03;
+                break;
+            }
+            case 'S': // never used???
+                break;
+            case 'c':
+            {
+                needle += sizeof (int);  // advance multitude of 4!
+                break;
+            }
+            case 'm':
+            {
+                needle += sizeof (uint32_t);
+                break;
+            }
+            case 'T':
+            {
+                break;
+            }
+            case 'F':
+            {
+                break;
+            }
+            case 'N': // never used???
+            case 'I': // never used???
+            {
+                needle++;
+                break;
+            }
+            default:
+                zsys_error("format identifier '%c' not matched", *self->format+stridx);
+        }
+        // save current element bytearray index
+        stridx++;
+        self->data_indexes[stridx] = needle;
+        zsys_info("stridx: %i, strlen format: %i", stridx, strlen(self->format));
+    }
+}
+
+// Return a pointer to the item at the head of the OSC data.
+// Sets the given char argument to the type tag of the data.
+// If the message is empty, returns NULL.
+const void *
+zosc_first (zosc_t *self, char *type)
+{
+    assert(self);
+    if (self->data_begin == 0 )
+        return NULL;    // empty message
+
+    s_require_indexes(self);
+    self->cursor_index = 0;
+    *type = self->format[0];
+    return zchunk_data(self->chunk) + self->data_indexes[0];
+}
+
+// Return the next item of the OSC message. If the list is empty, returns
+// NULL. To move to the start of the OSC message call zosc_first ().
+const void *
+zosc_next (zosc_t *self, char *type)
+{
+    assert(self);
+    if (self->data_begin == 0 )
+        return NULL;    // empty message
+
+    s_require_indexes(self);
+    self->cursor_index++;
+    if ( self->cursor_index > (int)strlen(self->format)-1 )
+        return NULL;    //  no more elements
+
+    *type = self->format[self->cursor_index];
+    return zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+}
+
+// Return a pointer to the item at the tail of the OSC message.
+// Sets the given char argument to the type tag of the data. If
+// the message is empty, returns NULL.
+const void *
+zosc_last (zosc_t *self, char *type)
+{
+    assert(self);
+    if (self->data_begin == 0 )
+        return NULL;    // empty message
+    s_require_indexes(self);
+
+    self->cursor_index = (int)strlen(self->format)-1;
+    *type = self->format[self->cursor_index];
+    return zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+}
+
+int
+zosc_pop_int32(zosc_t *self, int *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'i')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = (int32_t)ntohl(*((uint32_t *)data));
+    return 0;
+}
+
+int
+zosc_pop_int64(zosc_t *self, int64_t *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'h')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = (int64_t)ntohll(*((uint64_t *)data));
+    return 0;
+}
+
+int
+zosc_pop_float(zosc_t *self, float *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'f')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    uint32_t flt_v = ntohl(*((uint32_t *)data));
+    *val = *((float *)&flt_v);  // tricky but it works, a normal cast gets it wrong
+    return 0;
+}
+
+int
+zosc_pop_double(zosc_t *self, double *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'd')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    uint64_t dbl_v = ntohll(*((uint64_t *)data));
+    *val = *((double *)&dbl_v);  // tricky but it works, a normal cast gets it wrong
+    return 0;
+}
+
+int
+zosc_pop_string(zosc_t *self, char **val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 's')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = strdup((char *)data);
+    return 0;
+}
+
+int
+zosc_pop_char(zosc_t *self, char *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'c')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = *((char*)data+3);  // network order with alignment!
+    return 0;
+}
+
+int
+zosc_pop_bool(zosc_t *self, bool *val)
+{
+    assert(self);
+    if ( ! (self->format[self->cursor_index] == 'F' || self->format[self->cursor_index] == 'T' ) )
+        return -1; //  wrong type
+    *val = self->format[self->cursor_index] == 'F' ? false : true;
+    return 0;
+}
+
+int
+zosc_pop_midi(zosc_t *self, uint32_t *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'm')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = ntohl(*((uint32_t *)data));
+    return 0;
 }
 
 //  --------------------------------------------------------------------------
@@ -695,7 +928,7 @@ zosc_test (bool verbose)
 
     // test constructing messages
     int64_t prez = 3;
-    zosc_t* conm = zosc_create("/construct", "iihfdscF", 1,2, prez, 3.14,6.283185307179586, "greetings", 'q');
+    zosc_t* conm = zosc_create("/construct", "iihfdscF", -2,2, prez, 3.14,6.283185307179586, "greetings", 'q');
     assert(conm);
     assert(streq(zosc_address(conm), "/construct"));
     assert(streq(zosc_format(conm), "iihfdscF"));
@@ -708,7 +941,7 @@ zosc_test (bool verbose)
     char q = 'z';
     bool Ftest = true;
     zosc_retr(conm, "iihfdscF", &x, &y, &z, &zz, &zzz, &ss, &q, &Ftest);
-    assert( x==1 );
+    assert( x==-2 );
     assert( y==2 );
     assert( z==3 );
     assert( fabsf(zz-3.14f) < FLT_EPSILON );
@@ -717,6 +950,80 @@ zosc_test (bool verbose)
     assert( q == 'q');
     assert( !Ftest );
     zstr_free(&ss);
+
+    // test iterating
+    char type = '0';
+    const void *data = zosc_first(conm, &type);
+    while ( data )
+    {
+        zsys_info("type tag is %c", type);
+        switch (type)
+        {
+        case('i'):
+        {
+            int32_t test = 9;
+            int rc = zosc_pop_int32(conm, &test);
+            assert(rc == 0);
+            assert( test == -2 || test == 2);
+            break;
+        }
+        case('h'):
+        {
+            int32_t fail = 9;
+            int rc = zosc_pop_int32(conm, &fail); // this will fail
+            assert(rc == -1);
+            int64_t test = 9;
+            rc = zosc_pop_int64(conm, &test);
+            assert(rc == 0);
+            assert( test == 3 );
+            break;
+        }
+        case('f'):
+        {
+            float flt_v = 0.f;
+            int rc = zosc_pop_float(conm, &flt_v);
+            assert(rc == 0);
+            assert( fabsf(flt_v-3.14f) < FLT_EPSILON );
+            break;
+        }
+        case 'd':
+        {
+            double dbl_v = 0.;
+            int rc = zosc_pop_double(conm, &dbl_v);
+            assert(rc == 0);
+            assert( fabs(dbl_v-6.283185307179586) < DBL_EPSILON );
+            break;
+        }
+        case 's':
+        {
+            char *str;
+            int rc = zosc_pop_string(conm, &str);
+            assert(rc == 0);
+            assert(streq(str, "greetings"));
+            zstr_free(&str);
+            break;
+        }
+        case 'c':
+        {
+            char chr;
+            int rc = zosc_pop_char(conm, &chr);
+            assert(rc == 0);
+            assert(chr == 'q');
+            break;
+        }
+        case 'F':
+        {
+            bool bl;
+            int rc = zosc_pop_bool(conm, &bl);
+            assert(rc == 0);
+            assert( !bl );
+            break;
+        }
+        default:
+            assert(0);
+        }
+        data = zosc_next(conm, &type);
+    }
 
 #ifdef ZMQ_DGRAM
     zsock_t *dgrams = zsock_new_dgram("udp://*:*");

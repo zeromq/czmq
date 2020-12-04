@@ -9509,6 +9509,28 @@ lib.zosc_print.restype = None
 lib.zosc_print.argtypes = [zosc_p]
 lib.zosc_is.restype = c_bool
 lib.zosc_is.argtypes = [c_void_p]
+lib.zosc_first.restype = c_void_p
+lib.zosc_first.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_next.restype = c_void_p
+lib.zosc_next.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_last.restype = c_void_p
+lib.zosc_last.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_pop_int32.restype = c_int
+lib.zosc_pop_int32.argtypes = [zosc_p, POINTER(c_int)]
+lib.zosc_pop_int64.restype = c_int
+lib.zosc_pop_int64.argtypes = [zosc_p, POINTER(msecs_p)]
+lib.zosc_pop_float.restype = c_int
+lib.zosc_pop_float.argtypes = [zosc_p, POINTER(c_float)]
+lib.zosc_pop_double.restype = c_int
+lib.zosc_pop_double.argtypes = [zosc_p, POINTER(c_double)]
+lib.zosc_pop_string.restype = c_int
+lib.zosc_pop_string.argtypes = [zosc_p, POINTER(c_char_p)]
+lib.zosc_pop_char.restype = c_int
+lib.zosc_pop_char.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_pop_bool.restype = c_int
+lib.zosc_pop_bool.argtypes = [zosc_p, POINTER(c_bool)]
+lib.zosc_pop_midi.restype = c_int
+lib.zosc_pop_midi.argtypes = [zosc_p, POINTER(c_int)]
 lib.zosc_test.restype = None
 lib.zosc_test.argtypes = [c_bool]
 
@@ -9710,6 +9732,94 @@ Take ownership of the chunk.
         Probe the supplied object, and report if it looks like a zosc_t.
         """
         return lib.zosc_is(self)
+
+    def first(self, type):
+        """
+        Return a pointer to the item at the head of the OSC data.
+Sets the given char argument to the type tag of the data.
+If the message is empty, returns NULL and the sets the
+given char to NULL.
+        """
+        return c_void_p(lib.zosc_first(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def next(self, type):
+        """
+        Return the next item of the OSC message. If the list is empty, returns
+NULL. To move to the start of the OSC message call zosc_first ().
+        """
+        return c_void_p(lib.zosc_next(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def last(self, type):
+        """
+        Return a pointer to the item at the tail of the OSC message.
+Sets the given char argument to the type tag of the data. If
+the message is empty, returns NULL.
+        """
+        return c_void_p(lib.zosc_last(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def pop_int32(self, val):
+        """
+        Set the provided 32 bit integer from value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_int32(self._as_parameter_, byref(c_int.from_param(val)))
+
+    def pop_int64(self, val):
+        """
+        Set the provided 64 bit integer from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_int64(self._as_parameter_, byref(msecs_p.from_param(val)))
+
+    def pop_float(self, val):
+        """
+        Set the provided float from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_float(self._as_parameter_, byref(c_float.from_param(val)))
+
+    def pop_double(self, val):
+        """
+        Set the provided double from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_double(self._as_parameter_, byref(c_double.from_param(val)))
+
+    def pop_string(self, val):
+        """
+        Set the provided string from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success. Caller owns the string!
+        """
+        return lib.zosc_pop_string(self._as_parameter_, byref(c_char_p.from_param(val)))
+
+    def pop_char(self, val):
+        """
+        Set the provided char from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_char(self._as_parameter_, byref(char_p.from_param(val)))
+
+    def pop_bool(self, val):
+        """
+        Set the provided boolean from the type tag in the message. Booleans are not represented
+in the data in the message, only in the type tag. If the type tag at the current
+position does not correspond it will fail and return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_bool(self._as_parameter_, byref(c_bool.from_param(val)))
+
+    def pop_midi(self, val):
+        """
+        Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+cursor position in the message. If the type tag at the current position does
+not correspond it will fail and return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_midi(self._as_parameter_, byref(c_int.from_param(val)))
 
     @staticmethod
     def test(verbose):

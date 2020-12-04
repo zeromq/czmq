@@ -143,6 +143,106 @@ bool QZosc::is (void *self)
 }
 
 ///
+//  Return a pointer to the item at the head of the OSC data.
+//  Sets the given char argument to the type tag of the data.
+//  If the message is empty, returns NULL and the sets the
+//  given char to NULL.
+const void * QZosc::first (char *type)
+{
+    const void * rv = zosc_first (self, type);
+    return rv;
+}
+
+///
+//  Return the next item of the OSC message. If the list is empty, returns
+//  NULL. To move to the start of the OSC message call zosc_first ().
+const void * QZosc::next (char *type)
+{
+    const void * rv = zosc_next (self, type);
+    return rv;
+}
+
+///
+//  Return a pointer to the item at the tail of the OSC message.
+//  Sets the given char argument to the type tag of the data. If
+//  the message is empty, returns NULL.
+const void * QZosc::last (char *type)
+{
+    const void * rv = zosc_last (self, type);
+    return rv;
+}
+
+///
+//  Set the provided 32 bit integer from value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QZosc::popInt32 (int *val)
+{
+    int rv = zosc_pop_int32 (self, val);
+    return rv;
+}
+
+///
+//  Set the provided 64 bit integer from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QZosc::popInt64 (int64_t *val)
+{
+    int rv = zosc_pop_int64 (self, val);
+    return rv;
+}
+
+///
+//  Set the provided float from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QZosc::popFloat (float *val)
+{
+    int rv = zosc_pop_float (self, val);
+    return rv;
+}
+
+///
+//  Set the provided double from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QZosc::popDouble (double *val)
+{
+    int rv = zosc_pop_double (self, val);
+    return rv;
+}
+
+///
+//  Set the provided char from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QZosc::popChar (char *val)
+{
+    int rv = zosc_pop_char (self, val);
+    return rv;
+}
+
+///
+//  Set the provided boolean from the type tag in the message. Booleans are not represented
+//  in the data in the message, only in the type tag. If the type tag at the current
+//  position does not correspond it will fail and return -1. Returns 0 on success.
+int QZosc::popBool (bool *val)
+{
+    int rv = zosc_pop_bool (self, val);
+    return rv;
+}
+
+///
+//  Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+//  cursor position in the message. If the type tag at the current position does
+//  not correspond it will fail and return -1. Returns 0 on success.
+int QZosc::popMidi (quint32 val)
+{
+    int rv = zosc_pop_midi (self, (uint32_t *) val);
+    return rv;
+}
+
+///
 //  Self test of this class.
 void QZosc::test (bool verbose)
 {

@@ -9586,6 +9586,14 @@ NAN_MODULE_INIT (Zosc::Init) {
     Nan::SetPrototypeMethod (tpl, "packx", _packx);
     Nan::SetPrototypeMethod (tpl, "unpack", _unpack);
     Nan::SetPrototypeMethod (tpl, "print", _print);
+    Nan::SetPrototypeMethod (tpl, "popInt32", _pop_int32);
+    Nan::SetPrototypeMethod (tpl, "popInt64", _pop_int64);
+    Nan::SetPrototypeMethod (tpl, "popFloat", _pop_float);
+    Nan::SetPrototypeMethod (tpl, "popDouble", _pop_double);
+    Nan::SetPrototypeMethod (tpl, "popString", _pop_string);
+    Nan::SetPrototypeMethod (tpl, "popChar", _pop_char);
+    Nan::SetPrototypeMethod (tpl, "popBool", _pop_bool);
+    Nan::SetPrototypeMethod (tpl, "popMidi", _pop_midi);
     Nan::SetPrototypeMethod (tpl, "test", _test);
 
     constructor ().Reset (Nan::GetFunction (tpl).ToLocalChecked ());
@@ -9725,6 +9733,158 @@ NAN_METHOD (Zosc::_unpack) {
 NAN_METHOD (Zosc::_print) {
     Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
     zosc_print (zosc->self);
+}
+
+NAN_METHOD (Zosc::_pop_int32) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `val`");
+
+    //int * val; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int val;
+
+
+    if (info [0]->IsNumber ())
+    {
+          val = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`val` must be a number");
+    int result = zosc_pop_int32 (zosc->self, (int *) &val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_pop_int64) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `val`");
+
+    //int64_t * val; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int64_t val;
+
+
+    if (info [0]->IsNumber ())
+    {
+          val = Nan::To<int64_t>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`val` must be a number");
+    int result = zosc_pop_int64 (zosc->self, (int64_t *) &val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_pop_float) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `val`");
+
+    //float * val; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    double val;
+
+
+    if (info [0]->IsDouble ())
+    {
+          val = Nan::To<double>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`val` must be a number");
+    int result = zosc_pop_float (zosc->self, (float *) &val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_pop_double) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `val`");
+
+    //double * val; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    double val;
+
+
+    if (info [0]->IsDouble ())
+    {
+          val = Nan::To<double>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`val` must be a number");
+    int result = zosc_pop_double (zosc->self, (double *) &val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_pop_string) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    char *val;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `val`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`val` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String val_utf8 (info [0].As<String>());
+    val = *val_utf8;
+         //} //bjornw end
+    int result = zosc_pop_string (zosc->self, (char **)&val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_pop_char) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    char val;
+    if (info [0]->IsUndefined ())
+    {
+        return Nan::ThrowTypeError ("method requires a `val`");
+    }
+    else if (!info [0]->IsString ())
+    {
+        return Nan::ThrowTypeError ("`val` must be a string");
+    }
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String val_utf8 (info [0].As<String>());
+
+    if (strlen (*val_utf8) != 1)
+        return Nan::ThrowTypeError ("`val` must be a single character");
+    val = (*val_utf8) [0];
+    //} // bjornw end
+    int result = zosc_pop_char (zosc->self, (char *) &val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_pop_bool) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `val`");
+
+    //bool * val; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    bool val;
+
+
+    if (info [0]->IsBoolean ())
+    {
+          val = Nan::To<bool>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`val` must be a Boolean");
+    int result = zosc_pop_bool (zosc->self, (bool *) &val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zosc::_pop_midi) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `val`");
+
+    //uint32_t * val; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    uint32_t val;
+
+
+    if (info [0]->IsNumber ())
+    {
+          val = Nan::To<uint32_t>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`val` must be a number");
+    int result = zosc_pop_midi (zosc->self, (uint32_t *) &val);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zosc::_test) {

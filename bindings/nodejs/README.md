@@ -5135,6 +5135,70 @@ nothing my_zosc.print ()
 Dump OSC message to stdout, for debugging and tracing.
 
 ```
+integer my_zosc.popInt32 (Number)
+```
+
+Set the provided 32 bit integer from value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+
+```
+integer my_zosc.popInt64 (Number)
+```
+
+Set the provided 64 bit integer from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+
+```
+integer my_zosc.popFloat (Number)
+```
+
+Set the provided float from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+
+```
+integer my_zosc.popDouble (Number)
+```
+
+Set the provided double from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+
+```
+integer my_zosc.popString (String)
+```
+
+Set the provided string from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success. Caller owns the string!
+
+```
+integer my_zosc.popChar (String)
+```
+
+Set the provided char from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+
+```
+integer my_zosc.popBool (Boolean)
+```
+
+Set the provided boolean from the type tag in the message. Booleans are not represented
+in the data in the message, only in the type tag. If the type tag at the current
+position does not correspond it will fail and return -1. Returns 0 on success.
+
+```
+integer my_zosc.popMidi (Number)
+```
+
+Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+cursor position in the message. If the type tag at the current position does
+not correspond it will fail and return -1. Returns 0 on success.
+
+```
 nothing my_zosc.test (Boolean)
 ```
 

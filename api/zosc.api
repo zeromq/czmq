@@ -154,4 +154,93 @@
         <argument name = "self" type = "anything" mutable = "1" />
         <return type = "boolean" />
     </method>
+
+    <method name = "first">
+        Return a pointer to the item at the head of the OSC data. 
+        Sets the given char argument to the type tag of the data.
+        If the message is empty, returns NULL and the sets the 
+        given char to NULL.
+        <argument name = "type" type = "char" by_reference = "1" />
+        <return type = "anything" mutable = "0" />
+    </method>
+
+    <method name = "next">
+        Return the next item of the OSC message. If the list is empty, returns 
+        NULL. To move to the start of the OSC message call zosc_first (). 
+        <argument name = "type" type = "char" by_reference = "1" />
+        <return type = "anything" mutable = "0" />
+    </method>
+
+    <method name = "last">
+        Return a pointer to the item at the tail of the OSC message. 
+        Sets the given char argument to the type tag of the data. If 
+        the message is empty, returns NULL. 
+        <argument name = "type" type = "char" by_reference = "1" />
+        <return type = "anything" mutable = "0" />
+    </method>
+
+    <method name = "pop int32">
+        Set the provided 32 bit integer from value at the current cursor position in the message. 
+        If the type tag at the current position does not correspond it will fail and 
+        return -1. Returns 0 on success.
+        <argument name = "val" type = "integer" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "pop int64">
+        Set the provided 64 bit integer from the value at the current cursor position in the message. 
+        If the type tag at the current position does not correspond it will fail and 
+        return -1. Returns 0 on success.
+        <argument name = "val" type = "msecs" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "pop float">
+        Set the provided float from the value at the current cursor position in the message. 
+        If the type tag at the current position does not correspond it will fail and 
+        return -1. Returns 0 on success.
+        <argument name = "val" type = "real" size = "4" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "pop double">
+        Set the provided double from the value at the current cursor position in the message. 
+        If the type tag at the current position does not correspond it will fail and 
+        return -1. Returns 0 on success.
+        <argument name = "val" type = "real" size = "8" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "pop string">
+        Set the provided string from the value at the current cursor position in the message. 
+        If the type tag at the current position does not correspond it will fail and 
+        return -1. Returns 0 on success. Caller owns the string!
+        <argument name = "val" type = "string" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "pop char">
+        Set the provided char from the value at the current cursor position in the message. 
+        If the type tag at the current position does not correspond it will fail and 
+        return -1. Returns 0 on success.
+        <argument name = "val" type = "char" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "pop bool">
+        Set the provided boolean from the type tag in the message. Booleans are not represented
+        in the data in the message, only in the type tag. If the type tag at the current 
+        position does not correspond it will fail and return -1. Returns 0 on success.
+        <argument name = "val" type = "boolean" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "pop midi">
+        Set the provided 4 bytes (unsigned 32bit int) from the value at the current 
+        cursor position in the message. If the type tag at the current position does 
+        not correspond it will fail and return -1. Returns 0 on success.
+        <argument name = "val" type = "number" size = "4" by_reference = "1" />
+        <return type = "integer" />
+    </method>
+
 </class>

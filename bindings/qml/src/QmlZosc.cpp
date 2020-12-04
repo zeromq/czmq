@@ -82,6 +82,94 @@ void QmlZosc::print () {
     zosc_print (self);
 };
 
+///
+//  Return a pointer to the item at the head of the OSC data.
+//  Sets the given char argument to the type tag of the data.
+//  If the message is empty, returns NULL and the sets the
+//  given char to NULL.
+const void *QmlZosc::first (char *type) {
+    return zosc_first (self, type);
+};
+
+///
+//  Return the next item of the OSC message. If the list is empty, returns
+//  NULL. To move to the start of the OSC message call zosc_first ().
+const void *QmlZosc::next (char *type) {
+    return zosc_next (self, type);
+};
+
+///
+//  Return a pointer to the item at the tail of the OSC message.
+//  Sets the given char argument to the type tag of the data. If
+//  the message is empty, returns NULL.
+const void *QmlZosc::last (char *type) {
+    return zosc_last (self, type);
+};
+
+///
+//  Set the provided 32 bit integer from value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QmlZosc::popInt32 (int *val) {
+    return zosc_pop_int32 (self, val);
+};
+
+///
+//  Set the provided 64 bit integer from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QmlZosc::popInt64 (int64_t *val) {
+    return zosc_pop_int64 (self, val);
+};
+
+///
+//  Set the provided float from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QmlZosc::popFloat (float *val) {
+    return zosc_pop_float (self, val);
+};
+
+///
+//  Set the provided double from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QmlZosc::popDouble (double *val) {
+    return zosc_pop_double (self, val);
+};
+
+///
+//  Set the provided string from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success. Caller owns the string!
+int QmlZosc::popString (QString val) {
+    return zosc_pop_string (self, val.toUtf8().data());
+};
+
+///
+//  Set the provided char from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+int QmlZosc::popChar (char *val) {
+    return zosc_pop_char (self, val);
+};
+
+///
+//  Set the provided boolean from the type tag in the message. Booleans are not represented
+//  in the data in the message, only in the type tag. If the type tag at the current
+//  position does not correspond it will fail and return -1. Returns 0 on success.
+int QmlZosc::popBool (bool *val) {
+    return zosc_pop_bool (self, val);
+};
+
+///
+//  Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+//  cursor position in the message. If the type tag at the current position does
+//  not correspond it will fail and return -1. Returns 0 on success.
+int QmlZosc::popMidi (uint32_t *val) {
+    return zosc_pop_midi (self, val);
+};
+
 
 QObject* QmlZosc::qmlAttachedProperties(QObject* object) {
     return new QmlZoscAttached(object);

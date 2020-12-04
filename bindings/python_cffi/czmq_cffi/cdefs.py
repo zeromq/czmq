@@ -4699,6 +4699,72 @@ void
 bool
     zosc_is (void *self);
 
+// Return a pointer to the item at the head of the OSC data.
+// Sets the given char argument to the type tag of the data.
+// If the message is empty, returns NULL and the sets the
+// given char to NULL.
+const void *
+    zosc_first (zosc_t *self, char *type);
+
+// Return the next item of the OSC message. If the list is empty, returns
+// NULL. To move to the start of the OSC message call zosc_first ().
+const void *
+    zosc_next (zosc_t *self, char *type);
+
+// Return a pointer to the item at the tail of the OSC message.
+// Sets the given char argument to the type tag of the data. If
+// the message is empty, returns NULL.
+const void *
+    zosc_last (zosc_t *self, char *type);
+
+// Set the provided 32 bit integer from value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_int32 (zosc_t *self, int *val);
+
+// Set the provided 64 bit integer from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_int64 (zosc_t *self, int64_t *val);
+
+// Set the provided float from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_float (zosc_t *self, float *val);
+
+// Set the provided double from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_double (zosc_t *self, double *val);
+
+// Set the provided string from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success. Caller owns the string!
+int
+    zosc_pop_string (zosc_t *self, char **val);
+
+// Set the provided char from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_char (zosc_t *self, char *val);
+
+// Set the provided boolean from the type tag in the message. Booleans are not represented
+// in the data in the message, only in the type tag. If the type tag at the current
+// position does not correspond it will fail and return -1. Returns 0 on success.
+int
+    zosc_pop_bool (zosc_t *self, bool *val);
+
+// Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+// cursor position in the message. If the type tag at the current position does
+// not correspond it will fail and return -1. Returns 0 on success.
+int
+    zosc_pop_midi (zosc_t *self, uint32_t *val);
+
 // Self test of this class.
 void
     zosc_test (bool verbose);
