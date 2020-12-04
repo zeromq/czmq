@@ -955,7 +955,9 @@ zosc_test (bool verbose)
     const void *data = zosc_first(conm, &type);
     while ( data )
     {
-        zsys_info("type tag is %c", type);
+        if (verbose)
+            zsys_info("type tag is %c", type);
+
         switch (type)
         {
         case('i'):
