@@ -664,7 +664,6 @@ s_require_indexes(zosc_t *self)
         // save current element bytearray index
         stridx++;
         self->data_indexes[stridx] = needle;
-        zsys_info("stridx: %i, strlen format: %i", stridx, strlen(self->format));
     }
 }
 
