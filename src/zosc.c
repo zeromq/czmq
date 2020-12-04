@@ -671,7 +671,7 @@ s_require_indexes(zosc_t *self)
 // Return a pointer to the item at the head of the OSC data.
 // Sets the given char argument to the type tag of the data.
 // If the message is empty, returns NULL.
-void *
+const void *
 zosc_first (zosc_t *self, char *type)
 {
     assert(self);
@@ -686,7 +686,7 @@ zosc_first (zosc_t *self, char *type)
 
 // Return the next item of the OSC message. If the list is empty, returns
 // NULL. To move to the start of the OSC message call zosc_first ().
-void *
+const void *
 zosc_next (zosc_t *self, char *type)
 {
     assert(self);
@@ -705,7 +705,7 @@ zosc_next (zosc_t *self, char *type)
 // Return a pointer to the item at the tail of the OSC message.
 // Sets the given char argument to the type tag of the data. If
 // the message is empty, returns NULL.
-void *
+const void *
 zosc_last (zosc_t *self, char *type)
 {
     assert(self);
@@ -719,7 +719,7 @@ zosc_last (zosc_t *self, char *type)
 }
 
 int
-zosc_pop_int32(zosc_t *self, int32_t *val)
+zosc_pop_int32(zosc_t *self, int *val)
 {
     assert(self);
     if (self->format[self->cursor_index] != 'i')
@@ -767,6 +767,53 @@ zosc_pop_double(zosc_t *self, double *val)
     *val = *((double *)&dbl_v);  // tricky but it works, a normal cast gets it wrong
     return 0;
 }
+
+int
+zosc_pop_string(zosc_t *self, char **val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 's')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = strdup(data);
+    return 0;
+}
+
+int
+zosc_pop_char(zosc_t *self, char *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'c')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = *((char*)data+3);  // network order with alignment!
+    return 0;
+}
+
+int
+zosc_pop_bool(zosc_t *self, bool *val)
+{
+    assert(self);
+    if ( ! (self->format[self->cursor_index] == 'F' || self->format[self->cursor_index] == 'T' ) )
+        return -1; //  wrong type
+    *val = self->format[self->cursor_index] == 'F' ? false : true;
+    return 0;
+}
+
+int
+zosc_pop_midi(zosc_t *self, uint32_t *val)
+{
+    assert(self);
+    if (self->format[self->cursor_index] != 'm')
+        return -1; //  wrong type
+
+    void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
+    *val = ntohl(*((uint32_t *)data));
+    return 0;
+}
+
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
@@ -906,7 +953,7 @@ zosc_test (bool verbose)
 
     // test iterating
     char type = '0';
-    void *data = zosc_first(conm, &type);
+    const void *data = zosc_first(conm, &type);
     while ( data )
     {
         zsys_info("type tag is %c", type);
@@ -949,18 +996,27 @@ zosc_test (bool verbose)
         }
         case 's':
         {
-            char *str = (char *)data;
+            char *str;
+            int rc = zosc_pop_string(conm, &str);
+            assert(rc == 0);
             assert(streq(str, "greetings"));
+            zstr_free(&str);
             break;
         }
         case 'c':
         {
-            char chr = *((char*)data+3);
+            char chr;
+            int rc = zosc_pop_char(conm, &chr);
+            assert(rc == 0);
             assert(chr == 'q');
             break;
         }
         case 'F':
         {
+            bool bl;
+            int rc = zosc_pop_bool(conm, &bl);
+            assert(rc == 0);
+            assert( !bl );
             break;
         }
         default:

@@ -212,6 +212,69 @@ public class Zosc implements AutoCloseable {
         return __last (self, type);
     }
     /*
+    Set the provided 32 bit integer from value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popInt32 (long self, int val);
+    public int popInt32 (int val) {
+        return __popInt32 (self, val);
+    }
+    /*
+    Set the provided 64 bit integer from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popInt64 (long self, long val);
+    public int popInt64 (long val) {
+        return __popInt64 (self, val);
+    }
+    /*
+    Set the provided float from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popFloat (long self, float val);
+    public int popFloat (float val) {
+        return __popFloat (self, val);
+    }
+    /*
+    Set the provided double from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popDouble (long self, double val);
+    public int popDouble (double val) {
+        return __popDouble (self, val);
+    }
+    /*
+    Set the provided char from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popChar (long self, char val);
+    public int popChar (char val) {
+        return __popChar (self, val);
+    }
+    /*
+    Set the provided boolean from the type tag in the message. Booleans are not represented
+    in the data in the message, only in the type tag. If the type tag at the current
+    position does not correspond it will fail and return -1. Returns 0 on success.
+    */
+    native static int __popBool (long self, boolean val);
+    public int popBool (boolean val) {
+        return __popBool (self, val);
+    }
+    /*
+    Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+    cursor position in the message. If the type tag at the current position does
+    not correspond it will fail and return -1. Returns 0 on success.
+    */
+    native static int __popMidi (long self, int val);
+    public int popMidi (int val) {
+        return __popMidi (self, val);
+    }
+    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

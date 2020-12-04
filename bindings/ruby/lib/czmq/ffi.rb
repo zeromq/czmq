@@ -997,6 +997,14 @@ module CZMQ
       attach_function :zosc_first, [:pointer, :pointer], :pointer, **opts
       attach_function :zosc_next, [:pointer, :pointer], :pointer, **opts
       attach_function :zosc_last, [:pointer, :pointer], :pointer, **opts
+      attach_function :zosc_pop_int32, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_int64, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_float, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_double, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_string, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_char, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_bool, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_midi, [:pointer, :pointer], :int, **opts
       attach_function :zosc_test, [:bool], :void, **opts
 
       require_relative 'ffi/zosc'

@@ -335,6 +335,110 @@ module CZMQ
         result
       end
 
+      # Set the provided 32 bit integer from value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_int32(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_int32(self_p, val)
+        result
+      end
+
+      # Set the provided 64 bit integer from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_int64(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_int64(self_p, val)
+        result
+      end
+
+      # Set the provided float from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_float(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_float(self_p, val)
+        result
+      end
+
+      # Set the provided double from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_double(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_double(self_p, val)
+        result
+      end
+
+      # Set the provided string from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success. Caller owns the string!
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_string(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_string(self_p, val)
+        result
+      end
+
+      # Set the provided char from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_char(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_char(self_p, val)
+        result
+      end
+
+      # Set the provided boolean from the type tag in the message. Booleans are not represented
+      # in the data in the message, only in the type tag. If the type tag at the current
+      # position does not correspond it will fail and return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_bool(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_bool(self_p, val)
+        result
+      end
+
+      # Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+      # cursor position in the message. If the type tag at the current position does
+      # not correspond it will fail and return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_midi(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_midi(self_p, val)
+        result
+      end
+
       # Self test of this class.
       #
       # @param verbose [Boolean]

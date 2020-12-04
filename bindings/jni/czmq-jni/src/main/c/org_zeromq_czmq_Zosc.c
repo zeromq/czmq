@@ -158,6 +158,55 @@ Java_org_zeromq_czmq_Zosc__1_1last (JNIEnv *env, jclass c, jlong self, jchar typ
     return last_;
 }
 
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1popInt32 (JNIEnv *env, jclass c, jlong self, jint val)
+{
+    jint pop_int32_ = (jint) zosc_pop_int32 ((zosc_t *) (intptr_t) self, (int *) (intptr_t) &val);
+    return pop_int32_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1popInt64 (JNIEnv *env, jclass c, jlong self, jlong val)
+{
+    jint pop_int64_ = (jint) zosc_pop_int64 ((zosc_t *) (intptr_t) self, (int64_t *) (intptr_t) &val);
+    return pop_int64_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1popFloat (JNIEnv *env, jclass c, jlong self, jfloat val)
+{
+    jint pop_float_ = (jint) zosc_pop_float ((zosc_t *) (intptr_t) self, (float *) (intptr_t) &val);
+    return pop_float_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1popDouble (JNIEnv *env, jclass c, jlong self, jdouble val)
+{
+    jint pop_double_ = (jint) zosc_pop_double ((zosc_t *) (intptr_t) self, (double *) (intptr_t) &val);
+    return pop_double_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1popChar (JNIEnv *env, jclass c, jlong self, jchar val)
+{
+    jint pop_char_ = (jint) zosc_pop_char ((zosc_t *) (intptr_t) self, (char *) (intptr_t) &val);
+    return pop_char_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1popBool (JNIEnv *env, jclass c, jlong self, jboolean val)
+{
+    jint pop_bool_ = (jint) zosc_pop_bool ((zosc_t *) (intptr_t) self, (bool *) (intptr_t) &val);
+    return pop_bool_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1popMidi (JNIEnv *env, jclass c, jlong self, jint val)
+{
+    jint pop_midi_ = (jint) zosc_pop_midi ((zosc_t *) (intptr_t) self, (uint32_t *) (intptr_t) &val);
+    return pop_midi_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zosc__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
