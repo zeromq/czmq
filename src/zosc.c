@@ -596,7 +596,7 @@ s_require_indexes(zosc_t *self)
     assert(self);
     assert(self->data_begin);
     if (self->data_indexes) return;
-    self->data_indexes = zmalloc( sizeof(size_t) * (strlen(self->format)+1) );
+    self->data_indexes = (size_t *)zmalloc( sizeof(size_t) * (strlen(self->format)+1) );
     self->data_indexes[0] = self->data_begin;
     // generate the indexes
     size_t needle = self->data_begin;
@@ -776,7 +776,7 @@ zosc_pop_string(zosc_t *self, char **val)
         return -1; //  wrong type
 
     void *data = zchunk_data(self->chunk) + self->data_indexes[self->cursor_index];
-    *val = strdup(data);
+    *val = strdup((char *)data);
     return 0;
 }
 
