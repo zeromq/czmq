@@ -384,7 +384,11 @@ zmonitor_test (bool verbose)
     if (verbose)
         printf ("\n");
 
-#if defined (ZMQ_EVENT_ALL)
+#if ZMQ_VERSION_MAJOR < 3
+    printf ("SKIPPED (on zmq pre-3)\n");
+    return;
+#endif
+
     //  @selftest
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
@@ -437,7 +441,6 @@ zmonitor_test (bool verbose)
     zactor_destroy (&servermon);
     zsock_destroy (&client);
     zsock_destroy (&server);
-#endif
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
