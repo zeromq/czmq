@@ -664,7 +664,6 @@ s_require_indexes(zosc_t *self)
         // save current element bytearray index
         stridx++;
         self->data_indexes[stridx] = needle;
-        zsys_info("stridx: %i, strlen format: %i", stridx, strlen(self->format));
     }
 }
 
@@ -956,7 +955,9 @@ zosc_test (bool verbose)
     const void *data = zosc_first(conm, &type);
     while ( data )
     {
-        zsys_info("type tag is %c", type);
+        if (verbose)
+            zsys_info("type tag is %c", type);
+
         switch (type)
         {
         case('i'):
