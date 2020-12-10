@@ -9495,6 +9495,8 @@ lib.zosc_address.restype = c_char_p
 lib.zosc_address.argtypes = [zosc_p]
 lib.zosc_format.restype = c_char_p
 lib.zosc_format.argtypes = [zosc_p]
+lib.zosc_append.restype = c_int
+lib.zosc_append.argtypes = [zosc_p, c_char_p]
 lib.zosc_retr.restype = c_int
 lib.zosc_retr.argtypes = [zosc_p, c_char_p]
 lib.zosc_dup.restype = zosc_p
@@ -9678,6 +9680,29 @@ The format type tags are as follows:
   b - binary blob
         """
         return lib.zosc_format(self._as_parameter_)
+
+    def append(self, format, *args):
+        """
+        Append data to the osc message. The format describes the data that
+needs to be appended in the message. This essentially relocates all
+data!
+The format type tags are as follows:
+  i - 32bit integer
+  h - 64bit integer
+  f - 32bit floating point number (IEEE)
+  d - 64bit (double) floating point number
+  s - string (NULL terminated)
+  t = timetag: an OSC timetag in NTP format (uint64_t)
+  S - symbol
+  c - char
+  m - 4 byte midi packet (8 digits hexadecimal)
+  T - TRUE (no value required)
+  F - FALSE (no value required)
+  N - NIL (no value required)
+  I - Impulse (for triggers) or INFINITUM (no value required)
+  b - binary blob
+        """
+        return lib.zosc_append(self._as_parameter_, format, *args)
 
     def retr(self, format, *args):
         """
