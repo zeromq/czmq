@@ -270,6 +270,7 @@ zosc_create (const char *address, const char *format, ...)
     self->address =  (char *)zchunk_data(self->chunk);
     // set the format string to the pointer in the chunk of data
     self->format = (char *)zchunk_data(self->chunk)+format_start;
+
     return self;
 }
 
@@ -315,6 +316,148 @@ zosc_format (zosc_t *self)
     assert(self);
     assert(self->format);
     return self->format;
+}
+
+int
+zosc_append(zosc_t *self, const char *format, ...)
+{
+    assert(self);
+    assert(format);
+
+    // prepare data buffer
+
+    // create new format string (format_cur + format)
+    unsigned long formatlen = strlen(format)+ strlen(self->format);
+    int aligned = ((int)formatlen + 3) &~0x03;
+    char new_format[aligned]; // perhaps do this on the heap for safety???
+    snprintf(new_format, sizeof(new_format), "%s%s", self->format, format);
+
+    // create a new chunk
+    size_t init_size = 2 + strlen(self->address) + aligned * 5; // 5 times format string as almost all types are 4 bytes
+    zchunk_t *newchunk = zchunk_new(NULL, init_size);
+    // insert the address
+    size_t size = zchunk_extend(newchunk, self->address, strlen(self->address) + 1);
+    size_t newsize = (size + 3) & (size_t)~0x03;
+    // extend the chunk to a multitude of 4
+    if (newsize-size)
+        size = zchunk_extend(newchunk, "\x00\x00\x00\x00", newsize-size);
+    // insert the new format
+    size = zchunk_extend(newchunk, ",", sizeof (char));
+    size_t format_start = size; // save the start position of the format string
+    size = zchunk_extend(newchunk, new_format, strlen(new_format) + 1 );
+    // extend the chunk to a multitude of 4
+    newsize = (size + 3) & (size_t)~0x03;
+    if (newsize-size)
+        size = zchunk_extend(newchunk, "\x00\x00\x00\x00", newsize-size);
+
+    // save the pointer to where the data starts
+    size_t new_data_begin = size;
+
+    // copy current data from data begin to end
+    size = zchunk_extend(newchunk, zchunk_data(self->chunk)+self->data_begin, zchunk_size(self->chunk)-self->data_begin);
+
+    // now append the new data
+    va_list argptr;
+    va_start(argptr, format);
+    int rc = 0;
+
+    while(*format)
+    {
+        switch (*format)
+        {
+            case 'b':
+            {
+                // todo handle bundles
+
+            }
+            case 'i' :
+            {
+                uint32_t int_v = va_arg( argptr, uint32_t );
+                int_v = htonl(int_v);
+                zchunk_extend( newchunk, &int_v, sizeof(uint32_t) );
+                break;
+            }
+            case 'h':
+            {
+                uint64_t int_v = va_arg( argptr, uint64_t );
+                int_v = htonll(int_v);
+                zchunk_extend( newchunk, &int_v, sizeof(uint64_t) );
+                break;
+            }
+            case 'f':
+            {
+                float flt_v = (float)va_arg( argptr, double );
+                uint32_t flt_int = htonl(*((uint32_t *) &flt_v));
+                zchunk_extend( newchunk, &flt_int, sizeof(float) );
+                break;
+            }
+            case 'd':
+            {
+                double dbl_v = (double)va_arg( argptr, double );
+                uint64_t dbl_int = htonll(*((uint64_t *) &dbl_v));
+                zchunk_extend( newchunk, &dbl_int, sizeof(double) );
+                break;
+            }
+            case 's':
+            {
+                //  not sure if the double pointer is the way to go
+                char *str = va_arg( argptr, char * );
+                assert(str);
+                if (str)
+                {
+                    size = zchunk_extend( newchunk, str, strlen(str)+1);
+                    //  osc dictates we need to supply data in multitudes of 4 bytes so append \0's if needed
+                    newsize = (size + 3) & (size_t)~0x03;
+                    if (newsize-size)
+                        size = zchunk_extend(newchunk, "\x00\x00\x00\x00", newsize-size);
+                }
+                break;
+            }
+            case 'S': // never used???
+                break;
+            case 'c': // is this ever used?
+            {
+                char char_v = (char)va_arg( argptr, int); // the standard dictates to use int for smaller vars
+                //  osc dictates we need to supply data in multitudes of 4 bytes so create a 0 array to hold our char
+                //  Not sure if this correct on big endian machines!!!
+                char v[5] = "\x00\x00\x00\x00"; // a char array on windows always wants a terminating null so we need size 5 :|
+                v[3] = char_v;
+                size = zchunk_extend( newchunk, v, 4 );
+                break;
+            }
+            case 'm': // midi data
+            {
+                uint32_t midi_v = va_arg( argptr, uint32_t);
+                zchunk_extend( newchunk, &midi_v, sizeof(uint32_t) );
+                break;
+            }
+            case 'T':
+            case 'F':
+            case 'N': // never used???
+            case 'I': // never used???
+            {
+                break;
+            }
+            default:
+                zsys_error("format identifier '%c' not matched", *format);
+        }
+        format++;
+    }
+    zchunk_destroy(&self->chunk);
+    self->chunk = newchunk;
+    self->data_begin = new_data_begin;
+    // the chunk data starts with the address string
+    self->address =  (char *)zchunk_data(self->chunk);
+    // set the format string to the pointer in the chunk of data
+    self->format = (char *)zchunk_data(self->chunk)+format_start;
+    // release the indexes
+    if (self->data_indexes)
+    {
+        free(self->data_indexes);
+        self->data_indexes = NULL;
+    }
+
+    return 0;
 }
 
 int
@@ -1025,6 +1168,32 @@ zosc_test (bool verbose)
         }
         data = zosc_next(conm, &type);
     }
+
+    // test append
+    int64_t preal = -80000;
+    zosc_append(conm, "ih", -200, preal);
+    int ax,ay;
+    int64_t az;
+    float azz;
+    double azzz;
+    char *ass = "aliens";
+    char aq = 'z';
+    bool aFtest = true;
+    int ai = 0;
+    int64_t al = 0;
+    zosc_retr(conm, "iihfdscFih", &ax, &ay, &az, &azz, &azzz, &ass, &aq, &aFtest, &ai, &al);
+    assert( ax==-2 );
+    assert( ay==2 );
+    assert( az==3 );
+    assert( fabsf(azz-3.14f) < FLT_EPSILON );
+    assert( fabs(azzz-6.283185307179586) < DBL_EPSILON );
+    assert( streq( ass, "greetings") );
+    assert( aq == 'q');
+    assert( !aFtest );
+    assert( ai==-200 );
+    assert( al==-80000 );
+    zstr_free(&ass);
+
 
 #ifdef ZMQ_DGRAM
     zsock_t *dgrams = zsock_new_dgram("udp://*:*");
