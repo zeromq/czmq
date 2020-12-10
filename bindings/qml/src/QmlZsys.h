@@ -348,7 +348,7 @@ public slots:
     //  Return IPv6 address to use for zbeacon reception, or "" if none was set.
     const QString ipv6Address ();
 
-    //  Set IPv6 milticast address to use for sending zbeacon messages. This needs
+    //  Set IPv6 multicast address to use for sending zbeacon messages. This needs
     //  to be set if IPv6 is enabled. If the environment variable
     //  ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
     //  address.

@@ -8217,7 +8217,7 @@ use that as the default IPv6 address.
     @staticmethod
     def set_ipv6_mcast_address(value):
         """
-        Set IPv6 milticast address to use for sending zbeacon messages. This needs
+        Set IPv6 multicast address to use for sending zbeacon messages. This needs
 to be set if IPv6 is enabled. If the environment variable
 ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
 address.
