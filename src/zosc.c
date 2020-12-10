@@ -38,6 +38,95 @@ struct _zosc_t {
     size_t      *data_indexes;  //  data offset positions of the elements in the message
 };
 
+// appends data to the chunk returning the new size, returns -1 on failure
+static size_t
+s_append_data(zchunk_t *chunk, char typetag, va_list argptr)
+{
+    size_t size = (size_t)-1;
+    switch (typetag)
+    {
+        case 'b':
+        {
+            // todo handle bundles
+            zsys_error("bundles or blobs not yet implemented");
+            break;
+        }
+        case 'i' :
+        {
+            uint32_t int_v = va_arg( argptr, uint32_t );
+            int_v = htonl(int_v);
+            size = zchunk_extend( chunk, &int_v, sizeof(uint32_t) );
+            break;
+        }
+        case 'h':
+        {
+            uint64_t int_v = va_arg( argptr, uint64_t );
+            int_v = htonll(int_v);
+            size = zchunk_extend( chunk, &int_v, sizeof(uint64_t) );
+            break;
+        }
+        case 'f':
+        {
+            float flt_v = (float)va_arg( argptr, double );
+            uint32_t flt_int = htonl(*((uint32_t *) &flt_v));
+            size = zchunk_extend( chunk, &flt_int, sizeof(float) );
+            break;
+        }
+        case 'd':
+        {
+            double dbl_v = (double)va_arg( argptr, double );
+            uint64_t dbl_int = htonll(*((uint64_t *) &dbl_v));
+            size = zchunk_extend( chunk, &dbl_int, sizeof(double) );
+            break;
+        }
+        case 's':
+        {
+            //  not sure if the double pointer is the way to go
+            char *str = va_arg( argptr, char * );
+            assert(str);
+            if (str)
+            {
+                size = zchunk_extend( chunk, str, strlen(str)+1);
+                //  osc dictates we need to supply data in multitudes of 4 bytes so append \0's if needed
+                size_t newsize = (size + 3) & (size_t)~0x03;
+                if (newsize-size)
+                    size = zchunk_extend(chunk, "\x00\x00\x00\x00", newsize-size);
+            }
+            break;
+        }
+        case 'S': // never used???
+            break;
+        case 'c': // is this ever used?
+        {
+            char char_v = (char)va_arg( argptr, int); // the standard dictates to use int for smaller vars
+            //  osc dictates we need to supply data in multitudes of 4 bytes so create a 0 array to hold our char
+            //  Not sure if this correct on big endian machines!!!
+            char v[5] = "\x00\x00\x00\x00"; // a char array on windows always wants a terminating null so we need size 5 :|
+            v[3] = char_v;
+            size = zchunk_extend( chunk, v, 4 );
+            break;
+        }
+        case 'm': // midi data
+        {
+            uint32_t midi_v = va_arg( argptr, uint32_t);
+            size = zchunk_extend( chunk, &midi_v, sizeof(uint32_t) );
+            break;
+        }
+        case 'T':
+        case 'F':
+        case 'N': // never used???
+        case 'I': // never used???
+        {
+            // booleans and infinite are not added as data but only as type tag
+            // just return the current size
+            size = zchunk_size(chunk);
+            break;
+        }
+        default:
+            zsys_error("format identifier '%c' not matched", typetag);
+    }
+    return size;
+}
 
 //  --------------------------------------------------------------------------
 //  Create a new zosc
@@ -160,7 +249,7 @@ zosc_create (const char *address, const char *format, ...)
     zosc_t *self = (zosc_t *) zmalloc (sizeof (zosc_t));
     assert (self);
 
-    size_t init_size = strlen(address) + strlen(format) * 5; // 5 times format string as almost all types are 4 bytes
+    size_t init_size = strlen(address) + strlen(format) * 10; // 10 times format string as almost all types are 4 bytes, just a guess
     init_size += 2;       // to count for the two terminating \0's
     self->chunk = zchunk_new(NULL, init_size);
     self->data_indexes = NULL;
@@ -186,84 +275,7 @@ zosc_create (const char *address, const char *format, ...)
     va_start(argptr, format);
     while(*format)
     {
-        switch (*format)
-        {
-            case 'b':
-            {
-                // todo handle bundles
-
-            }
-            case 'i' :
-            {
-                uint32_t int_v = va_arg( argptr, uint32_t );
-                int_v = htonl(int_v);
-                zchunk_extend( self->chunk, &int_v, sizeof(uint32_t) );
-                break;
-            }
-            case 'h':
-            {
-                uint64_t int_v = va_arg( argptr, uint64_t );
-                int_v = htonll(int_v);
-                zchunk_extend( self->chunk, &int_v, sizeof(uint64_t) );
-                break;
-            }
-            case 'f':
-            {
-                float flt_v = (float)va_arg( argptr, double );
-                uint32_t flt_int = htonl(*((uint32_t *) &flt_v));
-                zchunk_extend( self->chunk, &flt_int, sizeof(float) );
-                break;
-            }
-            case 'd':
-            {
-                double dbl_v = (double)va_arg( argptr, double );
-                uint64_t dbl_int = htonll(*((uint64_t *) &dbl_v));
-                zchunk_extend( self->chunk, &dbl_int, sizeof(double) );
-                break;
-            }
-            case 's':
-            {
-                //  not sure if the double pointer is the way to go
-                char *str = va_arg( argptr, char * );
-                assert(str);
-                if (str)
-                {
-                    size = zchunk_extend( self->chunk, str, strlen(str)+1);
-                    //  osc dictates we need to supply data in multitudes of 4 bytes so append \0's if needed
-                    newsize = (size + 3) & (size_t)~0x03;
-                    if (newsize-size)
-                        size = zchunk_extend(self->chunk, "\x00\x00\x00\x00", newsize-size);
-                }
-                break;
-            }
-            case 'S': // never used???
-                break;
-            case 'c': // is this ever used?
-            {
-                char char_v = (char)va_arg( argptr, int); // the standard dictates to use int for smaller vars
-                //  osc dictates we need to supply data in multitudes of 4 bytes so create a 0 array to hold our char
-                //  Not sure if this correct on big endian machines!!!
-                char v[5] = "\x00\x00\x00\x00"; // a char array on windows always wants a terminating null so we need size 5 :|
-                v[3] = char_v;
-                size = zchunk_extend( self->chunk, v, 4 );
-                break;
-            }
-            case 'm': // midi data
-            {
-                uint32_t midi_v = va_arg( argptr, uint32_t);
-                zchunk_extend( self->chunk, &midi_v, sizeof(uint32_t) );
-                break;
-            }
-            case 'T':
-            case 'F':
-            case 'N': // never used???
-            case 'I': // never used???
-            {
-                break;
-            }
-            default:
-                zsys_error("format identifier '%c' not matched", *format);
-        }
+        s_append_data(self->chunk, *format, argptr);
         format++;
     }
     // the chunk data starts with the address string
@@ -324,16 +336,14 @@ zosc_append(zosc_t *self, const char *format, ...)
     assert(self);
     assert(format);
 
-    // prepare data buffer
-
     // create new format string (format_cur + format)
     unsigned long formatlen = strlen(format)+ strlen(self->format);
-    int aligned = ((int)formatlen + 3) &~0x03;
+    unsigned int aligned = (unsigned)(((int)formatlen + 3) &~0x03);
     char new_format[aligned]; // perhaps do this on the heap for safety???
     snprintf(new_format, sizeof(new_format), "%s%s", self->format, format);
 
     // create a new chunk
-    size_t init_size = 2 + strlen(self->address) + aligned * 5; // 5 times format string as almost all types are 4 bytes
+    size_t init_size = 2 + strlen(self->address) + aligned * 10; // 10 times format string as almost all types are 4 bytes and we need space
     zchunk_t *newchunk = zchunk_new(NULL, init_size);
     // insert the address
     size_t size = zchunk_extend(newchunk, self->address, strlen(self->address) + 1);
@@ -359,88 +369,10 @@ zosc_append(zosc_t *self, const char *format, ...)
     // now append the new data
     va_list argptr;
     va_start(argptr, format);
-    int rc = 0;
 
     while(*format)
     {
-        switch (*format)
-        {
-            case 'b':
-            {
-                // todo handle bundles
-
-            }
-            case 'i' :
-            {
-                uint32_t int_v = va_arg( argptr, uint32_t );
-                int_v = htonl(int_v);
-                zchunk_extend( newchunk, &int_v, sizeof(uint32_t) );
-                break;
-            }
-            case 'h':
-            {
-                uint64_t int_v = va_arg( argptr, uint64_t );
-                int_v = htonll(int_v);
-                zchunk_extend( newchunk, &int_v, sizeof(uint64_t) );
-                break;
-            }
-            case 'f':
-            {
-                float flt_v = (float)va_arg( argptr, double );
-                uint32_t flt_int = htonl(*((uint32_t *) &flt_v));
-                zchunk_extend( newchunk, &flt_int, sizeof(float) );
-                break;
-            }
-            case 'd':
-            {
-                double dbl_v = (double)va_arg( argptr, double );
-                uint64_t dbl_int = htonll(*((uint64_t *) &dbl_v));
-                zchunk_extend( newchunk, &dbl_int, sizeof(double) );
-                break;
-            }
-            case 's':
-            {
-                //  not sure if the double pointer is the way to go
-                char *str = va_arg( argptr, char * );
-                assert(str);
-                if (str)
-                {
-                    size = zchunk_extend( newchunk, str, strlen(str)+1);
-                    //  osc dictates we need to supply data in multitudes of 4 bytes so append \0's if needed
-                    newsize = (size + 3) & (size_t)~0x03;
-                    if (newsize-size)
-                        size = zchunk_extend(newchunk, "\x00\x00\x00\x00", newsize-size);
-                }
-                break;
-            }
-            case 'S': // never used???
-                break;
-            case 'c': // is this ever used?
-            {
-                char char_v = (char)va_arg( argptr, int); // the standard dictates to use int for smaller vars
-                //  osc dictates we need to supply data in multitudes of 4 bytes so create a 0 array to hold our char
-                //  Not sure if this correct on big endian machines!!!
-                char v[5] = "\x00\x00\x00\x00"; // a char array on windows always wants a terminating null so we need size 5 :|
-                v[3] = char_v;
-                size = zchunk_extend( newchunk, v, 4 );
-                break;
-            }
-            case 'm': // midi data
-            {
-                uint32_t midi_v = va_arg( argptr, uint32_t);
-                zchunk_extend( newchunk, &midi_v, sizeof(uint32_t) );
-                break;
-            }
-            case 'T':
-            case 'F':
-            case 'N': // never used???
-            case 'I': // never used???
-            {
-                break;
-            }
-            default:
-                zsys_error("format identifier '%c' not matched", *format);
-        }
+        s_append_data(newchunk, *format, argptr);
         format++;
     }
     zchunk_destroy(&self->chunk);
