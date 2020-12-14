@@ -88,6 +88,15 @@ Java_org_zeromq_czmq_Zosc__1_1format (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zosc__1_1append (JNIEnv *env, jclass c, jlong self, jstring format)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    jint append_ = (jint) zosc_append ((zosc_t *) (intptr_t) self, format_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return append_;
+}
+
+JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zosc__1_1retr (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);

@@ -49,8 +49,8 @@ fold_end() {
 case $TRAVIS_OS_NAME in
 windows)
     export
-#    choco install openjdk
-#    export JAVA_HOME="C:\Program Files\OpenJDK\jdk-13.0.2"
+    choco install openjdk
+    export JAVA_HOME="C:\Program Files\OpenJDK\jdk-13.0.2"
     export BUILD_PREFIX=$TEMP/ci_build
     # Build will fail if processes are still running at the end of the script.
     # Gradle by default starts a daemon so consequtive builds are faster.
@@ -81,10 +81,10 @@ windows)
     ctest --build-config Release
     cd ../..
 
-#    cd czmq
-#    cd bindings/jni
-#    ./gradlew build jar -PbuildPrefix=$BUILD_PREFIX -x test --info
-#    ./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
+    cd czmq
+    cd bindings/jni
+    ./gradlew build jar -PbuildPrefix=$BUILD_PREFIX -x test --info
+    ./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
 
     exit 0
 esac

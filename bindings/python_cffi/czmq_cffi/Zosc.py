@@ -121,6 +121,29 @@ See the class's test method for more examples how to use the class.
         """
         return utils.lib.zosc_format(self._p)
 
+    def append(self, format, *format_args):
+        """
+        Append data to the osc message. The format describes the data that
+        needs to be appended in the message. This essentially relocates all
+        data!
+        The format type tags are as follows:
+          i - 32bit integer
+          h - 64bit integer
+          f - 32bit floating point number (IEEE)
+          d - 64bit (double) floating point number
+          s - string (NULL terminated)
+          t = timetag: an OSC timetag in NTP format (uint64_t)
+          S - symbol
+          c - char
+          m - 4 byte midi packet (8 digits hexadecimal)
+          T - TRUE (no value required)
+          F - FALSE (no value required)
+          N - NIL (no value required)
+          I - Impulse (for triggers) or INFINITUM (no value required)
+          b - binary blob
+        """
+        return utils.lib.zosc_append(self._p, utils.to_bytes(format), *format_args)
+
     def retr(self, format, *format_args):
         """
         Retrieve the values provided by the given format. Note that zosc_retr

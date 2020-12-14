@@ -9580,6 +9580,7 @@ NAN_MODULE_INIT (Zosc::Init) {
     Nan::SetPrototypeMethod (tpl, "data", _data);
     Nan::SetPrototypeMethod (tpl, "address", _address);
     Nan::SetPrototypeMethod (tpl, "format", _format);
+    Nan::SetPrototypeMethod (tpl, "append", _append);
     Nan::SetPrototypeMethod (tpl, "retr", _retr);
     Nan::SetPrototypeMethod (tpl, "dup", _dup);
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
@@ -9664,6 +9665,22 @@ NAN_METHOD (Zosc::_format) {
     Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
     char *result = (char *) zosc_format (zosc->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Zosc::_append) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    char *format;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `format`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`format` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String format_utf8 (info [0].As<String>());
+    format = *format_utf8;
+         //} //bjornw end
+    int result = zosc_append (zosc->self, (const char *)format);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
 }
 
 NAN_METHOD (Zosc::_retr) {

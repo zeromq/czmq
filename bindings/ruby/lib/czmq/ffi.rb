@@ -987,6 +987,7 @@ module CZMQ
       attach_function :zosc_data, [:pointer], :pointer, **opts
       attach_function :zosc_address, [:pointer], :string, **opts
       attach_function :zosc_format, [:pointer], :string, **opts
+      attach_function :zosc_append, [:pointer, :string, :varargs], :int, **opts
       attach_function :zosc_retr, [:pointer, :string, :varargs], :int, **opts
       attach_function :zosc_dup, [:pointer], :pointer, **opts
       attach_function :zosc_pack, [:pointer], :pointer, **opts

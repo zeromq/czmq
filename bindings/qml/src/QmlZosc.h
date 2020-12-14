@@ -54,6 +54,26 @@ public slots:
     //    b - binary blob
     const QString format ();
 
+    //  Append data to the osc message. The format describes the data that
+    //  needs to be appended in the message. This essentially relocates all
+    //  data!
+    //  The format type tags are as follows:
+    //    i - 32bit integer
+    //    h - 64bit integer
+    //    f - 32bit floating point number (IEEE)
+    //    d - 64bit (double) floating point number
+    //    s - string (NULL terminated)
+    //    t = timetag: an OSC timetag in NTP format (uint64_t)
+    //    S - symbol
+    //    c - char
+    //    m - 4 byte midi packet (8 digits hexadecimal)
+    //    T - TRUE (no value required)
+    //    F - FALSE (no value required)
+    //    N - NIL (no value required)
+    //    I - Impulse (for triggers) or INFINITUM (no value required)
+    //    b - binary blob
+    int append (const QString &format);
+
     //  Retrieve the values provided by the given format. Note that zosc_retr
     //  creates the objects and the caller must destroy them when finished.
     //  The supplied pointers do not need to be initialized. Returns 0 if
