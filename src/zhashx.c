@@ -1198,7 +1198,7 @@ zhashx_test (bool verbose)
     assert (zlistx_size (keys) == 4);
     zlistx_destroy (&keys);
 
-    zlistx_t *values = zhashx_values(hash);
+    zlistx_t *values = zhashx_values (hash);
     assert (zlistx_size (values) == 4);
     zlistx_destroy (&values);
 
