@@ -2349,6 +2349,7 @@ zsock_test (bool verbose)
     // ZMQ_DGRAM ipv4 unicast test
     zsock_t* dgramr = zsock_new_dgram ("udp://*:7777");
     assert (dgramr);
+    assert ( streq( "DGRAM", zsys_sockname(ZMQ_DGRAM)) );
     //zsock_t* dgrams = zsock_new_dgram ("udp://*:*");
     zsock_t* dgrams = zsock_new (ZMQ_DGRAM);
     zsock_bind (dgrams, "udp://127.0.0.1:7778" );

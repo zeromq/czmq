@@ -564,11 +564,13 @@ zsys_sockname (int socktype)
         "XPUB", "XSUB", "STREAM",
         "SERVER", "CLIENT",
         "RADIO", "DISH",
-        "SCATTER", "GATHER"
+        "SCATTER", "GATHER", "DGRAM"
     };
     //  This array matches ZMQ_XXX type definitions
     assert (ZMQ_PAIR == 0);
-#if defined (ZMQ_SCATTER)
+#if defined (ZMQ_DGRAM)
+    assert (socktype >= 0 && socktype <= ZMQ_DGRAM);
+#elif defined (ZMQ_SCATTER)
     assert (socktype >= 0 && socktype <= ZMQ_SCATTER);
 #elif defined (ZMQ_DISH)
     assert (socktype >= 0 && socktype <= ZMQ_DISH);
