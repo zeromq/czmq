@@ -345,7 +345,7 @@ zosc_append(zosc_t *self, const char *format, ...)
     assert(format);
 
     // create new format string (format_cur + format)
-    unsigned long formatlen = strlen(format)+ strlen(self->format);
+    unsigned long formatlen = strlen(format)+ strlen(self->format) + 1; // +1 for the 0 byte
     unsigned int aligned = (unsigned)(((int)formatlen + 3) &~0x03);
     // for safety we'd better do this on the heap??? which is slower.
 #ifdef _MSC_VER
