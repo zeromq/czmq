@@ -3200,6 +3200,16 @@ type
   // Return thread name prefix.
   function zsys_thread_name_prefix: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Configure the numeric prefix to each thread created for the internal
+  // context's thread pool. This option is only supported on Linux.
+  // If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+  // provides the default.
+  // Note that this method is valid only before any socket is created.
+  procedure zsys_set_thread_name_prefix_str(Prefix: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Return thread name prefix.
+  function zsys_thread_name_prefix_str: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
   // This option is only supported on Linux.
   // Note that this method is valid only before any socket is created.

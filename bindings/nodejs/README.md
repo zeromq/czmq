@@ -4165,6 +4165,22 @@ integer my_zsys.threadNamePrefix ()
 Return thread name prefix.
 
 ```
+nothing my_zsys.setThreadNamePrefixStr (String)
+```
+
+Configure the numeric prefix to each thread created for the internal
+context's thread pool. This option is only supported on Linux.
+If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+provides the default.
+Note that this method is valid only before any socket is created.
+
+```
+string my_zsys.threadNamePrefixStr ()
+```
+
+Return thread name prefix.
+
+```
 nothing my_zsys.threadAffinityCpuAdd (Number)
 ```
 

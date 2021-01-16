@@ -451,6 +451,20 @@ CZMQ_EXPORT char *
     zsys_sprintf_hint (int hint, const char *format, ...);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Configure the numeric prefix to each thread created for the internal
+//  context's thread pool. This option is only supported on Linux.
+//  If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+//  provides the default.
+//  Note that this method is valid only before any socket is created.
+CZMQ_EXPORT void
+    zsys_set_thread_name_prefix_str (const char *prefix);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return thread name prefix.
+CZMQ_EXPORT const char *
+    zsys_thread_name_prefix_str (void);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Configure whether to use zero copy strategy in libzmq. If the environment
 //  variable ZSYS_ZERO_COPY_RECV is defined, that provides the default.
 //  Otherwise the default is 1.

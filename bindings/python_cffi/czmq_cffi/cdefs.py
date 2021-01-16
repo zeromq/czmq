@@ -3956,6 +3956,18 @@ void
 int
     zsys_thread_name_prefix (void);
 
+// Configure the numeric prefix to each thread created for the internal
+// context's thread pool. This option is only supported on Linux.
+// If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+// provides the default.
+// Note that this method is valid only before any socket is created.
+void
+    zsys_set_thread_name_prefix_str (const char *prefix);
+
+// Return thread name prefix.
+const char *
+    zsys_thread_name_prefix_str (void);
+
 // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
 // This option is only supported on Linux.
 // Note that this method is valid only before any socket is created.

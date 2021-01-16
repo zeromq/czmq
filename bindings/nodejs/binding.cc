@@ -7465,6 +7465,8 @@ NAN_MODULE_INIT (Zsys::Init) {
     Nan::SetPrototypeMethod (tpl, "setThreadPriority", _set_thread_priority);
     Nan::SetPrototypeMethod (tpl, "setThreadNamePrefix", _set_thread_name_prefix);
     Nan::SetPrototypeMethod (tpl, "threadNamePrefix", _thread_name_prefix);
+    Nan::SetPrototypeMethod (tpl, "setThreadNamePrefixStr", _set_thread_name_prefix_str);
+    Nan::SetPrototypeMethod (tpl, "threadNamePrefixStr", _thread_name_prefix_str);
     Nan::SetPrototypeMethod (tpl, "threadAffinityCpuAdd", _thread_affinity_cpu_add);
     Nan::SetPrototypeMethod (tpl, "threadAffinityCpuRemove", _thread_affinity_cpu_remove);
     Nan::SetPrototypeMethod (tpl, "setMaxSockets", _set_max_sockets);
@@ -7930,6 +7932,25 @@ NAN_METHOD (Zsys::_set_thread_name_prefix) {
 NAN_METHOD (Zsys::_thread_name_prefix) {
     int result = zsys_thread_name_prefix ();
     info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsys::_set_thread_name_prefix_str) {
+    char *prefix;
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `prefix`");
+    else
+    if (!info [0]->IsString ())
+        return Nan::ThrowTypeError ("`prefix` must be a string");
+    //else { // bjornw: remove brackets to keep scope
+    Nan::Utf8String prefix_utf8 (info [0].As<String>());
+    prefix = *prefix_utf8;
+         //} //bjornw end
+    zsys_set_thread_name_prefix_str ((const char *)prefix);
+}
+
+NAN_METHOD (Zsys::_thread_name_prefix_str) {
+    char *result = (char *) zsys_thread_name_prefix_str ();
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zsys::_thread_affinity_cpu_add) {

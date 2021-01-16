@@ -7583,6 +7583,10 @@ lib.zsys_set_thread_name_prefix.restype = None
 lib.zsys_set_thread_name_prefix.argtypes = [c_int]
 lib.zsys_thread_name_prefix.restype = c_int
 lib.zsys_thread_name_prefix.argtypes = []
+lib.zsys_set_thread_name_prefix_str.restype = None
+lib.zsys_set_thread_name_prefix_str.argtypes = [c_char_p]
+lib.zsys_thread_name_prefix_str.restype = c_char_p
+lib.zsys_thread_name_prefix_str.argtypes = []
 lib.zsys_thread_affinity_cpu_add.restype = None
 lib.zsys_thread_affinity_cpu_add.argtypes = [c_int]
 lib.zsys_thread_affinity_cpu_remove.restype = None
@@ -8048,6 +8052,24 @@ Note that this method is valid only before any socket is created.
         Return thread name prefix.
         """
         return lib.zsys_thread_name_prefix()
+
+    @staticmethod
+    def set_thread_name_prefix_str(prefix):
+        """
+        Configure the numeric prefix to each thread created for the internal
+context's thread pool. This option is only supported on Linux.
+If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+provides the default.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_set_thread_name_prefix_str(prefix)
+
+    @staticmethod
+    def thread_name_prefix_str():
+        """
+        Return thread name prefix.
+        """
+        return lib.zsys_thread_name_prefix_str()
 
     @staticmethod
     def thread_affinity_cpu_add(cpu):

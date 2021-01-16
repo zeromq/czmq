@@ -541,6 +541,27 @@ module CZMQ
         result
       end
 
+      # Configure the numeric prefix to each thread created for the internal
+      # context's thread pool. This option is only supported on Linux.
+      # If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+      # provides the default.
+      # Note that this method is valid only before any socket is created.
+      #
+      # @param prefix [String, #to_s, nil]
+      # @return [void]
+      def self.set_thread_name_prefix_str(prefix)
+        result = ::CZMQ::FFI.zsys_set_thread_name_prefix_str(prefix)
+        result
+      end
+
+      # Return thread name prefix.
+      #
+      # @return [String]
+      def self.thread_name_prefix_str()
+        result = ::CZMQ::FFI.zsys_thread_name_prefix_str()
+        result
+      end
+
       # Adds a specific CPU to the affinity list of the ZMQ context thread pool.
       # This option is only supported on Linux.
       # Note that this method is valid only before any socket is created.

@@ -881,6 +881,8 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_set_thread_priority);
     static NAN_METHOD (_set_thread_name_prefix);
     static NAN_METHOD (_thread_name_prefix);
+    static NAN_METHOD (_set_thread_name_prefix_str);
+    static NAN_METHOD (_thread_name_prefix_str);
     static NAN_METHOD (_thread_affinity_cpu_add);
     static NAN_METHOD (_thread_affinity_cpu_remove);
     static NAN_METHOD (_set_max_sockets);

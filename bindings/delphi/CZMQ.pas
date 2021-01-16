@@ -5506,6 +5506,16 @@ uses
     // Return thread name prefix.
     class function ThreadNamePrefix: Integer;
 
+    // Configure the numeric prefix to each thread created for the internal
+    // context's thread pool. This option is only supported on Linux.
+    // If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+    // provides the default.
+    // Note that this method is valid only before any socket is created.
+    class procedure SetThreadNamePrefixStr(const Prefix: string);
+
+    // Return thread name prefix.
+    class function ThreadNamePrefixStr: string;
+
     // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
     // This option is only supported on Linux.
     // Note that this method is valid only before any socket is created.
@@ -9996,6 +10006,19 @@ end;
   class function TZsys.ThreadNamePrefix: Integer;
   begin
     Result := zsys_thread_name_prefix;
+  end;
+
+  class procedure TZsys.SetThreadNamePrefixStr(const Prefix: string);
+  var
+    __Prefix__: UTF8String;
+  begin
+    __Prefix__ := UTF8String(Prefix);
+    zsys_set_thread_name_prefix_str(PAnsiChar(__Prefix__));
+  end;
+
+  class function TZsys.ThreadNamePrefixStr: string;
+  begin
+    Result := string(UTF8String(zsys_thread_name_prefix_str));
   end;
 
   class procedure TZsys.ThreadAffinityCpuAdd(Cpu: Integer);
