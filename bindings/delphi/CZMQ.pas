@@ -1583,6 +1583,22 @@ uses
     // Check whether the socket has available message to read.
     function HasIn: Boolean;
 
+    // Get socket option `priority`.
+    // Available from libzmq 4.3.0.
+    function Priority: Integer;
+
+    // Set socket option `priority`.
+    // Available from libzmq 4.3.0.
+    procedure SetPriority(Priority: Integer);
+
+    // Get socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    function ReconnectStop: Integer;
+
+    // Set socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    procedure SetReconnectStop(ReconnectStop: Integer);
+
     // Set socket option `only_first_subscribe`.
     // Available from libzmq 4.3.0.
     procedure SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
@@ -4530,6 +4546,22 @@ uses
 
     // Check whether the socket has available message to read.
     function HasIn: Boolean;
+
+    // Get socket option `priority`.
+    // Available from libzmq 4.3.0.
+    function Priority: Integer;
+
+    // Set socket option `priority`.
+    // Available from libzmq 4.3.0.
+    procedure SetPriority(Priority: Integer);
+
+    // Get socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    function ReconnectStop: Integer;
+
+    // Set socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    procedure SetReconnectStop(ReconnectStop: Integer);
 
     // Set socket option `only_first_subscribe`.
     // Available from libzmq 4.3.0.
@@ -8688,6 +8720,26 @@ end;
   function TZsock.HasIn: Boolean;
   begin
     Result := zsock_has_in(FHandle);
+  end;
+
+  function TZsock.Priority: Integer;
+  begin
+    Result := zsock_priority(FHandle);
+  end;
+
+  procedure TZsock.SetPriority(Priority: Integer);
+  begin
+    zsock_set_priority(FHandle, Priority);
+  end;
+
+  function TZsock.ReconnectStop: Integer;
+  begin
+    Result := zsock_reconnect_stop(FHandle);
+  end;
+
+  procedure TZsock.SetReconnectStop(ReconnectStop: Integer);
+  begin
+    zsock_set_reconnect_stop(FHandle, ReconnectStop);
   end;
 
   procedure TZsock.SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);

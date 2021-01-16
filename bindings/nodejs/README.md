@@ -2579,6 +2579,34 @@ boolean my_zsock.hasIn ()
 Check whether the socket has available message to read.
 
 ```
+integer my_zsock.priority ()
+```
+
+Get socket option `priority`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setPriority (Number)
+```
+
+Set socket option `priority`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.reconnectStop ()
+```
+
+Get socket option `reconnect_stop`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setReconnectStop (Number)
+```
+
+Set socket option `reconnect_stop`.
+Available from libzmq 4.3.0.
+
+```
 nothing my_zsock.setOnlyFirstSubscribe (Number)
 ```
 

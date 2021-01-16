@@ -2223,6 +2223,22 @@ type
   // Check whether the socket has available message to read.
   function zsock_has_in(self: PZsock): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Get socket option `priority`.
+  // Available from libzmq 4.3.0.
+  function zsock_priority(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `priority`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_priority(self: PZsock; Priority: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get socket option `reconnect_stop`.
+  // Available from libzmq 4.3.0.
+  function zsock_reconnect_stop(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `reconnect_stop`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_reconnect_stop(self: PZsock; ReconnectStop: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Set socket option `only_first_subscribe`.
   // Available from libzmq 4.3.0.
   procedure zsock_set_only_first_subscribe(self: PZsock; OnlyFirstSubscribe: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};

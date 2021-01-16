@@ -4536,6 +4536,10 @@ NAN_MODULE_INIT (Zsock::Init) {
     Nan::SetPrototypeMethod (tpl, "join", _join);
     Nan::SetPrototypeMethod (tpl, "leave", _leave);
     Nan::SetPrototypeMethod (tpl, "hasIn", _has_in);
+    Nan::SetPrototypeMethod (tpl, "priority", _priority);
+    Nan::SetPrototypeMethod (tpl, "setPriority", _set_priority);
+    Nan::SetPrototypeMethod (tpl, "reconnectStop", _reconnect_stop);
+    Nan::SetPrototypeMethod (tpl, "setReconnectStop", _set_reconnect_stop);
     Nan::SetPrototypeMethod (tpl, "setOnlyFirstSubscribe", _set_only_first_subscribe);
     Nan::SetPrototypeMethod (tpl, "setHelloMsg", _set_hello_msg);
     Nan::SetPrototypeMethod (tpl, "setDisconnectMsg", _set_disconnect_msg);
@@ -5068,6 +5072,54 @@ NAN_METHOD (Zsock::_has_in) {
     Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
     bool result = zsock_has_in (zsock->self);
     info.GetReturnValue ().Set (Nan::New<Boolean>(result));
+}
+
+NAN_METHOD (Zsock::_priority) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_priority (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_priority) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `priority`");
+
+    //int priority; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int priority;
+
+
+    if (info [0]->IsNumber ())
+    {
+          priority = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`priority` must be a number");
+    zsock_set_priority (zsock->self, (int) priority);
+}
+
+NAN_METHOD (Zsock::_reconnect_stop) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    int result = zsock_reconnect_stop (zsock->self);
+    info.GetReturnValue ().Set (Nan::New<Number>(result));
+}
+
+NAN_METHOD (Zsock::_set_reconnect_stop) {
+    Zsock *zsock = Nan::ObjectWrap::Unwrap <Zsock> (info.Holder ());
+    if (info [0]->IsUndefined ())
+        return Nan::ThrowTypeError ("method requires a `reconnect stop`");
+
+    //int reconnect_stop; // bjornw typedef - if using c_type, then you get 'int * major' but it needs to be 'int major'. later using the FromJust() returns an int
+    int reconnect_stop;
+
+
+    if (info [0]->IsNumber ())
+    {
+          reconnect_stop = Nan::To<int>(info [0]).FromJust ();
+    }
+    else
+        return Nan::ThrowTypeError ("`reconnect stop` must be a number");
+    zsock_set_reconnect_stop (zsock->self, (int) reconnect_stop);
 }
 
 NAN_METHOD (Zsock::_set_only_first_subscribe) {
