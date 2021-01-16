@@ -2579,6 +2579,34 @@ boolean my_zsock.hasIn ()
 Check whether the socket has available message to read.
 
 ```
+integer my_zsock.priority ()
+```
+
+Get socket option `priority`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setPriority (Number)
+```
+
+Set socket option `priority`.
+Available from libzmq 4.3.0.
+
+```
+integer my_zsock.reconnectStop ()
+```
+
+Get socket option `reconnect_stop`.
+Available from libzmq 4.3.0.
+
+```
+nothing my_zsock.setReconnectStop (Number)
+```
+
+Set socket option `reconnect_stop`.
+Available from libzmq 4.3.0.
+
+```
 nothing my_zsock.setOnlyFirstSubscribe (Number)
 ```
 
@@ -4132,6 +4160,22 @@ Note that this method is valid only before any socket is created.
 
 ```
 integer my_zsys.threadNamePrefix ()
+```
+
+Return thread name prefix.
+
+```
+nothing my_zsys.setThreadNamePrefixStr (String)
+```
+
+Configure the numeric prefix to each thread created for the internal
+context's thread pool. This option is only supported on Linux.
+If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+provides the default.
+Note that this method is valid only before any socket is created.
+
+```
+string my_zsys.threadNamePrefixStr ()
 ```
 
 Return thread name prefix.

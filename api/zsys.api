@@ -318,6 +318,20 @@
         <return type = "integer" />
     </method>
 
+    <method name = "set thread name prefix str" singleton = "1" state = "draft">
+        Configure the numeric prefix to each thread created for the internal
+        context's thread pool. This option is only supported on Linux.
+        If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+        provides the default.
+        Note that this method is valid only before any socket is created.
+        <argument name = "prefix" type = "string" />
+    </method>
+
+    <method name = "thread name prefix str" singleton = "1" state = "draft">
+        Return thread name prefix.
+        <return type = "string" />
+    </method>
+
     <method name = "thread affinity cpu add" singleton = "1">
         Adds a specific CPU to the affinity list of the ZMQ context thread pool.
         This option is only supported on Linux.

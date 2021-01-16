@@ -277,6 +277,34 @@ bool QmlZsock::hasIn () {
 };
 
 ///
+//  Get socket option `priority`.
+//  Available from libzmq 4.3.0.
+int QmlZsock::priority () {
+    return zsock_priority (self);
+};
+
+///
+//  Set socket option `priority`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setPriority (int priority) {
+    zsock_set_priority (self, priority);
+};
+
+///
+//  Get socket option `reconnect_stop`.
+//  Available from libzmq 4.3.0.
+int QmlZsock::reconnectStop () {
+    return zsock_reconnect_stop (self);
+};
+
+///
+//  Set socket option `reconnect_stop`.
+//  Available from libzmq 4.3.0.
+void QmlZsock::setReconnectStop (int reconnectStop) {
+    zsock_set_reconnect_stop (self, reconnectStop);
+};
+
+///
 //  Set socket option `only_first_subscribe`.
 //  Available from libzmq 4.3.0.
 void QmlZsock::setOnlyFirstSubscribe (int onlyFirstSubscribe) {

@@ -373,6 +373,32 @@ Java_org_zeromq_czmq_Zsock__1_1hasIn (JNIEnv *env, jclass c, jlong self)
     return has_in_;
 }
 
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1priority (JNIEnv *env, jclass c, jlong self)
+{
+    jint priority_ = (jint) zsock_priority ((zsock_t *) (intptr_t) self);
+    return priority_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setPriority (JNIEnv *env, jclass c, jlong self, jint priority)
+{
+    zsock_set_priority ((zsock_t *) (intptr_t) self, (int) priority);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1reconnectStop (JNIEnv *env, jclass c, jlong self)
+{
+    jint reconnect_stop_ = (jint) zsock_reconnect_stop ((zsock_t *) (intptr_t) self);
+    return reconnect_stop_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setReconnectStop (JNIEnv *env, jclass c, jlong self, jint reconnect_stop)
+{
+    zsock_set_reconnect_stop ((zsock_t *) (intptr_t) self, (int) reconnect_stop);
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setOnlyFirstSubscribe (JNIEnv *env, jclass c, jlong self, jint only_first_subscribe)
 {

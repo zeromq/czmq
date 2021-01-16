@@ -2761,6 +2761,26 @@ void *
 bool
     zsock_has_in (void *self);
 
+// Get socket option `priority`.
+// Available from libzmq 4.3.0.
+int
+    zsock_priority (void *self);
+
+// Set socket option `priority`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_priority (void *self, int priority);
+
+// Get socket option `reconnect_stop`.
+// Available from libzmq 4.3.0.
+int
+    zsock_reconnect_stop (void *self);
+
+// Set socket option `reconnect_stop`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_reconnect_stop (void *self, int reconnect_stop);
+
 // Set socket option `only_first_subscribe`.
 // Available from libzmq 4.3.0.
 void
@@ -3935,6 +3955,18 @@ void
 // Return thread name prefix.
 int
     zsys_thread_name_prefix (void);
+
+// Configure the numeric prefix to each thread created for the internal
+// context's thread pool. This option is only supported on Linux.
+// If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+// provides the default.
+// Note that this method is valid only before any socket is created.
+void
+    zsys_set_thread_name_prefix_str (const char *prefix);
+
+// Return thread name prefix.
+const char *
+    zsys_thread_name_prefix_str (void);
 
 // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
 // This option is only supported on Linux.

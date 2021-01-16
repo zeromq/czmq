@@ -485,6 +485,38 @@ public class Zsock implements AutoCloseable {
         return __hasIn (self);
     }
     /*
+    Get socket option `priority`.
+    Available from libzmq 4.3.0.
+    */
+    native static int __priority (long self);
+    public int priority () {
+        return __priority (self);
+    }
+    /*
+    Set socket option `priority`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setPriority (long self, int priority);
+    public void setPriority (int priority) {
+        __setPriority (self, priority);
+    }
+    /*
+    Get socket option `reconnect_stop`.
+    Available from libzmq 4.3.0.
+    */
+    native static int __reconnectStop (long self);
+    public int reconnectStop () {
+        return __reconnectStop (self);
+    }
+    /*
+    Set socket option `reconnect_stop`.
+    Available from libzmq 4.3.0.
+    */
+    native static void __setReconnectStop (long self, int reconnectStop);
+    public void setReconnectStop (int reconnectStop) {
+        __setReconnectStop (self, reconnectStop);
+    }
+    /*
     Set socket option `only_first_subscribe`.
     Available from libzmq 4.3.0.
     */

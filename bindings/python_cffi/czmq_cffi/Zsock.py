@@ -457,6 +457,34 @@ class Zsock(object):
         """
         return utils.lib.zsock_has_in(self._p)
 
+    def priority(self):
+        """
+        Get socket option `priority`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_priority(self._p)
+
+    def set_priority(self, priority):
+        """
+        Set socket option `priority`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_priority(self._p, priority)
+
+    def reconnect_stop(self):
+        """
+        Get socket option `reconnect_stop`.
+        Available from libzmq 4.3.0.
+        """
+        return utils.lib.zsock_reconnect_stop(self._p)
+
+    def set_reconnect_stop(self, reconnect_stop):
+        """
+        Set socket option `reconnect_stop`.
+        Available from libzmq 4.3.0.
+        """
+        utils.lib.zsock_set_reconnect_stop(self._p, reconnect_stop)
+
     def set_only_first_subscribe(self, only_first_subscribe):
         """
         Set socket option `only_first_subscribe`.

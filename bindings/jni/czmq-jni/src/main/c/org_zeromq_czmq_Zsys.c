@@ -268,6 +268,22 @@ Java_org_zeromq_czmq_Zsys__1_1threadNamePrefix (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsys__1_1setThreadNamePrefixStr (JNIEnv *env, jclass c, jstring prefix)
+{
+    char *prefix_ = (char *) (*env)->GetStringUTFChars (env, prefix, NULL);
+    zsys_set_thread_name_prefix_str (prefix_);
+    (*env)->ReleaseStringUTFChars (env, prefix, prefix_);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zsys__1_1threadNamePrefixStr (JNIEnv *env, jclass c)
+{
+    char *thread_name_prefix_str_ = (char *) zsys_thread_name_prefix_str ();
+    jstring return_string_ = (*env)->NewStringUTF (env, thread_name_prefix_str_);
+    return return_string_;
+}
+
+JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsys__1_1threadAffinityCpuAdd (JNIEnv *env, jclass c, jint cpu)
 {
     zsys_thread_affinity_cpu_add ((int) cpu);

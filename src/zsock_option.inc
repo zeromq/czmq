@@ -20,6 +20,100 @@
 */
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_PRIORITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_priority (void *self, int priority)
+{
+    assert (self);
+#   if defined (ZMQ_PRIORITY)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock priority option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_PRIORITY, &priority, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_PRIORITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_priority (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_PRIORITY)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock priority option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int priority;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_PRIORITY, &priority, &option_len);
+    return priority;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RECONNECT_STOP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_reconnect_stop (void *self, int reconnect_stop)
+{
+    assert (self);
+#   if defined (ZMQ_RECONNECT_STOP)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock reconnect_stop option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return;
+    }
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECONNECT_STOP, &reconnect_stop, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RECONNECT_STOP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsock_reconnect_stop (void *self)
+{
+    assert (self);
+#   if defined (ZMQ_RECONNECT_STOP)
+    int major, minor, patch;
+    zmq_version (&major, &minor, &patch);
+    if (ZMQ_MAKE_VERSION (major, minor, patch) < ZMQ_MAKE_VERSION (4, 3, 0)) {
+        zsys_error ("zsock reconnect_stop option not supported by libzmq version %d.%d.%d, "
+            "run with libzmq >= 4.3.0\n", major, minor, patch, NULL);
+        return 0;
+    }
+    int reconnect_stop;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECONNECT_STOP, &reconnect_stop, &option_len);
+    return reconnect_stop;
+#   else
+    return 0;
+#   endif
+}
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_ONLY_FIRST_SUBSCRIBE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -4191,6 +4285,22 @@ zsock_option_test (bool verbose)
     zsock_t *self;
 #if (ZMQ_VERSION_MAJOR >= 4)
 #   if (ZMQ_VERSION_MINOR >= 3)
+#     if defined (ZMQ_PRIORITY)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_priority (self, 1);
+    assert (zsock_priority (self) == 1);
+    zsock_priority (self);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_RECONNECT_STOP)
+    self = zsock_new (ZMQ_ROUTER);
+    assert (self);
+    zsock_set_reconnect_stop (self, 1);
+    assert (zsock_reconnect_stop (self) == 1);
+    zsock_reconnect_stop (self);
+    zsock_destroy (&self);
+#     endif
 #     if defined (ZMQ_ONLY_FIRST_SUBSCRIBE)
     self = zsock_new (ZMQ_XPUB);
     assert (self);

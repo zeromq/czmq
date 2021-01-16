@@ -2223,6 +2223,22 @@ type
   // Check whether the socket has available message to read.
   function zsock_has_in(self: PZsock): Boolean; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Get socket option `priority`.
+  // Available from libzmq 4.3.0.
+  function zsock_priority(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `priority`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_priority(self: PZsock; Priority: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Get socket option `reconnect_stop`.
+  // Available from libzmq 4.3.0.
+  function zsock_reconnect_stop(self: PZsock): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Set socket option `reconnect_stop`.
+  // Available from libzmq 4.3.0.
+  procedure zsock_set_reconnect_stop(self: PZsock; ReconnectStop: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Set socket option `only_first_subscribe`.
   // Available from libzmq 4.3.0.
   procedure zsock_set_only_first_subscribe(self: PZsock; OnlyFirstSubscribe: Integer); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
@@ -3183,6 +3199,16 @@ type
 
   // Return thread name prefix.
   function zsys_thread_name_prefix: Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Configure the numeric prefix to each thread created for the internal
+  // context's thread pool. This option is only supported on Linux.
+  // If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+  // provides the default.
+  // Note that this method is valid only before any socket is created.
+  procedure zsys_set_thread_name_prefix_str(Prefix: PAnsiChar); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Return thread name prefix.
+  function zsys_thread_name_prefix_str: PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
   // This option is only supported on Linux.
