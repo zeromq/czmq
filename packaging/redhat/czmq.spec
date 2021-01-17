@@ -34,7 +34,7 @@
 %endif
 
 Name:           czmq
-Version:        4.2.1
+Version:        4.2.2
 Release:        1
 Summary:        the high-level c binding for 0mq
 License:        MPL-2.0

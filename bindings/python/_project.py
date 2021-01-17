@@ -3,7 +3,7 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 NAME        = "czmq"
-VERSION     = "4.2.1"
+VERSION     = "4.2.2"
 LICENSE     = "mpl-2.0"
 DESCRIPTION = """Python bindings of: the high-level c binding for 0mq"""
 URL         = "https://github.com/zeromq/czmq"

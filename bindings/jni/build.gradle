@@ -34,9 +34,9 @@ subprojects {
     group = 'org.zeromq.czmq'
 
     if (project.hasProperty('isRelease')) {
-        version = '4.2.1'
+        version = '4.2.2'
     } else {
-        version = '4.2.1-SNAPSHOT'
+        version = '4.2.2-SNAPSHOT'
     }
 }
 

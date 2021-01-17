@@ -5,7 +5,7 @@
 
 module CZMQ
   module FFI
-    VERSION = '4.2.1'
+    VERSION = '4.2.2'
   end
 end
 
