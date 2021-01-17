@@ -10,7 +10,7 @@ It DOES:
 * provide easy to use CLASS compatible API for accessing argv
 * is platform independent
 * provide getopt_long style -- argument, which delimits parameters from arguments
-* makes parameters positon independent
+* makes parameters position independent
 * hides several formats of command line to one (-Idir, --include=dir,
   --include dir are the same from API pov)
 
