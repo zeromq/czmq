@@ -43,7 +43,7 @@ Then in the jni's android directory (czmq-jni/android), run:
 This does the following:
 
 * It compiles the CZMQ C sources for Android, into a native library libczmq.so in /tmp/android_build/<architecture>/lib
-* It compiles the JNI Java classes into a jar file czmq-jni-4.2.1.jar in bindings/jni/czmq-jni/build/libs
+* It compiles the JNI Java classes into a jar file czmq-jni-4.2.2.jar in bindings/jni/czmq-jni/build/libs
 * It compiles the JNI C sources for Android, into a native library libczmqjni.so.
 * It combines all these into jar file for the built architecture, which you can use in your Android projects.
 * It merges the jar files built for the different architectures into one jar file.
