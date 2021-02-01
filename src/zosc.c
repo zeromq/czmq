@@ -149,7 +149,9 @@ zosc_new (const char *address)
     assert (self);
     //  Initialize class properties here
     self->address = strdup(address);
+    self->format = strdup("");
     assert(self->address);
+    assert(self->format);
     self->chunk = zchunk_new(NULL, 0);
     self->data_begin = 0;
     self->data_indexes = NULL;
@@ -942,6 +944,11 @@ zosc_test (bool verbose)
     "\x40\x09\x21\xfb\x54\x44\x2d\x18\x68\x65\x6c\x6c\x6f\x00\x00\x00";
 
     //  @selftest
+    zosc_t *cd = zosc_new("/createdestroy");
+    assert(cd);
+    zosc_destroy(&cd);
+    assert(cd == NULL);
+
     // we need to have packets on the heap
     char *p1 = (char *)malloc(40);
     memcpy(p1, oscpacket, 40);
@@ -1114,6 +1121,10 @@ zosc_test (bool verbose)
     }
 
     // test append
+    zosc_t *cappd = zosc_new("/createappenddestroy");
+    zosc_append(cappd, "s", "addedstring");
+    zosc_destroy(&cappd);
+
     int64_t preal = -80000;
     zosc_append(conm, "ih", -200, preal);
     int ax,ay;
