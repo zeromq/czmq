@@ -149,7 +149,9 @@ zosc_new (const char *address)
     assert (self);
     //  Initialize class properties here
     self->address = strdup(address);
+    self->format = strdup("");
     assert(self->address);
+    assert(self->format);
     self->chunk = zchunk_new(NULL, 0);
     self->data_begin = 0;
     self->data_indexes = NULL;
