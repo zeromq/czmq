@@ -2376,6 +2376,7 @@ zsock_test (bool verbose)
     zstr_free (&addr);
     zstr_free (&message);
 
+#ifndef __APPLE__
     // ZMQ_DGRAM ipv4 multicast test
     zsock_t* mdgramr = zsock_new_dgram ("udp://225.25.25.25:7777");
     assert (mdgramr);
@@ -2389,6 +2390,7 @@ zsock_test (bool verbose)
 
     char *mdmessage, *maddr;
 
+    // this call blocks forever on MacOS
     zmsg_t *mdmsg = zmsg_recv( mdgramr );
     assert (mdmsg);
     maddr = zmsg_popstr (mdmsg);
@@ -2400,6 +2402,7 @@ zsock_test (bool verbose)
     zstr_free (&mdmessage);
     zstr_free (&maddr);
     zstr_free (&mdmessage);
+#endif
 
 //    // ipv6 (not supported yet)
 //    zsys_set_ipv6(1);
