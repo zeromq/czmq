@@ -334,7 +334,7 @@ zsys_init (void)
         zsys_set_thread_name_prefix (s_thread_name_prefix);
 
     if (getenv ("ZSYS_THREAD_NAME_PREFIX_STR"))
-        zsys_set_thread_name_prefix_str (getenv ("ZSYS_THREAD_NAME_PREFIX"));
+        zsys_set_thread_name_prefix_str (getenv ("ZSYS_THREAD_NAME_PREFIX_STR"));
     else
         zsys_set_thread_name_prefix_str (s_thread_name_prefix_str);
 
