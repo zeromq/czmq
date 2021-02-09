@@ -135,19 +135,26 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ########################################################################
 # LIBZMQ dependency
 ########################################################################
-find_package(libzmq REQUIRED)
-IF (LIBZMQ_FOUND)
-    include_directories(${LIBZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-  IF (PC_LIBZMQ_FOUND)
-      set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
-  ELSE (PC_LIBZMQ_FOUND)
-      set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
-  ENDIF (PC_LIBZMQ_FOUND)
-ELSE (LIBZMQ_FOUND)
-    message( FATAL_ERROR "libzmq not found." )
-ENDIF (LIBZMQ_FOUND)
+IF (TARGET libzmq)
+    message( STATUS "CMake target 'libzmq' found." )
+    set(LIBZMQ_FOUND 1)
+    set(LIBZMQ_LIBRARIES libzmq)
+    list(APPEND MORE_LIBRARIES libzmq)
+ELSE(TARGET libzmq)
+    find_package(libzmq REQUIRED)
+    IF (LIBZMQ_FOUND)
+        include_directories(${LIBZMQ_INCLUDE_DIRS})
+        list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
+    IF (PC_LIBZMQ_FOUND)
+        set(pkg_config_names_private "${pkg_config_names_private} libzmq")
+        list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+    ELSE (PC_LIBZMQ_FOUND)
+        set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
+    ENDIF (PC_LIBZMQ_FOUND)
+    ELSE (LIBZMQ_FOUND)
+        message( FATAL_ERROR "libzmq not found." )
+    ENDIF (LIBZMQ_FOUND)
+ENDIF(TARGET libzmq)
 
 ########################################################################
 # UUID dependency
@@ -523,10 +530,10 @@ install(
 ########################################################################
 include(CMakePackageConfigHelpers)
 if (WIN32)
-  set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for czmqConfig.cmake")
+  set(CZMQ_CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for czmqConfig.cmake")
 else()
   # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-  set(CMAKECONFIG_INSTALL_DIR "share/cmake/czmq" CACHE STRING "install path for czmqConfig.cmake")
+  set(CZMQ_CMAKECONFIG_INSTALL_DIR "share/cmake/czmq" CACHE STRING "install path for czmqConfig.cmake")
 endif()
 
 if (NOT CMAKE_VERSION VERSION_LESS 3.0)
@@ -535,16 +542,16 @@ if (NOT CMAKE_VERSION VERSION_LESS 3.0)
 endif()
 configure_package_config_file(builds/cmake/Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/czmqConfig.cmake"
-                              INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+                              INSTALL_DESTINATION ${CZMQ_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/czmqConfigVersion.cmake
                                  VERSION ${CZMQ_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
 install(EXPORT czmq-targets
         FILE czmqTargets.cmake
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+        DESTINATION ${CZMQ_CMAKECONFIG_INSTALL_DIR})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/czmqConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/czmqConfigVersion.cmake
-              DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+              DESTINATION ${CZMQ_CMAKECONFIG_INSTALL_DIR})
 
 ########################################################################
 # executables
