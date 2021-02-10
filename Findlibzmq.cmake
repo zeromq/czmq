@@ -4,7 +4,7 @@
 ################################################################################
 
 if (NOT MSVC)
-    include(FindPkgConfig)
+    find_package(PkgConfig)
     pkg_check_modules(PC_LIBZMQ "libzmq")
     if (PC_LIBZMQ_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
@@ -18,7 +18,7 @@ if (NOT MSVC)
 endif (NOT MSVC)
 
 find_path (
-    LIBZMQ_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
     NAMES zmq.h
     HINTS ${PC_LIBZMQ_INCLUDE_HINTS}
 )
@@ -34,7 +34,7 @@ if (MSVC)
     endif ()
 
     # Retrieve ZeroMQ version number from zmq.h
-    file(STRINGS "${LIBZMQ_INCLUDE_DIRS}/zmq.h" zmq_version_defines
+    file(STRINGS "${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS}/zmq.h" zmq_version_defines
         REGEX "#define ZMQ_VERSION_(MAJOR|MINOR|PATCH)")
     foreach(ver ${zmq_version_defines})
         if(ver MATCHES "#define ZMQ_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
@@ -58,21 +58,21 @@ if (MSVC)
         "libzmq-mt-s-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_STATIC
     )
 
-    find_library (LIBZMQ_LIBRARY_DEBUG
+    find_library (${CMAKE_FIND_PACKAGE_NAME}_LIBRARY_DEBUG
         NAMES ${_zmq_debug_names}
     )
 
-    find_library (LIBZMQ_LIBRARY_RELEASE
+    find_library (${CMAKE_FIND_PACKAGE_NAME}_LIBRARY_RELEASE
         NAMES ${_zmq_release_names}
     )
 
     include(SelectLibraryConfigurations)
-    select_library_configurations(LIBZMQ)
+    select_library_configurations(${CMAKE_FIND_PACKAGE_NAME})
 endif ()
 
-if (NOT LIBZMQ_LIBRARIES)
+if (NOT ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES)
     find_library (
-        LIBZMQ_LIBRARIES
+        ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES
         NAMES libzmq zmq
         HINTS ${PC_LIBZMQ_LIBRARY_HINTS}
     )
@@ -81,12 +81,12 @@ endif ()
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    LIBZMQ
-    REQUIRED_VARS LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}
+    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 mark_as_advanced(
-    LIBZMQ_FOUND
-    LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_FOUND
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 
 ################################################################################
