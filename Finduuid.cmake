@@ -4,7 +4,7 @@
 ################################################################################
 
 if (NOT MSVC)
-    include(FindPkgConfig)
+    find_package(PkgConfig)
     pkg_check_modules(PC_UUID "uuid")
     if (PC_UUID_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
@@ -18,13 +18,13 @@ if (NOT MSVC)
 endif (NOT MSVC)
 
 find_path (
-    UUID_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
     NAMES uuid/uuid.h
     HINTS ${PC_UUID_INCLUDE_HINTS}
 )
 
 find_library (
-    UUID_LIBRARIES
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES
     NAMES uuid
     HINTS ${PC_UUID_LIBRARY_HINTS}
 )
@@ -32,12 +32,12 @@ find_library (
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    UUID
-    REQUIRED_VARS UUID_LIBRARIES UUID_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}
+    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 mark_as_advanced(
-    UUID_FOUND
-    UUID_LIBRARIES UUID_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_FOUND
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 
 ################################################################################
