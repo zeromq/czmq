@@ -126,23 +126,33 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 set(OPTIONAL_LIBRARIES)
 set(OPTIONAL_LIBRARIES_STATIC)
+set(REQUIRED_LIBRARIES)
+set(REQUIRED_LIBRARIES_STATIC)
 
 ########################################################################
 # LIBZMQ dependency
 ########################################################################
-find_package(libzmq REQUIRED)
-IF (libzmq_FOUND)
-    include_directories(${libzmq_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
-  IF (PC_LIBZMQ_FOUND)
-      set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
-  ELSE (PC_LIBZMQ_FOUND)
-      set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
-  ENDIF (PC_LIBZMQ_FOUND)
-ELSE (libzmq_FOUND)
-    message( FATAL_ERROR "libzmq not found." )
-ENDIF (libzmq_FOUND)
+find_package(ZeroMQ CONFIG)
+IF(ZeroMQ_FOUND)
+  list(APPEND REQUIRED_LIBRARIES libzmq)
+  list(APPEND REQUIRED_LIBRARIES_STATIC libzmq-static)
+  get_target_property(LIBZMQ_INCLUDE_DIRS libzmq-static INTERFACE_INCLUDE_DIRECTORIES)
+  include_directories(${LIBZMQ_INCLUDE_DIRS})
+ELSE()
+  find_package(libzmq REQUIRED)
+  IF (libzmq_FOUND)
+      include_directories(${libzmq_INCLUDE_DIRS})
+      list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+    IF (PC_LIBZMQ_FOUND)
+        set(pkg_config_names_private "${pkg_config_names_private} libzmq")
+        list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+    ELSE (PC_LIBZMQ_FOUND)
+        set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
+    ENDIF (PC_LIBZMQ_FOUND)
+  ELSE (libzmq_FOUND)
+      message( FATAL_ERROR "libzmq not found." )
+  ENDIF (libzmq_FOUND)
+ENDIF (ZeroMQ_FOUND)
 
 ########################################################################
 # UUID dependency
@@ -429,7 +439,7 @@ if (CZMQ_BUILD_SHARED)
   )
 
   target_link_libraries(czmq
-    PUBLIC ${MORE_LIBRARIES}
+    PUBLIC ${MORE_LIBRARIES} ${REQUIRED_LIBRARIES}
   )
 
   install(TARGETS czmq
@@ -466,7 +476,7 @@ if (CZMQ_BUILD_STATIC)
   )
 
   target_link_libraries(czmq-static
-    PUBLIC ${MORE_LIBRARIES}
+    PUBLIC ${MORE_LIBRARIES} ${REQUIRED_LIBRARIES_STATIC}
   )
 
   install(TARGETS czmq-static
