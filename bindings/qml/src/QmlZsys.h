@@ -140,7 +140,7 @@ public slots:
 
     //  Format a string using printf formatting, returning a freshly allocated
     //  buffer. If there was insufficient memory, returns NULL. Free the returned
-    //  string using zstr_free(). The hinted version allows to optimize by using
+    //  string using zstr_free(). The hinted version allows one to optimize by using
     //  a larger starting buffer size (known to/assumed by the developer) and so
     //  avoid reallocations.
     const QString sprintfHint (int hint, const QString &format);
@@ -234,6 +234,16 @@ public slots:
 
     //  Return thread name prefix.
     int threadNamePrefix ();
+
+    //  Configure the numeric prefix to each thread created for the internal
+    //  context's thread pool. This option is only supported on Linux.
+    //  If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+    //  provides the default.
+    //  Note that this method is valid only before any socket is created.
+    void setThreadNamePrefixStr (const QString &prefix);
+
+    //  Return thread name prefix.
+    const QString threadNamePrefixStr ();
 
     //  Adds a specific CPU to the affinity list of the ZMQ context thread pool.
     //  This option is only supported on Linux.

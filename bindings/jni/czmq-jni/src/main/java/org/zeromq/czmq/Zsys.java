@@ -205,7 +205,7 @@ public class Zsys {
     /*
     Format a string using printf formatting, returning a freshly allocated
     buffer. If there was insufficient memory, returns NULL. Free the returned
-    string using zstr_free(). The hinted version allows to optimize by using
+    string using zstr_free(). The hinted version allows one to optimize by using
     a larger starting buffer size (known to/assumed by the developer) and so
     avoid reallocations.
     */
@@ -320,6 +320,24 @@ public class Zsys {
     native static int __threadNamePrefix ();
     public static int threadNamePrefix () {
         return __threadNamePrefix ();
+    }
+    /*
+    Configure the numeric prefix to each thread created for the internal
+    context's thread pool. This option is only supported on Linux.
+    If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+    provides the default.
+    Note that this method is valid only before any socket is created.
+    */
+    native static void __setThreadNamePrefixStr (String prefix);
+    public static void setThreadNamePrefixStr (String prefix) {
+        __setThreadNamePrefixStr (prefix);
+    }
+    /*
+    Return thread name prefix.
+    */
+    native static String __threadNamePrefixStr ();
+    public static String threadNamePrefixStr () {
+        return __threadNamePrefixStr ();
     }
     /*
     Adds a specific CPU to the affinity list of the ZMQ context thread pool.

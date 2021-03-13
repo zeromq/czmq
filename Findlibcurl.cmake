@@ -4,7 +4,7 @@
 ################################################################################
 
 if (NOT MSVC)
-    include(FindPkgConfig)
+    find_package(PkgConfig)
     pkg_check_modules(PC_LIBCURL "libcurl")
     if (PC_LIBCURL_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
@@ -18,13 +18,13 @@ if (NOT MSVC)
 endif (NOT MSVC)
 
 find_path (
-    LIBCURL_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
     NAMES curl/curl.h
     HINTS ${PC_LIBCURL_INCLUDE_HINTS}
 )
 
 find_library (
-    LIBCURL_LIBRARIES
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES
     NAMES libcurl curl
     HINTS ${PC_LIBCURL_LIBRARY_HINTS}
 )
@@ -32,12 +32,12 @@ find_library (
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    LIBCURL
-    REQUIRED_VARS LIBCURL_LIBRARIES LIBCURL_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}
+    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 mark_as_advanced(
-    LIBCURL_FOUND
-    LIBCURL_LIBRARIES LIBCURL_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_FOUND
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 
 ################################################################################

@@ -183,7 +183,7 @@ void QmlZsysAttached::version (int *major, int *minor, int *patch) {
 ///
 //  Format a string using printf formatting, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
-//  string using zstr_free(). The hinted version allows to optimize by using
+//  string using zstr_free(). The hinted version allows one to optimize by using
 //  a larger starting buffer size (known to/assumed by the developer) and so
 //  avoid reallocations.
 const QString QmlZsysAttached::sprintfHint (int hint, const QString &format) {
@@ -328,6 +328,22 @@ void QmlZsysAttached::setThreadNamePrefix (int prefix) {
 //  Return thread name prefix.
 int QmlZsysAttached::threadNamePrefix () {
     return zsys_thread_name_prefix ();
+};
+
+///
+//  Configure the numeric prefix to each thread created for the internal
+//  context's thread pool. This option is only supported on Linux.
+//  If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+//  provides the default.
+//  Note that this method is valid only before any socket is created.
+void QmlZsysAttached::setThreadNamePrefixStr (const QString &prefix) {
+    zsys_set_thread_name_prefix_str (prefix.toUtf8().data());
+};
+
+///
+//  Return thread name prefix.
+const QString QmlZsysAttached::threadNamePrefixStr () {
+    return QString (zsys_thread_name_prefix_str ());
 };
 
 ///

@@ -10,6 +10,13 @@
     -->
     <version major = "4" minor = "3" style = "macro">
         <!-- Options that are new in 4.3 -->
+
+        <option name = "priority"          type = "int"   mode = "rw" test = "ROUTER"
+            test_value = "1" />
+
+        <option name = "reconnect_stop"    type = "int"    mode = "rw" test = "ROUTER"
+            test_value = "1" />
+
         <option name = "only_first_subscribe" type = "int" mode = "w"  test = "XPUB"
             test_value = "1" >
             <restrict type = "XPUB" />

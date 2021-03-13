@@ -1164,7 +1164,7 @@ zproc_test (bool verbose)
     zproc_set_env (self, &env);
 
     // execute the binary. It runs in own actor, which monitor the process and
-    // pass data accross pipes and zeromq sockets
+    // pass data across pipes and zeromq sockets
     if (verbose)
         zsys_debug("zproc_test() : launching helper '%s'", file );
     zproc_run (self);

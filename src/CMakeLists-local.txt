@@ -43,3 +43,5 @@ int main(int argc, char *argv [])
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCZMQ_HAVE_SOCK_CLOEXEC=1")
   endif()
 endif()
+
+configure_file("${PROJECT_BINARY_DIR}/platform.h.in" "${PROJECT_BINARY_DIR}/platform.h")

@@ -10,6 +10,30 @@
 
 <!-- The following socket options are available in libzmq from version 4.3.0 -->
 
+<method name = "priority" polymorphic = "1">
+    Get socket option `priority`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set priority" polymorphic = "1">
+    Set socket option `priority`.
+    Available from libzmq 4.3.0.
+    <argument name = "priority" type = "integer" />
+</method>
+
+<method name = "reconnect stop" polymorphic = "1">
+    Get socket option `reconnect_stop`.
+    Available from libzmq 4.3.0.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set reconnect stop" polymorphic = "1">
+    Set socket option `reconnect_stop`.
+    Available from libzmq 4.3.0.
+    <argument name = "reconnect stop" type = "integer" />
+</method>
+
 <method name = "set only first subscribe" polymorphic = "1">
     Set socket option `only_first_subscribe`.
     Available from libzmq 4.3.0.

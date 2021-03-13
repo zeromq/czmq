@@ -205,6 +205,16 @@ module CZMQ
         result
       end
 
+      # Return the state stored in certstore
+      #
+      # @return [::FFI::Pointer]
+      def state()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zcertstore_state(self_p)
+        result
+      end
+
       # Self test of this class
       #
       # @param verbose [Boolean]

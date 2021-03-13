@@ -966,6 +966,10 @@ zhashx_dup (zhashx_t *self)
     if (copy) {
         copy->destructor = self->destructor;
         copy->duplicator = self->duplicator;
+        copy->key_duplicator = self->key_duplicator;
+        copy->key_destructor = self->key_destructor;
+        copy->key_comparator = self->key_comparator;
+        copy->hasher = self->hasher;
         uint index;
         size_t limit = primes [self->prime_index];
         for (index = 0; index < limit; index++) {
@@ -1198,7 +1202,7 @@ zhashx_test (bool verbose)
     assert (zlistx_size (keys) == 4);
     zlistx_destroy (&keys);
 
-    zlistx_t *values = zhashx_values(hash);
+    zlistx_t *values = zhashx_values (hash);
     assert (zlistx_size (values) == 4);
     zlistx_destroy (&values);
 

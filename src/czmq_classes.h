@@ -402,11 +402,25 @@ CZMQ_PRIVATE void
 //  *** Draft method, defined for internal use only ***
 //  Format a string using printf formatting, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
-//  string using zstr_free(). The hinted version allows to optimize by using
+//  string using zstr_free(). The hinted version allows one to optimize by using
 //  a larger starting buffer size (known to/assumed by the developer) and so
 //  avoid reallocations.
 CZMQ_PRIVATE char *
     zsys_sprintf_hint (int hint, const char *format, ...);
+
+//  *** Draft method, defined for internal use only ***
+//  Configure the numeric prefix to each thread created for the internal
+//  context's thread pool. This option is only supported on Linux.
+//  If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+//  provides the default.
+//  Note that this method is valid only before any socket is created.
+CZMQ_PRIVATE void
+    zsys_set_thread_name_prefix_str (const char *prefix);
+
+//  *** Draft method, defined for internal use only ***
+//  Return thread name prefix.
+CZMQ_PRIVATE const char *
+    zsys_thread_name_prefix_str (void);
 
 //  *** Draft method, defined for internal use only ***
 //  Configure whether to use zero copy strategy in libzmq. If the environment

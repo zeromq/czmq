@@ -326,7 +326,7 @@ module CZMQ
 
       # Format a string using printf formatting, returning a freshly allocated
       # buffer. If there was insufficient memory, returns NULL. Free the returned
-      # string using zstr_free(). The hinted version allows to optimize by using
+      # string using zstr_free(). The hinted version allows one to optimize by using
       # a larger starting buffer size (known to/assumed by the developer) and so
       # avoid reallocations.
       #
@@ -538,6 +538,27 @@ module CZMQ
       # @return [Integer]
       def self.thread_name_prefix()
         result = ::CZMQ::FFI.zsys_thread_name_prefix()
+        result
+      end
+
+      # Configure the numeric prefix to each thread created for the internal
+      # context's thread pool. This option is only supported on Linux.
+      # If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+      # provides the default.
+      # Note that this method is valid only before any socket is created.
+      #
+      # @param prefix [String, #to_s, nil]
+      # @return [void]
+      def self.set_thread_name_prefix_str(prefix)
+        result = ::CZMQ::FFI.zsys_set_thread_name_prefix_str(prefix)
+        result
+      end
+
+      # Return thread name prefix.
+      #
+      # @return [String]
+      def self.thread_name_prefix_str()
+        result = ::CZMQ::FFI.zsys_thread_name_prefix_str()
         result
       end
 

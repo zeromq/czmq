@@ -273,7 +273,8 @@ server_connect (server_t *self, const char *endpoint)
         
         //  Monitor this remote server for incoming messages
         engine_handle_socket (self, remote, remote_handler);
-        
+
+#if defined (ZMQ_EVENT_ALL)
         //  Monitor this remote server for disconnection / reconnection
         zactor_t *monitor = zactor_new (zmonitor, remote);
         zlistx_add_end (self->monitors, monitor);
@@ -286,7 +287,8 @@ server_connect (server_t *self, const char *endpoint)
         zstr_send (monitor, "START");
         zsock_wait (monitor);
         engine_handle_socket (self, zactor_sock (monitor), monitor_handler);
-        
+#endif
+
         zhashx_insert (self->active_remotes, endpoint, remote);
         zhashx_insert (self->remotes, endpoint, remote);
         

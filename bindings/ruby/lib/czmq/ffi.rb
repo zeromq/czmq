@@ -135,6 +135,7 @@ module CZMQ
       attach_function :zcertstore_empty, [:pointer], :void, **opts
       attach_function :zcertstore_print, [:pointer], :void, **opts
       attach_function :zcertstore_certs, [:pointer], :pointer, **opts
+      attach_function :zcertstore_state, [:pointer], :pointer, **opts
       attach_function :zcertstore_test, [:bool], :void, **opts
 
       require_relative 'ffi/zcertstore'
@@ -592,6 +593,10 @@ module CZMQ
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
       attach_function :zsock_has_in, [:pointer], :bool, **opts
+      attach_function :zsock_priority, [:pointer], :int, **opts
+      attach_function :zsock_set_priority, [:pointer, :int], :void, **opts
+      attach_function :zsock_reconnect_stop, [:pointer], :int, **opts
+      attach_function :zsock_set_reconnect_stop, [:pointer, :int], :void, **opts
       attach_function :zsock_set_only_first_subscribe, [:pointer, :int], :void, **opts
       attach_function :zsock_set_hello_msg, [:pointer, :pointer], :void, **opts
       attach_function :zsock_set_disconnect_msg, [:pointer, :pointer], :void, **opts
@@ -822,6 +827,8 @@ module CZMQ
       attach_function :zsys_set_thread_priority, [:int], :void, **opts
       attach_function :zsys_set_thread_name_prefix, [:int], :void, **opts
       attach_function :zsys_thread_name_prefix, [], :int, **opts
+      attach_function :zsys_set_thread_name_prefix_str, [:string], :void, **opts
+      attach_function :zsys_thread_name_prefix_str, [], :string, **opts
       attach_function :zsys_thread_affinity_cpu_add, [:int], :void, **opts
       attach_function :zsys_thread_affinity_cpu_remove, [:int], :void, **opts
       attach_function :zsys_set_max_sockets, [:size_t], :void, **opts
@@ -986,6 +993,7 @@ module CZMQ
       attach_function :zosc_data, [:pointer], :pointer, **opts
       attach_function :zosc_address, [:pointer], :string, **opts
       attach_function :zosc_format, [:pointer], :string, **opts
+      attach_function :zosc_append, [:pointer, :string, :varargs], :int, **opts
       attach_function :zosc_retr, [:pointer, :string, :varargs], :int, **opts
       attach_function :zosc_dup, [:pointer], :pointer, **opts
       attach_function :zosc_pack, [:pointer], :pointer, **opts
@@ -993,6 +1001,17 @@ module CZMQ
       attach_function :zosc_unpack, [:pointer], :pointer, **opts
       attach_function :zosc_print, [:pointer], :void, **opts
       attach_function :zosc_is, [:pointer], :bool, **opts
+      attach_function :zosc_first, [:pointer, :pointer], :pointer, **opts
+      attach_function :zosc_next, [:pointer, :pointer], :pointer, **opts
+      attach_function :zosc_last, [:pointer, :pointer], :pointer, **opts
+      attach_function :zosc_pop_int32, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_int64, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_float, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_double, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_string, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_char, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_bool, [:pointer, :pointer], :int, **opts
+      attach_function :zosc_pop_midi, [:pointer, :pointer], :int, **opts
       attach_function :zosc_test, [:bool], :void, **opts
 
       require_relative 'ffi/zosc'

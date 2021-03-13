@@ -212,6 +212,35 @@ module CZMQ
         result
       end
 
+      # Append data to the osc message. The format describes the data that
+      # needs to be appended in the message. This essentially relocates all
+      # data!
+      # The format type tags are as follows:
+      #   i - 32bit integer
+      #   h - 64bit integer
+      #   f - 32bit floating point number (IEEE)
+      #   d - 64bit (double) floating point number
+      #   s - string (NULL terminated)
+      #   t = timetag: an OSC timetag in NTP format (uint64_t)
+      #   S - symbol
+      #   c - char
+      #   m - 4 byte midi packet (8 digits hexadecimal)
+      #   T - TRUE (no value required)
+      #   F - FALSE (no value required)
+      #   N - NIL (no value required)
+      #   I - Impulse (for triggers) or INFINITUM (no value required)
+      #   b - binary blob
+      #
+      # @param format [String, #to_s, nil]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [Integer]
+      def append(format, *args)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_append(self_p, format, *args)
+        result
+      end
+
       # Retrieve the values provided by the given format. Note that zosc_retr
       # creates the objects and the caller must destroy them when finished.
       # The supplied pointers do not need to be initialized. Returns 0 if
@@ -277,7 +306,7 @@ module CZMQ
         result
       end
 
-      # Dump OSC message to stderr, for debugging and tracing.
+      # Dump OSC message to stdout, for debugging and tracing.
       #
       # @return [void]
       def print()
@@ -293,6 +322,149 @@ module CZMQ
       # @return [Boolean]
       def self.is(self_)
         result = ::CZMQ::FFI.zosc_is(self_)
+        result
+      end
+
+      # Return a pointer to the item at the head of the OSC data.
+      # Sets the given char argument to the type tag of the data.
+      # If the message is empty, returns NULL and the sets the
+      # given char to NULL.
+      #
+      # @param type [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
+      def first(type)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_first(self_p, type)
+        result
+      end
+
+      # Return the next item of the OSC message. If the list is empty, returns
+      # NULL. To move to the start of the OSC message call zosc_first ().
+      #
+      # @param type [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
+      def next(type)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_next(self_p, type)
+        result
+      end
+
+      # Return a pointer to the item at the tail of the OSC message.
+      # Sets the given char argument to the type tag of the data. If
+      # the message is empty, returns NULL.
+      #
+      # @param type [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
+      def last(type)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_last(self_p, type)
+        result
+      end
+
+      # Set the provided 32 bit integer from value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_int32(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_int32(self_p, val)
+        result
+      end
+
+      # Set the provided 64 bit integer from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_int64(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_int64(self_p, val)
+        result
+      end
+
+      # Set the provided float from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_float(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_float(self_p, val)
+        result
+      end
+
+      # Set the provided double from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_double(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_double(self_p, val)
+        result
+      end
+
+      # Set the provided string from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success. Caller owns the string!
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_string(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_string(self_p, val)
+        result
+      end
+
+      # Set the provided char from the value at the current cursor position in the message.
+      # If the type tag at the current position does not correspond it will fail and
+      # return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_char(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_char(self_p, val)
+        result
+      end
+
+      # Set the provided boolean from the type tag in the message. Booleans are not represented
+      # in the data in the message, only in the type tag. If the type tag at the current
+      # position does not correspond it will fail and return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_bool(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_bool(self_p, val)
+        result
+      end
+
+      # Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+      # cursor position in the message. If the type tag at the current position does
+      # not correspond it will fail and return -1. Returns 0 on success.
+      #
+      # @param val [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
+      def pop_midi(val)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_pop_midi(self_p, val)
         result
       end
 

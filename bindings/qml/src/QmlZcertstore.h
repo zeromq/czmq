@@ -52,6 +52,9 @@ public slots:
     //  for destroying it.  The caller does not take ownership of the zcert_t
     //  objects.
     QmlZlistx *certs ();
+
+    //  Return the state stored in certstore
+    void *state ();
 };
 
 class QmlZcertstoreAttached : public QObject

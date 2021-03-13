@@ -72,6 +72,12 @@ class Zcertstore(object):
         """
         return utils.lib.zcertstore_certs(self._p)
 
+    def state(self):
+        """
+        Return the state stored in certstore
+        """
+        return utils.lib.zcertstore_state(self._p)
+
     @staticmethod
     def test(verbose):
         """

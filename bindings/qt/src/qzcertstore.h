@@ -54,6 +54,9 @@ public:
     //  objects.
     QZlistx * certs ();
 
+    //  Return the state stored in certstore
+    void * state ();
+
     //  Self test of this class
     static void test (bool verbose);
 

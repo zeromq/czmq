@@ -986,6 +986,8 @@ lib.zcertstore_print.restype = None
 lib.zcertstore_print.argtypes = [zcertstore_p]
 lib.zcertstore_certs.restype = zlistx_p
 lib.zcertstore_certs.argtypes = [zcertstore_p]
+lib.zcertstore_state.restype = c_void_p
+lib.zcertstore_state.argtypes = [zcertstore_p]
 lib.zcertstore_test.restype = None
 lib.zcertstore_test.argtypes = [c_bool]
 
@@ -1085,6 +1087,12 @@ for destroying it.  The caller does not take ownership of the zcert_t
 objects.
         """
         return Zlistx(lib.zcertstore_certs(self._as_parameter_), True)
+
+    def state(self):
+        """
+        Return the state stored in certstore
+        """
+        return c_void_p(lib.zcertstore_state(self._as_parameter_))
 
     @staticmethod
     def test(verbose):
@@ -5253,6 +5261,14 @@ lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
 lib.zsock_has_in.restype = c_bool
 lib.zsock_has_in.argtypes = [zsock_p]
+lib.zsock_priority.restype = c_int
+lib.zsock_priority.argtypes = [zsock_p]
+lib.zsock_set_priority.restype = None
+lib.zsock_set_priority.argtypes = [zsock_p, c_int]
+lib.zsock_reconnect_stop.restype = c_int
+lib.zsock_reconnect_stop.argtypes = [zsock_p]
+lib.zsock_set_reconnect_stop.restype = None
+lib.zsock_set_reconnect_stop.argtypes = [zsock_p, c_int]
 lib.zsock_set_only_first_subscribe.restype = None
 lib.zsock_set_only_first_subscribe.argtypes = [zsock_p, c_int]
 lib.zsock_set_hello_msg.restype = None
@@ -6079,6 +6095,34 @@ return the supplied value. Takes a polymorphic socket reference.
         Check whether the socket has available message to read.
         """
         return lib.zsock_has_in(self._as_parameter_)
+
+    def priority(self):
+        """
+        Get socket option `priority`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_priority(self._as_parameter_)
+
+    def set_priority(self, priority):
+        """
+        Set socket option `priority`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_priority(self._as_parameter_, priority)
+
+    def reconnect_stop(self):
+        """
+        Get socket option `reconnect_stop`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_reconnect_stop(self._as_parameter_)
+
+    def set_reconnect_stop(self, reconnect_stop):
+        """
+        Set socket option `reconnect_stop`.
+Available from libzmq 4.3.0.
+        """
+        return lib.zsock_set_reconnect_stop(self._as_parameter_, reconnect_stop)
 
     def set_only_first_subscribe(self, only_first_subscribe):
         """
@@ -7539,6 +7583,10 @@ lib.zsys_set_thread_name_prefix.restype = None
 lib.zsys_set_thread_name_prefix.argtypes = [c_int]
 lib.zsys_thread_name_prefix.restype = c_int
 lib.zsys_thread_name_prefix.argtypes = []
+lib.zsys_set_thread_name_prefix_str.restype = None
+lib.zsys_set_thread_name_prefix_str.argtypes = [c_char_p]
+lib.zsys_thread_name_prefix_str.restype = c_char_p
+lib.zsys_thread_name_prefix_str.argtypes = []
 lib.zsys_thread_affinity_cpu_add.restype = None
 lib.zsys_thread_affinity_cpu_add.argtypes = [c_int]
 lib.zsys_thread_affinity_cpu_remove.restype = None
@@ -7845,7 +7893,7 @@ number into provided fields, providing reference isn't null in each case.
         """
         Format a string using printf formatting, returning a freshly allocated
 buffer. If there was insufficient memory, returns NULL. Free the returned
-string using zstr_free(). The hinted version allows to optimize by using
+string using zstr_free(). The hinted version allows one to optimize by using
 a larger starting buffer size (known to/assumed by the developer) and so
 avoid reallocations.
         """
@@ -8004,6 +8052,24 @@ Note that this method is valid only before any socket is created.
         Return thread name prefix.
         """
         return lib.zsys_thread_name_prefix()
+
+    @staticmethod
+    def set_thread_name_prefix_str(prefix):
+        """
+        Configure the numeric prefix to each thread created for the internal
+context's thread pool. This option is only supported on Linux.
+If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+provides the default.
+Note that this method is valid only before any socket is created.
+        """
+        return lib.zsys_set_thread_name_prefix_str(prefix)
+
+    @staticmethod
+    def thread_name_prefix_str():
+        """
+        Return thread name prefix.
+        """
+        return lib.zsys_thread_name_prefix_str()
 
     @staticmethod
     def thread_affinity_cpu_add(cpu):
@@ -9487,6 +9553,8 @@ lib.zosc_address.restype = c_char_p
 lib.zosc_address.argtypes = [zosc_p]
 lib.zosc_format.restype = c_char_p
 lib.zosc_format.argtypes = [zosc_p]
+lib.zosc_append.restype = c_int
+lib.zosc_append.argtypes = [zosc_p, c_char_p]
 lib.zosc_retr.restype = c_int
 lib.zosc_retr.argtypes = [zosc_p, c_char_p]
 lib.zosc_dup.restype = zosc_p
@@ -9501,6 +9569,28 @@ lib.zosc_print.restype = None
 lib.zosc_print.argtypes = [zosc_p]
 lib.zosc_is.restype = c_bool
 lib.zosc_is.argtypes = [c_void_p]
+lib.zosc_first.restype = c_void_p
+lib.zosc_first.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_next.restype = c_void_p
+lib.zosc_next.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_last.restype = c_void_p
+lib.zosc_last.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_pop_int32.restype = c_int
+lib.zosc_pop_int32.argtypes = [zosc_p, POINTER(c_int)]
+lib.zosc_pop_int64.restype = c_int
+lib.zosc_pop_int64.argtypes = [zosc_p, POINTER(msecs_p)]
+lib.zosc_pop_float.restype = c_int
+lib.zosc_pop_float.argtypes = [zosc_p, POINTER(c_float)]
+lib.zosc_pop_double.restype = c_int
+lib.zosc_pop_double.argtypes = [zosc_p, POINTER(c_double)]
+lib.zosc_pop_string.restype = c_int
+lib.zosc_pop_string.argtypes = [zosc_p, POINTER(c_char_p)]
+lib.zosc_pop_char.restype = c_int
+lib.zosc_pop_char.argtypes = [zosc_p, POINTER(char_p)]
+lib.zosc_pop_bool.restype = c_int
+lib.zosc_pop_bool.argtypes = [zosc_p, POINTER(c_bool)]
+lib.zosc_pop_midi.restype = c_int
+lib.zosc_pop_midi.argtypes = [zosc_p, POINTER(c_int)]
 lib.zosc_test.restype = None
 lib.zosc_test.argtypes = [c_bool]
 
@@ -9649,6 +9739,29 @@ The format type tags are as follows:
         """
         return lib.zosc_format(self._as_parameter_)
 
+    def append(self, format, *args):
+        """
+        Append data to the osc message. The format describes the data that
+needs to be appended in the message. This essentially relocates all
+data!
+The format type tags are as follows:
+  i - 32bit integer
+  h - 64bit integer
+  f - 32bit floating point number (IEEE)
+  d - 64bit (double) floating point number
+  s - string (NULL terminated)
+  t = timetag: an OSC timetag in NTP format (uint64_t)
+  S - symbol
+  c - char
+  m - 4 byte midi packet (8 digits hexadecimal)
+  T - TRUE (no value required)
+  F - FALSE (no value required)
+  N - NIL (no value required)
+  I - Impulse (for triggers) or INFINITUM (no value required)
+  b - binary blob
+        """
+        return lib.zosc_append(self._as_parameter_, format, *args)
+
     def retr(self, format, *args):
         """
         Retrieve the values provided by the given format. Note that zosc_retr
@@ -9692,7 +9805,7 @@ Take ownership of the chunk.
 
     def print(self):
         """
-        Dump OSC message to stderr, for debugging and tracing.
+        Dump OSC message to stdout, for debugging and tracing.
         """
         return lib.zosc_print(self._as_parameter_)
 
@@ -9702,6 +9815,94 @@ Take ownership of the chunk.
         Probe the supplied object, and report if it looks like a zosc_t.
         """
         return lib.zosc_is(self)
+
+    def first(self, type):
+        """
+        Return a pointer to the item at the head of the OSC data.
+Sets the given char argument to the type tag of the data.
+If the message is empty, returns NULL and the sets the
+given char to NULL.
+        """
+        return c_void_p(lib.zosc_first(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def next(self, type):
+        """
+        Return the next item of the OSC message. If the list is empty, returns
+NULL. To move to the start of the OSC message call zosc_first ().
+        """
+        return c_void_p(lib.zosc_next(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def last(self, type):
+        """
+        Return a pointer to the item at the tail of the OSC message.
+Sets the given char argument to the type tag of the data. If
+the message is empty, returns NULL.
+        """
+        return c_void_p(lib.zosc_last(self._as_parameter_, byref(char_p.from_param(type))))
+
+    def pop_int32(self, val):
+        """
+        Set the provided 32 bit integer from value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_int32(self._as_parameter_, byref(c_int.from_param(val)))
+
+    def pop_int64(self, val):
+        """
+        Set the provided 64 bit integer from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_int64(self._as_parameter_, byref(msecs_p.from_param(val)))
+
+    def pop_float(self, val):
+        """
+        Set the provided float from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_float(self._as_parameter_, byref(c_float.from_param(val)))
+
+    def pop_double(self, val):
+        """
+        Set the provided double from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_double(self._as_parameter_, byref(c_double.from_param(val)))
+
+    def pop_string(self, val):
+        """
+        Set the provided string from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success. Caller owns the string!
+        """
+        return lib.zosc_pop_string(self._as_parameter_, byref(c_char_p.from_param(val)))
+
+    def pop_char(self, val):
+        """
+        Set the provided char from the value at the current cursor position in the message.
+If the type tag at the current position does not correspond it will fail and
+return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_char(self._as_parameter_, byref(char_p.from_param(val)))
+
+    def pop_bool(self, val):
+        """
+        Set the provided boolean from the type tag in the message. Booleans are not represented
+in the data in the message, only in the type tag. If the type tag at the current
+position does not correspond it will fail and return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_bool(self._as_parameter_, byref(c_bool.from_param(val)))
+
+    def pop_midi(self, val):
+        """
+        Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+cursor position in the message. If the type tag at the current position does
+not correspond it will fail and return -1. Returns 0 on success.
+        """
+        return lib.zosc_pop_midi(self._as_parameter_, byref(c_int.from_param(val)))
 
     @staticmethod
     def test(verbose):

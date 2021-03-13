@@ -88,16 +88,16 @@ cp $ANDROID_BUILD_PREFIX/lib/*.so lib/$TOOLCHAIN_ABI
 cp $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/$TOOLCHAIN_ABI/libc++_shared.so lib/$TOOLCHAIN_ABI
 
 #   Build android jar
-zip -r -m ../czmq-android-$TOOLCHAIN_ABI-4.2.1.jar lib/ org/ META-INF/
+zip -r -m ../czmq-android-$TOOLCHAIN_ABI-4.2.2.jar lib/ org/ META-INF/
 cd ..
 rm -rf build
 
 echo "********  Merging ABI jars"
 mkdir build && cd build
 #   Copy contents from all ABI jar - overwriting class files and manifest
-unzip -qo '../czmq-android-*4.2.1.jar'
+unzip -qo '../czmq-android-*4.2.2.jar'
 #   Build merged jar
-zip -r -m ../czmq-android-4.2.1.jar lib/ org/ META-INF/
+zip -r -m ../czmq-android-4.2.2.jar lib/ org/ META-INF/
 cd ..
 rm -rf build
 

@@ -957,6 +957,114 @@ module CZMQ
         result
       end
 
+      # Get socket option `priority`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def priority()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_priority(self_p)
+        result
+      end
+
+      # Get socket option `priority`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #priority.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.priority(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_priority(self_p)
+        result
+      end
+
+      # Set socket option `priority`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param priority [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_priority(priority)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        priority = Integer(priority)
+        result = ::CZMQ::FFI.zsock_set_priority(self_p, priority)
+        result
+      end
+
+      # Set socket option `priority`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_priority.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param priority [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_priority(self_p, priority)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        priority = Integer(priority)
+        result = ::CZMQ::FFI.zsock_set_priority(self_p, priority)
+        result
+      end
+
+      # Get socket option `reconnect_stop`.
+      # Available from libzmq 4.3.0.
+      #
+      # @return [Integer]
+      def reconnect_stop()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_reconnect_stop(self_p)
+        result
+      end
+
+      # Get socket option `reconnect_stop`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #reconnect_stop.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.reconnect_stop(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_reconnect_stop(self_p)
+        result
+      end
+
+      # Set socket option `reconnect_stop`.
+      # Available from libzmq 4.3.0.
+      #
+      # @param reconnect_stop [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_reconnect_stop(reconnect_stop)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        reconnect_stop = Integer(reconnect_stop)
+        result = ::CZMQ::FFI.zsock_set_reconnect_stop(self_p, reconnect_stop)
+        result
+      end
+
+      # Set socket option `reconnect_stop`.
+      # Available from libzmq 4.3.0.
+      #
+      # This is the polymorphic version of #set_reconnect_stop.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param reconnect_stop [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_reconnect_stop(self_p, reconnect_stop)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        reconnect_stop = Integer(reconnect_stop)
+        result = ::CZMQ::FFI.zsock_set_reconnect_stop(self_p, reconnect_stop)
+        result
+      end
+
       # Set socket option `only_first_subscribe`.
       # Available from libzmq 4.3.0.
       #

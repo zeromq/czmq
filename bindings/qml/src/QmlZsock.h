@@ -230,6 +230,22 @@ public slots:
     //  Check whether the socket has available message to read.
     bool hasIn ();
 
+    //  Get socket option `priority`.
+    //  Available from libzmq 4.3.0.
+    int priority ();
+
+    //  Set socket option `priority`.
+    //  Available from libzmq 4.3.0.
+    void setPriority (int priority);
+
+    //  Get socket option `reconnect_stop`.
+    //  Available from libzmq 4.3.0.
+    int reconnectStop ();
+
+    //  Set socket option `reconnect_stop`.
+    //  Available from libzmq 4.3.0.
+    void setReconnectStop (int reconnectStop);
+
     //  Set socket option `only_first_subscribe`.
     //  Available from libzmq 4.3.0.
     void setOnlyFirstSubscribe (int onlyFirstSubscribe);

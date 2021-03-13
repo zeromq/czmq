@@ -72,11 +72,61 @@ public:
     //  Transform a zframe into a zosc.
     static QZosc * unpack (QZframe *frame);
 
-    //  Dump OSC message to stderr, for debugging and tracing.
+    //  Dump OSC message to stdout, for debugging and tracing.
     void print ();
 
     //  Probe the supplied object, and report if it looks like a zosc_t.
     static bool is (void *self);
+
+    //  Return a pointer to the item at the head of the OSC data.
+    //  Sets the given char argument to the type tag of the data.
+    //  If the message is empty, returns NULL and the sets the
+    //  given char to NULL.
+    const void * first (char *type);
+
+    //  Return the next item of the OSC message. If the list is empty, returns
+    //  NULL. To move to the start of the OSC message call zosc_first ().
+    const void * next (char *type);
+
+    //  Return a pointer to the item at the tail of the OSC message.
+    //  Sets the given char argument to the type tag of the data. If
+    //  the message is empty, returns NULL.
+    const void * last (char *type);
+
+    //  Set the provided 32 bit integer from value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popInt32 (int *val);
+
+    //  Set the provided 64 bit integer from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popInt64 (int64_t *val);
+
+    //  Set the provided float from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popFloat (float *val);
+
+    //  Set the provided double from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popDouble (double *val);
+
+    //  Set the provided char from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popChar (char *val);
+
+    //  Set the provided boolean from the type tag in the message. Booleans are not represented
+    //  in the data in the message, only in the type tag. If the type tag at the current
+    //  position does not correspond it will fail and return -1. Returns 0 on success.
+    int popBool (bool *val);
+
+    //  Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+    //  cursor position in the message. If the type tag at the current position does
+    //  not correspond it will fail and return -1. Returns 0 on success.
+    int popMidi (quint32 val);
 
     //  Self test of this class.
     static void test (bool verbose);

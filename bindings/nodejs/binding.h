@@ -641,6 +641,10 @@ class Zsock: public Nan::ObjectWrap {
     static NAN_METHOD (_join);
     static NAN_METHOD (_leave);
     static NAN_METHOD (_has_in);
+    static NAN_METHOD (_priority);
+    static NAN_METHOD (_set_priority);
+    static NAN_METHOD (_reconnect_stop);
+    static NAN_METHOD (_set_reconnect_stop);
     static NAN_METHOD (_set_only_first_subscribe);
     static NAN_METHOD (_set_hello_msg);
     static NAN_METHOD (_set_disconnect_msg);
@@ -877,6 +881,8 @@ class Zsys: public Nan::ObjectWrap {
     static NAN_METHOD (_set_thread_priority);
     static NAN_METHOD (_set_thread_name_prefix);
     static NAN_METHOD (_thread_name_prefix);
+    static NAN_METHOD (_set_thread_name_prefix_str);
+    static NAN_METHOD (_thread_name_prefix_str);
     static NAN_METHOD (_thread_affinity_cpu_add);
     static NAN_METHOD (_thread_affinity_cpu_remove);
     static NAN_METHOD (_set_max_sockets);
@@ -1116,12 +1122,21 @@ class Zosc: public Nan::ObjectWrap {
     static NAN_METHOD (_data);
     static NAN_METHOD (_address);
     static NAN_METHOD (_format);
+    static NAN_METHOD (_append);
     static NAN_METHOD (_retr);
     static NAN_METHOD (_dup);
     static NAN_METHOD (_pack);
     static NAN_METHOD (_packx);
     static NAN_METHOD (_unpack);
     static NAN_METHOD (_print);
+    static NAN_METHOD (_pop_int32);
+    static NAN_METHOD (_pop_int64);
+    static NAN_METHOD (_pop_float);
+    static NAN_METHOD (_pop_double);
+    static NAN_METHOD (_pop_string);
+    static NAN_METHOD (_pop_char);
+    static NAN_METHOD (_pop_bool);
+    static NAN_METHOD (_pop_midi);
     static NAN_METHOD (_test);
 };
 

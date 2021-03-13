@@ -188,6 +188,9 @@ uses
     // for destroying it.  The caller does not take ownership of the zcert_t
     // objects.
     function Certs: IZlistx;
+
+    // Return the state stored in certstore
+    function State: Pointer;
   end;
 
   // work with memory chunks
@@ -1580,6 +1583,22 @@ uses
     // Check whether the socket has available message to read.
     function HasIn: Boolean;
 
+    // Get socket option `priority`.
+    // Available from libzmq 4.3.0.
+    function Priority: Integer;
+
+    // Set socket option `priority`.
+    // Available from libzmq 4.3.0.
+    procedure SetPriority(Priority: Integer);
+
+    // Get socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    function ReconnectStop: Integer;
+
+    // Set socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    procedure SetReconnectStop(ReconnectStop: Integer);
+
     // Set socket option `only_first_subscribe`.
     // Available from libzmq 4.3.0.
     procedure SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
@@ -2550,6 +2569,9 @@ uses
     // for destroying it.  The caller does not take ownership of the zcert_t
     // objects.
     function Certs: IZlistx;
+
+    // Return the state stored in certstore
+    function State: Pointer;
   end;
 
   // work with memory chunks
@@ -4525,6 +4547,22 @@ uses
     // Check whether the socket has available message to read.
     function HasIn: Boolean;
 
+    // Get socket option `priority`.
+    // Available from libzmq 4.3.0.
+    function Priority: Integer;
+
+    // Set socket option `priority`.
+    // Available from libzmq 4.3.0.
+    procedure SetPriority(Priority: Integer);
+
+    // Get socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    function ReconnectStop: Integer;
+
+    // Set socket option `reconnect_stop`.
+    // Available from libzmq 4.3.0.
+    procedure SetReconnectStop(ReconnectStop: Integer);
+
     // Set socket option `only_first_subscribe`.
     // Available from libzmq 4.3.0.
     procedure SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
@@ -5373,7 +5411,7 @@ uses
 
     // Format a string using printf formatting, returning a freshly allocated
     // buffer. If there was insufficient memory, returns NULL. Free the returned
-    // string using zstr_free(). The hinted version allows to optimize by using
+    // string using zstr_free(). The hinted version allows one to optimize by using
     // a larger starting buffer size (known to/assumed by the developer) and so
     // avoid reallocations.
     class function SprintfHint(Hint: Integer; const Format: string): string;
@@ -5467,6 +5505,16 @@ uses
 
     // Return thread name prefix.
     class function ThreadNamePrefix: Integer;
+
+    // Configure the numeric prefix to each thread created for the internal
+    // context's thread pool. This option is only supported on Linux.
+    // If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+    // provides the default.
+    // Note that this method is valid only before any socket is created.
+    class procedure SetThreadNamePrefixStr(const Prefix: string);
+
+    // Return thread name prefix.
+    class function ThreadNamePrefixStr: string;
 
     // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
     // This option is only supported on Linux.
@@ -6207,6 +6255,11 @@ end;
   function TZcertstore.Certs: IZlistx;
   begin
     Result := TZlistx.Wrap(zcertstore_certs(FHandle), true);
+  end;
+
+  function TZcertstore.State: Pointer;
+  begin
+    Result := zcertstore_state(FHandle);
   end;
 
  (* TZchunk *)
@@ -8679,6 +8732,26 @@ end;
     Result := zsock_has_in(FHandle);
   end;
 
+  function TZsock.Priority: Integer;
+  begin
+    Result := zsock_priority(FHandle);
+  end;
+
+  procedure TZsock.SetPriority(Priority: Integer);
+  begin
+    zsock_set_priority(FHandle, Priority);
+  end;
+
+  function TZsock.ReconnectStop: Integer;
+  begin
+    Result := zsock_reconnect_stop(FHandle);
+  end;
+
+  procedure TZsock.SetReconnectStop(ReconnectStop: Integer);
+  begin
+    zsock_set_reconnect_stop(FHandle, ReconnectStop);
+  end;
+
   procedure TZsock.SetOnlyFirstSubscribe(OnlyFirstSubscribe: Integer);
   begin
     zsock_set_only_first_subscribe(FHandle, OnlyFirstSubscribe);
@@ -9933,6 +10006,19 @@ end;
   class function TZsys.ThreadNamePrefix: Integer;
   begin
     Result := zsys_thread_name_prefix;
+  end;
+
+  class procedure TZsys.SetThreadNamePrefixStr(const Prefix: string);
+  var
+    __Prefix__: UTF8String;
+  begin
+    __Prefix__ := UTF8String(Prefix);
+    zsys_set_thread_name_prefix_str(PAnsiChar(__Prefix__));
+  end;
+
+  class function TZsys.ThreadNamePrefixStr: string;
+  begin
+    Result := string(UTF8String(zsys_thread_name_prefix_str));
   end;
 
   class procedure TZsys.ThreadAffinityCpuAdd(Cpu: Integer);

@@ -4,7 +4,7 @@
 ################################################################################
 
 if (NOT MSVC)
-    include(FindPkgConfig)
+    find_package(PkgConfig)
     pkg_check_modules(PC_LZ4 "liblz4")
     if (PC_LZ4_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
@@ -18,13 +18,13 @@ if (NOT MSVC)
 endif (NOT MSVC)
 
 find_path (
-    LZ4_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
     NAMES lz4.h
     HINTS ${PC_LZ4_INCLUDE_HINTS}
 )
 
 find_library (
-    LZ4_LIBRARIES
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES
     NAMES liblz4 lz4
     HINTS ${PC_LZ4_LIBRARY_HINTS}
 )
@@ -32,12 +32,12 @@ find_library (
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    LZ4
-    REQUIRED_VARS LZ4_LIBRARIES LZ4_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}
+    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 mark_as_advanced(
-    LZ4_FOUND
-    LZ4_LIBRARIES LZ4_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_FOUND
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 
 ################################################################################

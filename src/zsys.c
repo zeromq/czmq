@@ -70,6 +70,9 @@ s_handler_fn_shim (DWORD ctrltype)
 static void *s_process_ctx = NULL;
 static bool s_initialized = false;
 static bool s_shutting_down = false;
+#if defined (__UNIX__)
+static void zsys_cleanup (void);
+#endif
 
 #ifndef S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC
 // This is a private tunable that is likely to be replaced or tweaked later
@@ -84,6 +87,7 @@ static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
 static int s_thread_sched_policy = -1; //  ZSYS_THREAD_SCHED_POLICY=-1
 static int s_thread_priority = -1;  //  ZSYS_THREAD_PRIORITY=-1
 static int s_thread_name_prefix = -1;  //  ZSYS_THREAD_NAME_PREFIX=-1
+static char s_thread_name_prefix_str[16] = "0";  //  ZSYS_THREAD_NAME_PREFIX_STR="0"
 static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static int s_max_msgsz = INT_MAX;   //  ZSYS_MAX_MSGSZ=INT_MAX
 static int64_t s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
@@ -136,7 +140,10 @@ typedef CRITICAL_SECTION zsys_mutex_t;
 
 //  Mutex to guard socket counter
 static zsys_mutex_t s_mutex;
-
+#if defined (__UNIX__)
+// Mutex to guard the multiple zsys_init() - to make it threadsafe
+static zsys_mutex_t s_init_mutex;
+#endif
 //  Implementation for the zsys_vprintf() which is known from legacy
 //  and poses as a stable interface now.
 static inline
@@ -150,13 +157,52 @@ s_zsys_vprintf_hint (int hint, const char *format, va_list argptr);
 //  Not threadsafe, so call only from main thread. Safe to call multiple
 //  times. Returns global CZMQ context.
 
+#if defined (__UNIX__)
+// mutex for pthread_once to run the init function only once in a process
+static pthread_once_t init_all_mutex_var = PTHREAD_ONCE_INIT;
+
+// handler to initialize mutexes one time in multi threaded env
+static void zsys_initialize_mutex() {
+    ZMUTEX_INIT (s_mutex);
+    ZMUTEX_INIT (s_init_mutex);
+}
+
+// handler to detect fork condition and cleanup the stale context inherited from parent process
+static void zsys_pthread_at_fork_handler(void) {
+    // re-initialize mutexes
+    ZMUTEX_INIT (s_init_mutex);
+    ZMUTEX_INIT (s_mutex);
+    // call cleanup
+    zsys_cleanup();
+}
+#endif
+
 void *
 zsys_init (void)
 {
+#if defined (__UNIX__)
+    //To avoid two inits at same time
+    pthread_once(&init_all_mutex_var, zsys_initialize_mutex);
+
     if (s_initialized) {
         assert (s_process_ctx);
         return s_process_ctx;
     }
+
+    ZMUTEX_LOCK (s_init_mutex);
+#endif
+
+    // Doing this again here... to ensure that after mutex wait if the thread 2 gets execution, it will
+    // will get the context right away
+    if (s_initialized) {
+        assert (s_process_ctx);
+#if defined (__UNIX__)
+        // unlock the mutex before returning the context
+        ZMUTEX_UNLOCK(s_init_mutex);
+#endif
+        return s_process_ctx;
+    }
+
     //  Pull process defaults from environment
     if (getenv ("ZSYS_IO_THREADS"))
         s_io_threads = atoi (getenv ("ZSYS_IO_THREADS"));
@@ -211,10 +257,15 @@ zsys_init (void)
 
     zsys_catch_interrupts ();
 
+#if defined (__WINDOWS__)
     ZMUTEX_INIT (s_mutex);
+#endif
     s_sockref_list = zlist_new ();
     if (!s_sockref_list) {
         zsys_shutdown ();
+#if defined (__UNIX__)
+        ZMUTEX_UNLOCK(s_init_mutex);
+#endif
         return NULL;
     }
     srandom ((unsigned) time (NULL));
@@ -227,7 +278,12 @@ zsys_init (void)
 #endif
     s_initialized = true;
 
+#if defined (__UNIX__)
     atexit (zsys_shutdown);
+    pthread_atfork(NULL, NULL, &zsys_pthread_at_fork_handler);
+    //don't hold the lock because some of the function will call zsys_init again
+    ZMUTEX_UNLOCK(s_init_mutex);
+#endif
 
     //  The following functions call zsys_init(), so they MUST be called after
     //  s_initialized is set in order to avoid an infinite recursion
@@ -276,6 +332,9 @@ zsys_init (void)
         zsys_set_thread_name_prefix (atoi (getenv ("ZSYS_THREAD_NAME_PREFIX")));
     else
         zsys_set_thread_name_prefix (s_thread_name_prefix);
+
+    if (getenv ("ZSYS_THREAD_NAME_PREFIX_STR"))
+        zsys_set_thread_name_prefix_str (getenv ("ZSYS_THREAD_NAME_PREFIX_STR"));
 
     return s_process_ctx;
 }
@@ -333,6 +392,7 @@ zsys_shutdown (void)
       s_thread_sched_policy = -1;
       s_thread_priority = -1;
       s_thread_name_prefix = -1;
+      strcpy (s_thread_name_prefix_str, "0");
       s_max_sockets = 1024;
       s_max_msgsz = INT_MAX;
       s_file_stable_age_msec = S_DEFAULT_ZSYS_FILE_STABLE_AGE_MSEC;
@@ -369,6 +429,42 @@ zsys_shutdown (void)
     s_shutting_down = false;
 }
 
+#if defined (__UNIX__)
+//  Restores all CZMQ global state to initial values
+static void
+zsys_cleanup (void)
+{
+    ZMUTEX_LOCK (s_init_mutex);
+    s_process_ctx = NULL;
+    zsys_interrupted = 0;
+    zctx_interrupted = 0;
+
+    s_first_time = true;
+    handle_signals = true;
+
+    s_initialized = false;
+
+    s_io_threads = 1;
+    s_max_sockets = 1024;
+    s_max_msgsz = INT_MAX;
+    s_linger = 0;
+    s_sndhwm = 1000;
+    s_rcvhwm = 1000;
+    s_pipehwm = 1000;
+    s_ipv6 = 0;
+    s_interface = NULL;
+    s_ipv6_address = NULL;
+    s_ipv6_mcast_address = NULL;
+    s_auto_use_fd = 0;
+    s_logident = NULL;
+    s_logstream = NULL;
+    s_logsystem = false;
+    s_logsender = NULL;
+
+    s_open_sockets = 0;
+    ZMUTEX_UNLOCK (s_init_mutex);
+}
+#endif
 
 //  --------------------------------------------------------------------------
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
@@ -474,11 +570,13 @@ zsys_sockname (int socktype)
         "XPUB", "XSUB", "STREAM",
         "SERVER", "CLIENT",
         "RADIO", "DISH",
-        "SCATTER", "GATHER"
+        "SCATTER", "GATHER", "DGRAM"
     };
     //  This array matches ZMQ_XXX type definitions
     assert (ZMQ_PAIR == 0);
-#if defined (ZMQ_SCATTER)
+#if defined (ZMQ_DGRAM)
+    assert (socktype >= 0 && socktype <= ZMQ_DGRAM);
+#elif defined (ZMQ_SCATTER)
     assert (socktype >= 0 && socktype <= ZMQ_SCATTER);
 #elif defined (ZMQ_DISH)
     assert (socktype >= 0 && socktype <= ZMQ_DISH);
@@ -1542,6 +1640,63 @@ zsys_thread_name_prefix ()
 
 
 //  --------------------------------------------------------------------------
+//  Configure the string prefix to each thread created for the internal
+//  context's thread pool. This option is only supported on Linux.
+//  If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+//  provides the default.
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_thread_name_prefix_str (const char *prefix)
+{
+    size_t prefix_len = 0;
+
+    if (!prefix)
+        return;
+    prefix_len = strlen (prefix);
+    if (prefix_len == 0 || prefix_len > sizeof (s_thread_name_prefix_str) - 1)
+        return;
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (s_open_sockets)
+        zsys_error ("zsys_set_thread_name_prefix() is not valid after"
+                " creating sockets");
+    assert (s_open_sockets == 0);
+    strcpy(s_thread_name_prefix_str, prefix);
+#if defined (ZMQ_THREAD_NAME_PREFIX) && defined (ZMQ_BUILD_DRAFT_API) && \
+    ((ZMQ_VERSION_MAJOR > 4) || \
+        ((ZMQ_VERSION_MAJOR >= 4) && ((ZMQ_VERSION_MINOR > 3) || \
+            ((ZMQ_VERSION_MINOR >= 3) && (ZMQ_VERSION_PATCH >= 3)))))
+    zmq_ctx_set_ext (s_process_ctx, ZMQ_THREAD_NAME_PREFIX, s_thread_name_prefix_str, sizeof (s_thread_name_prefix_str));
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+//  --------------------------------------------------------------------------
+//  Return ZMQ_THREAD_NAME_PREFIX_STR option.
+const char *
+zsys_thread_name_prefix_str ()
+{
+    size_t prefix_len = sizeof (s_thread_name_prefix_str);
+
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+#if defined (ZMQ_THREAD_NAME_PREFIX) && defined (ZMQ_BUILD_DRAFT_API) && \
+    ((ZMQ_VERSION_MAJOR > 4) || \
+        ((ZMQ_VERSION_MAJOR >= 4) && ((ZMQ_VERSION_MINOR > 3) || \
+            ((ZMQ_VERSION_MINOR >= 3) && (ZMQ_VERSION_PATCH >= 3)))))
+    zmq_ctx_get_ext (s_process_ctx, ZMQ_THREAD_NAME_PREFIX, s_thread_name_prefix_str, &prefix_len);
+#else
+    (void) prefix_len;
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+    return s_thread_name_prefix_str;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Adds a specific CPU to the affinity list of the ZMQ context thread pool.
 //  This option is only supported on Linux.
 //  Note that this method is valid only before any socket is created.
@@ -2563,6 +2718,7 @@ zsys_test (bool verbose)
     zsys_set_thread_sched_policy (-1);
     zsys_set_thread_name_prefix (0);
     assert (0 == zsys_thread_name_prefix());
+    assert (streq ("0", zsys_thread_name_prefix_str()));
     zsys_thread_affinity_cpu_add (0);
     zsys_thread_affinity_cpu_remove (0);
     zsys_set_zero_copy_recv(0);

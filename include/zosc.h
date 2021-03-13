@@ -102,6 +102,28 @@ CZMQ_EXPORT const char *
     zosc_format (zosc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Append data to the osc message. The format describes the data that
+//  needs to be appended in the message. This essentially relocates all
+//  data!
+//  The format type tags are as follows:
+//    i - 32bit integer
+//    h - 64bit integer
+//    f - 32bit floating point number (IEEE)
+//    d - 64bit (double) floating point number
+//    s - string (NULL terminated)
+//    t = timetag: an OSC timetag in NTP format (uint64_t)
+//    S - symbol
+//    c - char
+//    m - 4 byte midi packet (8 digits hexadecimal)
+//    T - TRUE (no value required)
+//    F - FALSE (no value required)
+//    N - NIL (no value required)
+//    I - Impulse (for triggers) or INFINITUM (no value required)
+//    b - binary blob
+CZMQ_EXPORT int
+    zosc_append (zosc_t *self, const char *format, ...);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Retrieve the values provided by the given format. Note that zosc_retr
 //  creates the objects and the caller must destroy them when finished.
 //  The supplied pointers do not need to be initialized. Returns 0 if
@@ -140,7 +162,7 @@ CZMQ_EXPORT zosc_t *
     zosc_unpack (zframe_t *frame);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Dump OSC message to stderr, for debugging and tracing.
+//  Dump OSC message to stdout, for debugging and tracing.
 CZMQ_EXPORT void
     zosc_print (zosc_t *self);
 
@@ -148,6 +170,83 @@ CZMQ_EXPORT void
 //  Probe the supplied object, and report if it looks like a zosc_t.
 CZMQ_EXPORT bool
     zosc_is (void *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return a pointer to the item at the head of the OSC data.
+//  Sets the given char argument to the type tag of the data.
+//  If the message is empty, returns NULL and the sets the
+//  given char to NULL.
+CZMQ_EXPORT const void *
+    zosc_first (zosc_t *self, char *type);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return the next item of the OSC message. If the list is empty, returns
+//  NULL. To move to the start of the OSC message call zosc_first ().
+CZMQ_EXPORT const void *
+    zosc_next (zosc_t *self, char *type);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return a pointer to the item at the tail of the OSC message.
+//  Sets the given char argument to the type tag of the data. If
+//  the message is empty, returns NULL.
+CZMQ_EXPORT const void *
+    zosc_last (zosc_t *self, char *type);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided 32 bit integer from value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+CZMQ_EXPORT int
+    zosc_pop_int32 (zosc_t *self, int *val);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided 64 bit integer from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+CZMQ_EXPORT int
+    zosc_pop_int64 (zosc_t *self, int64_t *val);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided float from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+CZMQ_EXPORT int
+    zosc_pop_float (zosc_t *self, float *val);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided double from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+CZMQ_EXPORT int
+    zosc_pop_double (zosc_t *self, double *val);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided string from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success. Caller owns the string!
+CZMQ_EXPORT int
+    zosc_pop_string (zosc_t *self, char **val);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided char from the value at the current cursor position in the message.
+//  If the type tag at the current position does not correspond it will fail and
+//  return -1. Returns 0 on success.
+CZMQ_EXPORT int
+    zosc_pop_char (zosc_t *self, char *val);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided boolean from the type tag in the message. Booleans are not represented
+//  in the data in the message, only in the type tag. If the type tag at the current
+//  position does not correspond it will fail and return -1. Returns 0 on success.
+CZMQ_EXPORT int
+    zosc_pop_bool (zosc_t *self, bool *val);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+//  cursor position in the message. If the type tag at the current position does
+//  not correspond it will fail and return -1. Returns 0 on success.
+CZMQ_EXPORT int
+    zosc_pop_midi (zosc_t *self, uint32_t *val);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Self test of this class.

@@ -4,7 +4,7 @@
 ################################################################################
 
 if (NOT MSVC)
-    include(FindPkgConfig)
+    find_package(PkgConfig)
     pkg_check_modules(PC_LIBMICROHTTPD "libmicrohttpd")
     if (PC_LIBMICROHTTPD_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
@@ -18,13 +18,13 @@ if (NOT MSVC)
 endif (NOT MSVC)
 
 find_path (
-    LIBMICROHTTPD_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
     NAMES microhttpd.h
     HINTS ${PC_LIBMICROHTTPD_INCLUDE_HINTS}
 )
 
 find_library (
-    LIBMICROHTTPD_LIBRARIES
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES
     NAMES libmicrohttpd microhttpd
     HINTS ${PC_LIBMICROHTTPD_LIBRARY_HINTS}
 )
@@ -32,12 +32,12 @@ find_library (
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    LIBMICROHTTPD
-    REQUIRED_VARS LIBMICROHTTPD_LIBRARIES LIBMICROHTTPD_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}
+    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 mark_as_advanced(
-    LIBMICROHTTPD_FOUND
-    LIBMICROHTTPD_LIBRARIES LIBMICROHTTPD_INCLUDE_DIRS
+    ${CMAKE_FIND_PACKAGE_NAME}_FOUND
+    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
 )
 
 ################################################################################

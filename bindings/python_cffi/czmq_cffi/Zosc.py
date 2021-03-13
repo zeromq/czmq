@@ -121,6 +121,29 @@ See the class's test method for more examples how to use the class.
         """
         return utils.lib.zosc_format(self._p)
 
+    def append(self, format, *format_args):
+        """
+        Append data to the osc message. The format describes the data that
+        needs to be appended in the message. This essentially relocates all
+        data!
+        The format type tags are as follows:
+          i - 32bit integer
+          h - 64bit integer
+          f - 32bit floating point number (IEEE)
+          d - 64bit (double) floating point number
+          s - string (NULL terminated)
+          t = timetag: an OSC timetag in NTP format (uint64_t)
+          S - symbol
+          c - char
+          m - 4 byte midi packet (8 digits hexadecimal)
+          T - TRUE (no value required)
+          F - FALSE (no value required)
+          N - NIL (no value required)
+          I - Impulse (for triggers) or INFINITUM (no value required)
+          b - binary blob
+        """
+        return utils.lib.zosc_append(self._p, utils.to_bytes(format), *format_args)
+
     def retr(self, format, *format_args):
         """
         Retrieve the values provided by the given format. Note that zosc_retr
@@ -164,7 +187,7 @@ See the class's test method for more examples how to use the class.
 
     def print_py(self):
         """
-        Dump OSC message to stderr, for debugging and tracing.
+        Dump OSC message to stdout, for debugging and tracing.
         """
         utils.lib.zosc_print(self._p)
 
@@ -174,6 +197,94 @@ See the class's test method for more examples how to use the class.
         Probe the supplied object, and report if it looks like a zosc_t.
         """
         return utils.lib.zosc_is(self._p)
+
+    def first(self, type):
+        """
+        Return a pointer to the item at the head of the OSC data.
+        Sets the given char argument to the type tag of the data.
+        If the message is empty, returns NULL and the sets the
+        given char to NULL.
+        """
+        return utils.lib.zosc_first(self._p, utils.ffi.new("char_t **", type._p))
+
+    def next(self, type):
+        """
+        Return the next item of the OSC message. If the list is empty, returns
+        NULL. To move to the start of the OSC message call zosc_first ().
+        """
+        return utils.lib.zosc_next(self._p, utils.ffi.new("char_t **", type._p))
+
+    def last(self, type):
+        """
+        Return a pointer to the item at the tail of the OSC message.
+        Sets the given char argument to the type tag of the data. If
+        the message is empty, returns NULL.
+        """
+        return utils.lib.zosc_last(self._p, utils.ffi.new("char_t **", type._p))
+
+    def pop_int32(self, val):
+        """
+        Set the provided 32 bit integer from value at the current cursor position in the message.
+        If the type tag at the current position does not correspond it will fail and
+        return -1. Returns 0 on success.
+        """
+        return utils.lib.zosc_pop_int32(self._p, val)
+
+    def pop_int64(self, val):
+        """
+        Set the provided 64 bit integer from the value at the current cursor position in the message.
+        If the type tag at the current position does not correspond it will fail and
+        return -1. Returns 0 on success.
+        """
+        return utils.lib.zosc_pop_int64(self._p, utils.ffi.new("msecs_t **", val._p))
+
+    def pop_float(self, val):
+        """
+        Set the provided float from the value at the current cursor position in the message.
+        If the type tag at the current position does not correspond it will fail and
+        return -1. Returns 0 on success.
+        """
+        return utils.lib.zosc_pop_float(self._p, val)
+
+    def pop_double(self, val):
+        """
+        Set the provided double from the value at the current cursor position in the message.
+        If the type tag at the current position does not correspond it will fail and
+        return -1. Returns 0 on success.
+        """
+        return utils.lib.zosc_pop_double(self._p, val)
+
+    def pop_string(self, val):
+        """
+        Set the provided string from the value at the current cursor position in the message.
+        If the type tag at the current position does not correspond it will fail and
+        return -1. Returns 0 on success. Caller owns the string!
+        """
+        return utils.lib.zosc_pop_string(self._p, utils.to_bytes(val))
+
+    def pop_char(self, val):
+        """
+        Set the provided char from the value at the current cursor position in the message.
+        If the type tag at the current position does not correspond it will fail and
+        return -1. Returns 0 on success.
+        """
+        return utils.lib.zosc_pop_char(self._p, utils.ffi.new("char_t **", val._p))
+
+    def pop_bool(self, val):
+        """
+        Set the provided boolean from the type tag in the message. Booleans are not represented
+        in the data in the message, only in the type tag. If the type tag at the current
+        position does not correspond it will fail and return -1. Returns 0 on success.
+        """
+        return utils.lib.zosc_pop_bool(self._p, val)
+
+    def pop_midi(self, val):
+        """
+        Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+        cursor position in the message. If the type tag at the current position does
+        not correspond it will fail and return -1. Returns 0 on success.
+        """
+        return utils.lib.zosc_pop_midi(self._p, val)
 
     @staticmethod
     def test(verbose):

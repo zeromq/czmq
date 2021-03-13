@@ -306,6 +306,28 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
+//  Get socket option `priority`.
+//  Available from libzmq 4.3.0.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_priority (void *self);
+
+//  Set socket option `priority`.
+//  Available from libzmq 4.3.0.
+CZMQ_EXPORT void
+    zsock_set_priority (void *self, int priority);
+
+//  Get socket option `reconnect_stop`.
+//  Available from libzmq 4.3.0.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_reconnect_stop (void *self);
+
+//  Set socket option `reconnect_stop`.
+//  Available from libzmq 4.3.0.
+CZMQ_EXPORT void
+    zsock_set_reconnect_stop (void *self, int reconnect_stop);
+
 //  Set socket option `only_first_subscribe`.
 //  Available from libzmq 4.3.0.
 CZMQ_EXPORT void

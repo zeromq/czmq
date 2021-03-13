@@ -202,7 +202,7 @@ class Zsys(object):
         """
         Format a string using printf formatting, returning a freshly allocated
         buffer. If there was insufficient memory, returns NULL. Free the returned
-        string using zstr_free(). The hinted version allows to optimize by using
+        string using zstr_free(). The hinted version allows one to optimize by using
         a larger starting buffer size (known to/assumed by the developer) and so
         avoid reallocations.
         """
@@ -361,6 +361,24 @@ class Zsys(object):
         Return thread name prefix.
         """
         return utils.lib.zsys_thread_name_prefix()
+
+    @staticmethod
+    def set_thread_name_prefix_str(prefix):
+        """
+        Configure the numeric prefix to each thread created for the internal
+        context's thread pool. This option is only supported on Linux.
+        If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+        provides the default.
+        Note that this method is valid only before any socket is created.
+        """
+        utils.lib.zsys_set_thread_name_prefix_str(utils.to_bytes(prefix))
+
+    @staticmethod
+    def thread_name_prefix_str():
+        """
+        Return thread name prefix.
+        """
+        return utils.lib.zsys_thread_name_prefix_str()
 
     @staticmethod
     def thread_affinity_cpu_add(cpu):

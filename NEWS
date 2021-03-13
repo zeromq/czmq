@@ -1,11 +1,14 @@
-CZMQ version 4.2.1 stable, released on 20xx/xx/xx
+CZMQ version 4.2.x stable, released on 20xx/xx/xx
+=================================================
+
+CZMQ version 4.2.1 stable, released on 2021/01/17
 =================================================
 
 * Note for packagers: NSS can now be used and linked against to avoid using
   an internal embedded reimplementation of SHA. It is enabled by default if
   present.
 
-* New DRAFT zsock API to match libzmq's 4.3.3 stable socket options:
+* New DRAFT zsock API to match libzmq's 4.3.4 socket options:
   - zsock_set_xpub_manual_last_value
   - zsock_socks_username, zsock_set_socks_username
   - zsock_socks_password, zsock_set_socks_password
@@ -14,12 +17,24 @@ CZMQ version 4.2.1 stable, released on 20xx/xx/xx
   - zsock_set_wss_key_pem, zsock_set_wss_cert_pem, zsock_set_wss_trust_pem,
     zsock_set_wss_hostname, zsock_set_wss_trust_system
   - zsock_set_only_first_subscribe
+  - zsock_hello_msg, zsock_set_hello_msg
+  - zsock_disconnect_msg, zsock_set_disconnect_msg
+  - zsock_priority, zsock_set_priority
+  - zsock_reconnect_stop, zsock_set_reconnect_stop
   See zsock manpage for more details.
 
 * New DRAFT zframe and zmsg API to print arbitrary length messages:
   - zframe_print_n
   - zmsg_print_n
   See zframe and zmsg manpages for more details.
+
+* New DRAFT zosc* APIs to support the OSC (Open Sound Control) protocol.
+  See zosc_* manpages for more details.
+
+* New DRAFT zcertstore_get_state API to get the state stored in the certstore.
+  See the zcertstore manpage for more details.
+
+* Support for new libzmq DRAFT socket type ZMQ_DGRAM was added to zsock.
 
 * Fixed #1972 - Findlibzmq.cmake out of date, Windows build fails
 
@@ -30,6 +45,39 @@ CZMQ version 4.2.1 stable, released on 20xx/xx/xx
 * Fixed #2020 - use libnss in zdigest if available for SHA functions.
 
 * Fixed #2028 - zpoller docs isn't mentioning file handles
+
+* Fixed #2043 - zhttp_response_recv leaks memory when result is non-zero
+
+* Fixed #2045 - Problem: zframe_print output is truncated
+
+* Fixed #2048 - no logging if zsys is not initialized
+
+* Fixed #2057 - zchunk_slurp() causes assert if file can't be opened
+
+* Fixed #2062 - allow zbeacon to resolve ip address to interface or interface
+                name to interface
+
+* Fixed #2064 - Enable ipv4 multicast packet types when using zbeacon
+
+* Fixed #2072 - fix build on Android NDK >= 24
+
+* Fixed #2086 - zsys is re-initialized when logging an error in zsys_shutdown
+
+* Fixed #2090 - "quit" variable in zproc_wait() can overflow
+
+* Fixed #2087 - logsender destroyed before last log message
+
+* Fixed #2103 - if gossip server disconnects and reconnects, persisting gossip
+                clients do not exchange tuples anymore when server reconnects
+
+* Fixed #2113 - zcertstore has no API to get the disk state from a custom loader
+
+* Fixed #2115 - various issues around zcertstore API string ownership
+
+* Fixed #2038 - zsock_t sockets do not work in child process after fork
+
+* Fixed #2144 - zhashx_dup() does not copy callbacks
+
 
 CZMQ version 4.2.0 stable, released on 2019/02/10
 =================================================

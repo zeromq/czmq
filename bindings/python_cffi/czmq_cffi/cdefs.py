@@ -493,6 +493,10 @@ void
 zlistx_t *
     zcertstore_certs (zcertstore_t *self);
 
+// Return the state stored in certstore
+void *
+    zcertstore_state (zcertstore_t *self);
+
 // Self test of this class
 void
     zcertstore_test (bool verbose);
@@ -2757,6 +2761,26 @@ void *
 bool
     zsock_has_in (void *self);
 
+// Get socket option `priority`.
+// Available from libzmq 4.3.0.
+int
+    zsock_priority (void *self);
+
+// Set socket option `priority`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_priority (void *self, int priority);
+
+// Get socket option `reconnect_stop`.
+// Available from libzmq 4.3.0.
+int
+    zsock_reconnect_stop (void *self);
+
+// Set socket option `reconnect_stop`.
+// Available from libzmq 4.3.0.
+void
+    zsock_set_reconnect_stop (void *self, int reconnect_stop);
+
 // Set socket option `only_first_subscribe`.
 // Available from libzmq 4.3.0.
 void
@@ -3820,7 +3844,7 @@ void
 
 // Format a string using printf formatting, returning a freshly allocated
 // buffer. If there was insufficient memory, returns NULL. Free the returned
-// string using zstr_free(). The hinted version allows to optimize by using
+// string using zstr_free(). The hinted version allows one to optimize by using
 // a larger starting buffer size (known to/assumed by the developer) and so
 // avoid reallocations.
 char *
@@ -3931,6 +3955,18 @@ void
 // Return thread name prefix.
 int
     zsys_thread_name_prefix (void);
+
+// Configure the numeric prefix to each thread created for the internal
+// context's thread pool. This option is only supported on Linux.
+// If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+// provides the default.
+// Note that this method is valid only before any socket is created.
+void
+    zsys_set_thread_name_prefix_str (const char *prefix);
+
+// Return thread name prefix.
+const char *
+    zsys_thread_name_prefix_str (void);
 
 // Adds a specific CPU to the affinity list of the ZMQ context thread pool.
 // This option is only supported on Linux.
@@ -4658,6 +4694,27 @@ const char *
 const char *
     zosc_format (zosc_t *self);
 
+// Append data to the osc message. The format describes the data that
+// needs to be appended in the message. This essentially relocates all
+// data!
+// The format type tags are as follows:
+//   i - 32bit integer
+//   h - 64bit integer
+//   f - 32bit floating point number (IEEE)
+//   d - 64bit (double) floating point number
+//   s - string (NULL terminated)
+//   t = timetag: an OSC timetag in NTP format (uint64_t)
+//   S - symbol
+//   c - char
+//   m - 4 byte midi packet (8 digits hexadecimal)
+//   T - TRUE (no value required)
+//   F - FALSE (no value required)
+//   N - NIL (no value required)
+//   I - Impulse (for triggers) or INFINITUM (no value required)
+//   b - binary blob
+int
+    zosc_append (zosc_t *self, const char *format, ...);
+
 // Retrieve the values provided by the given format. Note that zosc_retr
 // creates the objects and the caller must destroy them when finished.
 // The supplied pointers do not need to be initialized. Returns 0 if
@@ -4687,13 +4744,79 @@ zframe_t *
 zosc_t *
     zosc_unpack (zframe_t *frame);
 
-// Dump OSC message to stderr, for debugging and tracing.
+// Dump OSC message to stdout, for debugging and tracing.
 void
     zosc_print (zosc_t *self);
 
 // Probe the supplied object, and report if it looks like a zosc_t.
 bool
     zosc_is (void *self);
+
+// Return a pointer to the item at the head of the OSC data.
+// Sets the given char argument to the type tag of the data.
+// If the message is empty, returns NULL and the sets the
+// given char to NULL.
+const void *
+    zosc_first (zosc_t *self, char *type);
+
+// Return the next item of the OSC message. If the list is empty, returns
+// NULL. To move to the start of the OSC message call zosc_first ().
+const void *
+    zosc_next (zosc_t *self, char *type);
+
+// Return a pointer to the item at the tail of the OSC message.
+// Sets the given char argument to the type tag of the data. If
+// the message is empty, returns NULL.
+const void *
+    zosc_last (zosc_t *self, char *type);
+
+// Set the provided 32 bit integer from value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_int32 (zosc_t *self, int *val);
+
+// Set the provided 64 bit integer from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_int64 (zosc_t *self, int64_t *val);
+
+// Set the provided float from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_float (zosc_t *self, float *val);
+
+// Set the provided double from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_double (zosc_t *self, double *val);
+
+// Set the provided string from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success. Caller owns the string!
+int
+    zosc_pop_string (zosc_t *self, char **val);
+
+// Set the provided char from the value at the current cursor position in the message.
+// If the type tag at the current position does not correspond it will fail and
+// return -1. Returns 0 on success.
+int
+    zosc_pop_char (zosc_t *self, char *val);
+
+// Set the provided boolean from the type tag in the message. Booleans are not represented
+// in the data in the message, only in the type tag. If the type tag at the current
+// position does not correspond it will fail and return -1. Returns 0 on success.
+int
+    zosc_pop_bool (zosc_t *self, bool *val);
+
+// Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+// cursor position in the message. If the type tag at the current position does
+// not correspond it will fail and return -1. Returns 0 on success.
+int
+    zosc_pop_midi (zosc_t *self, uint32_t *val);
 
 // Self test of this class.
 void

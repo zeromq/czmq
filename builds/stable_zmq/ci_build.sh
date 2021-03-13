@@ -3,7 +3,7 @@
 set -x
 set -e
 
-mkdir tmp
+mkdir -p tmp
 BUILD_PREFIX=$PWD/tmp
 
 CONFIG_OPTS=()
@@ -27,7 +27,7 @@ fi
 git clone --quiet --depth 1 https://github.com/zeromq/${ZMQ_REPO} libzmq
 cd libzmq
 git --no-pager log --oneline -n1
-./autogen.sh 2> /dev/null
+autoreconf --install --force --verbose -I config
 ./configure "${CONFIG_OPTS[@]}" --with-libsodium
 make -j4
 make install

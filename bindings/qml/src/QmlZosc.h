@@ -54,6 +54,26 @@ public slots:
     //    b - binary blob
     const QString format ();
 
+    //  Append data to the osc message. The format describes the data that
+    //  needs to be appended in the message. This essentially relocates all
+    //  data!
+    //  The format type tags are as follows:
+    //    i - 32bit integer
+    //    h - 64bit integer
+    //    f - 32bit floating point number (IEEE)
+    //    d - 64bit (double) floating point number
+    //    s - string (NULL terminated)
+    //    t = timetag: an OSC timetag in NTP format (uint64_t)
+    //    S - symbol
+    //    c - char
+    //    m - 4 byte midi packet (8 digits hexadecimal)
+    //    T - TRUE (no value required)
+    //    F - FALSE (no value required)
+    //    N - NIL (no value required)
+    //    I - Impulse (for triggers) or INFINITUM (no value required)
+    //    b - binary blob
+    int append (const QString &format);
+
     //  Retrieve the values provided by the given format. Note that zosc_retr
     //  creates the objects and the caller must destroy them when finished.
     //  The supplied pointers do not need to be initialized. Returns 0 if
@@ -71,8 +91,63 @@ public slots:
     //  Transform zosc into a zframe that can be sent in a message.
     QmlZframe *pack ();
 
-    //  Dump OSC message to stderr, for debugging and tracing.
+    //  Dump OSC message to stdout, for debugging and tracing.
     void print ();
+
+    //  Return a pointer to the item at the head of the OSC data.
+    //  Sets the given char argument to the type tag of the data.
+    //  If the message is empty, returns NULL and the sets the
+    //  given char to NULL.
+    const void *first (char *type);
+
+    //  Return the next item of the OSC message. If the list is empty, returns
+    //  NULL. To move to the start of the OSC message call zosc_first ().
+    const void *next (char *type);
+
+    //  Return a pointer to the item at the tail of the OSC message.
+    //  Sets the given char argument to the type tag of the data. If
+    //  the message is empty, returns NULL.
+    const void *last (char *type);
+
+    //  Set the provided 32 bit integer from value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popInt32 (int *val);
+
+    //  Set the provided 64 bit integer from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popInt64 (int64_t *val);
+
+    //  Set the provided float from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popFloat (float *val);
+
+    //  Set the provided double from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popDouble (double *val);
+
+    //  Set the provided string from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success. Caller owns the string!
+    int popString (QString val);
+
+    //  Set the provided char from the value at the current cursor position in the message.
+    //  If the type tag at the current position does not correspond it will fail and
+    //  return -1. Returns 0 on success.
+    int popChar (char *val);
+
+    //  Set the provided boolean from the type tag in the message. Booleans are not represented
+    //  in the data in the message, only in the type tag. If the type tag at the current
+    //  position does not correspond it will fail and return -1. Returns 0 on success.
+    int popBool (bool *val);
+
+    //  Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+    //  cursor position in the message. If the type tag at the current position does
+    //  not correspond it will fail and return -1. Returns 0 on success.
+    int popMidi (uint32_t *val);
 };
 
 class QmlZoscAttached : public QObject

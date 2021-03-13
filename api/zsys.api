@@ -171,7 +171,7 @@
     <method name = "sprintf hint" singleton = "1" polymorphic = "1" state = "draft">
         Format a string using printf formatting, returning a freshly allocated
         buffer. If there was insufficient memory, returns NULL. Free the returned
-        string using zstr_free(). The hinted version allows to optimize by using
+        string using zstr_free(). The hinted version allows one to optimize by using
         a larger starting buffer size (known to/assumed by the developer) and so
         avoid reallocations.
 
@@ -316,6 +316,20 @@
     <method name = "thread name prefix" singleton = "1">
         Return thread name prefix.
         <return type = "integer" />
+    </method>
+
+    <method name = "set thread name prefix str" singleton = "1" state = "draft">
+        Configure the numeric prefix to each thread created for the internal
+        context's thread pool. This option is only supported on Linux.
+        If the environment variable ZSYS_THREAD_NAME_PREFIX_STR is defined, that
+        provides the default.
+        Note that this method is valid only before any socket is created.
+        <argument name = "prefix" type = "string" />
+    </method>
+
+    <method name = "thread name prefix str" singleton = "1" state = "draft">
+        Return thread name prefix.
+        <return type = "string" />
     </method>
 
     <method name = "thread affinity cpu add" singleton = "1">

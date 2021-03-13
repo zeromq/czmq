@@ -127,6 +127,30 @@ public class Zosc implements AutoCloseable {
         return __format (self);
     }
     /*
+    Append data to the osc message. The format describes the data that
+    needs to be appended in the message. This essentially relocates all
+    data!
+    The format type tags are as follows:
+      i - 32bit integer
+      h - 64bit integer
+      f - 32bit floating point number (IEEE)
+      d - 64bit (double) floating point number
+      s - string (NULL terminated)
+      t = timetag: an OSC timetag in NTP format (uint64_t)
+      S - symbol
+      c - char
+      m - 4 byte midi packet (8 digits hexadecimal)
+      T - TRUE (no value required)
+      F - FALSE (no value required)
+      N - NIL (no value required)
+      I - Impulse (for triggers) or INFINITUM (no value required)
+      b - binary blob
+    */
+    native static int __append (long self, String format);
+    public int append (String format) {
+        return __append (self, format);
+    }
+    /*
     Retrieve the values provided by the given format. Note that zosc_retr
     creates the objects and the caller must destroy them when finished.
     The supplied pointers do not need to be initialized. Returns 0 if
@@ -171,7 +195,7 @@ public class Zosc implements AutoCloseable {
         return new Zosc (__unpack (frame.self));
     }
     /*
-    Dump OSC message to stderr, for debugging and tracing.
+    Dump OSC message to stdout, for debugging and tracing.
     */
     native static void __print (long self);
     public void print () {
@@ -183,6 +207,96 @@ public class Zosc implements AutoCloseable {
     native static boolean __is (long self);
     public static boolean is (long self) {
         return __is (self);
+    }
+    /*
+    Return a pointer to the item at the head of the OSC data.
+    Sets the given char argument to the type tag of the data.
+    If the message is empty, returns NULL and the sets the
+    given char to NULL.
+    */
+    native static long __first (long self, char type);
+    public long first (char type) {
+        return __first (self, type);
+    }
+    /*
+    Return the next item of the OSC message. If the list is empty, returns
+    NULL. To move to the start of the OSC message call zosc_first ().
+    */
+    native static long __next (long self, char type);
+    public long next (char type) {
+        return __next (self, type);
+    }
+    /*
+    Return a pointer to the item at the tail of the OSC message.
+    Sets the given char argument to the type tag of the data. If
+    the message is empty, returns NULL.
+    */
+    native static long __last (long self, char type);
+    public long last (char type) {
+        return __last (self, type);
+    }
+    /*
+    Set the provided 32 bit integer from value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popInt32 (long self, int val);
+    public int popInt32 (int val) {
+        return __popInt32 (self, val);
+    }
+    /*
+    Set the provided 64 bit integer from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popInt64 (long self, long val);
+    public int popInt64 (long val) {
+        return __popInt64 (self, val);
+    }
+    /*
+    Set the provided float from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popFloat (long self, float val);
+    public int popFloat (float val) {
+        return __popFloat (self, val);
+    }
+    /*
+    Set the provided double from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popDouble (long self, double val);
+    public int popDouble (double val) {
+        return __popDouble (self, val);
+    }
+    /*
+    Set the provided char from the value at the current cursor position in the message.
+    If the type tag at the current position does not correspond it will fail and
+    return -1. Returns 0 on success.
+    */
+    native static int __popChar (long self, char val);
+    public int popChar (char val) {
+        return __popChar (self, val);
+    }
+    /*
+    Set the provided boolean from the type tag in the message. Booleans are not represented
+    in the data in the message, only in the type tag. If the type tag at the current
+    position does not correspond it will fail and return -1. Returns 0 on success.
+    */
+    native static int __popBool (long self, boolean val);
+    public int popBool (boolean val) {
+        return __popBool (self, val);
+    }
+    /*
+    Set the provided 4 bytes (unsigned 32bit int) from the value at the current
+    cursor position in the message. If the type tag at the current position does
+    not correspond it will fail and return -1. Returns 0 on success.
+    */
+    native static int __popMidi (long self, int val);
+    public int popMidi (int val) {
+        return __popMidi (self, val);
     }
     /*
     Self test of this class.
