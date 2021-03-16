@@ -269,13 +269,6 @@ IF (CZMQ_WITH_LIBMICROHTTPD AND libmicrohttpd_FOUND)
 ENDIF (CZMQ_WITH_LIBMICROHTTPD AND libmicrohttpd_FOUND)
 
 ########################################################################
-# Android specific dependencies
-########################################################################
-if (ANDROID)
-  list(APPEND MORE_LIBRARIES log)
-endif(ANDROID)
-
-########################################################################
 # version
 ########################################################################
 set(CZMQ_VERSION_MAJOR 4)
