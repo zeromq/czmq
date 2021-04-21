@@ -252,7 +252,6 @@ s_self_prepare_udp (self_t *self)
                             self->port_nbr, &hint, &send_to);
                 }
                 assert (rc == 0);
-                assert (rc == 0);
                 if_index = if_nametoindex (name);
 
                 if (self->verbose && !enable_multicast)
@@ -310,6 +309,7 @@ s_self_prepare_udp (self_t *self)
                 zsys_socket_error ("zbeacon: setsockopt IPV6_MULTICAST_IF failed");
         }
         else if(enable_multicast){
+#if defined (__WINDOWS__)
             struct ip_mreq mreq;
             memcpy (&mreq.imr_interface,
                     &(((inaddr_t *) (bind_to->ai_addr))->sin_addr),
@@ -337,6 +337,26 @@ s_self_prepare_udp (self_t *self)
                             (char *) &if_index, sizeof (if_index)))
                 zsys_socket_error (
                   "zbeacon: setsockopt IP_MULTICAST_IF failed");
+#else
+            struct ip_mreqn mreqn;
+            memcpy (&mreqn.imr_address,
+                    &(((inaddr_t *) (bind_to->ai_addr))->sin_addr),
+                    sizeof (struct in_addr));
+            memcpy (&mreqn.imr_multiaddr,
+                    &(((inaddr_t *) (send_to->ai_addr))->sin_addr),
+                    sizeof (struct in_addr));
+            mreqn.imr_ifindex = if_index;
+
+            if (setsockopt (self->udpsock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                            (char *) &mreqn, sizeof (mreqn)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_ADD_MEMBERSHIP failed");
+
+            if (setsockopt (self->udpsock_send, IPPROTO_IP, IP_MULTICAST_IF,
+                            (char *) &mreqn, sizeof (mreqn)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_MULTICAST_IF failed");
+#endif
         }
 
         //  If bind fails, we close the socket for opening again later (next poll interval)
@@ -607,9 +627,16 @@ static void zbeacon_ipv4_mcast_test (bool verbose)
             zsys_set_ipv4_mcast_address (NULL);
             return;
         }
+#if defined (__WINDOWS__)
         unsigned int if_index = 1;
         if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, (char *)&if_index,
                 sizeof(if_index)) != 0){
+#else
+        struct ip_mreqn mreqn;
+        mreqn.imr_ifindex = 1;
+        if (setsockopt (sock, IPPROTO_IP, IP_MULTICAST_IF,
+                (char *) &mreqn, sizeof (mreqn))) {
+#endif
             //  multicast may not be enabled during test so skip!
             printf ("SKIPPED - Is IPv4 UDP multicast allowed?\n");
             zsys_udp_close (sock);
