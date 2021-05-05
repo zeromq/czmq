@@ -63,11 +63,6 @@ zuuid_new (void)
     assert (sizeof (uuid) == ZUUID_LEN);
     UuidCreate (&uuid);
     zuuid_set (self, (byte *) &uuid);
-#elif defined (HAVE_UUID)
-    uuid_t uuid;
-    assert (sizeof (uuid) == ZUUID_LEN);
-    uuid_generate (uuid);
-    zuuid_set (self, (byte *) uuid);
 #elif defined (__UTYPE_OPENBSD) || defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
     uuid_t uuid;
     uint32_t status = 0;
@@ -79,6 +74,11 @@ zuuid_new (void)
     byte buffer [ZUUID_LEN];
     uuid_enc_be (&buffer, &uuid);
     zuuid_set (self, buffer);
+#elif defined (HAVE_UUID)
+    uuid_t uuid;
+    assert (sizeof (uuid) == ZUUID_LEN);
+    uuid_generate (uuid);
+    zuuid_set (self, (byte *) uuid);
 #else
     //  No UUID system calls, so generate a random string
     byte uuid [ZUUID_LEN];
