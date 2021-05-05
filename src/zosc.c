@@ -150,7 +150,7 @@ zosc_new (const char *address)
     //  Initialize class properties here
     self->format = "";
     self->chunk = zchunk_new(address, strlen(address) + 1);
-    self->address = zchunk_data(self->chunk);
+    self->address = (char *)zchunk_data(self->chunk);
     assert(self->address);
     assert(self->format);
     self->data_begin = 0;
