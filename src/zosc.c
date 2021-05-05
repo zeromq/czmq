@@ -148,11 +148,11 @@ zosc_new (const char *address)
     zosc_t *self = (zosc_t *) zmalloc (sizeof (zosc_t));
     assert (self);
     //  Initialize class properties here
-    self->address = strdup(address);
-    self->format = strdup("");
+    self->format = "";
+    self->chunk = zchunk_new(address, strlen(address) + 1);
+    self->address = zchunk_data(self->chunk);
     assert(self->address);
     assert(self->format);
-    self->chunk = zchunk_new(NULL, 0);
     self->data_begin = 0;
     self->data_indexes = NULL;
     return self;
