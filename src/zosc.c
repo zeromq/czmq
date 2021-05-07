@@ -18,14 +18,21 @@
 @end
 */
 
-#ifdef WIN32
-#include <winsock2.h>           //  needed for ntohll/htonll
+#if defined( WIN32 )
+  #include <winsock2.h>           //  needed for ntohll/htonll
 #endif
 #include "czmq_classes.h"
-#if __unix__ && !__APPLE__
-#include <endian.h>
-#define htonll(x) htobe64(x)
-#define ntohll(x) be64toh(x)
+#if defined(__MINGW32__)
+  #define htonll(x) ((((uint64_t)htonl(x&0xFFFFFFFF)) << 32) + htonl(x >> 32))
+  #define ntohll(x) ((((uint64_t)ntohl(x&0xFFFFFFFF)) << 32) + ntohl(x >> 32))
+#elif defined(__UTYPE_FREEBSD) || defined(__UTYPE_NETBSD)
+  #include <sys/endian.h>
+  #define htonll(x) htobe64(x)
+  #define ntohll(x) be64toh(x)
+#elif defined(__UNIX__)
+  #include <endian.h>
+  #define htonll(x) htobe64(x)
+  #define ntohll(x) be64toh(x)
 #endif
 //  Structure of our class
 
