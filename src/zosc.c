@@ -139,12 +139,19 @@ s_append_data(zchunk_t *chunk, const char *format, va_list argptr)
         }
         format++;
     }
-    if ( size > 8192 )
-        zsys_debug("The packet size exceeds 8192 bytes. It's fine for ZMTP but for DGRAM(UDP) it only works on rare networks");
+    static bool warn_jumbo_once = false;
+    static bool warn_ether_once = false;
+    if ( size > 8192 && !warn_jumbo_once )
+    {
+        warn_jumbo_once = true;
+        zsys_debug("The packet size exceeds 8192 bytes. It's fine for ZMTP but for DGRAM(UDP) it only works on rare networks. This warning is only echoed once");
+    }
     else
-    if ( size > 508 )
-        zsys_debug("The packet size exceeds 508 bytes. It's fine for ZMTP but for DGRAM(UDP) it might not work");
-
+    if ( size > 508 && !warn_ether_once )
+    {
+        warn_ether_once = true;
+        zsys_debug("The packet size exceeds 508 bytes. It's fine for ZMTP but for DGRAM(UDP) it might not work. This warning is only echoed once");
+    }
     return size;
 }
 
