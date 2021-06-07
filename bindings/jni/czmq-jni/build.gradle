@@ -11,7 +11,7 @@ ext.hasNotEmptyProperty = { propertyName ->
 }
 
 dependencies {
-    compile 'org.scijava:native-lib-loader:2.3.4'
+    compile 'org.scijava:native-lib-loader:2.3.5'
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
