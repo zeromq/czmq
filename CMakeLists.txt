@@ -778,35 +778,38 @@ include(CTest)
 ########################################################################
 # cleanup
 ########################################################################
-if (NOT TARGET distclean)
-    add_custom_target (distclean @echo Cleaning for source distribution)
-endif()
+option(WITH_DISTCLEAN "Activate the 'distclean' target" ON)
+if (WITH_DISTCLEAN)
+  if (NOT TARGET distclean)
+      add_custom_target (distclean @echo Cleaning for source distribution)
+  endif()
 
-set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
-                    ${PROJECT_BINARY_DIR}/cmake_install.cmake
-                    ${PROJECT_BINARY_DIR}/Makefile
-                    ${PROJECT_BINARY_DIR}/CMakeFiles
-                    ${PROJECT_BINARY_DIR}/CTestTestfile.cmake
-                    ${PROJECT_BINARY_DIR}/DartConfiguration.tcl
-                    ${PROJECT_BINARY_DIR}/Testing
-                    ${PROJECT_BINARY_DIR}/compile_commands.json
-                    ${PROJECT_BINARY_DIR}/platform.h
-                    ${PROJECT_BINARY_DIR}/src/libczmq.pc
-                    ${PROJECT_BINARY_DIR}/src/libczmq.so
-                    ${PROJECT_BINARY_DIR}/src/czmq_selftest
-                    ${PROJECT_BINARY_DIR}/src/zmakecert
-                    ${PROJECT_BINARY_DIR}/src/zsp
-                    ${PROJECT_BINARY_DIR}/src/test_randof
-                    ${PROJECT_BINARY_DIR}/src/czmq_selftest
-)
+  set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
+                      ${PROJECT_BINARY_DIR}/cmake_install.cmake
+                      ${PROJECT_BINARY_DIR}/Makefile
+                      ${PROJECT_BINARY_DIR}/CMakeFiles
+                      ${PROJECT_BINARY_DIR}/CTestTestfile.cmake
+                      ${PROJECT_BINARY_DIR}/DartConfiguration.tcl
+                      ${PROJECT_BINARY_DIR}/Testing
+                      ${PROJECT_BINARY_DIR}/compile_commands.json
+                      ${PROJECT_BINARY_DIR}/platform.h
+                      ${PROJECT_BINARY_DIR}/src/libczmq.pc
+                      ${PROJECT_BINARY_DIR}/src/libczmq.so
+                      ${PROJECT_BINARY_DIR}/src/czmq_selftest
+                      ${PROJECT_BINARY_DIR}/src/zmakecert
+                      ${PROJECT_BINARY_DIR}/src/zsp
+                      ${PROJECT_BINARY_DIR}/src/test_randof
+                      ${PROJECT_BINARY_DIR}/src/czmq_selftest
+  )
 
-add_custom_command(
-    DEPENDS clean
-    COMMENT "distribution clean"
-    COMMAND rm
-    ARGS    -rf CMakeTmp ${cmake_generated}
-    TARGET  distclean
-)
+  add_custom_command(
+      DEPENDS clean
+      COMMENT "distribution clean"
+      COMMAND rm
+      ARGS    -rf CMakeTmp ${cmake_generated}
+      TARGET  distclean
+  )
+endif(WITH_DISTCLEAN)
 
 include(ClangFormat OPTIONAL)
 
