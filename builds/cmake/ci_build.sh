@@ -190,13 +190,10 @@ if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s libcurl4-nss-dev >/dev/null 2>
         $CI_TIME autoconf || \
         $CI_TIME autoreconf -fiv
     fi
-    if [ -e ./configure ]; then
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-    else
-        mkdir build
-        cd build
-        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
-    fi
+    ( # Custom additional options for libcurl
+      CONFIG_OPTS+=("--with-secure-transport")
+      $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+    )
     if [ -e ./configure ]; then
         $CI_TIME make -j4
         $CI_TIME make install
