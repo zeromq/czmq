@@ -8,12 +8,12 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.jfrog.artifactory' version '4.9.9'
-    id 'com.jfrog.bintray' version '1.8.4'
-    id 'com.google.osdetector' version '1.6.2'
+    id 'com.jfrog.artifactory' version '4.21.0'
+    id 'com.jfrog.bintray' version '1.8.5'
+    id 'com.google.osdetector' version '1.7.0'
 }
 
-wrapper.gradleVersion = '6.5.1'
+wrapper.gradleVersion = '7.0.2'
 
 subprojects {
     apply plugin: 'java'

@@ -102,7 +102,10 @@ if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./c
     $CI_TIME autoconf || \
     $CI_TIME autoreconf -fiv
 fi
-$CI_TIME ./configure "${CONFIG_OPTS[@]}"
+( # Custom additional options for libcurl
+  CONFIG_OPTS+=("--with-secure-transport")
+  $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+)
 $CI_TIME make -j4
 $CI_TIME make install
 
@@ -141,7 +144,7 @@ TERM=dumb $CI_TIME ./gradlew clean
 
 if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$BINDING_OPTS" == "android" ]; then
     pushd ../../builds/android
-        export NDK_VERSION=android-ndk-r21d
+        export NDK_VERSION=android-ndk-r21e
         export ANDROID_NDK_ROOT="/tmp/${NDK_VERSION}"
 
         case $(uname | tr '[:upper:]' '[:lower:]') in

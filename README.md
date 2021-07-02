@@ -9,7 +9,7 @@
 
 | Linux & MacOSX | Windows  |
 |:--------------:|:--------:|
-|[![Build Status](https://travis-ci.org/zeromq/czmq.png?branch=master)](https://travis-ci.org/zeromq/czmq)|[![Build status](https://ci.appveyor.com/api/projects/status/q7y22juu3pnl5wq6?svg=true)](https://ci.appveyor.com/project/zeromq/czmq)|
+|[![Build Status](https://travis-ci.com/zeromq/czmq.svg?branch=master)](https://travis-ci.com/zeromq/czmq)|[![Build status](https://ci.appveyor.com/api/projects/status/q7y22juu3pnl5wq6?svg=true)](https://ci.appveyor.com/project/zeromq/czmq)|
 
 ## Contents
 

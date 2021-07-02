@@ -362,13 +362,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
             $CI_TIME autoconf || \
             $CI_TIME autoreconf -fiv
         fi
-        if [ -e ./configure ]; then
+        ( # Custom additional options for libcurl
+            CONFIG_OPTS+=("--with-secure-transport")
             $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-        else
-            mkdir build
-            cd build
-            $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
-        fi
+        )
         if [ -e ./configure ]; then
             $CI_TIME make -j4
             $CI_TIME make install

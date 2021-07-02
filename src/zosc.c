@@ -18,14 +18,23 @@
 @end
 */
 
-#ifdef WIN32
-#include <winsock2.h>           //  needed for ntohll/htonll
+#if defined( WIN32 )
+  #include <winsock2.h>           //  needed for ntohll/htonll
 #endif
 #include "czmq_classes.h"
-#if __unix__ && !__APPLE__
-#include <endian.h>
-#define htonll(x) htobe64(x)
-#define ntohll(x) be64toh(x)
+#if defined(__MINGW32__)
+  #define htonll(x) ((((uint64_t)htonl(x&0xFFFFFFFF)) << 32) + htonl(x >> 32))
+  #define ntohll(x) ((((uint64_t)ntohl(x&0xFFFFFFFF)) << 32) + ntohl(x >> 32))
+#elif defined(__UTYPE_FREEBSD) || defined(__UTYPE_NETBSD)
+  #include <sys/endian.h>
+  #define htonll(x) htobe64(x)
+  #define ntohll(x) be64toh(x)
+#elif defined(__UTYPE_OSX)
+  #include <machine/endian.h>
+#elif defined(__UNIX__)
+  #include <endian.h>
+  #define htonll(x) htobe64(x)
+  #define ntohll(x) be64toh(x)
 #endif
 //  Structure of our class
 
@@ -130,12 +139,19 @@ s_append_data(zchunk_t *chunk, const char *format, va_list argptr)
         }
         format++;
     }
-    if ( size > 8192 )
-        zsys_debug("The packet size exceeds 8192 bytes. It's fine for ZMTP but for DGRAM(UDP) it only works on rare networks");
+    static bool warn_jumbo_once = false;
+    static bool warn_ether_once = false;
+    if ( size > 8192 && !warn_jumbo_once )
+    {
+        warn_jumbo_once = true;
+        zsys_debug("The packet size exceeds 8192 bytes. It's fine for ZMTP but for DGRAM(UDP) it only works on rare networks. This warning is only echoed once");
+    }
     else
-    if ( size > 508 )
-        zsys_debug("The packet size exceeds 508 bytes. It's fine for ZMTP but for DGRAM(UDP) it might not work");
-
+    if ( size > 508 && !warn_ether_once )
+    {
+        warn_ether_once = true;
+        zsys_debug("The packet size exceeds 508 bytes. It's fine for ZMTP but for DGRAM(UDP) it might not work. This warning is only echoed once");
+    }
     return size;
 }
 
@@ -148,11 +164,11 @@ zosc_new (const char *address)
     zosc_t *self = (zosc_t *) zmalloc (sizeof (zosc_t));
     assert (self);
     //  Initialize class properties here
-    self->address = strdup(address);
-    self->format = strdup("");
+    self->format = "";
+    self->chunk = zchunk_new(address, strlen(address) + 1);
+    self->address = (char *)zchunk_data(self->chunk);
     assert(self->address);
     assert(self->format);
-    self->chunk = zchunk_new(NULL, 0);
     self->data_begin = 0;
     self->data_indexes = NULL;
     return self;

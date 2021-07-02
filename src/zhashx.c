@@ -329,6 +329,7 @@ s_item_lookup (zhashx_t *self, const void *key)
         assert (s_zhashx_rehash (self, new_prime_index) == 0);
         limit = primes [self->prime_index];
         self->cached_index = self->hasher (key) % limit;
+        self->chain_limit += CHAIN_GROWS;
     }
     return item;
 }

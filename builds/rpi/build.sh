@@ -176,7 +176,10 @@ if [ ! $INCREMENTAL ]; then
             $CI_TIME autoconf || \
             $CI_TIME autoreconf -fiv
         fi
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        ( # Custom additional options for libcurl
+            CONFIG_OPTS+=("--with-secure-transport")
+            $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        )
         $CI_TIME make -j4
         $CI_TIME make install
     ) || exit 1
