@@ -1,7 +1,12 @@
 # Define job order
 stages:
   - lib-build
+  - lib-deploy
 
+# Global variables. Can be used by any jobs
+variables:
+  VS_CMAKE_GENERATOR: "Visual Studio 15 2017"
+  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\autan\\gitlab_workspace\\dependencies"
 
 # Create library for macos
 lib-build-macos:
@@ -9,28 +14,30 @@ lib-build-macos:
   tags:
     - osx
   script:
-    - git clean -xfd
-    - mkdir build
-    - mkdir release
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$HOME/builds/sysroot/usr/local/
-    - cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$HOME/builds/sysroot/usr/local/ -G "Xcode"
     - make -j8 -C build
-    - make -C build DESTDIR=$PWD/release install
-    - make -C build DESTDIR=$HOME/builds/sysroot/ install
-    - mkdir -p builds/xcode/Debug
-    - cp build/libczmq.?.?.?.dylib builds/xcode/Debug
-    - cd release/usr/local/
-    - tar zcvf ../../../libczmq.tgz *
-    - cd ../../..
   artifacts:
     paths:
-      - libczmq.tgz
+      - build
     name: "lib-build-macos"
     expire_in: 1 day
   dependencies: []
+
+lib-deploy-macos:
+  stage: lib-deploy
+  tags:
+    - osx
+  script:
+    - make -C build DESTDIR=$HOME/builds/sysroot/ install
+  dependencies:
+    - lib-build-macos
+  needs:
+    - lib-build-macos
   only:
     refs:
       - master
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
   
 # Create library for windows
 # Library will be build for 4 targets : Debug x86, Debug x64, Release x86, Release x64
@@ -45,24 +52,43 @@ lib-build-windows:
     - mkdir build
     - cd build
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86"
-    - cmake -S .. -B DebugX86 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - cmake -S .. -B DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build DebugX86 --target ALL_BUILD --config Debug
-    - cmake --install DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86"
-    - cmake -S .. -B ReleaseX86 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - cmake -S .. -B ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build ReleaseX86 --target ALL_BUILD --config Release
-    - cmake --install ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64"
-    - cmake -S .. -B DebugX64 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - cmake -S .. -B DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build DebugX64 --target ALL_BUILD --config Debug
-    - cmake --install DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64"
-    - cmake -S .. -B ReleaseX64 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
+    - cmake -S .. -B ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DENABLE_DRAFTS=ON -DCZMQ_BUILD_STATIC=OFF
     - cmake --build ReleaseX64 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+      - build
+    name: "lib-build-windows"
+    expire_in: 1 day
+  dependencies: []
+    
+lib-deploy-windows:
+  stage: lib-deploy
+  tags:
+    - windows
+  script:
+    - cd build
+    - cmake --install DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
+    - cmake --install ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
+    - cmake --install DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
     - cmake --install ReleaseX64 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
+  dependencies:
+    - lib-build-windows
+  needs:
+    - lib-build-windows
   only:
     refs:
       - master
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 # Create library for linux
 lib-build-linux:
@@ -71,24 +97,31 @@ lib-build-linux:
   tags:
     - docker
   script:
-    - mkdir build
-    - mkdir release
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/
     - make -C build
-    - make -C build DESTDIR=$PWD/release install
-    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
-    - cd release/usr/local/
-    - tar zcvf ../../../libczmq.tgz *
-    - cd ../../..
   artifacts:
     paths:
-      - libczmq.tgz
+      - build
     name: "lib-build-linux-x64"
     expire_in: 1 day
   dependencies: []
+
+lib-deploy-linux:
+  stage: lib-deploy
+  image: ingescape/debian-testing-compil
+  tags:
+    - docker
+  script:
+    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
+  dependencies:
+    - lib-build-linux
+  needs:
+    - lib-build-linux
   only:
     refs:
       - master
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 # Create library for CentOS with qt
 lib-build-centos-qt:
@@ -98,7 +131,26 @@ lib-build-centos-qt:
   script:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=/builds/sysroot/usr/local/
     - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-build-linux-x64"
+    expire_in: 1 day
+  dependencies: []
+
+lib-deploy-centos-qt:
+  stage: lib-deploy
+  tags:
+    - centos-qt
+  script:
     - make -C build DESTDIR=/builds/sysroot/ install
+  dependencies:
+    - lib-build-centos-qt
+  needs:
+    - lib-build-centos-qt
   only:
     refs:
       - master
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+
