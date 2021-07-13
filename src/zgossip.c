@@ -322,6 +322,16 @@ server_accept (server_t *self, const char *key, const char *value)
     if (tuple && streq (tuple->value, value))
         return;                 //  Duplicate tuple, do nothing
 
+    // Clean previous tuple on same endpoint
+    tuple = (tuple_t *) zhashx_first (self->tuples);
+    while (tuple) {
+        if (streq(tuple->value, value)) {
+            zhashx_delete(self->tuples, tuple->key);
+            break;
+        }
+        tuple = (tuple_t *) zhashx_next (self->tuples);
+    }
+    
     //  Create new tuple
     tuple = (tuple_t *) zmalloc (sizeof (tuple_t));
     assert (tuple);
