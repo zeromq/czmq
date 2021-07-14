@@ -947,6 +947,16 @@ AC_ARG_ENABLE([zmakecert],
 AM_CONDITIONAL([ENABLE_ZMAKECERT], [test x$enable_zmakecert != xno])
 AM_COND_IF([ENABLE_ZMAKECERT], [AC_MSG_NOTICE([ENABLE_ZMAKECERT defined])])
 
+# Check for zoscdump intent
+AC_ARG_ENABLE([zoscdump],
+    AS_HELP_STRING([--enable-zoscdump],
+        [Compile and install 'zoscdump' [default=yes]]),
+    [enable_zoscdump=$enableval],
+    [enable_zoscdump=yes])
+
+AM_CONDITIONAL([ENABLE_ZOSCDUMP], [test x$enable_zoscdump != xno])
+AM_COND_IF([ENABLE_ZOSCDUMP], [AC_MSG_NOTICE([ENABLE_ZOSCDUMP defined])])
+
 # Check for zsp intent
 AC_ARG_ENABLE([zsp],
     AS_HELP_STRING([--enable-zsp],

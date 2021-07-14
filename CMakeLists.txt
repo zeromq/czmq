@@ -569,6 +569,30 @@ install(TARGETS zmakecert
     RUNTIME DESTINATION bin
 )
 add_executable(
+    zoscdump
+    "${SOURCE_DIR}/src/zoscdump.c"
+)
+if (TARGET czmq)
+target_link_libraries(
+    zoscdump
+    czmq
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+)
+endif()
+if (NOT TARGET czmq AND TARGET czmq-static)
+target_link_libraries(
+    zoscdump
+    czmq-static
+    ${LIBZMQ_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
+    ${OPTIONAL_LIBRARIES_STATIC}
+)
+endif()
+install(TARGETS zoscdump
+    RUNTIME DESTINATION bin
+)
+add_executable(
     zsp
     "${SOURCE_DIR}/src/zsp.c"
 )
@@ -764,6 +788,7 @@ set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
                     ${PROJECT_BINARY_DIR}/src/libczmq.so
                     ${PROJECT_BINARY_DIR}/src/czmq_selftest
                     ${PROJECT_BINARY_DIR}/src/zmakecert
+                    ${PROJECT_BINARY_DIR}/src/zoscdump
                     ${PROJECT_BINARY_DIR}/src/zsp
                     ${PROJECT_BINARY_DIR}/src/test_randof
                     ${PROJECT_BINARY_DIR}/src/czmq_selftest

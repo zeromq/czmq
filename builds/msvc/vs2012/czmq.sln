@@ -4,6 +4,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libczmq", "libczmq\libczmq.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zmakecert", "zmakecert\zmakecert.vcxproj", "{A5497C4B-1CD1-4779-9458-135994788}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zoscdump", "zoscdump\zoscdump.vcxproj", "{A5497C4B-1CD1-4779-9458-110736464}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zsp", "zsp\zsp.vcxproj", "{A5497C4B-1CD1-4779-9458-33184}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_randof", "test_randof\test_randof.vcxproj", "{A5497C4B-1CD1-4779-9458-117342710}"
@@ -74,6 +76,30 @@ Global
 		{A5497C4B-1CD1-4779-9458-135994788}.StaticRelease|Win32.Build.0 = ReleaseSEXE|Win32
 		{A5497C4B-1CD1-4779-9458-135994788}.StaticRelease|x64.ActiveCfg = ReleaseSEXE|x64
 		{A5497C4B-1CD1-4779-9458-135994788}.StaticRelease|x64.Build.0 = ReleaseSEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.DynDebug|Win32.ActiveCfg = DebugDEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.DynDebug|Win32.Build.0 = DebugDEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.DynDebug|x64.ActiveCfg = DebugDEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.DynDebug|x64.Build.0 = DebugDEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.DynRelease|Win32.ActiveCfg = ReleaseDEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.DynRelease|Win32.Build.0 = ReleaseDEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.DynRelease|x64.ActiveCfg = ReleaseDEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.DynRelease|x64.Build.0 = ReleaseDEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgDebug|Win32.ActiveCfg = DebugLEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgDebug|Win32.Build.0 = DebugLEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgDebug|x64.ActiveCfg = DebugLEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgDebug|x64.Build.0 = DebugLEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgRelease|Win32.ActiveCfg = ReleaseLEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgRelease|Win32.Build.0 = ReleaseLEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgRelease|x64.ActiveCfg = ReleaseLEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.LtcgRelease|x64.Build.0 = ReleaseLEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticDebug|Win32.ActiveCfg = DebugSEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticDebug|Win32.Build.0 = DebugSEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticDebug|x64.ActiveCfg = DebugSEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticDebug|x64.Build.0 = DebugSEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticRelease|Win32.ActiveCfg = ReleaseSEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticRelease|Win32.Build.0 = ReleaseSEXE|Win32
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticRelease|x64.ActiveCfg = ReleaseSEXE|x64
+		{A5497C4B-1CD1-4779-9458-110736464}.StaticRelease|x64.Build.0 = ReleaseSEXE|x64
 		{A5497C4B-1CD1-4779-9458-33184}.DynDebug|Win32.ActiveCfg = DebugDEXE|Win32
 		{A5497C4B-1CD1-4779-9458-33184}.DynDebug|Win32.Build.0 = DebugDEXE|Win32
 		{A5497C4B-1CD1-4779-9458-33184}.DynDebug|x64.ActiveCfg = DebugDEXE|x64

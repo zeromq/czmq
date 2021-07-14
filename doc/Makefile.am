@@ -6,7 +6,7 @@
 all-local: doc
 
 # Public programs ("main" tags in project.xml), auto-regenerated:
-MAN1 = zmakecert.1
+MAN1 = zmakecert.1 zoscdump.1
 # Public classes ("class" tags in project.xml), auto-regenerated:
 MAN3 = zactor.3 zargs.3 zarmour.3 zcert.3 zcertstore.3 zchunk.3 zclock.3 zconfig.3 zdigest.3 zdir.3 zdir_patch.3 zfile.3 zframe.3 zhash.3 zhashx.3 ziflist.3 zlist.3 zlistx.3 zloop.3 zmsg.3 zpoller.3 zproc.3 zsock.3 zstr.3 zsys.3 ztimerset.3 ztrie.3 zuuid.3 zhttp_client.3 zhttp_server.3 zhttp_server_options.3 zhttp_request.3 zhttp_response.3 zosc.3 zauth.3 zbeacon.3 zgossip.3 zmonitor.3 zproxy.3 zrex.3
 # Project overview, written by a human after initial skeleton:
@@ -231,6 +231,11 @@ GENERATED_DOCS += zmakecert.txt zmakecert.doc
 zmakecert.txt: $(top_srcdir)/src/zmakecert.c
 	mkdir -p "$(builddir)/$(@D)"
 	"$(srcdir)/mkman" "zmakecert" "$(builddir)/zmakecert.txt" "$(srcdir)/.."
+
+GENERATED_DOCS += zoscdump.txt zoscdump.doc
+zoscdump.txt: $(top_srcdir)/src/zoscdump.c
+	mkdir -p "$(builddir)/$(@D)"
+	"$(srcdir)/mkman" "zoscdump" "$(builddir)/zoscdump.txt" "$(srcdir)/.."
 
 
 clean-local:
