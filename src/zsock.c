@@ -2203,11 +2203,15 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
 #ifdef ZMQ_STREAM
-    zsock_t *streamrecv = zsock_new_stream("@tcp://127.0.0.1:1234");
+    zsock_t *streamrecv = zsock_new(ZMQ_STREAM);
     assert (streamrecv);
+    port = zsock_bind(streamrecv, "tcp://*:*");
+    assert(port > 0);
 
-    zsock_t *streamsender = zsock_new_stream(">tcp://127.0.0.1:1234");
+    zsock_t *streamsender = zsock_new(ZMQ_STREAM);
     assert (streamsender);
+    rc = zsock_connect(streamsender, "tcp://127.0.0.1:%i", port);
+    assert (rc == 0);
 
     zmsg_t *connectmsg = zmsg_recv(streamrecv); // receiver gets a message on connect
     zframe_t *id = zmsg_pop(connectmsg);        // first frame is id
