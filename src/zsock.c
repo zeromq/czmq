@@ -2202,6 +2202,104 @@ zsock_test (bool verbose)
     zframe_destroy (&frame);
     zmsg_destroy (&msg);
 
+#ifdef ZMQ_STREAM
+    zsock_t *streamrecv = zsock_new_stream("@tcp://127.0.0.1:1234");
+    assert (streamrecv);
+
+    zsock_t *streamsender = zsock_new_stream(">tcp://127.0.0.1:1234");
+    assert (streamsender);
+
+    zmsg_t *connectmsg = zmsg_recv(streamrecv); // receiver gets a message on connect
+    zframe_t *id = zmsg_pop(connectmsg);        // first frame is id
+    assert (id);
+    assert (zframe_size(id) == 5);              // the id is 5 bytes, does this always hold?
+    //byte *vid = zframe_data(id);                // access to the actual id value
+    zframe_t *empty = zmsg_pop(connectmsg);     // second frame is empty
+    assert (empty);
+    assert (zframe_size(empty) == 0);
+    zframe_destroy(&id);
+    zframe_destroy(&empty);
+    zmsg_destroy(&connectmsg);
+
+    zmsg_t *connectmsg2 = zmsg_recv(streamsender); // sender also receives a message on connect
+    zframe_t *id2 = zmsg_pop(connectmsg2);         // first frame is id
+    assert (id2);
+    assert (zframe_size(id2) == 5);                // the id is 5 bytes
+    //byte *vid2 = zframe_data(id2);                 // access to the actual id value
+    zframe_t *empty2 = zmsg_pop(connectmsg2);      // second frame is empty
+    assert (empty2);
+    assert (zframe_size(empty2) == 0);
+    zframe_destroy(&id2);
+    zframe_destroy(&empty2);
+    zmsg_destroy(&connectmsg2);
+
+    // send a http request, first get our id
+    uint8_t rid [256];
+    size_t rid_size = 256;
+    rc = zmq_getsockopt (zsock_resolve(streamsender), ZMQ_ROUTING_ID, rid, &rid_size);
+    assert (rc == 0);
+    zmsg_t *request = zmsg_new();
+    assert (request);
+    rc = zmsg_addmem(request, rid, rid_size);
+    assert (rc == 0);
+    rc = zmsg_addstr(request, "GET /\n\n");
+    assert (rc == 0);
+    rc = zmsg_send(&request, streamsender);
+    assert (rc == 0);
+
+    // receive the request
+    zmsg_t * recvreq = zmsg_recv(streamrecv);
+    assert (recvreq);
+    zframe_t* ridframe = zmsg_pop(recvreq); // first frame is routing id
+    byte *rid2 = (byte *)zframe_data(ridframe);
+    assert (zframe_size(ridframe) == 5);
+    char *httpreq = zmsg_popstr(recvreq);
+    assert (streq(httpreq, "GET /\n\n"));
+    zstr_free (&httpreq);
+    zmsg_destroy(&recvreq);
+
+    //  Send reply back to client
+    char http_response[] = "HTTP/1.0 200 OK\r\n"
+                           "Content-Type: text/plain\r\n"
+                           "\r\n"
+                           "Hello, World!";
+    rc = zsock_send(streamrecv, "bs", rid2, 5, http_response);
+    assert (rc == 0);
+
+    // send empty frame to signal disconnect
+    rc = zsock_send(streamrecv, "bz", rid2, 5);
+    assert (rc == 0);
+    zframe_destroy(&ridframe);
+
+    // Get reply at sender and check that it's complete
+    zmsg_t *httpmsg = zmsg_recv(streamsender);
+    assert (httpmsg);
+    zframe_t *httpid = zmsg_pop(httpmsg);
+    assert (zframe_size(httpid) == 5);
+    char *httpresp = zmsg_popstr(httpmsg);
+    assert (httpresp);
+    assert ( streq(httpresp, http_response) );
+    zframe_destroy(&httpid);
+    zmsg_destroy(&httpmsg);
+    zstr_free(&httpresp);
+
+    // streamrecv sent disconnect so we should have received an empty frame
+    zmsg_t *disconnectmsg = zmsg_recv(streamrecv); // sender also receives a message on connect
+    zframe_t *id3 = zmsg_pop(disconnectmsg);         // first frame is id
+    assert (id3);
+    assert (zframe_size(id3) == 5);                // the id is 5 bytes
+    zframe_t *empty3 = zmsg_pop(disconnectmsg);      // second frame is empty
+    assert (empty3);
+    assert (zframe_size(empty3) == 0);
+    zframe_destroy(&id3);
+    zframe_destroy(&empty3);
+    zmsg_destroy(&disconnectmsg);
+
+    zsock_destroy(&streamsender);
+    zsock_destroy(&streamrecv);
+
+#endif
+
 #ifdef ZMQ_SERVER
 
     //  Test zsock_bsend/brecv pictures with binary encoding on SERVER and CLIENT sockets
