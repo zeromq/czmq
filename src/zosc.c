@@ -396,8 +396,9 @@ zosc_append(zosc_t *self, const char *format, ...)
     // save the pointer to where the data starts
     size_t new_data_begin = size;
 
-    // copy current data from data begin to end
-    size = zchunk_extend(newchunk, zchunk_data(self->chunk)+self->data_begin, zchunk_size(self->chunk)-self->data_begin);
+    // copy current data from data begin to end if there is any data
+    if (self->data_begin)
+        size = zchunk_extend(newchunk, zchunk_data(self->chunk)+self->data_begin, zchunk_size(self->chunk)-self->data_begin);
 
     // now append the new data
     va_list argptr;

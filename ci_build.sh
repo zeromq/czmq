@@ -49,7 +49,7 @@ fold_end() {
 case $TRAVIS_OS_NAME in
 windows)
     export
-    choco install openjdk
+    choco install openjdk13
     export JAVA_HOME="C:\Program Files\OpenJDK\jdk-13.0.2"
     export BUILD_PREFIX=$TEMP/ci_build
     # Build will fail if processes are still running at the end of the script.
