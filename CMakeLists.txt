@@ -596,9 +596,11 @@ target_link_libraries(
     ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
-install(TARGETS zmakecert
-    RUNTIME DESTINATION bin
-)
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "iOS")
+  install(TARGETS zmakecert
+      RUNTIME DESTINATION bin
+  )
+endif()
 add_executable(
     zsp
     "${SOURCE_DIR}/src/zsp.c"
