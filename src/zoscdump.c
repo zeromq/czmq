@@ -44,17 +44,20 @@ determine_socket( const char *bind)
     if (zrex_eq(rex, bind, "^(.+)://.*") )
     {
         const char *transport = zrex_hit(rex, 1);
-        if ( streq(transport, "udp") )
-             retsock = zsock_new_dgram(bind);
 
+        if ( streq(transport, "ipc") )
+            retsock = zsock_new_pull( bind );
+#ifdef ZMQ_DGRAM
+        else if ( streq(transport, "udp") )
+             retsock = zsock_new_dgram(bind);
+#endif
+#ifdef ZMQ_STREAM
         else if ( streq(transport, "tcp") )
         {
             retsock = zsock_new(ZMQ_STREAM);
-            zsock_bind(retsock, bind);
+            zsock_bind(retsock, "%s", bind);
         }
-
-        else if ( streq(transport, "ipc") )
-            retsock = zsock_new_pull( bind );
+#endif
 
         else
             zsys_error("Not a valid transport in %s", transport);
@@ -69,6 +72,7 @@ determine_socket( const char *bind)
 
     return NULL;
 }
+
 
 void
 recv_dgram(zmsg_t *msg)
@@ -173,12 +177,16 @@ main (int argc, char *argv [])
 
         switch ( zsock_type(which) )
         {
+#ifdef ZMQ_DGRAM
         case ZMQ_DGRAM:
             recv_dgram(msg);
             break;
+#endif
+#ifdef ZMQ_STREAM
         case ZMQ_STREAM:
             recv_stream(msg);
             break;
+#endif
         default:
             zsys_error("Unsupported socket type");
             break;
@@ -188,11 +196,11 @@ main (int argc, char *argv [])
     }
 
     zpoller_destroy(&poller);
-    zsock_t *sock = zlist_first(sockets);
+    zsock_t *sock = (zsock_t *)zlist_first(sockets);
     while (sock)
     {
         zsock_destroy(&sock);
-        sock = zlist_next(sockets);
+        sock = (zsock_t *)zlist_next(sockets);
     }
 
     return ret;
