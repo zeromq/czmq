@@ -29,7 +29,7 @@
   #include <sys/endian.h>
   #define htonll(x) htobe64(x)
   #define ntohll(x) be64toh(x)
-#elif defined(__UTYPE_OSX)
+#elif defined(__UTYPE_OSX) || defined(__UTYPE_IOS)
   #include <machine/endian.h>
 #elif defined(__UNIX__)
   #include <endian.h>
