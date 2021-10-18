@@ -15,7 +15,7 @@ SET target=%1
 if NOT "%target%" == "" set target=/t:%target%&set action=Cleaning
 
 SET solution=czmq.sln
-SET version=15
+SET version=16
 SET log=build.log
 SET tools=Microsoft Visual Studio %version%.0\VC\vcvarsall.bat
 if "%version%" == "15" SET tools=Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
@@ -25,56 +25,56 @@ IF NOT EXIST %environment% SET environment="%programfiles%\%tools%"
 IF NOT EXIST %environment% GOTO no_tools
 
 SET packages=
-IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2017\libzmq.import.props" (
-    COPY /Y "..\..\..\..\libzmq\builds/msvc/vs2017\libzmq.import.props" . > %log%
+IF EXIST "..\..\..\..\libzmq\builds/msvc/vs2019\libzmq.import.props" (
+    COPY /Y "..\..\..\..\libzmq\builds/msvc/vs2019\libzmq.import.props" . > %log%
     IF errorlevel 1 GOTO error
 ) ELSE (
     ECHO Did not find libzmq, aborting.
     ECHO Please clone from https://github.com/zeromq/libzmq.git, and then build.
     GOTO error
 )
-IF EXIST "..\..\..\..\uuid\builds/msvc/vs2017\uuid.import.props" (
-    COPY /Y "..\..\..\..\uuid\builds/msvc/vs2017\uuid.import.props" . > %log%
+IF EXIST "..\..\..\..\uuid\builds/msvc/vs2019\uuid.import.props" (
+    COPY /Y "..\..\..\..\uuid\builds/msvc/vs2019\uuid.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_UUID=1
     ECHO Building with uuid
 ) ELSE (
     ECHO Building without uuid
 )
-IF EXIST "..\..\..\..\systemd\builds/msvc/vs2017\systemd.import.props" (
-    COPY /Y "..\..\..\..\systemd\builds/msvc/vs2017\systemd.import.props" . > %log%
+IF EXIST "..\..\..\..\systemd\builds/msvc/vs2019\systemd.import.props" (
+    COPY /Y "..\..\..\..\systemd\builds/msvc/vs2019\systemd.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_SYSTEMD=1
     ECHO Building with systemd
 ) ELSE (
     ECHO Building without systemd
 )
-IF EXIST "..\..\..\..\lz4\builds/msvc/vs2017\lz4.import.props" (
-    COPY /Y "..\..\..\..\lz4\builds/msvc/vs2017\lz4.import.props" . > %log%
+IF EXIST "..\..\..\..\lz4\builds/msvc/vs2019\lz4.import.props" (
+    COPY /Y "..\..\..\..\lz4\builds/msvc/vs2019\lz4.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_LZ4=1
     ECHO Building with lz4
 ) ELSE (
     ECHO Building without lz4
 )
-IF EXIST "..\..\..\..\libcurl\builds/msvc/vs2017\libcurl.import.props" (
-    COPY /Y "..\..\..\..\libcurl\builds/msvc/vs2017\libcurl.import.props" . > %log%
+IF EXIST "..\..\..\..\libcurl\builds/msvc/vs2019\libcurl.import.props" (
+    COPY /Y "..\..\..\..\libcurl\builds/msvc/vs2019\libcurl.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_LIBCURL=1
     ECHO Building with libcurl
 ) ELSE (
     ECHO Building without libcurl
 )
-IF EXIST "..\..\..\..\nss\builds/msvc/vs2017\nss.import.props" (
-    COPY /Y "..\..\..\..\nss\builds/msvc/vs2017\nss.import.props" . > %log%
+IF EXIST "..\..\..\..\nss\builds/msvc/vs2019\nss.import.props" (
+    COPY /Y "..\..\..\..\nss\builds/msvc/vs2019\nss.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_NSS=1
     ECHO Building with nss
 ) ELSE (
     ECHO Building without nss
 )
-IF EXIST "..\..\..\..\libmicrohttpd\builds/msvc/vs2017\libmicrohttpd.import.props" (
-    COPY /Y "..\..\..\..\libmicrohttpd\builds/msvc/vs2017\libmicrohttpd.import.props" . > %log%
+IF EXIST "..\..\..\..\libmicrohttpd\builds/msvc/vs2019\libmicrohttpd.import.props" (
+    COPY /Y "..\..\..\..\libmicrohttpd\builds/msvc/vs2019\libmicrohttpd.import.props" . > %log%
     IF errorlevel 1 GOTO error
     SET packages=%packages% /p:HAVE_LIBMICROHTTPD=1
     ECHO Building with libmicrohttpd

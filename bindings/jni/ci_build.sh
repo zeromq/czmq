@@ -144,7 +144,7 @@ TERM=dumb $CI_TIME ./gradlew clean
 
 if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$BINDING_OPTS" == "android" ]; then
     pushd ../../builds/android
-        export NDK_VERSION=android-ndk-r21e
+        export NDK_VERSION=android-ndk-r22b
         export ANDROID_NDK_ROOT="/tmp/${NDK_VERSION}"
 
         case $(uname | tr '[:upper:]' '[:lower:]') in
