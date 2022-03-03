@@ -701,7 +701,10 @@ zmsg_decode (zframe_t *frame)
             break;
         }
         zframe_t *decoded = zframe_new (source, frame_size);
-        assert (decoded);
+        if (!decoded) {
+            zmsg_destroy (&self);
+            break;
+        }
         zmsg_append (self, &decoded);
         source += frame_size;
     }

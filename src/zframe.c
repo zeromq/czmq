@@ -57,7 +57,7 @@ zframe_new (const void *data, size_t size)
     if (size) {
         //  Catch heap exhaustion in this specific case
         if (zmq_msg_init_size (&self->zmsg, size)) {
-            zframe_destroy (&self);
+            freen (self);
             return NULL;
         }
         if (data)
