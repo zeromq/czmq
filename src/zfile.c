@@ -434,7 +434,7 @@ zfile_input (zfile_t *self)
 int
 zfile_output (zfile_t *self)
 {
-    int rc;
+    int rc = 0;
     assert (self);
 
     //  Create file path if it doesn't exist
@@ -443,14 +443,16 @@ zfile_output (zfile_t *self)
         return -1;
     char *last_slash = strrchr (file_path, '/');
     if (last_slash)
+    {
         *last_slash = 0;
+        rc = zsys_dir_create (file_path);
+    }
 
     //  Wipe symbolic link if that's what the file was
     if (self->link) {
         freen (self->link);
         self->link = NULL;
     }
-    rc = zsys_dir_create (file_path);
     freen (file_path);
     if (rc != 0)
         return -1;
@@ -919,6 +921,13 @@ zfile_test (bool verbose)
     assert (!zsys_file_exists (filename));
     zstr_free (&filename);
 #endif // CZMQ_BUILD_DRAFT_API
+
+    // create a file without a path, test for issue #2208
+    zfile_t *relfile = zfile_new(NULL, "relfile.tst");
+    assert(relfile);
+    int rco = zfile_output(relfile);
+    assert(rco == 0);
+    zfile_delete("relfile.tst");
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
