@@ -151,7 +151,6 @@ IF (TARGET libzmq)
     message( STATUS "CMake target 'libzmq' found." )
     set(LIBZMQ_FOUND 1)
     set(LIBZMQ_LIBRARIES libzmq)
-    list(APPEND MORE_LIBRARIES libzmq)
 ELSE(TARGET libzmq)
     find_package(libzmq REQUIRED)
     IF (libzmq_FOUND)
@@ -463,6 +462,10 @@ if (CZMQ_BUILD_SHARED)
     PUBLIC ${MORE_LIBRARIES}
   )
 
+  if (TARGET libzmq)
+    target_link_libraries(czmq PUBLIC libzmq)
+  endif()
+
   install(TARGETS czmq
     EXPORT czmq-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
@@ -499,6 +502,15 @@ if (CZMQ_BUILD_STATIC)
   target_link_libraries(czmq-static
     PUBLIC ${MORE_LIBRARIES}
   )
+
+  option(STATIC_ZMQ_LINK "Force static targets to link against the static ZeroMQ dependencies instead of the dynamic ones" OFF)
+  if (TARGET libzmq)
+    if (STATIC_ZMQ_LINK)
+      target_link_libraries(czmq-static PRIVATE libzmq-static)
+    else()
+      target_link_libraries(czmq-static PUBLIC libzmq)
+    endif()
+  endif()
 
   install(TARGETS czmq-static
     EXPORT czmq-targets
