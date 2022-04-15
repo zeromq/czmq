@@ -16,7 +16,7 @@ ifneq ("$(wildcard $(OBS_BUILD_CFG))","")
 ifneq ("$(shell grep drafts $(OBS_BUILD_CFG))","")
 DRAFTS=yes
 endif
-ifneq ("$(shell grep python_cffi $(OBS_BUILD_CFG))","")
+ifneq ("$(shell grep python3_cffi $(OBS_BUILD_CFG))","")
 PYTHON_CFFI=yes
 endif
 endif
@@ -38,7 +38,7 @@ ifneq (,$(findstring python_cffi,$(DEB_BUILD_OPTIONS)))
 ifeq (,$(findstring nopython,$(DEB_BUILD_OPTIONS)))
 ifeq (,$(findstring nopython,$(DEB_BUILD_PROFILES)))
 PYTHON_CFFI=yes
-WITH_PYTHON = --with=python2,python3
+WITH_PYTHON = --with=python3
 endif
 endif
 endif
@@ -48,31 +48,37 @@ export PYBUILD_NAME=czmq-cffi
 export PKG_CONFIG_PATH=$(CURDIR)/bindings/python_cffi:$PKG_CONFIG_PATH
 
 override_dh_auto_build:
-	dh_auto_build
+	dh_auto_build -O--buildsystem=autoconf
 	# Problem: we need pkg-config points to built and not yet installed copy of czmq
 	# Solution: chicken-egg problem - let's make "fake" pkg-config file
 	sed -e "s@^libdir.*@libdir=$(CURDIR)/src/.libs@" 		-e "s@^includedir.*@includedir=$(CURDIR)/include@" 		src/libczmq.pc > bindings/python_cffi/libczmq.pc
 	dh_auto_build --sourcedirectory=bindings/python_cffi -O--buildsystem=pybuild
 
 override_dh_auto_install:
-	dh_auto_install
+	dh_auto_install -O--buildsystem=autoconf
 	dh_auto_install --sourcedirectory=bindings/python_cffi -O--buildsystem=pybuild
 
 override_dh_auto_clean:
-	dh_auto_clean
+	dh_auto_clean -O--buildsystem=autoconf
 	dh_auto_clean -O--buildsystem=pybuild
 	rm -f bindings/python_cffi/*.pc
 	rm -rf bindings/python_cffi/*.egg-info/
 else
 WITH_PYTHON =
 # This tells debhelper to avoid building the python CFFI packages
-DH_OPTIONS += -Npython-czmq-cffi
 DH_OPTIONS += -Npython3-czmq-cffi
 export DH_OPTIONS
+
+override_dh_auto_build:
+	dh_auto_build -O--buildsystem=autoconf
+
+override_dh_auto_install:
+	dh_auto_install -O--buildsystem=autoconf
+
+override_dh_auto_clean:
+	dh_auto_clean -O--buildsystem=autoconf
 endif
 
-# Workaround for automake < 1.14 bug
-$(shell dpkg --compare-versions `dpkg-query -W -f='$${Version}\n' automake` lt 1:1.14 && mkdir -p config)
 $(shell test -f src/Makemodule-local.am || touch src/Makemodule-local.am)
 
 override_dh_strip:

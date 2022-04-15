@@ -31,7 +31,8 @@ def pkgconfig_kwargs (libs):
         def _dropILl (string):
             if string.startswith (b"-I") or string.startswith (b"-L") or string.startswith (b"-l"):
                 return string [2:]
-        return [_dropILl (x) for x in string.split ()]
+            return string
+        return [_dropILl (x) for x in string.split () if x != b"-isystem"]
 
     # convert -Dfoo=bar to list of tuples [("foo", "bar")] expected by cffi
     def macros (string):

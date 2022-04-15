@@ -1,0 +1,28 @@
+pull_request:
+  steps:
+    - branch_package:
+        source_project: network:messaging:zeromq:git-draft
+        source_package: czmq
+        target_project: network:messaging:zeromq:ci
+  filters:
+    event: pull_request
+merge:
+  steps:
+    - trigger_services:
+        project: network:messaging:zeromq:git-stable
+        package: czmq
+  filters:
+    event: push
+    branches:
+      only:
+        - master
+release:
+  steps:
+    - trigger_services:
+        project: network:messaging:zeromq:release-stable
+        package: czmq
+    - trigger_services:
+        project: network:messaging:zeromq:release-draft
+        package: czmq
+  filters:
+    event: tag_push
