@@ -13,9 +13,8 @@ Build-Depends: debhelper (>= 9),
     libcurl4-nss-dev (>= 7.28.0),
     libnss3-dev,
     libmicrohttpd-dev,
-    dh-python,
-    python-all-dev, python-cffi, python-setuptools,
-    python3-all-dev, python3-cffi, python3-setuptools,
+    dh-python <!nopython>,
+    python3-all-dev <!nopython>, python3-cffi <!nopython>, python3-setuptools <!nopython>,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 

@@ -1,5 +1,5 @@
 <services>
-  <service name="tar_scm">
+  <service name="obs_scm">
     <param name="url">https://github.com/zeromq/czmq</param>
     <param name="scm">git</param>
     <!-- delete to build from latest master on each refresh -->
@@ -11,82 +11,74 @@
     <param name="exclude">.git</param>
     <param name="changesgenerate">enable</param>
     <param name="filename">czmq</param>
+    <param name="extract">packaging/debian/czmq.dsc</param>
+    <param name="extract">packaging/redhat/czmq.spec</param>
   </service>
 
-  <!-- extract redhat packaging -->
-  <service name="extract_file">
-    <param name="archive">*.tar</param>
-    <param name="files">*/packaging/redhat/czmq.spec</param>
-    <param name="outfilename">czmq.spec</param>
-  </service>
+  <service name="tar" mode="buildtime"/>
 
   <!-- extract debian packaging -->
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
-    <param name="files">*/packaging/debian/czmq.dsc.obs</param>
-    <param name="outfilename">czmq.dsc</param>
-  </service>
-  <service name="extract_file">
-    <param name="archive">*.tar</param>
-  	<param name="files">*/packaging/debian/changelog</param>
+    <param name="files">*/packaging/debian/changelog</param>
     <param name="outfilename">debian.changelog</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/compat</param>
     <param name="outfilename">debian.compat</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/control</param>
     <param name="outfilename">debian.control</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/copyright</param>
     <param name="outfilename">debian.copyright</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/czmq.install</param>
     <param name="outfilename">debian.czmq.install</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/czmq.manpages</param>
     <param name="outfilename">debian.czmq.manpages</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/format</param>
     <param name="outfilename">debian.format</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/libczmq4.install</param>
     <param name="outfilename">debian.libczmq4.install</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/libczmq-dev.install</param>
     <param name="outfilename">debian.libczmq-dev.install</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/libczmq-dev.manpages</param>
     <param name="outfilename">debian.libczmq-dev.manpages</param>
   </service>
-  <service name="extract_file">
+  <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/rules</param>
     <param name="outfilename">debian.rules</param>
   </service>
 
-  <service name="set_version">
+  <service name="set_version" mode="buildtime">
     <param name="basename">czmq</param>
   </service>
 
-  <service name="recompress">
+  <service name="recompress" mode="buildtime">
     <param name="file">*.tar</param>
     <param name="compression">gz</param>
   </service>
