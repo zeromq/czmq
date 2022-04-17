@@ -928,6 +928,8 @@ zfile_test (bool verbose)
     int rco = zfile_output(relfile);
     assert(rco == 0);
     zfile_delete("relfile.tst");
+    zfile_close (relfile);
+    zfile_destroy (&relfile);
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
