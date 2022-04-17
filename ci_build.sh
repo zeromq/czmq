@@ -189,6 +189,11 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     if [ -z "${CI_CONFIG_QUIET-}" ] || [ "${CI_CONFIG_QUIET-}" = yes ] || [ "${CI_CONFIG_QUIET-}" = true ]; then
         CONFIG_OPTS+=("--quiet")
     fi
+    if [ -z "${CI_SELFTEST-}" ] || [ "${CI_SELFTEST-}" = yes ] || [ "${CI_SELFTEST-}" = true ]; then
+        CONFIG_OPTS+=("--enable-czmq_selftest")
+    else
+        CONFIG_OPTS+=("--disable-czmq_selftest")
+    fi
 
     if [ "$HAVE_CCACHE" = yes ] && [ "${COMPILER_FAMILY}" = GCC ]; then
         PATH="/usr/lib/ccache:$PATH"
@@ -250,7 +255,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     # Start of recipe for dependency: libzmq
 	fold_start dependency.libzmq "Install dependency libzmq"
     if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s libzmq3-dev >/dev/null 2>&1) || \
-          (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1)) \
+          (command -v brew >/dev/null 2>&1 && brew ls --versions zeromq >/dev/null 2>&1)) \
     ; then
         echo ""
         BASE_PWD=${PWD}
@@ -295,7 +300,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     # Start of recipe for dependency: uuid
 	fold_start dependency.uuid "Install dependency uuid"
     if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s uuid-dev >/dev/null 2>&1) || \
-          (command -v brew >/dev/null 2>&1 && brew ls --versions uuid >/dev/null 2>&1)) \
+          (command -v brew >/dev/null 2>&1 && brew ls --versions ossp-uuid >/dev/null 2>&1)) \
     ; then
         echo ""
         echo "WARNING: Can not build prerequisite 'uuid'" >&2
@@ -337,7 +342,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     # Start of recipe for dependency: libcurl
 	fold_start dependency.libcurl "Install dependency libcurl"
     if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s libcurl4-nss-dev >/dev/null 2>&1) || \
-          (command -v brew >/dev/null 2>&1 && brew ls --versions libcurl >/dev/null 2>&1)) \
+          (command -v brew >/dev/null 2>&1 && brew ls --versions curl >/dev/null 2>&1)) \
     ; then
         echo ""
         BASE_PWD=${PWD}

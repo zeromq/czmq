@@ -107,6 +107,11 @@
         <option name = "check_abi_compliance" value = "1" />
     </target>
 
+    <target name = "gh_actions" >
+        <option name = "check_zproject" value = "1" />
+        <option name = "check_abi_compliance" value = "1" />
+    </target>
+
     <target name = "jenkins" >
         <!-- While Jenkinsfile does not build prerequisites,
              request via node label that they are expected
