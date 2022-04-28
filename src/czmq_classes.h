@@ -523,11 +523,16 @@ CZMQ_PRIVATE char *
     zsys_zplprintf_error (const char *format, zconfig_t *args);
 
 //  *** Draft constants, defined for internal use only ***
-#define ZGOSSIP_MSG_HELLO 1                 //
-#define ZGOSSIP_MSG_PUBLISH 2               //
-#define ZGOSSIP_MSG_PING 3                  //
-#define ZGOSSIP_MSG_PONG 4                  //
-#define ZGOSSIP_MSG_INVALID 5               //
+
+#define ZGOSSIP_MSG_HELLO 1
+
+#define ZGOSSIP_MSG_PUBLISH 2
+
+#define ZGOSSIP_MSG_PING 3
+
+#define ZGOSSIP_MSG_PONG 4
+
+#define ZGOSSIP_MSG_INVALID 5
 
 //  *** Draft method, defined for internal use only ***
 //  Create a new empty zgossip_msg

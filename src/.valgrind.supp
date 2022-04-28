@@ -53,6 +53,24 @@
    ...
 }
 {
+   <Curl_nss_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc
+   ...
+   fun:Curl_nss_init
+   ...
+}
+{
+   <Curl_ssh_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc
+   ...
+   fun:Curl_ssh_init
+   ...
+}
+{
    <MHD_init>
    Memcheck:Leak
    match-leak-kinds: reachable

@@ -23,12 +23,24 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-#define ZARMOUR_MODE_BASE64_STD 0            // Standard base 64
-#define ZARMOUR_MODE_BASE64_URL 1            // URL and filename friendly base 64
-#define ZARMOUR_MODE_BASE32_STD 2            // Standard base 32
-#define ZARMOUR_MODE_BASE32_HEX 3            // Extended hex base 32
-#define ZARMOUR_MODE_BASE16 4                // Standard base 16
-#define ZARMOUR_MODE_Z85 5                   // Z85 from ZeroMQ RFC 32
+
+// Standard base 64
+#define ZARMOUR_MODE_BASE64_STD 0
+
+// URL and filename friendly base 64
+#define ZARMOUR_MODE_BASE64_URL 1
+
+// Standard base 32
+#define ZARMOUR_MODE_BASE32_STD 2
+
+// Extended hex base 32
+#define ZARMOUR_MODE_BASE32_HEX 3
+
+// Standard base 16
+#define ZARMOUR_MODE_BASE16 4
+
+// Z85 from ZeroMQ RFC 32
+#define ZARMOUR_MODE_Z85 5
 
 //  Create a new zarmour
 CZMQ_EXPORT zarmour_t *
