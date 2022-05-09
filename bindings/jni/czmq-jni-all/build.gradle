@@ -6,7 +6,7 @@
 */
 
 dependencies {
-    compile project(':czmq-jni')
+    implementation project(':czmq-jni')
     runtimeOnly "org.zeromq.czmq:czmq-jni-linux-x86_64:${project.version}"
     runtimeOnly "org.zeromq.czmq:czmq-jni-osx-x86_64:${project.version}"
     runtimeOnly "org.zeromq.czmq:czmq-jni-windows-x86_64:${project.version}"
