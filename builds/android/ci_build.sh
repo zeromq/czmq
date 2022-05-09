@@ -4,15 +4,15 @@
 #  Read the zproject/README.md for information about making permanent changes. #
 ################################################################################
 
-export NDK_VERSION=android-ndk-r22b
+export NDK_VERSION=android-ndk-r24
 export ANDROID_NDK_ROOT="/tmp/${NDK_VERSION}"
 
 case $(uname | tr '[:upper:]' '[:lower:]') in
   linux*)
-    HOST_PLATFORM=linux-x86_64
+    HOST_PLATFORM=linux
     ;;
   darwin*)
-    HOST_PLATFORM=darwin-x86_64
+    HOST_PLATFORM=darwin
     ;;
   *)
     echo "Unsupported platform"

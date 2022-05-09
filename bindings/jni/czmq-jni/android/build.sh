@@ -7,7 +7,7 @@
 #
 #   Requires these environment variables be set, e.g.:
 #
-#     ANDROID_NDK_ROOT=$HOME/android-ndk-r20
+#     ANDROID_NDK_ROOT=$HOME/android-ndk-r24
 #
 #   Exit if any step fails
 set -e
