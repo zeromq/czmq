@@ -334,6 +334,16 @@ zdir_flatten (zdir_t *self)
     uint index = 0;
     if (self)
         index = s_dir_flatten (self, files, index);
+    
+    //sort flattened list for proper patches computation
+    zlist_t *sorted = zlist_new ();
+    for (size_t i = 0; i < self->count; i++)
+        zlist_append (sorted, files[i]);
+    zlist_sort (sorted, s_file_compare);
+    for (size_t i = 0; i < self->count; i++)
+        files[i] = zlist_pop (sorted);
+    zlist_destroy (&sorted);
+    
     return files;
 }
 
