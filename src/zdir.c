@@ -341,7 +341,7 @@ zdir_flatten (zdir_t *self)
         zlist_append (sorted, files[i]);
     zlist_sort (sorted, s_file_compare);
     for (size_t i = 0; i < self->count; i++)
-        files[i] = zlist_pop (sorted);
+        files[i] = (zfile_t *) zlist_pop (sorted);
     zlist_destroy (&sorted);
     
     return files;
