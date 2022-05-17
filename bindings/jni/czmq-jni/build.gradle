@@ -11,9 +11,9 @@ ext.hasNotEmptyProperty = { propertyName ->
 }
 
 dependencies {
-    compile 'org.scijava:native-lib-loader:2.3.5'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.hamcrest:hamcrest-all:1.3'
+    implementation 'org.scijava:native-lib-loader:2.4.0'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.hamcrest:hamcrest-all:1.3'
 }
 
 //  ------------------------------------------------------------------
@@ -21,7 +21,7 @@ dependencies {
 
 task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def classpath = sourceSets.main.output.classesDirs
-    def appclasspath = configurations.runtime.files*.getAbsolutePath().join(File.pathSeparator)
+    def appclasspath = configurations.runtimeClasspath.files*.getAbsolutePath().join(File.pathSeparator)
     def nativeIncludes = 'src/native/include'
     def jniClasses = [
             'src/main/java/org/zeromq/czmq/Zarmour.java',
