@@ -1,0 +1,1 @@
+Make sure to use the flag `--enable-python-binding=yes` when building CZMQ to enable Python bindings.
