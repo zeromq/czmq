@@ -520,8 +520,10 @@ zframe_print_n (zframe_t *self, const char *prefix, size_t length)
     int is_bin = 0;
     uint char_nbr;
     for (char_nbr = 0; char_nbr < size; char_nbr++)
-        if (data [char_nbr] < 32 || data [char_nbr] > 127)
+        if (data [char_nbr] < 32 || data [char_nbr] > 127) {
             is_bin = 1;
+            break;
+        }
 
     char buffer [256] = "";
     size_t max_size = is_bin? 35: 70;
@@ -534,7 +536,7 @@ zframe_print_n (zframe_t *self, const char *prefix, size_t length)
             ellipsis = "...";
         }
 
-	length = size;
+	    length = size;
     }
     if (length > size)
         length = size;
@@ -622,8 +624,10 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
     int is_bin = 0;
     uint char_nbr;
     for (char_nbr = 0; char_nbr < size; char_nbr++)
-        if (data [char_nbr] < 9 || data [char_nbr] > 127)
+        if (data [char_nbr] < 9 || data [char_nbr] > 127) {
             is_bin = 1;
+            break;
+        }
 
     fprintf (file, "[%03d] ", (int) size);
     size_t max_size = is_bin? 35: 70;
