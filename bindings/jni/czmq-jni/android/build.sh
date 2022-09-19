@@ -62,13 +62,16 @@ echo "********  Building CZMQ JNI for Android"
 rm -rf build && mkdir build && cd build
 # Export android build's environment variables for cmake
 android_build_set_env $BUILD_ARCH
-cmake -v \
-    -DANDROID_ABI=$TOOLCHAIN_ABI \
-    -DANDROID_PLATFORM=$MIN_SDK_VERSION \
-    -DANDROID_STL=c++_shared \
-    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
-    -DCMAKE_FIND_ROOT_PATH=$ANDROID_BUILD_PREFIX \
-    ..
+(
+    VERBOSE=1 \
+    cmake \
+        -DANDROID_ABI=$TOOLCHAIN_ABI \
+        -DANDROID_PLATFORM=$MIN_SDK_VERSION \
+        -DANDROID_STL=c++_shared \
+        -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+        -DCMAKE_FIND_ROOT_PATH=$ANDROID_BUILD_PREFIX \
+        ..
+)
 
 #   CMake wrongly searches current directory and then toolchain path instead
 #   of lib path for these files, so make them available temporarily
