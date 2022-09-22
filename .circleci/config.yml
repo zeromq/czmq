@@ -38,7 +38,7 @@ jobs:
           name: Build and test czmq
           command: |
             $Env:PATH += ";$Env:CMAKE_DIR"
-            git clone --depth 1 --quiet git://github.com/sappo/czmq.git "$Env:CZMQ_DIR"
+            git clone --depth 1 --quiet https://github.com/sappo/czmq.git "$Env:CZMQ_DIR"
             cd "$Env:CZMQ_DIR"
             mkdir build
             cd build
