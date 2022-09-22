@@ -147,7 +147,7 @@ Which we install like this (using the Debian-style apt-get package manager):
 
 Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libzmq (ZeroMQ core) library (NOTE: skip ldconfig on OSX):
 
-    git clone git://github.com/zeromq/libzmq.git
+    git clone https://github.com/zeromq/libzmq.git
     cd libzmq
     ./autogen.sh
     # do not specify "--with-libsodium" if you prefer to use internal tweetnacl security implementation (recommended for development)
@@ -157,7 +157,7 @@ Here's how to build CZMQ from GitHub (building from packages is very similar, yo
     sudo ldconfig
     cd ..
 
-    git clone git://github.com/zeromq/czmq.git
+    git clone https://github.com/zeromq/czmq.git
     cd czmq
     ./autogen.sh && ./configure && make check
     sudo make install
@@ -206,7 +206,7 @@ Once done, you can find the library files under `libsodium\bin\<Win32|x64>\<Debu
 Here, the `<Platform Toolset>` is the platform toolset you are using: `v100` for `VS2010`, `v140` for `VS2015`, `v141` for `VS2017`, etc.
 
 ```
-git clone git://github.com/zeromq/libzmq.git
+git clone https://github.com/zeromq/libzmq.git
 cd libzmq
 mkdir build
 cd build
@@ -220,7 +220,7 @@ cd ..\..\
 
 Now, it is time to build `czmq`:
 ```
-git clone git://github.com/zeromq/czmq.git
+git clone https://github.com/zeromq/czmq.git
 cd czmq
 mkdir build
 cd build
@@ -240,14 +240,14 @@ That is not the whole story. We didn't mention the building of `libcurl`, `lz4`,
     cd ..\..\..\..
 
     :: if libsodium is on disk, the Windows build of libzmq will automatically use it
-    git clone git://github.com/zeromq/libzmq.git
+    git clone https://github.com/zeromq/libzmq.git
     cd libzmq\builds\msvc
     configure.bat
     cd build
     buildall.bat
     cd ..\..\..\..
 
-    git clone git://github.com/zeromq/czmq.git
+    git clone https://github.com/zeromq/czmq.git
     cd czmq\builds\msvc
     configure.bat
     cd build
