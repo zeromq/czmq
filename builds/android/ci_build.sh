@@ -32,14 +32,17 @@ fi
 rm -rf /tmp/tmp-deps
 mkdir -p /tmp/tmp-deps
 
+export LIBMICROHTTPD_ROOT="/tmp/tmp-deps/libmicrohttpd"
+rm -f $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
+tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+mv $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) $LIBMICROHTTPD_ROOT
+
 export LIBZMQ_ROOT="/tmp/tmp-deps/libzmq"
 git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
 
 export LIBCURL_ROOT="/tmp/tmp-deps/libcurl"
 git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
-
-export LIBMICROHTTPD_ROOT="/tmp/tmp-deps/libmicrohttpd"
-git clone --quiet --depth 1 https://gnunet.org/git/libmicrohttpd.git $LIBMICROHTTPD_ROOT
 
 ./build.sh "arm"
 ./build.sh "arm64"
