@@ -22,9 +22,14 @@ To specify the minimum sdk version set the environment variable below:
 
     export MIN_SDK_VERSION=21   # Default value if unset
 
-To specify the prefix directory set the environment variable below:
+To specify your own Android build directory, set the environment variable below:
 
-    export ANDROID_BUILD_DIR=./builds/android/prefix/<android_arch> # Default value if unset
+    # ANDROID_BUILD_DIR must be an absolute path.
+    export ANDROID_BUILD_DIR=<czmq absolute path>/builds/android                # Default value if unset
+
+This configuration will create a prefix folder, like:
+
+    $ANDROID_BUILD_DIR/prefix/<android_arch>.
 
 ## Build
 
