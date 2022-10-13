@@ -113,8 +113,16 @@ fi
 
     export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
 
-    (cd "${cache}/czmq" && $CI_TIME ./autogen.sh 2> /dev/null \
-        && $CI_TIME ./configure --quiet "${ANDROID_BUILD_OPTS[@]}" --without-docs \
+    (
+        CONFIG_OPTS=()
+        CONFIG_OPTS+=("--quiet")
+        CONFIG_OPTS+=("${ANDROID_BUILD_OPTS[@]}")
+        CONFIG_OPTS+=("--without-docs")
+
+        cd "${cache}/czmq" \
+        && $CI_TIME ./autogen.sh 2> /dev/null \
+        && android_show_configure_opts "LIBCZMQ" "${CONFIG_OPTS[@]}" \
+        && $CI_TIME ./configure "${CONFIG_OPTS[@]}" \
         && $CI_TIME make -j 4 \
         && $CI_TIME make install) || exit 1
 }
