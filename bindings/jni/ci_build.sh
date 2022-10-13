@@ -7,6 +7,10 @@
 #   Exit if any step fails
 set -e
 
+export LIBZMQ_ROOT="${LIBZMQ_ROOT:-/tmp/tmp-deps/libzmq}"
+export LIBCURL_ROOT="${LIBCURL_ROOT:-/tmp/tmp-deps/libcurl}"
+export LIBMICROHTTPD_ROOT="${LIBMICROHTTPD_ROOT:-/tmp/tmp-deps/libmicrohttpd}"
+
 # Set this to enable verbose profiling
 [ -n "${CI_TIME-}" ] || CI_TIME=""
 case "$CI_TIME" in
@@ -50,18 +54,29 @@ mkdir -p /tmp/tmp-deps
 
 # Clone and build dependencies
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
-export LIBMICROHTTPD_ROOT="/tmp/tmp-deps/libmicrohttpd"
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
-tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
-mv $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) $LIBMICROHTTPD_ROOT
+if [ -d "${LIBMICROHTTPD_ROOT}" ] ; then
+    echo "CZMQ - Cleaning LIBMICROHTTPD folder '${LIBMICROHTTPD_ROOT}' ..."
+    ( cd "${LIBMICROHTTPD_ROOT}" && ( make clean || : ))
+else
+    echo "CZMQ - Downloading LIBMICROHTTPD from 'http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz' ..."
+    rm -f $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
+    tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+    mv $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) $LIBMICROHTTPD_ROOT
+    echo "CZMQ - LIBMICROHTTPD extracted under under '${LIBMICROHTTPD_ROOT}'."
+fi
 cd $LIBMICROHTTPD_ROOT
 $CI_TIME ./configure "${CONFIG_OPTS[@]}"
 $CI_TIME make -j4
 $CI_TIME make install
 
-export LIBZMQ_ROOT="/tmp/tmp-deps/libzmq"
-$CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
-
+if [ -d "${LIBZMQ_ROOT}" ] ; then
+    echo "CZMQ - Cleaning LIBZMQ folder '${LIBZMQ_ROOT}' ..."
+    ( cd "${LIBZMQ_ROOT}" && ( make clean || : ))
+else
+    echo "CZMQ - Cloning 'https://github.com/zeromq/libzmq.git' (default branch) under '${LIBZMQ_ROOT}' ..."
+    $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
+fi
 cd $LIBZMQ_ROOT
 git --no-pager log --oneline -n1
 if [ -e autogen.sh ]; then
@@ -83,9 +98,13 @@ $CI_TIME make -j4
 $CI_TIME make install
 
 
-export LIBCURL_ROOT="/tmp/tmp-deps/libcurl"
-$CI_TIME git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
-
+if [ -d "${LIBCURL_ROOT}" ] ; then
+    echo "CZMQ - Cleaning LIBCURL folder '${LIBCURL_ROOT}' ..."
+    ( cd "${LIBCURL_ROOT}" && ( make clean || : ))
+else
+    echo "CZMQ - Cloning 'https://github.com/curl/curl.git' (default branch) under '${LIBCURL_ROOT}' ..."
+    $CI_TIME git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
+fi
 cd $LIBCURL_ROOT
 git --no-pager log --oneline -n1
 if [ -e autogen.sh ]; then

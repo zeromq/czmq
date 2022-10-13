@@ -10,6 +10,10 @@ set -e
 export NDK_VERSION=android-ndk-r24
 export ANDROID_NDK_ROOT="/tmp/${NDK_VERSION}"
 
+export LIBZMQ_ROOT="${LIBZMQ_ROOT:-/tmp/tmp-deps/libzmq}"
+export LIBCURL_ROOT="${LIBCURL_ROOT:-/tmp/tmp-deps/libcurl}"
+export LIBMICROHTTPD_ROOT="${LIBMICROHTTPD_ROOT:-/tmp/tmp-deps/libmicrohttpd}"
+
 case $(uname | tr '[:upper:]' '[:lower:]') in
   linux*)
     HOST_PLATFORM=linux
@@ -35,17 +39,35 @@ fi
 rm -rf /tmp/tmp-deps
 mkdir -p /tmp/tmp-deps
 
-export LIBMICROHTTPD_ROOT="/tmp/tmp-deps/libmicrohttpd"
-rm -f $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
-tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
-mv $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) $LIBMICROHTTPD_ROOT
+if [ -d "${LIBMICROHTTPD_root}" ] ; then
+    echo "CZMQ - Cleaning LIBMICROHTTPD folder '${LIBMICROHTTPD_ROOT}' ..."
+    ( cd "${LIBMICROHTTPD_ROOT}" && ( make clean || : ))
+else
+    echo "CZMQ - Downloading LIBMICROHTTPD from 'http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz' ..."
+    rm -f $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
+    tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+    mv $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) $LIBMICROHTTPD_ROOT
+    echo "CZMQ - LIBMICROHTTPD extracted under under '${LIBMICROHTTPD_ROOT}' ..."
+fi
 
-export LIBZMQ_ROOT="/tmp/tmp-deps/libzmq"
-git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
+if [ -d "${LIBZMQ_ROOT}" ] ; then
+    echo "CZMQ - Cleaning LIBZMQ folder '${LIBZMQ_ROOT}' ..."
+    ( cd "${LIBZMQ_ROOT}" && ( make clean || : ))
+else
+    echo "CZMQ - Cloning 'https://github.com/zeromq/libzmq.git' (default branch) under '${LIBZMQ_ROOT}' ..."
+    git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git "${LIBZMQ_ROOT}"
+    ( cd ${LIBZMQ_ROOT} && git log --oneline -n 1 )
+fi
 
-export LIBCURL_ROOT="/tmp/tmp-deps/libcurl"
-git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
+if [ -d "${LIBCURL_ROOT}" ] ; then
+    echo "CZMQ - Cleaning LIBCURL folder '${LIBCURL_ROOT}' ..."
+    ( cd "${LIBCURL_ROOT}" && ( make clean || : ))
+else
+    echo "CZMQ - Cloning 'https://github.com/curl/curl.git' (default branch) under '${LIBCURL_ROOT}' ..."
+    git clone --quiet --depth 1 https://github.com/curl/curl.git "${LIBCURL_ROOT}"
+    ( cd ${LIBCURL_ROOT} && git log --oneline -n 1 )
+fi
 
 ./build.sh "arm"
 ./build.sh "arm64"
