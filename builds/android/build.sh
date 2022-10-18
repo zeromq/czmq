@@ -124,7 +124,8 @@ fi
         && android_show_configure_opts "LIBCZMQ" "${CONFIG_OPTS[@]}" \
         && $CI_TIME ./configure "${CONFIG_OPTS[@]}" \
         && $CI_TIME make -j 4 \
-        && $CI_TIME make install) || exit 1
+        && $CI_TIME make install
+    ) || exit 1
 }
 
 ##

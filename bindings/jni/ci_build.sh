@@ -62,6 +62,7 @@ else
     rm -f $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
     wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
     tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+    mkdir -p "$(dirname "${LIBMICROHTTPD_ROOT}")"
     mv $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) $LIBMICROHTTPD_ROOT
     echo "CZMQ - LIBMICROHTTPD extracted under under '${LIBMICROHTTPD_ROOT}'."
 fi
@@ -74,6 +75,7 @@ if [ -d "${LIBZMQ_ROOT}" ] ; then
     echo "CZMQ - Cleaning LIBZMQ folder '${LIBZMQ_ROOT}' ..."
     ( cd "${LIBZMQ_ROOT}" && ( make clean || : ))
 else
+    mkdir -p "$(dirname "${LIBZMQ_ROOT}")"
     echo "CZMQ - Cloning 'https://github.com/zeromq/libzmq.git' (default branch) under '${LIBZMQ_ROOT}' ..."
     $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
 fi
@@ -102,6 +104,7 @@ if [ -d "${LIBCURL_ROOT}" ] ; then
     echo "CZMQ - Cleaning LIBCURL folder '${LIBCURL_ROOT}' ..."
     ( cd "${LIBCURL_ROOT}" && ( make clean || : ))
 else
+    mkdir -p "$(dirname "${LIBCURL_ROOT}")"
     echo "CZMQ - Cloning 'https://github.com/curl/curl.git' (default branch) under '${LIBCURL_ROOT}' ..."
     $CI_TIME git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
 fi
