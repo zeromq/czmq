@@ -5307,7 +5307,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZsys = class
   public
 
@@ -5796,7 +5795,6 @@ uses
     function Dup: IZuuid;
   end;
 
-  //
   TZauth = class
   public
 
@@ -5804,7 +5802,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZbeacon = class
   public
 
@@ -5812,7 +5809,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZgossip = class
   public
 
@@ -5820,7 +5816,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZmonitor = class
   public
 
@@ -5828,7 +5823,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZproxy = class
   public
 
@@ -5836,7 +5830,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZrex = class
   public
 
