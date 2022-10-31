@@ -28,27 +28,32 @@ const
 
   // Standard base 64
   CZMQ_ZARMOUR_MODE_BASE64_STD = 0;
+
   // URL and filename friendly base 64
   CZMQ_ZARMOUR_MODE_BASE64_URL = 1;
+
   // Standard base 32
   CZMQ_ZARMOUR_MODE_BASE32_STD = 2;
+
   // Extended hex base 32
   CZMQ_ZARMOUR_MODE_BASE32_HEX = 3;
+
   // Standard base 16
   CZMQ_ZARMOUR_MODE_BASE16 = 4;
+
   // Z85 from ZeroMQ RFC 32
   CZMQ_ZARMOUR_MODE_Z85 = 5;
 
   // Creates a new file
   CZMQ_ZDIR_PATCH_CREATE = 1;
+
   // Delete a file
   CZMQ_ZDIR_PATCH_DELETE = 2;
 
-  //
   CZMQ_ZFRAME_MORE = 1;
-  //
+
   CZMQ_ZFRAME_REUSE = 2;
-  //
+
   CZMQ_ZFRAME_DONTWAIT = 4;
 
 type
@@ -465,7 +470,6 @@ type
 
 type
 
-  //
   TZconfigFct = function(This: PZconfig; Arg: Pointer; Level: Integer): Integer; stdcall;
   PZconfigFct = ^TZconfigFct;
 
@@ -2997,7 +3001,6 @@ type
   procedure zstr_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zsys *)
-(*  *)
 
 type
 
@@ -3480,37 +3483,31 @@ type
   procedure zuuid_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zauth *)
-(*  *)
 
   // Self test of this class.
   procedure zauth_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zbeacon *)
-(*  *)
 
   // Self test of this class.
   procedure zbeacon_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zgossip *)
-(*  *)
 
   // Self test of this class.
   procedure zgossip_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zmonitor *)
-(*  *)
 
   // Self test of this class.
   procedure zmonitor_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zproxy *)
-(*  *)
 
   // Self test of this class.
   procedure zproxy_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
 (* Zrex *)
-(*  *)
 
   // Self test of this class.
   procedure zrex_test(Verbose: Boolean); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
