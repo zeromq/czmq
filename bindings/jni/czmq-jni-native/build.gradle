@@ -13,13 +13,7 @@ dependencies {
 //  Build section
 
 task copyLibs(type: Copy) {
-    def libraryPaths = System.getProperty('java.library.path').split(File.pathSeparator).toList()
-    libraryPaths.add('/usr/local/lib')
-    if (osdetector.os == 'windows') {
-        libraryPaths.add("${rootDir}/czmq-jni/build/Release")
-    } else {
-        libraryPaths.add("${rootDir}/czmq-jni/build")
-    }
+    def libraryPaths = []
     if (project.hasProperty('buildPrefix')) {
         if (osdetector.os == 'windows') {
             // DLLs are installed to the bin directory by cmake
@@ -28,6 +22,18 @@ task copyLibs(type: Copy) {
         libraryPaths.add("${project.buildPrefix}/lib")
     }
 
+    def javaLibraryPaths = System.getProperty('java.library.path').split(File.pathSeparator).toList()
+    libraryPaths.addAll (javaLibraryPaths)
+
+    libraryPaths.add('/usr/local/lib')
+    if (osdetector.os == 'windows') {
+        libraryPaths.add("${rootDir}/czmq-jni/build/Release")
+    } else {
+        libraryPaths.add("${rootDir}/czmq-jni/build")
+    }
+
+    def oldStrategy = duplicatesStrategy
+    duplicatesStrategy = DuplicatesStrategy.WARN
     libraryPaths.each { path ->
         from path
             include 'libczmqjni.so'
@@ -59,6 +65,7 @@ task copyLibs(type: Copy) {
             include '*microhttpd*.dll'
         into 'build/natives'
     }
+    duplicatesStrategy = oldStrategy
 }
 
 jar.baseName = "czmq-jni-${osdetector.classifier}"

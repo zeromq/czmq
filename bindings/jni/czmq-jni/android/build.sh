@@ -7,7 +7,7 @@
 #
 #   Requires these environment variables be set, e.g.:
 #
-#     ANDROID_NDK_ROOT=$HOME/android-ndk-r24
+#     ANDROID_NDK_ROOT=$HOME/android-ndk-r25
 #
 #   Exit if any step fails
 set -e
@@ -41,6 +41,19 @@ if [ -z $BUILD_ARCH ]; then
     usage
     exit 1
 fi
+
+case $(uname | tr '[:upper:]' '[:lower:]') in
+  linux*)
+    export HOST_PLATFORM=linux-x86_64
+    ;;
+  darwin*)
+    export HOST_PLATFORM=darwin-x86_64
+    ;;
+  *)
+    echo "Unsupported platform"
+    exit 1
+    ;;
+esac
 
 source ../../../../builds/android/android_build_helper.sh
 
@@ -88,7 +101,7 @@ find ../../build/libs/ -type f -name 'czmq-jni-*.jar' ! -name '*javadoc.jar' ! -
 mkdir -p lib/$TOOLCHAIN_ABI
 cp libczmqjni.so lib/$TOOLCHAIN_ABI
 cp $ANDROID_BUILD_PREFIX/lib/*.so lib/$TOOLCHAIN_ABI
-cp $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/$TOOLCHAIN_ABI/libc++_shared.so lib/$TOOLCHAIN_ABI
+cp ${ANDROID_STL_ROOT}/${ANDROID_STL} lib/$TOOLCHAIN_ABI
 
 #   Build android jar
 zip -r -m ../czmq-android-$TOOLCHAIN_ABI-4.2.2.jar lib/ org/ META-INF/

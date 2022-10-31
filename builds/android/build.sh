@@ -33,11 +33,17 @@ function usage {
     echo "Usage ./build.sh [ arm | arm64 | x86 | x86_64 ]"
 }
 
-# Use directory of current script as the build directory and working directory
+# Use directory of current script as the working directory
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 # Get access to android_build functions and variables
 source ./android_build_helper.sh
+
+# Choose a C++ standard library implementation from the ndk
+export ANDROID_BUILD_CXXSTL="gnustl_shared_49"
+
+# Additional flags for LIBTOOL, for LIBZMQ and other dependencies.
+export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
 
 BUILD_ARCH=$1
 if [ -z $BUILD_ARCH ]; then
@@ -59,7 +65,7 @@ case $(uname | tr '[:upper:]' '[:lower:]') in
 esac
 
 # Set default values used in ci builds
-export NDK_VERSION=${NDK_VERSION:-android-ndk-r24}
+export NDK_VERSION=${NDK_VERSION:-android-ndk-r25}
 # With NDK r22b, the minimum SDK version range is [16, 31].
 # Since NDK r24, the minimum SDK version range is [19, 31].
 # SDK version 21 is the minimum version for 64-bit builds.
@@ -110,8 +116,6 @@ fi
 
     # Remove *.la files as they might cause errors with cross compiled libraries
     find ${ANDROID_BUILD_PREFIX} -name '*.la' -exec rm {} +
-
-    export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
 
     (
         CONFIG_OPTS=()
