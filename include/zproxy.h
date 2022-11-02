@@ -56,6 +56,15 @@ extern "C" {
 //      zstr_sendx (proxy, "BACKEND", "XPUB", endpoints, NULL);
 //      zsock_wait (proxy);
 //
+// To set heartbeat socket options -- see zsock_set_heartbeat_* () -- on the
+// backend or frontend socket specify them after the endpoints. The values are
+// in milliseconds:
+//
+//      zstr_sendx (proxy, "FRONTEND", "XSUB", endpoints,
+//          "HEARTBEAT_IVL", "300000", "HEARTBEAT_TIMEOUT", "30000",
+//          "HEARTBEAT_TTL", "0", NULL);
+//      zsock_wait (proxy);
+//
 //  Capture all proxied messages; these are delivered to the application
 //  via an inproc PULL socket that you have already bound to the specified
 //  endpoint:
