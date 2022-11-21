@@ -168,7 +168,7 @@ To use the draft APIs, you may build `czmq` with `draft` feature:
 vcpkg install czmq[draft]
 ```
 
-If you are an adventurer, and want to always use the lastest version of `czmq`, pass an extra `--head` option:
+If you are an adventurer, and want to always use the latest version of `czmq`, pass an extra `--head` option:
 ```
 vcpkg.exe install czmq --head
 ```
