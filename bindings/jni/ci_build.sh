@@ -7,12 +7,47 @@
 #   Exit if any step fails
 set -e
 
-export LIBZMQ_ROOT="${LIBZMQ_ROOT:-/tmp/tmp-deps/libzmq}"
-export LIBCURL_ROOT="${LIBCURL_ROOT:-/tmp/tmp-deps/libcurl}"
-export LIBMICROHTTPD_ROOT="${LIBMICROHTTPD_ROOT:-/tmp/tmp-deps/libmicrohttpd}"
+# Use directory of current script as the working directory
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+PROJECT_ROOT="$(cd ../.. && pwd)"
+PROJECT_JNI_ROOT="${PROJECT_ROOT}/bindings/jni"
 
-# Set this to enable verbose profiling
-[ -n "${CI_TIME-}" ] || CI_TIME=""
+# Configuration
+export NDK_VERSION="${NDK_VERSION:-android-ndk-r25}"
+export ANDROID_NDK_ROOT="${ANDROID_NDK_ROOT:-/tmp/${NDK_VERSION}}"
+export MIN_SDK_VERSION=${MIN_SDK_VERSION:-21}
+export ANDROID_BUILD_DIR="${ANDROID_BUILD_DIR:-${PWD}/.build}"
+export ANDROID_DEPENDENCIES_DIR="${ANDROID_DEPENDENCIES_DIR:-${PWD}/.deps}"
+export BUILD_PREFIX="${BUILD_PREFIX:-/tmp/jni_build}"
+
+export TRAVIS_TAG="${TRAVIS_TAG:-no}"
+export TRAVIS_OS_NAME="${TRAVIS_OS_NAME:-}"
+export BINDING_OPTS="${BINDING_OPTS:-}"
+
+export CI_CONFIG_QUIET="${CI_CONFIG_QUIET:-yes}"
+export CI_TIME="${CI_TIME:-}"
+export CI_TRACE="${CI_TRACE:-no}"
+
+# By default, dependencies will be cloned to /tmp/tmp-deps.
+# If you have your own source tree for XXX, uncomment its
+# XXX_ROOT configuration line below, and provide its absolute tree:
+#    export LIBZMQ_ROOT="<absolute_path_to_LIBZMQ_source_tree>"
+#    export LIBCURL_ROOT="<absolute_path_to_LIBCURL_source_tree>"
+#    export LIBMICROHTTPD_ROOT="<absolute_path_to_LIBMICROHTTPD_source_tree>"
+
+########################################################################
+# Preparation
+########################################################################
+# Get access to android_build functions and variables
+# Perform some sanity checks and calculate some variables.
+source "${PROJECT_ROOT}/builds/android/android_build_helper.sh"
+
+android_init_dependency_root "libzmq"             # Check or initialize LIBZMQ_ROOT
+android_init_dependency_root "libcurl"            # Check or initialize LIBCURL_ROOT
+android_init_dependency_root "libmicrohttpd"      # Check or initialize LIBMICROHTTPD_ROOT
+
+android_download_ndk
+
 case "$CI_TIME" in
     [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
         CI_TIME="time -p " ;;
@@ -20,22 +55,12 @@ case "$CI_TIME" in
         CI_TIME="" ;;
 esac
 
-# Set this to enable verbose tracing
-[ -n "${CI_TRACE-}" ] || CI_TRACE="no"
 case "$CI_TRACE" in
     [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
         set +x ;;
     [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
         set -x ;;
 esac
-
-########################################################################
-# Build and check the jni binding
-########################################################################
-
-export BUILD_PREFIX=/tmp/jni_build
-CZMQ_JNI_ROOT=${PWD}
-CZMQ_ROOT=${PWD}/../..
 
 CONFIG_OPTS=()
 CONFIG_OPTS+=("CFLAGS=-I${BUILD_PREFIX}/include")
@@ -45,9 +70,7 @@ CONFIG_OPTS+=("LDFLAGS=-L${BUILD_PREFIX}/lib")
 CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
 CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
 CONFIG_OPTS+=("--with-docs=no")
-if [ -z "${CI_CONFIG_QUIET-}" ] || [ "${CI_CONFIG_QUIET-}" = yes ] || [ "${CI_CONFIG_QUIET-}" = true ]; then
-    CONFIG_OPTS+=("--quiet")
-fi
+[ "${CI_CONFIG_QUIET}" = "yes" ] && CONFIG_OPTS+=("--quiet")
 
 GRADLEW_OPTS=()
 GRADLEW_OPTS+=("-PbuildPrefix=$BUILD_PREFIX")
@@ -56,146 +79,68 @@ GRADLEW_OPTS+=("--info")
 rm -rf /tmp/tmp-deps
 mkdir -p /tmp/tmp-deps
 
-# Clone and build dependencies
+########################################################################
+# Clone and build native dependencies
+########################################################################
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
-if [ -d "${LIBMICROHTTPD_ROOT}" ] ; then
-    echo "CZMQ - Cleaning LIBMICROHTTPD folder '${LIBMICROHTTPD_ROOT}' ..."
-    ( cd "${LIBMICROHTTPD_ROOT}" && ( make clean || : ))
-else
-    echo "CZMQ - Downloading LIBMICROHTTPD from 'http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz' ..."
-    rm -f $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
-    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
-    tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
-    mkdir -p "$(dirname "${LIBMICROHTTPD_ROOT}")"
-    mv $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz) $LIBMICROHTTPD_ROOT
-    echo "CZMQ - LIBMICROHTTPD extracted under under '${LIBMICROHTTPD_ROOT}'."
-fi
-cd $LIBMICROHTTPD_ROOT
-$CI_TIME ./configure "${CONFIG_OPTS[@]}"
-$CI_TIME make -j4
-$CI_TIME make install
 
-if [ -d "${LIBZMQ_ROOT}" ] ; then
-    echo "CZMQ - Cleaning LIBZMQ folder '${LIBZMQ_ROOT}' ..."
-    ( cd "${LIBZMQ_ROOT}" && ( make clean || : ))
-else
-    mkdir -p "$(dirname "${LIBZMQ_ROOT}")"
-    echo "CZMQ - Cloning 'https://github.com/zeromq/libzmq.git' (default branch) under '${LIBZMQ_ROOT}' ..."
-    $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git $LIBZMQ_ROOT
+######################
+#  Build native 'libzmq.so'
+if [ ! -d "${LIBZMQ_ROOT}" ] ; then
+    android_clone_library "LIBZMQ" "${LIBZMQ_ROOT}" "https://github.com/zeromq/libzmq.git" ""
 fi
-cd $LIBZMQ_ROOT
-git --no-pager log --oneline -n1
-if [ -e autogen.sh ]; then
-    $CI_TIME ./autogen.sh 2> /dev/null
-fi
-if [ -e buildconf ]; then
-    $CI_TIME ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    $CI_TIME libtoolize --copy --force && \
-    $CI_TIME aclocal -I . && \
-    $CI_TIME autoheader && \
-    $CI_TIME automake --add-missing --copy && \
-    $CI_TIME autoconf || \
-    $CI_TIME autoreconf -fiv
-fi
-$CI_TIME ./configure "${CONFIG_OPTS[@]}"
-$CI_TIME make -j4
-$CI_TIME make install
 
-
-if [ -d "${LIBCURL_ROOT}" ] ; then
-    echo "CZMQ - Cleaning LIBCURL folder '${LIBCURL_ROOT}' ..."
-    ( cd "${LIBCURL_ROOT}" && ( make clean || : ))
-else
-    mkdir -p "$(dirname "${LIBCURL_ROOT}")"
-    echo "CZMQ - Cloning 'https://github.com/curl/curl.git' (default branch) under '${LIBCURL_ROOT}' ..."
-    $CI_TIME git clone --quiet --depth 1 https://github.com/curl/curl.git $LIBCURL_ROOT
-fi
-cd $LIBCURL_ROOT
-git --no-pager log --oneline -n1
-if [ -e autogen.sh ]; then
-    $CI_TIME ./autogen.sh 2> /dev/null
-fi
-if [ -e buildconf ]; then
-    $CI_TIME ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    $CI_TIME libtoolize --copy --force && \
-    $CI_TIME aclocal -I . && \
-    $CI_TIME autoheader && \
-    $CI_TIME automake --add-missing --copy && \
-    $CI_TIME autoconf || \
-    $CI_TIME autoreconf -fiv
-fi
-( # Custom additional options for libcurl
-  CONFIG_OPTS+=("--with-secure-transport")
-  $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+(
+    android_build_library "LIBZMQ" "${LIBZMQ_ROOT}"
 )
-$CI_TIME make -j4
-$CI_TIME make install
 
 
-cd $CZMQ_ROOT
+######################
+#  Build native 'libcurl.so'
+if [ ! -d "${LIBCURL_ROOT}" ] ; then
+    android_clone_library "LIBCURL" "${LIBCURL_ROOT}" "https://github.com/curl/curl.git" ""
+fi
+
+(
+    # Custom additional options for libcurl
+    CONFIG_OPTS+=("--with-secure-transport")
+
+    android_build_library "LIBCURL" "${LIBCURL_ROOT}"
+)
+
+
+######################
+#  Build native 'libmicrohttpd.so'
+if [ ! -d "${LIBMICROHTTPD_ROOT}" ] ; then
+    android_download_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}" "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
+fi
+
+(
+    android_build_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}"
+)
+
+
+######################
+# Build native 'libczmq.so'
+cd "${PROJECT_ROOT}"
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of currently tested project..."
-git --no-pager log --oneline -n1
-if [ -e autogen.sh ]; then
-    $CI_TIME ./autogen.sh 2> /dev/null
-fi
-if [ -e buildconf ]; then
-    $CI_TIME ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    $CI_TIME libtoolize --copy --force && \
-    $CI_TIME aclocal -I . && \
-    $CI_TIME autoheader && \
-    $CI_TIME automake --add-missing --copy && \
-    $CI_TIME autoconf || \
-    $CI_TIME autoreconf -fiv
-fi
-$CI_TIME ./configure "${CONFIG_OPTS[@]}"
-$CI_TIME make -j4
-$CI_TIME make install
+
+(
+    android_build_library "LIBCZMQ" "${PROJECT_ROOT}"
+)
+
 [ -z "$CI_TIME" ] || echo "`date`: Build completed without fatal errors!"
-
-cd ${CZMQ_JNI_ROOT}
-[ -z "$TRAVIS_TAG" ] || IS_RELEASE="-PisRelease"
-
-TERM=dumb $CI_TIME ./gradlew build jar ${GRADLEW_OPTS[@]} ${CZMQ_GRADLEW_OPTS} $IS_RELEASE
-TERM=dumb $CI_TIME ./gradlew clean
 
 ########################################################################
 #  Build and check the jni android binding
 ########################################################################
+cd "${PROJECT_JNI_ROOT}"
+[ "${TRAVIS_TAG}" = "yes" ] && IS_RELEASE="-PisRelease"
+
+TERM=dumb $CI_TIME ./gradlew build jar ${GRADLEW_OPTS[@]} ${CZMQ_GRADLEW_OPTS} $IS_RELEASE
+TERM=dumb $CI_TIME ./gradlew clean
 
 if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$BINDING_OPTS" == "android" ]; then
-    pushd ../../builds/android
-        export NDK_VERSION=android-ndk-r25
-        export ANDROID_NDK_ROOT="/tmp/${NDK_VERSION}"
-
-        case $(uname | tr '[:upper:]' '[:lower:]') in
-          linux*)
-            HOST_PLATFORM=linux
-            ;;
-          darwin*)
-            HOST_PLATFORM=darwin
-            ;;
-          *)
-            echo "Unsupported platform"
-            exit 1
-            ;;
-        esac
-
-        if [ ! -d "${ANDROID_NDK_ROOT}" ]; then
-            export FILENAME=$NDK_VERSION-$HOST_PLATFORM.zip
-
-            (cd '/tmp' \
-                && wget http://dl.google.com/android/repository/$FILENAME -O $FILENAME &> /dev/null \
-                && unzip -q $FILENAME) || exit 1
-            unset FILENAME
-        fi
-    popd
-
     pushd czmq-jni/android
         $CI_TIME ./build.sh "arm"
         $CI_TIME ./build.sh "arm64"
@@ -203,3 +148,8 @@ if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$BINDING_OPTS" == "android" ]; then
         $CI_TIME ./build.sh "x86_64"
     popd
 fi
+
+################################################################################
+#  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #
+#  Read the zproject/README.md for information about making permanent changes. #
+################################################################################
