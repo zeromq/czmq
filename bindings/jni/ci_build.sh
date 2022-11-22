@@ -42,9 +42,15 @@ export CI_TRACE="${CI_TRACE:-no}"
 # Perform some sanity checks and calculate some variables.
 source "${PROJECT_ROOT}/builds/android/android_build_helper.sh"
 
+# Initialize our dependency _ROOT variables:
 android_init_dependency_root "libzmq"             # Check or initialize LIBZMQ_ROOT
 android_init_dependency_root "libcurl"            # Check or initialize LIBCURL_ROOT
 android_init_dependency_root "libmicrohttpd"      # Check or initialize LIBMICROHTTPD_ROOT
+
+# Fetch required dependencies:
+[ ! -d "${LIBZMQ_ROOT}" ]           && android_clone_library "LIBZMQ" "${LIBZMQ_ROOT}" "https://github.com/zeromq/libzmq.git" ""
+[ ! -d "${LIBCURL_ROOT}" ]          && android_clone_library "LIBCURL" "${LIBCURL_ROOT}" "https://github.com/curl/curl.git" ""
+[ ! -d "${LIBMICROHTTPD_ROOT}" ]    && android_download_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}" "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
 
 android_download_ndk
 
@@ -86,10 +92,6 @@ mkdir -p /tmp/tmp-deps
 
 ######################
 #  Build native 'libzmq.so'
-if [ ! -d "${LIBZMQ_ROOT}" ] ; then
-    android_clone_library "LIBZMQ" "${LIBZMQ_ROOT}" "https://github.com/zeromq/libzmq.git" ""
-fi
-
 (
     android_build_library "LIBZMQ" "${LIBZMQ_ROOT}"
 )
@@ -97,10 +99,6 @@ fi
 
 ######################
 #  Build native 'libcurl.so'
-if [ ! -d "${LIBCURL_ROOT}" ] ; then
-    android_clone_library "LIBCURL" "${LIBCURL_ROOT}" "https://github.com/curl/curl.git" ""
-fi
-
 (
     # Custom additional options for libcurl
     CONFIG_OPTS+=("--with-secure-transport")
@@ -111,10 +109,6 @@ fi
 
 ######################
 #  Build native 'libmicrohttpd.so'
-if [ ! -d "${LIBMICROHTTPD_ROOT}" ] ; then
-    android_download_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}" "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
-fi
-
 (
     android_build_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}"
 )

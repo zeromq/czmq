@@ -75,9 +75,15 @@ function usage {
 BUILD_ARCH="$1"
 [ -z "${BUILD_ARCH}" ] && usage
 
+# Initialize our dependency _ROOT variables:
 android_init_dependency_root "libzmq"             # Check or initialize LIBZMQ_ROOT
 android_init_dependency_root "libcurl"            # Check or initialize LIBCURL_ROOT
 android_init_dependency_root "libmicrohttpd"      # Check or initialize LIBMICROHTTPD_ROOT
+
+# Fetch required dependencies:
+[ ! -d "${LIBZMQ_ROOT}" ]           && android_clone_library "LIBZMQ" "${LIBZMQ_ROOT}" "https://github.com/zeromq/libzmq.git" ""
+[ ! -d "${LIBCURL_ROOT}" ]          && android_clone_library "LIBCURL" "${LIBCURL_ROOT}" "https://github.com/curl/curl.git" ""
+[ ! -d "${LIBMICROHTTPD_ROOT}" ]    && android_download_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}" "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
 
 case "$CI_TIME" in
     [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
@@ -124,10 +130,6 @@ DEPENDENCIES=()
 
 DEPENDENCIES+=("libzmq.so")
 (android_build_verify_so "libzmq.so" &> /dev/null) || {
-    if [ ! -d "${LIBZMQ_ROOT}" ] ; then
-        android_clone_library "LIBZMQ" "${LIBZMQ_ROOT}" "https://github.com/zeromq/libzmq.git" ""
-    fi
-
     if [ -f "${LIBZMQ_ROOT}/builds/android/build.sh" ] ; then
         (
             bash "${LIBZMQ_ROOT}/builds/android/build.sh" "${BUILD_ARCH}"
