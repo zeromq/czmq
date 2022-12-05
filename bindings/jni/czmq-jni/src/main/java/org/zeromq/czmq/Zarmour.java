@@ -16,7 +16,7 @@ public class Zarmour implements AutoCloseable {
         Map<String, Boolean> libraries = new LinkedHashMap<>();
         libraries.put("zmq", false);
         libraries.put("uuid", true);
-        libraries.put("libsystemd", true);
+        libraries.put("systemd", true);
         libraries.put("lz4", true);
         libraries.put("curl", true);
         libraries.put("nss", true);

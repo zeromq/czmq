@@ -50,7 +50,7 @@ task copyLibs(type: Copy) {
             include '*uuid*.dll'
             include 'libsystemd.so'
             include 'libsystemd.dylib'
-            include '*libsystemd*.dll'
+            include '*systemd*.dll'
             include 'liblz4.so'
             include 'liblz4.dylib'
             include '*lz4*.dll'
