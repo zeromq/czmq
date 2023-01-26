@@ -130,7 +130,9 @@ set(OPTIONAL_LIBRARIES_STATIC)
 ########################################################################
 # LIBZMQ dependency
 ########################################################################
-find_package(libzmq REQUIRED)
+IF (NOT libzmq_FOUND)
+    find_package(libzmq REQUIRED)
+ENDIF(NOT libzmq_FOUND)
 IF (libzmq_FOUND)
     include_directories(${libzmq_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
@@ -147,7 +149,9 @@ ENDIF (libzmq_FOUND)
 ########################################################################
 # UUID dependency
 ########################################################################
-find_package(uuid)
+IF (NOT uuid_FOUND)
+    find_package(uuid)
+ENDIF(NOT uuid_FOUND)
 option(CZMQ_WITH_UUID "Build czmq with uuid" ${UUID_FOUND})
 IF (CZMQ_WITH_UUID AND uuid_FOUND)
     include_directories(${uuid_INCLUDE_DIRS})
@@ -165,7 +169,9 @@ ENDIF (CZMQ_WITH_UUID AND uuid_FOUND)
 ########################################################################
 # SYSTEMD dependency
 ########################################################################
-find_package(systemd)
+IF (NOT systemd_FOUND)
+    find_package(systemd)
+ENDIF(NOT systemd_FOUND)
 option(CZMQ_WITH_SYSTEMD "Build czmq with systemd" ${SYSTEMD_FOUND})
 IF (CZMQ_WITH_SYSTEMD AND systemd_FOUND)
     include_directories(${systemd_INCLUDE_DIRS})
@@ -183,7 +189,9 @@ ENDIF (CZMQ_WITH_SYSTEMD AND systemd_FOUND)
 ########################################################################
 # LZ4 dependency
 ########################################################################
-find_package(lz4)
+IF (NOT lz4_FOUND)
+    find_package(lz4)
+ENDIF(NOT lz4_FOUND)
 option(CZMQ_WITH_LZ4 "Build czmq with lz4" ${LZ4_FOUND})
 IF (CZMQ_WITH_LZ4 AND lz4_FOUND)
     include_directories(${lz4_INCLUDE_DIRS})
@@ -201,7 +209,9 @@ ENDIF (CZMQ_WITH_LZ4 AND lz4_FOUND)
 ########################################################################
 # LIBCURL dependency
 ########################################################################
-find_package(libcurl)
+IF (NOT libcurl_FOUND)
+    find_package(libcurl)
+ENDIF(NOT libcurl_FOUND)
 option(CZMQ_WITH_LIBCURL "Build czmq with libcurl" ${LIBCURL_FOUND})
 IF (CZMQ_WITH_LIBCURL AND libcurl_FOUND)
     include_directories(${libcurl_INCLUDE_DIRS})
@@ -219,7 +229,9 @@ ENDIF (CZMQ_WITH_LIBCURL AND libcurl_FOUND)
 ########################################################################
 # NSS dependency
 ########################################################################
-find_package(nss)
+IF (NOT nss_FOUND)
+    find_package(nss)
+ENDIF(NOT nss_FOUND)
 option(CZMQ_WITH_NSS "Build czmq with nss" ${NSS_FOUND})
 IF (CZMQ_WITH_NSS AND nss_FOUND)
     include_directories(${nss_INCLUDE_DIRS})
@@ -237,7 +249,9 @@ ENDIF (CZMQ_WITH_NSS AND nss_FOUND)
 ########################################################################
 # LIBMICROHTTPD dependency
 ########################################################################
-find_package(libmicrohttpd)
+IF (NOT libmicrohttpd_FOUND)
+    find_package(libmicrohttpd)
+ENDIF(NOT libmicrohttpd_FOUND)
 option(CZMQ_WITH_LIBMICROHTTPD "Build czmq with libmicrohttpd" ${LIBMICROHTTPD_FOUND})
 IF (CZMQ_WITH_LIBMICROHTTPD AND libmicrohttpd_FOUND)
     include_directories(${libmicrohttpd_INCLUDE_DIRS})
