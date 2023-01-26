@@ -15,21 +15,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             BUILD_TYPE: default
             DRAFT: enabled
             CLANG_FORMAT: clang-format-11
             PACKAGES: automake autoconf clang-format-11 git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev asciidoc xmlto
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             BUILD_TYPE: default
             DRAFT: disabled
             CLANG_FORMAT: clang-format-11
             PACKAGES: automake autoconf clang-format-11 git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             BUILD_TYPE: valgrind
             DRAFT: enabled
-            PACKAGES: automake autoconf valgrind git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev ubuntu-dbgsym-keyring
-          - os: ubuntu-latest
+            PACKAGES: automake autoconf valgrind git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev
+          - os: ubuntu-20.04
             BUILD_TYPE: cmake
             DRAFT: enabled
             PACKAGES: cmake git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev
@@ -37,17 +37,15 @@ jobs:
             BUILD_TYPE: default
             PACKAGES: automake autoconf  ossp-uuid zeromq curl libmicrohttpd
             DRAFT: enabled
-            CI_SELFTEST: no
           - os: macos-latest
             BUILD_TYPE: default
             DRAFT: disabled
-            CI_SELFTEST: no
             PACKAGES: automake autoconf  ossp-uuid zeromq curl libmicrohttpd
 # For non-cmake users, there is an autotools solution with a bit more overhead
 # to have dependencies ready and pass configure script before making this check).
 # Note that the autotools variant will also require dependencies preinstalled to
 # pass its configure script:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             BUILD_TYPE: cmake
             DO_CLANG_FORMAT_CHECK: 1
             CLANG_FORMAT: clang-format-11
@@ -56,10 +54,10 @@ jobs:
 # 1) Your project sources have a "latest_release" branch or tag
 #    to check out and compare the current commit's ABI to;
 # 2) Prerequisites are available as packages - no custom rebuilds.
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             BUILD_TYPE: abi-compliance-checker
             PACKAGES: universal-ctags abi-dumper abi-compliance-checker git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             BUILD_TYPE: check_zproject
             PACKAGES: git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev generator-scripting-language zproject
     env:
@@ -84,26 +82,13 @@ jobs:
       CI_SELFTEST: ${{ matrix.CI_SELFTEST }}
     steps:
     - name: Add debian packages
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-20.04'
       uses: myci-actions/add-deb-repo@10
       with:
         repo-name: obs
         repo: deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/xUbuntu_20.04/ ./
         keys-asc: https://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/xUbuntu_20.04/Release.key
         install: ${{ matrix.PACKAGES }}
-    - name: Add dbgsym packages (main)
-      if: matrix.os == 'ubuntu-latest' && matrix.BUILD_TYPE == 'valgrind'
-      uses: myci-actions/add-deb-repo@10
-      with:
-        repo-name: dbgsym-main
-        repo: deb http://ddebs.ubuntu.com focal main
-    - name: Add dbgsym packages (updates)
-      if: matrix.os == 'ubuntu-latest' && matrix.BUILD_TYPE == 'valgrind'
-      uses: myci-actions/add-deb-repo@10
-      with:
-        repo-name: dbgsym-updates
-        repo: deb http://ddebs.ubuntu.com focal-updates main
-        install: libcurl3-nss-dbgsym
     - name: Add brew packages
       if: matrix.os == 'macos-latest'
       shell: bash
@@ -112,7 +97,7 @@ jobs:
       with:
         path: czmq
     - name: build
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      if: matrix.os == 'ubuntu-20.04' || matrix.os == 'macos-latest'
       shell: bash
       working-directory: czmq
       run: ./ci_build.sh
