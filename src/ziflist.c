@@ -211,17 +211,20 @@ s_reload (ziflist_t *self, bool ipv6)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
         struct ifaddrs *interface = interfaces;
+        zhash_t *mactable = zhash_new();
+        zhash_autofree(mactable);
         while (interface) {
-            // first try to get a mac addr (AF_PACKET)
-            unsigned char mac[18] = "NA";
+            // first try to get a mac addr (AF_PACKET) and save it in a table
             if ((interface)->ifa_addr && ((interface)->ifa_addr)->sa_family == AF_PACKET)
             {
+                unsigned char mac[18] = "NA";
                 struct sockaddr_ll *s = (struct sockaddr_ll*)(interface->ifa_addr);
                 int i;
                 int len = 0;
                 for (i = 0; i < 6; i++) {
                     len += snprintf(mac+len, 18, "%02X%s", s->sll_addr[i], i < 5 ? ":":"");
                 }
+                zhash_insert(mactable, (interface)->ifa_name, mac);
                 zsys_info("%s: %s", (interface)->ifa_name, mac);
             }
 
@@ -237,7 +240,9 @@ s_reload (ziflist_t *self, bool ipv6)
             &&(interface->ifa_netmask->sa_family == AF_INET
                     || (ipv6 && (interface->ifa_netmask->sa_family == AF_INET6)))
             &&  s_valid_flags (interface->ifa_flags,
-                    ipv6 && (interface->ifa_addr->sa_family == AF_INET6))) {
+                    ipv6 && (interface->ifa_addr->sa_family == AF_INET6)))
+            {
+                const char *mac = zhash_lookup(mactable, interface->ifa_name);
                 interface_t *item = s_interface_new (interface->ifa_name,
                         interface->ifa_addr, interface->ifa_netmask,
                         interface->ifa_broadaddr, mac);
@@ -246,6 +251,7 @@ s_reload (ziflist_t *self, bool ipv6)
             }
             interface = interface->ifa_next;
         }
+        zhash_destroy(&mactable);
     }
     freeifaddrs (interfaces);
 
@@ -544,13 +550,28 @@ ziflist_test (bool verbose)
     assert (iflist);
 
     size_t items = ziflist_size (iflist);
+    if (items)
+    {
+        // test mac addresses
+        const char *item = ziflist_first(iflist);
+        while (item)
+        {
+            const char *mac = ziflist_mac(iflist);
+            if ( strlen(mac) == 17 )
+                assert( mac[2] == ':' && mac[5] == ':' && mac[8] == ':'
+                        && mac[11] == ':' && mac[14] == ':' );
+            else
+               assert( strlen(mac) == 2 );
+            item = ziflist_next (iflist);
+        }
+    }
 
     if (verbose) {
         printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
         const char *name = ziflist_first (iflist);
         while (name) {
-            printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
-                    name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+            printf (" - name=%s address=%s netmask=%s broadcast=%s mac=%s\n",
+                    name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist), ziflist_mac(iflist));
             name = ziflist_next (iflist);
         }
     }
