@@ -372,11 +372,11 @@ s_reload (ziflist_t *self, bool ipv6)
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
             // Retrieve the MAC address from the PIP_ADAPTER_ADDRESSES structure
             unsigned char *mac_address = cur_address->PhysicalAddress;
-            unsigned char mac[18] = "NA";
+            char mac[18] = "NA";
             if (mac_address != NULL && cur_address->PhysicalAddressLength == 6) {
                 int len = 0;
-                for (i = 0; i < 6; i++) {
-                    len += snprintf(mac+len, 18, "%02X%s", mac_address[i], i < 5 ? ":":"" );
+                for (int i = 0; i < 6; i++) {
+                    len += snprintf( mac+len, 18, "%02X%s", mac_address[i], i < 5 ? ":":"" );
                 }
             }
             interface_t *item = s_interface_new (asciiFriendlyName,
