@@ -1315,6 +1315,9 @@ type
   // Return the current interface network mask as a printable string
   function ziflist_netmask(self: PZiflist): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Return the current interface MAC address as a printable string
+  function ziflist_mac(self: PZiflist): PAnsiChar; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Return the list of interfaces.
   procedure ziflist_print(self: PZiflist); cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 

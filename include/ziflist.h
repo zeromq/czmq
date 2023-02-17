@@ -61,6 +61,10 @@ CZMQ_EXPORT const char *
 CZMQ_EXPORT const char *
     ziflist_netmask (ziflist_t *self);
 
+//  Return the current interface MAC address as a printable string
+CZMQ_EXPORT const char *
+    ziflist_mac (ziflist_t *self);
+
 //  Return the list of interfaces.
 CZMQ_EXPORT void
     ziflist_print (ziflist_t *self);

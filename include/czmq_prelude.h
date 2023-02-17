@@ -327,6 +327,9 @@
 #   if (defined (__UTYPE_LINUX) && defined (HAVE_LIBSYSTEMD))
 #       include <systemd/sd-daemon.h>
 #   endif
+#   if (defined (HAVE_GETIFADDRS))
+#       include <netpacket/packet.h>
+#   endif
 #endif
 
 #if (defined (__VMS__))

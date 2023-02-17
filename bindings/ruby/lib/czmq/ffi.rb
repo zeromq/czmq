@@ -383,6 +383,7 @@ module CZMQ
       attach_function :ziflist_address, [:pointer], :string, **opts
       attach_function :ziflist_broadcast, [:pointer], :string, **opts
       attach_function :ziflist_netmask, [:pointer], :string, **opts
+      attach_function :ziflist_mac, [:pointer], :string, **opts
       attach_function :ziflist_print, [:pointer], :void, **opts
       attach_function :ziflist_new_ipv6, [], :pointer, **opts
       attach_function :ziflist_reload_ipv6, [:pointer], :void, **opts

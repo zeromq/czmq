@@ -86,6 +86,14 @@ const QString QZiflist::netmask ()
 }
 
 ///
+//  Return the current interface MAC address as a printable string
+const QString QZiflist::mac ()
+{
+    const QString rv = QString (ziflist_mac (self));
+    return rv;
+}
+
+///
 //  Return the list of interfaces.
 void QZiflist::print ()
 {

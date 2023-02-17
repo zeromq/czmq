@@ -1627,6 +1627,10 @@ const char *
 const char *
     ziflist_netmask (ziflist_t *self);
 
+// Return the current interface MAC address as a printable string
+const char *
+    ziflist_mac (ziflist_t *self);
+
 // Return the list of interfaces.
 void
     ziflist_print (ziflist_t *self);

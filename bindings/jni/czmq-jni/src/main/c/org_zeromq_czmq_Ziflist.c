@@ -78,6 +78,14 @@ Java_org_zeromq_czmq_Ziflist__1_1netmask (JNIEnv *env, jclass c, jlong self)
     return return_string_;
 }
 
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Ziflist__1_1mac (JNIEnv *env, jclass c, jlong self)
+{
+    char *mac_ = (char *) ziflist_mac ((ziflist_t *) (intptr_t) self);
+    jstring return_string_ = (*env)->NewStringUTF (env, mac_);
+    return return_string_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1print (JNIEnv *env, jclass c, jlong self)
 {

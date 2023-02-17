@@ -44,6 +44,9 @@ public:
     //  Return the current interface network mask as a printable string
     const QString netmask ();
 
+    //  Return the current interface MAC address as a printable string
+    const QString mac ();
+
     //  Return the list of interfaces.
     void print ();
 
