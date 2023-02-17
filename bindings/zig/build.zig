@@ -17,17 +17,40 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib = b.addStaticLibrary(.{
-        .name = "zig-czmq",
+    const config_header = if (!target.isWindows()) b.addConfigHeader(.{
+        .style = .blank,
+        .include_path = "platform.h",
+    }, .{
+        .CZMQ_BUILD_DRAFT_API = {},
+        .HAVE_LINUX_WIRELESS_H = {},
+        .HAVE_NET_IF_H = {},
+        .HAVE_NET_IF_MEDIA_H = null,
+        .HAVE_GETIFADDRS = {},
+        .HAVE_FREEIFADDRS = {},
+        .HAVE_DECL_AI_V4MAPPED = 0,
+    }) else b.addConfigHeader(.{
+        .style = .blank,
+        .include_path = "platform.h",
+    }, .{});
+
+    const lib = b.addSharedLibrary(.{
+        .name = "zig_czmq",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
         .root_source_file = .{ .path = "src/main.zig" },
+        .version = .{ .major = 4, .minor = 2, .patch = 2 },
         .target = target,
         .optimize = optimize,
     });
+    lib.addConfigHeader(config_header);
     lib.addIncludePath("../../include");
-    lib.addLibraryPath("../../build");
-    lib.linkSystemLibrary("czmq");
+    lib.addIncludePath(config_header.include_path);
+    lib.addCSourceFiles(lib_src, lib_flags);
+    if (target.isWindows()) {
+        lib.linkSystemLibraryName("ws2_32");
+        lib.linkSystemLibraryName("rpcrt4");
+        lib.linkSystemLibraryName("iphlpapi");
+    }
     lib.linkSystemLibrary("zmq");
     lib.linkLibC();
     // This declares intent for the library to be installed into the standard
@@ -41,9 +64,15 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    libtest.addConfigHeader(config_header);
+    libtest.addIncludePath(config_header.include_path);
     libtest.addIncludePath("../../include");
-    libtest.addLibraryPath("../../build");
-    libtest.linkSystemLibrary("czmq");
+    libtest.addCSourceFiles(lib_src, lib_flags);
+    if (target.isWindows()) {
+        libtest.linkSystemLibraryName("ws2_32");
+        libtest.linkSystemLibraryName("rpcrt4");
+        libtest.linkSystemLibraryName("iphlpapi");
+    }
     libtest.linkSystemLibrary("zmq");
     libtest.linkLibC();
 
@@ -53,3 +82,43 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&libtest.step);
 }
+
+const lib_flags: []const []const u8 = &.{
+    "-std=gnu99",
+    "-O3",
+    //    "-Wall",
+    "-fno-sanitize=all", // disable undefined sanitizer (default on zig/clang wrapper)
+};
+const lib_src: []const []const u8 = &.{
+    "../../src/zactor.c",
+    "../../src/zarmour.c",
+    "../../src/zcert.c",
+    "../../src/zcertstore.c",
+    "../../src/zchunk.c",
+    "../../src/zclock.c",
+    "../../src/zconfig.c",
+    "../../src/zdigest.c",
+    "../../src/zdir.c",
+    "../../src/zdir_patch.c",
+    "../../src/zfile.c",
+    "../../src/zframe.c",
+    "../../src/zhash.c",
+    "../../src/zhashx.c",
+    "../../src/ziflist.c",
+    "../../src/zlist.c",
+    "../../src/zlistx.c",
+    "../../src/zloop.c",
+    "../../src/zmsg.c",
+    "../../src/zpoller.c",
+    "../../src/zsock.c",
+    "../../src/zstr.c",
+    "../../src/zsys.c",
+    "../../src/zuuid.c",
+    "../../src/zauth.c",
+    "../../src/zbeacon.c",
+    "../../src/zgossip.c",
+    "../../src/zmonitor.c",
+    "../../src/zproxy.c",
+    "../../src/zrex.c",
+    "../../src/zgossip_msg.c",
+};
