@@ -17,6 +17,10 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    const libzmq = b.dependency("libzmq", .{
+        .optimize = optimize,
+        .target = target,
+    });
     const config_header = if (!target.isWindows()) b.addConfigHeader(.{
         .style = .blank,
         .include_path = "platform.h",
@@ -51,7 +55,8 @@ pub fn build(b: *std.Build) void {
         lib.linkSystemLibraryName("rpcrt4");
         lib.linkSystemLibraryName("iphlpapi");
     }
-    lib.linkSystemLibrary("zmq");
+    lib.linkLibrary(libzmq.artifact("zmq"));
+    //lib.linkSystemLibrary("zmq");
     lib.linkLibC();
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when

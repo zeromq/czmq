@@ -1,0 +1,11 @@
+.{
+    .name = "libzig_czmq",
+    .version = "4.2.2",
+
+    .dependencies = .{
+        .libzmq = .{
+            .url = "https://github.com/kassane/libzmq/archive/89416003587ea21f36b8538791c4825fad012fba.tar.gz",
+            .hash = "122026d048d3a2925e86b3121a98aa8546a6109ff8ecffa75e7d9f2d1aea614f7250",
+        },
+    },
+}
