@@ -4,8 +4,8 @@
 
     .dependencies = .{
         .libzmq = .{
-            .url = "https://github.com/kassane/libzmq/archive/89416003587ea21f36b8538791c4825fad012fba.tar.gz",
-            .hash = "122026d048d3a2925e86b3121a98aa8546a6109ff8ecffa75e7d9f2d1aea614f7250",
+            .url = "https://github.com/kassane/libzmq/archive/a6438dc78d00f3736ede988b0fdc2f6361c442b4.tar.gz",
+            .hash = "1220fc3abc4aa9fb75c61b00297a2ec1d4f70d7f65f4151f6f7a93f59a265a56bc9e",
         },
     },
 }

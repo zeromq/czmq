@@ -17,10 +17,11 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
-    const libzmq = b.dependency("libzmq", .{
+    const libzmq_dep = b.dependency("libzmq", .{
         .optimize = optimize,
         .target = target,
     });
+    const libzmq = libzmq_dep.artifact("zmq");
     const config_header = if (!target.isWindows()) b.addConfigHeader(.{
         .style = .blank,
         .include_path = "platform.h",
@@ -55,13 +56,14 @@ pub fn build(b: *std.Build) void {
         lib.linkSystemLibraryName("rpcrt4");
         lib.linkSystemLibraryName("iphlpapi");
     }
-    lib.linkLibrary(libzmq.artifact("zmq"));
-    //lib.linkSystemLibrary("zmq");
+    lib.linkLibrary(libzmq);
     lib.linkLibC();
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
     lib.install();
+    lib.installHeadersDirectory("../../include", "");
+    lib.installLibraryHeaders(libzmq);
 
     // Creates a step for unit testing.
     const libtest = b.addTest(.{
@@ -78,9 +80,8 @@ pub fn build(b: *std.Build) void {
         libtest.linkSystemLibraryName("rpcrt4");
         libtest.linkSystemLibraryName("iphlpapi");
     }
-    libtest.linkSystemLibrary("zmq");
+    libtest.linkLibrary(libzmq);
     libtest.linkLibC();
-
     // This creates a build step. It will be visible in the `zig build --help` menu,
     // and can be selected like this: `zig build test`
     // This will evaluate the `test` step rather than the default, which is "install".
@@ -91,8 +92,7 @@ pub fn build(b: *std.Build) void {
 const lib_flags: []const []const u8 = &.{
     "-std=gnu99",
     "-O3",
-    //    "-Wall",
-    "-fno-sanitize=all", // disable undefined sanitizer (default on zig/clang wrapper)
+    "-Wall",
 };
 const lib_src: []const []const u8 = &.{
     "../../src/zactor.c",
