@@ -17,11 +17,14 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    const pkg_dep = b.option(bool, "fetch", "Download libzmq with zig-pkg [default: false]") orelse false;
+
     const libzmq_dep = b.dependency("libzmq", .{
         .optimize = optimize,
         .target = target,
     });
     const libzmq = libzmq_dep.artifact("zmq");
+
     const config_header = if (!target.isWindows()) b.addConfigHeader(.{
         .style = .blank,
         .include_path = "platform.h",
@@ -38,12 +41,22 @@ pub fn build(b: *std.Build) void {
         .include_path = "platform.h",
     }, .{});
 
-    const lib = b.addSharedLibrary(.{
-        .name = "zig_czmq",
+    const shared = b.option(bool, "shared", "Build shared Library [default: false]") orelse false;
+    const lib = if (shared) b.addSharedLibrary(.{
+        .name = "czmq_zig",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
-        .root_source_file = .{ .path = "src/main.zig" },
-        .version = .{ .major = 4, .minor = 2, .patch = 2 },
+        //.root_source_file = .{ .path = "src/main.zig" },
+        .version = .{
+            .major = 4,
+            .minor = 2,
+            .patch = 2,
+        },
+        .target = target,
+        .optimize = optimize,
+    }) else b.addStaticLibrary(.{
+        .name = "czmq_zig",
+        .root_source_file = .{ .path = "src/czmq.zig" },
         .target = target,
         .optimize = optimize,
     });
@@ -51,13 +64,23 @@ pub fn build(b: *std.Build) void {
     lib.addIncludePath("../../include");
     lib.addIncludePath(config_header.include_path);
     lib.addCSourceFiles(lib_src, lib_flags);
-    if (target.isWindows()) {
+    if (target.isWindows() and shared) {
         lib.linkSystemLibraryName("ws2_32");
         lib.linkSystemLibraryName("rpcrt4");
         lib.linkSystemLibraryName("iphlpapi");
     }
-    lib.linkLibrary(libzmq);
-    lib.linkLibC();
+    if (pkg_dep)
+        lib.linkLibrary(libzmq)
+    else
+        lib.linkSystemLibrary("zmq");
+    if (target.isLinux() and shared) {
+        lib.linkSystemLibrary("dl");
+        lib.linkSystemLibrary("rt");
+    }
+    if (target.getAbi() != .msvc) {
+        lib.linkLibCpp();
+        lib.linkLibC();
+    }
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
@@ -67,7 +90,7 @@ pub fn build(b: *std.Build) void {
 
     // Creates a step for unit testing.
     const libtest = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = .{ .path = "src/czmq.zig" },
         .target = target,
         .optimize = optimize,
     });
@@ -75,13 +98,19 @@ pub fn build(b: *std.Build) void {
     libtest.addIncludePath(config_header.include_path);
     libtest.addIncludePath("../../include");
     libtest.addCSourceFiles(lib_src, lib_flags);
-    if (target.isWindows()) {
+    if (target.isWindows() and shared) {
         libtest.linkSystemLibraryName("ws2_32");
         libtest.linkSystemLibraryName("rpcrt4");
         libtest.linkSystemLibraryName("iphlpapi");
     }
-    libtest.linkLibrary(libzmq);
-    libtest.linkLibC();
+    if (pkg_dep)
+        libtest.linkLibrary(libzmq)
+    else
+        libtest.linkSystemLibrary("zmq");
+    if (target.getAbi() != .msvc) {
+        libtest.linkLibCpp();
+        libtest.linkLibC();
+    }
     // This creates a build step. It will be visible in the `zig build --help` menu,
     // and can be selected like this: `zig build test`
     // This will evaluate the `test` step rather than the default, which is "install".
@@ -93,6 +122,7 @@ const lib_flags: []const []const u8 = &.{
     "-std=gnu99",
     "-O3",
     "-Wall",
+    "-pedantic",
 };
 const lib_src: []const []const u8 = &.{
     "../../src/zactor.c",
@@ -126,4 +156,14 @@ const lib_src: []const []const u8 = &.{
     "../../src/zproxy.c",
     "../../src/zrex.c",
     "../../src/zgossip_msg.c",
+    "../../src/ztrie.c",
+    "../../src/zargs.c",
+    "../../src/zproc.c",
+    "../../src/ztimerset.c",
+    "../../src/zhttp_server.c",
+    "../../src/zhttp_client.c",
+    "../../src/zhttp_request.c",
+    "../../src/zhttp_response.c",
+    "../../src/zhttp_server_options.c",
+    "../../src/zosc.c",
 };
