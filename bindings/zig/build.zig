@@ -2,6 +2,12 @@
 
 const std = @import("std");
 
+const pkgBuilder = struct {
+    mode: std.builtin.OptimizeMode,
+    target: std.zig.CrossTarget,
+    build: *std.Build.CompileStep,
+};
+
 // Although this function looks imperative, note that its job is to
 // declaratively construct a build graph that will be executed by an external
 // runner.
@@ -17,13 +23,9 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
-    const pkg_dep = b.option(bool, "fetch", "Download libzmq with zig-pkg [default: false]") orelse false;
-
-    const libzmq_dep = b.dependency("libzmq", .{
-        .optimize = optimize,
-        .target = target,
-    });
-    const libzmq = libzmq_dep.artifact("zmq");
+    // Options
+    const pkg_dep = b.option(bool, "fetch", "Download libzmq with zig-pkg [default: true]") orelse true;
+    const shared = b.option(bool, "shared", "Build shared library [default: true]") orelse true;
 
     const config_header = if (!target.isWindows()) b.addConfigHeader(.{
         .style = .blank,
@@ -41,12 +43,11 @@ pub fn build(b: *std.Build) void {
         .include_path = "platform.h",
     }, .{});
 
-    const shared = b.option(bool, "shared", "Build shared Library [default: false]") orelse false;
-    const lib = if (shared) b.addSharedLibrary(.{
+    const libczmq = if (shared) b.addSharedLibrary(.{
         .name = "czmq_zig",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
-        //.root_source_file = .{ .path = "src/main.zig" },
+        //.root_source_file = .{ .path = "src/czmq.zig" },
         .version = .{
             .major = 4,
             .minor = 2,
@@ -60,54 +61,89 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    lib.addConfigHeader(config_header);
-    lib.addIncludePath("../../include");
-    lib.addIncludePath(config_header.include_path);
-    lib.addCSourceFiles(lib_src, lib_flags);
+    libczmq.addConfigHeader(config_header);
+    libczmq.addIncludePath("../../include");
+    libczmq.addIncludePath(config_header.include_path);
+    libczmq.addCSourceFiles(lib_src, lib_flags);
     if (target.isWindows() and shared) {
-        lib.linkSystemLibraryName("ws2_32");
-        lib.linkSystemLibraryName("rpcrt4");
-        lib.linkSystemLibraryName("iphlpapi");
+        libczmq.linkSystemLibraryName("ws2_32");
+        libczmq.linkSystemLibraryName("rpcrt4");
+        libczmq.linkSystemLibraryName("iphlpapi");
     }
-    if (pkg_dep)
-        lib.linkLibrary(libzmq)
-    else
-        lib.linkSystemLibrary("zmq");
+    if (pkg_dep) {
+        const libzmq_dep = b.dependency("libzmq", .{
+            .optimize = optimize,
+            .target = target,
+        });
+        const libzmq = libzmq_dep.artifact("zmq");
+        libczmq.linkLibrary(libzmq);
+        libczmq.installLibraryHeaders(libzmq);
+    } else libczmq.linkSystemLibrary("zmq");
     if (target.isLinux() and shared) {
-        lib.linkSystemLibrary("dl");
-        lib.linkSystemLibrary("rt");
+        libczmq.linkSystemLibrary("dl");
+        libczmq.linkSystemLibrary("rt");
     }
+
+    // TODO: No support MSVC libC++ (ucrt/msvcrt/vcruntime)
+    // https://github.com/ziglang/zig/issues/4785 - drop replacement for MSVC
     if (target.getAbi() != .msvc) {
-        lib.linkLibCpp();
-        lib.linkLibC();
+        libczmq.linkLibCpp();
+        libczmq.linkLibC();
     }
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
-    lib.install();
-    lib.installHeadersDirectory("../../include", "");
-    lib.installLibraryHeaders(libzmq);
+    libczmq.install();
+    b.installDirectory(.{
+        .source_dir = "../../include",
+        .install_dir = .header,
+        .install_subdir = "",
+        .exclude_extensions = &.{"am"},
+    });
 
+    build_test(b, .{ .target = target, .mode = optimize, .build = libczmq });
+    buildSample(b, .{ .target = target, .mode = optimize, .build = libczmq }, "hello_czmq", "../../examples/security/hello.c");
+}
+
+fn buildSample(b: *std.Build.Builder, lib: pkgBuilder, name: []const u8, file: []const u8) void {
+    const test_exe = b.addExecutable(.{
+        .name = name,
+        .optimize = lib.mode,
+        .target = lib.target,
+    });
+    test_exe.linkLibrary(lib.build);
+    test_exe.addSystemIncludePath("../../include");
+    test_exe.addCSourceFile(file, lib_flags);
+    if (lib.target.isWindows())
+        test_exe.linkSystemLibraryName("ws2_32");
+    test_exe.linkLibC();
+    test_exe.install();
+
+    const run_cmd = test_exe.run();
+    run_cmd.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    const run_step = b.step("run", b.fmt("Run the {s}", .{name}));
+    run_step.dependOn(&run_cmd.step);
+}
+
+fn build_test(b: *std.Build.Builder, pkg: pkgBuilder) void {
     // Creates a step for unit testing.
     const libtest = b.addTest(.{
         .root_source_file = .{ .path = "src/czmq.zig" },
-        .target = target,
-        .optimize = optimize,
+        .target = pkg.target,
+        .optimize = pkg.mode,
     });
-    libtest.addConfigHeader(config_header);
-    libtest.addIncludePath(config_header.include_path);
-    libtest.addIncludePath("../../include");
-    libtest.addCSourceFiles(lib_src, lib_flags);
-    if (target.isWindows() and shared) {
+    //    libtest.addIncludePath("../../include");
+    if (pkg.target.isWindows()) {
         libtest.linkSystemLibraryName("ws2_32");
         libtest.linkSystemLibraryName("rpcrt4");
         libtest.linkSystemLibraryName("iphlpapi");
     }
-    if (pkg_dep)
-        libtest.linkLibrary(libzmq)
-    else
-        libtest.linkSystemLibrary("zmq");
-    if (target.getAbi() != .msvc) {
+    libtest.linkLibrary(pkg.build);
+    if (pkg.target.getAbi() != .msvc) {
         libtest.linkLibCpp();
         libtest.linkLibC();
     }
@@ -126,7 +162,10 @@ const lib_flags: []const []const u8 = &.{
 };
 const lib_src: []const []const u8 = &.{
     "../../src/zactor.c",
+    "../../src/zargs.c",
     "../../src/zarmour.c",
+    "../../src/zauth.c",
+    "../../src/zbeacon.c",
     "../../src/zcert.c",
     "../../src/zcertstore.c",
     "../../src/zchunk.c",
@@ -137,33 +176,30 @@ const lib_src: []const []const u8 = &.{
     "../../src/zdir_patch.c",
     "../../src/zfile.c",
     "../../src/zframe.c",
+    "../../src/zgossip.c",
+    "../../src/zgossip_msg.c",
     "../../src/zhash.c",
     "../../src/zhashx.c",
+    "../../src/zhttp_client.c",
+    "../../src/zhttp_request.c",
+    "../../src/zhttp_response.c",
+    "../../src/zhttp_server.c",
+    "../../src/zhttp_server_options.c",
     "../../src/ziflist.c",
     "../../src/zlist.c",
     "../../src/zlistx.c",
     "../../src/zloop.c",
+    "../../src/zmonitor.c",
     "../../src/zmsg.c",
+    "../../src/zosc.c",
     "../../src/zpoller.c",
+    "../../src/zproc.c",
+    "../../src/zproxy.c",
+    "../../src/zrex.c",
     "../../src/zsock.c",
     "../../src/zstr.c",
     "../../src/zsys.c",
-    "../../src/zuuid.c",
-    "../../src/zauth.c",
-    "../../src/zbeacon.c",
-    "../../src/zgossip.c",
-    "../../src/zmonitor.c",
-    "../../src/zproxy.c",
-    "../../src/zrex.c",
-    "../../src/zgossip_msg.c",
-    "../../src/ztrie.c",
-    "../../src/zargs.c",
-    "../../src/zproc.c",
     "../../src/ztimerset.c",
-    "../../src/zhttp_server.c",
-    "../../src/zhttp_client.c",
-    "../../src/zhttp_request.c",
-    "../../src/zhttp_response.c",
-    "../../src/zhttp_server_options.c",
-    "../../src/zosc.c",
+    "../../src/ztrie.c",
+    "../../src/zuuid.c",
 };
