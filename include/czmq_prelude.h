@@ -328,7 +328,13 @@
 #       include <systemd/sd-daemon.h>
 #   endif
 #   if (defined (HAVE_GETIFADDRS))
-#       include <netpacket/packet.h>
+#       if (defined (__UTYPE_OSX))
+#           include <net/ethernet.h>     //  For struct sockaddr_dl
+#           include <net/if_dl.h>
+#           include <net/if_types.h>
+#       else
+#           include <netpacket/packet.h> //  For struct sockaddr_ll
+#       endif
 #   endif
 #endif
 

@@ -214,8 +214,26 @@ s_reload (ziflist_t *self, bool ipv6)
         zhash_t *mactable = zhash_new();
         zhash_autofree(mactable);
         while (interface) {
-            // first try to get a mac addr (AF_PACKET) and save it in a table
-            if ((interface)->ifa_addr && ((interface)->ifa_addr)->sa_family == AF_PACKET)
+            // first try to get a mac addr and save it in a table
+#if defined __UTYPE_OSX
+            if (interface->ifa_addr != NULL && interface->ifa_flags & IFF_UP && interface->ifa_addr->sa_family == AF_LINK)
+            {
+                struct sockaddr_dl *sdl = (struct sockaddr_dl *) interface->ifa_addr;
+                if (sdl->sdl_type == IFT_ETHER)
+                {
+                    const unsigned char *rawmac = (unsigned char *)sdl->sdl_data + sdl->sdl_nlen;
+                    char mac[18] = "NA";
+                    int i;
+                    int len = 0;
+                    for (i = 0; i < 6; i++)
+                    {
+                        len += snprintf(mac+len, 18, "%02X%s", rawmac[i], i < 5 ? ":":"");
+                    }
+                    zhash_insert(mactable, interface->ifa_name, (void *)mac);
+                }
+            }
+#else
+            if (interface->ifa_addr && ((interface)->ifa_addr)->sa_family == AF_PACKET)
             {
                 unsigned char mac[18] = "NA";
                 struct sockaddr_ll *s = (struct sockaddr_ll*)(interface->ifa_addr);
@@ -224,10 +242,9 @@ s_reload (ziflist_t *self, bool ipv6)
                 for (i = 0; i < 6; i++) {
                     len += snprintf(mac+len, 18, "%02X%s", s->sll_addr[i], i < 5 ? ":":"");
                 }
-                zhash_insert(mactable, (interface)->ifa_name, mac);
-                zsys_info("%s: %s", (interface)->ifa_name, mac);
+                zhash_insert(mactable, (interface)->ifa_name, (void *)mac);
             }
-
+#endif
             // next get layer 3 info if any
 
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
