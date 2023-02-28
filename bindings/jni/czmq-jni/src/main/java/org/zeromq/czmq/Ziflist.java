@@ -96,6 +96,13 @@ public class Ziflist implements AutoCloseable {
         return __netmask (self);
     }
     /*
+    Return the current interface MAC address as a printable string
+    */
+    native static String __mac (long self);
+    public String mac () {
+        return __mac (self);
+    }
+    /*
     Return the list of interfaces.
     */
     native static void __print (long self);

@@ -1692,6 +1692,12 @@ string my_ziflist.netmask ()
 Return the current interface network mask as a printable string
 
 ```
+string my_ziflist.mac ()
+```
+
+Return the current interface MAC address as a printable string
+
+```
 nothing my_ziflist.print ()
 ```
 

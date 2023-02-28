@@ -160,6 +160,16 @@ module CZMQ
         result
       end
 
+      # Return the current interface MAC address as a printable string
+      #
+      # @return [String]
+      def mac()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_mac(self_p)
+        result
+      end
+
       # Return the list of interfaces.
       #
       # @return [void]
