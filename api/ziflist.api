@@ -52,7 +52,7 @@
         <return type = "string" />
     </method>
 
-    <method name = "mac">
+    <method name = "mac" state = "draft">
         Return the current interface MAC address as a printable string
         <return type = "string" />
     </method>
