@@ -3261,6 +3261,7 @@ NAN_MODULE_INIT (Ziflist::Init) {
     Nan::SetPrototypeMethod (tpl, "address", _address);
     Nan::SetPrototypeMethod (tpl, "broadcast", _broadcast);
     Nan::SetPrototypeMethod (tpl, "netmask", _netmask);
+    Nan::SetPrototypeMethod (tpl, "mac", _mac);
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "newIpv6", _new_ipv6);
     Nan::SetPrototypeMethod (tpl, "reloadIpv6", _reload_ipv6);
@@ -3341,6 +3342,12 @@ NAN_METHOD (Ziflist::_broadcast) {
 NAN_METHOD (Ziflist::_netmask) {
     Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
     char *result = (char *) ziflist_netmask (ziflist->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
+}
+
+NAN_METHOD (Ziflist::_mac) {
+    Ziflist *ziflist = Nan::ObjectWrap::Unwrap <Ziflist> (info.Holder ());
+    char *result = (char *) ziflist_mac (ziflist->self);
     info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 

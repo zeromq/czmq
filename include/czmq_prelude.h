@@ -327,6 +327,15 @@
 #   if (defined (__UTYPE_LINUX) && defined (HAVE_LIBSYSTEMD))
 #       include <systemd/sd-daemon.h>
 #   endif
+#   if (defined (HAVE_GETIFADDRS))
+#       if (defined (__UTYPE_OSX))
+#           include <net/ethernet.h>     //  For struct sockaddr_dl
+#           include <net/if_dl.h>
+#           include <net/if_types.h>
+#       else
+#           include <netpacket/packet.h> //  For struct sockaddr_ll
+#       endif
+#   endif
 #endif
 
 #if (defined (__VMS__))

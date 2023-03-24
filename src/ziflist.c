@@ -30,6 +30,7 @@ typedef struct {
     char *address;
     char *netmask;
     char *broadcast;
+    char *mac;
     bool is_ipv6;
 } interface_t;
 
@@ -47,6 +48,7 @@ s_interface_destroy (interface_t **self_p)
         freen (self->address);
         freen (self->netmask);
         freen (self->broadcast);
+        freen (self->mac);
         freen (self);
         *self_p = NULL;
     }
@@ -58,7 +60,7 @@ s_interface_destroy (interface_t **self_p)
 
 static interface_t *
 s_interface_new (char *name, struct sockaddr *address, struct sockaddr *netmask,
-        struct sockaddr *broadcast)
+        struct sockaddr *broadcast, const char *mac)
 {
     char hbuf[NI_MAXHOST];
     int rc;
@@ -108,6 +110,8 @@ s_interface_new (char *name, struct sockaddr *address, struct sockaddr *netmask,
         self->broadcast = strdup (zsys_ipv6_mcast_address ());
         assert (self->broadcast);
     }
+
+    self->mac = strdup(mac);
 
     self->is_ipv6 = address->sa_family == AF_INET6 ? true : false;
 
@@ -159,6 +163,7 @@ ziflist_print (ziflist_t *self)
         zsys_info (" - interface address : %s", iface->address);
         zsys_info (" - interface netmask : %s", iface->netmask);
         zsys_info (" - interface broadcast : %s", iface->broadcast);
+        zsys_info (" - interface mac : %s", iface->mac);
     }
 }
 
@@ -206,7 +211,42 @@ s_reload (ziflist_t *self, bool ipv6)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
         struct ifaddrs *interface = interfaces;
+        zhash_t *mactable = zhash_new();
+        zhash_autofree(mactable);
         while (interface) {
+            // first try to get a mac addr and save it in a table
+#if defined __UTYPE_OSX
+            if (interface->ifa_addr != NULL && interface->ifa_flags & IFF_UP && interface->ifa_addr->sa_family == AF_LINK)
+            {
+                struct sockaddr_dl *sdl = (struct sockaddr_dl *) interface->ifa_addr;
+                if (sdl->sdl_type == IFT_ETHER)
+                {
+                    const unsigned char *rawmac = (unsigned char *)sdl->sdl_data + sdl->sdl_nlen;
+                    char mac[18] = "NA";
+                    int i;
+                    int len = 0;
+                    for (i = 0; i < 6; i++)
+                    {
+                        len += snprintf(mac+len, 18, "%02X%s", rawmac[i], i < 5 ? ":":"");
+                    }
+                    zhash_insert(mactable, interface->ifa_name, (void *)mac);
+                }
+            }
+#else
+            if (interface->ifa_addr && ((interface)->ifa_addr)->sa_family == AF_PACKET)
+            {
+                unsigned char mac[18] = "NA";
+                struct sockaddr_ll *s = (struct sockaddr_ll*)(interface->ifa_addr);
+                int i;
+                int len = 0;
+                for (i = 0; i < 6; i++) {
+                    len += snprintf(mac+len, 18, "%02X%s", s->sll_addr[i], i < 5 ? ":":"");
+                }
+                zhash_insert(mactable, (interface)->ifa_name, (void *)mac);
+            }
+#endif
+            // next get layer 3 info if any
+
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
             if (interface->ifa_addr
             && (interface->ifa_broadaddr
@@ -217,15 +257,18 @@ s_reload (ziflist_t *self, bool ipv6)
             &&(interface->ifa_netmask->sa_family == AF_INET
                     || (ipv6 && (interface->ifa_netmask->sa_family == AF_INET6)))
             &&  s_valid_flags (interface->ifa_flags,
-                    ipv6 && (interface->ifa_addr->sa_family == AF_INET6))) {
+                    ipv6 && (interface->ifa_addr->sa_family == AF_INET6)))
+            {
+                const char *mac = zhash_lookup(mactable, interface->ifa_name);
                 interface_t *item = s_interface_new (interface->ifa_name,
                         interface->ifa_addr, interface->ifa_netmask,
-                        interface->ifa_broadaddr);
+                        interface->ifa_broadaddr, mac);
                 if (item)
                     zlistx_add_end (list, item);
             }
             interface = interface->ifa_next;
         }
+        zhash_destroy(&mactable);
     }
     freeifaddrs (interfaces);
 
@@ -269,10 +312,20 @@ s_reload (ziflist_t *self, bool ipv6)
             else
                 is_valid = false;
 
+            unsigned char mac[18] = "NA";
+            unsigned char rawmac[6];
+            if (!ioctl(sock, SIOCGIFHWADDR, (caddr_t)ifr, sizeof(struct ifreq))) {
+                memcpy(rawmac, ifr->ifr_hwaddr.sa_data, 6);
+                int len = 0;
+                for (int i = 0; i < 6; i++) {
+                    len += snprintf(mac+len, 18, "%02X%s", rawmac[i], i < 5 ? ":":"" );
+                }
+            }
+
             if (is_valid) {
                 interface_t *item = s_interface_new (ifr->ifr_name,
                         (struct sockaddr *)&address, (struct sockaddr *)&netmask,
-                        (struct sockaddr *)&broadcast);
+                        (struct sockaddr *)&broadcast, mac);
                 if (item)
                     zlistx_add_end (list, item);
             }
@@ -334,9 +387,19 @@ s_reload (ziflist_t *self, bool ipv6)
             netmask.sin_family = AF_INET;
             broadcast = address;
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
+            // Retrieve the MAC address from the PIP_ADAPTER_ADDRESSES structure
+            unsigned char *mac_address = cur_address->PhysicalAddress;
+            char mac[18] = "NA";
+            if (mac_address != NULL && cur_address->PhysicalAddressLength == 6) {
+                int len = 0;
+                for (int i = 0; i < 6; i++) {
+                    len += snprintf( mac+len, 18, "%02X%s", mac_address[i], i < 5 ? ":":"" );
+                }
+            }
             interface_t *item = s_interface_new (asciiFriendlyName,
                     (struct sockaddr *)&address, (struct sockaddr *)&netmask,
-                    (struct sockaddr *)&broadcast);
+                    (struct sockaddr *)&broadcast, mac);
+
             if (item)
                 zlistx_add_end (list, item);
         }
@@ -456,6 +519,16 @@ ziflist_netmask (ziflist_t *self)
         return NULL;
 }
 
+const char *
+ziflist_mac (ziflist_t *self)
+{
+    assert (self);
+    interface_t *iface = (interface_t *) zlistx_item ((zlistx_t *) self);
+    if (iface)
+        return iface->mac;
+    else
+        return NULL;
+}
 
 //  --------------------------------------------------------------------------
 //  Return true if the current interface uses IPv6
@@ -494,13 +567,28 @@ ziflist_test (bool verbose)
     assert (iflist);
 
     size_t items = ziflist_size (iflist);
+    if (items)
+    {
+        // test mac addresses
+        const char *item = ziflist_first(iflist);
+        while (item)
+        {
+            const char *mac = ziflist_mac(iflist);
+            if ( strlen(mac) == 17 )
+                assert( mac[2] == ':' && mac[5] == ':' && mac[8] == ':'
+                        && mac[11] == ':' && mac[14] == ':' );
+            else
+               assert( strlen(mac) == 2 );
+            item = ziflist_next (iflist);
+        }
+    }
 
     if (verbose) {
         printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
         const char *name = ziflist_first (iflist);
         while (name) {
-            printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
-                    name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+            printf (" - name=%s address=%s netmask=%s broadcast=%s mac=%s\n",
+                    name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist), ziflist_mac(iflist));
             name = ziflist_next (iflist);
         }
     }
