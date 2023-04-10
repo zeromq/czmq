@@ -66,6 +66,12 @@ class Ziflist(object):
         """
         return utils.lib.ziflist_netmask(self._p)
 
+    def mac(self):
+        """
+        Return the current interface MAC address as a printable string
+        """
+        return utils.lib.ziflist_mac(self._p)
+
     def print_py(self):
         """
         Return the list of interfaces.

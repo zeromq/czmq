@@ -3451,6 +3451,8 @@ lib.ziflist_broadcast.restype = c_char_p
 lib.ziflist_broadcast.argtypes = [ziflist_p]
 lib.ziflist_netmask.restype = c_char_p
 lib.ziflist_netmask.argtypes = [ziflist_p]
+lib.ziflist_mac.restype = c_char_p
+lib.ziflist_mac.argtypes = [ziflist_p]
 lib.ziflist_print.restype = None
 lib.ziflist_print.argtypes = [ziflist_p]
 lib.ziflist_new_ipv6.restype = ziflist_p
@@ -3551,6 +3553,12 @@ class Ziflist(object):
         Return the current interface network mask as a printable string
         """
         return lib.ziflist_netmask(self._as_parameter_)
+
+    def mac(self):
+        """
+        Return the current interface MAC address as a printable string
+        """
+        return lib.ziflist_mac(self._as_parameter_)
 
     def print(self):
         """

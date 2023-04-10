@@ -1,8 +1,25 @@
 # czmq-jni
 
-[ ![Download](https://api.bintray.com/packages/zeromq/maven/czmq-jni/images/download.svg) ](https://bintray.com/zeromq/maven/czmq-jni/_latestVersion)
-
 JNI Binding for CZMQ
+
+## Preamble
+
+As stated in LIBZMQ documentation, Android build systems are still DRAFT.
+
+[ZActor & ZLoop](https://github.com/zeromq/czmq/issues/2214) are not (yet ?) supported.
+It's also probably the case for a few other features.
+
+This being said, CZMQ can already be used for Android.
+
+
+## Prerequisites
+
+GRADLE need to be installed on your system.
+
+Note also that GRADLE requires CMake 3.6. For old distributions, this
+may mean an upgrade of CMake. This can do done from sources and is rather
+easy to rebuild/install though (tested on CentOS 7, Fedora 24, ...)
+
 
 ## Building the JNI Layer for Linux and OSX
 
@@ -30,14 +47,19 @@ If libraries of dependent projects are not installed in any of the default locat
 
 ## Building the JNI Layer for Android
 
+### Manual build
+
 Before you start make sure that you've built the JNI Layer for your current OS.
 
-Please read the prerequisites section of the [README](../../builds/android/README.md) in the android build directory.
+Please read the preamble section of the [README](../../builds/android/README.md) in the android build directory.
 
 You only need to set the environment variables.
 
 Then in the jni's android directory (czmq-jni/android), run:
 
+    export XXX=xxx
+    export YYY=yyy
+    cd <czmq>/bindings/jni/czmq-jni/android
     ./build.sh [ arm | arm64 | x86 | x86_64 ]
 
 This does the following:
@@ -47,6 +69,56 @@ This does the following:
 * It compiles the JNI C sources for Android, into a native library libczmqjni.so.
 * It combines all these into jar file for the built architecture, which you can use in your Android projects.
 * It merges the jar files built for the different architectures into one jar file.
+
+
+### More automated build mecanism
+
+You may also use `bindings/jni/ci_build.sh`:
+
+    export XXX=xxx
+    export YYY=yyy
+    ./ci_build.sh
+
+Basically, this script builds the whole for JAVA and but also for Android,
+but generated libraries are available in a different place:
+
+* bindings/jni/.deps         # all required dependencies
+
+* bindings/jni/.build/       # all generated native libraries
+
+* bindings/jni/.build/prefix # all generated android libraries
+
+
+If you have your own `prebuilt` Android libraries, place them under
+
+* bindings/jni/.build/prefix/{arm,arm6,x86,x86_64}/lib/.
+
+They will be automatically packed in generated JAR files.
+
+
+### Compatibility
+
+This build system is tested on a few recent distributions:
+
+* CentOS 7 (see [PREREQUISITES](#prerequisites)
+
+* Fedora (24 to 37 and see [PREREQUISITES](#prerequisites)
+
+* Rocky Linux (8 & 9)
+
+* Debian (9 to 11)
+
+* Ubuntu (16, 18, 20 & 22.04)
+
+Both build systems (`build.sh` and `ci_build.sh`) are tested with NDK 19 to 25,
+with current default of `android-ndk-25`.
+
+
+### Configuration
+
+Both come with many different configuration possibilities.
+Again, refer to [builds/android/README](../../builds/android/README.md) for details.
+
 
 ## Building the JNI Layer for Windows
 
@@ -73,6 +145,7 @@ Now run:
     gradlew build jar -PbuildPrefix=C:\tmp\deps
     gradlew test -PbuildPrefix=C:\tmp\deps
 
+
 ## Installing the JNI Layer
 
 If you like to use this JNI Layer in another project you'll need to distribute it
@@ -87,9 +160,11 @@ like to build a release version you need the set the release switch:
 
     ./gradlew publishToMavenLocal -PisRelease
 
+
 ## Using the JNI API
 
 - to be written.
+
 
 ## License
 
@@ -105,6 +180,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 ## Information for maintainers
 
+BINTRAY is no more accepting PUBLISH. Hence, this chapter has to be reviewed.
+
+See [CZMQ issue #2249](https://github.com/zeromq/czmq/issues/2249) and probably a few others.
+
+
 ### Create or update the gradle wrapper
 
 The gradle wrapper is a tool that allows to use gradle on multiple platforms
@@ -118,12 +198,14 @@ Now commit all generated files to the project. Yes the jar file as well! Users
 will now be able to call the gradle wrapper (gradlew) which will install gradle
 for them.
 
+
 ### Travis build
 
 Travis can build and check this jni layer there add the following line to your
 travis environment matrix
 
     - BUILD_TYPE=bindings BINDING=jni
+
 
 ### Deploy to bintray with Travis CI
 

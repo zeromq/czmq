@@ -32,6 +32,12 @@ typedef enum proxy_socket {
 }
 proxy_socket;
 
+typedef struct {
+    int ivl;
+    int timeout;
+    int ttl;
+} zproxy_heartbeat_t;
+
 #define AUTH_NONE  0
 #define AUTH_PLAIN 1
 #define AUTH_CURVE 2
@@ -87,7 +93,7 @@ s_self_destroy (self_t **self_p)
 }
 
 static zsock_t *
-s_self_create_socket (self_t *self, char *type_name, char *endpoints, proxy_socket selected_socket)
+s_self_create_socket (self_t *self, char *type_name, char *endpoints, zproxy_heartbeat_t *heartbeat, proxy_socket selected_socket)
 {
     //  This array matches ZMQ_XXX type definitions
     assert (ZMQ_PAIR == 0);
@@ -126,6 +132,15 @@ s_self_create_socket (self_t *self, char *type_name, char *endpoints, proxy_sock
 
             // Enable curve authentication
             zsock_set_curve_server (sock, 1);
+        }
+        if (heartbeat->ivl != 0) {
+            if (self->verbose) {
+                zsys_info ("zproxy - setting heartbeat ivl=%d, timeout=%d, ttl=%d",
+                    heartbeat->ivl, heartbeat->timeout, heartbeat->ttl);
+            }
+            zsock_set_heartbeat_ivl (sock, heartbeat->ivl);
+            zsock_set_heartbeat_timeout (sock, heartbeat->timeout);
+            zsock_set_heartbeat_ttl (sock, heartbeat->ttl);
         }
 #endif
         if (zsock_attach (sock, endpoints, true)) {
@@ -183,6 +198,34 @@ s_self_selected_socket (zmsg_t *request)
     return socket;
 }
 
+static int
+s_get_int_value (zmsg_t *request)
+{
+    char *value = zmsg_popstr (request);
+    assert (value);
+    char *endp = NULL;
+    int int_value = strtol (value, &endp, 0);
+    assert (endp != value); // no digits found
+    zstr_free (&value);
+    return int_value;
+}
+
+static void
+s_parse_heartbeat_command (zmsg_t *request, zproxy_heartbeat_t *heartbeat) {
+    char *setting = zmsg_popstr (request);
+    while (setting != NULL) {
+        if (streq (setting, "HEARTBEAT_IVL"))
+            heartbeat->ivl =  s_get_int_value (request);
+        else
+        if (streq (setting, "HEARTBEAT_TIMEOUT"))
+            heartbeat->timeout = s_get_int_value (request);
+        else
+        if (streq (setting, "HEARTBEAT_TTL"))
+            heartbeat->ttl = s_get_int_value (request);
+        zstr_free (&setting);
+        setting = zmsg_popstr (request);
+    }
+}
 
 static void
 s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket selected_socket)
@@ -191,12 +234,16 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket 
     assert (type_name);
     char *endpoints = zmsg_popstr (request);
     assert (endpoints);
+
+    zproxy_heartbeat_t heartbeat = { 0, }; // default value 0 for all members
+    s_parse_heartbeat_command (request, &heartbeat);
+
     if (self->verbose)
         zsys_info ("zproxy: - %s type=%s attach=%s authentication=%s",
             s_self_selected_socket_name (selected_socket), type_name, endpoints,
             s_self_selected_socket_auth (self->auth_type [selected_socket]));
     assert (*sock_p == NULL);
-    *sock_p = s_self_create_socket (self, type_name, endpoints, selected_socket);
+    *sock_p = s_self_create_socket (self, type_name, endpoints, &heartbeat, selected_socket);
     assert (*sock_p);
 
 #ifdef CZMQ_BUILD_DRAFT_API
@@ -468,7 +515,7 @@ s_can_connect (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, const char *f
 }
 
 static void
-s_bind_test_sockets (zactor_t *proxy, char **frontend, char **backend)
+s_create_endpoints (zactor_t *proxy, char **frontend, char **backend)
 {
     zstr_free (frontend);
     zstr_free (backend);
@@ -477,6 +524,12 @@ s_bind_test_sockets (zactor_t *proxy, char **frontend, char **backend)
     srandom ((uint) (time (NULL) ^ *(int *) proxy));
     *frontend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
     *backend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
+}
+
+static void
+s_bind_test_sockets (zactor_t *proxy, char **frontend, char **backend)
+{
+    s_create_endpoints (proxy, frontend, backend);
 
     //  Wait a moment to make sure ports have time to unbind...
     zclock_sleep(200);
@@ -805,7 +858,54 @@ zproxy_test (bool verbose)
         true);
     assert (success);
 
+    // Test heartbeat functionality
+
+    s_create_test_sockets (&proxy, &faucet, &sink, verbose);
+    s_create_endpoints (proxy, &frontend, &backend);
+    zclock_sleep (200);
+
+    // Set the heartbeat interval to much longer than the TTL so that
+    // the socket times out on the remote side
+    zstr_sendx (proxy, "FRONTEND", "PULL", frontend,
+        "HEARTBEAT_IVL", "300", "HEARTBEAT_TTL", "100", NULL);
+    zsock_wait (proxy);
+
+    zstr_sendx (proxy, "BACKEND", "PUSH", backend, NULL);
+    zsock_wait (proxy);
+
+    // Setup a monitor to make sure we disconnect
+    zactor_t *monitor = zactor_new (zmonitor, faucet);
+    assert (monitor);
+    if (verbose)
+        zstr_sendx (monitor, "VERBOSE", NULL);
+    zstr_sendx (monitor, "LISTEN", "CONNECTED", "DISCONNECTED",  NULL);
+    zstr_sendx (monitor, "START", NULL);
+    zsock_wait (monitor);
+
+    // Connect the faucet
+    int rc = zsock_connect (faucet, "%s", frontend);
+    assert (rc == 0);
+
+    zmsg_t *msg = zmsg_recv (monitor);
+    assert (msg);
+    char *event = zmsg_popstr (msg);
+    assert (streq (event, "CONNECTED"));
+    zmsg_destroy (&msg);
+    zstr_free (&event);
+
+    // time to settle ~300ms
+    zclock_sleep (300);
+
+    // Now we should have been disconnected
+    msg = zmsg_recv (monitor);
+    assert (msg);
+    event = zmsg_popstr (msg);
+    assert (streq (event, "DISCONNECTED"));
+    zmsg_destroy (&msg);
+    zstr_free (&event);
+
     //  Cleanup
+    zactor_destroy (&monitor);
     zsock_destroy (&faucet);
     zsock_destroy (&sink);
     zactor_destroy (&proxy);

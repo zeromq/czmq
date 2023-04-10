@@ -71,6 +71,11 @@ CZMQ_EXPORT void
 
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
+//  Return the current interface MAC address as a printable string
+CZMQ_EXPORT const char *
+    ziflist_mac (ziflist_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Get a list of network interfaces currently defined on the system
 //  Includes IPv6 interfaces
 //  Caller owns return value and must destroy it when done.

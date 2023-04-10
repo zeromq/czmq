@@ -52,6 +52,11 @@
         <return type = "string" />
     </method>
 
+    <method name = "mac" state = "draft">
+        Return the current interface MAC address as a printable string
+        <return type = "string" />
+    </method>
+
     <method name = "print">
         Return the list of interfaces.
     </method>

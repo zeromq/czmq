@@ -228,7 +228,6 @@ zuuid_str_canonical (zuuid_t *self)
     assert (self);
     if (!self->str_canonical)
         self->str_canonical = (char *) zmalloc (8 + 4 + 4 + 4 + 12 + 5);
-    *self->str_canonical = 0;
     memcpy (self->str_canonical, self->str, 8);
     self->str_canonical[8] = '-';
     memcpy (self->str_canonical + 9, self->str + 8, 4);

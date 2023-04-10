@@ -213,6 +213,11 @@ CZMQ_PRIVATE zhashx_t *
     zhashx_unpack_own (zframe_t *frame, zhashx_deserializer_fn deserializer);
 
 //  *** Draft method, defined for internal use only ***
+//  Return the current interface MAC address as a printable string
+CZMQ_PRIVATE const char *
+    ziflist_mac (ziflist_t *self);
+
+//  *** Draft method, defined for internal use only ***
 //  Get a list of network interfaces currently defined on the system
 //  Includes IPv6 interfaces
 //  Caller owns return value and must destroy it when done.

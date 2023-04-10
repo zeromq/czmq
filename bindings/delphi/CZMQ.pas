@@ -892,6 +892,9 @@ uses
     // Return the current interface network mask as a printable string
     function Netmask: string;
 
+    // Return the current interface MAC address as a printable string
+    function Mac: string;
+
     // Return the list of interfaces.
     procedure Print;
 
@@ -3617,6 +3620,9 @@ uses
     // Return the current interface network mask as a printable string
     function Netmask: string;
 
+    // Return the current interface MAC address as a printable string
+    function Mac: string;
+
     // Return the list of interfaces.
     procedure Print;
 
@@ -5307,7 +5313,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZsys = class
   public
 
@@ -5796,7 +5801,6 @@ uses
     function Dup: IZuuid;
   end;
 
-  //
   TZauth = class
   public
 
@@ -5804,7 +5808,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZbeacon = class
   public
 
@@ -5812,7 +5815,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZgossip = class
   public
 
@@ -5820,7 +5822,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZmonitor = class
   public
 
@@ -5828,7 +5829,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZproxy = class
   public
 
@@ -5836,7 +5836,6 @@ uses
     class procedure Test(Verbose: Boolean);
   end;
 
-  //
   TZrex = class
   public
 
@@ -7666,6 +7665,11 @@ end;
   function TZiflist.Netmask: string;
   begin
     Result := string(UTF8String(ziflist_netmask(FHandle)));
+  end;
+
+  function TZiflist.Mac: string;
+  begin
+    Result := string(UTF8String(ziflist_mac(FHandle)));
   end;
 
   procedure TZiflist.Print;

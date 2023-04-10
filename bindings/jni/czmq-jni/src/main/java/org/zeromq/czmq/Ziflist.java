@@ -16,7 +16,7 @@ public class Ziflist implements AutoCloseable {
         Map<String, Boolean> libraries = new LinkedHashMap<>();
         libraries.put("zmq", false);
         libraries.put("uuid", true);
-        libraries.put("libsystemd", true);
+        libraries.put("systemd", true);
         libraries.put("lz4", true);
         libraries.put("curl", true);
         libraries.put("nss", true);
@@ -94,6 +94,13 @@ public class Ziflist implements AutoCloseable {
     native static String __netmask (long self);
     public String netmask () {
         return __netmask (self);
+    }
+    /*
+    Return the current interface MAC address as a printable string
+    */
+    native static String __mac (long self);
+    public String mac () {
+        return __mac (self);
     }
     /*
     Return the list of interfaces.
