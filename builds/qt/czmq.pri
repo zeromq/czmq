@@ -57,5 +57,9 @@ INCLUDEPATH += \
 }
 
 win32 {
+    INCLUDEPATH += \
+        $$PWD/windows \
+        $$PWD/../../src
+
     LIBS += -L$$C:/Windows/System32 -lrpcrt4
 }
