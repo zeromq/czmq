@@ -68,13 +68,13 @@ CZMQ_EXPORT void *
     zlist_item (zlist_t *self);
 
 //  Append an item to the end of the list, return 0 if OK or -1 if this
-//  failed for some reason (out of memory). Note that if a duplicator has
+//  failed for some reason (invalid input). Note that if a duplicator has
 //  been set, this method will also duplicate the item.
 CZMQ_EXPORT int
     zlist_append (zlist_t *self, void *item);
 
 //  Push an item to the start of the list, return 0 if OK or -1 if this
-//  failed for some reason (out of memory). Note that if a duplicator has
+//  failed for some reason (invalid input). Note that if a duplicator has
 //  been set, this method will also duplicate the item.
 CZMQ_EXPORT int
     zlist_push (zlist_t *self, void *item);
