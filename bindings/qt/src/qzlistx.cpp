@@ -42,7 +42,7 @@ QZlistx::~QZlistx ()
 ///
 //  Add an item to the head of the list. Calls the item duplicator, if any,
 //  on the item. Resets cursor to list head. Returns an item handle on
-//  success, NULL if memory was exhausted.
+//  success.
 void * QZlistx::addStart (void *item)
 {
     void * rv = zlistx_add_start (self, item);
@@ -52,7 +52,7 @@ void * QZlistx::addStart (void *item)
 ///
 //  Add an item to the tail of the list. Calls the item duplicator, if any,
 //  on the item. Resets cursor to list head. Returns an item handle on
-//  success, NULL if memory was exhausted.
+//  success.
 void * QZlistx::addEnd (void *item)
 {
     void * rv = zlistx_add_end (self, item);
@@ -233,8 +233,7 @@ void QZlistx::sort ()
 //  duplicator, if any, on the item. If low_value is true, starts searching
 //  from the start of the list, otherwise searches from the end. Use the item
 //  comparator, if any, to find where to place the new node. Returns a handle
-//  to the new node, or NULL if memory was exhausted. Resets the cursor to the
-//  list head.
+//  to the new node. Resets the cursor to the list head.
 void * QZlistx::insert (void *item, bool lowValue)
 {
     void * rv = zlistx_insert (self, item, lowValue);

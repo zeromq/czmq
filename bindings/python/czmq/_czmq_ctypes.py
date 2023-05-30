@@ -3965,7 +3965,7 @@ unpacks to an empty list.
         """
         Add an item to the head of the list. Calls the item duplicator, if any,
 on the item. Resets cursor to list head. Returns an item handle on
-success, NULL if memory was exhausted.
+success.
         """
         return c_void_p(lib.zlistx_add_start(self._as_parameter_, item))
 
@@ -3973,7 +3973,7 @@ success, NULL if memory was exhausted.
         """
         Add an item to the tail of the list. Calls the item duplicator, if any,
 on the item. Resets cursor to list head. Returns an item handle on
-success, NULL if memory was exhausted.
+success.
         """
         return c_void_p(lib.zlistx_add_end(self._as_parameter_, item))
 
@@ -4117,8 +4117,7 @@ reorder equal items.
 duplicator, if any, on the item. If low_value is true, starts searching
 from the start of the list, otherwise searches from the end. Use the item
 comparator, if any, to find where to place the new node. Returns a handle
-to the new node, or NULL if memory was exhausted. Resets the cursor to the
-list head.
+to the new node. Resets the cursor to the list head.
         """
         return c_void_p(lib.zlistx_insert(self._as_parameter_, item, low_value))
 

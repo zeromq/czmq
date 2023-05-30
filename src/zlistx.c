@@ -509,8 +509,7 @@ zlistx_sort (zlistx_t *self)
 //  duplicator, if any, on the item. If low_value is true, starts searching
 //  from the start of the list, otherwise searches from the end. Use the item
 //  comparator, if any, to find where to place the new node. Returns a handle
-//  to the new node, or NULL if memory was exhausted. Resets the cursor to the
-//  list head.
+//  to the new node. Resets the cursor to the list head.
 
 void *
 zlistx_insert (zlistx_t *self, void *item, bool low_value)
