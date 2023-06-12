@@ -215,7 +215,7 @@ s_reload (ziflist_t *self, bool ipv6)
         zhash_autofree(mactable);
         while (interface) {
             // first try to get a mac addr and save it in a table
-#if defined __UTYPE_OSX
+#if defined __UTYPE_OSX  || defined __UTYPE_IOS
             if (interface->ifa_addr != NULL && interface->ifa_flags & IFF_UP && interface->ifa_addr->sa_family == AF_LINK)
             {
                 struct sockaddr_dl *sdl = (struct sockaddr_dl *) interface->ifa_addr;

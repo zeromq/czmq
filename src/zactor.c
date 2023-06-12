@@ -123,7 +123,7 @@ zactor_new (zactor_fn actor, void *args)
 #if defined (__UNIX__)
     pthread_t thread;
     pthread_create (&thread, NULL, s_thread_shim, shim);
-#if defined (__UTYPE_OSX)
+#if defined (__UTYPE_OSX) || defined (__UTYPE_IOS)
     pthread_setname_np("ZACTOR");
 #else
     pthread_setname_np(thread, "ZACTOR");
