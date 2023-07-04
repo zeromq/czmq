@@ -26,7 +26,7 @@
 #if defined (__WINDOWS__) && !defined (HAVE_UUID)
 #   define HAVE_UUID 1
 #endif
-#if defined (__UTYPE_OSX) && !defined (HAVE_UUID)
+#if (defined (__UTYPE_OSX)  || defined (__UTYPE_IOS)) && !defined (HAVE_UUID)
 #   define HAVE_UUID 1
 #endif
 #if defined (HAVE_UUID) || defined (__UTYPE_FREEBSD)

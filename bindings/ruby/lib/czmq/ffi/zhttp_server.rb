@@ -47,8 +47,9 @@ module CZMQ
       # @param ptr [::FFI::Pointer]
       # @return [Proc]
       def self.create_finalizer_for(ptr)
+        ptr_ptr = ::FFI::MemoryPointer.new :pointer
+
         Proc.new do
-          ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zhttp_server_destroy ptr_ptr
         end
