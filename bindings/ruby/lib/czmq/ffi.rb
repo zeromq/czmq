@@ -233,6 +233,7 @@ module CZMQ
       attach_function :zdir_cursize, [:pointer], :pointer, **opts
       attach_function :zdir_count, [:pointer], :size_t, **opts
       attach_function :zdir_list, [:pointer], :pointer, **opts
+      attach_function :zdir_list_paths, [:pointer], :pointer, **opts
       attach_function :zdir_remove, [:pointer, :bool], :void, **opts
       attach_function :zdir_diff, [:pointer, :pointer, :string], :pointer, **opts
       attach_function :zdir_resync, [:pointer, :string], :pointer, **opts

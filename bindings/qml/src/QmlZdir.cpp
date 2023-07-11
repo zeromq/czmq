@@ -44,6 +44,16 @@ QmlZlist *QmlZdir::list () {
 };
 
 ///
+//  Returns a sorted list of char*; Each entry in the list is a path of a file
+//  or directory contained in self.
+//  Caller owns return value and must destroy it when done.
+QmlZlist *QmlZdir::listPaths () {
+    QmlZlist *retQ_ = new QmlZlist ();
+    retQ_->self = zdir_list_paths (self);
+    return retQ_;
+};
+
+///
 //  Remove directory, optionally including all files that it contains, at
 //  all levels. If force is false, will only remove the directory if empty.
 //  If force is true, will remove all files and all subdirectories.

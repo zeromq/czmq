@@ -1834,6 +1834,7 @@ NAN_MODULE_INIT (Zdir::Init) {
     Nan::SetPrototypeMethod (tpl, "cursize", _cursize);
     Nan::SetPrototypeMethod (tpl, "count", _count);
     Nan::SetPrototypeMethod (tpl, "list", _list);
+    Nan::SetPrototypeMethod (tpl, "listPaths", _list_paths);
     Nan::SetPrototypeMethod (tpl, "remove", _remove);
     Nan::SetPrototypeMethod (tpl, "diff", _diff);
     Nan::SetPrototypeMethod (tpl, "resync", _resync);
@@ -1924,6 +1925,18 @@ NAN_METHOD (Zdir::_count) {
 NAN_METHOD (Zdir::_list) {
     Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
     zlist_t *result = zdir_list (zdir->self);
+    Zlist *zlist_result = new Zlist (result);
+    if (zlist_result) {
+    //  Don't yet know how to return a new object
+    //      zlist->Wrap (info.This ());
+    //      info.GetReturnValue ().Set (info.This ());
+        info.GetReturnValue ().Set (Nan::New<Boolean>(true));
+    }
+}
+
+NAN_METHOD (Zdir::_list_paths) {
+    Zdir *zdir = Nan::ObjectWrap::Unwrap <Zdir> (info.Holder ());
+    zlist_t *result = zdir_list_paths (zdir->self);
     Zlist *zlist_result = new Zlist (result);
     if (zlist_result) {
     //  Don't yet know how to return a new object

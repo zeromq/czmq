@@ -59,6 +59,14 @@ class Zdir(object):
         """
         return utils.lib.zdir_list(self._p)
 
+    def list_paths(self):
+        """
+        Returns a sorted list of char*; Each entry in the list is a path of a file
+        or directory contained in self.
+        Caller owns return value and must destroy it when done.
+        """
+        return utils.lib.zdir_list_paths(self._p)
+
     def remove(self, force):
         """
         Remove directory, optionally including all files that it contains, at

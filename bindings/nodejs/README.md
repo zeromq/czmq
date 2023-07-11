@@ -952,6 +952,14 @@ to a zfile_t item already allocated in the zdir tree. Do not destroy the
 original zdir tree until you are done with this list.
 
 ```
+zlist my_zdir.listPaths ()
+```
+
+Returns a sorted list of char*; Each entry in the list is a path of a file
+or directory contained in self.
+Caller owns return value and must destroy it when done.
+
+```
 nothing my_zdir.remove (Boolean)
 ```
 
