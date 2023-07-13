@@ -431,6 +431,89 @@ zdir_list (zdir_t *self)
 }
 
 //  --------------------------------------------------------------------------
+//  Returns a sorted list of char* of all the paths of a directory.
+//  Directories paths end with a slash.
+//  Caller owns return value and must destroy it when done.
+
+static int s_zdir_flat_size (zdir_t *self);
+static int s_dir_flatten_paths (zdir_t *self, char *parent, char **paths, int index);
+
+zlist_t *
+zdir_list_paths (zdir_t *self)
+{
+    size_t flat_size = s_zdir_flat_size (self);
+    char **paths = (char **) zmalloc (sizeof (char *) * (flat_size + 1));
+    uint index = 0;
+    if (self)
+        index = s_dir_flatten_paths (self, self->path, paths, index);
+
+    //create and sort list
+    zlist_t *sorted = zlist_new ();
+    for (size_t i = 0; i < index; i++) {
+        zlist_append (sorted, paths[i]);
+    }
+    zlist_sort (sorted, NULL);
+
+    freen (paths);
+
+    return sorted;
+}
+
+// Calculate the flat size of a directory, counting subdirectories.
+// Calls itself recursively.
+
+static int
+s_zdir_flat_size (zdir_t *self)
+{
+    int flat_size;
+    if (self) {
+        zdir_t *subdir = (zdir_t *) zlist_first (self->subdirs);
+        while (subdir) {
+            flat_size += s_zdir_flat_size(subdir) + 1;
+            subdir = (zdir_t *) zlist_next (self->subdirs);
+        }
+        zfile_t *file = (zfile_t *) zlist_first (self->files);
+        while (file) {
+            flat_size += 1;
+            file = (zfile_t *) zlist_next (self->files);
+        }
+    } else
+        flat_size = 0;
+
+    return flat_size;
+}
+
+// Flatten one directory, counting subdirectories.
+// Calls itself recursively.
+
+static int
+s_dir_flatten_paths (zdir_t *self, char *parent, char **paths, int index)
+{
+    //  Flatten the files
+    zlist_sort (self->files, s_file_compare);
+    zfile_t *file = (zfile_t *) zlist_first (self->files);
+    while (file) {
+        paths [index++] = (char *) zfile_filename(file, parent);
+        file = (zfile_t *) zlist_next (self->files);
+    }
+    //  Flatten subdirectories, recursively
+    zlist_sort (self->subdirs, s_dir_compare);
+    zdir_t *subdir = (zdir_t *) zlist_first (self->subdirs);
+    char endstr [2];
+    endstr [0] = '/';
+    endstr [1] = '\0';
+
+    while (subdir) {
+        // Remove the parent path and the first slash of the subdir path
+        // Add a slash at the end of a subdirectory path
+        paths [index++] = strcat (subdir->path + (strlen (parent) + 1), endstr);
+        index = s_dir_flatten_paths (subdir, parent, paths, index);
+        subdir = (zdir_t *) zlist_next (self->subdirs);
+    }
+    return index;
+}
+
+//  --------------------------------------------------------------------------
 //  Remove directory, optionally including all files that it contains, at
 //  all levels. If force is false, will only remove the directory if empty.
 //  If force is true, will remove all files and all subdirectories.

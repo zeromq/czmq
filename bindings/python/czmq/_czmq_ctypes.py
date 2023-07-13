@@ -1926,6 +1926,8 @@ lib.zdir_count.restype = c_size_t
 lib.zdir_count.argtypes = [zdir_p]
 lib.zdir_list.restype = zlist_p
 lib.zdir_list.argtypes = [zdir_p]
+lib.zdir_list_paths.restype = zlist_p
+lib.zdir_list_paths.argtypes = [zdir_p]
 lib.zdir_remove.restype = None
 lib.zdir_remove.argtypes = [zdir_p, c_bool]
 lib.zdir_diff.restype = zlist_p
@@ -2025,6 +2027,13 @@ to a zfile_t item already allocated in the zdir tree. Do not destroy the
 original zdir tree until you are done with this list.
         """
         return Zlist(lib.zdir_list(self._as_parameter_), True)
+
+    def list_paths(self):
+        """
+        Returns a sorted list of char*; Each entry in the list is a path of a file
+or directory contained in self.
+        """
+        return Zlist(lib.zdir_list_paths(self._as_parameter_), True)
 
     def remove(self, force):
         """

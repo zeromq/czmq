@@ -149,6 +149,18 @@ module CZMQ
         result
       end
 
+      # Returns a sorted list of char*; Each entry in the list is a path of a file
+      # or directory contained in self.
+      #
+      # @return [Zlist]
+      def list_paths()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_list_paths(self_p)
+        result = Zlist.__new result, true
+        result
+      end
+
       # Remove directory, optionally including all files that it contains, at
       # all levels. If force is false, will only remove the directory if empty.
       # If force is true, will remove all files and all subdirectories.

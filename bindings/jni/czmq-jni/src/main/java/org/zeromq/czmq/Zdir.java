@@ -87,6 +87,14 @@ public class Zdir implements AutoCloseable {
         return new Zlist (__list (self));
     }
     /*
+    Returns a sorted list of char*; Each entry in the list is a path of a file
+    or directory contained in self.
+    */
+    native static long __listPaths (long self);
+    public Zlist listPaths () {
+        return new Zlist (__listPaths (self));
+    }
+    /*
     Remove directory, optionally including all files that it contains, at
     all levels. If force is false, will only remove the directory if empty.
     If force is true, will remove all files and all subdirectories.

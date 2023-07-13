@@ -647,6 +647,10 @@ type
   // original zdir tree until you are done with this list.
   function zdir_list(self: PZdir): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
+  // Returns a sorted list of char*; Each entry in the list is a path of a file
+  // or directory contained in self.
+  function zdir_list_paths(self: PZdir): PZlist; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
   // Remove directory, optionally including all files that it contains, at
   // all levels. If force is false, will only remove the directory if empty.
   // If force is true, will remove all files and all subdirectories.

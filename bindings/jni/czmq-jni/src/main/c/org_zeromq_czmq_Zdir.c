@@ -65,6 +65,13 @@ Java_org_zeromq_czmq_Zdir__1_1list (JNIEnv *env, jclass c, jlong self)
     return list_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zdir__1_1listPaths (JNIEnv *env, jclass c, jlong self)
+{
+    jlong list_paths_ = (jlong) (intptr_t) zdir_list_paths ((zdir_t *) (intptr_t) self);
+    return list_paths_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zdir__1_1remove (JNIEnv *env, jclass c, jlong self, jboolean force)
 {

@@ -269,6 +269,7 @@ class Zdir: public Nan::ObjectWrap {
     static NAN_METHOD (_cursize);
     static NAN_METHOD (_count);
     static NAN_METHOD (_list);
+    static NAN_METHOD (_list_paths);
     static NAN_METHOD (_remove);
     static NAN_METHOD (_diff);
     static NAN_METHOD (_resync);

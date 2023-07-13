@@ -49,6 +49,12 @@
         original zdir tree until you are done with this list.
         <return type = "zlist" fresh = "1" />
     </method>
+    
+    <method name = "list_paths">
+        Returns a sorted list of char*; Each entry in the list is a path of a file
+        or directory contained in self.
+        <return type = "zlist" fresh = "1" />
+    </method>
 
     <method name = "remove">
         Remove directory, optionally including all files that it contains, at

@@ -396,6 +396,10 @@ uses
     // original zdir tree until you are done with this list.
     function List: IZlist;
 
+    // Returns a sorted list of char*; Each entry in the list is a path of a file
+    // or directory contained in self.
+    function ListPaths: IZlist;
+
     // Remove directory, optionally including all files that it contains, at
     // all levels. If force is false, will only remove the directory if empty.
     // If force is true, will remove all files and all subdirectories.
@@ -2965,6 +2969,10 @@ uses
     // to a zfile_t item already allocated in the zdir tree. Do not destroy the
     // original zdir tree until you are done with this list.
     function List: IZlist;
+
+    // Returns a sorted list of char*; Each entry in the list is a path of a file
+    // or directory contained in self.
+    function ListPaths: IZlist;
 
     // Remove directory, optionally including all files that it contains, at
     // all levels. If force is false, will only remove the directory if empty.
@@ -6822,6 +6830,11 @@ end;
   function TZdir.List: IZlist;
   begin
     Result := TZlist.Wrap(zdir_list(FHandle), true);
+  end;
+
+  function TZdir.ListPaths: IZlist;
+  begin
+    Result := TZlist.Wrap(zdir_list_paths(FHandle), true);
   end;
 
   procedure TZdir.Remove(Force: Boolean);
