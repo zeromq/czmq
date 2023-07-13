@@ -151,7 +151,6 @@ module CZMQ
 
       # Returns a sorted list of char*; Each entry in the list is a path of a file
       # or directory contained in self.
-      # Caller owns return value and must destroy it when done.
       #
       # @return [Zlist]
       def list_paths()

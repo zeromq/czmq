@@ -77,7 +77,6 @@ QZlist * QZdir::list ()
 ///
 //  Returns a sorted list of char*; Each entry in the list is a path of a file
 //  or directory contained in self.
-//  Caller owns return value and must destroy it when done.
 QZlist * QZdir::listPaths ()
 {
     QZlist *rv = new QZlist (zdir_list_paths (self));

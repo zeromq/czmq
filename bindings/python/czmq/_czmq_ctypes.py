@@ -2032,7 +2032,6 @@ original zdir tree until you are done with this list.
         """
         Returns a sorted list of char*; Each entry in the list is a path of a file
 or directory contained in self.
-Caller owns return value and must destroy it when done.
         """
         return Zlist(lib.zdir_list_paths(self._as_parameter_), True)
 
