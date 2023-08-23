@@ -226,6 +226,7 @@ s_item_insert (zhash_t *self, const char *key, void *value)
         }
         item->value = value;
         item->key = strdup (key);
+        assert (item->key);
         item->index = self->cached_index;
 
         //  Insert into start of bucket list
