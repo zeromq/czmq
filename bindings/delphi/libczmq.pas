@@ -1380,12 +1380,12 @@ type
   function zlist_item(self: PZlist): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Append an item to the end of the list, return 0 if OK or -1 if this
-  // failed for some reason (out of memory). Note that if a duplicator has
+  // failed for some reason (invalid input). Note that if a duplicator has
   // been set, this method will also duplicate the item.
   function zlist_append(self: PZlist; Item: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Push an item to the start of the list, return 0 if OK or -1 if this
-  // failed for some reason (out of memory). Note that if a duplicator has
+  // failed for some reason (invalid input). Note that if a duplicator has
   // been set, this method will also duplicate the item.
   function zlist_push(self: PZlist; Item: Pointer): Integer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
@@ -1477,12 +1477,12 @@ type
 
   // Add an item to the head of the list. Calls the item duplicator, if any,
   // on the item. Resets cursor to list head. Returns an item handle on
-  // success, NULL if memory was exhausted.
+  // success.
   function zlistx_add_start(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Add an item to the tail of the list. Calls the item duplicator, if any,
   // on the item. Resets cursor to list head. Returns an item handle on
-  // success, NULL if memory was exhausted.
+  // success.
   function zlistx_add_end(self: PZlistx; Item: Pointer): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Return the number of items in the list
@@ -1568,8 +1568,7 @@ type
   // duplicator, if any, on the item. If low_value is true, starts searching
   // from the start of the list, otherwise searches from the end. Use the item
   // comparator, if any, to find where to place the new node. Returns a handle
-  // to the new node, or NULL if memory was exhausted. Resets the cursor to the
-  // list head.
+  // to the new node. Resets the cursor to the list head.
   function zlistx_insert(self: PZlistx; Item: Pointer; LowValue: Boolean): Pointer; cdecl; external lib_czmq {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Move an item, specified by handle, into position in a sorted list. Uses

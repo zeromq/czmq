@@ -94,7 +94,7 @@ public class Zlist implements AutoCloseable {
     }
     /*
     Append an item to the end of the list, return 0 if OK or -1 if this
-    failed for some reason (out of memory). Note that if a duplicator has
+    failed for some reason (invalid input). Note that if a duplicator has
     been set, this method will also duplicate the item.
     */
     native static int __append (long self, long item);
@@ -103,7 +103,7 @@ public class Zlist implements AutoCloseable {
     }
     /*
     Push an item to the start of the list, return 0 if OK or -1 if this
-    failed for some reason (out of memory). Note that if a duplicator has
+    failed for some reason (invalid input). Note that if a duplicator has
     been set, this method will also duplicate the item.
     */
     native static int __push (long self, long item);
