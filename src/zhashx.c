@@ -1110,7 +1110,7 @@ s_test_serialize_int (const void *item)
 }
 
 static void *
-s_test_deserialze_int (const char *str_item)
+s_test_deserialize_int (const char *str_item)
 {
     int *int_item = (int *) zmalloc (sizeof (int));
     sscanf (str_item, "%d", int_item);
@@ -1237,7 +1237,7 @@ zhashx_test (bool verbose)
     zhashx_insert (own_hash, "val1", val1);
     zhashx_insert (own_hash, "val2", val2);
     frame = zhashx_pack_own (own_hash, s_test_serialize_int);
-    copy = zhashx_unpack_own (frame, s_test_deserialze_int);
+    copy = zhashx_unpack_own (frame, s_test_deserialize_int);
     zhashx_set_destructor (copy, s_test_destroy_int);
     zframe_destroy (&frame);
     assert (zhashx_size (copy) == 2);

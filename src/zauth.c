@@ -190,7 +190,7 @@ typedef struct {
     char *domain;               //  Server socket domain
     char *address;              //  Client IP address
     char *identity;             //  Server socket idenntity
-    char *mechanism;            //  Security mechansim
+    char *mechanism;            //  Security mechanism
     char *username;             //  PLAIN user name
     char *password;             //  PLAIN password, in clear text
     char *client_key;           //  CURVE client public key in ASCII
