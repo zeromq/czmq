@@ -65,21 +65,21 @@ CZMQ_EXPORT void
 //  *** Draft method, for development use, may change without warning ***
 //  Connects process stdin with a readable ('>', connect) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc
-//  sockets.  The writable one is then accessbile via zproc_stdin method.
+//  sockets.  The writable one is then accessible via zproc_stdin method.
 CZMQ_EXPORT void
     zproc_set_stdin (zproc_t *self, void *socket);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Connects process stdout with a writable ('@', bind) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc
-//  sockets.  The readable one is then accessbile via zproc_stdout method.
+//  sockets.  The readable one is then accessible via zproc_stdout method.
 CZMQ_EXPORT void
     zproc_set_stdout (zproc_t *self, void *socket);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Connects process stderr with a writable ('@', bind) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc
-//  sockets.  The readable one is then accessbile via zproc_stderr method.
+//  sockets.  The readable one is then accessible via zproc_stderr method.
 CZMQ_EXPORT void
     zproc_set_stderr (zproc_t *self, void *socket);
 

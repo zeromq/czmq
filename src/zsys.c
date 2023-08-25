@@ -1073,7 +1073,7 @@ char *
 s_zsys_vprintf_hint (int hint, const char *format, va_list argptr)
 {
     if (hint <= 0) {
-        //  The hint is not a hard requrement so no error here.
+        //  The hint is not a hard requirement so no error here.
         //  Just fall back to legacy default.
         hint = 256;
     }

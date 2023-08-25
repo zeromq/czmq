@@ -77,7 +77,7 @@ typedef struct _ztrie_node_t {
 //  Structure of our class
 
 struct _ztrie_t {
-    char delimiter;         //  Character that seperates the tokens of a route
+    char delimiter;         //  Character that separates the tokens of a route
     ztrie_node_t *root;     //  Root node of this tree
     ztrie_node_t *match;    //  Last match made by ztrie_matches
     zlistx_t *params;       //  List of regex parameters found during parsing
