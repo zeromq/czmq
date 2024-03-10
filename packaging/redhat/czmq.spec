@@ -203,3 +203,5 @@ python3 setup.py install --root=%{buildroot} --skip-build --prefix %{_prefix}
 %{_mandir}/man1/zmakecert*
 
 %changelog
+* Wed Dec 31 2014 czmq Developers <zeromq-dev@lists.zeromq.org
+- Initial packaging.
