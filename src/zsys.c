@@ -161,10 +161,16 @@ s_zsys_vprintf_hint (int hint, const char *format, va_list argptr);
 // mutex for pthread_once to run the init function only once in a process
 static pthread_once_t init_all_mutex_var = PTHREAD_ONCE_INIT;
 
+// handler to destroy s_mutex
+static void zsys_destroy_mutex() {
+    ZMUTEX_DESTROY(s_mutex);
+}
+
 // handler to initialize mutexes one time in multi threaded env
 static void zsys_initialize_mutex() {
     ZMUTEX_INIT (s_mutex);
     ZMUTEX_INIT (s_init_mutex);
+    atexit (zsys_destroy_mutex);
 }
 
 // handler to detect fork condition and cleanup the stale context inherited from parent process
@@ -174,6 +180,13 @@ static void zsys_pthread_at_fork_handler(void) {
     ZMUTEX_INIT (s_mutex);
     // call cleanup
     zsys_cleanup();
+}
+
+// mutex for pthread_once to register the atexit function only once in a process
+static pthread_once_t register_atexit_shutdown = PTHREAD_ONCE_INIT;
+// handler to register the atexit function one time in multi threaded env
+static void zsys_register_atexit_shutdown(void) {
+    atexit (zsys_shutdown);
 }
 #endif
 
@@ -279,7 +292,7 @@ zsys_init (void)
     s_initialized = true;
 
 #if defined (__UNIX__)
-    atexit (zsys_shutdown);
+    pthread_once(&register_atexit_shutdown, zsys_register_atexit_shutdown);
     pthread_atfork(NULL, NULL, &zsys_pthread_at_fork_handler);
     //don't hold the lock because some of the function will call zsys_init again
     ZMUTEX_UNLOCK(s_init_mutex);
@@ -407,7 +420,9 @@ zsys_shutdown (void)
     else
         zsys_error ("dangling sockets: cannot terminate ZMQ safely");
 
+#if !defined (__UNIX__)
     ZMUTEX_DESTROY (s_mutex);
+#endif
 
     //  Free dynamically allocated properties
     freen (s_interface);
