@@ -9,7 +9,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
     Http request that can be received from zhttp_server or sent to zhttp_client.
-    Class can be reused between send & recv calls.
+    Class can be reused between send &amp; recv calls.
     Headers and Content is being destroyed after every send call.
 
     <constructor>
@@ -125,7 +125,7 @@
         To use the percent symbol, just double it, e.g "%%something".
 
         Example:
-        if (zhttp_request_match (request, "POST", "/send/%s/%s", &name, &id))
+        if (zhttp_request_match (request, "POST", "/send/%s/%s", &amp;name, &amp;id))
 
         <argument name = "method" type = "string" />
         <argument name = "path" type = "string" variadic = "1" />
