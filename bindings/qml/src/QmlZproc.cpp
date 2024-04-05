@@ -40,7 +40,7 @@ void QmlZproc::setEnv (QmlZhash *arguments) {
 ///
 //  Connects process stdin with a readable ('>', connect) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc
-//  sockets.  The writable one is then accessbile via zproc_stdin method.
+//  sockets.  The writable one is then accessible via zproc_stdin method.
 void QmlZproc::setStdin (void *socket) {
     zproc_set_stdin (self, socket);
 };
@@ -48,7 +48,7 @@ void QmlZproc::setStdin (void *socket) {
 ///
 //  Connects process stdout with a writable ('@', bind) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc
-//  sockets.  The readable one is then accessbile via zproc_stdout method.
+//  sockets.  The readable one is then accessible via zproc_stdout method.
 void QmlZproc::setStdout (void *socket) {
     zproc_set_stdout (self, socket);
 };
@@ -56,7 +56,7 @@ void QmlZproc::setStdout (void *socket) {
 ///
 //  Connects process stderr with a writable ('@', bind) zeromq socket. If
 //  socket argument is NULL, zproc creates own managed pair of inproc
-//  sockets.  The readable one is then accessbile via zproc_stderr method.
+//  sockets.  The readable one is then accessible via zproc_stderr method.
 void QmlZproc::setStderr (void *socket) {
     zproc_set_stderr (self, socket);
 };

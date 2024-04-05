@@ -64,7 +64,7 @@ class Zproc(object):
         """
         Connects process stdin with a readable ('>', connect) zeromq socket. If
         socket argument is NULL, zproc creates own managed pair of inproc
-        sockets.  The writable one is then accessbile via zproc_stdin method.
+        sockets.  The writable one is then accessible via zproc_stdin method.
         """
         utils.lib.zproc_set_stdin(self._p, socket._p)
 
@@ -72,7 +72,7 @@ class Zproc(object):
         """
         Connects process stdout with a writable ('@', bind) zeromq socket. If
         socket argument is NULL, zproc creates own managed pair of inproc
-        sockets.  The readable one is then accessbile via zproc_stdout method.
+        sockets.  The readable one is then accessible via zproc_stdout method.
         """
         utils.lib.zproc_set_stdout(self._p, socket._p)
 
@@ -80,7 +80,7 @@ class Zproc(object):
         """
         Connects process stderr with a writable ('@', bind) zeromq socket. If
         socket argument is NULL, zproc creates own managed pair of inproc
-        sockets.  The readable one is then accessbile via zproc_stderr method.
+        sockets.  The readable one is then accessible via zproc_stderr method.
         """
         utils.lib.zproc_set_stderr(self._p, socket._p)
 

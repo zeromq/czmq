@@ -145,7 +145,7 @@ module CZMQ
 
       # Connects process stdin with a readable ('>', connect) zeromq socket. If
       # socket argument is NULL, zproc creates own managed pair of inproc
-      # sockets.  The writable one is then accessbile via zproc_stdin method.
+      # sockets.  The writable one is then accessible via zproc_stdin method.
       #
       # @param socket [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -158,7 +158,7 @@ module CZMQ
 
       # Connects process stdout with a writable ('@', bind) zeromq socket. If
       # socket argument is NULL, zproc creates own managed pair of inproc
-      # sockets.  The readable one is then accessbile via zproc_stdout method.
+      # sockets.  The readable one is then accessible via zproc_stdout method.
       #
       # @param socket [::FFI::Pointer, #to_ptr]
       # @return [void]
@@ -171,7 +171,7 @@ module CZMQ
 
       # Connects process stderr with a writable ('@', bind) zeromq socket. If
       # socket argument is NULL, zproc creates own managed pair of inproc
-      # sockets.  The readable one is then accessbile via zproc_stderr method.
+      # sockets.  The readable one is then accessible via zproc_stderr method.
       #
       # @param socket [::FFI::Pointer, #to_ptr]
       # @return [void]
