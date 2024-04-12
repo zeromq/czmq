@@ -82,7 +82,7 @@ public class Zproc implements AutoCloseable {
     /*
     Connects process stdin with a readable ('>', connect) zeromq socket. If
     socket argument is NULL, zproc creates own managed pair of inproc
-    sockets.  The writable one is then accessbile via zproc_stdin method.
+    sockets.  The writable one is then accessible via zproc_stdin method.
     */
     native static void __setStdin (long self, long socket);
     public void setStdin (long socket) {
@@ -91,7 +91,7 @@ public class Zproc implements AutoCloseable {
     /*
     Connects process stdout with a writable ('@', bind) zeromq socket. If
     socket argument is NULL, zproc creates own managed pair of inproc
-    sockets.  The readable one is then accessbile via zproc_stdout method.
+    sockets.  The readable one is then accessible via zproc_stdout method.
     */
     native static void __setStdout (long self, long socket);
     public void setStdout (long socket) {
@@ -100,7 +100,7 @@ public class Zproc implements AutoCloseable {
     /*
     Connects process stderr with a writable ('@', bind) zeromq socket. If
     socket argument is NULL, zproc creates own managed pair of inproc
-    sockets.  The readable one is then accessbile via zproc_stderr method.
+    sockets.  The readable one is then accessible via zproc_stderr method.
     */
     native static void __setStderr (long self, long socket);
     public void setStderr (long socket) {
