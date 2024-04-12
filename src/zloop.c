@@ -723,6 +723,10 @@ zloop_start (zloop_t *self)
         }
         rc = zmq_poll (self->pollset, (int) self->poll_size, s_tickless (self));
         if (rc == -1 || (zsys_interrupted && !self->nonstop)) {
+            if (errno == EINTR && self->nonstop) {
+                rc = 0;
+                continue;
+            }
             if (self->verbose) {
                 if (rc == -1)
                     zsys_debug ("zloop: interrupted: %s", strerror (errno));
@@ -915,6 +919,22 @@ s_timer_event5 (zloop_t *loop, int timer_id, void *arg)
     return 0;
 }
 
+static void
+s_raise_sigint_actor (zsock_t *pipe, void *args)
+{
+    zsock_signal (pipe, 0);
+    assert (zsys_interrupted == 0);
+    zsock_wait (pipe);
+    zclock_sleep (100);
+#if defined (__WINDOWS__)
+    assert (GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0) != 0);
+#else
+    assert (kill (getpid(), SIGINT) == 0);
+#endif
+    zclock_sleep (100);
+    assert (zsys_interrupted != 0);
+}
+
 void
 zloop_test (bool verbose)
 {
@@ -973,6 +993,34 @@ zloop_test (bool verbose)
     zloop_set_nonstop (loop, true);
     zloop_start (loop);
     //  zloop runs the handler which will terminate the loop
+    assert (timer_event_called);
+    zsys_interrupted = 0;
+
+    // Check that SIGINT terminates loop if nonstop is not set
+    zloop_destroy (&loop);
+    zactor_t *raise_sigint_actor = zactor_new (s_raise_sigint_actor, NULL);
+    assert (raise_sigint_actor);
+    loop = zloop_new ();
+    zloop_set_nonstop (loop, false);
+    timer_event_called = false;
+    zloop_timer (loop, 1000, 1, s_timer_event3, &timer_event_called);
+    zsock_signal (raise_sigint_actor, 0);
+    zloop_start (loop);
+    zactor_destroy (&raise_sigint_actor);
+    assert (!timer_event_called);
+    zsys_interrupted = 0;
+
+    // Check that SIGINT does not terminate the loop if nonstop is set
+    zloop_destroy (&loop);
+    raise_sigint_actor = zactor_new (s_raise_sigint_actor, NULL);
+    assert (raise_sigint_actor);
+    loop = zloop_new ();
+    zloop_set_nonstop (loop, true);
+    timer_event_called = false;
+    zloop_timer (loop, 500, 1, s_timer_event3, &timer_event_called);
+    zsock_signal (raise_sigint_actor, 0);
+    zloop_start (loop);
+    zactor_destroy (&raise_sigint_actor);
     assert (timer_event_called);
     zsys_interrupted = 0;
 
