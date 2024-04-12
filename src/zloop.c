@@ -709,6 +709,7 @@ zloop_start (zloop_t *self)
 {
     assert (self);
     int rc = 0;
+    self->terminated = false;
 
     //  Main reactor loop
     while (!zsys_interrupted || self->nonstop) {
