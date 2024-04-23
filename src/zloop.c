@@ -313,6 +313,8 @@ s_tickless (zloop_t *self)
 zloop_t *
 zloop_new (void)
 {
+    zsys_init ();
+
     zloop_t *self = (zloop_t *) zmalloc (sizeof (zloop_t));
     assert (self);
 
