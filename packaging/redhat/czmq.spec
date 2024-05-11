@@ -201,6 +201,8 @@ python3 setup.py install --root=%{buildroot} --skip-build --prefix %{_prefix}
 %doc README.txt
 %{_bindir}/zmakecert
 %{_mandir}/man1/zmakecert*
+%{_bindir}/zoscdump
+%{_mandir}/man1/zoscdump*
 
 %changelog
 * Wed Dec 31 2014 czmq Developers <zeromq-dev@lists.zeromq.org

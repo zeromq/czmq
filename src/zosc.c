@@ -638,7 +638,7 @@ zosc_print (zosc_t *self)
             {
                 //  not sure if the double pointer is the way to go
                 char *str = (char*)(zchunk_data( self->chunk ) + needle);
-                fprintf(stdout, " %s", str);
+                fprintf(stdout, " \"%s\"", str);
                 size_t l = strlen((char*)(zchunk_data( self->chunk ) + needle));
                 needle += l + 1;
                 needle = (needle + 3) & (size_t)~0x03;

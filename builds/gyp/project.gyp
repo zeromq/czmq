@@ -174,6 +174,16 @@
       ]
     },
     {
+      'target_name': 'zoscdump',
+      'type': 'executable',
+      'sources': [
+        '../../src/zoscdump.c'
+      ],
+      'dependencies': [
+        'libczmq'
+      ]
+    },
+    {
       'target_name': 'zsp',
       'type': 'executable',
       'sources': [

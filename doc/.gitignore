@@ -93,6 +93,8 @@ zrex.txt
 zrex.doc
 zmakecert.txt
 zmakecert.doc
+zoscdump.txt
+zoscdump.doc
 
 # Make sure to track the manually maintained project description
 !*.adoc

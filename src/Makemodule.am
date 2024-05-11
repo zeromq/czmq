@@ -102,6 +102,13 @@ src_zmakecert_LDADD = ${program_libs}
 src_zmakecert_SOURCES = src/zmakecert.c
 endif #ENABLE_ZMAKECERT
 
+if ENABLE_ZOSCDUMP
+bin_PROGRAMS += src/zoscdump
+src_zoscdump_CPPFLAGS = ${AM_CPPFLAGS}
+src_zoscdump_LDADD = ${program_libs}
+src_zoscdump_SOURCES = src/zoscdump.c
+endif #ENABLE_ZOSCDUMP
+
 if ENABLE_ZSP
 noinst_PROGRAMS += src/zsp
 src_zsp_CPPFLAGS = ${AM_CPPFLAGS}
@@ -168,6 +175,7 @@ dist_api_DATA = \
 # define custom target for all products of /src
 src: \
 		src/zmakecert \
+		src/zoscdump \
 		src/zsp \
 		src/test_randof \
 		src/czmq_selftest \
