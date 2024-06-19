@@ -269,6 +269,110 @@ zosc_frommem (char *data, size_t size)
     return self;
 }
 
+
+zosc_t *
+zosc_fromstring (const char *oscstr)
+{
+    // split spaces
+    char *input = strdup(oscstr);
+    char *address = strtok(input, " ");
+    if (address == NULL)
+    {
+        // no spaces return
+        zstr_free(&input);
+        return NULL;
+    }
+    char *format = strtok(NULL, " ");
+    if (format == NULL)
+    {
+        // no format
+        zstr_free(&input);
+        return NULL;
+    }
+    zosc_t *oscm = zosc_new(address);
+    int i = 0;
+    char type = *format;
+    while( type != 0 )
+    {
+        char *value = NULL;
+        if (type != 'F' && type != 'T' )
+        {
+            value = strtok(NULL, " ");
+            if (value == NULL)
+                goto error;
+        }
+
+        switch (type)
+        {
+            case('i'):
+            {
+                int32_t v = atoi(value);
+                zosc_append(oscm, "i", v);
+                break;
+            }
+            case('h'):
+            {
+                int64_t v = atol(value);
+                zosc_append(oscm, "h", v);
+                break;
+            }
+            case('f'):
+            {
+                float v = (float)atof(value);
+                zosc_append(oscm, "f", v);
+                break;
+            }
+            case('d'):
+            {
+                double v = atof(value);
+                zosc_append(oscm, "d", v);
+                break;
+            }
+            case('s'):
+            {
+                zosc_append(oscm, "s", value);
+                break;
+            }
+            case('c'):
+            {
+                zosc_append(oscm, "c", value[0]);
+                break;
+            }
+            case('m'):
+            {
+                // TODO midi
+                //zosc_append(oscm, "m", value);
+                break;
+            }
+            case('F'):
+            {
+                zosc_append(oscm, "F", NULL);
+                break;
+            }
+            case('T'):
+            {
+                zosc_append(oscm, "T", NULL);
+                break;
+            }
+            default:
+            {
+                zsys_info("type tag is %c", type);
+                break;
+            }
+        }
+        i++;                // get next character
+        type = *(format+i);
+    }
+    zstr_free(&input);
+    return oscm;
+
+error:
+    zstr_free(&input);
+    zosc_destroy(&oscm);
+    return NULL;
+}
+
+
 zosc_t *
 zosc_create (const char *address, const char *format, ...)
 {
@@ -590,15 +694,16 @@ zosc_unpack (zframe_t *frame)
 }
 
 //  Dump OSC message to stdout, for debugging and tracing.
-void
-zosc_print (zosc_t *self)
+char *
+zosc_dump (zosc_t *self)
 {
     assert(self);
     assert(self->format);
+    char *out = (char *)malloc(1024);
 
     size_t needle = self->data_begin;
     int i=0;
-    fprintf(stdout, "%s %s", self->address, self->format);
+    sprintf(out, "%s %s", self->address, self->format);
     while(self->format[i])
     {
         switch (self->format[i])
@@ -607,14 +712,14 @@ zosc_print (zosc_t *self)
             {
                 void *data = zchunk_data( self->chunk ) + needle;
                 int32_t int_v = (int32_t)ntohl(*(uint32_t *)data);
-                fprintf(stdout, " %i", int_v);
+                sprintf(out, "%s %i", out, int_v);
                 needle += sizeof (uint32_t);
                 break;
             }
             case 'h':
             {
                 uint64_t int_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + (needle * sizeof (char) )));
-                fprintf(stdout, " %ld", (long)int_v);
+                sprintf(out, "%s %ld", out, (long)int_v);
                 needle += sizeof (uint64_t);
                 break;
             }
@@ -622,7 +727,7 @@ zosc_print (zosc_t *self)
             {
                 uint32_t flt_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
                 float *v = (float *)&flt_v;  // hackish
-                fprintf(stdout, " %.6f", (double)*v);
+                sprintf(out, "%s %.6f", out, (double)*v);
                 needle += sizeof (float);
                 break;
             }
@@ -630,7 +735,7 @@ zosc_print (zosc_t *self)
             {
                 uint64_t dbl_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + needle));
                 double *v = (double *)&dbl_v;
-                fprintf(stdout, " %f", *v);
+                sprintf(out, "%s %f", out, *v);
                 needle += sizeof (double);
                 break;
             }
@@ -638,7 +743,7 @@ zosc_print (zosc_t *self)
             {
                 //  not sure if the double pointer is the way to go
                 char *str = (char*)(zchunk_data( self->chunk ) + needle);
-                fprintf(stdout, " %s", str);
+                sprintf(out, "%s %s", out, str);
                 size_t l = strlen((char*)(zchunk_data( self->chunk ) + needle));
                 needle += l + 1;
                 needle = (needle + 3) & (size_t)~0x03;
@@ -650,26 +755,26 @@ zosc_print (zosc_t *self)
             {
                 char chr = (*(char*)(zchunk_data( self->chunk ) +
                                         needle + 3));
-                fprintf(stdout, " %c", chr);
+                sprintf(out, "%s %c", out, chr);
                 needle += sizeof (int);  // advance multitude of 4!
                 break;
             }
             case 'm':
             {
                 uint32_t midi = ntohl(*(uint32_t *)(zchunk_data( self->chunk ) + needle));
-                fprintf(stdout, " 0x%08x", midi);
+                sprintf(out, "%s 0x%08x", out, midi);
                 needle += sizeof (uint32_t);
                 break;
             }
             case 'T':
             {
                 // value only determined based on the format!
-                fprintf(stdout, " True");
+                //sprintf(out, "%s True", out);
                 break;
             }
             case 'F':
             {
-                fprintf(stdout, " False");
+                //sprintf(out, "%s False", out);
                 break;
             }
             case 'N': // never used???
@@ -685,8 +790,17 @@ zosc_print (zosc_t *self)
         }
         i++;
     }
-    fprintf(stdout, "\n");
+    return out;
 }
+
+void
+zosc_print (zosc_t *self)
+{
+    char *s = zosc_dump(self);
+    zsys_debug("%s", s);
+    zstr_free(&s);
+}
+
 
 bool
 zosc_is (void *self)
@@ -1035,6 +1149,35 @@ zosc_test (bool verbose)
     assert( streq(stest, "hello") );
     zstr_free(&stest);
     zosc_destroy(&testmsg);
+
+    // test contructing from string
+    zosc_t* strm = zosc_fromstring("/stringmsg ihfdscF 32 64 1.100000 3.140000 hello q");
+    assert(strm);
+    assert(streq(zosc_address(strm), "/stringmsg"));
+    assert(streq(zosc_format(strm), "ihfdscF"));
+    char *sd = zosc_dump(strm);
+    assert(streq(sd, "/stringmsg ihfdscF 32 64 1.100000 3.140000 hello q"));
+    zstr_free(&sd);
+    {
+        int32_t test = 0;
+        int64_t test64 = 0;
+        float testf = 0.0f;
+        double testd = 0.0;
+        char * tests = "robots";
+        char c = 'a';
+        bool b = true;
+        zosc_retr(strm, zosc_format(strm), &test, &test64, &testf, &testd, &tests, &c, &b);
+        assert( test == 32 );
+        assert( test64 == 64 );
+        assert( fabsf(testf-1.1f) < FLT_EPSILON );
+        assert( fabs(testd-3.14) < DBL_EPSILON );
+        assert( streq(tests, "hello") );
+        zstr_free( &tests );
+        assert( c == 'q' );
+    }
+    // test print
+    zosc_print(strm);
+    zosc_destroy(&strm);
 
     // test constructing messages
     int64_t prez = 3;
