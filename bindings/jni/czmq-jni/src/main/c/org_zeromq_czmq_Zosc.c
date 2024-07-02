@@ -38,6 +38,15 @@ Java_org_zeromq_czmq_Zosc__1_1frommem (JNIEnv *env, jclass c, jbyteArray data, j
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zosc__1_1fromstring (JNIEnv *env, jclass c, jstring oscstring)
+{
+    char *oscstring_ = (char *) (*env)->GetStringUTFChars (env, oscstring, NULL);
+    jlong fromstring_ = (jlong) (intptr_t) zosc_fromstring (oscstring_);
+    (*env)->ReleaseStringUTFChars (env, oscstring, oscstring_);
+    return fromstring_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zosc__1_1create (JNIEnv *env, jclass c, jstring address, jstring format)
 {
     char *address_ = (char *) (*env)->GetStringUTFChars (env, address, NULL);
@@ -131,6 +140,15 @@ Java_org_zeromq_czmq_Zosc__1_1unpack (JNIEnv *env, jclass c, jlong frame)
 {
     jlong unpack_ = (jlong) (intptr_t) zosc_unpack ((zframe_t *) (intptr_t) frame);
     return unpack_;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zosc__1_1dump (JNIEnv *env, jclass c, jlong self)
+{
+    char *dump_ = (char *) zosc_dump ((zosc_t *) (intptr_t) self);
+    jstring return_string_ = (*env)->NewStringUTF (env, dump_);
+    zstr_free (&dump_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL

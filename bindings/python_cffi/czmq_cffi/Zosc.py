@@ -62,6 +62,14 @@ See the class's test method for more examples how to use the class.
         return utils.lib.zosc_frommem(data, size)
 
     @staticmethod
+    def fromstring(oscstring):
+        """
+        Create a new zosc message from a string. This the same syntax as
+        zosc_create but written as a single line string.
+        """
+        return utils.lib.zosc_fromstring(utils.to_bytes(oscstring))
+
+    @staticmethod
     def create(address, format, *format_args):
         """
         Create a new zosc message from the given format and arguments.
@@ -184,6 +192,12 @@ See the class's test method for more examples how to use the class.
         Transform a zframe into a zosc.
         """
         return utils.lib.zosc_unpack(frame._p)
+
+    def dump(self):
+        """
+        Return a string describing the the OSC message. The returned string must be freed by the caller.
+        """
+        return utils.lib.zosc_dump(self._p)
 
     def print_py(self):
         """

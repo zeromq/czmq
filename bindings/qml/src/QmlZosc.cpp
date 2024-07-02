@@ -100,6 +100,15 @@ QmlZframe *QmlZosc::pack () {
 };
 
 ///
+//  Return a string describing the the OSC message. The returned string must be freed by the caller.
+QString QmlZosc::dump () {
+    char *retStr_ = zosc_dump (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
 //  Dump OSC message to stdout, for debugging and tracing.
 void QmlZosc::print () {
     zosc_print (self);
@@ -251,6 +260,15 @@ QmlZosc *QmlZoscAttached::fromframe (QmlZframe *frame) {
 QmlZosc *QmlZoscAttached::frommem (char *data, size_t size) {
     QmlZosc *qmlSelf = new QmlZosc ();
     qmlSelf->self = zosc_frommem (data, size);
+    return qmlSelf;
+};
+
+///
+//  Create a new zosc message from a string. This the same syntax as
+//  zosc_create but written as a single line string.
+QmlZosc *QmlZoscAttached::fromstring (const QString &oscstring) {
+    QmlZosc *qmlSelf = new QmlZosc ();
+    qmlSelf->self = zosc_fromstring (oscstring.toUtf8().data());
     return qmlSelf;
 };
 

@@ -28,6 +28,10 @@ public:
     //  and calling free on the data after construction.
     static QZosc* frommem (char *data, size_t size, QObject *qObjParent = 0);
 
+    //  Create a new zosc message from a string. This the same syntax as
+    //  zosc_create but written as a single line string.
+    static QZosc* fromstring (const QString &oscstring, QObject *qObjParent = 0);
+
     //  Destroy an OSC message
     ~QZosc ();
 
@@ -71,6 +75,9 @@ public:
 
     //  Transform a zframe into a zosc.
     static QZosc * unpack (QZframe *frame);
+
+    //  Return a string describing the the OSC message. The returned string must be freed by the caller.
+    QString dump ();
 
     //  Dump OSC message to stdout, for debugging and tracing.
     void print ();

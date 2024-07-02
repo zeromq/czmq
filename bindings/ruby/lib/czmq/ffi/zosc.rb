@@ -124,6 +124,15 @@ module CZMQ
         __new ptr
       end
 
+      # Create a new zosc message from a string. This the same syntax as
+      # zosc_create but written as a single line string.
+      # @param oscstring [String, #to_s, nil]
+      # @return [CZMQ::Zosc]
+      def self.fromstring(oscstring)
+        ptr = ::CZMQ::FFI.zosc_fromstring(oscstring)
+        __new ptr
+      end
+
       # Create a new zosc message from the given format and arguments.
       # The format type tags are as follows:
       #   i - 32bit integer
@@ -304,6 +313,17 @@ module CZMQ
         frame = frame.__ptr if frame
         result = ::CZMQ::FFI.zosc_unpack(frame)
         result = Zosc.__new result, true
+        result
+      end
+
+      # Return a string describing the the OSC message. The returned string must be freed by the caller.
+      #
+      # @return [::FFI::AutoPointer]
+      def dump()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zosc_dump(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 

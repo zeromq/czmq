@@ -43,6 +43,12 @@ CZMQ_EXPORT zosc_t *
     zosc_frommem (char *data, size_t size);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Create a new zosc message from a string. This the same syntax as
+//  zosc_create but written as a single line string.
+CZMQ_EXPORT zosc_t *
+    zosc_fromstring (const char *oscstring);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Create a new zosc message from the given format and arguments.
 //  The format type tags are as follows:
 //    i - 32bit integer
@@ -160,6 +166,12 @@ CZMQ_EXPORT zframe_t *
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zosc_t *
     zosc_unpack (zframe_t *frame);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return a string describing the the OSC message. The returned string must be freed by the caller.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zosc_dump (zosc_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
 //  Dump OSC message to stdout, for debugging and tracing.

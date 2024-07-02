@@ -4642,6 +4642,11 @@ zosc_t *
 zosc_t *
     zosc_frommem (char *data, size_t size);
 
+// Create a new zosc message from a string. This the same syntax as
+// zosc_create but written as a single line string.
+zosc_t *
+    zosc_fromstring (const char *oscstring);
+
 // Create a new zosc message from the given format and arguments.
 // The format type tags are as follows:
 //   i - 32bit integer
@@ -4744,6 +4749,10 @@ zframe_t *
 // Transform a zframe into a zosc.
 zosc_t *
     zosc_unpack (zframe_t *frame);
+
+// Return a string describing the the OSC message. The returned string must be freed by the caller.
+char *
+    zosc_dump (zosc_t *self);
 
 // Dump OSC message to stdout, for debugging and tracing.
 void

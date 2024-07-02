@@ -91,6 +91,9 @@ public slots:
     //  Transform zosc into a zframe that can be sent in a message.
     QmlZframe *pack ();
 
+    //  Return a string describing the the OSC message. The returned string must be freed by the caller.
+    QString dump ();
+
     //  Dump OSC message to stdout, for debugging and tracing.
     void print ();
 
@@ -184,6 +187,10 @@ public slots:
     //  Create a new zosc message from memory. Take ownership of the memory
     //  and calling free on the data after construction.
     QmlZosc *frommem (char *data, size_t size);
+
+    //  Create a new zosc message from a string. This the same syntax as
+    //  zosc_create but written as a single line string.
+    QmlZosc *fromstring (const QString &oscstring);
 
     //  Create a new zosc message from the given format and arguments.
     //  The format type tags are as follows:

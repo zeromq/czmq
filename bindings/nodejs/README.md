@@ -5209,6 +5209,12 @@ zosc my_zosc.unpack (Zframe)
 Transform a zframe into a zosc.
 
 ```
+string my_zosc.dump ()
+```
+
+Return a string describing the the OSC message. The returned string must be freed by the caller.
+
+```
 nothing my_zosc.print ()
 ```
 

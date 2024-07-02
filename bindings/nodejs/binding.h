@@ -1130,6 +1130,7 @@ class Zosc: public Nan::ObjectWrap {
     static NAN_METHOD (_pack);
     static NAN_METHOD (_packx);
     static NAN_METHOD (_unpack);
+    static NAN_METHOD (_dump);
     static NAN_METHOD (_print);
     static NAN_METHOD (_pop_int32);
     static NAN_METHOD (_pop_int64);
