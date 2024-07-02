@@ -9679,6 +9679,7 @@ NAN_MODULE_INIT (Zosc::Init) {
     Nan::SetPrototypeMethod (tpl, "pack", _pack);
     Nan::SetPrototypeMethod (tpl, "packx", _packx);
     Nan::SetPrototypeMethod (tpl, "unpack", _unpack);
+    Nan::SetPrototypeMethod (tpl, "dump", _dump);
     Nan::SetPrototypeMethod (tpl, "print", _print);
     Nan::SetPrototypeMethod (tpl, "popInt32", _pop_int32);
     Nan::SetPrototypeMethod (tpl, "popInt64", _pop_int64);
@@ -9838,6 +9839,12 @@ NAN_METHOD (Zosc::_unpack) {
     //      info.GetReturnValue ().Set (info.This ());
         info.GetReturnValue ().Set (Nan::New<Boolean>(true));
     }
+}
+
+NAN_METHOD (Zosc::_dump) {
+    Zosc *zosc = Nan::ObjectWrap::Unwrap <Zosc> (info.Holder ());
+    char *result = (char *) zosc_dump (zosc->self);
+    info.GetReturnValue ().Set (Nan::New (result).ToLocalChecked ());
 }
 
 NAN_METHOD (Zosc::_print) {

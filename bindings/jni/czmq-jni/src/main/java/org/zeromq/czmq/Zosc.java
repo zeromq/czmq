@@ -54,6 +54,14 @@ public class Zosc implements AutoCloseable {
         return new Zosc (__frommem (data, size));
     }
     /*
+    Create a new zosc message from a string. This the same syntax as
+    zosc_create but written as a single line string.
+    */
+    native static long __fromstring (String oscstring);
+    public static Zosc fromstring (String oscstring) {
+        return new Zosc (__fromstring (oscstring));
+    }
+    /*
     Create a new zosc message from the given format and arguments.
     The format type tags are as follows:
       i - 32bit integer
@@ -193,6 +201,13 @@ public class Zosc implements AutoCloseable {
     native static long __unpack (long frame);
     public static Zosc unpack (Zframe frame) {
         return new Zosc (__unpack (frame.self));
+    }
+    /*
+    Return a string describing the the OSC message. The returned string must be freed by the caller.
+    */
+    native static String __dump (long self);
+    public String dump () {
+        return __dump (self);
     }
     /*
     Dump OSC message to stdout, for debugging and tracing.

@@ -168,7 +168,7 @@ CZMQ_EXPORT zosc_t *
     zosc_unpack (zframe_t *frame);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Return a string describing the the OSC message.
+//  Return a string describing the the OSC message. The returned string must be freed by the caller.
 //  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zosc_dump (zosc_t *self);
