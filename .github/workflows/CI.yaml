@@ -35,12 +35,12 @@ jobs:
             PACKAGES: cmake git uuid-dev libsystemd-dev liblz4-dev libnss3-dev libzmq3-dev libcurl4-nss-dev libmicrohttpd-dev
           - os: macos-latest
             BUILD_TYPE: default
-            PACKAGES: automake autoconf  ossp-uuid zeromq curl libmicrohttpd
+            PACKAGES: automake autoconf libtool  ossp-uuid zeromq curl libmicrohttpd
             DRAFT: enabled
           - os: macos-latest
             BUILD_TYPE: default
             DRAFT: disabled
-            PACKAGES: automake autoconf  ossp-uuid zeromq curl libmicrohttpd
+            PACKAGES: automake autoconf libtool  ossp-uuid zeromq curl libmicrohttpd
 # For non-cmake users, there is an autotools solution with a bit more overhead
 # to have dependencies ready and pass configure script before making this check).
 # Note that the autotools variant will also require dependencies preinstalled to
