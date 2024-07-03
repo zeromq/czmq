@@ -39,6 +39,14 @@ QZosc* QZosc::frommem (char *data, size_t size, QObject *qObjParent)
 }
 
 ///
+//  Create a new zosc message from a string. This the same syntax as
+//  zosc_create but written as a single line string.
+QZosc* QZosc::fromstring (const QString &oscstring, QObject *qObjParent)
+{
+    return new QZosc (zosc_fromstring (oscstring.toUtf8().data()), qObjParent);
+}
+
+///
 //  Destroy an OSC message
 QZosc::~QZosc ()
 {
@@ -123,6 +131,16 @@ QZframe * QZosc::packx ()
 QZosc * QZosc::unpack (QZframe *frame)
 {
     QZosc *rv = new QZosc (zosc_unpack (frame->self));
+    return rv;
+}
+
+///
+//  Return a string describing the the OSC message. The returned string must be freed by the caller.
+QString QZosc::dump ()
+{
+    char *retStr_ = zosc_dump (self);
+    QString rv = QString (retStr_);
+    zstr_free (&retStr_);
     return rv;
 }
 
