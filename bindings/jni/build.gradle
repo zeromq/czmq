@@ -5,15 +5,24 @@
 ################################################################################
 */
 
+buildscript {
+    configurations.configureEach {
+        resolutionStrategy {
+            force 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+        }
+        exclude group: 'xerces', module: 'xercesImpl'
+    }
+}
+
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.jfrog.artifactory' version '4.21.0'
+    id 'com.jfrog.artifactory' version '5.2.3'
     id 'com.jfrog.bintray' version '1.8.5'
-    id 'com.google.osdetector' version '1.7.0'
+    id 'com.google.osdetector' version '1.7.3'
 }
 
-wrapper.gradleVersion = '7.5.1'
+wrapper.gradleVersion = '8.9'
 
 subprojects {
     apply plugin: 'java'
@@ -47,7 +56,6 @@ artifactory {
             repoKey = 'oss-snapshot-local'
             username = System.getenv('ARTIFACTORY_USERNAME')
             password = System.getenv('ARTIFACTORY_PASSWORD')
-            maven = true
         }
     }
 }

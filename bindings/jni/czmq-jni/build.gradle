@@ -11,15 +11,15 @@ ext.hasNotEmptyProperty = { propertyName ->
 }
 
 dependencies {
-    implementation 'org.scijava:native-lib-loader:2.4.0'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.hamcrest:hamcrest-all:1.3'
+    implementation 'org.scijava:native-lib-loader:2.5.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
 }
 
 //  ------------------------------------------------------------------
 //  Build section
 
-task generateJniHeaders(type: Exec, dependsOn: 'classes') {
+tasks.register('generateJniHeaders', type: Exec, dependsOn: 'classes') {
     def classpath = sourceSets.main.output.classesDirs
     def appclasspath = configurations.runtimeClasspath.files*.getAbsolutePath().join(File.pathSeparator)
     def nativeIncludes = 'src/native/include'
@@ -63,14 +63,14 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     commandLine("javac", "-h", "$nativeIncludes", "-classpath", "$classpath${File.pathSeparator}$appclasspath", *jniClasses, *utilityClasses)
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     def defaultJavaLibraryPath = System.getProperty("java.library.path")
     if (osdetector.os == 'windows') {
-         def extraJavaLibraryPath = hasNotEmptyProperty('buildPrefix') ? "$project.buildPrefix\\bin;$project.buildPrefix\\lib" : ''
-         extraJavaLibraryPath = extraJavaLibraryPath.replace("/", "\\")
-         systemProperty "java.library.path", "${projectDir}\\build\\Release${File.pathSeparator}" +
-                                             "${extraJavaLibraryPath}${File.pathSeparator}" +
-                                             "${defaultJavaLibraryPath}"
+        def extraJavaLibraryPath = hasNotEmptyProperty('buildPrefix') ? "$project.buildPrefix\\bin;$project.buildPrefix\\lib" : ''
+        extraJavaLibraryPath = extraJavaLibraryPath.replace("/", "\\")
+        systemProperty "java.library.path", "${projectDir}\\build\\Release${File.pathSeparator}" +
+                                            "${extraJavaLibraryPath}${File.pathSeparator}" +
+                                            "${defaultJavaLibraryPath}"
     } else {
         def extraJavaLibraryPath = hasNotEmptyProperty('buildPrefix') ? "$project.buildPrefix/lib" : ''
         systemProperty "java.library.path", "${projectDir}/build${File.pathSeparator}" +
@@ -81,22 +81,22 @@ tasks.withType(Test) {
     }
 }
 
-task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
-    workingDir  'build'
+tasks.register('initCMake', type: Exec, dependsOn: 'generateJniHeaders') {
+    workingDir 'build'
     def prefixPath = hasNotEmptyProperty('buildPrefix') ? "-DCMAKE_PREFIX_PATH=$project.buildPrefix" : ''
     commandLine 'cmake', "$prefixPath", '..'
 }
 
-task buildNative(type: Exec, dependsOn: 'initCMake') {
+tasks.register('buildNative', type: Exec, dependsOn: 'initCMake') {
     if (osdetector.os == 'windows') {
         commandLine 'cmake',
-                    '--build',  'build',
+                    '--build', 'build',
                     '--config', 'Release',
                     '--target', 'czmqjni',
-                    '--', '-verbosity:Minimal',  '-maxcpucount'
+                    '--', '-verbosity:Minimal', '-maxcpucount'
     } else {
         commandLine 'cmake',
-                    '--build',  'build'
+                    '--build', 'build'
     }
 }
 
@@ -106,13 +106,13 @@ test.dependsOn buildNative
 //  ------------------------------------------------------------------
 //  Install and Publish section
 
-task sourcesJar(type: Jar, dependsOn: 'classes') {
-    classifier = 'sources'
+tasks.register('sourcesJar', type: Jar, dependsOn: 'classes') {
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: 'javadoc') {
-    classifier = 'javadoc'
+tasks.register('javadocJar', type: Jar, dependsOn: 'javadoc') {
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
@@ -147,7 +147,6 @@ publishing {
 artifactoryPublish {
     publications ('mavenJava')
 }
-
 
 bintray {
     user = System.getenv('BINTRAY_USER')
