@@ -12,7 +12,7 @@ dependencies {
 //  ------------------------------------------------------------------
 //  Build section
 
-task copyLibs(type: Copy) {
+tasks.register('copyLibs', type: Copy) {
     def libraryPaths = []
     if (project.hasProperty('buildPrefix')) {
         if (osdetector.os == 'windows') {
@@ -23,7 +23,7 @@ task copyLibs(type: Copy) {
     }
 
     def javaLibraryPaths = System.getProperty('java.library.path').split(File.pathSeparator).toList()
-    libraryPaths.addAll (javaLibraryPaths)
+    libraryPaths.addAll(javaLibraryPaths)
 
     libraryPaths.add('/usr/local/lib')
     if (osdetector.os == 'windows') {
@@ -68,7 +68,7 @@ task copyLibs(type: Copy) {
     duplicatesStrategy = oldStrategy
 }
 
-jar.baseName = "czmq-jni-${osdetector.classifier}"
+jar.archiveBaseName = "czmq-jni-${osdetector.classifier}"
 jar.dependsOn copyLibs
 
 jar {
