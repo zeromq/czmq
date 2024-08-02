@@ -19,7 +19,8 @@ dependencies {
 //  ------------------------------------------------------------------
 //  Build section
 
-tasks.register('generateJniHeaders', type: Exec, dependsOn: 'classes') {
+tasks.register('generateJniHeaders', Exec) {
+    dependsOn 'classes'
     def classpath = sourceSets.main.output.classesDirs
     def appclasspath = configurations.runtimeClasspath.files*.getAbsolutePath().join(File.pathSeparator)
     def nativeIncludes = 'src/native/include'
@@ -81,13 +82,15 @@ tasks.withType(Test).configureEach {
     }
 }
 
-tasks.register('initCMake', type: Exec, dependsOn: 'generateJniHeaders') {
+tasks.register('initCMake', Exec) {
+    dependsOn 'generateJniHeaders'
     workingDir 'build'
     def prefixPath = hasNotEmptyProperty('buildPrefix') ? "-DCMAKE_PREFIX_PATH=$project.buildPrefix" : ''
     commandLine 'cmake', "$prefixPath", '..'
 }
 
-tasks.register('buildNative', type: Exec, dependsOn: 'initCMake') {
+tasks.register('buildNative', Exec) {
+    dependsOn 'initCMake'
     if (osdetector.os == 'windows') {
         commandLine 'cmake',
                     '--build', 'build',
@@ -106,12 +109,14 @@ test.dependsOn buildNative
 //  ------------------------------------------------------------------
 //  Install and Publish section
 
-tasks.register('sourcesJar', type: Jar, dependsOn: 'classes') {
+tasks.register('sourcesJar', Jar) {
+    dependsOn 'classes'
     archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
-tasks.register('javadocJar', type: Jar, dependsOn: 'javadoc') {
+tasks.register('javadocJar', Jar) {
+    dependsOn 'javadoc'
     archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }

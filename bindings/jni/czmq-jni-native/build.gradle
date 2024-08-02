@@ -12,7 +12,7 @@ dependencies {
 //  ------------------------------------------------------------------
 //  Build section
 
-tasks.register('copyLibs', type: Copy) {
+tasks.register('copyLibs', Copy) {
     def libraryPaths = []
     if (project.hasProperty('buildPrefix')) {
         if (osdetector.os == 'windows') {
