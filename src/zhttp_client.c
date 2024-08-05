@@ -216,9 +216,13 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 curl_easy_setopt (curl, CURLOPT_HEADERDATA, request);
                 curl_easy_setopt (curl, CURLOPT_PRIVATE, request);
 
-                if (streq (command, "POST")) {
+                if (streq (command, "POST") || streq (command, "PUT") ||
+                      streq (command, "PATCH")) {
                     curl_easy_setopt (curl, CURLOPT_POSTFIELDS, content);
                     curl_easy_setopt (curl, CURLOPT_POSTFIELDSIZE, content ? strlen (content) : 0);
+
+                    if (strneq (command, "POST"))
+                        curl_easy_setopt (curl, CURLOPT_CUSTOMREQUEST, command);
                 }
 
                 code = curl_multi_add_handle (multi, curl);
