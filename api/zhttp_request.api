@@ -112,6 +112,16 @@
         Set the content to NULL
     </method>
 
+    <method name = "set username">
+        Set the request username
+        <argument name = "username" type = "string" />
+    </method>
+
+    <method name = "set password">
+        Set the request password
+        <argument name = "password" type = "string" />
+    </method>
+
     <method name = "match">
         Match the path of the request.
         Support wildcards with '%s' symbol inside the match string.

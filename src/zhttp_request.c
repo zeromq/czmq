@@ -26,8 +26,10 @@ struct _zhttp_request_t {
     char *url;
     char method[256];
     zhash_t *headers;
-    char* content;
+    char *content;
     bool free_content;
+    char *username;
+    char *password;
 };
 
 
@@ -46,6 +48,8 @@ zhttp_request_new (void)
     strcpy (self->method, "GET");
     self->content = NULL;
     self->free_content = false;
+    self->username = NULL;
+    self->password = NULL;
 
     return self;
 }
@@ -69,6 +73,9 @@ zhttp_request_destroy (zhttp_request_t **self_p)
 
         self->content = NULL;
         self->free_content = false;
+
+        zstr_free (&self->username);
+        zstr_free (&self->password);
 
         //  Free object itself
         free (self);
@@ -118,8 +125,9 @@ zhttp_request_send (zhttp_request_t *self, zhttp_client_t *client, int timeout, 
     if (rc == -1)
         return -1;
 
-    zsock_bsend (client, "4ppSp1p", timeout, arg, arg2, self->url,
-            self->headers, self->free_content ? (byte)1 : (byte)0, self->content);
+    zsock_bsend (client, "4ppSp1pss", timeout, arg, arg2, self->url,
+            self->headers, self->free_content ? (byte)1 : (byte)0, self->content,
+            self->username, self->password);
 
     self->headers = zhash_new ();
     zhash_autofree (self->headers);
@@ -255,6 +263,23 @@ zhttp_request_reset_content (zhttp_request_t *self) {
     self->free_content = false;
     self->content = NULL;
 }
+
+
+void
+zhttp_request_set_username (zhttp_request_t *self, const char *username) {
+    assert (self);
+    zstr_free (&self->username);
+    self->username = strdup (username);
+}
+
+
+void
+zhttp_request_set_password (zhttp_request_t *self, const char *password) {
+    assert (self);
+    zstr_free (&self->password);
+    self->password = strdup (password);
+}
+
 
 bool
 zhttp_request_match (zhttp_request_t *self, const char *method, const char *match, ...) {
