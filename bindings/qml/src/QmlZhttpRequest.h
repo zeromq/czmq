@@ -84,6 +84,12 @@ public slots:
     //  Set the content to NULL
     void resetContent ();
 
+    //  Set the request username
+    void setUsername (const QString &username);
+
+    //  Set the request password
+    void setPassword (const QString &password);
+
     //  Match the path of the request.
     //  Support wildcards with '%s' symbol inside the match string.
     //  Matching wildcards until the next '/', '?' or '\0'.

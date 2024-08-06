@@ -962,6 +962,8 @@ module CZMQ
       attach_function :zhttp_request_set_content, [:pointer, :pointer], :void, **opts
       attach_function :zhttp_request_set_content_const, [:pointer, :string], :void, **opts
       attach_function :zhttp_request_reset_content, [:pointer], :void, **opts
+      attach_function :zhttp_request_set_username, [:pointer, :string], :void, **opts
+      attach_function :zhttp_request_set_password, [:pointer, :string], :void, **opts
       attach_function :zhttp_request_match, [:pointer, :string, :string, :varargs], :bool, **opts
       attach_function :zhttp_request_test, [:bool], :void, **opts
 

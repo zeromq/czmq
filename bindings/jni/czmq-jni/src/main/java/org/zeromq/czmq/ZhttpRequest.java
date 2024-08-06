@@ -154,6 +154,20 @@ public class ZhttpRequest implements AutoCloseable {
         __resetContent (self);
     }
     /*
+    Set the request username
+    */
+    native static void __setUsername (long self, String username);
+    public void setUsername (String username) {
+        __setUsername (self, username);
+    }
+    /*
+    Set the request password
+    */
+    native static void __setPassword (long self, String password);
+    public void setPassword (String password) {
+        __setPassword (self, password);
+    }
+    /*
     Match the path of the request.
     Support wildcards with '%s' symbol inside the match string.
     Matching wildcards until the next '/', '?' or '\0'.

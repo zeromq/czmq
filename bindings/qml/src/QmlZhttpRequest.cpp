@@ -115,6 +115,18 @@ void QmlZhttpRequest::resetContent () {
 };
 
 ///
+//  Set the request username
+void QmlZhttpRequest::setUsername (const QString &username) {
+    zhttp_request_set_username (self, username.toUtf8().data());
+};
+
+///
+//  Set the request password
+void QmlZhttpRequest::setPassword (const QString &password) {
+    zhttp_request_set_password (self, password.toUtf8().data());
+};
+
+///
 //  Match the path of the request.
 //  Support wildcards with '%s' symbol inside the match string.
 //  Matching wildcards until the next '/', '?' or '\0'.

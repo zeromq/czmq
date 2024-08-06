@@ -1076,6 +1076,8 @@ class ZhttpRequest: public Nan::ObjectWrap {
     static NAN_METHOD (_set_content);
     static NAN_METHOD (_set_content_const);
     static NAN_METHOD (_reset_content);
+    static NAN_METHOD (_set_username);
+    static NAN_METHOD (_set_password);
     static NAN_METHOD (_match);
     static NAN_METHOD (_test);
 };

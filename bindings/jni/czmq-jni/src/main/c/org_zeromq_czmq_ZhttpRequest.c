@@ -132,6 +132,22 @@ Java_org_zeromq_czmq_ZhttpRequest__1_1resetContent (JNIEnv *env, jclass c, jlong
     zhttp_request_reset_content ((zhttp_request_t *) (intptr_t) self);
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_ZhttpRequest__1_1setUsername (JNIEnv *env, jclass c, jlong self, jstring username)
+{
+    char *username_ = (char *) (*env)->GetStringUTFChars (env, username, NULL);
+    zhttp_request_set_username ((zhttp_request_t *) (intptr_t) self, username_);
+    (*env)->ReleaseStringUTFChars (env, username, username_);
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_ZhttpRequest__1_1setPassword (JNIEnv *env, jclass c, jlong self, jstring password)
+{
+    char *password_ = (char *) (*env)->GetStringUTFChars (env, password, NULL);
+    zhttp_request_set_password ((zhttp_request_t *) (intptr_t) self, password_);
+    (*env)->ReleaseStringUTFChars (env, password, password_);
+}
+
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_ZhttpRequest__1_1match (JNIEnv *env, jclass c, jlong self, jstring method, jstring path)
 {

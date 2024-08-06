@@ -9190,6 +9190,10 @@ lib.zhttp_request_set_content_const.restype = None
 lib.zhttp_request_set_content_const.argtypes = [zhttp_request_p, c_char_p]
 lib.zhttp_request_reset_content.restype = None
 lib.zhttp_request_reset_content.argtypes = [zhttp_request_p]
+lib.zhttp_request_set_username.restype = None
+lib.zhttp_request_set_username.argtypes = [zhttp_request_p, c_char_p]
+lib.zhttp_request_set_password.restype = None
+lib.zhttp_request_set_password.argtypes = [zhttp_request_p, c_char_p]
 lib.zhttp_request_match.restype = c_bool
 lib.zhttp_request_match.argtypes = [zhttp_request_p, c_char_p, c_char_p]
 lib.zhttp_request_test.restype = None
@@ -9345,6 +9349,18 @@ The content is assumed to be constant-memory and will therefore not be copied or
         Set the content to NULL
         """
         return lib.zhttp_request_reset_content(self._as_parameter_)
+
+    def set_username(self, username):
+        """
+        Set the request username
+        """
+        return lib.zhttp_request_set_username(self._as_parameter_, username)
+
+    def set_password(self, password):
+        """
+        Set the request password
+        """
+        return lib.zhttp_request_set_password(self._as_parameter_, password)
 
     def match(self, method, path, *args):
         """
