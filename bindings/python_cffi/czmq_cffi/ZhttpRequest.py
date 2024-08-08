@@ -127,6 +127,18 @@ Headers and Content is being destroyed after every send call.
         """
         utils.lib.zhttp_request_reset_content(self._p)
 
+    def set_username(self, username):
+        """
+        Set the request username
+        """
+        utils.lib.zhttp_request_set_username(self._p, utils.to_bytes(username))
+
+    def set_password(self, password):
+        """
+        Set the request password
+        """
+        utils.lib.zhttp_request_set_password(self._p, utils.to_bytes(password))
+
     def match(self, method, path, *path_args):
         """
         Match the path of the request.

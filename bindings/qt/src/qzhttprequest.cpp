@@ -153,6 +153,22 @@ void QZhttpRequest::resetContent ()
 }
 
 ///
+//  Set the request username
+void QZhttpRequest::setUsername (const QString &username)
+{
+    zhttp_request_set_username (self, username.toUtf8().data());
+
+}
+
+///
+//  Set the request password
+void QZhttpRequest::setPassword (const QString &password)
+{
+    zhttp_request_set_password (self, password.toUtf8().data());
+
+}
+
+///
 //  Self test of this class.
 void QZhttpRequest::test (bool verbose)
 {

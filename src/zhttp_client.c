@@ -183,10 +183,12 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 char *url;
                 zhash_t *headers;
                 byte free_content;
-                char* content;
+                char *content;
+                char *username;
+                char *password;
 
-                int rc = zsock_brecv (pipe, "4ppSp1p", &timeout, &arg, &arg2,
-                        &url, &headers, &free_content, &content);
+                int rc = zsock_brecv (pipe, "4ppSp1pss", &timeout, &arg, &arg2,
+                        &url, &headers, &free_content, &content, &username, &password);
                 assert (rc == 0);
 
                 struct curl_slist *curl_headers = zhash_to_slist (headers);
@@ -215,6 +217,12 @@ static void zhttp_client_actor (zsock_t *pipe, void *args) {
                 curl_easy_setopt (curl, CURLOPT_HEADERFUNCTION, header_callback);
                 curl_easy_setopt (curl, CURLOPT_HEADERDATA, request);
                 curl_easy_setopt (curl, CURLOPT_PRIVATE, request);
+
+                if (*username)
+                    curl_easy_setopt (curl, CURLOPT_USERNAME, username);
+
+                if (*password)
+                    curl_easy_setopt (curl, CURLOPT_PASSWORD, password);
 
                 if (streq (command, "POST") || streq (command, "PUT") ||
                       streq (command, "PATCH")) {

@@ -125,6 +125,16 @@ CZMQ_EXPORT void
     zhttp_request_reset_content (zhttp_request_t *self);
 
 //  *** Draft method, for development use, may change without warning ***
+//  Set the request username
+CZMQ_EXPORT void
+    zhttp_request_set_username (zhttp_request_t *self, const char *username);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set the request password
+CZMQ_EXPORT void
+    zhttp_request_set_password (zhttp_request_t *self, const char *password);
+
+//  *** Draft method, for development use, may change without warning ***
 //  Match the path of the request.
 //  Support wildcards with '%s' symbol inside the match string.
 //  Matching wildcards until the next '/', '?' or '\0'.

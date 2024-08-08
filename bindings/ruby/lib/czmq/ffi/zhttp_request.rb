@@ -269,6 +269,28 @@ module CZMQ
         result
       end
 
+      # Set the request username
+      #
+      # @param username [String, #to_s, nil]
+      # @return [void]
+      def set_username(username)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhttp_request_set_username(self_p, username)
+        result
+      end
+
+      # Set the request password
+      #
+      # @param password [String, #to_s, nil]
+      # @return [void]
+      def set_password(password)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhttp_request_set_password(self_p, password)
+        result
+      end
+
       # Match the path of the request.
       # Support wildcards with '%s' symbol inside the match string.
       # Matching wildcards until the next '/', '?' or '\0'.

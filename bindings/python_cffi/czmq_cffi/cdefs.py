@@ -4541,6 +4541,14 @@ void
 void
     zhttp_request_reset_content (zhttp_request_t *self);
 
+// Set the request username
+void
+    zhttp_request_set_username (zhttp_request_t *self, const char *username);
+
+// Set the request password
+void
+    zhttp_request_set_password (zhttp_request_t *self, const char *password);
+
 // Match the path of the request.
 // Support wildcards with '%s' symbol inside the match string.
 // Matching wildcards until the next '/', '?' or '\0'.

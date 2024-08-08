@@ -74,6 +74,12 @@ public:
     //  Set the content to NULL
     void resetContent ();
 
+    //  Set the request username
+    void setUsername (const QString &username);
+
+    //  Set the request password
+    void setPassword (const QString &password);
+
     //  Self test of this class.
     static void test (bool verbose);
 

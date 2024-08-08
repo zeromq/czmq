@@ -4953,6 +4953,18 @@ nothing my_zhttp_request.resetContent ()
 Set the content to NULL
 
 ```
+nothing my_zhttp_request.setUsername (String)
+```
+
+Set the request username
+
+```
+nothing my_zhttp_request.setPassword (String)
+```
+
+Set the request password
+
+```
 boolean my_zhttp_request.match (String, String)
 ```
 
