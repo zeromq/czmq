@@ -26,8 +26,8 @@
 
     Decoding a message:
 
-        int rc = zosc_retr(oscmsg, "iihfdscF", &intx, &inty, &intz, &floatz, 
-                            &doublez, &strings, &charq, &someBool);
+        int rc = zosc_retr(oscmsg, "iihfdscF", &amp;intx, &amp;inty, &amp;intz, &amp;floatz, 
+                            &amp;doublez, &amp;strings, &amp;charq, &amp;someBool);
 
     See the class's test method for more examples how to use the class.
 

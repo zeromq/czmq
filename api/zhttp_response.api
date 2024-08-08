@@ -9,7 +9,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
     Http response that can be received from zhttp_client or sent to zhttp_server.
-    Class can be reused between send & recv calls.
+    Class can be reused between send &amp; recv calls.
     Headers and Content is being destroyed after every send call.
 
     <constructor>
