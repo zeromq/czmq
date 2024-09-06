@@ -62,6 +62,8 @@ zchunk_new (const void *data, size_t size)
         if (data) {
             self->size = size;
             memcpy (self->data, data, self->size);
+        } else {
+         	if( size > 0 ) self->data[0] = 0;
         }
     }
     return self;
@@ -181,6 +183,7 @@ zchunk_data (zchunk_t *self)
 {
     assert (self);
     assert (zchunk_is (self));
+    if( self->size < 1 ) return NULL;
     return self->data;
 }
 
