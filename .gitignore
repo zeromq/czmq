@@ -32,9 +32,9 @@ src/czmq_selftest
 core
 
 # Distcheck workspace and archives
-czmq-*/
-czmq-*.tar.gz
-czmq-*.zip
+/czmq-*/
+/czmq-*.tar.gz
+/czmq-*.zip
 
 # Man pages
 doc/*.1
