@@ -21,12 +21,21 @@ module CZMQ
     end
 
     begin
-      lib_name = 'libczmq'
-      lib_dirs = ['/usr/local/lib', '/opt/local/lib', '/usr/lib64']
-      env_name = "#{lib_name.upcase}_PATH"
-      lib_dirs = [*ENV[env_name].split(':'), *lib_dirs] if ENV[env_name]
-      lib_paths = lib_dirs.map { |path| "#{path}/#{lib_name}.#{::FFI::Platform::LIBSUFFIX}" }
-      ffi_lib lib_paths + [lib_name]
+      lib_name      = 'libczmq'
+      major_version = '4'
+      lib_dirs      = ['/usr/local/lib', '/opt/local/lib', '/usr/lib64', '/usr/lib']
+      lib_dirs      = [*ENV['LD_LIBRARY_PATH'].split(':'), *lib_dirs] if ENV['LD_LIBRARY_PATH']
+      lib_dirs      = [*ENV["#{lib_name.upcase}_PATH"].split(':'), *lib_dirs] if ENV["#{lib_name.upcase}_PATH"]
+      lib_paths     = lib_dirs.map do |path|
+        [
+          "#{path}/#{lib_name}.#{::FFI::Platform::LIBSUFFIX}",
+          "#{path}/#{lib_name}.#{::FFI::Platform::LIBSUFFIX}.#{major_version}"
+        ]
+      end.flatten
+
+      lib_paths.concat [lib_name, "#{lib_name}.#{::FFI::Platform::LIBSUFFIX}.#{major_version}"]
+
+      ffi_lib lib_paths
       @available = true
     rescue LoadError
       warn ""
