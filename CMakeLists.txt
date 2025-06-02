@@ -12,7 +12,6 @@ project(czmq
 )
 enable_testing()
 
-set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
 if(MSVC)
@@ -31,7 +30,7 @@ set(pkg_config_names_private "")
 # options
 ########################################################################
 if (NOT CMAKE_BUILD_TYPE)
-    if (EXISTS "${SOURCE_DIR}/.git")
+    if (EXISTS "${PROJECT_SOURCE_DIR}/.git")
         set (CMAKE_BUILD_TYPE Debug)
     else ()
 # http://xit0.org/2013/04/cmake-use-git-branch-and-commit-details-in-project/
@@ -80,7 +79,7 @@ endif()
 include(CheckSymbolExists)
 check_symbol_exists(AI_V4MAPPED "czmq.h" HAVE_DECL_AI_V4MAPPED)
 
-file(REMOVE "${SOURCE_DIR}/src/platform.h")
+file(REMOVE "${PROJECT_SOURCE_DIR}/src/platform.h")
 
 file(WRITE "${PROJECT_BINARY_DIR}/platform.h.in" "
 #cmakedefine HAVE_LINUX_WIRELESS_H
@@ -98,7 +97,7 @@ if (WIN32)
     #so the sources have to be compiled as c++
     if (MSVC AND NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
         enable_language(CXX)
-        file(GLOB sources "${SOURCE_DIR}/src/*.c")
+        file(GLOB sources "${PROJECT_SOURCE_DIR}/src/*.c")
         set_source_files_properties(
             ${sources}
             PROPERTIES LANGUAGE CXX
@@ -124,7 +123,7 @@ if (CYGWIN)
     set(MORE_LIBRARIES)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 set(OPTIONAL_LIBRARIES)
 set(OPTIONAL_LIBRARIES_STATIC)
 
@@ -348,7 +347,7 @@ install(FILES ${czmq_headers} DESTINATION include)
 ########################################################################
 
 
-include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}")
 set (czmq_sources
     src/zactor.c
     src/zarmour.c
@@ -519,12 +518,12 @@ ELSE (ENABLE_DRAFTS)
     set (pkg_config_defines "")
 ENDIF (ENABLE_DRAFTS)
 configure_file(
-    "${SOURCE_DIR}/src/libczmq.pc.in"
-    "${SOURCE_DIR}/src/libczmq.pc"
+    "${PROJECT_SOURCE_DIR}/src/libczmq.pc.in"
+    "${PROJECT_SOURCE_DIR}/src/libczmq.pc"
 @ONLY)
 
 install(
-    FILES "${SOURCE_DIR}/src/libczmq.pc"
+    FILES "${PROJECT_SOURCE_DIR}/src/libczmq.pc"
     DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
 )
 
@@ -561,7 +560,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/czmqConfig.cmake
 ########################################################################
 add_executable(
     zmakecert
-    "${SOURCE_DIR}/src/zmakecert.c"
+    "${PROJECT_SOURCE_DIR}/src/zmakecert.c"
 )
 if (TARGET czmq)
 target_link_libraries(
@@ -585,7 +584,7 @@ install(TARGETS zmakecert
 )
 add_executable(
     zsp
-    "${SOURCE_DIR}/src/zsp.c"
+    "${PROJECT_SOURCE_DIR}/src/zsp.c"
 )
 if (TARGET czmq)
 target_link_libraries(
@@ -606,7 +605,7 @@ target_link_libraries(
 endif()
 add_executable(
     test_randof
-    "${SOURCE_DIR}/src/test_randof.c"
+    "${PROJECT_SOURCE_DIR}/src/test_randof.c"
 )
 if (TARGET czmq)
 target_link_libraries(
@@ -627,7 +626,7 @@ target_link_libraries(
 endif()
 add_executable(
     czmq_selftest
-    "${SOURCE_DIR}/src/czmq_selftest.c"
+    "${PROJECT_SOURCE_DIR}/src/czmq_selftest.c"
 )
 if (TARGET czmq)
 target_link_libraries(
