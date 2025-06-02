@@ -12,6 +12,8 @@ project(czmq
 )
 enable_testing()
 
+include(GNUInstallDirs)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
 if(MSVC)
@@ -340,7 +342,7 @@ IF (ENABLE_DRAFTS)
 ENDIF (ENABLE_DRAFTS)
 
 source_group ("Header Files" FILES ${czmq_headers})
-install(FILES ${czmq_headers} DESTINATION include)
+install(FILES ${czmq_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 ########################################################################
 # library
@@ -448,15 +450,12 @@ if (CZMQ_BUILD_SHARED)
 
   install(TARGETS czmq
     EXPORT czmq-targets
-    LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-    ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
   )
 
   target_include_directories(czmq
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-      $<INSTALL_INTERFACE:include>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 endif()
 
@@ -485,15 +484,12 @@ if (CZMQ_BUILD_STATIC)
 
   install(TARGETS czmq-static
     EXPORT czmq-targets
-    LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-    ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
   )
 
   target_include_directories(czmq-static
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-      $<INSTALL_INTERFACE:include>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
   target_compile_definitions(czmq-static
     PUBLIC CZMQ_STATIC
@@ -510,8 +506,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project
 set (VERSION "4.2.2")
 set (prefix "${CMAKE_INSTALL_PREFIX}")
 set (exec_prefix "\${prefix}")
-set (libdir "\${prefix}/lib${LIB_SUFFIX}")
-set (includedir "\${prefix}/include")
+set (libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
+set (includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
 IF (ENABLE_DRAFTS)
     set (pkg_config_defines "-DCZMQ_BUILD_DRAFT_API=1")
 ELSE (ENABLE_DRAFTS)
@@ -524,7 +520,7 @@ configure_file(
 
 install(
     FILES "${PROJECT_SOURCE_DIR}/src/libczmq.pc"
-    DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
 )
 
 ########################################################################
@@ -534,8 +530,7 @@ include(CMakePackageConfigHelpers)
 if (WIN32)
   set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for czmqConfig.cmake")
 else()
-  # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-  set(CMAKECONFIG_INSTALL_DIR "share/cmake/czmq" CACHE STRING "install path for czmqConfig.cmake")
+  set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/czmq" CACHE STRING "install path for czmqConfig.cmake")
 endif()
 
 if (NOT CMAKE_VERSION VERSION_LESS 3.0)
@@ -579,9 +574,7 @@ target_link_libraries(
     ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
-install(TARGETS zmakecert
-    RUNTIME DESTINATION bin
-)
+install(TARGETS zmakecert)
 add_executable(
     zsp
     "${PROJECT_SOURCE_DIR}/src/zsp.c"
