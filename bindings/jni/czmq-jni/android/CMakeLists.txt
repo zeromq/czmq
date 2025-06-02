@@ -4,8 +4,9 @@
 ################################################################################
 cmake_minimum_required (VERSION 3.6...4.0)
 
-project (czmqjni CXX)
-enable_language (C)
+project (czmqjni
+    LANGUAGES C CXX
+)
 
 # Search for Find*.cmake files in the following locations
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")

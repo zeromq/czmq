@@ -7,8 +7,9 @@
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 2.8...4.0)
-project(czmq)
-enable_language(C)
+project(czmq
+    LANGUAGES C
+)
 enable_testing()
 
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
