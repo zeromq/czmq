@@ -372,6 +372,10 @@ s_reload (ziflist_t *self, bool ipv6)
         PIP_ADAPTER_PREFIX pPrefix = cur_address->FirstPrefix;
 
         PWCHAR friendlyName = cur_address->FriendlyName;
+        if (friendlyName == NULL) {
+            cur_address = cur_address->Next;
+            continue;
+        }
         size_t asciiSize = wcstombs (0, friendlyName, 0) + 1;
         char *asciiFriendlyName = (char *) zmalloc (asciiSize);
         wcstombs (asciiFriendlyName, friendlyName, asciiSize);
