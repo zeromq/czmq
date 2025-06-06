@@ -947,6 +947,9 @@ AC_ARG_ENABLE([zmakecert],
 AM_CONDITIONAL([ENABLE_ZMAKECERT], [test x$enable_zmakecert != xno])
 AM_COND_IF([ENABLE_ZMAKECERT], [AC_MSG_NOTICE([ENABLE_ZMAKECERT defined])])
 
+AM_CONDITIONAL([ENABLE_CZMQ_SELFTEST], [test x$enable_czmq_selftest != xno])
+AM_COND_IF([ENABLE_CZMQ_SELFTEST], [AC_MSG_NOTICE([ENABLE_CZMQ_SELFTEST defined])])
+
 # Check for zsp intent
 AC_ARG_ENABLE([zsp],
     AS_HELP_STRING([--enable-zsp],
@@ -956,6 +959,9 @@ AC_ARG_ENABLE([zsp],
 
 AM_CONDITIONAL([ENABLE_ZSP], [test x$enable_zsp != xno])
 AM_COND_IF([ENABLE_ZSP], [AC_MSG_NOTICE([ENABLE_ZSP defined])])
+
+AM_CONDITIONAL([ENABLE_CZMQ_SELFTEST], [test x$enable_czmq_selftest != xno])
+AM_COND_IF([ENABLE_CZMQ_SELFTEST], [AC_MSG_NOTICE([ENABLE_CZMQ_SELFTEST defined])])
 
 # Check for test_randof intent
 AC_ARG_ENABLE([test_randof],
@@ -967,12 +973,18 @@ AC_ARG_ENABLE([test_randof],
 AM_CONDITIONAL([ENABLE_TEST_RANDOF], [test x$enable_test_randof != xno])
 AM_COND_IF([ENABLE_TEST_RANDOF], [AC_MSG_NOTICE([ENABLE_TEST_RANDOF defined])])
 
+AM_CONDITIONAL([ENABLE_CZMQ_SELFTEST], [test x$enable_czmq_selftest != xno])
+AM_COND_IF([ENABLE_CZMQ_SELFTEST], [AC_MSG_NOTICE([ENABLE_CZMQ_SELFTEST defined])])
+
 # Check for czmq_selftest intent
 AC_ARG_ENABLE([czmq_selftest],
     AS_HELP_STRING([--enable-czmq_selftest],
         [Compile 'czmq_selftest' in src [default=yes]]),
     [enable_czmq_selftest=$enableval],
     [enable_czmq_selftest=yes])
+
+AM_CONDITIONAL([ENABLE_CZMQ_SELFTEST], [test x$enable_czmq_selftest != xno])
+AM_COND_IF([ENABLE_CZMQ_SELFTEST], [AC_MSG_NOTICE([ENABLE_CZMQ_SELFTEST defined])])
 
 AM_CONDITIONAL([ENABLE_CZMQ_SELFTEST], [test x$enable_czmq_selftest != xno])
 AM_COND_IF([ENABLE_CZMQ_SELFTEST], [AC_MSG_NOTICE([ENABLE_CZMQ_SELFTEST defined])])
