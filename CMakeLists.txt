@@ -6,12 +6,13 @@
 ########################################################################
 # Project setup
 ########################################################################
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 2.8...4.0)
 project(czmq)
 enable_language(C)
 enable_testing()
 
-set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+include(GNUInstallDirs)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
 if(MSVC)
@@ -30,7 +31,7 @@ set(pkg_config_names_private "")
 # options
 ########################################################################
 if (NOT CMAKE_BUILD_TYPE)
-    if (EXISTS "${SOURCE_DIR}/.git")
+    if (EXISTS "${PROJECT_SOURCE_DIR}/.git")
         set (CMAKE_BUILD_TYPE Debug)
     else ()
 # http://xit0.org/2013/04/cmake-use-git-branch-and-commit-details-in-project/
@@ -79,7 +80,7 @@ endif()
 include(CheckSymbolExists)
 check_symbol_exists(AI_V4MAPPED "czmq.h" HAVE_DECL_AI_V4MAPPED)
 
-file(REMOVE "${SOURCE_DIR}/src/platform.h")
+file(REMOVE "${PROJECT_SOURCE_DIR}/src/platform.h")
 
 file(WRITE "${PROJECT_BINARY_DIR}/platform.h.in" "
 #cmakedefine HAVE_LINUX_WIRELESS_H
@@ -97,7 +98,7 @@ if (WIN32)
     #so the sources have to be compiled as c++
     if (MSVC AND NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
         enable_language(CXX)
-        file(GLOB sources "${SOURCE_DIR}/src/*.c")
+        file(GLOB sources "${PROJECT_SOURCE_DIR}/src/*.c")
         set_source_files_properties(
             ${sources}
             PROPERTIES LANGUAGE CXX
@@ -123,7 +124,7 @@ if (CYGWIN)
     set(MORE_LIBRARIES)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 set(OPTIONAL_LIBRARIES)
 set(OPTIONAL_LIBRARIES_STATIC)
 
@@ -340,14 +341,14 @@ IF (ENABLE_DRAFTS)
 ENDIF (ENABLE_DRAFTS)
 
 source_group ("Header Files" FILES ${czmq_headers})
-install(FILES ${czmq_headers} DESTINATION include)
+install(FILES ${czmq_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 ########################################################################
 # library
 ########################################################################
 
 
-include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}")
 set (czmq_sources
     src/zactor.c
     src/zarmour.c
@@ -448,15 +449,12 @@ if (CZMQ_BUILD_SHARED)
 
   install(TARGETS czmq
     EXPORT czmq-targets
-    LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-    ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
   )
 
   target_include_directories(czmq
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-      $<INSTALL_INTERFACE:include>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 endif()
 
@@ -485,15 +483,12 @@ if (CZMQ_BUILD_STATIC)
 
   install(TARGETS czmq-static
     EXPORT czmq-targets
-    LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-    ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
   )
 
   target_include_directories(czmq-static
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-      $<INSTALL_INTERFACE:include>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
   target_compile_definitions(czmq-static
     PUBLIC CZMQ_STATIC
@@ -510,21 +505,21 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project
 set (VERSION "4.2.2")
 set (prefix "${CMAKE_INSTALL_PREFIX}")
 set (exec_prefix "\${prefix}")
-set (libdir "\${prefix}/lib${LIB_SUFFIX}")
-set (includedir "\${prefix}/include")
+set (libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
+set (includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
 IF (ENABLE_DRAFTS)
     set (pkg_config_defines "-DCZMQ_BUILD_DRAFT_API=1")
 ELSE (ENABLE_DRAFTS)
     set (pkg_config_defines "")
 ENDIF (ENABLE_DRAFTS)
 configure_file(
-    "${SOURCE_DIR}/src/libczmq.pc.in"
-    "${SOURCE_DIR}/src/libczmq.pc"
+    "${PROJECT_SOURCE_DIR}/src/libczmq.pc.in"
+    "${PROJECT_SOURCE_DIR}/src/libczmq.pc"
 @ONLY)
 
 install(
-    FILES "${SOURCE_DIR}/src/libczmq.pc"
-    DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
+    FILES "${PROJECT_SOURCE_DIR}/src/libczmq.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
 )
 
 ########################################################################
@@ -534,8 +529,7 @@ include(CMakePackageConfigHelpers)
 if (WIN32)
   set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for czmqConfig.cmake")
 else()
-  # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-  set(CMAKECONFIG_INSTALL_DIR "share/cmake/czmq" CACHE STRING "install path for czmqConfig.cmake")
+  set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/czmq" CACHE STRING "install path for czmqConfig.cmake")
 endif()
 
 if (NOT CMAKE_VERSION VERSION_LESS 3.0)
@@ -560,7 +554,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/czmqConfig.cmake
 ########################################################################
 add_executable(
     zmakecert
-    "${SOURCE_DIR}/src/zmakecert.c"
+    "${PROJECT_SOURCE_DIR}/src/zmakecert.c"
 )
 if (TARGET czmq)
 target_link_libraries(
@@ -579,12 +573,10 @@ target_link_libraries(
     ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
-install(TARGETS zmakecert
-    RUNTIME DESTINATION bin
-)
+install(TARGETS zmakecert)
 add_executable(
     zsp
-    "${SOURCE_DIR}/src/zsp.c"
+    "${PROJECT_SOURCE_DIR}/src/zsp.c"
 )
 if (TARGET czmq)
 target_link_libraries(
@@ -605,7 +597,7 @@ target_link_libraries(
 endif()
 add_executable(
     test_randof
-    "${SOURCE_DIR}/src/test_randof.c"
+    "${PROJECT_SOURCE_DIR}/src/test_randof.c"
 )
 if (TARGET czmq)
 target_link_libraries(
@@ -626,7 +618,7 @@ target_link_libraries(
 endif()
 add_executable(
     czmq_selftest
-    "${SOURCE_DIR}/src/czmq_selftest.c"
+    "${PROJECT_SOURCE_DIR}/src/czmq_selftest.c"
 )
 if (TARGET czmq)
 target_link_libraries(
@@ -762,83 +754,21 @@ include(CTest)
 # cleanup
 ########################################################################
 if (NOT TARGET distclean)
-    add_custom_target (distclean @echo Cleaning for source distribution)
-endif()
-
-set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
-                    ${PROJECT_BINARY_DIR}/cmake_install.cmake
-                    ${PROJECT_BINARY_DIR}/Makefile
-                    ${PROJECT_BINARY_DIR}/CMakeFiles
-                    ${PROJECT_BINARY_DIR}/CTestTestfile.cmake
-                    ${PROJECT_BINARY_DIR}/DartConfiguration.tcl
-                    ${PROJECT_BINARY_DIR}/Testing
-                    ${PROJECT_BINARY_DIR}/compile_commands.json
-                    ${PROJECT_BINARY_DIR}/platform.h
-                    ${PROJECT_BINARY_DIR}/src/libczmq.pc
-                    ${PROJECT_BINARY_DIR}/src/libczmq.so
-                    ${PROJECT_BINARY_DIR}/src/czmq_selftest
-                    ${PROJECT_BINARY_DIR}/src/zmakecert
-                    ${PROJECT_BINARY_DIR}/src/zsp
-                    ${PROJECT_BINARY_DIR}/src/test_randof
-                    ${PROJECT_BINARY_DIR}/src/czmq_selftest
-)
-
-add_custom_command(
-    DEPENDS clean
-    COMMENT "distribution clean"
-    COMMAND rm
-    ARGS    -rf CMakeTmp ${cmake_generated}
-    TARGET  distclean
-)
-
-include(ClangFormat OPTIONAL)
-
-########################################################################
-# summary
-########################################################################
-message ("")
-message (STATUS "******************* Configuration Summary *******************")
-message (STATUS "General:")
-message (STATUS "  Version           :   ${VERSION}")
-message (STATUS "  System            :   ${CMAKE_SYSTEM_NAME}")
-message (STATUS "  C compiler        :   ${CMAKE_C_COMPILER}")
-message (STATUS "  Debug C flags     :   ${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS}")
-message (STATUS "  Release C flags   :   ${CMAKE_C_FLAGS_RELEASE} ${CMAKE_C_FLAGS}")
-message (STATUS "  Build type        :   ${CMAKE_BUILD_TYPE}")
-message (STATUS "  Static build      :   ${CZMQ_BUILD_STATIC}")
-message (STATUS "  Shared build      :   ${CZMQ_BUILD_SHARED}")
-IF (ENABLE_DRAFTS)
-message (STATUS "  Draft API         :   Yes")
-ELSE (ENABLE_DRAFTS)
-message (STATUS "  Draft API         :   No")
-ENDIF (ENABLE_DRAFTS)
-message (STATUS "")
-message (STATUS "Dependencies:")
-include(FeatureSummary)
-feature_summary (WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
-message (STATUS "")
-message (STATUS "Install:")
-message (STATUS "  Install prefix    :" "${CMAKE_INSTALL_PREFIX}")
-message (STATUS "")
-message (STATUS "************************* Options ***************************")
-message (STATUS "Options:")
-message (STATUS "  Use the Draft API (default = yes):")
-message (STATUS "  -DENABLE-DRAFTS=[yes|no]")
-message (STATUS "")
-message (STATUS "*************************************************************")
-message (STATUS "Configuration complete! Now procced with:")
-message (STATUS "  'make'                 compile the project")
-message (STATUS "  'make test'            run the project's selftest")
-message (STATUS "  'make install'         install the project to ${CMAKE_INSTALL_PREFIX}")
-message (STATUS "")
-message (STATUS "Further options are:")
-message (STATUS "  'ctest -V              run test with verbose logging")
-message (STATUS "  'ctest -R <test_name>' run a specific test")
-message (STATUS "  'ctest -T memcheck'    run the project's selftest with")
-message (STATUS "                         valgrind to check for memory leaks")
-message (STATUS "")
-
-################################################################################
-#  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #
-#  Read the zproject/README.md for information about making permanent changes. #
-################################################################################
+    if (CMAKE_VERSION VERSION_LESS 3.17)
+        set(rm_command rm -rf)
+    else()
+        set(rm_command ${CMAKE_COMMAND} -E rm -rf --)
+    endif()
+    set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
+                        ${PROJECT_BINARY_DIR}/cmake_install.cmake
+                        ${PROJECT_BINARY_DIR}/Makefile
+                        ${PROJECT_BINARY_DIR}/CMakeFiles
+                        ${PROJECT_BINARY_DIR}/CTestTestfile.cmake
+                        ${PROJECT_BINARY_DIR}/DartConfiguration.tcl
+                        ${PROJECT_BINARY_DIR}/Testing
+                        ${PROJECT_BINARY_DIR}/compile_commands.json
+                        ${PROJECT_BINARY_DIR}/platform.h
+                        ${PROJECT_BINARY_DIR}/src/libczmq.pc
+                        ${PROJECT_BINARY_DIR}/src/libczmq.so
+                        ${PROJECT_BINARY_DIR}/src/czmq_selftest
+    .for project.main
