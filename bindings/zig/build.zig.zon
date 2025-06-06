@@ -1,0 +1,11 @@
+.{
+    .name = "libczmq_zig",
+    .version = "4.2.2",
+
+    .dependencies = .{
+        .libzmq = .{
+            .url = "https://github.com/zeromq/libzmq/archive/88c7d08321890b63e2dc7605150d7f3834aa30e2.tar.gz",
+            .hash = "12206e4de251cf62141dbb593a590391071917444dc915bc8f3604f94721d1f0031e",
+        },
+    },
+}
