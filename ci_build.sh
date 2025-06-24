@@ -341,7 +341,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
 
     # Start of recipe for dependency: libcurl
 	fold_start dependency.libcurl "Install dependency libcurl"
-    if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s libcurl4-nss-dev >/dev/null 2>&1) || \
+    if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s libcurl4-gnutls-dev >/dev/null 2>&1) || \
           (command -v brew >/dev/null 2>&1 && brew ls --versions curl >/dev/null 2>&1)) \
     ; then
         echo ""
