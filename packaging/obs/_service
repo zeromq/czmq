@@ -25,11 +25,6 @@
   </service>
   <service name="extract_file" mode="buildtime">
     <param name="archive">*.tar</param>
-    <param name="files">*/packaging/debian/compat</param>
-    <param name="outfilename">debian.compat</param>
-  </service>
-  <service name="extract_file" mode="buildtime">
-    <param name="archive">*.tar</param>
     <param name="files">*/packaging/debian/control</param>
     <param name="outfilename">debian.control</param>
   </service>
