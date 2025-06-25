@@ -14,8 +14,8 @@ Section:        net
 Priority:       optional
 Maintainer:     czmq Developers <zeromq-dev@lists.zeromq.org>
 Standards-Version: 4.0.1.0
-Build-Depends: debhelper (>= 9),
-    pkg-config,
+Build-Depends: debhelper-compat (= 12),
+    pkgconf | pkg-config,
     libzmq3-dev,
     uuid-dev,
     libsystemd-dev (>= 200.0.0),
@@ -25,8 +25,7 @@ Build-Depends: debhelper (>= 9),
     libmicrohttpd-dev,
     dh-python <!nopython>,
     python3-all-dev <!nopython>, python3-cffi <!nopython>, python3-setuptools <!nopython>,
-    asciidoc-base | asciidoc, xmlto,
-    dh-autoreconf
+    asciidoc-base <!nodoc>, xmlto <!nodoc>,
 
 Package: libczmq4
 Architecture: any
