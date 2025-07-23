@@ -529,16 +529,19 @@ typedef struct {
 // That's it about the randof() macro definition...
 
 
-// Windows MSVS doesn't have stdbool
-#if (defined (_MSC_VER))
-#   if (!defined (__cplusplus) && (!defined (true)))
-#       define true 1
-#       define false 0
-        typedef char bool;
+// Fallback for booleans for pre-C23 C and MSVC builds
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ < 202311L
+#   if (defined (_MSC_VER))
+#       if (!defined (__cplusplus) && (!defined (true)))
+#           define true 1
+#           define false 0
+            typedef char bool;
+#       endif
+#   else
+#       include <stdbool.h>
 #   endif
-#else
-#   include <stdbool.h>
 #endif
+
 
 //- A number of POSIX and C99 keywords and data types -----------------------
 //  CZMQ uses uint for array indices; equivalent to unsigned int, but more
