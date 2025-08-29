@@ -19,7 +19,7 @@
     </use>
     <use project = "nss" optional = "1" implied = "1" />
     <use project = "libmicrohttpd"
-         tarball = "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
+         tarball = "http://ftpmirror.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
          implied = "1" optional = "1"  />
 
     <check_symbol_exists symbol = "AI_V4MAPPED" include = "netdb.h" />
