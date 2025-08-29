@@ -50,7 +50,7 @@ android_init_dependency_root "libmicrohttpd"      # Check or initialize LIBMICRO
 # Fetch required dependencies:
 [ ! -d "${LIBZMQ_ROOT}" ]           && android_clone_library "LIBZMQ" "${LIBZMQ_ROOT}" "https://github.com/zeromq/libzmq.git" ""
 [ ! -d "${LIBCURL_ROOT}" ]          && android_clone_library "LIBCURL" "${LIBCURL_ROOT}" "https://github.com/curl/curl.git" ""
-[ ! -d "${LIBMICROHTTPD_ROOT}" ]    && android_download_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}" "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
+[ ! -d "${LIBMICROHTTPD_ROOT}" ]    && android_download_library "LIBMICROHTTPD" "${LIBMICROHTTPD_ROOT}" "http://ftpmirror.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz"
 
 android_download_ndk
 

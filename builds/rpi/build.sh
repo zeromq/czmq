@@ -106,11 +106,11 @@ if [ ! $INCREMENTAL ]; then
     # Clone and build dependencies
     BASE_PWD=${PWD}
     cd tmp-deps
-    if [ ! -e $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz") ]; then
-        $CI_TIME wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
-        tar -xzf $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
+    if [ ! -e $(basename "http://ftpmirror.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz") ]; then
+        $CI_TIME wget http://ftpmirror.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz
+        tar -xzf $(basename "http://ftpmirror.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz")
     fi
-    pushd $(basename "http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz)
+    pushd $(basename "http://ftpmirror.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.44.tar.gz" .tar.gz)
     (
         $CI_TIME ./configure "${CONFIG_OPTS[@]}"
         $CI_TIME make -j4
