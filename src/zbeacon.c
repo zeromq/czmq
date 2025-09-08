@@ -273,16 +273,27 @@ s_self_prepare_udp (self_t *self)
         inaddr_storage_t bind_address;
 
         //  On Windows we bind to the host address
-        //  On *NIX we bind to INADDR_ANY or in6addr_any, otherwise multicast
-        //  packets will be filtered out despite joining the group
+        //  On *NIX we bind to INADDR_ANY or in6addr_any if using broadcast,
+        //  and to the specific multicast address when using IPv4 multicast.
+        //  Binding to INADDR_ANY would make us receive packets from all
+        //  IPv4 multicast groups despite joining only one.
 #if (defined (__WINDOWS__))
         memcpy (&bind_address, bind_to->ai_addr, bind_to->ai_addrlen);
 #else
         memcpy (&bind_address, send_to->ai_addr, send_to->ai_addrlen);
-        if (zsys_ipv6 ())
+        if (zsys_ipv6 ()) {
             bind_address.__inaddr_u.__addr6.sin6_addr = in6addr_any;
-        else
-            bind_address.__inaddr_u.__addr.sin_addr.s_addr = htonl (INADDR_ANY);
+        }
+        else {
+            if (enable_multicast) {
+                if (inet_pton (AF_INET, zsys_ipv4_mcast_address(),
+                        &bind_address.__inaddr_u.__addr.sin_addr) != 1)
+                    zsys_socket_error ("zbeacon: multicast inet_pton failed");
+            }
+            else {
+                bind_address.__inaddr_u.__addr.sin_addr.s_addr = htonl (INADDR_ANY);
+            }
+        }
 #endif
         memcpy (&self->broadcast, send_to->ai_addr, send_to->ai_addrlen);
 
@@ -323,20 +334,32 @@ s_self_prepare_udp (self_t *self)
                 zsys_socket_error (
                   "zbeacon: setsockopt IP_ADD_MEMBERSHIP failed");
 
-            if (setsockopt (self->udpsock, IPPROTO_IP, IP_MULTICAST_IF,
-                            (char *) &if_index, sizeof (if_index)))
-                zsys_socket_error (
-                  "zbeacon: setsockopt IP_MULTICAST_IF failed");
-
             if (setsockopt (self->udpsock_send, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                             (char *) &mreq, sizeof (mreq)))
                 zsys_socket_error (
                   "zbeacon: setsockopt IP_ADD_MEMBERSHIP failed");
 
+#if (defined (__WINDOWS__))
+            if (setsockopt (self->udpsock, IPPROTO_IP, IP_MULTICAST_IF,
+                            (char *) &if_index, sizeof (if_index)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_MULTICAST_IF failed");
+
             if (setsockopt (self->udpsock_send, IPPROTO_IP, IP_MULTICAST_IF,
                             (char *) &if_index, sizeof (if_index)))
                 zsys_socket_error (
                   "zbeacon: setsockopt IP_MULTICAST_IF failed");
+#else
+            if (setsockopt (self->udpsock, IPPROTO_IP, IP_MULTICAST_IF,
+                            (char *) &mreq.imr_interface, sizeof (mreq.imr_interface)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_MULTICAST_IF failed");
+
+            if (setsockopt (self->udpsock_send, IPPROTO_IP, IP_MULTICAST_IF,
+                            (char *) &mreq.imr_interface, sizeof (mreq.imr_interface)))
+                zsys_socket_error (
+                  "zbeacon: setsockopt IP_MULTICAST_IF failed");
+#endif
         }
 
         //  If bind fails, we close the socket for opening again later (next poll interval)
@@ -597,29 +620,6 @@ static void zbeacon_ipv4_mcast_test (bool verbose)
     //  Before starting test configure beacon for ipv4 multicast
     zsys_set_ipv4_mcast_address ("239.0.0.0");
 
-    //  Check that udp multicast is enabled
-    {
-        SOCKET sock = zsys_udp_new (true);
-        if (sock == INVALID_SOCKET) {
-            //  multicast may not be enabled during test so skip!
-            printf ("SKIPPED - Is IPv4 UDP multicast allowed?\n");
-            //  Unset multicast
-            zsys_set_ipv4_mcast_address (NULL);
-            return;
-        }
-        unsigned int if_index = 1;
-        if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, (char *)&if_index,
-                sizeof(if_index)) != 0){
-            //  multicast may not be enabled during test so skip!
-            printf ("SKIPPED - Is IPv4 UDP multicast allowed?\n");
-            zsys_udp_close (sock);
-            //  Unset multicast
-            zsys_set_ipv4_mcast_address (NULL);
-            return;
-        }
-        zsys_udp_close (sock);
-    }
-
     //  @selftest
     //  Test 1 - two beacons, one speaking, one listening
     //  Create speaker beacon to broadcast our service
@@ -631,7 +631,7 @@ static void zbeacon_ipv4_mcast_test (bool verbose)
     zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
     if (!*hostname) {
-        printf ("OK (skipping test, no UDP broadcasting)\n");
+        printf ("SKIPPED - Is IPv4 multicast allowed?\n");
         zactor_destroy (&speaker);
         freen (hostname);
         return;

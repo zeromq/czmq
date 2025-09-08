@@ -1147,8 +1147,8 @@ zsys_vprintf (const char *format, va_list argptr)
 
 //  --------------------------------------------------------------------------
 //  Create a UDP beacon socket; if the routable option is true, uses
-//  multicast (not yet implemented), else uses broadcast. This method
-//  and related ones might _eventually_ be moved to a zudp class.
+//  multicast for IPv4 (IPv6 multicast not implemented yet), else uses broadcast.
+//  This method and related ones might _eventually_ be moved to a zudp class.
 
 SOCKET
 zsys_udp_new (bool routable)
