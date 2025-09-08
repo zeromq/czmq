@@ -1845,13 +1845,10 @@ zsock_resolve (void *self)
     if (zsock_is (self))
         return ((zsock_t *) self)->handle;
 
-    //  Check if we have a valid ZMQ socket by probing the socket type
-    int type;
-    size_t option_len = sizeof (int);
-    if (zmq_getsockopt (self, ZMQ_TYPE, &type, &option_len) == 0)
-        return self;
-
     //  Check if self is a valid FD or socket FD
+    //  We need to check this before zmq_getsockopt, because tag check may
+    //  cause a segfault if we are checking a native SOCKET (since the data
+    //  type is smaller than the full object).
     //  TODO: this code should move to zsys_isfd () as we don't like
     //  non-portable code outside of that class.
     int sock_type = -1;
@@ -1866,6 +1863,13 @@ zsock_resolve (void *self)
     if (rc == 0 || (rc == -1 && errno == ENOTSOCK))
         return NULL;        //  It's a socket FD or FD
 #endif
+
+    //  Check if we have a valid ZMQ socket by probing the socket type
+    int type;
+    size_t option_len = sizeof (int);
+    if (zmq_getsockopt (self, ZMQ_TYPE, &type, &option_len) == 0)
+        return self;
+
     //  Socket appears to be something else, return it as-is
     return self;
 }
