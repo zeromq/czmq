@@ -884,15 +884,15 @@ zhash_test (bool verbose)
     //  Test save and load
     zhash_comment (hash, "This is a test file");
     zhash_comment (hash, "Created by %s", "czmq_selftest");
-    zhash_save (hash, ".cache");
+    zhash_save (hash, "src/selftest-rw/zhash-test");
     copy = zhash_new ();
     assert (copy);
-    zhash_load (copy, ".cache");
+    zhash_load (copy, "src/selftest-rw/zhash-test");
     item = (char *) zhash_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-    zsys_file_delete (".cache");
+    zsys_file_delete ("src/selftest-rw/zhash-test");
 
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");

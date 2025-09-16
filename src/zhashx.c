@@ -1250,15 +1250,15 @@ zhashx_test (bool verbose)
     //  Test save and load
     zhashx_comment (hash, "This is a test file");
     zhashx_comment (hash, "Created by %s", "czmq_selftest");
-    zhashx_save (hash, ".cache");
+    zhashx_save (hash, "src/selftest-rw/zhashx-test");
     copy = zhashx_new ();
     assert (copy);
-    zhashx_load (copy, ".cache");
+    zhashx_load (copy, "src/selftest-rw/zhashx-test");
     item = (char *) zhashx_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
     zhashx_destroy (&copy);
-    zsys_file_delete (".cache");
+    zsys_file_delete ("src/selftest-rw/zhashx-test");
 
     //  Delete a item
     zhashx_delete (hash, "LIVEBEEF");
