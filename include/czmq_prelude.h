@@ -530,15 +530,16 @@ typedef struct {
 
 
 // Fallback for booleans for pre-C23 C and MSVC builds
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ < 202311L
-#   if (defined (_MSC_VER))
-#       if (!defined (__cplusplus) && (!defined (true)))
-#           define true 1
-#           define false 0
-            typedef char bool;
-#       endif
+#if !defined(__cplusplus) && !defined(__bool_true_false_are_defined)
+#   if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#      include <stdbool.h>
+#   elif defined(_MSC_VER)
+       typedef char bool;
+#      define true  1
+#      define false 0
+#      define __bool_true_false_are_defined 1
 #   else
-#       include <stdbool.h>
+#      include <stdbool.h>
 #   endif
 #endif
 
