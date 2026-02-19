@@ -227,7 +227,7 @@ s_reload (ziflist_t *self, bool ipv6)
                     int len = 0;
                     for (i = 0; i < 6; i++)
                     {
-                        len += snprintf(mac+len, 18, "%02X%s", rawmac[i], i < 5 ? ":":"");
+                        len += snprintf(mac+len, 18-len, "%02X%s", rawmac[i], i < 5 ? ":":"");
                     }
                     zhash_insert(mactable, interface->ifa_name, (void *)mac);
                 }
@@ -240,7 +240,7 @@ s_reload (ziflist_t *self, bool ipv6)
                 int i;
                 int len = 0;
                 for (i = 0; i < 6; i++) {
-                    len += snprintf(mac+len, 18, "%02X%s", s->sll_addr[i], i < 5 ? ":":"");
+                    len += snprintf(mac+len, 18-len, "%02X%s", s->sll_addr[i], i < 5 ? ":":"");
                 }
                 zhash_insert(mactable, (interface)->ifa_name, (void *)mac);
             }
@@ -320,7 +320,7 @@ s_reload (ziflist_t *self, bool ipv6)
                 memcpy(rawmac, ifr->ifr_hwaddr.sa_data, 6);
                 int len = 0;
                 for (int i = 0; i < 6; i++) {
-                    len += snprintf(mac+len, 18, "%02X%s", rawmac[i], i < 5 ? ":":"" );
+                    len += snprintf(mac+len, 18-len, "%02X%s", rawmac[i], i < 5 ? ":":"" );
                 }
             }
 
@@ -399,7 +399,7 @@ s_reload (ziflist_t *self, bool ipv6)
             if (mac_address != NULL && cur_address->PhysicalAddressLength == 6) {
                 int len = 0;
                 for (int i = 0; i < 6; i++) {
-                    len += snprintf( mac+len, 18, "%02X%s", mac_address[i], i < 5 ? ":":"" );
+                    len += snprintf( mac+len, 18-len, "%02X%s", mac_address[i], i < 5 ? ":":"" );
                 }
             }
             interface_t *item = s_interface_new (asciiFriendlyName,
