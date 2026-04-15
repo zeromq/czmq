@@ -479,6 +479,8 @@ zlistx_sort (zlistx_t *self)
     bool swapped = false;
     while (gap > 1 || swapped) {
         gap = (size_t) ((double) gap / 1.3);
+        if (gap < 1)
+            gap = 1;
         node_t *base = self->head->next;
         node_t *test = self->head->next;
         size_t jump = gap;
@@ -741,6 +743,43 @@ zlistx_unpack (zframe_t *frame) {
 //  --------------------------------------------------------------------------
 //  Runs selftest of class
 
+static int compare_ints(const void *item1, const void *item2) {
+    int val1 = *(int*)item1;
+    int val2 = *(int*)item2;
+    if (val1 > val2) return 1;
+    if (val1 < val2) return -1;
+    return 0;
+}
+
+static void test_numeric_sort() {
+    // Test numeric sort
+    zlistx_t *list = zlistx_new();
+    zlistx_set_comparator(list, compare_ints);
+
+    int values[] = {5,10,8,7,6,4,2,9,1,11};
+    size_t nitems = sizeof(values) / sizeof(int);
+
+    for (int i = 0; i < nitems; i++) {
+        zlistx_add_end(list, &values[i]);
+    }
+
+    zlistx_sort(list);
+
+    assert (zlistx_size (list) == nitems);
+    assert (1 == *(int *) zlistx_first(list));
+    assert (2 == *(int *) zlistx_next(list));
+    assert (4 == *(int *) zlistx_next(list));
+    assert (5 == *(int *) zlistx_next(list));
+    assert (6 == *(int *) zlistx_next(list));
+    assert (7 == *(int *) zlistx_next(list));
+    assert (8 == *(int *) zlistx_next(list));
+    assert (9 == *(int *) zlistx_next(list));
+    assert (10 == *(int *) zlistx_next(list));
+    assert (11 == *(int *) zlistx_next(list));
+
+    zlistx_destroy(&list);
+}
+
 void
 zlistx_test (bool verbose)
 {
@@ -867,6 +906,8 @@ zlistx_test (bool verbose)
 
     zlistx_purge (list);
     zlistx_destroy (&list);
+
+    test_numeric_sort();
 
 #if defined (__WINDOWS__)
     zsys_shutdown();
