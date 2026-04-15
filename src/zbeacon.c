@@ -392,8 +392,8 @@ s_self_prepare_udp (self_t *self)
         self->udpsock_send = INVALID_SOCKET;
     }
 
-    freeaddrinfo (bind_to);
-    freeaddrinfo (send_to);
+    if( bind_to != NULL ) freeaddrinfo (bind_to);
+    if( send_to != NULL ) freeaddrinfo (send_to);
 }
 
 
