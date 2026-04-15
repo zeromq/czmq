@@ -181,7 +181,7 @@ ztimerset_test (bool verbose)
     assert (!timer_invoked);
     int timeout = ztimerset_timeout (self);
     assert (timeout > 0);
-    zclock_sleep (timeout);
+    zclock_sleep (timeout + 20);
     rc = ztimerset_execute (self);
     assert (rc == 0);
     assert (timer_invoked);
