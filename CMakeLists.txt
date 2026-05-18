@@ -59,6 +59,9 @@ endif ()
 IF (ENABLE_DRAFTS)
     ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
 ENDIF (ENABLE_DRAFTS)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  add_definitions(-D_GNU_SOURCE)
+endif()
 
 ########################################################################
 # platform.h
