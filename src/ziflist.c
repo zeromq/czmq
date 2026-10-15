@@ -260,13 +260,14 @@ s_reload (ziflist_t *self, bool ipv6)
                     ipv6 && (interface->ifa_addr->sa_family == AF_INET6)))
             {
                 const char *mac = zhash_lookup(mactable, interface->ifa_name);
-                if (mac) {
-                    interface_t *item = s_interface_new (interface->ifa_name,
-                            interface->ifa_addr, interface->ifa_netmask,
-                            interface->ifa_broadaddr, mac);
-                    if (item)
-                        zlistx_add_end (list, item);
-                }
+
+                if (!mac) // Android 11+ and Linux alias ifaces have no MAC address (no AF_PACKET enrty from getifaddrs)
+                    mac = "NA"; // So we define a stub
+                interface_t *item = s_interface_new (interface->ifa_name,
+                        interface->ifa_addr, interface->ifa_netmask,
+                        interface->ifa_broadaddr, mac);
+                if (item)
+                    zlistx_add_end (list, item);
             }
             interface = interface->ifa_next;
         }
