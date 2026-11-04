@@ -315,6 +315,9 @@ s_reload (ziflist_t *self, bool ipv6)
                 is_valid = false;
 
             unsigned char mac[18] = "NA";
+#if !defined (__ANDROID__)
+            // Since Android 11, apps may not read MAC addresses
+            // (SELinux denies SIOCGIFHWADDR and logs an AVC denial).
             unsigned char rawmac[6];
             if (!ioctl(sock, SIOCGIFHWADDR, (caddr_t)ifr, sizeof(struct ifreq))) {
                 memcpy(rawmac, ifr->ifr_hwaddr.sa_data, 6);
@@ -323,6 +326,7 @@ s_reload (ziflist_t *self, bool ipv6)
                     len += snprintf(mac+len, 18-len, "%02X%s", rawmac[i], i < 5 ? ":":"" );
                 }
             }
+#endif
 
             if (is_valid) {
                 interface_t *item = s_interface_new (ifr->ifr_name,
