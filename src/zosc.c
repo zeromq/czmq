@@ -703,7 +703,7 @@ zosc_dump (zosc_t *self)
 
     size_t needle = self->data_begin;
     int i=0;
-    sprintf(out, "%s %s", self->address, self->format);
+    int out_len = sprintf(out, "%s %s", self->address, self->format);
     while(self->format[i])
     {
         switch (self->format[i])
@@ -712,14 +712,14 @@ zosc_dump (zosc_t *self)
             {
                 void *data = zchunk_data( self->chunk ) + needle;
                 int32_t int_v = (int32_t)ntohl(*(uint32_t *)data);
-                sprintf(out, "%s %i", out, int_v);
+                out_len += sprintf(&out[out_len], " %i", int_v);
                 needle += sizeof (uint32_t);
                 break;
             }
             case 'h':
             {
                 uint64_t int_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + (needle * sizeof (char) )));
-                sprintf(out, "%s %ld", out, (long)int_v);
+                out_len += sprintf(&out[out_len], " %ld", (long)int_v);
                 needle += sizeof (uint64_t);
                 break;
             }
@@ -727,7 +727,7 @@ zosc_dump (zosc_t *self)
             {
                 uint32_t flt_v = ntohl(*(uint32_t*)(zchunk_data( self->chunk ) + needle));
                 float *v = (float *)&flt_v;  // hackish
-                sprintf(out, "%s %.6f", out, (double)*v);
+                out_len += sprintf(&out[out_len], " %.6f", (double)*v);
                 needle += sizeof (float);
                 break;
             }
@@ -735,7 +735,7 @@ zosc_dump (zosc_t *self)
             {
                 uint64_t dbl_v = ntohll(*(uint64_t*)(zchunk_data( self->chunk ) + needle));
                 double *v = (double *)&dbl_v;
-                sprintf(out, "%s %f", out, *v);
+                out_len += sprintf(&out[out_len], " %f", *v);
                 needle += sizeof (double);
                 break;
             }
@@ -743,7 +743,7 @@ zosc_dump (zosc_t *self)
             {
                 //  not sure if the double pointer is the way to go
                 char *str = (char*)(zchunk_data( self->chunk ) + needle);
-                sprintf(out, "%s %s", out, str);
+                out_len += sprintf(&out[out_len], " %s", str);
                 size_t l = strlen((char*)(zchunk_data( self->chunk ) + needle));
                 needle += l + 1;
                 needle = (needle + 3) & (size_t)~0x03;
@@ -755,14 +755,14 @@ zosc_dump (zosc_t *self)
             {
                 char chr = (*(char*)(zchunk_data( self->chunk ) +
                                         needle + 3));
-                sprintf(out, "%s %c", out, chr);
+                out_len += sprintf(&out[out_len], " %c", chr);
                 needle += sizeof (int);  // advance multitude of 4!
                 break;
             }
             case 'm':
             {
                 uint32_t midi = ntohl(*(uint32_t *)(zchunk_data( self->chunk ) + needle));
-                sprintf(out, "%s 0x%08x", out, midi);
+                out_len += sprintf(&out[out_len], " 0x%08x", midi);
                 needle += sizeof (uint32_t);
                 break;
             }
