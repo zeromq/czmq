@@ -122,7 +122,9 @@ zactor_new (zactor_fn actor, void *args)
 
 #if defined (__UNIX__)
     pthread_t thread;
-    pthread_create (&thread, NULL, s_thread_shim, shim);
+    int rc = pthread_create (&thread, NULL, s_thread_shim, shim);
+    assert (rc == 0);
+    (void) rc;              //  Avoid unused variable warning with NDEBUG
 #if defined (__UTYPE_OSX) || defined (__UTYPE_IOS)
     pthread_setname_np("ZACTOR");
 #else
