@@ -227,8 +227,9 @@ zgossip_msg_destroy (zgossip_msg_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
-//  there was an error. Blocks if there is no message waiting.
+//  Receive a zgossip_msg from the socket. Returns 0 if OK,
+//  -1 on receive error, -2 on malformed message. Blocks if there
+//  is no message waiting.
 
 int
 zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
@@ -238,9 +239,13 @@ zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
     if (zsock_type (input) == ZMQ_ROUTER) {
         zframe_destroy (&self->routing_id);
         self->routing_id = zframe_recv (input);
-        if (!self->routing_id || !zsock_rcvmore (input)) {
+        if (!self->routing_id) {
             zsys_warning ("zgossip_msg: no routing ID");
-            return -1;          //  Interrupted or malformed
+            return -1;          //  Interrupted
+        }
+        if (!zsock_rcvmore (input)) {
+            zsys_warning ("zgossip_msg: no message body");
+            return -2;          //  Invalid message
         }
     }
     zmq_msg_t frame;
@@ -248,7 +253,8 @@ zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
     int size = zmq_msg_recv (&frame, zsock_resolve (input), 0);
     if (size == -1) {
         zsys_warning ("zgossip_msg: interrupted");
-        goto malformed;         //  Interrupted
+        zmq_msg_close (&frame);
+        return -1;              //  Interrupted
     }
     //  Get and check protocol signature
     self->needle = (byte *) zmq_msg_data (&frame);
@@ -258,9 +264,7 @@ zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
     GET_NUMBER2 (signature);
     if (signature != (0xAAA0 | 0)) {
         zsys_warning ("zgossip_msg: invalid signature");
-        //  TODO: discard invalid messages and loop, and return
-        //  -1 only on interrupt
-        goto malformed;         //  Interrupted
+        goto malformed;         //  Invalid message
     }
     //  Get message id and parse per message type
     GET_NUMBER1 (self->id);
@@ -336,7 +340,7 @@ zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
     malformed:
         zsys_warning ("zgossip_msg: zgossip_msg malformed message, fail");
         zmq_msg_close (&frame);
-        return -1;              //  Invalid message
+        return -2;              //  Invalid message
 }
 
 

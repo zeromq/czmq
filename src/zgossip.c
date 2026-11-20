@@ -538,8 +538,11 @@ static int
 remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
 {
     server_t *self = (server_t *) argument;
-    if (zgossip_msg_recv (self->message, remote))
+    int rc = zgossip_msg_recv (self->message, remote);
+    if (rc == -1)
         return -1;          //  Interrupted
+    if (rc == -2)
+        return 0;           //  Malformed message
 
     if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_PUBLISH)
         server_accept (self,

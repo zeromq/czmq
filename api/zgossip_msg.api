@@ -36,8 +36,9 @@
 </destructor>
 
 <method name = "recv">
-    Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
-    there was an error. Blocks if there is no message waiting.
+    Receive a zgossip_msg from the socket. Returns 0 if OK,
+    -1 on receive error, -2 on malformed message. Blocks if there
+    is no message waiting.
     <argument name = "input" type = "zsock" />
     <return type = "integer" />
 </method>
