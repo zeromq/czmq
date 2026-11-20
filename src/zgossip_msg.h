@@ -47,8 +47,9 @@ CZMQ_PRIVATE void
     zgossip_msg_destroy (zgossip_msg_t **self_p);
 
 //  *** Draft method, for development use, may change without warning ***
-//  Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
-//  there was an error. Blocks if there is no message waiting.
+//  Receive a zgossip_msg from the socket. Returns 0 if OK,
+//  -1 on receive error, -2 on malformed message. Blocks if there
+//  is no message waiting.
 CZMQ_PRIVATE int
     zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input);
 
